@@ -716,6 +716,7 @@ impl EvmInner {
             }
             Err(err) => match err {
                 EVMError::Transaction(err) => Err(EVMError::Transaction(err)),
+                EVMError::Database(err) => Err(EVMError::Database(err.to_string())),
                 _ => {
                     panic!("fatal evm err {:?}", err);
                 }
@@ -789,6 +790,7 @@ impl EvmInner {
             }
             Err(err) => match err {
                 EVMError::Transaction(err) => Err(EVMError::Transaction(err)),
+                EVMError::Database(err) => Err(EVMError::Database(err.to_string())),
                 _ => {
                     panic!("fatal evm err {:?}", err);
                 }

@@ -961,6 +961,7 @@ impl DatabaseRef for PersistentDB {
 
 /// `DatabaseRef` view that serves all reads from one `RoTxn` instead of opening one per read.
 /// Holds the resize gate for the txn's lifetime so the env can't be remapped while it's open.
+/// Field order is drop-order: txn must precede _resize_guard.
 pub struct TxnDatabaseReader<'a> {
     db: &'a PersistentDB,
     txn: heed::RoTxn<'a, heed::WithTls>,
@@ -969,8 +970,7 @@ pub struct TxnDatabaseReader<'a> {
 
 impl<'a> TxnDatabaseReader<'a> {
     pub fn new(db: &'a PersistentDB) -> Result<Self, Error> {
-        let resize_guard = db.resize_lock.read().map_err(|_| Error::Lock)?;
-        let txn = db.env.read_txn()?;
+        let (resize_guard, txn) = db.open_read_txn()?;
         Ok(Self {
             db,
             txn,
@@ -1363,15 +1363,31 @@ impl PersistentDB {
         &self,
         f: impl FnOnce(&heed::RoTxn) -> Result<T, Error>,
     ) -> Result<T, Error> {
+        // Hold the resize read-guard for the whole `f` call so a same-process resize can't
+        // remap memory underneath the txn. `txn` drops before `_guard` (reverse declaration
+        // order), so the txn is released before the guard.
+        let (_guard, txn) = self.open_read_txn()?;
+        f(&txn)
+    }
+
+    /// Opens a read txn, recovering from a cross-process `MDB_MAP_RESIZED` by adopting the
+    /// externally-grown map size and retrying (bounded by `MAX_READ_RESIZE_RETRIES`).
+    ///
+    /// Returns the resize read-guard together with the txn. INVARIANT: the txn must drop
+    /// before the guard — a concurrent resize munmaps the map, so no txn may be live across
+    /// it. Both callers uphold this: `with_read_txn` drops its locals in reverse declaration
+    /// order (txn first), and `TxnDatabaseReader` stores them in field order `txn`,
+    /// `_resize_guard`.
+    fn open_read_txn(
+        &self,
+    ) -> Result<(RwLockReadGuard<'_, ()>, heed::RoTxn<'_, heed::WithTls>), Error> {
         let mut attempts = 0;
 
         loop {
-            // Hold the read side for the whole `f` call so a same-process resize can't
-            // remap memory underneath the txn (unchanged invariant).
             let guard = self.resize_lock.read().map_err(|_| Error::Lock)?;
 
             match self.env.read_txn() {
-                Ok(txn) => return f(&txn),
+                Ok(txn) => return Ok((guard, txn)),
 
                 // Another process grew the shared map beyond ours. Release the read guard
                 // BEFORE taking the write side — std::sync::RwLock self-deadlocks on a
@@ -1385,7 +1401,7 @@ impl PersistentDB {
                 }
 
                 // Anything else (incl. a persistent MapResized after exhausting retries)
-                // surfaces as before.
+                // surfaces to the caller.
                 Err(err) => return Err(err.into()),
             }
         }
@@ -1393,6 +1409,14 @@ impl PersistentDB {
 
     /// Runs `f` inside a write txn while holding the shared resize guard, so the env can't be remapped
     /// (mdb_env_set_mapsize) while the txn is live.
+    ///
+    /// Unlike [`Self::open_read_txn`], this deliberately has no `MDB_MAP_RESIZED` recovery. Every
+    /// write txn on this env — genesis bootstrap (`set_genesis_info`) and block commits
+    /// (`commit_to_db`) alike — is opened by the single consensus/core process, which is also the one
+    /// that grows the map (via `resize()` on `DbFull`); it adopts its own new size under the resize
+    /// write-guard and never observes a peer-induced `MapResized`. If a second writer process is ever
+    /// introduced against the same env, this path must gain the same adopt-and-retry loop as
+    /// `open_read_txn`.
     fn with_write_txn<T>(
         &self,
         f: impl FnOnce(&mut heed::RwTxn) -> Result<T, Error>,
