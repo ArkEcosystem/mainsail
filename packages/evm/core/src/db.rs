@@ -969,8 +969,7 @@ pub struct TxnDatabaseReader<'a> {
 
 impl<'a> TxnDatabaseReader<'a> {
     pub fn new(db: &'a PersistentDB) -> Result<Self, Error> {
-        let resize_guard = db.resize_lock.read().map_err(|_| Error::Lock)?;
-        let txn = db.env.read_txn()?;
+        let (resize_guard, txn) = db.open_read_txn()?;
         Ok(Self {
             db,
             txn,
@@ -1363,15 +1362,31 @@ impl PersistentDB {
         &self,
         f: impl FnOnce(&heed::RoTxn) -> Result<T, Error>,
     ) -> Result<T, Error> {
+        // Hold the resize read-guard for the whole `f` call so a same-process resize can't
+        // remap memory underneath the txn. `txn` drops before `_guard` (reverse declaration
+        // order), so the txn is released before the guard.
+        let (_guard, txn) = self.open_read_txn()?;
+        f(&txn)
+    }
+
+    /// Opens a read txn, recovering from a cross-process `MDB_MAP_RESIZED` by adopting the
+    /// externally-grown map size and retrying (bounded by `MAX_READ_RESIZE_RETRIES`).
+    ///
+    /// Returns the resize read-guard together with the txn. INVARIANT: the txn must drop
+    /// before the guard — a concurrent resize munmaps the map, so no txn may be live across
+    /// it. Both callers uphold this: `with_read_txn` drops its locals in reverse declaration
+    /// order (txn first), and `TxnDatabaseReader` stores them in field order `txn`,
+    /// `_resize_guard`.
+    fn open_read_txn(
+        &self,
+    ) -> Result<(RwLockReadGuard<'_, ()>, heed::RoTxn<'_, heed::WithTls>), Error> {
         let mut attempts = 0;
 
         loop {
-            // Hold the read side for the whole `f` call so a same-process resize can't
-            // remap memory underneath the txn (unchanged invariant).
             let guard = self.resize_lock.read().map_err(|_| Error::Lock)?;
 
             match self.env.read_txn() {
-                Ok(txn) => return f(&txn),
+                Ok(txn) => return Ok((guard, txn)),
 
                 // Another process grew the shared map beyond ours. Release the read guard
                 // BEFORE taking the write side — std::sync::RwLock self-deadlocks on a
@@ -1385,7 +1400,7 @@ impl PersistentDB {
                 }
 
                 // Anything else (incl. a persistent MapResized after exhausting retries)
-                // surfaces as before.
+                // surfaces to the caller.
                 Err(err) => return Err(err.into()),
             }
         }
