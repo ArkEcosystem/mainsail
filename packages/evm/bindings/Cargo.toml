@@ -24,6 +24,7 @@ napi = { version = "3.4.0", default-features = false, features = [
     "napi9",
     "serde-json",
     "tokio_rt",
+    "tokio_sync"
 ] }
 napi-derive = "3.3.0"
 
