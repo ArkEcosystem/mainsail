@@ -47,7 +47,7 @@ export class RequiredDependencyCanBeFoundServiceProvider extends ServiceProvider
 	}
 
 	public dependencies(): PluginDependency[] {
-		return [{ name: "dep", required: true }];
+		return [{ name: "dep" }];
 	}
 }
 
@@ -57,27 +57,7 @@ export class RequiredDependencyCannotBeFoundServiceProvider extends ServiceProvi
 	}
 
 	public dependencies(): PluginDependency[] {
-		return [{ name: "deps-required", required: true }];
-	}
-}
-
-export class RequiredDependencyCannotBeFoundAsyncServiceProvider extends ServiceProvider {
-	public name(): string {
-		return "stub";
-	}
-
-	public dependencies(): PluginDependency[] {
-		return [{ name: "deps-required", required: async () => true }];
-	}
-}
-
-export class OptionalDependencyCannotBeFoundServiceProvider extends ServiceProvider {
-	public name(): string {
-		return "stub";
-	}
-
-	public dependencies(): PluginDependency[] {
-		return [{ name: "deps-optional" }];
+		return [{ name: "deps-required" }];
 	}
 }
 
@@ -87,21 +67,11 @@ export class RequiredDependencyVersionCanBeSatisfiedServiceProvider extends Serv
 	}
 
 	public dependencies(): PluginDependency[] {
-		return [{ name: "dep", required: true, version: "<=2.0.0" }];
+		return [{ name: "dep", version: "<=2.0.0" }];
 	}
 }
 
 export class RequiredDependencyVersionCannotBeSatisfiedServiceProvider extends ServiceProvider {
-	public name(): string {
-		return "stub";
-	}
-
-	public dependencies(): PluginDependency[] {
-		return [{ name: "dep", required: true, version: ">=2.0.0" }];
-	}
-}
-
-export class OptionalDependencyVersionCannotBeSatisfiedServiceProvider extends ServiceProvider {
 	public name(): string {
 		return "stub";
 	}
