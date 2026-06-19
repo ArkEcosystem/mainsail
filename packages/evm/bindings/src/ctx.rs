@@ -15,6 +15,8 @@ pub struct JsEvmOptions {
     pub path: String,
     pub logger: Option<Function<'static, JsLogMessage, ()>>,
     pub history_size: Option<BigInt>,
+    /// Max concurrent EVM ops for this instance. Omit to leave unbounded (consensus/forger).
+    pub concurrency: Option<u32>,
 }
 
 #[napi(object)]
@@ -273,6 +275,7 @@ pub struct EvmOptions {
     pub path: PathBuf,
     pub logger_callback: Option<Function<'static, JsLogMessage, ()>>,
     pub history_size: Option<u64>,
+    pub concurrency: Option<u32>,
 }
 
 #[derive(Debug)]
@@ -613,6 +616,7 @@ impl TryFrom<JsEvmOptions> for EvmOptions {
             path: value.path.into(),
             logger_callback: value.logger,
             history_size,
+            concurrency: value.concurrency,
         })
     }
 }

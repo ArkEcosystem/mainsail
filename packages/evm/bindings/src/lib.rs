@@ -40,6 +40,7 @@ use revm::{
     primitives::{Address, B256, Bytes, TxKind, U256, hex::ToHexExt, map::HashMap},
     state::AccountInfo,
 };
+use tokio::sync::Semaphore;
 
 mod ctx;
 mod logger;
@@ -1268,6 +1269,7 @@ impl EvmInner {
 #[napi(js_name = "Evm")]
 pub struct JsEvmWrapper {
     evm: Arc<parking_lot::RwLock<EvmInner>>,
+    concurrency: Option<Arc<Semaphore>>, // None => unbounded (consensus/forger)
 }
 
 /// Pin the napi tokio runtime explicitly instead of relying on napi-rs's implicit default.
@@ -1294,8 +1296,13 @@ impl JsEvmWrapper {
     #[napi(constructor)]
     pub fn new(opts: JsEvmOptions) -> Result<Self> {
         let opts = EvmOptions::try_from(opts)?;
+        let concurrency = opts
+            .concurrency
+            .map(|n| Arc::new(Semaphore::new(n as usize)));
+
         Ok(JsEvmWrapper {
             evm: Arc::new(parking_lot::RwLock::new(EvmInner::new(opts))),
+            concurrency,
         })
     }
 
@@ -1883,7 +1890,10 @@ impl JsEvmWrapper {
         V: ToNapiValue,
         C: FnOnce(&'env Env, R) -> Result<V> + 'static,
     {
-        env.spawn_future_with_callback(Self::with_read(self.evm.clone(), f), cb)
+        env.spawn_future_with_callback(
+            Self::with_read(self.evm.clone(), self.concurrency.clone(), f),
+            cb,
+        )
     }
 
     fn write<'env, F, R, E, C, V>(&self, env: &'env Env, f: F, cb: C) -> Result<PromiseRaw<'env, V>>
@@ -1894,17 +1904,34 @@ impl JsEvmWrapper {
         V: ToNapiValue,
         C: FnOnce(&'env Env, R) -> Result<V> + 'static,
     {
-        env.spawn_future_with_callback(Self::with_write(self.evm.clone(), f), cb)
+        env.spawn_future_with_callback(
+            Self::with_write(self.evm.clone(), self.concurrency.clone(), f),
+            cb,
+        )
     }
 
     /// Run `f` against a shared (read) view of the EVM on the blocking pool.
     /// Concurrent readers proceed in parallel; only an in-flight writer blocks them.
-    async fn with_read<F, R, E>(evm: Arc<parking_lot::RwLock<EvmInner>>, f: F) -> Result<R>
+    async fn with_read<F, R, E>(
+        evm: Arc<parking_lot::RwLock<EvmInner>>,
+        concurrency: Option<Arc<Semaphore>>,
+        f: F,
+    ) -> Result<R>
     where
         F: FnOnce(&EvmInner) -> std::result::Result<R, E> + Send + 'static,
         R: Send + 'static,
         E: std::fmt::Display + Send + 'static,
     {
+        // Bounded instances wait here — off the blocking pool — when at capacity.
+        let _permit = match concurrency {
+            Some(sem) => Some(
+                sem.acquire_owned()
+                    .await
+                    .map_err(|_| napi::Error::from_reason("evm concurrency limiter closed"))?,
+            ),
+            None => None,
+        };
+
         tokio::task::spawn_blocking(move || {
             let evm = evm.read(); // shared lock; dropped at closure end
             f(&evm)
@@ -1915,12 +1942,26 @@ impl JsEvmWrapper {
     }
 
     /// Run `f` against an exclusive (write) view of the EVM on the blocking pool.
-    async fn with_write<F, R, E>(evm: Arc<parking_lot::RwLock<EvmInner>>, f: F) -> Result<R>
+    async fn with_write<F, R, E>(
+        evm: Arc<parking_lot::RwLock<EvmInner>>,
+        concurrency: Option<Arc<Semaphore>>,
+        f: F,
+    ) -> Result<R>
     where
         F: FnOnce(&mut EvmInner) -> std::result::Result<R, E> + Send + 'static,
         R: Send + 'static,
         E: std::fmt::Display + Send + 'static,
     {
+        // Bounded instances wait here — off the blocking pool — when at capacity.
+        let _permit = match concurrency {
+            Some(sem) => Some(
+                sem.acquire_owned()
+                    .await
+                    .map_err(|_| napi::Error::from_reason("evm concurrency limiter closed"))?,
+            ),
+            None => None,
+        };
+
         tokio::task::spawn_blocking(move || {
             let mut evm = evm.write(); // exclusive lock
             f(&mut evm)
