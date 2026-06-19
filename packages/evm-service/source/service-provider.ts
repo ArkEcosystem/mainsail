@@ -4,7 +4,7 @@ import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 
-import { EvmInstance } from "./instances/index.js";
+import { EvmInstance, LimitedEvmInstance } from "./instances/index.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -15,11 +15,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app
 			.bind(Identifiers.Evm.Instance)
-			.to(EvmInstance)
+			.to(LimitedEvmInstance)
 			.inSingletonScope()
 			.whenTagged("instance", "transaction-pool");
 
-		this.app.bind(Identifiers.Evm.Instance).to(EvmInstance).inSingletonScope().whenTagged("instance", "rpc");
+		this.app.bind(Identifiers.Evm.Instance).to(LimitedEvmInstance).inSingletonScope().whenTagged("instance", "rpc");
 	}
 
 	public async boot(): Promise<void> {}
