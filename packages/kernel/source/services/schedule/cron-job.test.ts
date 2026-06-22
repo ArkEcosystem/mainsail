@@ -89,6 +89,7 @@ describe<{
 		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.mockEventDispatcher);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue({ warn: () => {} });
 
 		context.job = context.app.resolve<CronJob>(CronJob);
 	});

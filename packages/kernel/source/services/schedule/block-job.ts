@@ -3,6 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { InvalidArgumentException } from "@mainsail/exceptions";
+import { ensureError } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { Job } from "./interfaces.js";
@@ -12,6 +13,9 @@ import { ExecuteCallbackWhenReady } from "./listeners.js";
 export class BlockJob implements Job {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher<Contracts.Crypto.BlockData>;
+
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	protected blockCount = 1;
 
@@ -35,7 +39,11 @@ export class BlockJob implements Job {
 						blockCount: this.blockCount,
 						executionTime: performance.now() - start,
 					})
-					.catch(() => {});
+					.catch((error) => {
+						this.logger.warn(
+							`Failed to dispatch scheduled block job event [${Events.ScheduleEvent.BlockJobFailed}]: ${ensureError(error).message}`,
+						);
+					});
 			}
 		};
 

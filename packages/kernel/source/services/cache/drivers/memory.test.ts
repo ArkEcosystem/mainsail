@@ -26,6 +26,7 @@ describe<{
 		context.app = new Application();
 
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue({ warn: () => {} });
 
 		context.store = context.app.resolve(MemoryCacheStore);
 	});
@@ -105,6 +106,21 @@ describe<{
 		}
 
 		assert.equal(unhandled, []);
+	});
+
+	it("should log a warning when an event dispatch rejects", async (context) => {
+		const dispatcher = context.app.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service);
+		stub(dispatcher, "dispatch").rejectedValue(new Error("dispatch boom"));
+
+		const logger = context.app.get<{ warn: () => void }>(Identifiers.Services.Log.Service);
+		const warnSpy = spy(logger, "warn");
+
+		await context.store.put("1", 1);
+
+		// The dispatch rejection is handled in a microtask; let it settle.
+		await new Promise((resolve) => setTimeout(resolve, 20));
+
+		warnSpy.called();
 	});
 
 	it("should get many items from the store", async (context) => {

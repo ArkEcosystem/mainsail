@@ -21,6 +21,7 @@ describe<{
 		context.eventDispatcher = context.app.resolve<MemoryEventDispatcher>(MemoryEventDispatcher);
 
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue({ warn: () => {} });
 
 		context.job = context.app.resolve<BlockJob>(BlockJob);
 	});
