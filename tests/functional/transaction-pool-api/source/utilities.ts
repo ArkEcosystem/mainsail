@@ -90,36 +90,16 @@ export const addTransactionsToPool = async (
 	return processor.process(transactions.map((t) => t.serialized));
 };
 
-export const waitBlock = async ({ app }: { app: Contracts.Kernel.Application }, count: number = 1) => {
-	const store = app.get<Contracts.State.Store>(Identifiers.State.Store);
-	const query = app.get<Contracts.TransactionPool.Query>(Identifiers.TransactionPool.Query);
-
-	let remainingTransactions = await query.getAll().all();
-
-	let currentBlockNumber = store.getBlockNumber();
-	let targetBlockNumber = currentBlockNumber + count;
-
-	do {
-		await sleep(100);
-		currentBlockNumber = store.getBlockNumber();
-		remainingTransactions = await query.getAll().all();
-
-		if (remainingTransactions.length > 0) {
-			targetBlockNumber = Math.max(currentBlockNumber, targetBlockNumber) + 1;
-		}
-	} while (currentBlockNumber < targetBlockNumber);
-};
-
-
 export const hasBalance = async (
 	{ app }: { app: Contracts.Kernel.Application },
 	address: string,
 	balance: number | string | bigint,
 ): Promise<boolean> => (await getBalanceByAddress(app, address)) === BigInt(balance);
 
-export const publicKeyToAddress = async (app: Contracts.Kernel.Application, publicKey: string): Promise<string> => app
-	.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-	.fromPublicKey(publicKey);
+export const publicKeyToAddress = async (app: Contracts.Kernel.Application, publicKey: string): Promise<string> =>
+	app
+		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
+		.fromPublicKey(publicKey);
 
 export const getBalanceByPublicKey = async (app: Contracts.Kernel.Application, publicKey: string): Promise<bigint> => {
 	const address = await publicKeyToAddress(app, publicKey);

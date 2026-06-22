@@ -112,16 +112,72 @@ export const addTransactionsToPool = async (
 	return processor.process(transactions.map((t) => t.serialized));
 };
 
-export const waitBlock = async (app: Contracts.Kernel.Application, count: number = 1): Promise<void> => {
-	const state = app.get<Contracts.State.Store>(Identifiers.State.Store);
+export const waitBlock = async ({ app }: { app: Contracts.Kernel.Application }, count: number = 1): Promise<void> => {
+	// Hard upper bound for a single waitBlock call.
+	const WAIT_BLOCK_TIMEOUT_MS = 30_000;
+	// If no new block is committed for this long the chain is stuck — fail fast.
+	const WAIT_BLOCK_STALL_MS = 10_000;
+	// Poll faster than the block time so we never sample across a whole block interval.
+	const WAIT_BLOCK_POLL_MS = 25;
 
-	let currentBlockNumber = state.getBlockNumber();
-	const targetBlockNumber = currentBlockNumber + count;
+	const store = app.get<Contracts.State.Store>(Identifiers.State.Store);
+	const query = app.get<Contracts.TransactionPool.Query>(Identifiers.TransactionPool.Query);
 
-	do {
-		await sleep(200);
-		currentBlockNumber = state.getBlockNumber();
-	} while (currentBlockNumber < targetBlockNumber);
+	const poolSize = async (): Promise<number> => (await query.getAll().all()).length;
+
+	const startBlockNumber = store.getBlockNumber();
+	const targetBlockNumber = startBlockNumber + count;
+
+	// First block number at which the pool was observed empty (-1 = not yet observed).
+	// Seeded from the entry sample so a fully-drained pool at entry is handled too.
+	let firstEmptyBlockNumber = (await poolSize()) === 0 ? startBlockNumber : -1;
+
+	const startedAt = Date.now();
+	let lastBlockNumber = startBlockNumber;
+	let lastProgressAt = startedAt;
+
+	for (;;) {
+		const currentBlockNumber = store.getBlockNumber();
+		if (currentBlockNumber > lastBlockNumber) {
+			lastBlockNumber = currentBlockNumber;
+			lastProgressAt = Date.now();
+		}
+
+		const pending = await poolSize();
+		if (pending === 0 && firstEmptyBlockNumber < 0) {
+			firstEmptyBlockNumber = currentBlockNumber;
+		}
+
+		const advancedEnough = currentBlockNumber >= targetBlockNumber;
+		const poolDrained = pending === 0;
+
+		// A block committed strictly after we first saw the pool empty => the block that
+		// swept the last pending txs is committed and queryable.
+		const inFlightSwept = firstEmptyBlockNumber >= 0 && currentBlockNumber > firstEmptyBlockNumber;
+		if (advancedEnough && poolDrained && inFlightSwept) {
+			break;
+		}
+
+		const now = Date.now();
+		if (now - startedAt > WAIT_BLOCK_TIMEOUT_MS) {
+			throw new Error(
+				`waitBlock timed out after ${WAIT_BLOCK_TIMEOUT_MS}ms ` +
+					`(start=${startBlockNumber}, target=${targetBlockNumber}, current=${currentBlockNumber}, pending=${pending})`,
+			);
+		}
+		if (now - lastProgressAt > WAIT_BLOCK_STALL_MS) {
+			throw new Error(
+				`waitBlock: no block committed for ${WAIT_BLOCK_STALL_MS}ms — consensus appears stalled ` +
+					`(current=${currentBlockNumber}, target=${targetBlockNumber}, pending=${pending})`,
+			);
+		}
+
+		await sleep(WAIT_BLOCK_POLL_MS);
+	}
+
+	if (app.isBound(Identifiers.ApiSync.Service)) {
+		await app.get<Contracts.ApiSync.Service>(Identifiers.ApiSync.Service).flush();
+	}
 };
 
 export const getRandomFundedWallet = async (context: Context, amount?: bigint): Promise<Contracts.Crypto.KeyPair> => {
