@@ -16,9 +16,7 @@ export const getRandomFundedWallet = async (
 	funder: Contracts.Crypto.KeyPair,
 	amount?: bigint,
 ): Promise<Contracts.Crypto.KeyPair> => {
-	const {
-		app
-	} = context;
+	const { app } = context;
 
 	const seed = Date.now().toString();
 
@@ -118,24 +116,8 @@ export const isTransactionCommitted = async (
 	{ app, wallets }: { app: Contracts.Kernel.Application; wallets: Contracts.Crypto.KeyPair[] },
 	{ hash }: Contracts.Crypto.Transaction,
 ): Promise<boolean> => {
-	const store = app.get<Contracts.State.Store>(Identifiers.State.Store);
-	const currentBlockNumber = store.getBlockNumber();
-
 	const database = app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
-	const forgedBlocks = await database.findBlocks(
-		Math.max(0, currentBlockNumber - 5),
-		currentBlockNumber + 5 /* just a buffer in case tx got included after target height */,
-	);
-
-	let found = false;
-	for (const block of forgedBlocks) {
-		found = block.transactions.some((transaction) => transaction.hash === hash);
-		if (found) {
-			break;
-		}
-	}
-
-	return found;
+	return (await database.getTransactionByHash(hash)) !== undefined;
 };
 
 export const getTransactionReceipt = async (
@@ -181,9 +163,10 @@ export const getWallets = async (app: Contracts.Kernel.Application): Promise<Con
 };
 
 export const getLegacyColdWallets = async (
-	app: Contracts.Kernel.Application): Promise<
-		{ keyPair: Contracts.Crypto.KeyPair; mainsailAddress: string; legacyColdWallet: Contracts.Evm.LegacyColdWallet }[]
-	> => {
+	app: Contracts.Kernel.Application,
+): Promise<
+	{ keyPair: Contracts.Crypto.KeyPair; mainsailAddress: string; legacyColdWallet: Contracts.Evm.LegacyColdWallet }[]
+> => {
 	const walletKeyPairFactory = app.getTagged<Contracts.Crypto.KeyPairFactory>(
 		Identifiers.Cryptography.Identity.KeyPair.Factory,
 		"type",
