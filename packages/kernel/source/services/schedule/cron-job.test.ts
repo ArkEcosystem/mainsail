@@ -208,6 +208,22 @@ describe<{
 		function_.calledOnce();
 	});
 
+	it("should keep ticking when the event dispatch rejects", (context) => {
+		// dispatch now returns a rejected promise; the fire-and-forget wrapper must swallow it
+		// so the cron tick neither throws nor leaves the rejection unhandled.
+		context.mockEventDispatcher.dispatch = () => Promise.reject(new Error("boom"));
+
+		const fakeTimers = clock({ now: 0 });
+		const function_ = spyFn();
+
+		context.job.everyMinute().execute(() => function_.call());
+
+		fakeTimers.tick(60 * 1000);
+		fakeTimers.tick(60 * 1000);
+
+		function_.calledTimes(2);
+	});
+
 	it("should dispatch CronJobFailed when the callback throws", (context) => {
 		const dispatchSpy = spy(context.mockEventDispatcher, "dispatch");
 		const fakeTimers = clock({ now: 0 });

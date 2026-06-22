@@ -27,12 +27,12 @@ export class CronJob implements Job {
 					await result;
 				}
 
-				void this.events.dispatch(Events.ScheduleEvent.CronJobFinished, {
+				this.#dispatch(Events.ScheduleEvent.CronJobFinished, {
 					executionTime: performance.now() - start,
 					expression: this.expression,
 				});
 			} catch {
-				void this.events.dispatch(Events.ScheduleEvent.CronJobFailed, {
+				this.#dispatch(Events.ScheduleEvent.CronJobFailed, {
 					executionTime: performance.now() - start,
 					expression: this.expression,
 				});
@@ -40,6 +40,12 @@ export class CronJob implements Job {
 		};
 
 		new Cron(this.expression, onCallback).start();
+	}
+
+	// Fire-and-forget: swallow any rejection so a failing event listener can never crash the
+	// cron timer tick. Wrapped in Promise.resolve because dispatch may return a non-Promise.
+	#dispatch(event: string, data: object): void {
+		void Promise.resolve(this.events.dispatch(event, data)).catch(() => {});
 	}
 
 	public cron(expression: string): this {
