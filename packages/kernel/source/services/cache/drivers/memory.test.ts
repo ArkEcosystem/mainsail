@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/constants";
+import { Events, Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 
 import { describe } from "@mainsail/test-runner";
@@ -21,7 +21,7 @@ const itemsFalsey: boolean[] = Array.from<boolean>({ length: 5 }).fill(false);
 describe<{
 	app: Application;
 	store: MemoryCacheStore<string, number>;
-}>("MemoryCacheStore", ({ assert, beforeEach, it }) => {
+}>("MemoryCacheStore", ({ assert, beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		context.app = new Application();
 
@@ -60,6 +60,51 @@ describe<{
 
 	it("should return undefined when getting missing item from the store", async (context) => {
 		assert.is(await context.store.get("1"), undefined);
+	});
+
+	it("should dispatch a hit (not a miss) for a falsy cached value", async (context) => {
+		const dispatcher = context.app.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service);
+		const dispatchSpy = spy(dispatcher, "dispatch");
+
+		await context.store.put("zero", 0);
+
+		assert.is(await context.store.get("zero"), 0);
+
+		dispatchSpy.calledWith(Events.CacheEvent.Hit, { key: "zero", value: 0 });
+		dispatchSpy.notCalledWith(Events.CacheEvent.Missed, { key: "zero" });
+	});
+
+	it("should dispatch a miss for a key that is absent", async (context) => {
+		const dispatcher = context.app.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service);
+		const dispatchSpy = spy(dispatcher, "dispatch");
+
+		assert.is(await context.store.get("absent"), undefined);
+
+		dispatchSpy.calledWith(Events.CacheEvent.Missed, { key: "absent" });
+	});
+
+	it("should not surface an unhandled rejection when the event dispatcher rejects", async (context) => {
+		const dispatcher = context.app.get<MemoryEventDispatcher>(Identifiers.Services.EventDispatcher.Service);
+		stub(dispatcher, "dispatch").rejectedValue(new Error("dispatch boom"));
+
+		const unhandled: unknown[] = [];
+		const onUnhandled = (reason: unknown) => unhandled.push(reason);
+		process.on("unhandledRejection", onUnhandled);
+
+		try {
+			// None of these must reject even though every dispatch rejects.
+			await assert.resolves(() => context.store.put("1", 1));
+			await assert.resolves(() => context.store.get("1"));
+			await assert.resolves(() => context.store.forget("1"));
+			await assert.resolves(() => context.store.flush());
+
+			// Allow the microtask/timer queue to flush so any unhandled rejection would surface.
+			await new Promise((resolve) => setTimeout(resolve, 20));
+		} finally {
+			process.off("unhandledRejection", onUnhandled);
+		}
+
+		assert.equal(unhandled, []);
 	});
 
 	it("should get many items from the store", async (context) => {

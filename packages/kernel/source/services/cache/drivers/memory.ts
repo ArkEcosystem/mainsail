@@ -28,15 +28,17 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	}
 
 	public async get(key: K): Promise<T | undefined> {
-		const value: T | undefined = this.#store.get(key);
+		if (this.#store.has(key)) {
+			const value = this.#store.get(key);
 
-		if (value) {
-			void this.eventDispatcher.dispatch(Events.CacheEvent.Hit, { key, value });
-		} else {
-			void this.eventDispatcher.dispatch(Events.CacheEvent.Missed, { key });
+			this.#dispatch(Events.CacheEvent.Hit, { key, value });
+
+			return value;
 		}
 
-		return value;
+		this.#dispatch(Events.CacheEvent.Missed, { key });
+
+		return undefined;
 	}
 
 	public async getMany(keys: K[]): Promise<Array<T | undefined>> {
@@ -46,7 +48,7 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	public async put(key: K, value: T, seconds?: number): Promise<boolean> {
 		this.#store.set(key, value);
 
-		void this.eventDispatcher.dispatch(Events.CacheEvent.Written, { key, seconds, value });
+		this.#dispatch(Events.CacheEvent.Written, { key, seconds, value });
 
 		return this.has(key);
 	}
@@ -82,7 +84,7 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	public async forget(key: K): Promise<boolean> {
 		this.#store.delete(key);
 
-		void this.eventDispatcher.dispatch(Events.CacheEvent.Forgotten, { key });
+		this.#dispatch(Events.CacheEvent.Forgotten, { key });
 
 		return this.missing(key);
 	}
@@ -94,12 +96,18 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 	public async flush(): Promise<boolean> {
 		this.#store.clear();
 
-		void this.eventDispatcher.dispatch(Events.CacheEvent.Flushed);
+		this.#dispatch(Events.CacheEvent.Flushed);
 
 		return this.#store.size === 0;
 	}
 
 	public async getPrefix(): Promise<string> {
 		throw new NotImplemented("getPrefix", this.constructor.name);
+	}
+
+	// Cache events are fire-and-forget; swallow rejections so a failing
+	// listener can never surface as an unhandled promise rejection.
+	#dispatch<D>(event: string, data?: D): void {
+		void this.eventDispatcher.dispatch(event, data).catch(() => {});
 	}
 }
