@@ -1,7 +1,8 @@
-import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
-import { EvmCalls } from "@mainsail/test-transaction-builders";
-import { assert, sleep } from "@mainsail/utils";
+
+import { Identifiers } from "@mainsail/constants";
+import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
+import { assert } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
 export const getAddressByPublicKey = async (app: Contracts.Kernel.Application, publicKey: string): Promise<string> => {
@@ -15,9 +16,7 @@ export const getRandomFundedWallet = async (
 	funder: Contracts.Crypto.KeyPair,
 	amount?: bigint,
 ): Promise<Contracts.Crypto.KeyPair> => {
-	const {
-		app
-	} = context;
+	const { app } = context;
 
 	const seed = Date.now().toString();
 
@@ -34,7 +33,7 @@ export const getRandomFundedWallet = async (
 	const fundTx = await EvmCalls.makeEvmCall(context, { recipient, sender: funder, value: amount });
 
 	await addTransactionsToPool(context, [fundTx]);
-	await waitBlock(context);
+	await Utils.waitBlock(context);
 
 	return randomKeyPair;
 };
@@ -90,36 +89,16 @@ export const addTransactionsToPool = async (
 	return processor.process(transactions.map((t) => t.serialized));
 };
 
-export const waitBlock = async ({ app }: { app: Contracts.Kernel.Application }, count: number = 1) => {
-	const store = app.get<Contracts.State.Store>(Identifiers.State.Store);
-	const query = app.get<Contracts.TransactionPool.Query>(Identifiers.TransactionPool.Query);
-
-	let remainingTransactions = await query.getAll().all();
-
-	let currentBlockNumber = store.getBlockNumber();
-	let targetBlockNumber = currentBlockNumber + count;
-
-	do {
-		await sleep(100);
-		currentBlockNumber = store.getBlockNumber();
-		remainingTransactions = await query.getAll().all();
-
-		if (remainingTransactions.length > 0) {
-			targetBlockNumber = Math.max(currentBlockNumber, targetBlockNumber) + 1;
-		}
-	} while (currentBlockNumber < targetBlockNumber);
-};
-
-
 export const hasBalance = async (
 	{ app }: { app: Contracts.Kernel.Application },
 	address: string,
 	balance: number | string | bigint,
 ): Promise<boolean> => (await getBalanceByAddress(app, address)) === BigInt(balance);
 
-export const publicKeyToAddress = async (app: Contracts.Kernel.Application, publicKey: string): Promise<string> => app
-	.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-	.fromPublicKey(publicKey);
+export const publicKeyToAddress = async (app: Contracts.Kernel.Application, publicKey: string): Promise<string> =>
+	app
+		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
+		.fromPublicKey(publicKey);
 
 export const getBalanceByPublicKey = async (app: Contracts.Kernel.Application, publicKey: string): Promise<bigint> => {
 	const address = await publicKeyToAddress(app, publicKey);
@@ -137,24 +116,8 @@ export const isTransactionCommitted = async (
 	{ app, wallets }: { app: Contracts.Kernel.Application; wallets: Contracts.Crypto.KeyPair[] },
 	{ hash }: Contracts.Crypto.Transaction,
 ): Promise<boolean> => {
-	const store = app.get<Contracts.State.Store>(Identifiers.State.Store);
-	const currentBlockNumber = store.getBlockNumber();
-
 	const database = app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
-	const forgedBlocks = await database.findBlocks(
-		Math.max(0, currentBlockNumber - 5),
-		currentBlockNumber + 5 /* just a buffer in case tx got included after target height */,
-	);
-
-	let found = false;
-	for (const block of forgedBlocks) {
-		found = block.transactions.some((transaction) => transaction.hash === hash);
-		if (found) {
-			break;
-		}
-	}
-
-	return found;
+	return (await database.getTransactionByHash(hash)) !== undefined;
 };
 
 export const getTransactionReceipt = async (
@@ -200,9 +163,10 @@ export const getWallets = async (app: Contracts.Kernel.Application): Promise<Con
 };
 
 export const getLegacyColdWallets = async (
-	app: Contracts.Kernel.Application): Promise<
-		{ keyPair: Contracts.Crypto.KeyPair; mainsailAddress: string; legacyColdWallet: Contracts.Evm.LegacyColdWallet }[]
-	> => {
+	app: Contracts.Kernel.Application,
+): Promise<
+	{ keyPair: Contracts.Crypto.KeyPair; mainsailAddress: string; legacyColdWallet: Contracts.Evm.LegacyColdWallet }[]
+> => {
 	const walletKeyPairFactory = app.getTagged<Contracts.Crypto.KeyPairFactory>(
 		Identifiers.Cryptography.Identity.KeyPair.Factory,
 		"type",
