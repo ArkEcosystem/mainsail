@@ -1,7 +1,8 @@
-import { Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
-import { EvmCalls } from "@mainsail/test-transaction-builders";
-import { assert, sleep } from "@mainsail/utils";
+
+import { Identifiers } from "@mainsail/constants";
+import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
+import { assert } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
 export const getAddressByPublicKey = async (app: Contracts.Kernel.Application, publicKey: string): Promise<string> => {
@@ -34,7 +35,7 @@ export const getRandomFundedWallet = async (
 	const fundTx = await EvmCalls.makeEvmCall(context, { recipient, sender: funder, value: amount });
 
 	await addTransactionsToPool(context, [fundTx]);
-	await waitBlock(context);
+	await Utils.waitBlock(context);
 
 	return randomKeyPair;
 };

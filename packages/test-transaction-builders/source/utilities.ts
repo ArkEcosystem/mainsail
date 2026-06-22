@@ -1,4 +1,4 @@
-import type { Contracts } from "@mainsail/contracts";
+import { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { TransactionBuilder, TransactionFactory, Verifier } from "@mainsail/crypto-transaction";
@@ -211,8 +211,7 @@ export const getRandomFundedWallet = async (context: Context, amount?: bigint): 
 	).build();
 
 	await addTransactionsToPool(context, [fundTx]);
-	await waitBlock(app);
-	await waitBlock(app); // Await 2 blocks to ensure the transaction is confirmed
+	await waitBlock({ app }, 2); // Await 2 blocks to ensure the transaction is confirmed
 
 	return randomKeyPair;
 };

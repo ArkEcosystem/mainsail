@@ -10,7 +10,6 @@ import {
 	getTransactionReceipt,
 	getWallets,
 	isTransactionCommitted,
-	waitBlock,
 	getRandomConsensusKeyPair,
 } from "./utilities.js";
 import { decodeEventLog, Hex, parseEther } from "viem";
@@ -44,7 +43,7 @@ describe<{
 			value: parseEther("300"),
 		});
 		await addTransactionsToPool(context, [fundTx]);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 
 		const validatorKeyPair = await getRandomConsensusKeyPair(context);
 		const tx = await EvmCalls.makeValidatorRegistration(context, {
@@ -55,7 +54,7 @@ describe<{
 		const { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 
 		const receipt = await getTransactionReceipt(context, tx);
@@ -83,7 +82,7 @@ describe<{
 			value: parseEther("1000"),
 		});
 		await addTransactionsToPool(context, [fundTx]);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 
 		// Register first time
 		const validatorKeyPair = await getRandomConsensusKeyPair(context);
@@ -95,7 +94,7 @@ describe<{
 		let { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 		let receipt = await getTransactionReceipt(context, tx);
 		assert.defined(receipt);
@@ -111,7 +110,7 @@ describe<{
 		({ accept } = await addTransactionsToPool(context, [tx]));
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 
 		receipt = await getTransactionReceipt(context, tx);
@@ -132,7 +131,7 @@ describe<{
 				value: parseEther("1000"),
 			});
 			await addTransactionsToPool(context, [fundTx]);
-			await waitBlock(context);
+			await Utils.waitBlock(context);
 		}
 
 		const validatorKeyPair = await getRandomConsensusKeyPair(context);
@@ -146,7 +145,7 @@ describe<{
 		let { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 		let receipt = await getTransactionReceipt(context, tx);
 		assert.defined(receipt);
@@ -161,7 +160,7 @@ describe<{
 		({ accept } = await addTransactionsToPool(context, [tx]));
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 
 		receipt = await getTransactionReceipt(context, tx);
@@ -180,7 +179,7 @@ describe<{
 			value: parseEther("1000"),
 		});
 		await addTransactionsToPool(context, [fundTx]);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 
 		const validatorKeyPair = await getRandomConsensusKeyPair(context);
 		const validatorKeyPairFake = await getRandomConsensusKeyPair(context);
@@ -197,7 +196,7 @@ describe<{
 		let { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 		let receipt = await getTransactionReceipt(context, tx);
 		assert.defined(receipt);
