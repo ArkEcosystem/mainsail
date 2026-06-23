@@ -23,6 +23,7 @@
 		"deps:types": "./node_modules/typesync/bin/typesync",
 		"format": "pnpm run lint && pnpm run prettier",
 		"ignore:tokens": "bash scripts/git-ignore-tokens.sh",
+		"injects:check": "node ./scripts/dead-injects.js",
 		"lint": "eslint packages/*/source --fix",
 		"lint:dry": "eslint packages/*/source",
 		"lint:error": "eslint packages/*/source --quiet",
