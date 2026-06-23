@@ -729,7 +729,7 @@ impl EvmInner {
         &mut self,
         tx_ctx: TxContext,
     ) -> std::result::Result<TxReceipt, EVMError<String>> {
-        let commit_key = &tx_ctx.block_context.commit_key;
+        let commit_key = tx_ctx.block_context.commit_key;
 
         let (committed, _) = self
             .persistent_db
@@ -737,7 +737,15 @@ impl EvmInner {
             .map_err(|err| EVMError::Database(format!("commit receipt lookup: {}", err).into()))?;
         assert!(!committed);
 
-        if let Some(mut pending) = self.pending_commits.get_mut(commit_key) {
+        // A legacy cold-wallet merge mutates the pending commit *before* the transaction
+        // executes (so the tx can spend the merged balance). If the tx then fails it is
+        // dropped from the block, and an orphaned merge would diverge this validator's state
+        // root from nodes that replay the block. Snapshot the pending commit before such a
+        // merge so we can restore it on failure. This runs only for the first transaction of
+        // a legacy sender — a one-time, migration-era event — so the clone is not a hot path.
+        let mut merge_restore: Option<PendingCommit> = None;
+
+        if let Some(mut pending) = self.pending_commits.get_mut(&commit_key) {
             // Make legacy cold wallet balance available to pending commit if not already present
             if let Some(legacy_address) = tx_ctx.legacy_address {
                 if !pending
@@ -754,6 +762,11 @@ impl EvmInner {
                             )
                         })? {
                         Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
+                            // Snapshot before the merge so a later transaction failure can
+                            // undo it. (An `apply_rewards` error is already self-healing: it
+                            // restores the prestate cache and never sets the bookkeeping.)
+                            merge_restore = Some(pending.clone());
+
                             let mut legacy_balances = HashMap::<Address, u128>::default();
                             legacy_balances.insert(
                                 tx_ctx.from,
@@ -789,13 +802,21 @@ impl EvmInner {
                 let receipt = map_execution_result(result, cumulative_gas_used);
                 Ok(receipt)
             }
-            Err(err) => match err {
-                EVMError::Transaction(err) => Err(EVMError::Transaction(err)),
-                EVMError::Database(err) => Err(EVMError::Database(err.to_string())),
-                _ => {
-                    panic!("fatal evm err {:?}", err);
+            Err(err) => {
+                // The transaction is dropped from the block; undo any legacy cold-wallet
+                // merge applied for it so the committed state never carries an orphaned merge.
+                if let Some(restore) = merge_restore {
+                    self.pending_commits.insert(commit_key, restore);
                 }
-            },
+
+                match err {
+                    EVMError::Transaction(err) => Err(EVMError::Transaction(err)),
+                    EVMError::Database(err) => Err(EVMError::Database(err.to_string())),
+                    _ => {
+                        panic!("fatal evm err {:?}", err);
+                    }
+                }
+            }
         }
     }
 
@@ -1150,7 +1171,21 @@ impl EvmInner {
 
                 Ok((result, cumulative_gas_used))
             }
-            Err(err) => Err(err),
+            Err(err) => {
+                // revm validates the tx before mutating state, so on a recoverable error
+                // nothing was committed and `state_db.cache` still holds the prestate we
+                // moved out of the pending commit. Hand it back so a failed tx is a no-op
+                // on the pending commit instead of leaving it empty — otherwise the next
+                // tx in this block executes against committed-only state and the forged
+                // block's state root diverges from honest re-execution.
+                if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key) {
+                    let state_db = evm.db_mut();
+                    if let Some(pending_commit) = self.pending_commits.get_mut(commit_key) {
+                        pending_commit.cache = std::mem::take(&mut state_db.cache);
+                    }
+                }
+                Err(err)
+            }
         }
     }
 
