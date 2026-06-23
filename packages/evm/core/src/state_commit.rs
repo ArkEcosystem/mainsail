@@ -253,7 +253,7 @@ mod tests {
         db::{Error, GenesisInfo, PendingCommit, PersistentDB},
         events,
         state_changes::{AccountMergeInfo, AccountUpdate, StateChangeset},
-        state_commit::{StateCommit, apply_rewards, collect_dirty_accounts},
+        state_commit::{StateCommit, apply_rewards, build_commit, collect_dirty_accounts},
     };
     use crate::{
         legacy::{LegacyAccountAttributes, LegacyAddress},
@@ -615,5 +615,205 @@ mod tests {
 
         assert!(matches!(result, Err(Error::Lock)));
         assert_eq!(resizes, 0); // non-DbFull errors return immediately
+    }
+
+    /// `build_commit` derives the committed change set from a pending commit's `transitions`,
+    /// not from its account `cache`. Emptying the cache before building must therefore produce
+    /// an identical change set.
+    #[test]
+    fn build_commit_is_independent_of_a_drained_cache() {
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+        let db = PersistentDB::new(crate::db::PersistentDBOptions::new(
+            path.path().to_path_buf(),
+        ))
+        .expect("database");
+
+        let account = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let mut rewards = HashMap::<Address, u128>::default();
+        rewards.insert(account, 1234);
+
+        let mut pending = PendingCommit::default();
+        apply_rewards(&db, &mut pending, rewards).expect("apply rewards");
+        assert!(pending.cache.accounts.contains_key(&account));
+        assert!(pending.transitions.transitions.contains_key(&account));
+
+        // Baseline: build with the cache intact.
+        let mut intact = pending.clone();
+        let intact_commit = build_commit(&mut intact).expect("build intact");
+
+        // Build again with the cache emptied but the transitions kept.
+        let mut drained = pending.clone();
+        drained.cache = Default::default();
+        assert!(drained.cache.accounts.is_empty());
+        assert!(drained.transitions.transitions.contains_key(&account));
+        let drained_commit = build_commit(&mut drained).expect("build drained");
+
+        assert_eq!(
+            format!("{:?}", intact_commit.change_set),
+            format!("{:?}", drained_commit.change_set),
+            "draining the cache must not change the committed change set"
+        );
+    }
+
+    /// A transaction executes against the pending commit's account cache as its prestate. An
+    /// account credited only in the cache (not yet committed to the database) is visible to a
+    /// transfer from it: the transfer succeeds against the populated cache, and fails with
+    /// insufficient funds against an empty cache.
+    #[test]
+    fn drained_cache_diverges_a_dependent_transaction() {
+        use revm::{
+            Context, ExecuteEvm, MainBuilder, MainContext,
+            context::{BlockEnv, TxEnv},
+            database::{CacheState, State, WrapDatabaseRef},
+            primitives::{TxKind, hardfork::SpecId},
+        };
+
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+        let db = PersistentDB::new(crate::db::PersistentDBOptions::new(
+            path.path().to_path_buf(),
+        ))
+        .expect("database");
+
+        let account = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let recipient = address!("ad6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let mut pending = PendingCommit::default();
+        let mut rewards = HashMap::<Address, u128>::default();
+        rewards.insert(account, 1_000_000);
+        apply_rewards(&db, &mut pending, rewards).expect("apply rewards");
+
+        let run_transfer = |prestate: CacheState| -> bool {
+            let state = State::builder()
+                .with_bundle_update()
+                .with_cached_prestate(prestate)
+                .with_database(WrapDatabaseRef(&db))
+                .build();
+
+            let mut evm = Context::mainnet()
+                .with_db(state)
+                .modify_cfg_chained(|cfg| {
+                    cfg.spec = SpecId::SHANGHAI;
+                    cfg.disable_nonce_check = true;
+                })
+                .modify_block_chained(|block: &mut BlockEnv| {
+                    block.gas_limit = 30_000_000;
+                })
+                .modify_tx_chained(|tx: &mut TxEnv| {
+                    tx.caller = account;
+                    tx.kind = TxKind::Call(recipient);
+                    tx.value = U256::from(1);
+                    tx.gas_limit = 21_000;
+                    tx.gas_price = 0;
+                    tx.gas_priority_fee = None;
+                    tx.nonce = 0;
+                })
+                .build_mainnet();
+
+            matches!(evm.replay(), Ok(result) if result.result.is_success())
+        };
+
+        assert!(
+            run_transfer(pending.cache.clone()),
+            "transfer should succeed against the populated cache"
+        );
+        assert!(
+            !run_transfer(CacheState::default()),
+            "transfer must NOT succeed against the empty cache"
+        );
+    }
+
+    /// A transaction that fails validation (here, spending more than its balance) leaves the
+    /// cached account state untouched: the sender's balance is unchanged and the recipient is
+    /// not credited.
+    #[test]
+    fn failed_replay_does_not_mutate_state_cache() {
+        use revm::{
+            Context, ExecuteEvm, MainBuilder, MainContext,
+            context::{BlockEnv, ContextTr, TxEnv},
+            database::{State, WrapDatabaseRef},
+            handler::EvmTr,
+            primitives::{TxKind, hardfork::SpecId},
+        };
+
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+        let db = PersistentDB::new(crate::db::PersistentDBOptions::new(
+            path.path().to_path_buf(),
+        ))
+        .expect("database");
+
+        // Prestate: `from` holds exactly `balance`.
+        let from = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let recipient = address!("ad6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let balance: u128 = 1_000;
+        let mut pending = PendingCommit::default();
+        let mut rewards = HashMap::<Address, u128>::default();
+        rewards.insert(from, balance);
+        apply_rewards(&db, &mut pending, rewards).expect("seed prestate");
+
+        let state = State::builder()
+            .with_bundle_update()
+            .with_cached_prestate(pending.cache.clone())
+            .with_database(WrapDatabaseRef(&db))
+            .build();
+
+        // A transfer that fails validation (spends more than `balance`).
+        let mut evm = Context::mainnet()
+            .with_db(state)
+            .modify_cfg_chained(|cfg| {
+                cfg.spec = SpecId::SHANGHAI;
+                cfg.disable_nonce_check = true;
+            })
+            .modify_block_chained(|block: &mut BlockEnv| {
+                block.gas_limit = 30_000_000;
+            })
+            .modify_tx_chained(|tx: &mut TxEnv| {
+                tx.caller = from;
+                tx.kind = TxKind::Call(recipient);
+                tx.value = U256::from(balance + 1);
+                tx.gas_limit = 21_000;
+                tx.gas_price = 0;
+                tx.gas_priority_fee = None;
+                tx.nonce = 0;
+            })
+            .build_mainnet();
+
+        assert!(
+            evm.replay().is_err(),
+            "transfer must fail (insufficient funds)"
+        );
+
+        // The failed replay must not have mutated the cached prestate.
+        let ctx = evm.ctx_mut();
+        let cache = &ctx.db().cache;
+        let from_balance = cache
+            .accounts
+            .get(&from)
+            .and_then(|a| a.account.as_ref())
+            .map(|a| a.info.balance)
+            .expect("from cached");
+        assert_eq!(
+            from_balance,
+            U256::from(balance),
+            "from balance must be unchanged after a failed tx"
+        );
+        let recipient_balance = cache
+            .accounts
+            .get(&recipient)
+            .and_then(|a| a.account.as_ref())
+            .map(|a| a.info.balance)
+            .unwrap_or(U256::ZERO);
+        assert_eq!(
+            recipient_balance,
+            U256::ZERO,
+            "recipient must not be credited by a failed tx"
+        );
     }
 }
