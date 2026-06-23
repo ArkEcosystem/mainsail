@@ -18,6 +18,9 @@ jobs:
     circular:
         uses: ./.github/workflows/_circular.yml
 
+    dead-injects:
+        uses: ./.github/workflows/_dead-injects.yml
+
     check-commit-count:
         uses: ./.github/workflows/_check-commit-count.yml
         permissions:
