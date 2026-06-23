@@ -14,9 +14,6 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Application.Instance)
-	public readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 

@@ -6,9 +6,6 @@ import { InvalidPayloadSize, MaxPayloadExceeded } from "@mainsail/exceptions";
 
 @injectable()
 export class SizeVerifier implements Contracts.Processor.Handler {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
