@@ -66,21 +66,25 @@ pub fn apply_rewards(
         .with_database(WrapDatabaseRef(&db))
         .build();
 
-    state
+    let result = state
         .increment_balances(rewards)
-        .map_err(|err| crate::db::Error::State(format!("increment balances err={}", err)))?;
+        .map_err(|err| crate::db::Error::State(format!("increment balances err={}", err)));
 
-    if let Some(transition_state) = state.transition_state.take() {
-        // println!("transition state {:#?}", transition_state);
-        pending
-            .transitions
-            .add_transitions(transition_state.transitions.into_iter());
+    // `increment_balances` short-circuits before committing any transition, so on error
+    // the state carries no reward changes. Only fold transitions in on success; always
+    // return the prestate cache so a recoverable failure never leaves `pending` empty.
+    if result.is_ok() {
+        if let Some(transition_state) = state.transition_state.take() {
+            pending
+                .transitions
+                .add_transitions(transition_state.transitions.into_iter());
+        }
     }
 
     pending.cache = std::mem::take(&mut state.cache);
     // println!("cache {:#?}", pending.cache.accounts);
 
-    Ok(())
+    result
 }
 
 pub fn commit_to_db(
