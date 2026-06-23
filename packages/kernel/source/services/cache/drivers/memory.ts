@@ -3,11 +3,15 @@ import type { Contracts } from "@mainsail/contracts";
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { NotImplemented } from "@mainsail/exceptions";
+import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T> {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
+
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	readonly #store: Map<K, T> = new Map<K, T>();
 
@@ -105,9 +109,11 @@ export class MemoryCacheStore<K, T> implements Contracts.Kernel.CacheStore<K, T>
 		throw new NotImplemented("getPrefix", this.constructor.name);
 	}
 
-	// Cache events are fire-and-forget; swallow rejections so a failing
+	// Cache events are fire-and-forget; log and swallow rejections so a failing
 	// listener can never surface as an unhandled promise rejection.
 	#dispatch<D>(event: string, data?: D): void {
-		void this.eventDispatcher.dispatch(event, data).catch(() => {});
+		void this.eventDispatcher.dispatch(event, data).catch((error) => {
+			this.logger.warn(`Failed to dispatch cache event [${event}]: ${ensureError(error).message}`);
+		});
 	}
 }
