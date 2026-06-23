@@ -96,11 +96,12 @@ for (const file of files) {
 			for (const member of node.members) {
 				if (!ts.isPropertyDeclaration(member)) continue;
 				if (!hasInjectDecorator(member)) continue;
-				const { line } = sf.getLineAndCharacterOfPosition(member.getStart(sf));
+				const { line, character } = sf.getLineAndCharacterOfPosition(member.name.getStart(sf));
 				injects.push({
 					name: member.name.getText(sf),
 					visibility: modifierOf(member),
 					line: line + 1,
+					column: character + 1,
 				});
 			}
 
@@ -149,6 +150,7 @@ for (const record of classes) {
 			name: inject.name,
 			visibility: inject.visibility,
 			line: inject.line,
+			column: inject.column,
 		});
 	}
 }
@@ -166,17 +168,29 @@ if (findings.length === 0) {
 console.log(chalk.bgRed.white.bold(` Found ${findings.length} dead inject(s) `));
 console.log();
 
-const byFile = new Map();
+// Group findings per package for readability.
+const packageOf = (file) => {
+	const rel = relative(ROOT, file);
+	return rel.split(/[/\\]/)[0];
+};
+
+const byPackage = new Map();
 for (const f of findings) {
-	if (!byFile.has(f.file)) byFile.set(f.file, []);
-	byFile.get(f.file).push(f);
+	const pkg = packageOf(f.file);
+	if (!byPackage.has(pkg)) byPackage.set(pkg, []);
+	byPackage.get(pkg).push(f);
 }
 
-for (const [file, items] of [...byFile.entries()].sort()) {
-	console.log(chalk.cyan.bold(relative(process.cwd(), file)));
-	for (const f of items.sort((a, b) => a.line - b.line)) {
+// `path:line:column` is detected by VS Code's integrated terminal as a link —
+// Ctrl/Cmd+click opens the file at the exact line and column.
+for (const [pkg, items] of [...byPackage.entries()].sort()) {
+	console.log(chalk.bold.underline(`@mainsail/${pkg}`));
+	for (const f of items.sort(
+		(a, b) => a.file.localeCompare(b.file) || a.line - b.line,
+	)) {
+		const location = `${relative(process.cwd(), f.file)}:${f.line}:${f.column}`;
 		console.log(
-			`  ${chalk.gray(`L${f.line}`)} ` +
+			`  ${chalk.cyan(location)} ` +
 				`${chalk.yellow(f.className)}.${chalk.red.bold(f.name)} ` +
 				chalk.gray(`(${f.visibility})`),
 		);
