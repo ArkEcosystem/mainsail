@@ -467,10 +467,90 @@ describe<{
 		assert.is(context.driver.size(), 1);
 	});
 
+	it("Later should not push job after the queue is cleared", async (context) => {
+		await context.driver.later(50, new DummyJob(() => {}));
+
+		await context.driver.clear();
+
+		await sleep(60);
+
+		assert.is(context.driver.size(), 0);
+	});
+
+	it("Later should not push job after the queue is stopped", async (context) => {
+		await context.driver.start();
+
+		await context.driver.later(50, new DummyJob(() => {}));
+
+		await context.driver.stop();
+
+		await sleep(60);
+
+		assert.is(context.driver.size(), 0);
+	});
+
 	it("Bulk should push multiple jobs", async (context) => {
 		await context.driver.bulk([new DummyJob(() => {}), new DummyJob(() => {})]);
 
 		assert.is(context.driver.size(), 2);
+	});
+
+	it("Bulk should process jobs when already started", async (context) => {
+		const jobMethodSpy = spyFn();
+
+		await context.driver.start();
+
+		await context.driver.bulk([new DummyJob(() => jobMethodSpy.call()), new DummyJob(() => jobMethodSpy.call())]);
+
+		await sleep(50);
+
+		jobMethodSpy.calledTimes(2);
+		assert.is(context.driver.size(), 0);
+	});
+
+	it("Drain should process jobs on an already started queue", async (context) => {
+		const jobMethod1 = stubFn().callsFake(async () => {
+			await sleep(20);
+		});
+		const jobMethod2 = stubFn().callsFake(async () => {
+			await sleep(20);
+		});
+
+		await context.driver.start();
+
+		await context.driver.bulk([
+			new DummyJob(async () => await jobMethod1.call()),
+			new DummyJob(async () => await jobMethod2.call()),
+		]);
+
+		await context.driver.drain();
+
+		assert.is(context.driver.size(), 0);
+		jobMethod1.calledOnce();
+		jobMethod2.calledOnce();
+		assert.true(context.driver.isStarted());
+		assert.false(context.driver.isRunning());
+	});
+
+	it("should not deadlock when an event listener throws", async (context) => {
+		const warnLoggerSpy = spy(context.logger, "warn");
+
+		// A throwing dispatch simulates a "queue.finished"/"queue.failed" listener blowing up.
+		context.eventDispatcher.dispatch = () => {
+			throw new Error("listener boom");
+		};
+
+		await context.driver.push(new DummyJob(() => {}));
+		await context.driver.start();
+
+		await sleep(20);
+
+		// The queue must recover instead of staying stuck as running.
+		assert.false(context.driver.isRunning());
+		warnLoggerSpy.called();
+
+		// Waiters (stop/pause/drain) must be released rather than hanging forever.
+		await assert.resolves(() => context.driver.stop());
 	});
 
 	it("EventEmitter should emit jobDone", async (context) => {
