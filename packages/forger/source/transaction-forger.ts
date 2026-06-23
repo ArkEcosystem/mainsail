@@ -145,8 +145,10 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 		transaction: Contracts.Crypto.Transaction,
 		result: ProcessTransactionResult,
 	): Promise<void> {
+		const optimisticExecution = result.gasLeft - transaction.gasLimit < 0;
+		let snapshotTaken = false;
+
 		try {
-			const optimisticExecution = result.gasLeft - transaction.gasLimit < 0;
 			if (optimisticExecution) {
 				// Optimistically execute transaction even if the gas limit exceeds the remaining
 				// block space since there's possibly still space to fit the actual gas consumed.
@@ -158,6 +160,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 				);
 
 				await this.evm.snapshot(this.#commitKey);
+				snapshotTaken = true;
 			}
 
 			const validation = await this.#validateTransaction(transaction);
@@ -170,7 +173,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 					`Skipping tx ${transaction.hash} due to insufficient block space (tx.gasUsed=${gasUsed} gasLeft=${transaction.gasLimit} optimistic=${optimisticExecution})`,
 				);
 
-				if (optimisticExecution) {
+				if (snapshotTaken) {
 					await this.evm.rollback(this.#commitKey);
 					return;
 				} else {
@@ -186,6 +189,18 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 			result.transactions.push(transaction);
 		} catch (rawError) {
 			const error = ensureError(rawError);
+
+			// Ensure unexpected errors keep the evm in a consistent state.
+			if (snapshotTaken) {
+				try {
+					await this.evm.rollback(this.#commitKey);
+				} catch (innerError) {
+					this.logger.warn(
+						`rollback failed after failed tx ${transaction.hash}: ${ensureError(innerError).message}`,
+					);
+				}
+			}
+
 			await this.#handleFailedTransaction(transaction, error as Error);
 		}
 	}
