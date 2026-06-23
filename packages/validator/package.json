@@ -43,7 +43,6 @@
 		"@mainsail/crypto-signature-ecdsa": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
-		"@mainsail/crypto-wif": "workspace:*",
 		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/forger": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
