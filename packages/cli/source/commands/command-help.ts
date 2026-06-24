@@ -22,9 +22,6 @@ export class CommandHelp {
 	@inject(Identifiers.Cli.Application.Instance)
 	protected readonly app!: Contracts.Cli.Application;
 
-	@inject(Identifiers.Cli.Package)
-	protected readonly pkg!: Contracts.Types.PackageJson;
-
 	public render(command: CommandInterface): string {
 		let helpMessage = `${this.app.get<AppHeader>(Identifiers.Cli.Component.AppHeader).render()}
 

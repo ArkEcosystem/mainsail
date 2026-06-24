@@ -23,9 +23,6 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
-	@inject(Identifiers.BlockchainUtils.FeeCalculator)
-	protected readonly gasFeeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
-
 	public async forgeBlock(
 		generatorAddress: string,
 		round: number,

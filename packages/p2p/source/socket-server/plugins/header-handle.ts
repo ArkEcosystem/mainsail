@@ -10,9 +10,6 @@ import { getPeerIp } from "../../utils/get-peer-ip.js";
 
 @injectable()
 export class HeaderHandlePlugin {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.P2P.Header.Service)
 	private readonly headerService!: Contracts.P2P.HeaderService;
 

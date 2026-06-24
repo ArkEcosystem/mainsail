@@ -10,9 +10,6 @@ import { getPeerIp } from "../../utils/index.js";
 
 @injectable()
 export class AcceptPeerPlugin {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.P2P.Peer.Processor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 

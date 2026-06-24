@@ -17,12 +17,6 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.State.Store)
 	protected readonly stateStore!: Contracts.State.Store;
 
-	@inject(Identifiers.BlockchainUtils.FeeCalculator)
-	protected readonly gasFeeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
-
-	@inject(Identifiers.Forger.Block)
-	protected readonly blockForger!: Contracts.Forger.BlockForger;
-
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
 	public configure(keyPair: Contracts.Validator.ValidatorKeyPair): Contracts.Validator.Validator {
