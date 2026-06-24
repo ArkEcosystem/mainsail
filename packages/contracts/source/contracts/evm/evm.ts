@@ -87,7 +87,7 @@ export interface AccountUpdateContext {
 }
 
 export interface PrepareNextCommitContext {
-	readonly commitKey: CommitKey;
+	readonly blockContext: BlockContext;
 }
 
 export interface PreverifyTransactionContext {
@@ -116,7 +116,7 @@ export interface TransactionContext {
 	readonly gasPrice: bigint;
 	readonly nonce: bigint;
 	readonly data: Buffer;
-	readonly blockContext: BlockContext;
+	readonly commitKey: CommitKey;
 	readonly txHash: string;
 	readonly specId: SpecId;
 }

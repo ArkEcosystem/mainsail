@@ -275,7 +275,14 @@ export class GenesisBlockGenerator extends Generator {
 		// which is a uint32 per transaction to store the individual length.
 		let payloadSize = transactions.length * 4;
 
-		await this.evm.prepareNextCommit({ commitKey });
+		await this.evm.prepareNextCommit({
+			blockContext: {
+				commitKey,
+				gasLimit: BigInt(30_000_000),
+				timestamp,
+				validatorAddress: proposer,
+			},
+		});
 
 		if (options.createLegacyColdWallets) {
 			await this.#createLegacyColdWallets(validatorsMnemonics);
@@ -286,12 +293,7 @@ export class GenesisBlockGenerator extends Generator {
 			assert.string(transaction.hash);
 
 			const { receipt } = await this.evm.process({
-				blockContext: {
-					commitKey,
-					gasLimit: BigInt(30_000_000),
-					timestamp,
-					validatorAddress: proposer,
-				},
+				commitKey,
 				data: Buffer.from(transaction.data.slice(2), "hex"),
 				from: transaction.from,
 				gasLimit: BigInt(transaction.gasLimit),

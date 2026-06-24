@@ -91,7 +91,14 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	}> {
 		try {
 			await this.evm.initializeGenesis(this.genesisInfo);
-			await this.evm.prepareNextCommit({ commitKey: this.#commitKey });
+			await this.evm.prepareNextCommit({
+				blockContext: {
+					commitKey: this.#commitKey,
+					gasLimit: BigInt(this.#milestone.block.maxGasLimit),
+					timestamp: BigInt(this.#timestamp),
+					validatorAddress: this.#generatorAddress,
+				},
+			});
 
 			const { fee, gasUsed, transactions } = await this.#processTransactions();
 
@@ -209,12 +216,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 		return await this.transactionHandler.apply(
 			{
 				evm: {
-					blockContext: {
-						commitKey: this.#commitKey,
-						gasLimit: BigInt(this.#milestone.block.maxGasLimit),
-						timestamp: BigInt(this.#timestamp),
-						validatorAddress: this.#generatorAddress,
-					},
+					commitKey: this.#commitKey,
 					instance: this.evm,
 				},
 			},

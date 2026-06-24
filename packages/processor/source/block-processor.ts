@@ -64,12 +64,18 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await this.verifier.verify(unit);
 
 			const block = unit.getBlock();
+			const milestone = this.configuration.getMilestone(block.number);
 
 			await this.evm.prepareNextCommit({
-				commitKey: {
-					blockHash: block.hash,
-					blockNumber: BigInt(block.number),
-					round: BigInt(block.round),
+				blockContext: {
+					commitKey: {
+						blockHash: block.hash,
+						blockNumber: BigInt(block.number),
+						round: BigInt(block.round),
+					},
+					gasLimit: BigInt(milestone.block.maxGasLimit),
+					timestamp: BigInt(block.timestamp),
+					validatorAddress: block.proposer,
 				},
 			});
 
