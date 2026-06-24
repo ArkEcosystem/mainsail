@@ -74,7 +74,7 @@ export class Bootstrapper {
 
 		this.validatorRepository.printLoadedValidators();
 		await this.txPoolWorker.start(this.stateStore.getBlockNumber());
-		await this.evmWorker.start(this.stateStore.getBlockNumber());
+		void this.evmWorker.start(this.stateStore.getBlockNumber());
 
 		// TODO: Check if we can extract bootstrap
 		void this.consensus.run();
