@@ -13,7 +13,7 @@ const jemallocPath = child_process
 	.trim();
 
 const alreadyPreloaded = (process.env.LD_PRELOAD || "").includes("libjemalloc");
-if (jemallocPath) {
+if (jemallocPath && !alreadyPreloaded) {
 	if (process.env.LD_PRELOAD !== jemallocPath) {
 		process.env.LD_PRELOAD = jemallocPath;
 		let exitCode = 0;
