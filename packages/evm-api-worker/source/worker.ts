@@ -88,9 +88,11 @@ export class Worker implements Contracts.Evm.Worker {
 	}
 
 	async #send<T>(method: string, ...arguments_: unknown[]): Promise<T> {
-		if (this.#bootPromise) {
-			await this.#bootPromise;
+		if (!this.#bootPromise) {
+			throw new Error("worker request issued before boot()");
 		}
+
+		await this.#bootPromise;
 
 		return this.ipcSubprocess.sendRequest<T>(method, ...arguments_);
 	}

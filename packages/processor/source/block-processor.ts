@@ -114,13 +114,21 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.databaseService.onCommit(unit);
 		await this.validatorSet.onCommit(unit);
 
+		// Run commit handlers concurrently and surface failures
 		const tasks = [this.txPoolWorker.onCommit(unit), this.evmWorker.onCommit(unit)];
 
 		if (this.apiSync && unit.blockNumber > this.configuration.getGenesisHeight()) {
 			tasks.push(this.apiSync.onCommit(unit));
 		}
 
-		await Promise.all(tasks);
+		const results = await Promise.allSettled(tasks);
+		const failures = results
+			.filter((result): result is PromiseRejectedResult => result.status === "rejected")
+			.map((result) => result.reason);
+
+		if (failures.length > 0) {
+			throw new AggregateError(failures, "one or more commit handlers failed");
+		}
 
 		for (const transaction of unit.getBlock().transactions) {
 			void this.#emitTransactionEvents(transaction);
