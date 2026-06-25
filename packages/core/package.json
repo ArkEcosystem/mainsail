@@ -68,7 +68,6 @@
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/forger": "workspace:*",
 		"@mainsail/logger-pino": "workspace:*",
-		"@mainsail/networking-dns": "workspace:*",
 		"@mainsail/networking-ntp": "workspace:*",
 		"@mainsail/p2p": "workspace:*",
 		"@mainsail/processor": "workspace:*",
