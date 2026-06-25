@@ -25,5 +25,9 @@ RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 py3-setuptools
     && apk del .build-deps \
     && echo 'node ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 
+# Preload jemalloc so the node process and its worker threads use it directly, and
+# bin/run.js skips its detect-and-re-exec fallback (~400ms cold-start saving).
+ENV LD_PRELOAD=/usr/lib/libjemalloc.so.2
+
 USER node
 ENTRYPOINT ["bash", "-c", "/entrypoint.sh \"$@\"", "--"]
