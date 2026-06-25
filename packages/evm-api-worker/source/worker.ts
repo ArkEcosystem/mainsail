@@ -51,12 +51,6 @@ export class Worker implements Contracts.Evm.Worker {
 		await this.#disposePromise;
 	}
 
-	async #ready(): Promise<void> {
-		if (this.#bootPromise) {
-			await this.#bootPromise;
-		}
-	}
-
 	async #doDispose(): Promise<void> {
 		// Let any work already in flight finish before tearing the worker down, so the
 		// dispose doesn't cut off requests that other service providers issued before us.
@@ -82,17 +76,22 @@ export class Worker implements Contracts.Evm.Worker {
 	}
 
 	public async start(blockNumber: number): Promise<void> {
-		await this.#ready();
-		await this.ipcSubprocess.sendRequest("start", blockNumber);
+		await this.#send("start", blockNumber);
 	}
 
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		await this.#ready();
-		await this.ipcSubprocess.sendRequest("commit", unit.blockNumber);
+		await this.#send("commit", unit.blockNumber);
 	}
 
 	public async setPeerCount(peerCount: number): Promise<void> {
-		await this.#ready();
-		await this.ipcSubprocess.sendRequest("setPeerCount", peerCount);
+		await this.#send("setPeerCount", peerCount);
+	}
+
+	async #send<T>(method: string, ...arguments_: unknown[]): Promise<T> {
+		if (this.#bootPromise) {
+			await this.#bootPromise;
+		}
+
+		return this.ipcSubprocess.sendRequest<T>(method, ...arguments_);
 	}
 }

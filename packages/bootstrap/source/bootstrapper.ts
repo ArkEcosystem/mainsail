@@ -5,6 +5,9 @@ import { inject, injectable, optional } from "@mainsail/container";
 
 @injectable()
 export class Bootstrapper {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Consensus.Service)
 	private readonly consensus!: Contracts.Consensus.Service;
 
@@ -73,8 +76,14 @@ export class Bootstrapper {
 		this.state.setBootstrap(false);
 
 		this.validatorRepository.printLoadedValidators();
-		await this.txPoolWorker.start(this.stateStore.getBlockNumber());
-		void this.evmWorker.start(this.stateStore.getBlockNumber());
+
+		void this.txPoolWorker
+			.start(this.stateStore.getBlockNumber())
+			.catch((error) => this.app.terminate("tx-pool worker failed to start", error));
+
+		void this.evmWorker
+			.start(this.stateStore.getBlockNumber())
+			.catch((error) => this.app.terminate("evm-api worker failed to start", error));
 
 		// TODO: Check if we can extract bootstrap
 		void this.consensus.run();

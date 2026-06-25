@@ -113,15 +113,17 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		await this.stateStore.onCommit(unit);
 		await this.databaseService.onCommit(unit);
 		await this.validatorSet.onCommit(unit);
-		await this.txPoolWorker.onCommit(unit);
-		await this.evmWorker.onCommit(unit);
+
+		const tasks = [this.txPoolWorker.onCommit(unit), this.evmWorker.onCommit(unit)];
 
 		if (this.apiSync && unit.blockNumber > this.configuration.getGenesisHeight()) {
-			await this.apiSync.onCommit(unit);
+			tasks.push(this.apiSync.onCommit(unit));
 		}
 
+		await Promise.all(tasks);
+
 		for (const transaction of unit.getBlock().transactions) {
-			await this.#emitTransactionEvents(transaction);
+			void this.#emitTransactionEvents(transaction);
 		}
 
 		this.#logBlockCommitted(unit);
