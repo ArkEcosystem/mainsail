@@ -1084,9 +1084,6 @@ importers:
       '@mainsail/logger-pino':
         specifier: workspace:*
         version: link:../logger-pino
-      '@mainsail/networking-dns':
-        specifier: workspace:*
-        version: link:../networking-dns
       '@mainsail/networking-ntp':
         specifier: workspace:*
         version: link:../networking-ntp
@@ -2043,7 +2040,7 @@ importers:
     dependencies:
       '@napi-rs/cli':
         specifier: 3.6.2
-        version: 3.6.2(@emnapi/core@1.4.5)(@emnapi/runtime@1.4.5)(@types/node@25.7.0)(node-addon-api@8.5.0)
+        version: 3.6.2(@emnapi/core@1.4.5)(@emnapi/runtime@1.4.5)(@types/node@25.7.0)(node-addon-api@6.1.0)
     optionalDependencies:
       '@mainsail/evm-linux-arm64-gnu':
         specifier: workspace:*
@@ -2517,34 +2514,6 @@ importers:
       tmp:
         specifier: 0.2.5
         version: 0.2.5
-      uvu:
-        specifier: 0.5.6
-        version: 0.5.6
-
-  packages/networking-dns:
-    dependencies:
-      '@mainsail/constants':
-        specifier: workspace:*
-        version: link:../constants
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-      joi:
-        specifier: 18.2.1
-        version: 18.2.1
-    devDependencies:
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/test-runner':
-        specifier: workspace:*
-        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -9027,10 +8996,6 @@ packages:
   node-addon-api@6.1.0:
     resolution: {integrity: sha512-+eawOlIgy680F0kBzPUNFhMZGtJ1YmqM6l4+Crf4IkImjYrO/mqPwRMh352g23uIaQKFItcQ64I7KMaJxHgAVA==}
 
-  node-addon-api@8.5.0:
-    resolution: {integrity: sha512-/bRZty2mXUIFY/xU5HLvveNHlswNJej+RnxBjOMkidWfwZzgTbPG1E3K5TOxRLOR+5hX7bSofy8yf1hZevMS8A==}
-    engines: {node: ^18 || ^20 || >= 21}
-
   node-gyp-build-optional-packages@5.2.2:
     resolution: {integrity: sha512-s+w+rBWnpTMwSFbaE0UXsRlg7hU4FjekKU4eyAih5T8nJuNZT1nNsskXpxmeqSK9UzkBl6UgRlnKc8hz8IEqOw==}
     hasBin: true
@@ -11996,7 +11961,7 @@ snapshots:
       outvariant: 1.4.3
       strict-event-emitter: 0.5.1
 
-  '@napi-rs/cli@3.6.2(@emnapi/core@1.4.5)(@emnapi/runtime@1.4.5)(@types/node@25.7.0)(node-addon-api@8.5.0)':
+  '@napi-rs/cli@3.6.2(@emnapi/core@1.4.5)(@emnapi/runtime@1.4.5)(@types/node@25.7.0)(node-addon-api@6.1.0)':
     dependencies:
       '@inquirer/prompts': 8.4.3(@types/node@25.7.0)
       '@napi-rs/cross-toolchain': 1.0.3(@emnapi/core@1.4.5)(@emnapi/runtime@1.4.5)
@@ -12004,7 +11969,7 @@ snapshots:
       '@octokit/rest': 22.0.1
       clipanion: 4.0.0-rc.4(typanion@3.14.0)
       colorette: 2.0.20
-      emnapi: 1.9.1(node-addon-api@8.5.0)
+      emnapi: 1.9.1(node-addon-api@6.1.0)
       es-toolkit: 1.45.1
       js-yaml: 4.1.1
       obug: 2.1.1
@@ -14316,9 +14281,9 @@ snapshots:
 
   elegant-spinner@1.0.1: {}
 
-  emnapi@1.9.1(node-addon-api@8.5.0):
+  emnapi@1.9.1(node-addon-api@6.1.0):
     optionalDependencies:
-      node-addon-api: 8.5.0
+      node-addon-api: 6.1.0
 
   emoji-regex@10.4.0: {}
 
@@ -16528,9 +16493,6 @@ snapshots:
       semver: 7.7.4
 
   node-addon-api@6.1.0: {}
-
-  node-addon-api@8.5.0:
-    optional: true
 
   node-gyp-build-optional-packages@5.2.2:
     dependencies:
