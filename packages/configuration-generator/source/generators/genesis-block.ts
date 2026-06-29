@@ -305,6 +305,12 @@ export class GenesisBlockGenerator extends Generator {
 				value: transaction.value,
 			});
 
+			if (!receipt.status) {
+				throw new Error(
+					`genesis transaction ${transaction.hash} (from ${transaction.from} to ${transaction.to}) reverted during EVM execution`,
+				);
+			}
+
 			totals.fee += BigInt(transaction.gasPrice);
 			totals.gasUsed += Number(receipt.gasUsed);
 
