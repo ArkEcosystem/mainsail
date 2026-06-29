@@ -83,7 +83,6 @@ const EXCEPTIONS = {
 			"@mainsail/fees",
 			"@mainsail/forger",
 			"@mainsail/logger-pino",
-			"@mainsail/networking-dns",
 			"@mainsail/networking-ntp",
 			"@mainsail/p2p",
 			"@mainsail/processor",

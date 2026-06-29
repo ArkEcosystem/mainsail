@@ -109,9 +109,6 @@
 			"path": "../logger-pino"
 		},
 		{
-			"path": "../networking-dns"
-		},
-		{
 			"path": "../networking-ntp"
 		},
 		{
