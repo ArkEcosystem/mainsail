@@ -36,16 +36,18 @@ export const processGenesis = async (
 		validatorContract: "0x0000000000000000000000000000000000000001",
 	});
 
-	await instance.prepareNextCommit({ commitKey });
+	await instance.prepareNextCommit({
+		blockContext: {
+			commitKey,
+			gasLimit: BigInt(10_000_000),
+			timestamp: BigInt(block.timestamp),
+			validatorAddress: block.proposer,
+		},
+	});
 
 	for (const transaction of block.transactions) {
 		const { receipt } = await instance.process({
-			blockContext: {
-				commitKey,
-				gasLimit: BigInt(10_000_000),
-				timestamp: BigInt(block.timestamp),
-				validatorAddress: block.proposer,
-			},
+			commitKey,
 			data: Buffer.from(transaction.data.slice(2), "hex"),
 			from: transaction.from,
 			gasLimit: BigInt(transaction.gasLimit),

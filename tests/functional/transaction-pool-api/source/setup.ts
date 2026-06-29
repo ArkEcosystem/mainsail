@@ -17,36 +17,33 @@ const setup = async (): Promise<Contracts.Kernel.Application> => {
 	app.bind(Identifiers.Application.Version).toConstantValue("1.0");
 	app.bind(Identifiers.Config.Flags).toConstantValue({});
 	app.bind(Identifiers.Config.Plugins).toConstantValue({});
-	app
-		.bind(Identifiers.Services.EventDispatcher.Service)
-		.to(Services.Events.MemoryEventDispatcher)
-		.inSingletonScope();
+	app.bind(Identifiers.Services.EventDispatcher.Service).to(Services.Events.MemoryEventDispatcher).inSingletonScope();
 
 	app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
 		getMessages: async () => [],
 		getProposals: async () => [],
-		getState: async () => { },
-		persist: async () => { },
+		getState: async () => {},
+		persist: async () => {},
 	});
 
 	app.bind(Identifiers.P2P.Broadcaster).toConstantValue({
-		broadcastMessage: async () => { },
-		broadcastProposal: async () => { },
+		broadcastMessage: async () => {},
+		broadcastProposal: async () => {},
 	});
-	app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => { } });
+	app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => {} });
 
 	app.bind(Identifiers.TransactionPool.Broadcaster).toConstantValue({
-		broadcastTransactions: async () => { },
+		broadcastTransactions: async () => {},
 	});
 	app.bind(Identifiers.TransactionPool.Worker).to(PoolWorker).inSingletonScope();
 	app.bind(Identifiers.Evm.Worker).toConstantValue({
-		onCommit: async () => { },
+		onCommit: async () => {},
 	});
 
 	app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
-	app
-		.bind(Identifiers.CryptoWorker.WorkerPool)
-		.toConstantValue({ getWorker: () => app.get<Worker>(Identifiers.CryptoWorker.Worker.Instance) });
+	app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue({
+		getWorker: () => app.get<Worker>(Identifiers.CryptoWorker.Worker.Instance),
+	});
 
 	await app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
 	await app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
@@ -163,7 +160,7 @@ const getPluginConfiguration = async (
 	let defaults = {};
 	try {
 		({ defaults } = await import(`${packageId}/distribution/defaults.js`));
-	} catch { }
+	} catch {}
 
 	return app
 		.resolve(Providers.PluginConfiguration)
@@ -181,19 +178,24 @@ const bootstrap = async (app: Application) => {
 	const store = app.get<Contracts.State.Store>(Identifiers.State.Store);
 	store.setGenesisCommit(genesisCommit);
 
-	const commitState = app.get<Contracts.Consensus.CommitStateFactory>(
-		Identifiers.Consensus.CommitState.Factory,
-	)(genesisCommit);
+	const commitState = app.get<Contracts.Consensus.CommitStateFactory>(Identifiers.Consensus.CommitState.Factory)(
+		genesisCommit,
+	);
 
 	const blockProcessor = app.get<Contracts.Processor.BlockProcessor>(Identifiers.Processor.BlockProcessor);
 
 	const evm = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
 
 	await evm.prepareNextCommit({
-		commitKey: {
-			blockHash: commitState.getBlock().hash,
-			blockNumber: BigInt(commitState.blockNumber),
-			round: BigInt(commitState.round),
+		blockContext: {
+			commitKey: {
+				blockHash: commitState.getBlock().hash,
+				blockNumber: BigInt(commitState.blockNumber),
+				round: BigInt(commitState.round),
+			},
+			gasLimit: BigInt(Number.MAX_SAFE_INTEGER),
+			timestamp: BigInt(genesisCommit.block.timestamp),
+			validatorAddress: genesisCommit.block.proposer,
 		},
 	});
 
