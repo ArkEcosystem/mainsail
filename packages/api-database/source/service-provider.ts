@@ -13,7 +13,7 @@ import {
 	MultiPaymentRepository,
 	PeerRepository,
 	PluginRepository,
-	PostgresConnectionOptions,
+	PostgresConnectionCredentialsOptions,
 	RepositoryDataSource,
 	StateRepository,
 	SystemRepository,
@@ -91,7 +91,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			return;
 		}
 
-		const options = this.config().getRequired<PostgresConnectionOptions>("database");
+		const options = this.config().getRequired<PostgresConnectionCredentialsOptions>("database");
 		assert.defined(options);
 
 		try {
@@ -121,6 +121,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				migrationsRun: false,
 				namingStrategy: new SnakeNamingStrategy(),
 				synchronize: false,
+				type: "postgres",
 			});
 
 			// Note: this only initializes the connection pool, etc. but does not run migrations.
