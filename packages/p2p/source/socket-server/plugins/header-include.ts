@@ -9,9 +9,6 @@ import { inject, injectable } from "@mainsail/container";
 
 @injectable()
 export class HeaderIncludePlugin {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.P2P.Header.Factory)
 	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
 

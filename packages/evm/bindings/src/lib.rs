@@ -1,7 +1,7 @@
 use std::{sync::Arc, u64};
 
 use ctx::{
-    BlockContext, CalculateRoundValidatorsContext, EvmOptions, ExecutionContext, GenesisContext,
+    CalculateRoundValidatorsContext, EvmOptions, ExecutionContext, GenesisContext,
     JsBlockHeaderData, JsCalculateRoundValidatorsContext, JsCommitData, JsCommitKey, JsEvmOptions,
     JsGenesisContext, JsPrepareNextCommitContext, JsPreverifyTransactionContext,
     JsTransactionContext, JsTransactionData, JsTransactionSimulateContext,
@@ -12,8 +12,8 @@ use logger::JsLogger;
 use mainsail_evm_core::{
     account::AccountInfoExtended,
     db::{
-        BlockHeaderData, CommitData, CommitKey, GenesisInfo, PendingCommit, PersistentDB,
-        PersistentDBOptions, ProofData, TransactionData, TxnDatabaseReader,
+        BlockContext, BlockHeaderData, CommitData, CommitKey, GenesisInfo, PendingCommit,
+        PersistentDB, PersistentDBOptions, ProofData, TransactionData, TxnDatabaseReader,
     },
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
@@ -84,9 +84,10 @@ impl EvmInner {
 
     pub fn prepare_next_commit(&mut self, ctx: PrepareNextCommitContext) -> Result<()> {
         let genesis_block_number = self.genesis_block_number();
-        if let Some(pending) = self.pending_commits.get(&ctx.commit_key) {
+        if let Some(pending) = self.pending_commits.get(&ctx.block_context.commit_key) {
             // do not replace any pending commit, while still in bootstrapping phase.
-            if pending.key.0 == genesis_block_number && ctx.commit_key == pending.key {
+            if pending.key.0 == genesis_block_number && ctx.block_context.commit_key == pending.key
+            {
                 return Ok(());
             }
 
@@ -94,13 +95,14 @@ impl EvmInner {
                 LogLevel::Debug,
                 format!(
                     "replacing existing pending commit {:?} for {:?}",
-                    pending.key, ctx.commit_key
+                    pending.key, ctx.block_context.commit_key
                 ),
             );
         }
 
         let pending_commit = PendingCommit {
-            key: ctx.commit_key,
+            key: ctx.block_context.commit_key,
+            block_context: ctx.block_context,
             ..Default::default()
         };
 
@@ -111,7 +113,7 @@ impl EvmInner {
     }
 
     pub fn view(&self, tx_ctx: TxViewContext) -> Result<TxViewResult> {
-        let result = self.transact_read(tx_ctx.into());
+        let result = self.transact_read(ExecutionContext::new_read(None, tx_ctx));
 
         Ok(match result {
             Ok((r, _)) => {
@@ -729,7 +731,7 @@ impl EvmInner {
         &mut self,
         tx_ctx: TxContext,
     ) -> std::result::Result<TxReceipt, EVMError<String>> {
-        let commit_key = tx_ctx.block_context.commit_key;
+        let commit_key = tx_ctx.commit_key;
 
         let (committed, _) = self
             .persistent_db
@@ -745,7 +747,10 @@ impl EvmInner {
         // a legacy sender — a one-time, migration-era event — so the clone is not a hot path.
         let mut merge_restore: Option<PendingCommit> = None;
 
+        let mut block_context = None;
         if let Some(mut pending) = self.pending_commits.get_mut(&commit_key) {
+            block_context = Some(pending.block_context.clone());
+
             // Make legacy cold wallet balance available to pending commit if not already present
             if let Some(legacy_address) = tx_ctx.legacy_address {
                 if !pending
@@ -797,7 +802,7 @@ impl EvmInner {
             }
         }
 
-        match self.transact_write(tx_ctx.into()) {
+        match self.transact_write(ExecutionContext::new_write(block_context, tx_ctx)) {
             Ok((result, cumulative_gas_used)) => {
                 let receipt = map_execution_result(result, cumulative_gas_used);
                 Ok(receipt)

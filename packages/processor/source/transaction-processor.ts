@@ -14,9 +14,6 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Application.Instance)
-	public readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -32,21 +29,12 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	): Promise<Contracts.Evm.TransactionReceipt> {
 		const block = unit.getBlock();
 
-		const milestone = this.configuration.getMilestone(block.number);
-
-		const commitKey: Contracts.Evm.CommitKey = {
-			blockHash: block.hash,
-			blockNumber: BigInt(block.number),
-			round: BigInt(block.round),
-		};
-
 		const transactionHandlerContext: Contracts.Transactions.TransactionHandlerContext = {
 			evm: {
-				blockContext: {
-					commitKey,
-					gasLimit: BigInt(milestone.block.maxGasLimit),
-					timestamp: BigInt(block.timestamp),
-					validatorAddress: block.proposer,
+				commitKey: {
+					blockHash: block.hash,
+					blockNumber: BigInt(block.number),
+					round: BigInt(block.round),
 				},
 				instance: this.evm,
 			},

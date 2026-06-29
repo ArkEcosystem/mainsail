@@ -296,7 +296,14 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				this.pluginConfiguration.getOptional<boolean>("mockFakeValidatorBlsKeys", false),
 		};
 
-		await this.evm.prepareNextCommit({ commitKey: options.commitKey });
+		await this.evm.prepareNextCommit({
+			blockContext: {
+				commitKey: options.commitKey,
+				gasLimit: BigInt(250_000_000),
+				timestamp: BigInt(options.timestamp),
+				validatorAddress: this.deployerAddress,
+			},
+		});
 
 		const deployerAccount = await this.evm.getAccountInfo(this.deployerAddress);
 		this.#nonce = deployerAccount.nonce;
@@ -540,12 +547,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const nonce = this.#nonce;
 
 		return {
-			blockContext: {
-				commitKey: options.commitKey,
-				gasLimit: BigInt(250_000_000),
-				timestamp: BigInt(options.timestamp),
-				validatorAddress: this.deployerAddress,
-			},
+			commitKey: options.commitKey,
 			data: Buffer.from(options.data, "hex"),
 			from: this.deployerAddress,
 			gasLimit: BigInt(200_000_000),

@@ -7,9 +7,6 @@ import dayjs from "dayjs";
 
 @injectable()
 export class TimestampVerifier implements Contracts.Processor.Handler {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.State.Store)
 	private readonly store!: Contracts.State.Store;
 

@@ -7,20 +7,11 @@ import { assert, ensureError } from "@mainsail/utils";
 
 @injectable()
 export class TransactionHandler implements Contracts.Transactions.TransactionHandler {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
-
-	@inject(Identifiers.Services.Log.Service)
-	protected readonly logger!: Contracts.Kernel.Logger;
-
 	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly configuration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
-
-	@inject(Identifiers.BlockchainUtils.FeeCalculator)
-	protected readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
@@ -77,9 +68,9 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		const { evmSpec } = this.configuration.getMilestone();
 
 		try {
-			const { blockContext, instance } = context.evm;
+			const { commitKey, instance } = context.evm;
 			const data = {
-				blockContext,
+				commitKey,
 				data: Buffer.from(transaction.data.slice(2), "hex"),
 				from: transaction.from,
 				gasLimit: BigInt(transaction.gasLimit),
