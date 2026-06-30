@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
-import { existsSync, readFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import { ensureDirSync, readJSONSync } from "fs-extra/esm";
 import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
@@ -207,5 +207,88 @@ describe<{
 		assert.length(validatorMnemonics, 7);
 		assert.equal(internalOptions.blockTime, 9000);
 		assert.equal(internalOptions.premine, "125000000000000000000000000");
+	});
+
+	it("should write database settings to .env when all DB options are provided", async ({ generator, configPath }) => {
+		await generator.generate(
+			options({
+				coreDBDatabase: "mydb",
+				coreDBHost: "db-host",
+				coreDBPassword: "pass",
+				coreDBPort: 6543,
+				coreDBUsername: "user",
+			}),
+		);
+
+		const environment = readFileSync(join(configPath, ".env")).toString();
+		assert.true(environment.includes("MAINSAIL_DB_HOST=db-host"));
+		assert.true(environment.includes("MAINSAIL_DB_PORT=6543"));
+		assert.true(environment.includes("MAINSAIL_DB_USERNAME=user"));
+		assert.true(environment.includes("MAINSAIL_DB_PASSWORD=pass"));
+		assert.true(environment.includes("MAINSAIL_DB_DATABASE=mydb"));
+	});
+
+	it("should build a snapshot-based configuration with mock validator keys", async ({ app, configPath }) => {
+		const snapshotSource = join(dirSync().name, "snap.compressed");
+		writeFileSync(snapshotSource, "snapshot-bytes");
+
+		const importer = {
+			genesisBlockNumber: 100n,
+			prepare: async () => {},
+			previousGenesisBlockHash: "b".repeat(64),
+			snapshotHash: "a".repeat(64),
+			validators: [
+				{ blsPublicKey: "", username: "alice" },
+				{ blsPublicKey: "", username: "bob" },
+			],
+		};
+		app.rebind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(importer);
+		const generator = app.get<ConfigurationGenerator>(InternalIdentifiers.ConfigurationGenerator);
+
+		await generator.generate(
+			options({
+				mockFakeValidatorBlsKeys: true,
+				snapshot: { path: snapshotSource, snapshotHash: "a".repeat(64) },
+				validators: 2,
+			}),
+		);
+
+		const crypto = readJSONSync(join(configPath, "crypto.json"));
+		// initialBlockNumber is taken from the importer's genesis block number.
+		assert.equal(crypto.milestones[0].height, 100);
+		assert.equal(crypto.milestones[0].snapshot, {
+			previousGenesisBlockHash: "b".repeat(64),
+			snapshotHash: "a".repeat(64),
+		});
+
+		// The snapshot file is copied into the snapshot directory.
+		assert.true(existsSync(join(configPath, "snapshot", "snap.compressed")));
+
+		// Validator secrets are the deterministic mock mnemonics (one per imported validator).
+		assert.length(readJSONSync(join(configPath, "validators.json")).secrets, 2);
+
+		// The mock-keys flag is propagated to the environment.
+		assert.true(
+			readFileSync(join(configPath, ".env"))
+				.toString()
+				.includes("MAINSAIL_SNAPSHOT_MOCK_FAKE_VALIDATOR_BLS_KEYS=1"),
+		);
+	});
+
+	it("should throw when a snapshot is requested without a snapshot hash", async ({ app }) => {
+		const importer = {
+			genesisBlockNumber: 0n,
+			prepare: async () => {},
+			previousGenesisBlockHash: "",
+			snapshotHash: "",
+			validators: [],
+		};
+		app.rebind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(importer);
+		const generator = app.get<ConfigurationGenerator>(InternalIdentifiers.ConfigurationGenerator);
+
+		await assert.rejects(
+			() => generator.generate(options({ snapshot: { path: "/snapshot/path" } })),
+			"missing snapshot config",
+		);
 	});
 });
