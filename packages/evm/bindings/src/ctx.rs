@@ -1,7 +1,7 @@
 use std::{path::PathBuf, str::FromStr};
 
 use mainsail_evm_core::{
-    db::{BlockHeaderData, CommitData, CommitKey, ProofData, TransactionData},
+    db::{BlockContext, BlockHeaderData, CommitData, CommitKey, ProofData, TransactionData},
     legacy::LegacyAddress,
 };
 use napi::bindgen_prelude::{BigInt, Buffer, Function};
@@ -32,7 +32,7 @@ pub struct JsTransactionContext {
     pub data: Buffer,
     pub tx_hash: String,
     pub index: Option<u32>,
-    pub block_context: JsBlockContext,
+    pub commit_key: JsCommitKey,
     pub spec_id: String,
 }
 
@@ -173,12 +173,12 @@ pub struct JsCommitData {
 
 #[napi(object)]
 pub struct JsPrepareNextCommitContext {
-    pub commit_key: JsCommitKey,
+    pub block_context: JsBlockContext,
 }
 
 #[derive(Debug)]
 pub struct PrepareNextCommitContext {
-    pub commit_key: CommitKey,
+    pub block_context: BlockContext,
 }
 
 #[derive(Debug)]
@@ -209,7 +209,7 @@ pub struct TxContext {
     pub nonce: u64,
     pub data: Bytes,
     pub tx_hash: B256,
-    pub block_context: BlockContext,
+    pub commit_key: CommitKey,
     pub spec_id: SpecId,
 }
 
@@ -233,14 +233,6 @@ pub struct TxSimulateContext {
     pub data: Bytes,
     pub block_context: BlockContext,
     pub spec_id: SpecId,
-}
-
-#[derive(Debug)]
-pub struct BlockContext {
-    pub commit_key: CommitKey,
-    pub gas_limit: u64,
-    pub timestamp: u64,
-    pub validator_address: Address,
 }
 
 #[derive(Debug)]
@@ -292,36 +284,34 @@ pub struct ExecutionContext {
     pub spec_id: SpecId,
 }
 
-impl From<TxViewContext> for ExecutionContext {
-    fn from(value: TxViewContext) -> Self {
+impl ExecutionContext {
+    pub fn new_read(block_context: Option<BlockContext>, tx_context: TxViewContext) -> Self {
         Self {
-            from: value.from,
-            to: Some(value.to),
-            gas_limit: value.gas_limit,
+            from: tx_context.from,
+            to: Some(tx_context.to),
+            gas_limit: tx_context.gas_limit,
             gas_price: 0,
             value: U256::ZERO,
             nonce: None,
-            data: value.data,
+            data: tx_context.data,
             tx_hash: None,
-            block_context: None,
-            spec_id: value.spec_id,
+            block_context,
+            spec_id: tx_context.spec_id,
         }
     }
-}
 
-impl From<TxContext> for ExecutionContext {
-    fn from(value: TxContext) -> Self {
+    pub fn new_write(block_context: Option<BlockContext>, tx_context: TxContext) -> Self {
         Self {
-            from: value.from,
-            to: value.to,
-            gas_limit: Some(value.gas_limit),
-            gas_price: value.gas_price,
-            value: value.value,
-            nonce: Some(value.nonce),
-            data: value.data,
-            tx_hash: Some(value.tx_hash),
-            block_context: Some(value.block_context),
-            spec_id: value.spec_id,
+            from: tx_context.from,
+            to: tx_context.to,
+            gas_limit: Some(tx_context.gas_limit),
+            gas_price: tx_context.gas_price,
+            value: tx_context.value,
+            nonce: Some(tx_context.nonce),
+            data: tx_context.data,
+            tx_hash: Some(tx_context.tx_hash),
+            block_context,
+            spec_id: tx_context.spec_id,
         }
     }
 }
@@ -461,7 +451,7 @@ impl TryFrom<JsPrepareNextCommitContext> for PrepareNextCommitContext {
 
     fn try_from(value: JsPrepareNextCommitContext) -> Result<Self, Self::Error> {
         Ok(PrepareNextCommitContext {
-            commit_key: value.commit_key.try_into()?,
+            block_context: value.block_context.try_into()?,
         })
     }
 }
@@ -505,8 +495,8 @@ impl TryFrom<JsTransactionContext> for TxContext {
             nonce: value.nonce.get_u64().1,
             data: utils::convert_js_buffer_to_bytes(value.data),
             tx_hash: utils::convert_string_to_b256(value.tx_hash)?,
-            block_context: value.block_context.try_into()?,
             spec_id: parse_spec_id(value.spec_id)?,
+            commit_key: value.commit_key.try_into()?,
         };
 
         Ok(tx_ctx)

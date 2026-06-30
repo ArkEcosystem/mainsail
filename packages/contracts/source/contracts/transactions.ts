@@ -1,5 +1,5 @@
 import type { Transaction, TransactionData } from "./crypto/index.js";
-import type { BlockContext, Instance, TransactionReceipt } from "./evm/index.js";
+import type { CommitKey, Instance, TransactionReceipt } from "./evm/index.js";
 import type { Wallet } from "./state/index.js";
 
 export type TransactionHandlerConstructor = new () => TransactionHandler;
@@ -7,7 +7,7 @@ export type TransactionHandlerConstructor = new () => TransactionHandler;
 export type TransactionHandlerContext = {
 	evm: {
 		instance: Instance;
-		blockContext: BlockContext;
+		commitKey: CommitKey;
 	};
 };
 

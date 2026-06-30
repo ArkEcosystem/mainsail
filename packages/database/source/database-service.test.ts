@@ -183,16 +183,18 @@ describe<{
 			usernameContract: "0x0000000000000000000000000000000000000001",
 		});
 
-		await evm.prepareNextCommit({ commitKey });
+		await evm.prepareNextCommit({
+			blockContext: {
+				commitKey,
+				gasLimit: BigInt("10000000"),
+				timestamp: BigInt(genesisCommit.block.timestamp),
+				validatorAddress: genesisCommit.block.proposer,
+			},
+		});
 
 		for (const transaction of genesisCommit.block.transactions) {
 			const { receipt } = await evm.process({
-				blockContext: {
-					commitKey,
-					gasLimit: BigInt("10000000"),
-					timestamp: BigInt(genesisCommit.block.timestamp),
-					validatorAddress: genesisCommit.block.proposer,
-				},
+				commitKey,
 				data: Buffer.from(transaction.data.slice(2), "hex"),
 				from: transaction.from,
 				gasLimit: BigInt(transaction.gasLimit),

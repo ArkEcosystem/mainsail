@@ -40,6 +40,7 @@ export class Deployer {
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	#genesisBlockInfo!: GenesisBlockInfo;
+	#genesisBlockContext!: Contracts.Evm.BlockContext;
 
 	#nonce = 0;
 	#needsCommit = false;
@@ -85,7 +86,9 @@ export class Deployer {
 			validatorContract: getCreateAddress({ from: this.deployerAddress, nonce: 1n }), // PROXY Uses nonce 1
 		};
 
-		await this.evm.prepareNextCommit({ commitKey });
+		this.#genesisBlockContext = this.#getBlockContext();
+
+		await this.evm.prepareNextCommit({ blockContext: this.#genesisBlockContext });
 		await this.evm.initializeGenesis(genesisInfo);
 
 		this.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(genesisInfo);
@@ -111,7 +114,7 @@ export class Deployer {
 	async #deployConsensusContract(): Promise<string> {
 		// CONSENSUS
 		const receipt = await this.#processTransaction({
-			blockContext: this.#getBlockContext(),
+			commitKey: this.#genesisBlockContext.commitKey,
 			data: Buffer.from(toBytes(ConsensusAbi.bytecode.object)),
 			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
@@ -153,7 +156,7 @@ export class Deployer {
 		});
 
 		const receipt = await this.#processTransaction({
-			blockContext: this.#getBlockContext(),
+			commitKey: this.#genesisBlockContext.commitKey,
 			data: Buffer.from(toBytes(deployData)),
 			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
@@ -189,7 +192,7 @@ export class Deployer {
 
 	async #deployUsernamesContract(): Promise<string> {
 		const receipt = await this.#processTransaction({
-			blockContext: this.#getBlockContext(),
+			commitKey: this.#genesisBlockContext.commitKey,
 			data: Buffer.from(toBytes(UsernamesAbi.bytecode.object)),
 			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
@@ -229,7 +232,7 @@ export class Deployer {
 		});
 
 		const receipt = await this.#processTransaction({
-			blockContext: this.#getBlockContext(),
+			commitKey: this.#genesisBlockContext.commitKey,
 			data: Buffer.from(toBytes(deployData)),
 			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
@@ -265,7 +268,7 @@ export class Deployer {
 
 	async #deployMultiPaymentContract(): Promise<string> {
 		const receipt = await this.#processTransaction({
-			blockContext: this.#getBlockContext(),
+			commitKey: this.#genesisBlockContext.commitKey,
 			data: Buffer.concat([Buffer.from(toBytes(MultiPaymentAbi.bytecode.object))]),
 			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
@@ -305,7 +308,7 @@ export class Deployer {
 		});
 
 		const receipt = await this.#processTransaction({
-			blockContext: this.#getBlockContext(),
+			commitKey: this.#genesisBlockContext.commitKey,
 			data: Buffer.from(toBytes(deployData)),
 			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
@@ -352,7 +355,7 @@ export class Deployer {
 	}
 
 	async #processTransaction(context: Contracts.Evm.TransactionContext): Promise<Contracts.Evm.TransactionReceipt> {
-		const { receipt } = await this.evm.getReceipt(context.blockContext.commitKey.blockNumber, context.txHash);
+		const { receipt } = await this.evm.getReceipt(this.#genesisBlockContext.commitKey.blockNumber, context.txHash);
 		if (receipt) {
 			return receipt;
 		}
