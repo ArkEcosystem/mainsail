@@ -216,7 +216,7 @@ export class GenesisBlockGenerator {
 					.resolve(TransactionBuilder)
 					.network(chainId)
 					.recipientAddress(this.#consensusProxyContractAddress)
-					.nonce("1") // vote transaction is always the 3rd tx from sender (1st one is validator registration)
+					.nonce("1") // vote transaction is always the 2nd tx from sender (1st one is validator registration)
 					.payload(data)
 					.gasPrice(0)
 					.gasLimit(200_000)
