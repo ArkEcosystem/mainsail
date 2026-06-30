@@ -117,9 +117,7 @@ export class GenesisBlockGenerator {
 
 		await this.app.resolve(Deployer).deploy({
 			generatorAddress: genesisWalletAddress,
-			initialBlockNumber: options.snapshot
-				? Number(this.snapshotLegacyImporter.genesisBlockNumber)
-				: options.initialBlockNumber,
+			initialBlockNumber: options.initialBlockNumber,
 			// Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`).
 			// In snapshot mode premine is "0", so this mints nothing and the snapshot importer supplies the state.
 			initialSupply: options.snapshot
@@ -349,7 +347,7 @@ export class GenesisBlockGenerator {
 					fee: totals.fee,
 					gasUsed: totals.gasUsed,
 					logsBloom: await this.evm.logsBloom(commitKey),
-					number: options.initialBlockNumber ?? 0,
+					number: options.initialBlockNumber,
 					parentHash:
 						options.snapshot?.previousGenesisBlockHash ??
 						"0000000000000000000000000000000000000000000000000000000000000000",
@@ -395,8 +393,6 @@ export class GenesisBlockGenerator {
 			mockFakeValidatorBlsKeys: options.mockFakeValidatorBlsKeys,
 			timestamp: dayjs(options.epoch).valueOf(),
 		});
-
-		options.initialBlockNumber = Number(this.snapshotLegacyImporter.genesisBlockNumber);
 
 		options.snapshot.snapshotHash = this.snapshotLegacyImporter.snapshotHash;
 		options.snapshot.previousGenesisBlockHash = this.snapshotLegacyImporter.previousGenesisBlockHash;
