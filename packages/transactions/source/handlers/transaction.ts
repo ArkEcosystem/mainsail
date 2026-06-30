@@ -68,9 +68,9 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		const { evmSpec } = this.configuration.getMilestone();
 
 		try {
-			const { blockContext, instance } = context.evm;
+			const { commitKey, instance } = context.evm;
 			const data = {
-				blockContext,
+				commitKey,
 				data: Buffer.from(transaction.data.slice(2), "hex"),
 				from: transaction.from,
 				gasLimit: BigInt(transaction.gasLimit),

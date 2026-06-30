@@ -148,7 +148,14 @@ describe<{
 			// Before: the proposer is unfunded.
 			assert.equal((await instance.getAccountInfo(proposer)).balance, 0n);
 
-			await instance.prepareNextCommit({ commitKey });
+			await instance.prepareNextCommit({
+				blockContext: {
+					commitKey,
+					gasLimit: BigInt(10_000_000),
+					timestamp: BigInt(12345),
+					validatorAddress: proposer,
+				},
+			});
 			await instance.updateRewardsAndVotes({
 				blockReward: reward,
 				commitKey,
@@ -188,7 +195,15 @@ describe<{
 				validatorContract: "0x0000000000000000000000000000000000000001",
 			});
 
-			await instance.prepareNextCommit({ commitKey });
+			await instance.prepareNextCommit({
+				blockContext: {
+					gasLimit: BigInt(10_000_000),
+					timestamp: BigInt(12345),
+					validatorAddress: proposer,
+					commitKey,
+				},
+			});
+
 			await instance.updateRewardsAndVotes({
 				blockReward: 0n,
 				commitKey,

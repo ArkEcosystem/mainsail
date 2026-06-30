@@ -971,20 +971,20 @@ export class Restore {
 		validatorRoundRepository,
 		walletRepository,
 	}: RepositoryContext): Promise<void> {
-		await Promise.all(
-			[
-				blockRepository,
-				contractRepository,
-				stateRepository,
-				transactionRepository,
-				validatorRoundRepository,
-				walletRepository,
-				legacyColdWalletRepository,
-				multiPaymentRepository,
-				tokenRepository,
-				tokenHolderRepository,
-				configurationRepository,
-			].map((repo) => repo.query(`ANALYZE ${repo.metadata.tableName}`)),
-		);
+		for (const repository of [
+			blockRepository,
+			contractRepository,
+			stateRepository,
+			transactionRepository,
+			validatorRoundRepository,
+			walletRepository,
+			legacyColdWalletRepository,
+			multiPaymentRepository,
+			tokenRepository,
+			tokenHolderRepository,
+			configurationRepository,
+		]) {
+			await repository.query(`ANALYZE ${repository.metadata.tableName}`);
+		}
 	}
 }

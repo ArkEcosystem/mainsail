@@ -273,8 +273,17 @@ pub struct CommitData {
 }
 
 #[derive(Clone, Debug, Default)]
+pub struct BlockContext {
+    pub commit_key: CommitKey,
+    pub gas_limit: u64,
+    pub timestamp: u64,
+    pub validator_address: Address,
+}
+
+#[derive(Clone, Debug, Default)]
 pub struct PendingCommit {
     pub key: CommitKey,
+    pub block_context: BlockContext,
     pub cache: CacheState,
     pub results: BTreeMap<B256, (ExecutionResult, u64)>,
     pub transitions: TransitionState,
@@ -1472,6 +1481,7 @@ impl PendingCommit {
     pub fn new(key: CommitKey) -> Self {
         Self {
             key,
+            block_context: Default::default(),
             cache: Default::default(),
             cumulative_gas_used: Default::default(),
             results: Default::default(),

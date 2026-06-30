@@ -67,12 +67,7 @@ export const makeCustomProposal = async (
 			result = await transactionHandler.apply(
 				{
 					evm: {
-						blockContext: {
-							commitKey,
-							gasLimit: BigInt(milestone.block.maxGasLimit),
-							timestamp: BigInt(dayjs().valueOf()),
-							validatorAddress: validators[0].publicKey,
-						},
+						commitKey,
 						instance: evm,
 					},
 				},

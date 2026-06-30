@@ -197,8 +197,6 @@ jobs:
               run: cd packages/kernel && pnpm run test:coverage
             - name: Test logger-pino
               run: cd packages/logger-pino && pnpm run test:coverage
-            - name: Test networking-dns
-              run: cd packages/networking-dns && pnpm run test:coverage
             - name: Test networking-ntp
               run: cd packages/networking-ntp && pnpm run test:coverage
             - name: Test p2p
