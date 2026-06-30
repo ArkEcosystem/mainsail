@@ -52,6 +52,9 @@ export class GenesisBlockGenerator {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	#consensusProxyContractAddress!: string;
 
 	async generate(
@@ -402,7 +405,9 @@ export class GenesisBlockGenerator {
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.set("genesisBlock.block.number", options.initialBlockNumber);
 
-		console.log(result);
+		this.logger.info(
+			`Imported legacy snapshot: ${result.importedValidatorsWithBlsKey} validators with BLS key, ${result.importedValidatorsWithoutBlsKey} without, ${result.importedUsernames} usernames, ${result.importedVoters} voters (initial total supply ${result.initialTotalSupply})`,
+		);
 	}
 
 	async #createLegacyColdWallets(validatorMnemonics: string[]) {
