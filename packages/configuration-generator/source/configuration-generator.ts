@@ -63,6 +63,9 @@ export class ConfigurationGenerator {
 	@inject(Identifiers.Services.Log.Service)
 	private logger!: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.Snapshot.Legacy.Importer)
+	private importer!: Contracts.Snapshot.LegacyImporter;
+
 	public async generate(options: Contracts.NetworkGenerator.Options): Promise<void> {
 		const internalOptions: Contracts.NetworkGenerator.InternalOptions = {
 			blockTime: 8000,
@@ -113,11 +116,8 @@ export class ConfigurationGenerator {
 			{
 				task: async () => {
 					if (options.snapshot) {
-						const importer = this.app.get<Contracts.Snapshot.LegacyImporter>(
-							Identifiers.Snapshot.Legacy.Importer,
-						);
-						await importer.prepare(options.snapshot.path);
-						internalOptions.initialBlockNumber = Number(importer.genesisBlockNumber);
+						await this.importer.prepare(options.snapshot.path);
+						internalOptions.initialBlockNumber = Number(this.importer.genesisBlockNumber);
 					}
 
 					const milestones = this.milestonesGenerator
@@ -147,16 +147,13 @@ export class ConfigurationGenerator {
 					);
 
 					if (options.snapshot) {
-						const importer = this.app.get<Contracts.Snapshot.LegacyImporter>(
-							Identifiers.Snapshot.Legacy.Importer,
-						);
 						milestones[0].snapshot = {
-							previousGenesisBlockHash: importer.previousGenesisBlockHash,
-							snapshotHash: importer.snapshotHash,
+							previousGenesisBlockHash: this.importer.previousGenesisBlockHash,
+							snapshotHash: this.importer.snapshotHash,
 						};
 
-						if (importer.validators && options.mockFakeValidatorBlsKeys) {
-							validatorsMnemonics = await this.#prepareMockValidatorKeys(internalOptions, importer);
+						if (this.importer.validators && options.mockFakeValidatorBlsKeys) {
+							validatorsMnemonics = await this.#prepareMockValidatorKeys(internalOptions);
 						}
 					}
 
@@ -252,7 +249,7 @@ export class ConfigurationGenerator {
 		return data;
 	}
 
-	async #prepareMockValidatorKeys(internalOptions: Contracts.NetworkGenerator.InternalOptions, importer: Contracts.Snapshot.LegacyImporter): Promise<string[]> {
+	async #prepareMockValidatorKeys(internalOptions: Contracts.NetworkGenerator.InternalOptions): Promise<string[]> {
 		// create fake mnemonics for testing
 		const consensusKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(
 			Identifiers.Cryptography.Identity.KeyPair.Factory,
@@ -263,7 +260,7 @@ export class ConfigurationGenerator {
 
 		const importedValidatorMnemonics: string[] = [];
 
-		for (const validator of importer.validators) {
+		for (const validator of this.importer.validators) {
 			const validatorMnemonic = this.mnemonicGenerator.generateDeterministic(
 				validator.username,
 			);
