@@ -72,7 +72,6 @@ export class ConfigurationGenerator {
 			initialBlockNumber: 0,
 			maxBlockGasLimit: 10_000_000,
 			maxBlockPayload: 2_097_152,
-			maxTxPerBlock: 150,
 			overwriteConfig: false,
 			peers: ["127.0.0.1"],
 			premine: "125000000000000000000000000",

@@ -13,7 +13,6 @@ export type MilestoneOptions = {
 	validatorRegistrationFee: string;
 	maxBlockPayload: number;
 	maxBlockGasLimit: number;
-	maxTxPerBlock: number;
 	blockTime: number;
 	timeouts?: {
 		blockPrepareTime: number;
