@@ -34,7 +34,6 @@ const EXCEPTIONS = {
 	"@mainsail/configuration-generator": {
 		dependencies: [
 			"@mainsail/crypto-key-pair-ecdsa",
-			"@mainsail/snapshot-legacy-exporter",
 		],
 		devDependencies: [],
 	},
