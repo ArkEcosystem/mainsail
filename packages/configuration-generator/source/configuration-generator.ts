@@ -249,7 +249,7 @@ export class ConfigurationGenerator {
 						this.configurationWriter.writeEnvironment(
 							this.environmentGenerator
 								.addInitialRecords()
-								.addRecords(this.#preparteEnvironmentOptions(internalOptions))
+								.addRecords(this.#prepareEnvironmentOptions(internalOptions))
 								.generate(),
 						);
 					},
@@ -280,7 +280,7 @@ export class ConfigurationGenerator {
 		logger?.info(`Configuration generated on location: ${this.configurationPath}`);
 	}
 
-	#preparteEnvironmentOptions(options: Contracts.NetworkGenerator.InternalOptions): EnvironmentData {
+	#prepareEnvironmentOptions(options: Contracts.NetworkGenerator.InternalOptions): EnvironmentData {
 		const data: EnvironmentData = {
 			MAINSAIL_API_EVM_HOST: "127.0.0.1",
 
