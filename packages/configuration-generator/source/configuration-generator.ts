@@ -60,6 +60,9 @@ export class ConfigurationGenerator {
 	@inject(InternalIdentifiers.Generator.Wallet)
 	private walletGenerator!: WalletGenerator;
 
+	@inject(Identifiers.Services.Log.Service)
+	private logger!: Contracts.Kernel.Logger;
+
 	public async generate(options: Contracts.NetworkGenerator.Options): Promise<void> {
 		const internalOptions: Contracts.NetworkGenerator.InternalOptions = {
 			blockTime: 8000,
@@ -239,17 +242,13 @@ export class ConfigurationGenerator {
 			},
 		);
 
-		let logger: Contracts.Kernel.Logger | undefined;
-		if (this.app.isBound(Identifiers.Services.Log.Service)) {
-			logger = this.app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service);
-		}
 
 		for (const task of tasks) {
-			logger?.info(task.title);
+			this.logger.info(task.title);
 			await task.task();
 		}
 
-		logger?.info(`Configuration generated on location: ${this.configurationPath}`);
+		this.logger.info(`Configuration generated on location: ${this.configurationPath}`);
 	}
 
 	#prepareEnvironmentOptions(options: Contracts.NetworkGenerator.InternalOptions): EnvironmentData {
