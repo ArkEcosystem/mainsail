@@ -6,7 +6,6 @@ export type EnvironmentOptions = {
 	coreDBDatabase?: string;
 
 	coreP2PPort: number;
-	coreWebhooksPort: number;
 };
 
 export type MilestoneOptions = {

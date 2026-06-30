@@ -66,7 +66,6 @@ export class ConfigurationGenerator {
 			coreDBHost: "localhost",
 			coreDBPort: 5432,
 			coreP2PPort: 4000,
-			coreWebhooksPort: 4004,
 			epoch: new Date(),
 			explorer: "",
 			force: false,
@@ -255,36 +254,20 @@ export class ConfigurationGenerator {
 
 	#prepareEnvironmentOptions(options: Contracts.NetworkGenerator.InternalOptions): EnvironmentData {
 		const data: EnvironmentData = {
-			MAINSAIL_API_EVM_HOST: "127.0.0.1",
-
-			MAINSAIL_API_EVM_PORT: 4008,
-
-			MAINSAIL_API_TRANSACTION_POOL_HOST: "127.0.0.1",
-
-			MAINSAIL_API_TRANSACTION_POOL_PORT: 4007,
-
-			MAINSAIL_CRYPTO_WORKER_COUNT: 2,
-			// MAINSAIL_DB_HOST: options.coreDBHost,
-			// MAINSAIL_DB_PORT: options.coreDBPort,
 			MAINSAIL_P2P_PORT: options.coreP2PPort,
-			MAINSAIL_WEBHOOKS_PORT: options.coreWebhooksPort,
 		};
 
 		if (options.mockFakeValidatorBlsKeys) {
 			data.MAINSAIL_SNAPSHOT_MOCK_FAKE_VALIDATOR_BLS_KEYS = "1";
 		}
 
-		// if (options.coreDBDatabase) {
-		// 	data.MAINSAIL_DB_DATABASE = options.coreDBDatabase;
-		// }
-
-		// if (options.coreDBUsername) {
-		// 	data.MAINSAIL_DB_USERNAME = options.coreDBUsername;
-		// }
-
-		// if (options.coreDBPassword) {
-		// 	data.MAINSAIL_DB_PASSWORD = options.coreDBDatabase;
-		// }
+		if(options.coreDBHost && options.coreDBPort && options.coreDBUsername && options.coreDBPassword && options.coreDBDatabase) {
+			data.MAINSAIL_DB_HOST = options.coreDBHost;
+			data.MAINSAIL_DB_PORT = options.coreDBPort;
+			data.MAINSAIL_DB_USERNAME = options.coreDBUsername;
+			data.MAINSAIL_DB_PASSWORD = options.coreDBPassword;
+			data.MAINSAIL_DB_DATABASE = options.coreDBDatabase;
+		}
 
 		return data;
 	}
