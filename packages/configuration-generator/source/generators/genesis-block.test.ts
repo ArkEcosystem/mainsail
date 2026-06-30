@@ -66,7 +66,6 @@ describe<{
 		assert.object(
 			await generator.generate(mnemonicGenerator.generate(), mnemonicGenerator.generateMany(validatorsCount), {
 				chainId: 123,
-				distribute: true,
 				epoch: new Date(),
 				initialBlockNumber: 0,
 				premine: "2000000000",

@@ -70,7 +70,6 @@ export class ConfigurationGenerator {
 			coreDBPort: 5432,
 			coreP2PPort: 4000,
 			coreWebhooksPort: 4004,
-			distribute: false,
 			epoch: new Date(),
 			explorer: "",
 			force: false,

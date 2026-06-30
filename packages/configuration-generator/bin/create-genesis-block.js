@@ -16,7 +16,6 @@ async function run() {
 		network: "devnet",
 		symbol: "TѦ",
 		token: "ARK",
-		distribute: true,
 		premine: "125000000000000000000000000",
 		chainId: 10000,
 		initialHeight: 0,

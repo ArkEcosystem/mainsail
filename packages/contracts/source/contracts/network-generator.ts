@@ -43,7 +43,6 @@ export type RewardOptions = {
 };
 
 export type GenesisBlockOptions = {
-	distribute: boolean;
 	premine: string;
 	chainId: number;
 	epoch: Date;

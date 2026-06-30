@@ -28,7 +28,6 @@ describe<{
 		await cli
 			.withFlags({
 				blockTime: "9000",
-				distribute: "true",
 				explorer: "myex.io",
 				maxBlockPayload: "123444",
 				maxTxPerBlock: "122",
@@ -113,7 +112,6 @@ describe<{
 				cli
 					.withFlags({
 						blockTime: "9000",
-						distribute: "true",
 						explorer: "myex.io",
 						maxBlockPayload: "123444",
 						maxTxPerBlock: "122",
@@ -143,7 +141,6 @@ describe<{
 					.withFlags({
 						blocktime: "9000",
 						delegates: "47",
-						distribute: "true",
 						explorer: "myex.io",
 						maxBlockPayload: "123444",
 						maxTxPerBlock: "122",
@@ -176,7 +173,6 @@ describe<{
 			"myn",
 			"my",
 			"myex.io",
-			true,
 			false,
 		]);
 
@@ -199,7 +195,6 @@ describe<{
 			"m",
 			"myex.io",
 			true,
-			true,
 		]);
 
 		await assert.rejects(() => cli.execute(Command), "Flag network is required.");
@@ -220,7 +215,6 @@ describe<{
 			"myn",
 			"m",
 			"myex.io",
-			true,
 			true,
 		]);
 
@@ -261,41 +255,6 @@ describe<{
 	});
 
 	// TODO: fix stub
-	it.skip("should generate a new configuration if the properties are confirmed and distribute is set to false", async ({
-		cli,
-	}) => {
-		const existsSync = stub(fs, "existsSync");
-		const ensureDirSync = stub(fs, "ensureDirSync");
-		const writeJSONSync = stub(fs, "writeJSONSync");
-		const writeFileSync = stub(fs, "writeFileSync");
-
-		prompts.inject([
-			"devnet",
-			"120000000000",
-			"47",
-			"9",
-			"122",
-			123_444,
-			"23000",
-			"66000",
-			168,
-			"27",
-			"myn",
-			"my",
-			"myex.io",
-			false,
-			true,
-		]);
-
-		await cli.withFlags({ distribute: false }).execute(Command);
-
-		existsSync.calledWith(configCore + "/mainsail");
-		ensureDirSync.calledWith(configCore + "/mainsail");
-		writeJSONSync.calledTimes(5);
-		writeFileSync.calledOnce();
-	});
-
-	// TODO: fix stub
 	it.skip("should generate a new configuration with additional flags", async ({ cli }) => {
 		const existsSync = stub(fs, "existsSync");
 		const ensureDirSync = stub(fs, "ensureDirSync");
@@ -309,7 +268,6 @@ describe<{
 				coreMonitorPort: 3005,
 				coreP2PPort: 3002,
 				coreWebhooksPort: 3004,
-				distribute: "true",
 				epoch: new Date("2020-11-04T00:00:00.000Z"),
 				explorer: "myex.io",
 				feeDynamicBytesDelegateRegistration: 3,
@@ -430,7 +388,6 @@ describe<{
 		await cli
 			.withFlags({
 				blockTime: "9000",
-				distribute: "true",
 				explorer: "myex.io",
 				maxBlockPayload: "123444",
 				maxTxPerBlock: "122",
@@ -464,7 +421,6 @@ describe<{
 			.withFlags({
 				blockTime: "9000",
 				configPath: "/path/to/config",
-				distribute: "true",
 				explorer: "myex.io",
 				maxBlockPayload: "123444",
 				maxTxPerBlock: "122",
@@ -496,7 +452,6 @@ describe<{
 		await cli
 			.withFlags({
 				blockTime: "9000",
-				distribute: "true",
 				explorer: "myex.io",
 				maxBlockPayload: "123444",
 				maxTxPerBlock: "122",

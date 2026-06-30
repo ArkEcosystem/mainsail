@@ -52,29 +52,18 @@ export class GenesisBlockGenerator extends Generator {
 				validatorsMnemonics.map(async (mnemonic) => await this.createWallet(mnemonic)),
 			);
 
-			if (options.distribute) {
-				transactions = transactions.concat(
-					...(await this.#createTransferTransactions(
-						genesisWallet,
-						validators,
-						options.premine,
-						options.chainId,
-					)),
-				);
+			// The premine is always distributed evenly across validators; this also ensures
+			// each validator holds enough balance to pay the (payable) registration fee.
+			transactions = await this.#createTransferTransactions(
+				genesisWallet,
+				validators,
+				options.premine,
+				options.chainId,
+			);
 
-				options.premine = transactions
-					.reduce((accumulator, current) => accumulator + current.value, 0n)
-					.toString();
-			} else {
-				transactions = transactions.concat(
-					await this.#createTransferTransaction(
-						genesisWallet,
-						genesisWallet,
-						options.premine,
-						options.chainId,
-					),
-				);
-			}
+			options.premine = transactions
+				.reduce((accumulator, current) => accumulator + current.value, 0n)
+				.toString();
 
 			const validatorTransactions = [
 				...(await this.#buildValidatorTransactions(
@@ -104,7 +93,6 @@ export class GenesisBlockGenerator extends Generator {
 	) {
 		if (options.snapshot) {
 			options.premine = "0";
-			options.distribute = false;
 		}
 
 		await this.app.resolve(Deployer).deploy({
@@ -112,11 +100,11 @@ export class GenesisBlockGenerator extends Generator {
 			initialBlockNumber: options.snapshot
 				? Number(this.snapshotLegacyImporter!.genesisBlockNumber)
 				: options.initialBlockNumber,
-			initialSupply: (options.distribute
-				? // Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`)
-					(BigInt(options.premine) / BigInt(validatorsCount)) * BigInt(validatorsCount)
-				: BigInt(options.premine)
-			).toString(),
+			// Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`).
+			// In snapshot mode premine is "0", so this mints nothing and the snapshot importer supplies the state.
+			initialSupply: options.snapshot
+				? "0"
+				: ((BigInt(options.premine) / BigInt(validatorsCount)) * BigInt(validatorsCount)).toString(),
 			timestamp: dayjs(options.epoch).valueOf(),
 		});
 
