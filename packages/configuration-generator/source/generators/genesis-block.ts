@@ -6,15 +6,20 @@ import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
+import { Application } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 import dayjs from "dayjs";
 import { bytesToHex, encodeFunctionData } from "viem";
 
 import { Wallet } from "../contracts.js";
-import { Generator } from "./generator.js";
+import { Identifiers as InternalIdentifiers } from "../identifiers.js";
+import { WalletGenerator } from "./wallet.js";
 
 @injectable()
-export class GenesisBlockGenerator extends Generator {
+export class GenesisBlockGenerator {
+	@inject(InternalIdentifiers.Application)
+	protected app!: Application;
+
 	@inject(Identifiers.Cryptography.Commit.Serializer)
 	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
 
@@ -28,6 +33,9 @@ export class GenesisBlockGenerator extends Generator {
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
+	@inject(InternalIdentifiers.Generator.Wallet)
+	private readonly walletGenerator!: WalletGenerator;
+
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
@@ -39,7 +47,7 @@ export class GenesisBlockGenerator extends Generator {
 		validatorsMnemonics: string[],
 		options: Contracts.NetworkGenerator.InternalOptions,
 	): Promise<Contracts.Crypto.CommitData> {
-		const genesisWallet = await this.createWallet(genesisMnemonic);
+		const genesisWallet = await this.walletGenerator.generate(genesisMnemonic);
 
 		await this.#prepareEvm(genesisWallet.address, validatorsMnemonics.length, options);
 
@@ -49,7 +57,7 @@ export class GenesisBlockGenerator extends Generator {
 			await this.#buildFromLegacySnapshot(options);
 		} else {
 			const validators = await Promise.all(
-				validatorsMnemonics.map(async (mnemonic) => await this.createWallet(mnemonic)),
+				validatorsMnemonics.map(async (mnemonic) => await this.walletGenerator.generate(mnemonic)),
 			);
 
 			// The premine is always distributed evenly across validators; this also ensures
