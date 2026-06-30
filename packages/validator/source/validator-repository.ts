@@ -44,8 +44,9 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 			if (validator) {
 				if (validator.isResigned) {
 					resigned.push(validator.address);
-				}
-				if (roundValidators.some((activeValidator) => activeValidator.blsPublicKey === consensusPublicKey)) {
+				} else if (
+					roundValidators.some((activeValidator) => activeValidator.blsPublicKey === consensusPublicKey)
+				) {
 					active.push(validator.address);
 				} else {
 					standBy.push(validator.address);

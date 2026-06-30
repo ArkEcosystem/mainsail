@@ -3326,9 +3326,6 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
-      '@mainsail/crypto-wif':
-        specifier: workspace:*
-        version: link:../crypto-wif
       '@mainsail/evm-consensus':
         specifier: workspace:*
         version: link:../evm-consensus
