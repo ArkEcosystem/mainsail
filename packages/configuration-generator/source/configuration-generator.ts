@@ -69,7 +69,6 @@ export class ConfigurationGenerator {
 			coreP2PPort: 4000,
 			epoch: new Date(),
 			explorer: "",
-			force: false,
 			initialBlockNumber: 0,
 			maxBlockGasLimit: 10_000_000,
 			maxBlockPayload: 2_097_152,

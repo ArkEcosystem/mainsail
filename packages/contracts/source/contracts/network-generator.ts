@@ -68,7 +68,6 @@ export type InternalOptions = EnvironmentOptions &
 		packageName?: string;
 		configPath?: string;
 		overwriteConfig: boolean;
-		force: boolean;
 
 		// Testing
 		createLegacyColdWallets?: boolean;
