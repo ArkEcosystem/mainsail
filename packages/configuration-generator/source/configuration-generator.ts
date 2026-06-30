@@ -156,26 +156,7 @@ export class ConfigurationGenerator {
 						};
 
 						if (importer.validators && options.mockFakeValidatorBlsKeys) {
-							const importedValidatorMnemonics: string[] = [];
-							// create fake mnemonics for testing
-							const consensusKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(
-								Identifiers.Cryptography.Identity.KeyPair.Factory,
-								"type",
-								"consensus",
-							);
-
-							for (const validator of importer.validators) {
-								const validatorMnemonic = this.mnemonicGenerator.generateDeterministic(
-									validator.username,
-								);
-								importedValidatorMnemonics.push(validatorMnemonic);
-
-								const consensusKeyPair = await consensusKeyPairFactory.fromMnemonic(validatorMnemonic);
-								validator.blsPublicKey = consensusKeyPair.publicKey;
-							}
-
-							// imported validators are already sorted by descending balance
-							validatorsMnemonics = importedValidatorMnemonics.slice(0, internalOptions.validators);
+							validatorsMnemonics = await this.#prepareMockValidatorKeys(internalOptions, importer);
 						}
 					}
 
@@ -269,5 +250,30 @@ export class ConfigurationGenerator {
 		}
 
 		return data;
+	}
+
+	async #prepareMockValidatorKeys(internalOptions: Contracts.NetworkGenerator.InternalOptions, importer: Contracts.Snapshot.LegacyImporter): Promise<string[]> {
+		// create fake mnemonics for testing
+		const consensusKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(
+			Identifiers.Cryptography.Identity.KeyPair.Factory,
+			"type",
+			"consensus",
+		);
+
+
+		const importedValidatorMnemonics: string[] = [];
+
+		for (const validator of importer.validators) {
+			const validatorMnemonic = this.mnemonicGenerator.generateDeterministic(
+				validator.username,
+			);
+			importedValidatorMnemonics.push(validatorMnemonic);
+
+			const consensusKeyPair = await consensusKeyPairFactory.fromMnemonic(validatorMnemonic);
+			validator.blsPublicKey = consensusKeyPair.publicKey;
+		}
+
+		// imported validators are already sorted by descending balance
+		return importedValidatorMnemonics.slice(0, internalOptions.validators);
 	}
 }
