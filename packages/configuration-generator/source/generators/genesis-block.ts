@@ -84,10 +84,6 @@ export class GenesisBlockGenerator {
 				options.chainId,
 			);
 
-			options.premine = transactions
-				.reduce((accumulator, current) => accumulator + current.value, 0n)
-				.toString();
-
 			const validatorTransactions = [
 				...(await this.#buildValidatorTransactions(
 					validators,
@@ -114,10 +110,6 @@ export class GenesisBlockGenerator {
 		validatorsCount: number,
 		options: Contracts.NetworkGenerator.InternalOptions,
 	) {
-		if (options.snapshot) {
-			options.premine = "0";
-		}
-
 		await this.app.resolve(Deployer).deploy({
 			generatorAddress: genesisWalletAddress,
 			initialBlockNumber: options.initialBlockNumber,
@@ -399,7 +391,6 @@ export class GenesisBlockGenerator {
 
 		options.snapshot.snapshotHash = this.snapshotLegacyImporter.snapshotHash;
 		options.snapshot.previousGenesisBlockHash = this.snapshotLegacyImporter.previousGenesisBlockHash;
-		options.premine = "0";
 
 		this.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)

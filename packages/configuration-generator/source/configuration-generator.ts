@@ -112,6 +112,7 @@ export class ConfigurationGenerator {
 					if (options.snapshot) {
 						await this.importer.prepare(options.snapshot.path);
 						internalOptions.initialBlockNumber = Number(this.importer.genesisBlockNumber);
+						internalOptions.premine = "0";
 					}
 
 					const milestones = this.milestonesGenerator
