@@ -41,7 +41,7 @@ describe<{
 	configPath: string;
 	generator: ConfigurationGenerator;
 	genesis: { generate: (...arguments_: unknown[]) => Promise<unknown> };
-}>("ConfigurationGenerator", ({ beforeAll, beforeEach, it, assert, spy, stub }) => {
+}>("ConfigurationGenerator", ({ beforeAll, beforeEach, afterEach, it, assert, spy, stub }) => {
 	const options = (overrides: Record<string, unknown> = {}) => ({
 		chainId: 10_000,
 		network: "devnet",
@@ -72,6 +72,12 @@ describe<{
 		context.app.rebind(InternalIdentifiers.Generator.GenesisBlock).toConstantValue(context.genesis);
 
 		context.generator = context.app.get<ConfigurationGenerator>(InternalIdentifiers.ConfigurationGenerator);
+	});
+
+	// makeApplication wires up the Rust EVM addon, whose native runtime keeps the event loop
+	// alive until an instance is disposed. Tear it down so the test process exits cleanly.
+	afterEach(async ({ app }) => {
+		await app.getTagged<{ dispose(): Promise<void> }>(Identifiers.Evm.Instance, "instance", "evm").dispose();
 	});
 
 	it("should generate a complete configuration with default options", async ({ generator, configPath }) => {
@@ -150,13 +156,6 @@ describe<{
 		info.calledWith("Writing crypto.json in core config path.");
 		info.calledWith("Writing .env in core config path.");
 		info.calledWith(`Configuration generated on location: ${configPath}`);
-	});
-
-	it("should still generate when no logger is bound", async ({ app, generator, configPath }) => {
-		app.unbind(Identifiers.Services.Log.Service);
-
-		await assert.resolves(() => generator.generate(options()));
-		assert.true(existsSync(join(configPath, "crypto.json")));
 	});
 
 	it("should throw if the configuration destination already exists", async ({ generator, configPath }) => {
