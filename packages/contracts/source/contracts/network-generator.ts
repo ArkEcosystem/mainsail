@@ -81,13 +81,3 @@ export type Options = Partial<InternalOptions> & {
 	symbol: string;
 	chainId: number;
 };
-
-export type WriteOptions = {
-	writeApp: boolean;
-	writePeers: boolean;
-	writeEnvironment: boolean;
-	writeValidators: boolean;
-	writeGenesisBlock: boolean;
-	writeCrypto: boolean;
-	writeSnapshot: boolean;
-};

@@ -60,10 +60,7 @@ export class ConfigurationGenerator {
 	@inject(InternalIdentifiers.Generator.Wallet)
 	private walletGenerator!: WalletGenerator;
 
-	public async generate(
-		options: Contracts.NetworkGenerator.Options,
-		writeOptions?: Contracts.NetworkGenerator.WriteOptions,
-	): Promise<void> {
+	public async generate(options: Contracts.NetworkGenerator.Options): Promise<void> {
 		const internalOptions: Contracts.NetworkGenerator.InternalOptions = {
 			blockTime: 8000,
 			coreDBHost: "localhost",
@@ -89,17 +86,6 @@ export class ConfigurationGenerator {
 			...options,
 		};
 
-		writeOptions = {
-			writeApp: true,
-			writeCrypto: true,
-			writeEnvironment: true,
-			writeGenesisBlock: true,
-			writePeers: true,
-			writeSnapshot: !!options.snapshot,
-			writeValidators: true,
-			...writeOptions,
-		};
-
 		const genesisWalletMnemonic = this.mnemonicGenerator.generate();
 		let validatorsMnemonics = this.mnemonicGenerator.generateMany(internalOptions.validators);
 
@@ -114,21 +100,15 @@ export class ConfigurationGenerator {
 				},
 				title: `Preparing directories.`,
 			},
-		];
-
-		if (writeOptions.writeGenesisBlock) {
-			tasks.push({
+			{
 				task: async () => {
 					this.configurationWriter.writeGenesisWallet(
 						await this.walletGenerator.generate(genesisWalletMnemonic),
 					);
 				},
 				title: "Writing genesis-wallet.json in core config path.",
-			});
-		}
-
-		if (writeOptions.writeCrypto) {
-			tasks.push({
+			},
+			{
 				task: async () => {
 					if (options.snapshot) {
 						const importer = this.app.get<Contracts.Snapshot.LegacyImporter>(
@@ -208,10 +188,11 @@ export class ConfigurationGenerator {
 					this.configurationWriter.writeCrypto(genesisBlock, milestones, network);
 				},
 				title: "Writing crypto.json in core config path.",
-			});
-		}
+			},
+		];
 
-		if (writeOptions.writeSnapshot) {
+		// Only write the snapshot when a snapshot source was provided.
+		if (options.snapshot) {
 			tasks.push({
 				task: async () => {
 					if (!options.snapshot || !options.snapshot.snapshotHash) {
@@ -225,47 +206,39 @@ export class ConfigurationGenerator {
 			});
 		}
 
-		if (writeOptions.writePeers) {
-			tasks.push({
+		tasks.push(
+			{
 				task: async () => {
 					this.configurationWriter.writePeers(
 						this.peersGenerator.generate(internalOptions.coreP2PPort, internalOptions.peers),
 					);
 				},
 				title: "Writing peers.json in core config path.",
-			});
-		}
-
-		if (writeOptions.writeValidators) {
-			tasks.push(
-				{
-					task: async () => {
-						this.configurationWriter.writeValidators(validatorsMnemonics);
-					},
-					title: "Writing validators.json in core config path.",
+			},
+			{
+				task: async () => {
+					this.configurationWriter.writeValidators(validatorsMnemonics);
 				},
-				{
-					task: async () => {
-						this.configurationWriter.writeEnvironment(
-							this.environmentGenerator
-								.addInitialRecords()
-								.addRecords(this.#prepareEnvironmentOptions(internalOptions))
-								.generate(),
-						);
-					},
-					title: "Writing .env in core config path.",
+				title: "Writing validators.json in core config path.",
+			},
+			{
+				task: async () => {
+					this.configurationWriter.writeEnvironment(
+						this.environmentGenerator
+							.addInitialRecords()
+							.addRecords(this.#prepareEnvironmentOptions(internalOptions))
+							.generate(),
+					);
 				},
-			);
-		}
-
-		if (writeOptions.writeApp) {
-			tasks.push({
+				title: "Writing .env in core config path.",
+			},
+			{
 				task: async () => {
 					this.configurationWriter.writeApp(this.appGenerator.generate(internalOptions));
 				},
 				title: "Writing app.json in core config path.",
-			});
-		}
+			},
+		);
 
 		let logger: Contracts.Kernel.Logger | undefined;
 		if (this.app.isBound(Identifiers.Services.Log.Service)) {

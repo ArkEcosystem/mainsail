@@ -209,22 +209,4 @@ describe<{
 		assert.equal(internalOptions.blockTime, 9000);
 		assert.equal(internalOptions.premine, "125000000000000000000000000");
 	});
-
-	it("should only write the files enabled in the write options", async ({ generator, configPath }) => {
-		await generator.generate(options(), {
-			writeApp: false,
-			writeValidators: false,
-		});
-
-		// The prepare task always runs and creates the destination directory.
-		assert.true(existsSync(configPath));
-		assert.true(existsSync(join(configPath, "crypto.json")));
-		assert.true(existsSync(join(configPath, "peers.json")));
-		assert.true(existsSync(join(configPath, "genesis-wallet.json")));
-
-		// Disabled writers leave no files behind. Note .env is produced by the validators task.
-		assert.false(existsSync(join(configPath, "app.json")));
-		assert.false(existsSync(join(configPath, "validators.json")));
-		assert.false(existsSync(join(configPath, ".env")));
-	});
 });
