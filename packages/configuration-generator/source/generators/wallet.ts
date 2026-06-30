@@ -1,12 +1,11 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { injectable , inject, tagged } from "@mainsail/container";
+import { injectable, inject, tagged } from "@mainsail/container";
 
 import { Wallet } from "../contracts.js";
 import { Identifiers as InternalIdentifiers } from "../identifiers.js";
 import { MnemonicGenerator } from "./mnemonic.js";
-
 
 @injectable()
 export class WalletGenerator {

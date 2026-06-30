@@ -214,7 +214,6 @@ export class ConfigurationGenerator {
 			},
 		);
 
-
 		for (const task of tasks) {
 			this.logger.info(task.title);
 			await task.task();
@@ -232,7 +231,13 @@ export class ConfigurationGenerator {
 			data.MAINSAIL_SNAPSHOT_MOCK_FAKE_VALIDATOR_BLS_KEYS = "1";
 		}
 
-		if(options.coreDBHost && options.coreDBPort && options.coreDBUsername && options.coreDBPassword && options.coreDBDatabase) {
+		if (
+			options.coreDBHost &&
+			options.coreDBPort &&
+			options.coreDBUsername &&
+			options.coreDBPassword &&
+			options.coreDBDatabase
+		) {
 			data.MAINSAIL_DB_HOST = options.coreDBHost;
 			data.MAINSAIL_DB_PORT = options.coreDBPort;
 			data.MAINSAIL_DB_USERNAME = options.coreDBUsername;
@@ -251,13 +256,10 @@ export class ConfigurationGenerator {
 			"consensus",
 		);
 
-
 		const importedValidatorMnemonics: string[] = [];
 
 		for (const validator of this.importer.validators) {
-			const validatorMnemonic = this.mnemonicGenerator.generateDeterministic(
-				validator.username,
-			);
+			const validatorMnemonic = this.mnemonicGenerator.generateDeterministic(validator.username);
 			importedValidatorMnemonics.push(validatorMnemonic);
 
 			const consensusKeyPair = await consensusKeyPairFactory.fromMnemonic(validatorMnemonic);

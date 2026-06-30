@@ -54,9 +54,6 @@ describe<{
 	it("#generate - should throw when @mainsail/state is missing from the template", ({ appGenerator }) => {
 		stub(appGenerator, "generateDefault").returnValue({ main: [{ package: "@mainsail/foo" }] } as any);
 
-		assert.throws(
-			() => appGenerator.generate({ snapshot: { path: "x" } } as any),
-			/"@mainsail\/state" not found/,
-		);
+		assert.throws(() => appGenerator.generate({ snapshot: { path: "x" } } as any), /"@mainsail\/state" not found/);
 	});
 });

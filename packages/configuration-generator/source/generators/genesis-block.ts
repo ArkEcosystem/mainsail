@@ -413,7 +413,6 @@ export class GenesisBlockGenerator {
 			legacyColdWallet: Contracts.Evm.LegacyColdWallet;
 		}[]
 	> {
-
 		const legacyColdWallets: {
 			keyPair: Contracts.Crypto.KeyPair;
 			mainsailAddress: string;
