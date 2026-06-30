@@ -7,7 +7,7 @@ import { ensureDirSync, pathExistsSync } from "fs-extra/esm";
 import { join } from "path";
 
 import { ConfigurationWriter } from "./configuration-writer.js";
-import { EnvironmentData } from "./contracts.js";
+import { EnvironmentData, Task } from "./contracts.js";
 import {
 	AppGenerator,
 	EnvironmentGenerator,
@@ -19,11 +19,6 @@ import {
 	WalletGenerator,
 } from "./generators/index.js";
 import { Identifiers as InternalIdentifiers } from "./identifiers.js";
-
-type Task = {
-	task: () => Promise<void>;
-	title: string;
-};
 
 @injectable()
 export class ConfigurationGenerator {
