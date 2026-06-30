@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Identifiers } from "@mainsail/constants";
-import { inject, injectable, optional, tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
@@ -27,14 +27,26 @@ export class GenesisBlockGenerator {
 	private readonly transactionVerifier!: Contracts.Crypto.TransactionVerifier;
 
 	@inject(Identifiers.Snapshot.Legacy.Importer)
-	@optional()
-	private readonly snapshotLegacyImporter?: Contracts.Snapshot.LegacyImporter;
+	private readonly snapshotLegacyImporter!: Contracts.Snapshot.LegacyImporter;
 
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	@inject(InternalIdentifiers.Generator.Wallet)
 	private readonly walletGenerator!: WalletGenerator;
+
+	@inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
+
+	@tagged("type", "wallet")
+	@inject(Identifiers.Cryptography.Identity.KeyPair.Factory)
+	private readonly keyPairFactoryWallet!: Contracts.Crypto.KeyPairFactory;
+
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
+
+	@inject(Identifiers.Cryptography.Legacy.Identity.AddressFactory)
+	private readonly legacyAddressFactory!: Contracts.Crypto.AddressFactory;
 
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
@@ -106,7 +118,7 @@ export class GenesisBlockGenerator {
 		await this.app.resolve(Deployer).deploy({
 			generatorAddress: genesisWalletAddress,
 			initialBlockNumber: options.snapshot
-				? Number(this.snapshotLegacyImporter!.genesisBlockNumber)
+				? Number(this.snapshotLegacyImporter.genesisBlockNumber)
 				: options.initialBlockNumber,
 			// Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`).
 			// In snapshot mode premine is "0", so this mints nothing and the snapshot importer supplies the state.
@@ -332,7 +344,7 @@ export class GenesisBlockGenerator {
 		});
 
 		return {
-			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
+			block: await this.blockFactory.make(
 				{
 					fee: totals.fee,
 					gasUsed: totals.gasUsed,
@@ -373,7 +385,6 @@ export class GenesisBlockGenerator {
 
 	async #buildFromLegacySnapshot(options: Contracts.NetworkGenerator.GenesisBlockOptions) {
 		assert.defined(options.snapshot);
-		assert.defined(this.snapshotLegacyImporter);
 
 		// Load snapshot into EVM
 		const result = await this.snapshotLegacyImporter.import({
@@ -410,19 +421,6 @@ export class GenesisBlockGenerator {
 			legacyColdWallet: Contracts.Evm.LegacyColdWallet;
 		}[]
 	> {
-		const walletKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(
-			Identifiers.Cryptography.Identity.KeyPair.Factory,
-			"type",
-			"wallet",
-		);
-
-		const mainsailAddressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
-			Identifiers.Cryptography.Identity.Address.Factory,
-		);
-
-		const legacyAddressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
-			Identifiers.Cryptography.Legacy.Identity.AddressFactory,
-		);
 
 		const legacyColdWallets: {
 			keyPair: Contracts.Crypto.KeyPair;
@@ -433,10 +431,10 @@ export class GenesisBlockGenerator {
 			// use reversed secret as seed to not conflict with validators
 			const reversed = secret.split(" ").reverse().join(" ");
 
-			const walletKeyPair = await walletKeyPairFactory.fromMnemonic(reversed);
+			const walletKeyPair = await this.keyPairFactoryWallet.fromMnemonic(reversed);
 
-			const mainsailAddress = await mainsailAddressFactory.fromPublicKey(walletKeyPair.publicKey);
-			const legacyAddress = await legacyAddressFactory.fromPublicKey(walletKeyPair.publicKey);
+			const mainsailAddress = await this.addressFactory.fromPublicKey(walletKeyPair.publicKey);
+			const legacyAddress = await this.legacyAddressFactory.fromPublicKey(walletKeyPair.publicKey);
 			legacyColdWallets.push({
 				keyPair: walletKeyPair,
 				legacyColdWallet: {
