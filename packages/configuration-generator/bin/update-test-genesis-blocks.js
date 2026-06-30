@@ -18,7 +18,7 @@ const configurations = [
 		premine: "125000000000000000000000000",
 		chainId: 10000,
 		validators: 53,
-		initialHeight: 0,
+		initialBlockNumber: 0,
 		overwriteConfig: true,
 		createLegacyColdWallets: true,
 		timeouts: {
@@ -58,7 +58,7 @@ const configurations = [
 		premine: "125000000000000000000000000",
 		chainId: 10000,
 		validators: 5,
-		initialHeight: 0,
+		initialBlockNumber: 0,
 		overwriteConfig: true,
 		timeouts: {
 			blockPrepareTime: 200,
@@ -96,7 +96,7 @@ const configurations = [
 		premine: "125000000000000000000000000",
 		chainId: 10000,
 		validators: 53,
-		initialHeight: 0,
+		initialBlockNumber: 0,
 		overwriteConfig: true,
 		timeouts: {
 			blockPrepareTime: 100,
@@ -135,7 +135,7 @@ const configurations = [
 		premine: "125000000000000000000000000",
 		chainId: 10000,
 		validators: 5,
-		initialHeight: 0,
+		initialBlockNumber: 0,
 		overwriteConfig: true,
 		mockFakeValidatorBlsKeys: true,
 		timeouts: {
@@ -179,7 +179,7 @@ const configurations = [
 		premine: "125000000000000000000000000",
 		chainId: 10000,
 		validators: 5,
-		initialHeight: 0,
+		initialBlockNumber: 0,
 		overwriteConfig: true,
 		timeouts: {
 			blockPrepareTime: 2000,
@@ -265,7 +265,7 @@ const configurations = [
 		token: "ARK",
 		premine: "125000000000000000000000000",
 		chainId: 10000,
-		initialHeight: 0,
+		initialBlockNumber: 0,
 		validators: 5,
 		overwriteConfig: true,
 		mockFakeValidatorBlsKeys: true,

@@ -157,8 +157,8 @@ export class ConfigurationGenerator {
 							milestones,
 							// @ts-ignore
 							network: {
-								chainId: options.chainId,
-								pubKeyHash: options.pubKeyHash || 30,
+								chainId: internalOptions.chainId,
+								pubKeyHash: internalOptions.pubKeyHash,
 							},
 						},
 						false,

@@ -18,7 +18,7 @@ async function run() {
 		token: "ARK",
 		premine: "125000000000000000000000000",
 		chainId: 10000,
-		initialHeight: 0,
+		initialBlockNumber: 0,
 		// snapshot: {
 		// 	path: "../../62b828b447bb37642fc267c971621db611e19c8a92ee3fe0dc89a080118fc47a.compressed",
 		// },
