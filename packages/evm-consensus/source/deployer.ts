@@ -133,7 +133,7 @@ export class Deployer {
 
 		this.logger.info(`Deployed ${label} contract from ${this.deployerAddress} to ${receipt.contractAddress}`);
 
-		return receipt.contractAddress!;
+		return receipt.contractAddress;
 	}
 
 	async #deployProxy(deployment: ProxyDeployment): Promise<void> {
