@@ -15,7 +15,7 @@ export abstract class AbstractController {
 	protected getQueryPagination(query: RequestQuery): Contracts.Api.Pagination {
 		return {
 			limit: query.limit,
-			offset: (query.page - 1) * query.limit || 0,
+			offset: query.offset ?? ((query.page - 1) * query.limit || 0),
 		};
 	}
 
