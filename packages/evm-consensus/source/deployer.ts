@@ -43,8 +43,6 @@ export class Deployer {
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
-	#genesisBlockContext!: Contracts.Evm.BlockContext;
-
 	#nonce = 0;
 	#needsCommit = false;
 
@@ -52,9 +50,15 @@ export class Deployer {
 		this.hashFactory.sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).toString("hex");
 
 	public async deploy(): Promise<void> {
-		this.#genesisBlockContext = this.#getBlockContext();
+		const milestone = this.configuration.getMilestone();
 
-		await this.evm.prepareNextCommit({ blockContext: this.#genesisBlockContext });
+		await this.evm.prepareNextCommit({ blockContext: {
+			commitKey: this.#getCommitKey(),
+			gasLimit: BigInt(milestone.block.maxGasLimit),
+			timestamp: BigInt(this.genesisBlockInfo.timestamp),
+			validatorAddress: this.deployerAddress,
+		} });
+
 		await this.evm.initializeGenesis(this.genesisBlockInfo);
 
 		const consensusAddress = await this.#deployContract(ConsensusAbi.bytecode.object, 0, "Consensus");
@@ -90,7 +94,7 @@ export class Deployer {
 		});
 
 		if (this.#needsCommit) {
-			const commitKey = this.#genesisBlockContext.commitKey;
+			const commitKey = this.#getCommitKey();
 			await this.evm.onCommit({
 				commitKey,
 				getBlock: () => ({ ...commitKey, number: commitKey.blockNumber }),
@@ -99,17 +103,8 @@ export class Deployer {
 		}
 	}
 
-
-	#getBlockContext(): Contracts.Evm.BlockContext {
-		const milestone = this.configuration.getMilestone();
-
-		// Commit Key chosen in a way such that it does not conflict with blocks.
-		return {
-			commitKey: { blockNumber: BigInt(2 ** 32 + 1), round: BigInt(0) },
-			gasLimit: BigInt(milestone.block.maxGasLimit),
-			timestamp: BigInt(this.genesisBlockInfo.timestamp),
-			validatorAddress: this.deployerAddress,
-		};
+	#getCommitKey(): Contracts.Evm.CommitKey {
+		return { blockNumber: BigInt(2 ** 32 + 1), round: BigInt(0) };
 	}
 
 	#getSpecId(): Contracts.Evm.SpecId {
@@ -119,7 +114,7 @@ export class Deployer {
 
 	async #deployContract(data: string, nonce: number, label: string): Promise<string> {
 		const receipt = await this.#processTransaction({
-			commitKey: this.#genesisBlockContext.commitKey,
+			commitKey: this.#getCommitKey(),
 			data: Buffer.from(toBytes(data)),
 			from: this.deployerAddress,
 			gasLimit: BigInt(10_000_000),
@@ -178,7 +173,7 @@ export class Deployer {
 	}
 
 	async #processTransaction(context: Contracts.Evm.TransactionContext): Promise<Contracts.Evm.TransactionReceipt> {
-		const { receipt } = await this.evm.getReceipt(this.#genesisBlockContext.commitKey.blockNumber, context.txHash);
+		const { receipt } = await this.evm.getReceipt(this.#getCommitKey().blockNumber, context.txHash);
 		if (receipt) {
 			return receipt;
 		}
