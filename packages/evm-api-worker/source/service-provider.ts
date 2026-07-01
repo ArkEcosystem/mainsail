@@ -26,10 +26,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
-		await this.app.get<Contracts.Evm.Worker>(Identifiers.Evm.Worker).boot({
-			...this.flags,
-			thread: "evm-api",
-		});
+		// API-only worker; nothing on the consensus/P2P path depends on it at boot, so don't
+		// block startup on its full kernel bootstrap. Endpoints come online shortly after.
+		void this.app
+			.get<Contracts.Evm.Worker>(Identifiers.Evm.Worker)
+			.boot({
+				...this.flags,
+				thread: "evm-api",
+			})
+			.catch((error) => this.app.terminate("evm-api worker failed to boot", error));
 	}
 
 	public async dispose(): Promise<void> {
