@@ -30,6 +30,9 @@ export class Deployer {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.Cryptography.Hash.Factory)
+	private readonly hashFactory!: Contracts.Crypto.HashFactory;
+
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
@@ -40,9 +43,6 @@ export class Deployer {
 	@inject(EvmConsensusIdentifiers.Internal.GenesisInfo)
 	private readonly genesisBlockInfo!: Contracts.Evm.GenesisInfo;
 
-	@inject(Identifiers.Cryptography.Hash.Factory)
-	private readonly hashFactory!: Contracts.Crypto.HashFactory;
-
 	#nonce = 0;
 	#needsCommit = false;
 
@@ -52,12 +52,14 @@ export class Deployer {
 	public async deploy(): Promise<void> {
 		const milestone = this.configuration.getMilestone();
 
-		await this.evm.prepareNextCommit({ blockContext: {
-			commitKey: this.#getCommitKey(),
-			gasLimit: BigInt(milestone.block.maxGasLimit),
-			timestamp: BigInt(this.genesisBlockInfo.timestamp),
-			validatorAddress: this.deployerAddress,
-		} });
+		await this.evm.prepareNextCommit({
+			blockContext: {
+				commitKey: this.#getCommitKey(),
+				gasLimit: BigInt(milestone.block.maxGasLimit),
+				timestamp: BigInt(this.genesisBlockInfo.timestamp),
+				validatorAddress: this.deployerAddress,
+			},
+		});
 
 		await this.evm.initializeGenesis(this.genesisBlockInfo);
 
@@ -80,11 +82,7 @@ export class Deployer {
 			nonce: 3,
 		});
 
-		const multiPaymentAddress = await this.#deployContract(
-			MultiPaymentAbi.bytecode.object,
-			4,
-			"MultiPayment",
-		);
+		const multiPaymentAddress = await this.#deployContract(MultiPaymentAbi.bytecode.object, 4, "MultiPayment");
 		await this.#deployProxy({
 			abi: MultiPaymentAbi.abi,
 			addressIdentifier: EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
