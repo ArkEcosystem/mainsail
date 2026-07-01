@@ -31,6 +31,8 @@ describe<{ server: any; extSpy: any }>("Index", ({ it, beforeEach, assert }) => 
 		pagination.register(server, {});
 
 		assert.is(extSpy.length, 2);
+		assert.is(extSpy[0][0], "onPreHandler");
+		assert.is(extSpy[1][0], "onPostHandler");
 	});
 
 	it("should throw the joi error for invalid options", ({ server }) => {
