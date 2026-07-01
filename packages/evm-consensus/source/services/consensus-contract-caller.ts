@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
-import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
+import { Address, decodeFunctionResult, encodeFunctionData, toHex } from "viem";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 
@@ -19,9 +19,11 @@ export class ConsensusContractCaller {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
+	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
+	private readonly deployerAddress!: Address;
+
 	public async view<T>(functionName: string, arguments_?: readonly unknown[]): Promise<T> {
 		const consensusContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
-		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
 		const { evmSpec } = this.configuration.getMilestone();
 
 		const data = encodeFunctionData({
@@ -32,7 +34,7 @@ export class ConsensusContractCaller {
 
 		const result = await this.evm.view({
 			data: Buffer.from(data, "hex"),
-			from: deployerAddress,
+			from: this.deployerAddress,
 			specId: evmSpec,
 			to: consensusContractAddress,
 		});
