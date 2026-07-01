@@ -4,6 +4,7 @@ import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
+import { Address, getCreateAddress } from "viem";
 
 import { Deployer } from "./deployer.js";
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
@@ -14,6 +15,8 @@ import { ValidatorSet } from "./validator-set.js";
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
+		const deployerAddress: Address = "0x0000000000000000000000000000000000000001";
+
 		this.app.bind(Identifiers.ValidatorSet.Service).to(ValidatorSet).inSingletonScope();
 		this.app
 			.bind(EvmConsensusIdentifiers.Internal.ConsensusContractCaller)
@@ -21,9 +24,17 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.inSingletonScope();
 		this.app.bind(Identifiers.Evm.ContractService.Consensus).to(ConsensusContractService);
 		this.app.bind(EvmConsensusIdentifiers.Internal.Deployer).to(Deployer).inSingletonScope();
+		this.app.bind(EvmConsensusIdentifiers.Internal.Addresses.Deployer).toConstantValue(deployerAddress);
+
 		this.app
-			.bind(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
-			.toConstantValue("0x0000000000000000000000000000000000000001");
+			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
+			.toConstantValue(getCreateAddress({ from: deployerAddress, nonce: 1n }));
+		this.app
+			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Usernames)
+			.toConstantValue(getCreateAddress({ from: deployerAddress, nonce: 3n }));
+		this.app
+			.bind(EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment)
+			.toConstantValue(getCreateAddress({ from: deployerAddress, nonce: 5n }));
 	}
 
 	public async boot(): Promise<void> {

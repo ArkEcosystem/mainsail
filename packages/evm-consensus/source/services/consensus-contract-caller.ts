@@ -22,8 +22,10 @@ export class ConsensusContractCaller {
 	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
 	private readonly deployerAddress!: Address;
 
+	@inject(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
+	private readonly consensusContractAddress!: string;
+
 	public async view<T>(functionName: string, arguments_?: readonly unknown[]): Promise<T> {
-		const consensusContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
 		const { evmSpec } = this.configuration.getMilestone();
 
 		const data = encodeFunctionData({
@@ -36,7 +38,7 @@ export class ConsensusContractCaller {
 			data: Buffer.from(data, "hex"),
 			from: this.deployerAddress,
 			specId: evmSpec,
-			to: consensusContractAddress,
+			to: this.consensusContractAddress,
 		});
 
 		if (!result.success) {

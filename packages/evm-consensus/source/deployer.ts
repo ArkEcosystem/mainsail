@@ -10,7 +10,7 @@ import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
 
 interface ProxyDeployment {
 	readonly abi: Record<string, unknown>[];
-	readonly bindingIdentifier: symbol;
+	readonly addressIdentifier: symbol;
 	readonly implementationAddress: string;
 	readonly initializerArguments?: readonly unknown[];
 	readonly name: string;
@@ -67,7 +67,7 @@ export class Deployer {
 		const consensusAddress = await this.#deployContract(ConsensusAbi.bytecode.object, 0, "Consensus");
 		await this.#deployProxy({
 			abi: ConsensusAbi.abi,
-			bindingIdentifier: EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
+			addressIdentifier: EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
 			implementationAddress: consensusAddress,
 			initializerArguments: [this.configuration.getMilestone().validatorRegistrationFee],
 			name: "Consensus",
@@ -77,7 +77,7 @@ export class Deployer {
 		const usernamesAddress = await this.#deployContract(UsernamesAbi.bytecode.object, 2, "Usernames");
 		await this.#deployProxy({
 			abi: UsernamesAbi.abi,
-			bindingIdentifier: EvmConsensusIdentifiers.Contracts.Addresses.Usernames,
+			addressIdentifier: EvmConsensusIdentifiers.Contracts.Addresses.Usernames,
 			implementationAddress: usernamesAddress,
 			name: "Usernames",
 			nonce: 3,
@@ -90,7 +90,7 @@ export class Deployer {
 		);
 		await this.#deployProxy({
 			abi: MultiPaymentAbi.abi,
-			bindingIdentifier: EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
+			addressIdentifier: EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
 			implementationAddress: multiPaymentAddress,
 			name: "MultiPayment",
 			nonce: 5,
@@ -114,8 +114,8 @@ export class Deployer {
 			initialBlockNumber: BigInt(this.#genesisBlockInfo.initialBlockNumber),
 			initialSupply: BigInt(this.#genesisBlockInfo.initialSupply),
 
-			usernameContract: getCreateAddress({ from: this.deployerAddress, nonce: 3n }), // PROXY Uses nonce 3
-			validatorContract: getCreateAddress({ from: this.deployerAddress, nonce: 1n }), // PROXY Uses nonce 1
+			usernameContract: this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Usernames), // PROXY Uses nonce 3
+			validatorContract: this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus), // PROXY Uses nonce 1
 		};
 
 		this.#genesisBlockContext = this.#getBlockContext();
@@ -186,6 +186,10 @@ export class Deployer {
 
 		const address = await this.#deployContract(deployData, deployment.nonce, `${deployment.name} PROXY`);
 
+		if (address !== this.app.get<string>(deployment.addressIdentifier)) {
+			throw new Error("Contract address mismatch");
+		}
+
 		this.#emitContractDeployed({
 			activeImplementation: deployment.implementationAddress,
 			address,
@@ -193,8 +197,6 @@ export class Deployer {
 			name: deployment.name,
 			proxy: "UUPS",
 		});
-
-		this.app.bind(deployment.bindingIdentifier).toConstantValue(address);
 	}
 
 	#emitContractDeployed(event: Contracts.Evm.DeployerContract): void {
