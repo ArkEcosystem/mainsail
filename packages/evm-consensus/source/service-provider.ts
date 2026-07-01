@@ -12,13 +12,12 @@ import { ConsensusContractCaller } from "./services/consensus-contract-caller.js
 import { ConsensusContractService } from "./services/consensus-contract-service.js";
 import { ValidatorSet } from "./validator-set.js";
 
-const deployerAddress: Address = "0x0000000000000000000000000000000000000001";
+const DEPLOYER_ADDRESS: Address = "0x0000000000000000000000000000000000000001";
 
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-
 		this.app.bind(Identifiers.ValidatorSet.Service).to(ValidatorSet).inSingletonScope();
 		this.app
 			.bind(EvmConsensusIdentifiers.Internal.ConsensusContractCaller)
@@ -26,24 +25,24 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.inSingletonScope();
 		this.app.bind(Identifiers.Evm.ContractService.Consensus).to(ConsensusContractService);
 		this.app.bind(EvmConsensusIdentifiers.Internal.Deployer).to(Deployer).inSingletonScope();
-		this.app.bind(EvmConsensusIdentifiers.Internal.Addresses.Deployer).toConstantValue(deployerAddress);
+		this.app.bind(EvmConsensusIdentifiers.Internal.Addresses.Deployer).toConstantValue(DEPLOYER_ADDRESS);
 
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
-			.toConstantValue(getCreateAddress({ from: deployerAddress, nonce: 1n }));
+			.toConstantValue(getCreateAddress({ from: DEPLOYER_ADDRESS, nonce: 1n }));
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Usernames)
-			.toConstantValue(getCreateAddress({ from: deployerAddress, nonce: 3n }));
+			.toConstantValue(getCreateAddress({ from: DEPLOYER_ADDRESS, nonce: 3n }));
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment)
-			.toConstantValue(getCreateAddress({ from: deployerAddress, nonce: 5n }));
+			.toConstantValue(getCreateAddress({ from: DEPLOYER_ADDRESS, nonce: 5n }));
 
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		assert.defined(genesisBlock);
 
 		const genesisInfo: Contracts.Evm.GenesisInfo = {
 			account: genesisBlock.block.proposer,
-			deployerAccount: deployerAddress,
+			deployerAccount: DEPLOYER_ADDRESS,
 			initialBlockNumber: BigInt(genesisBlock.block.number),
 			initialSupply: this.#calculateInitialSupply(genesisBlock),
 			timestamp: BigInt(genesisBlock.block.timestamp),
