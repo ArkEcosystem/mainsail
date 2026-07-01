@@ -37,10 +37,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind(EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment)
 			.toConstantValue(getCreateAddress({ from: deployerAddress, nonce: 5n }));
-	}
-
-	public async boot(): Promise<void> {
-		this.app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).info("Booting EVM Consensus...");
 
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		assert.defined(genesisBlock);
@@ -57,6 +53,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		};
 
 		this.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(genesisInfo);
+	}
+
+	public async boot(): Promise<void> {
+		this.app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).info("Booting EVM Consensus...");
 
 		await this.app.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer).deploy();
 	}
