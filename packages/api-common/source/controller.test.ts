@@ -72,7 +72,8 @@ describe<{
 	});
 
 	it("getQueryPagination - honors an explicit offset over the page/limit computation", ({ subject }) => {
-		assert.equal(subject.pagination({ limit: 25, offset: 50, page: 3 }), { limit: 25, offset: 50 });
+		// page-derived offset would be (3-1)*10 = 20, so offset 50 only appears if the explicit param is honored.
+		assert.equal(subject.pagination({ limit: 10, offset: 50, page: 3 }), { limit: 10, offset: 50 });
 	});
 
 	it("getQueryPagination - respects an explicit offset of 0 (nullish, not falsy)", ({ subject }) => {
