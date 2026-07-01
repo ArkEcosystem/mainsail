@@ -117,7 +117,7 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action<[TxData]> 
 		// There's a fairly high chance for the transaction to execute successfully
 		// with gasLimit set to the first execution's usedGas + gasRefund. Explicitly
 		// check that gas amount and use as a limit for the binary search.
-		const optimisticGasLimit = (receipt.gasUsed + receipt.gasRefunded + 2300n) * (64n / 63n);
+		const optimisticGasLimit = ((receipt.gasUsed + receipt.gasRefunded + 2300n) * 64n) / 63n;
 		if (optimisticGasLimit < maxGasLimit) {
 			const { executionError, success } = await this.#execute({ ...context, gasLimit: optimisticGasLimit });
 			if (executionError) {

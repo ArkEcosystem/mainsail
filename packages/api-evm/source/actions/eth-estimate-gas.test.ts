@@ -171,11 +171,11 @@ describe<{
 		assert.equal(simulate.getCallArgs(0)[0].gasPrice, 100n);
 	});
 
-	it("should converge on the optimistic gas limit when it succeeds", async ({ action, evm }) => {
-		// gasUsed 21000, gasRefunded 0 -> optimistic = (21000 + 0 + 2300) * 1 = 23300 = 0x5B04
-		// optimistic (23300) < maxGasLimit (30_000_000) and succeeds, so maxGasLimit becomes 23300.
-		// binary search: minGasLimit = 20999, error ratio (23300-20999)/23300 ~ 0.0987 > 0.015,
-		// continues bisecting until close enough. Final result should be the converged max limit.
+	it("should apply the 64/63 headroom to the optimistic gas limit and converge", async ({ action, evm }) => {
+		// gasUsed 21000, gasRefunded 0 -> optimistic = ((21000 + 0 + 2300) * 64) / 63 = 23669
+		// (the 64/63 headroom is applied; without it the value would be 23300).
+		// The optimistic limit (23669) is below the full block limit and succeeds, then the binary
+		// search narrows the range until it is within the 1.5% error ratio.
 		const simulate = stub(evm, "simulate").resolvedValue({
 			receipt: { gasRefunded: 0n, gasUsed: 21_000n, status: 1 },
 		});
@@ -183,8 +183,9 @@ describe<{
 		const result = await action.handle([{ data: "0x1234", from, to: contract }]);
 
 		// First execution runs with the full block gas limit.
-		assert.true(simulate.getCallArgs(0)[0].gasLimit === 30_000_000n);
-		// Optimistic limit (23300) succeeds, then binary search converges to 21286 = 0x5326.
-		assert.equal(result, "0x5326");
+		assert.equal(simulate.getCallArgs(0)[0].gasLimit, 30_000_000n);
+		// The optimistic limit includes the 64/63 headroom (23669, not the un-adjusted 23300).
+		assert.equal(simulate.getCallArgs(1)[0].gasLimit, 23_669n);
+		assert.equal(result, "0x52ad");
 	});
 });
