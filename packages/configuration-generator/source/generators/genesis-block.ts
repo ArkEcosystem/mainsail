@@ -110,16 +110,24 @@ export class GenesisBlockGenerator {
 		validatorsCount: number,
 		options: Contracts.NetworkGenerator.InternalOptions,
 	) {
-		await this.app.resolve(Deployer).deploy({
-			generatorAddress: genesisWalletAddress,
-			initialBlockNumber: options.initialBlockNumber,
+		const genesisInfo: Contracts.Evm.GenesisInfo = {
+			account: genesisWalletAddress,
+			deployerAccount: this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer),
+			initialBlockNumber: BigInt(options.initialBlockNumber),
 			// Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`).
 			// In snapshot mode premine is "0", so this mints nothing and the snapshot importer supplies the state.
 			initialSupply: options.snapshot
-				? "0"
-				: ((BigInt(options.premine) / BigInt(validatorsCount)) * BigInt(validatorsCount)).toString(),
-			timestamp: dayjs(options.epoch).valueOf(),
-		});
+				? 0n
+				: (BigInt(options.premine) / BigInt(validatorsCount)) * BigInt(validatorsCount),
+			timestamp: BigInt(dayjs(options.epoch).valueOf()),
+
+			usernameContract: this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Usernames), // PROXY Uses nonce 3
+			validatorContract: this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus), // PROXY Uses nonce 1
+		};
+
+		this.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(genesisInfo);
+
+		await this.app.resolve(Deployer).deploy();
 
 		this.#consensusProxyContractAddress = this.app.get<string>(
 			EvmConsensusIdentifiers.Contracts.Addresses.Consensus,

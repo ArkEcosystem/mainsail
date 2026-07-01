@@ -12,10 +12,12 @@ import { ConsensusContractCaller } from "./services/consensus-contract-caller.js
 import { ConsensusContractService } from "./services/consensus-contract-service.js";
 import { ValidatorSet } from "./validator-set.js";
 
+const deployerAddress: Address = "0x0000000000000000000000000000000000000001";
+
+
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		const deployerAddress: Address = "0x0000000000000000000000000000000000000001";
 
 		this.app.bind(Identifiers.ValidatorSet.Service).to(ValidatorSet).inSingletonScope();
 		this.app
@@ -43,15 +45,23 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
 		assert.defined(genesisBlock);
 
-		await this.app.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer).deploy({
-			generatorAddress: genesisBlock.block.proposer,
-			initialBlockNumber: genesisBlock.block.number,
+		const genesisInfo: Contracts.Evm.GenesisInfo = {
+			account: genesisBlock.block.proposer,
+			deployerAccount: deployerAddress,
+			initialBlockNumber: BigInt(genesisBlock.block.number),
 			initialSupply: this.#calculateInitialSupply(genesisBlock),
-			timestamp: genesisBlock.block.timestamp,
-		});
+			timestamp: BigInt(genesisBlock.block.timestamp),
+
+			usernameContract: this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Usernames), // PROXY Uses nonce 3
+			validatorContract: this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus), // PROXY Uses nonce 1
+		};
+
+		this.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(genesisInfo);
+
+		await this.app.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer).deploy();
 	}
 
-	#calculateInitialSupply(genesisBlock: Contracts.Crypto.CommitJson): string {
+	#calculateInitialSupply(genesisBlock: Contracts.Crypto.CommitJson): bigint {
 		const generatorAddress = genesisBlock.block.proposer;
 
 		let supply = 0n;
@@ -60,7 +70,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			supply += BigInt(transaction.value);
 		}
 
-		return supply.toString();
+		return supply;
 	}
 }
 

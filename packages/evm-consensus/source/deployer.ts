@@ -3,7 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { ConsensusAbi, ERC1967ProxyAbi, MultiPaymentAbi, UsernamesAbi } from "@mainsail/evm-contracts";
-import { assert } from "@mainsail/utils";
 import { Address, encodeDeployData, encodeFunctionData, getCreateAddress, Hex, toBytes } from "viem";
 
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
@@ -15,13 +14,6 @@ interface ProxyDeployment {
 	readonly initializerArguments?: readonly unknown[];
 	readonly name: string;
 	readonly nonce: number;
-}
-
-export interface GenesisBlockInfo {
-	readonly timestamp: number;
-	readonly initialSupply: string;
-	readonly generatorAddress: string;
-	readonly initialBlockNumber: number;
 }
 
 @injectable()
@@ -45,10 +37,12 @@ export class Deployer {
 	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
 	private readonly deployerAddress!: Address;
 
+	@inject(EvmConsensusIdentifiers.Internal.GenesisInfo)
+	private readonly genesisBlockInfo!: Contracts.Evm.GenesisInfo;
+
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
-	#genesisBlockInfo!: GenesisBlockInfo;
 	#genesisBlockContext!: Contracts.Evm.BlockContext;
 
 	#nonce = 0;
@@ -57,12 +51,11 @@ export class Deployer {
 	#generateTxHash = () =>
 		this.hashFactory.sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).toString("hex");
 
-	public async deploy(genesisBlockInfo: GenesisBlockInfo): Promise<void> {
-		this.#genesisBlockInfo = genesisBlockInfo;
+	public async deploy(): Promise<void> {
+		this.#genesisBlockContext = this.#getBlockContext();
 
-		const { commitKey } = this.#getBlockContext();
-
-		await this.#initialize(commitKey);
+		await this.evm.prepareNextCommit({ blockContext: this.#genesisBlockContext });
+		await this.evm.initializeGenesis(this.genesisBlockInfo);
 
 		const consensusAddress = await this.#deployContract(ConsensusAbi.bytecode.object, 0, "Consensus");
 		await this.#deployProxy({
@@ -97,6 +90,7 @@ export class Deployer {
 		});
 
 		if (this.#needsCommit) {
+			const commitKey = this.#genesisBlockContext.commitKey;
 			await this.evm.onCommit({
 				commitKey,
 				getBlock: () => ({ ...commitKey, number: commitKey.blockNumber }),
@@ -105,26 +99,6 @@ export class Deployer {
 		}
 	}
 
-	async #initialize(commitKey: Contracts.Evm.CommitKey): Promise<void> {
-		assert.defined(this.#genesisBlockInfo);
-
-		const genesisInfo = {
-			account: this.#genesisBlockInfo.generatorAddress,
-			deployerAccount: this.deployerAddress,
-			initialBlockNumber: BigInt(this.#genesisBlockInfo.initialBlockNumber),
-			initialSupply: BigInt(this.#genesisBlockInfo.initialSupply),
-
-			usernameContract: this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Usernames), // PROXY Uses nonce 3
-			validatorContract: this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus), // PROXY Uses nonce 1
-		};
-
-		this.#genesisBlockContext = this.#getBlockContext();
-
-		await this.evm.prepareNextCommit({ blockContext: this.#genesisBlockContext });
-		await this.evm.initializeGenesis(genesisInfo);
-
-		this.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(genesisInfo);
-	}
 
 	#getBlockContext(): Contracts.Evm.BlockContext {
 		const milestone = this.configuration.getMilestone();
@@ -133,7 +107,7 @@ export class Deployer {
 		return {
 			commitKey: { blockNumber: BigInt(2 ** 32 + 1), round: BigInt(0) },
 			gasLimit: BigInt(milestone.block.maxGasLimit),
-			timestamp: BigInt(this.#genesisBlockInfo.timestamp),
+			timestamp: BigInt(this.genesisBlockInfo.timestamp),
 			validatorAddress: this.deployerAddress,
 		};
 	}
