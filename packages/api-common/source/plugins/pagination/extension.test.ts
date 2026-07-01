@@ -155,10 +155,11 @@ describe<{ subject: Extension }>("Extension", ({ it, beforeEach, assert }) => {
 		assert.is(newSource.meta.totalCount, 25);
 		// pageCount = trunc(25/10) + (25%10===0?0:1) = 2 + 1 = 3
 		assert.is(newSource.meta.pageCount, 3);
-		assert.defined(newSource.meta.self);
-		assert.defined(newSource.meta.first);
-		assert.defined(newSource.meta.last);
-		assert.startsWith(newSource.meta.self, "/blocks?");
+		assert.equal(newSource.meta.self, "/blocks?limit=10&page=1");
+		assert.equal(newSource.meta.first, "/blocks?limit=10&page=1");
+		assert.equal(newSource.meta.last, "/blocks?limit=10&page=3");
+		assert.equal(newSource.meta.next, "/blocks?limit=10&page=2");
+		assert.equal(newSource.meta.previous, null);
 	});
 
 	it("onPostHandler should handle source as an array", ({ subject }) => {
