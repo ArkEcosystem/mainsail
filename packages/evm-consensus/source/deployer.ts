@@ -13,7 +13,6 @@ interface ProxyDeployment {
 	readonly bindingIdentifier: symbol;
 	readonly implementationAddress: string;
 	readonly initializerArguments?: readonly unknown[];
-	readonly label: string;
 	readonly name: string;
 	readonly nonce: number;
 }
@@ -65,38 +64,35 @@ export class Deployer {
 
 		await this.#initialize(commitKey);
 
-		const consensusAddress = await this.#deployContract(ConsensusAbi.bytecode.object, 0, "Consensus contract");
+		const consensusAddress = await this.#deployContract(ConsensusAbi.bytecode.object, 0, "Consensus");
 		await this.#deployProxy({
 			abi: ConsensusAbi.abi,
 			bindingIdentifier: EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
 			implementationAddress: consensusAddress,
 			initializerArguments: [this.configuration.getMilestone().validatorRegistrationFee],
-			label: "Consensus PROXY contract",
-			name: "consensus",
+			name: "Consensus",
 			nonce: 1,
 		});
 
-		const usernamesAddress = await this.#deployContract(UsernamesAbi.bytecode.object, 2, "Usernames contract");
+		const usernamesAddress = await this.#deployContract(UsernamesAbi.bytecode.object, 2, "Usernames");
 		await this.#deployProxy({
 			abi: UsernamesAbi.abi,
 			bindingIdentifier: EvmConsensusIdentifiers.Contracts.Addresses.Usernames,
 			implementationAddress: usernamesAddress,
-			label: "Usernames PROXY contract",
-			name: "usernames",
+			name: "Usernames",
 			nonce: 3,
 		});
 
 		const multiPaymentAddress = await this.#deployContract(
 			MultiPaymentAbi.bytecode.object,
 			4,
-			"MultiPayment contract",
+			"MultiPayment",
 		);
 		await this.#deployProxy({
 			abi: MultiPaymentAbi.abi,
 			bindingIdentifier: EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
 			implementationAddress: multiPaymentAddress,
-			label: "MultiPayment PROXY contract",
-			name: "multi-payments",
+			name: "MultiPayment",
 			nonce: 5,
 		});
 
@@ -161,14 +157,14 @@ export class Deployer {
 		});
 
 		if (!receipt.status) {
-			throw new Error(`failed to deploy ${label}`);
+			throw new Error(`failed to deploy ${label} contract`);
 		}
 
 		if (receipt.contractAddress !== getCreateAddress({ from: this.deployerAddress, nonce: BigInt(nonce) })) {
 			throw new Error("Contract address mismatch");
 		}
 
-		this.logger.info(`Deployed ${label} from ${this.deployerAddress} to ${receipt.contractAddress}`);
+		this.logger.info(`Deployed ${label} contract from ${this.deployerAddress} to ${receipt.contractAddress}`);
 
 		return receipt.contractAddress!;
 	}
@@ -188,7 +184,7 @@ export class Deployer {
 			bytecode: ERC1967ProxyAbi.bytecode.object as Hex,
 		});
 
-		const address = await this.#deployContract(deployData, deployment.nonce, deployment.label);
+		const address = await this.#deployContract(deployData, deployment.nonce, `${deployment.name} PROXY`);
 
 		this.#emitContractDeployed({
 			activeImplementation: deployment.implementationAddress,
