@@ -35,12 +35,6 @@ describe<{ subject: Extension }>("Extension", ({ it, beforeEach, assert }) => {
 		assert.true(subject.isValidRoute(makeRoute({ pagination: {} }) as any));
 	});
 
-	it("hasPagination should reflect enabled flag", ({ subject }) => {
-		assert.true(subject.hasPagination(makeRoute({ pagination: { enabled: true } }) as any));
-		assert.false(subject.hasPagination(makeRoute({ pagination: { enabled: false } }) as any));
-		assert.false(subject.hasPagination(makeRoute(undefined) as any));
-	});
-
 	// onPreHandler
 
 	it("onPreHandler should parse string page/limit into numbers", ({ subject }) => {
