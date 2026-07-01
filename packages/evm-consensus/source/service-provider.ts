@@ -7,6 +7,7 @@ import { assert } from "@mainsail/utils";
 
 import { Deployer } from "./deployer.js";
 import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
+import { ConsensusContractCaller } from "./services/consensus-contract-caller.js";
 import { ConsensusContractService } from "./services/consensus-contract-service.js";
 import { ValidatorSet } from "./validator-set.js";
 
@@ -14,6 +15,10 @@ import { ValidatorSet } from "./validator-set.js";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.ValidatorSet.Service).to(ValidatorSet).inSingletonScope();
+		this.app
+			.bind(EvmConsensusIdentifiers.Internal.ConsensusContractCaller)
+			.to(ConsensusContractCaller)
+			.inSingletonScope();
 		this.app.bind(Identifiers.Evm.ContractService.Consensus).to(ConsensusContractService);
 		this.app.bind(EvmConsensusIdentifiers.Internal.Deployer).to(Deployer).inSingletonScope();
 		this.app

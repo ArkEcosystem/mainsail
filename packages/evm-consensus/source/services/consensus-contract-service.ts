@@ -1,11 +1,10 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable, tagged } from "@mainsail/container";
-import { ConsensusAbi } from "@mainsail/evm-contracts";
-import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
+import { inject, injectable } from "@mainsail/container";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
+import { ConsensusContractCaller } from "./consensus-contract-caller.js";
 import { AsyncValidatorRoundsIterator } from "./rounds-iterator.js";
 import { AsyncVotesIterator } from "./votes-iterator.js";
 
@@ -25,40 +24,11 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.Configuration;
-
-	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "evm")
-	private readonly evm!: Contracts.Evm.Instance;
+	@inject(EvmConsensusIdentifiers.Internal.ConsensusContractCaller)
+	private readonly contractCaller!: ConsensusContractCaller;
 
 	async getRoundValidators(): Promise<Contracts.State.ValidatorWallet[]> {
-		const consensusContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
-		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
-		const { evmSpec } = this.configuration.getMilestone();
-
-		const data = encodeFunctionData({
-			abi: ConsensusAbi.abi,
-			args: undefined,
-			functionName: "getRoundValidators",
-		}).slice(2);
-
-		const result = await this.evm.view({
-			data: Buffer.from(data, "hex"),
-			from: deployerAddress,
-			specId: evmSpec,
-			to: consensusContractAddress,
-		});
-
-		if (!result.success) {
-			await this.app.terminate("getRoundValidators failed");
-		}
-
-		const validators = decodeFunctionResult({
-			abi: ConsensusAbi.abi,
-			data: toHex(result.output!),
-			functionName: "getRoundValidators",
-		}) as ConsensusContractValidator[];
+		const validators = await this.contractCaller.view<ConsensusContractValidator[]>("getRoundValidators");
 
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
 		for (const validator of validators) {
@@ -83,32 +53,7 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 	}
 
 	async getAllValidators(): Promise<Contracts.State.ValidatorWallet[]> {
-		const consensusContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
-		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
-		const { evmSpec } = this.configuration.getMilestone();
-
-		const data = encodeFunctionData({
-			abi: ConsensusAbi.abi,
-			args: undefined,
-			functionName: "getAllValidators",
-		}).slice(2);
-
-		const result = await this.evm.view({
-			data: Buffer.from(data, "hex"),
-			from: deployerAddress,
-			specId: evmSpec,
-			to: consensusContractAddress,
-		});
-
-		if (!result.success) {
-			await this.app.terminate("getAllValidators failed");
-		}
-
-		const validators = decodeFunctionResult({
-			abi: ConsensusAbi.abi,
-			data: toHex(result.output!),
-			functionName: "getAllValidators",
-		}) as ConsensusContractValidator[];
+		const validators = await this.contractCaller.view<ConsensusContractValidator[]>("getAllValidators");
 
 		const validatorWallets: Contracts.State.ValidatorWallet[] = [];
 		for (const validator of validators) {
@@ -137,32 +82,7 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 	}
 
 	async getVotesCount(): Promise<number> {
-		const consensusContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
-		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
-		const { evmSpec } = this.configuration.getMilestone();
-
-		const data = encodeFunctionData({
-			abi: ConsensusAbi.abi,
-			args: undefined,
-			functionName: "getVotesCount",
-		}).slice(2);
-
-		const result = await this.evm.view({
-			data: Buffer.from(data, "hex"),
-			from: deployerAddress,
-			specId: evmSpec,
-			to: consensusContractAddress,
-		});
-
-		if (!result.success) {
-			await this.app.terminate("getVotesCount failed");
-		}
-
-		const voters = decodeFunctionResult({
-			abi: ConsensusAbi.abi,
-			data: toHex(result.output!),
-			functionName: "getVotesCount",
-		}) as bigint;
+		const voters = await this.contractCaller.view<bigint>("getVotesCount");
 
 		return Number(voters);
 	}

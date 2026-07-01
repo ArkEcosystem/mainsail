@@ -1,11 +1,10 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable, tagged } from "@mainsail/container";
-import { ConsensusAbi } from "@mainsail/evm-contracts";
-import { decodeFunctionResult, encodeFunctionData, toHex } from "viem";
+import { inject, injectable } from "@mainsail/container";
 
 import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
+import { ConsensusContractCaller } from "./consensus-contract-caller.js";
 
 const ROUNDS_PER_REQUEST = 2500;
 
@@ -19,18 +18,11 @@ interface ConsensusContractValidatorRound {
 
 @injectable()
 export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm.ValidatorRound> {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
-
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.Configuration;
-
 	@inject(Identifiers.BlockchainUtils.RoundCalculator)
 	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
 
-	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "evm")
-	private readonly evm!: Contracts.Evm.Instance;
+	@inject(EvmConsensusIdentifiers.Internal.ConsensusContractCaller)
+	private readonly contractCaller!: ConsensusContractCaller;
 
 	#rounds: Contracts.Evm.ValidatorRound[] = [];
 	#index = 0; // Index of returned round in chunk
@@ -56,32 +48,10 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 	}
 
 	private async getRounds(): Promise<Contracts.Evm.ValidatorRound[]> {
-		const consensusContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
-		const deployerAddress = this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer);
-		const { evmSpec } = this.configuration.getMilestone();
-
-		const data = encodeFunctionData({
-			abi: ConsensusAbi.abi,
-			args: [this.#offset, ROUNDS_PER_REQUEST],
-			functionName: "getRounds",
-		}).slice(2);
-
-		const result = await this.evm.view({
-			data: Buffer.from(data, "hex"),
-			from: deployerAddress,
-			specId: evmSpec,
-			to: consensusContractAddress,
-		});
-
-		if (!result.success) {
-			await this.app.terminate("getRounds failed");
-		}
-
-		const rounds = decodeFunctionResult({
-			abi: ConsensusAbi.abi,
-			data: toHex(result.output!),
-			functionName: "getRounds",
-		}) as ConsensusContractValidatorRound[];
+		const rounds = await this.contractCaller.view<ConsensusContractValidatorRound[]>("getRounds", [
+			this.#offset,
+			ROUNDS_PER_REQUEST,
+		]);
 
 		const validatorRounds: Contracts.Evm.ValidatorRound[] = [];
 		for (const validatorRound of rounds) {
