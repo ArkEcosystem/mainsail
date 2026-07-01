@@ -8,7 +8,6 @@ const makeRoute = (plugins?: object) => ({
 	route: { settings: plugins === undefined ? {} : { plugins } },
 });
 
-
 describe<{ server: any; extSpy: any }>("Index", ({ it, beforeEach, assert }) => {
 	beforeEach((context) => {
 		const calls: any[] = [];

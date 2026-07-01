@@ -53,8 +53,7 @@ export class Extension {
 		}
 
 		const { statusCode } = request.response;
-		const processResponse: boolean =
-			this.isValidRoute(request) && statusCode >= 200 && statusCode <= 299;
+		const processResponse: boolean = this.isValidRoute(request) && statusCode >= 200 && statusCode <= 299;
 
 		if (!processResponse) {
 			return h.continue;
