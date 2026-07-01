@@ -46,9 +46,6 @@ export class Deployer {
 	#nonce = 0;
 	#needsCommit = false;
 
-	#generateTxHash = () =>
-		this.hashFactory.sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).toString("hex");
-
 	public async deploy(): Promise<void> {
 		const milestone = this.configuration.getMilestone();
 
@@ -99,6 +96,10 @@ export class Deployer {
 				setAccountUpdates: () => ({}),
 			} as unknown as Contracts.Processor.ProcessableUnit);
 		}
+	}
+
+	#generateTxHash() :string {
+		return this.hashFactory.sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).toString("hex");
 	}
 
 	#getCommitKey(): Contracts.Evm.CommitKey {
