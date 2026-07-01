@@ -10,7 +10,6 @@ export const sandboxOptions: SandboxOptions = {
 	crypto: {
 		flags: {
 			blockTime: 8000,
-			distribute: true,
 			explorer: "http://uexplorer.ark.io",
 			maxBlockPayload: 2_097_152,
 			maxTxPerBlock: 150,

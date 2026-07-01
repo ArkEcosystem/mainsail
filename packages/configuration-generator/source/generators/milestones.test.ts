@@ -70,6 +70,31 @@ describe<{
 		);
 	});
 
+	it("#setInitial - should use explicitly provided timeouts", ({ generator }) => {
+		const timeouts = {
+			blockPrepareTime: 1,
+			blockTime: 2,
+			stageTimeout: 3,
+			stageTimeoutIncrease: 4,
+			tolerance: 5,
+		};
+
+		const [initial] = generator
+			.setInitial({
+				blockTime: 8000,
+				epoch: new Date(),
+				initialBlockNumber: 0,
+				maxBlockGasLimit: 1000,
+				maxBlockPayload: 2000,
+				timeouts,
+				validators: 53,
+				validatorRegistrationFee: "250",
+			})
+			.generate();
+
+		assert.equal(initial.timeouts, timeouts);
+	});
+
 	it("#setReward - should set reward", ({ generator }) => {
 		assert.equal(generator.setReward(3, "200").generate(), [
 			{
