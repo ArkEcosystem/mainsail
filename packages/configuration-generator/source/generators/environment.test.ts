@@ -42,4 +42,17 @@ describe<{
 
 		assert.equal(resul.TEST, "test");
 	});
+
+	it("#addRecords - should keep falsy-but-valid values and skip null/undefined", ({ generator }) => {
+		const resul = generator
+			.addRecords({ EMPTY: "", NOPE: undefined, NULLED: null, ZERO: 0 } as Record<string, string | number>)
+			.generate();
+
+		// 0 and "" are valid and must be preserved.
+		assert.equal(resul.ZERO, 0);
+		assert.equal(resul.EMPTY, "");
+		// null / undefined are skipped.
+		assert.undefined(resul.NOPE);
+		assert.undefined(resul.NULLED);
+	});
 });

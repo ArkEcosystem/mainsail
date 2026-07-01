@@ -61,7 +61,7 @@ importers:
         version: 9.1.7
       lerna:
         specifier: 9.0.7
-        version: 9.0.7(@types/node@25.7.0)
+        version: 9.0.7(@types/node@25.7.0)(debug@4.3.7)
       lint-staged:
         specifier: 17.0.4
         version: 17.0.4
@@ -779,9 +779,6 @@ importers:
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
-      '@mainsail/snapshot-legacy-exporter':
-        specifier: workspace:*
-        version: link:../snapshot-legacy-exporter
       '@mainsail/snapshot-legacy-importer':
         specifier: workspace:*
         version: link:../snapshot-legacy-importer
@@ -3443,7 +3440,7 @@ importers:
         version: 0.5.6
       viem:
         specifier: 2.22.15
-        version: 2.22.15(typescript@6.0.3)
+        version: 2.22.15(typescript@6.0.3)(zod@4.4.3)
 
   tests/e2e/consensus/checks:
     dependencies:
@@ -3455,7 +3452,7 @@ importers:
         version: 14.2.1
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@6.0.3)
+        version: 2.33.1(typescript@6.0.3)(zod@4.4.3)
 
   tests/e2e/consensus/peer-discovery:
     dependencies:
@@ -3488,7 +3485,7 @@ importers:
         version: 14.2.1
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@6.0.3)
+        version: 2.33.1(typescript@6.0.3)(zod@4.4.3)
 
   tests/functional/consensus:
     devDependencies:
@@ -3629,7 +3626,7 @@ importers:
         version: 0.5.6
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@6.0.3)
+        version: 2.33.1(typescript@6.0.3)(zod@4.4.3)
 
   tests/functional/resync:
     devDependencies:
@@ -3776,7 +3773,7 @@ importers:
         version: 0.5.6
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@6.0.3)
+        version: 2.33.1(typescript@6.0.3)(zod@4.4.3)
 
   tests/functional/transaction-pool-api:
     devDependencies:
@@ -3920,7 +3917,7 @@ importers:
         version: 0.5.6
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@6.0.3)
+        version: 2.33.1(typescript@6.0.3)(zod@4.4.3)
 
 packages:
 
@@ -6711,6 +6708,7 @@ packages:
   conventional-changelog-core@5.0.1:
     resolution: {integrity: sha512-Rvi5pH+LvgsqGwZPZ3Cq/tz4ty7mjijhr3qR4m9IBXNbxGGYgTVVO+duXzz9aArmHxFtwZ+LRkrNIMDQzgoY4A==}
     engines: {node: '>=14'}
+    deprecated: Deprecated and no longer maintained. Please use conventional-changelog instead.
 
   conventional-changelog-preset-loader@3.0.0:
     resolution: {integrity: sha512-qy9XbdSLmVnwnvzEisjxdDiLA4OmV3o8db+Zdg4WiFw14fP3B6XNz98X0swPPpkTd/pc1K7+adKgEDM1JCUMiA==}
@@ -7754,7 +7752,7 @@ packages:
   git-raw-commits@3.0.0:
     resolution: {integrity: sha512-b5OHmZ3vAgGrDn/X0kS+9qCfNKWe4K/jFnhwzVWWg0/k5eLa3060tZShrRg8Dja5kPc+YjS0Gc6y7cRr44Lpjw==}
     engines: {node: '>=14'}
-    deprecated: This package is no longer maintained. For the JavaScript API, please use @conventional-changelog/git-client instead.
+    deprecated: Deprecated and no longer maintained. Use @conventional-changelog/git-client instead.
     hasBin: true
 
   git-remote-origin-url@2.0.0:
@@ -7764,7 +7762,7 @@ packages:
   git-semver-tags@5.0.1:
     resolution: {integrity: sha512-hIvOeZwRbQ+7YEUmCkHqo8FOLQZCEn18yevLHADlFPZY02KJGsu5FZt9YW/lybfK2uhWFI7Qg/07LekJiTv7iA==}
     engines: {node: '>=14'}
-    deprecated: This package is no longer maintained. For the JavaScript API, please use @conventional-changelog/git-client instead.
+    deprecated: Deprecated and no longer maintained. Use @conventional-changelog/git-client instead.
     hasBin: true
 
   git-sha1@0.1.2:
@@ -12527,13 +12525,13 @@ snapshots:
       proc-log: 6.1.0
       which: 6.0.1
 
-  '@nx/devkit@22.7.1(nx@22.7.1)':
+  '@nx/devkit@22.7.1(nx@22.7.1(debug@4.3.7))':
     dependencies:
       '@zkochan/js-yaml': 0.0.7
       ejs: 5.0.1
       enquirer: 2.3.6
       minimatch: 10.2.4
-      nx: 22.7.1
+      nx: 22.7.1(debug@4.3.7)
       semver: 7.7.4
       tslib: 2.8.1
       yargs-parser: 21.1.1
@@ -13496,7 +13494,7 @@ snapshots:
       camel-case: 4.1.2
       fast-glob: 3.3.3
 
-  axios@1.15.0:
+  axios@1.15.0(debug@4.3.7):
     dependencies:
       follow-redirects: 1.15.11(debug@4.3.7)
       form-data: 4.0.5
@@ -15925,12 +15923,12 @@ snapshots:
     dependencies:
       package-json: 10.0.1
 
-  lerna@9.0.7(@types/node@25.7.0):
+  lerna@9.0.7(@types/node@25.7.0)(debug@4.3.7):
     dependencies:
       '@npmcli/arborist': 9.1.6
       '@npmcli/package-json': 7.0.2
       '@npmcli/run-script': 10.0.3
-      '@nx/devkit': 22.7.1(nx@22.7.1)
+      '@nx/devkit': 22.7.1(nx@22.7.1(debug@4.3.7))
       '@octokit/plugin-enterprise-rest': 6.0.1
       '@octokit/rest': 20.1.2
       aproba: 2.0.0
@@ -15968,7 +15966,7 @@ snapshots:
       npm-package-arg: 13.0.1
       npm-packlist: 10.0.3
       npm-registry-fetch: 19.1.0
-      nx: 22.7.1
+      nx: 22.7.1(debug@4.3.7)
       p-map: 4.0.0
       p-map-series: 2.1.0
       p-pipe: 3.1.0
@@ -16740,7 +16738,7 @@ snapshots:
 
   number-is-nan@1.0.1: {}
 
-  nx@22.7.1:
+  nx@22.7.1(debug@4.3.7):
     dependencies:
       '@emnapi/core': 1.4.5
       '@emnapi/runtime': 1.4.5
@@ -16755,7 +16753,7 @@ snapshots:
       ansi-styles: 4.3.0
       argparse: 2.0.1
       asynckit: 0.4.0
-      axios: 1.15.0
+      axios: 1.15.0(debug@4.3.7)
       balanced-match: 4.0.3
       base64-js: 1.5.1
       bl: 4.1.0
@@ -17008,7 +17006,7 @@ snapshots:
     transitivePeerDependencies:
       - zod
 
-  ox@0.6.7(typescript@6.0.3):
+  ox@0.6.7(typescript@6.0.3)(zod@4.4.3):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
       '@noble/curves': 1.9.6
@@ -17022,7 +17020,7 @@ snapshots:
     transitivePeerDependencies:
       - zod
 
-  ox@0.8.1(typescript@6.0.3):
+  ox@0.8.1(typescript@6.0.3)(zod@4.4.3):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
       '@noble/ciphers': 1.3.0
@@ -18770,7 +18768,7 @@ snapshots:
 
   vary@1.1.2: {}
 
-  viem@2.22.15(typescript@6.0.3):
+  viem@2.22.15(typescript@6.0.3)(zod@4.4.3):
     dependencies:
       '@noble/curves': 1.8.1
       '@noble/hashes': 1.7.1
@@ -18778,7 +18776,7 @@ snapshots:
       '@scure/bip39': 1.5.4
       abitype: 1.0.8(typescript@6.0.3)
       isows: 1.0.6(ws@8.18.0)
-      ox: 0.6.7(typescript@6.0.3)
+      ox: 0.6.7(typescript@6.0.3)(zod@4.4.3)
       ws: 8.18.0
     optionalDependencies:
       typescript: 6.0.3
@@ -18787,7 +18785,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  viem@2.33.1(typescript@6.0.3):
+  viem@2.33.1(typescript@6.0.3)(zod@4.4.3):
     dependencies:
       '@noble/curves': 1.9.2
       '@noble/hashes': 1.8.0
@@ -18795,7 +18793,7 @@ snapshots:
       '@scure/bip39': 1.6.0
       abitype: 1.0.8(typescript@6.0.3)
       isows: 1.0.7(ws@8.18.2)
-      ox: 0.8.1(typescript@6.0.3)
+      ox: 0.8.1(typescript@6.0.3)(zod@4.4.3)
       ws: 8.18.2
     optionalDependencies:
       typescript: 6.0.3

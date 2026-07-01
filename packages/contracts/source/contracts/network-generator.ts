@@ -6,7 +6,6 @@ export type EnvironmentOptions = {
 	coreDBDatabase?: string;
 
 	coreP2PPort: number;
-	coreWebhooksPort: number;
 };
 
 export type MilestoneOptions = {
@@ -14,7 +13,6 @@ export type MilestoneOptions = {
 	validatorRegistrationFee: string;
 	maxBlockPayload: number;
 	maxBlockGasLimit: number;
-	maxTxPerBlock: number;
 	blockTime: number;
 	timeouts?: {
 		blockPrepareTime: number;
@@ -43,7 +41,6 @@ export type RewardOptions = {
 };
 
 export type GenesisBlockOptions = {
-	distribute: boolean;
 	premine: string;
 	chainId: number;
 	epoch: Date;
@@ -70,7 +67,6 @@ export type InternalOptions = EnvironmentOptions &
 		packageName?: string;
 		configPath?: string;
 		overwriteConfig: boolean;
-		force: boolean;
 
 		// Testing
 		createLegacyColdWallets?: boolean;
@@ -81,14 +77,4 @@ export type Options = Partial<InternalOptions> & {
 	token: string;
 	symbol: string;
 	chainId: number;
-};
-
-export type WriteOptions = {
-	writeApp: boolean;
-	writePeers: boolean;
-	writeEnvironment: boolean;
-	writeValidators: boolean;
-	writeGenesisBlock: boolean;
-	writeCrypto: boolean;
-	writeSnapshot: boolean;
 };
