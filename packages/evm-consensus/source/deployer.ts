@@ -124,7 +124,7 @@ export class Deployer {
 		});
 
 		if (!receipt.status) {
-			throw new Error(`failed to deploy ${label} contract`);
+			throw new Error(`Failed to deploy ${label} contract`);
 		}
 
 		if (receipt.contractAddress !== getCreateAddress({ from: this.deployerAddress, nonce: BigInt(nonce) })) {
