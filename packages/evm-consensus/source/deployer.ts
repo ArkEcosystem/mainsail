@@ -197,13 +197,7 @@ export class Deployer {
 		this.app.bind(deployment.bindingIdentifier).toConstantValue(address);
 	}
 
-	public getDeploymentEvents(): Contracts.Evm.DeployerContract[] {
-		return this.#deploymentEvents;
-	}
-
-	#deploymentEvents: Contracts.Evm.DeployerContract[] = [];
 	#emitContractDeployed(event: Contracts.Evm.DeployerContract): void {
-		this.#deploymentEvents.push(event);
 		void this.events.dispatch(Events.DeployerEvent.ContractCreated, event);
 	}
 
