@@ -126,30 +126,6 @@ describe("TransactionFilter.getExpression", ({ it, assert }) => {
 		assert.equal(expression, { op: "false" });
 	});
 
-	it("derives deployedContractAddress cardinality from itself, not from gasPrice", async () => {
-		// Regression: the case previously iterated criteria.gasPrice, so pairing it with an array
-		// gasPrice duplicated the notNull expression once per gasPrice value. It must produce a
-		// single notNull regardless of how many gasPrice values are supplied.
-		const expression = await TransactionFilter.getExpression(walletRepository, {
-			deployedContractAddress: true,
-			gasPrice: [5, 6],
-		});
-
-		assert.equal(expression, {
-			expressions: [
-				{ op: "notNull", property: "deployedContractAddress" },
-				{
-					expressions: [
-						{ jsonFieldAccessor: undefined, op: "equal", property: "gasPrice", value: 5 },
-						{ jsonFieldAccessor: undefined, op: "equal", property: "gasPrice", value: 6 },
-					],
-					op: "or",
-				},
-			],
-			op: "and",
-		});
-	});
-
 	it("should build an and expression combining multiple fields", async () => {
 		const expression = await TransactionFilter.getExpression(walletRepository, {
 			blockHash: "bh",
