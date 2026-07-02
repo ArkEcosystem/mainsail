@@ -21,12 +21,6 @@ export class Server extends AbstractServer {
 	}
 
 	protected defaultOptions(): Record<string, unknown> {
-		const validateContext = {
-			configuration: {
-				plugins: {},
-			},
-		};
-
 		return {
 			router: {
 				stripTrailingSlash: true,
@@ -45,7 +39,11 @@ export class Server extends AbstractServer {
 					},
 
 					options: {
-						context: validateContext,
+						context: {
+							configuration: {
+								plugins: {},
+							},
+						},
 					},
 				},
 			},

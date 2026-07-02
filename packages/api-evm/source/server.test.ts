@@ -27,8 +27,6 @@ describe<{
 			.toConstantValue(context.configuration)
 			.whenTagged("plugin", "api-evm");
 
-		// Resolve Server directly; do not subclass — extending an @injectable a second time
-		// drops the property-injection metadata for the tagged configuration field.
 		context.server = context.app.resolve(Server);
 	});
 
