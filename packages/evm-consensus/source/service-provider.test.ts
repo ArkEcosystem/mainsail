@@ -26,7 +26,9 @@ describe<{
 }>("ServiceProvider", ({ it, beforeEach, assert, spy }) => {
 	beforeEach((context) => {
 		context.app = new Application();
-		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({ getGenesisCommit: () => genesisBlock });
+		context.app
+			.bind(Identifiers.Cryptography.Configuration)
+			.toConstantValue({ getGenesisCommit: () => genesisBlock });
 
 		context.serviceProvider = context.app.resolve(ServiceProvider);
 	});
@@ -40,12 +42,21 @@ describe<{
 		assert.true(app.isBound(Identifiers.EvmConsensus.Deployer));
 	});
 
-	it("#register - should bind the deployer and deterministic contract addresses", async ({ app, serviceProvider }) => {
+	it("#register - should bind the deployer and deterministic contract addresses", async ({
+		app,
+		serviceProvider,
+	}) => {
 		await serviceProvider.register();
 
 		assert.equal(app.get(Identifiers.EvmConsensus.DeployerAddress), DEPLOYER);
-		assert.equal(app.get(Identifiers.EvmConsensus.Contracts.Consensus), getCreateAddress({ from: DEPLOYER, nonce: 1n }));
-		assert.equal(app.get(Identifiers.EvmConsensus.Contracts.Usernames), getCreateAddress({ from: DEPLOYER, nonce: 3n }));
+		assert.equal(
+			app.get(Identifiers.EvmConsensus.Contracts.Consensus),
+			getCreateAddress({ from: DEPLOYER, nonce: 1n }),
+		);
+		assert.equal(
+			app.get(Identifiers.EvmConsensus.Contracts.Usernames),
+			getCreateAddress({ from: DEPLOYER, nonce: 3n }),
+		);
 		assert.equal(
 			app.get(Identifiers.EvmConsensus.Contracts.MultiPayment),
 			getCreateAddress({ from: DEPLOYER, nonce: 5n }),

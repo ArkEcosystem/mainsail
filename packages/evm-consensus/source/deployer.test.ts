@@ -7,7 +7,8 @@ import { Deployer } from "./deployer.js";
 
 const DEPLOYER_ADDRESS = "0x0000000000000000000000000000000000000001";
 const WRONG_ADDRESS = "0x00000000000000000000000000000000000000ff";
-const addressForNonce = (nonce: bigint | number): string => getCreateAddress({ from: DEPLOYER_ADDRESS, nonce: BigInt(nonce) });
+const addressForNonce = (nonce: bigint | number): string =>
+	getCreateAddress({ from: DEPLOYER_ADDRESS, nonce: BigInt(nonce) });
 
 describe<{
 	app: Application;
@@ -39,7 +40,11 @@ describe<{
 		context.events = { dispatch: async () => {} };
 		context.logger = { info: () => {} };
 		context.configuration = {
-			getMilestone: () => ({ block: { maxGasLimit: 30_000_000 }, evmSpec: "shanghai", validatorRegistrationFee: 100n }),
+			getMilestone: () => ({
+				block: { maxGasLimit: 30_000_000 },
+				evmSpec: "shanghai",
+				validatorRegistrationFee: 100n,
+			}),
 		};
 		context.hashFactory = { sha256: () => Buffer.from("00", "hex") };
 		context.genesisInfo = {
@@ -69,7 +74,12 @@ describe<{
 
 	beforeEach((context) => setup(context));
 
-	it("should initialize genesis and deploy all contracts and proxies", async ({ deployer, evm, events, genesisInfo }) => {
+	it("should initialize genesis and deploy all contracts and proxies", async ({
+		deployer,
+		evm,
+		events,
+		genesisInfo,
+	}) => {
 		const prepare = spy(evm, "prepareNextCommit");
 		const initialize = spy(evm, "initializeGenesis");
 		const process = spy(evm, "process");
@@ -105,7 +115,10 @@ describe<{
 		await assert.rejects(() => deployer.deploy(), "Failed to deploy Consensus contract");
 	});
 
-	it("should throw when a deployed contract address does not match the expected address", async ({ deployer, evm }) => {
+	it("should throw when a deployed contract address does not match the expected address", async ({
+		deployer,
+		evm,
+	}) => {
 		stub(evm, "process").resolvedValue({ receipt: { contractAddress: WRONG_ADDRESS, status: true } });
 
 		await assert.rejects(() => deployer.deploy(), "Contract address mismatch");

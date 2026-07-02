@@ -460,7 +460,11 @@ export class Restore {
 					assert.defined(receipt);
 
 					const { senderPublicKey } = transaction;
-					const parsedMultiPayments = parseMultiPayments(this.multiPaymentContractAddress, transaction, receipt);
+					const parsedMultiPayments = parseMultiPayments(
+						this.multiPaymentContractAddress,
+						transaction,
+						receipt,
+					);
 					const parsedUsernames = parseUsernames(this.usernameContractAddress, transaction, receipt);
 					const {
 						tokenActions: parsedTokenActions,
@@ -932,7 +936,6 @@ export class Restore {
 		// const deploymentEvents = this.app
 		// 	.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer)
 		// 	.getDeploymentEvents();
-
 		// await context.contractRepository
 		// 	.createQueryBuilder()
 		// 	.insert()

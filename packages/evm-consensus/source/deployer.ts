@@ -96,8 +96,10 @@ export class Deployer implements Contracts.EvmConsensus.Deployer {
 		}
 	}
 
-	#generateTxHash() :string {
-		return this.hashFactory.sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).toString("hex");
+	#generateTxHash(): string {
+		return this.hashFactory
+			.sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8"))
+			.toString("hex");
 	}
 
 	#getCommitKey(): Contracts.Evm.CommitKey {

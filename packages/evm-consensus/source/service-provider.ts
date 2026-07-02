@@ -16,10 +16,7 @@ const DEPLOYER_ADDRESS: Address = "0x0000000000000000000000000000000000000001";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.ValidatorSet.Service).to(ValidatorSet).inSingletonScope();
-		this.app
-			.bind(Identifiers.EvmConsensus.ConsensusContractCaller)
-			.to(ConsensusContractCaller)
-			.inSingletonScope();
+		this.app.bind(Identifiers.EvmConsensus.ConsensusContractCaller).to(ConsensusContractCaller).inSingletonScope();
 		this.app.bind(Identifiers.Evm.ContractService.Consensus).to(ConsensusContractService);
 		this.app.bind(Identifiers.EvmConsensus.Deployer).to(Deployer).inSingletonScope();
 		this.app.bind(Identifiers.EvmConsensus.DeployerAddress).toConstantValue(DEPLOYER_ADDRESS);
@@ -67,4 +64,3 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return supply;
 	}
 }
-

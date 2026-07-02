@@ -183,7 +183,7 @@ export const Identifiers = {
 		Deployer: Symbol("EvmConsensus<Deployer>"),
 		DeployerAddress: Symbol("EvmConsensus<DeployerAddress>"),
 		GenesisInfo: Symbol("EvmConsensus<GenesisInfo>"),
-		ValidatorSet: Symbol("EvmConsensus<ValidatorSet>")
+		ValidatorSet: Symbol("EvmConsensus<ValidatorSet>"),
 	},
 	Forger: {
 		Block: Symbol("Forger<Block>"),
