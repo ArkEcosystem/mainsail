@@ -3,7 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
-import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 import { ConsensusContractCaller } from "./consensus-contract-caller.js";
 
 const ROUNDS_PER_REQUEST = 2500;
@@ -21,7 +20,7 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 	@inject(Identifiers.BlockchainUtils.RoundCalculator)
 	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
 
-	@inject(EvmConsensusIdentifiers.Internal.ConsensusContractCaller)
+	@inject(Identifiers.EvmConsensus.ConsensusContractCaller)
 	private readonly contractCaller!: ConsensusContractCaller;
 
 	#rounds: Contracts.Evm.ValidatorRound[] = [];

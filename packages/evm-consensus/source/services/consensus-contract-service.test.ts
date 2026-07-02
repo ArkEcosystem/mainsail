@@ -2,7 +2,6 @@ import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 
-import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 import { ConsensusContractService } from "./consensus-contract-service.js";
 import { AsyncValidatorRoundsIterator } from "./rounds-iterator.js";
 import { AsyncVotesIterator } from "./votes-iterator.js";
@@ -31,7 +30,7 @@ describe<{
 		};
 
 		context.app = new Application();
-		context.app.bind(EvmConsensusIdentifiers.Internal.ConsensusContractCaller).toConstantValue(context.caller);
+		context.app.bind(Identifiers.EvmConsensus.ConsensusContractCaller).toConstantValue(context.caller);
 		context.app.bind(Identifiers.BlockchainUtils.RoundCalculator).toConstantValue({});
 
 		context.service = context.app.resolve(ConsensusContractService);

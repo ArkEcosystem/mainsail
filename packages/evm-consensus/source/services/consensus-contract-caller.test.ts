@@ -4,7 +4,6 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { encodeFunctionData, encodeFunctionResult, toBytes } from "viem";
 
-import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 import { ConsensusContractCaller } from "./consensus-contract-caller.js";
 
 const DEPLOYER = "0x0000000000000000000000000000000000000001";
@@ -29,8 +28,8 @@ describe<{
 		context.app = new Application();
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 		context.app.bind(Identifiers.Evm.Instance).toConstantValue(context.evm);
-		context.app.bind(EvmConsensusIdentifiers.Internal.Addresses.Deployer).toConstantValue(DEPLOYER);
-		context.app.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus).toConstantValue(CONSENSUS);
+		context.app.bind(Identifiers.EvmConsensus.DeployerAddress).toConstantValue(DEPLOYER);
+		context.app.bind(Identifiers.EvmConsensus.Contracts.Consensus).toConstantValue(CONSENSUS);
 
 		context.caller = context.app.resolve(ConsensusContractCaller);
 	});

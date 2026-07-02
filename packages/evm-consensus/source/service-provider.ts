@@ -7,7 +7,6 @@ import { assert } from "@mainsail/utils";
 import { Address, getCreateAddress } from "viem";
 
 import { Deployer } from "./deployer.js";
-import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
 import { ConsensusContractCaller } from "./services/consensus-contract-caller.js";
 import { ConsensusContractService } from "./services/consensus-contract-service.js";
 import { ValidatorSet } from "./validator-set.js";
@@ -20,21 +19,21 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.ValidatorSet.Service).to(ValidatorSet).inSingletonScope();
 		this.app
-			.bind(EvmConsensusIdentifiers.Internal.ConsensusContractCaller)
+			.bind(Identifiers.EvmConsensus.ConsensusContractCaller)
 			.to(ConsensusContractCaller)
 			.inSingletonScope();
 		this.app.bind(Identifiers.Evm.ContractService.Consensus).to(ConsensusContractService);
-		this.app.bind(EvmConsensusIdentifiers.Internal.Deployer).to(Deployer).inSingletonScope();
-		this.app.bind(EvmConsensusIdentifiers.Internal.Addresses.Deployer).toConstantValue(DEPLOYER_ADDRESS);
+		this.app.bind(Identifiers.EvmConsensus.Deployer).to(Deployer).inSingletonScope();
+		this.app.bind(Identifiers.EvmConsensus.DeployerAddress).toConstantValue(DEPLOYER_ADDRESS);
 
 		this.app
-			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
+			.bind(Identifiers.EvmConsensus.Contracts.Consensus)
 			.toConstantValue(getCreateAddress({ from: DEPLOYER_ADDRESS, nonce: 1n }));
 		this.app
-			.bind(EvmConsensusIdentifiers.Contracts.Addresses.Usernames)
+			.bind(Identifiers.EvmConsensus.Contracts.Usernames)
 			.toConstantValue(getCreateAddress({ from: DEPLOYER_ADDRESS, nonce: 3n }));
 		this.app
-			.bind(EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment)
+			.bind(Identifiers.EvmConsensus.Contracts.MultiPayment)
 			.toConstantValue(getCreateAddress({ from: DEPLOYER_ADDRESS, nonce: 5n }));
 
 		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
@@ -47,17 +46,17 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			initialSupply: this.#calculateInitialSupply(genesisBlock),
 			timestamp: BigInt(genesisBlock.block.timestamp),
 
-			usernameContract: this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Usernames), // PROXY Uses nonce 3
-			validatorContract: this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus), // PROXY Uses nonce 1
+			usernameContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Usernames), // PROXY Uses nonce 3
+			validatorContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus), // PROXY Uses nonce 1
 		};
 
-		this.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(genesisInfo);
+		this.app.bind(Identifiers.EvmConsensus.GenesisInfo).toConstantValue(genesisInfo);
 	}
 
 	public async boot(): Promise<void> {
 		this.app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).info("Booting EVM Consensus...");
 
-		await this.app.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer).deploy();
+		await this.app.get<Deployer>(Identifiers.EvmConsensus.Deployer).deploy();
 	}
 
 	#calculateInitialSupply(genesisBlock: Contracts.Crypto.CommitJson): bigint {

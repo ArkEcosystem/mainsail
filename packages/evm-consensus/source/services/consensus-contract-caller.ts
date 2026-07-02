@@ -5,8 +5,6 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { Address, decodeFunctionResult, encodeFunctionData, toHex } from "viem";
 
-import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
-
 @injectable()
 export class ConsensusContractCaller {
 	@inject(Identifiers.Application.Instance)
@@ -19,10 +17,10 @@ export class ConsensusContractCaller {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
+	@inject(Identifiers.EvmConsensus.DeployerAddress)
 	private readonly deployerAddress!: Address;
 
-	@inject(EvmConsensusIdentifiers.Contracts.Addresses.Consensus)
+	@inject(Identifiers.EvmConsensus.Contracts.Consensus)
 	private readonly consensusContractAddress!: string;
 
 	public async view<T>(functionName: string, arguments_?: readonly unknown[]): Promise<T> {

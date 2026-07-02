@@ -4,7 +4,7 @@ import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
-import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
+import { Deployer } from "@mainsail/evm-consensus";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { Application } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
@@ -112,7 +112,7 @@ export class GenesisBlockGenerator {
 	) {
 		const genesisInfo: Contracts.Evm.GenesisInfo = {
 			account: genesisWalletAddress,
-			deployerAccount: this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer),
+			deployerAccount: this.app.get<string>(Identifiers.EvmConsensus.DeployerAddress),
 			initialBlockNumber: BigInt(options.initialBlockNumber),
 			// Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`).
 			// In snapshot mode premine is "0", so this mints nothing and the snapshot importer supplies the state.
@@ -121,16 +121,16 @@ export class GenesisBlockGenerator {
 				: (BigInt(options.premine) / BigInt(validatorsCount)) * BigInt(validatorsCount),
 			timestamp: BigInt(dayjs(options.epoch).valueOf()),
 
-			usernameContract: this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Usernames), // PROXY Uses nonce 3
-			validatorContract: this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus), // PROXY Uses nonce 1
+			usernameContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Usernames), // PROXY Uses nonce 3
+			validatorContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus), // PROXY Uses nonce 1
 		};
 
-		this.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(genesisInfo);
+		this.app.bind(Identifiers.EvmConsensus.GenesisInfo).toConstantValue(genesisInfo);
 
 		await this.app.resolve(Deployer).deploy();
 
 		this.#consensusProxyContractAddress = this.app.get<string>(
-			EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
+			Identifiers.EvmConsensus.Contracts.Consensus,
 		);
 	}
 

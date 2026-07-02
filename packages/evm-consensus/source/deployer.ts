@@ -5,8 +5,6 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { ConsensusAbi, ERC1967ProxyAbi, MultiPaymentAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { Address, encodeDeployData, encodeFunctionData, getCreateAddress, Hex, toBytes } from "viem";
 
-import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
-
 interface ProxyDeployment {
 	readonly abi: Record<string, unknown>[];
 	readonly addressIdentifier: symbol;
@@ -37,10 +35,10 @@ export class Deployer {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
+	@inject(Identifiers.EvmConsensus.DeployerAddress)
 	private readonly deployerAddress!: Address;
 
-	@inject(EvmConsensusIdentifiers.Internal.GenesisInfo)
+	@inject(Identifiers.EvmConsensus.GenesisInfo)
 	private readonly genesisBlockInfo!: Contracts.Evm.GenesisInfo;
 
 	#nonce = 0;
@@ -63,7 +61,7 @@ export class Deployer {
 		const consensusAddress = await this.#deployContract(ConsensusAbi.bytecode.object, 0, "Consensus");
 		await this.#deployProxy({
 			abi: ConsensusAbi.abi,
-			addressIdentifier: EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
+			addressIdentifier: Identifiers.EvmConsensus.Contracts.Consensus,
 			implementationAddress: consensusAddress,
 			initializerArguments: [this.configuration.getMilestone().validatorRegistrationFee],
 			name: "Consensus",
@@ -73,7 +71,7 @@ export class Deployer {
 		const usernamesAddress = await this.#deployContract(UsernamesAbi.bytecode.object, 2, "Usernames");
 		await this.#deployProxy({
 			abi: UsernamesAbi.abi,
-			addressIdentifier: EvmConsensusIdentifiers.Contracts.Addresses.Usernames,
+			addressIdentifier: Identifiers.EvmConsensus.Contracts.Usernames,
 			implementationAddress: usernamesAddress,
 			name: "Usernames",
 			nonce: 3,
@@ -82,7 +80,7 @@ export class Deployer {
 		const multiPaymentAddress = await this.#deployContract(MultiPaymentAbi.bytecode.object, 4, "MultiPayment");
 		await this.#deployProxy({
 			abi: MultiPaymentAbi.abi,
-			addressIdentifier: EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
+			addressIdentifier: Identifiers.EvmConsensus.Contracts.MultiPayment,
 			implementationAddress: multiPaymentAddress,
 			name: "MultiPayment",
 			nonce: 5,

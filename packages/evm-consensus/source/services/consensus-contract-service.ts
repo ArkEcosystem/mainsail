@@ -3,7 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
-import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 import { ConsensusContractCaller } from "./consensus-contract-caller.js";
 import { AsyncValidatorRoundsIterator } from "./rounds-iterator.js";
 import { AsyncVotesIterator } from "./votes-iterator.js";
@@ -24,7 +23,7 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(EvmConsensusIdentifiers.Internal.ConsensusContractCaller)
+	@inject(Identifiers.EvmConsensus.ConsensusContractCaller)
 	private readonly contractCaller!: ConsensusContractCaller;
 
 	async getRoundValidators(): Promise<Contracts.State.ValidatorWallet[]> {

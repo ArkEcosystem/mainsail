@@ -2,7 +2,6 @@ import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 
-import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 import { AsyncValidatorRoundsIterator } from "./rounds-iterator.js";
 
 describe<{
@@ -30,7 +29,7 @@ describe<{
 		};
 
 		context.app = new Application();
-		context.app.bind(EvmConsensusIdentifiers.Internal.ConsensusContractCaller).toConstantValue(context.caller);
+		context.app.bind(Identifiers.EvmConsensus.ConsensusContractCaller).toConstantValue(context.caller);
 		context.app.bind(Identifiers.BlockchainUtils.RoundCalculator).toConstantValue({
 			calculateRoundInfoByRound: (round: number) => ({ roundHeight: round * 100 }),
 		});

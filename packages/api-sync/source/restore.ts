@@ -7,7 +7,6 @@ import {
 } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { parseTransactionError } from "@mainsail/evm-contracts";
 import { assert, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
@@ -148,6 +147,12 @@ export class Restore {
 
 	@inject(Identifiers.Evm.ContractService.Consensus)
 	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
+
+	@inject(Identifiers.EvmConsensus.Contracts.MultiPayment)
+	private readonly multiPaymentContractAddress!: string;
+
+	@inject(Identifiers.EvmConsensus.Contracts.Usernames)
+	private readonly usernameContractAddress!: string;
 
 	@inject(Identifiers.ApiSync.TokenParser)
 	private readonly tokenParser!: TokenParser;
@@ -314,12 +319,6 @@ export class Restore {
 		let ingestedTransactions = 0;
 		let totalRound = 0;
 
-		const multiPaymentContractAddress = this.app.get<string>(
-			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
-		);
-
-		const usernameContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Usernames);
-
 		do {
 			const fromBlockNumber = Math.min(currentBlockNumber, mostRecentCommit.block.number);
 			const toBlockNumber = Math.min(currentBlockNumber + BATCH_SIZE - 1, mostRecentCommit.block.number);
@@ -461,8 +460,8 @@ export class Restore {
 					assert.defined(receipt);
 
 					const { senderPublicKey } = transaction;
-					const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
-					const parsedUsernames = parseUsernames(usernameContractAddress, transaction, receipt);
+					const parsedMultiPayments = parseMultiPayments(this.multiPaymentContractAddress, transaction, receipt);
+					const parsedUsernames = parseUsernames(this.usernameContractAddress, transaction, receipt);
 					const {
 						tokenActions: parsedTokenActions,
 						tokenHolders: parsedTokenHolders,
@@ -930,24 +929,24 @@ export class Restore {
 	}
 
 	async #ingestContracts(context: RestoreContext): Promise<void> {
-		const deploymentEvents = this.app
-			.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer)
-			.getDeploymentEvents();
+		// const deploymentEvents = this.app
+		// 	.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer)
+		// 	.getDeploymentEvents();
 
-		await context.contractRepository
-			.createQueryBuilder()
-			.insert()
-			.orIgnore()
-			.values(
-				deploymentEvents.map((event) => ({
-					activeImplementation: event.activeImplementation ?? event.address,
-					address: event.address,
-					implementations: event.implementations,
-					name: event.name,
-					proxy: event.proxy,
-				})) as unknown as { address: string; abi: Record<string, unknown> }[],
-			)
-			.execute();
+		// await context.contractRepository
+		// 	.createQueryBuilder()
+		// 	.insert()
+		// 	.orIgnore()
+		// 	.values(
+		// 		deploymentEvents.map((event) => ({
+		// 			activeImplementation: event.activeImplementation ?? event.address,
+		// 			address: event.address,
+		// 			implementations: event.implementations,
+		// 			name: event.name,
+		// 			proxy: event.proxy,
+		// 		})) as unknown as { address: string; abi: Record<string, unknown> }[],
+		// 	)
+		// 	.execute();
 	}
 
 	async #updateValidatorRanks(context: RepositoryContext): Promise<void> {

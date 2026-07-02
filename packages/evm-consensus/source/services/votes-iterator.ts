@@ -1,8 +1,8 @@
 import type { Contracts } from "@mainsail/contracts";
 
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
-import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 import { ConsensusContractCaller } from "./consensus-contract-caller.js";
 
 const VOTES_PER_REQUEST = 10_000;
@@ -14,7 +14,7 @@ interface ConsensusContractVote {
 
 @injectable()
 export class AsyncVotesIterator implements AsyncIterable<Contracts.Evm.Vote> {
-	@inject(EvmConsensusIdentifiers.Internal.ConsensusContractCaller)
+	@inject(Identifiers.EvmConsensus.ConsensusContractCaller)
 	private readonly contractCaller!: ConsensusContractCaller;
 
 	#address = "0x0000000000000000000000000000000000000000";

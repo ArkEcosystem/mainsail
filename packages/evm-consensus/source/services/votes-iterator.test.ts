@@ -1,7 +1,7 @@
 import { Application } from "@mainsail/kernel";
+import { Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
 
-import { Identifiers as EvmConsensusIdentifiers } from "../identifiers.js";
 import { AsyncVotesIterator } from "./votes-iterator.js";
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -31,7 +31,7 @@ describe<{
 		};
 
 		context.app = new Application();
-		context.app.bind(EvmConsensusIdentifiers.Internal.ConsensusContractCaller).toConstantValue(context.caller);
+		context.app.bind(Identifiers.EvmConsensus.ConsensusContractCaller).toConstantValue(context.caller);
 
 		context.iterator = context.app.resolve(AsyncVotesIterator);
 	});

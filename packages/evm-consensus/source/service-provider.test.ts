@@ -5,7 +5,6 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { getCreateAddress } from "viem";
 
-import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
 import { ServiceProvider } from "./service-provider.js";
 
 const DEPLOYER = "0x0000000000000000000000000000000000000001";
@@ -38,19 +37,19 @@ describe<{
 		await serviceProvider.register();
 
 		assert.true(app.isBound(Identifiers.ValidatorSet.Service));
-		assert.true(app.isBound(EvmConsensusIdentifiers.Internal.ConsensusContractCaller));
+		assert.true(app.isBound(Identifiers.EvmConsensus.ConsensusContractCaller));
 		assert.true(app.isBound(Identifiers.Evm.ContractService.Consensus));
-		assert.true(app.isBound(EvmConsensusIdentifiers.Internal.Deployer));
+		assert.true(app.isBound(Identifiers.EvmConsensus.Deployer));
 	});
 
 	it("#register - should bind the deployer and deterministic contract addresses", async ({ app, serviceProvider }) => {
 		await serviceProvider.register();
 
-		assert.equal(app.get(EvmConsensusIdentifiers.Internal.Addresses.Deployer), DEPLOYER);
-		assert.equal(app.get(EvmConsensusIdentifiers.Contracts.Addresses.Consensus), getCreateAddress({ from: DEPLOYER, nonce: 1n }));
-		assert.equal(app.get(EvmConsensusIdentifiers.Contracts.Addresses.Usernames), getCreateAddress({ from: DEPLOYER, nonce: 3n }));
+		assert.equal(app.get(Identifiers.EvmConsensus.DeployerAddress), DEPLOYER);
+		assert.equal(app.get(Identifiers.EvmConsensus.Contracts.Consensus), getCreateAddress({ from: DEPLOYER, nonce: 1n }));
+		assert.equal(app.get(Identifiers.EvmConsensus.Contracts.Usernames), getCreateAddress({ from: DEPLOYER, nonce: 3n }));
 		assert.equal(
-			app.get(EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment),
+			app.get(Identifiers.EvmConsensus.Contracts.MultiPayment),
 			getCreateAddress({ from: DEPLOYER, nonce: 5n }),
 		);
 	});
@@ -58,7 +57,7 @@ describe<{
 	it("#register - should build and bind the genesis info", async ({ app, serviceProvider }) => {
 		await serviceProvider.register();
 
-		assert.equal(app.get(EvmConsensusIdentifiers.Internal.GenesisInfo), {
+		assert.equal(app.get(Identifiers.EvmConsensus.GenesisInfo), {
 			account: "0xproposer",
 			deployerAccount: DEPLOYER,
 			initialBlockNumber: 0n,
@@ -72,7 +71,7 @@ describe<{
 	it("#boot - should run the deployer", async () => {
 		const app = new Application();
 		const deployer = { deploy: async () => {} };
-		app.bind(EvmConsensusIdentifiers.Internal.Deployer).toConstantValue(deployer);
+		app.bind(Identifiers.EvmConsensus.Deployer).toConstantValue(deployer);
 		app.bind(Identifiers.Services.Log.Service).toConstantValue({ info: () => {} });
 
 		const serviceProvider = app.resolve(ServiceProvider);
