@@ -18,8 +18,8 @@ export class ReceiptResource {
 			from: transaction.from,
 			to: transaction.to,
 			cumulativeGasUsed: `0x${receipt.cumulativeGasUsed.toString(16)}`,
-			// For non-EIP1559 tx effectiveGasUsed == gasUsed
-			effectiveGasUsed: `0x${receipt.gasUsed.toString(16)}`,
+			// For non-EIP1559 transactions the effective gas price equals the gas price.
+			effectiveGasPrice: `0x${transaction.gasPrice.toString(16)}`,
 			gasUsed: `0x${receipt.gasUsed.toString(16)}`,
 			contractAddress: receipt.contractAddress,
 			logs: receipt.logs,
