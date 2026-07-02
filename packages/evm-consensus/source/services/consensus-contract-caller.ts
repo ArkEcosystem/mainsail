@@ -41,6 +41,7 @@ export class ConsensusContractCaller {
 			to: this.consensusContractAddress,
 		});
 
+		// TODO: Check if terminate is the right way to handle this, or if we should throw an error instead.
 		if (!result.success) {
 			await this.app.terminate(`${functionName} failed`);
 		}
