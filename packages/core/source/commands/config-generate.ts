@@ -130,13 +130,6 @@ export class Command extends Commands.Command {
 			default: "https://explorer.ark.io",
 		},
 		{
-			name: "distribute",
-			description: "Distribute the premine evenly between all validators?",
-			schema: Joi.bool(),
-			promptType: "confirm",
-			default: false,
-		},
-		{
 			name: "epoch",
 			description: "Start time of the network.",
 			schema: Joi.date(),

@@ -14,7 +14,13 @@ export class Extension {
 	public constructor(private readonly config: object) {}
 
 	public isValidRoute(request: HapiRequest): boolean {
-		return this.hasPagination(request);
+		const pagination = this.getRoutePaginationOptions(request);
+
+		if (!pagination) {
+			return false;
+		}
+
+		return pagination.enabled !== undefined ? pagination.enabled : true;
 	}
 
 	public onPreHandler(request: HapiRequest, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue {
@@ -47,8 +53,7 @@ export class Extension {
 		}
 
 		const { statusCode } = request.response;
-		const processResponse: boolean =
-			this.isValidRoute(request) && statusCode >= 200 && statusCode <= 299 && this.hasPagination(request);
+		const processResponse: boolean = this.isValidRoute(request) && statusCode >= 200 && statusCode <= 299;
 
 		if (!processResponse) {
 			return h.continue;
@@ -123,16 +128,6 @@ export class Extension {
 		(response as Utils.Mutable<Hapi.ResponseObject>).source = newSource;
 
 		return h.continue;
-	}
-
-	public hasPagination(request: HapiRequest): boolean {
-		const pagination = this.getRoutePaginationOptions(request);
-
-		if (!pagination) {
-			return false;
-		}
-
-		return pagination.enabled !== undefined ? pagination.enabled : true;
 	}
 
 	private getRoutePaginationOptions(request: HapiRequest): { enabled: boolean } | undefined {

@@ -109,6 +109,7 @@ describe<{
 	it("start requests start with the block number", async ({ worker, ipc }) => {
 		const sendRequest = spy(ipc, "sendRequest");
 
+		await worker.boot({});
 		await worker.start(42);
 
 		sendRequest.calledWith("start", 42);
@@ -119,6 +120,7 @@ describe<{
 		const sendRequest = stub(ipc, "sendRequest").resolvedValue(batch);
 		const options = { blockRound: "0", maxBytes: 1024, maxSize: 100 };
 
+		await worker.boot({});
 		const result = await worker.getTransactions(options);
 
 		sendRequest.calledWith("getTransactions", options);
@@ -128,6 +130,7 @@ describe<{
 	it("removeTransaction requests removal by address and id", async ({ worker, ipc }) => {
 		const sendRequest = spy(ipc, "sendRequest");
 
+		await worker.boot({});
 		await worker.removeTransaction("address-1", "hash-1");
 
 		sendRequest.calledWith("removeTransaction", "address-1", "hash-1");
@@ -136,6 +139,7 @@ describe<{
 	it("setPeer requests the peer by ip", async ({ worker, ipc }) => {
 		const sendRequest = spy(ipc, "sendRequest");
 
+		await worker.boot({});
 		await worker.setPeer("127.0.0.1");
 
 		sendRequest.calledWith("setPeer", "127.0.0.1");
@@ -144,6 +148,7 @@ describe<{
 	it("forgetPeer requests forgetting the peer by ip", async ({ worker, ipc }) => {
 		const sendRequest = spy(ipc, "sendRequest");
 
+		await worker.boot({});
 		await worker.forgetPeer("127.0.0.1");
 
 		sendRequest.calledWith("forgetPeer", "127.0.0.1");
@@ -152,6 +157,7 @@ describe<{
 	it("reloadWebhooks requests a webhook reload", async ({ worker, ipc }) => {
 		const sendRequest = spy(ipc, "sendRequest");
 
+		await worker.boot({});
 		await worker.reloadWebhooks();
 
 		sendRequest.calledWith("reloadWebhooks");
@@ -160,6 +166,7 @@ describe<{
 	it("handle reloads webhooks", async ({ worker, ipc }) => {
 		const sendRequest = spy(ipc, "sendRequest");
 
+		await worker.boot({});
 		await worker.handle({ data: {}, name: "webhooks.created" });
 
 		sendRequest.calledWith("reloadWebhooks");
@@ -182,6 +189,7 @@ describe<{
 			}),
 		} as any;
 
+		await worker.boot({});
 		await worker.onCommit(unit);
 
 		// Duplicate senders collapse via the Set.
@@ -202,6 +210,7 @@ describe<{
 			}),
 		} as any;
 
+		await worker.boot({});
 		await worker.onCommit(unit);
 
 		sendRequest.calledWith("commit", 100, ["alice"], 0, true);

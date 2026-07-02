@@ -89,11 +89,11 @@ describe<{
 		};
 
 		context.txPoolWorker = {
-			start: () => {},
+			start: async () => {},
 		};
 
 		context.evmWorker = {
-			start: () => {},
+			start: async () => {},
 		};
 
 		context.consensus = {
