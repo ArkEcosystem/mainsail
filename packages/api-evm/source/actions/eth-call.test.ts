@@ -84,40 +84,30 @@ describe<{
 	it("should throw RpcError 'execution reverted' with data when status !== 1", async ({ action, evm }) => {
 		stub(evm, "simulate").resolvedValue({ receipt: { output: Buffer.from("dead", "hex"), status: 0 } });
 
-		await assert.rejects(async () => action.handle([{ data: "0x1234" }, "latest"]), "execution reverted");
+		const error: any = await action.handle([{ data: "0x1234" }, "latest"]).catch((error_) => error_);
 
-		try {
-			await action.handle([{ data: "0x1234" }, "latest"]);
-			assert.fail("should have thrown");
-		} catch (error) {
-			assert.instance(error, RpcError);
-			assert.equal(error.message, "execution reverted");
-			assert.equal(error.data, "0xdead");
-		}
+		assert.instance(error, RpcError);
+		assert.equal(error.message, "execution reverted");
+		assert.equal(error.data, "0xdead");
 	});
 
 	it("should throw RpcError with undefined data when reverted without output", async ({ action, evm }) => {
 		stub(evm, "simulate").resolvedValue({ receipt: { output: undefined, status: 0 } });
 
-		try {
-			await action.handle([{ data: "0x1234" }, "latest"]);
-			assert.fail("should have thrown");
-		} catch (error) {
-			assert.instance(error, RpcError);
-			assert.undefined(error.data);
-		}
+		const error: any = await action.handle([{ data: "0x1234" }, "latest"]).catch((error_) => error_);
+
+		assert.instance(error, RpcError);
+		assert.undefined(error.data);
 	});
 
 	it("should wrap a non-RpcError thrown by simulate", async ({ action, evm }) => {
 		stub(evm, "simulate").rejectedValue(new Error("boom"));
 
-		try {
-			await action.handle([{ data: "0x1234" }, "latest"]);
-			assert.fail("should have thrown");
-		} catch (error) {
-			assert.instance(error, RpcError);
-			assert.equal(error.message, "execution reverted: boom");
-		}
+		await assert.rejects(
+			() => action.handle([{ data: "0x1234" }, "latest"]),
+			RpcError,
+			"execution reverted: boom",
+		);
 	});
 
 	it("should cap gas limit above maximum down to maximum", async ({ action, evm }) => {

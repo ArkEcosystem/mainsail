@@ -106,25 +106,21 @@ describe<{
 	it("should throw RpcError with message on execution error in first execute", async ({ action, evm }) => {
 		stub(evm, "simulate").rejectedValue(new Error("out of gas"));
 
-		try {
-			await action.handle([{ data: "0x1234", from, to: contract }]);
-			assert.fail("should have thrown");
-		} catch (error) {
-			assert.instance(error, RpcError);
-			assert.equal(error.message, "execution reverted: out of gas");
-		}
+		await assert.rejects(
+			() => action.handle([{ data: "0x1234", from, to: contract }]),
+			RpcError,
+			"execution reverted: out of gas",
+		);
 	});
 
 	it("should throw RpcError 'execution reverted' when first execution is unsuccessful", async ({ action, evm }) => {
 		stub(evm, "simulate").resolvedValue({ receipt: { gasRefunded: 0n, gasUsed: 21_000n, status: 0 } });
 
-		try {
-			await action.handle([{ data: "0x1234", from, to: contract }]);
-			assert.fail("should have thrown");
-		} catch (error) {
-			assert.instance(error, RpcError);
-			assert.equal(error.message, "execution reverted");
-		}
+		await assert.rejects(
+			() => action.handle([{ data: "0x1234", from, to: contract }]),
+			RpcError,
+			"execution reverted",
+		);
 	});
 
 	it("should pass user-provided gas as the initial max limit", async ({ action, evm }) => {
@@ -239,13 +235,11 @@ describe<{
 			return { receipt: { gasRefunded: 0n, gasUsed: 21_000n, status: 1 } };
 		});
 
-		try {
-			await action.handle([{ data: "0x1234", from, to: contract }]);
-			assert.fail("should have thrown");
-		} catch (error) {
-			assert.instance(error, RpcError);
-			assert.equal(error.message, "execution reverted: reverted optimistic");
-		}
+		await assert.rejects(
+			() => action.handle([{ data: "0x1234", from, to: contract }]),
+			RpcError,
+			"execution reverted: reverted optimistic",
+		);
 	});
 
 	it("should throw RpcError on execution error raised during a binary-search iteration", async ({ action, evm }) => {
@@ -260,12 +254,10 @@ describe<{
 			return { receipt: { gasRefunded: 0n, gasUsed: 21_000n, status: 1 } };
 		});
 
-		try {
-			await action.handle([{ data: "0x1234", from, to: contract }]);
-			assert.fail("should have thrown");
-		} catch (error) {
-			assert.instance(error, RpcError);
-			assert.equal(error.message, "execution reverted: reverted mid-search");
-		}
+		await assert.rejects(
+			() => action.handle([{ data: "0x1234", from, to: contract }]),
+			RpcError,
+			"execution reverted: reverted mid-search",
+		);
 	});
 });
