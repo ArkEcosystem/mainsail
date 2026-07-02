@@ -3,7 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
-import { assert } from "@mainsail/utils";
 import { Address, getCreateAddress } from "viem";
 
 import { Deployer } from "./deployer.js";
@@ -35,15 +34,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.bind(Identifiers.EvmConsensus.Contracts.MultiPayment)
 			.toConstantValue(getCreateAddress({ from: DEPLOYER_ADDRESS, nonce: 5n }));
 
-		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
-		assert.defined(genesisBlock);
+		const cryptoConfig = this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
+		const genesisBlock = cryptoConfig.getGenesisCommit().block;
 
 		const genesisInfo: Contracts.Evm.GenesisInfo = {
-			account: genesisBlock.block.proposer,
+			account: genesisBlock.proposer,
 			deployerAccount: DEPLOYER_ADDRESS,
-			initialBlockNumber: BigInt(genesisBlock.block.number),
+			initialBlockNumber: BigInt(genesisBlock.number),
 			initialSupply: this.#calculateInitialSupply(genesisBlock),
-			timestamp: BigInt(genesisBlock.block.timestamp),
+			timestamp: BigInt(genesisBlock.timestamp),
 
 			usernameContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Usernames), // PROXY Uses nonce 3
 			validatorContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus), // PROXY Uses nonce 1
@@ -58,12 +57,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		await this.app.get<Deployer>(Identifiers.EvmConsensus.Deployer).deploy();
 	}
 
-	#calculateInitialSupply(genesisBlock: Contracts.Crypto.CommitJson): bigint {
-		const generatorAddress = genesisBlock.block.proposer;
-
+	#calculateInitialSupply(genesisBlock: Contracts.Crypto.BlockJsonCrypto): bigint {
 		let supply = 0n;
 
-		for (const transaction of genesisBlock.block.transactions.filter((tx) => tx.from === generatorAddress)) {
+		for (const transaction of genesisBlock.transactions.filter((tx) => tx.from === genesisBlock.proposer)) {
 			supply += BigInt(transaction.value);
 		}
 

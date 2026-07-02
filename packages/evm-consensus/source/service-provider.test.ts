@@ -1,5 +1,3 @@
-import type { Contracts } from "@mainsail/contracts";
-
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
@@ -28,7 +26,7 @@ describe<{
 }>("ServiceProvider", ({ it, beforeEach, assert, spy }) => {
 	beforeEach((context) => {
 		context.app = new Application();
-		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", { genesisBlock });
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({ getGenesisCommit: () => genesisBlock });
 
 		context.serviceProvider = context.app.resolve(ServiceProvider);
 	});
