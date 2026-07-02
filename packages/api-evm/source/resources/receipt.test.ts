@@ -11,6 +11,7 @@ describe<{
 		blockHash: "aa".repeat(32),
 		blockNumber: 255,
 		from: "0x0000000000000000000000000000000000000001",
+		gasPrice: 1_000_000_000,
 		hash: "bb".repeat(32),
 		to: "0x0000000000000000000000000000000000000002",
 		transactionIndex: 3,
@@ -41,7 +42,7 @@ describe<{
 			blockNumber: "0xff",
 			contractAddress: "0x0000000000000000000000000000000000000003",
 			cumulativeGasUsed: "0x5208",
-			effectiveGasUsed: "0x3e8",
+			effectiveGasPrice: "0x3b9aca00",
 			from: "0x0000000000000000000000000000000000000001",
 			gasUsed: "0x3e8",
 			logs: [{ address: "0x0000000000000000000000000000000000000004" }],
@@ -68,7 +69,7 @@ describe<{
 		assert.is(result.status, "0x0");
 		assert.is(result.cumulativeGasUsed, "0x0");
 		assert.is(result.gasUsed, "0x0");
-		assert.is(result.effectiveGasUsed, "0x0");
+		assert.is(result.effectiveGasPrice, "0x3b9aca00");
 		assert.undefined(result.contractAddress);
 		assert.equal(result.logs, []);
 	});
@@ -86,7 +87,5 @@ describe<{
 
 		assert.is(result.cumulativeGasUsed, "0xff");
 		assert.is(result.gasUsed, "0x10");
-		// effectiveGasUsed mirrors gasUsed for non-EIP1559
-		assert.is(result.effectiveGasUsed, "0x10");
 	});
 });

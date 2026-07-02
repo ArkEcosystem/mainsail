@@ -188,4 +188,84 @@ describe<{
 		assert.equal(simulate.getCallArgs(1)[0].gasLimit, 23_669n);
 		assert.equal(result, "0x52ad");
 	});
+
+	it("should binary-search upward when the optimistic and mid-search executions fail", async ({ action, evm }) => {
+		// The unconstrained first run reports gasUsed = 100_000 (gasRefunded 0), but the transaction
+		// actually needs at least THRESHOLD = 200_000 gas to succeed. This forces the optimistic guess
+		// and several mid-search guesses to fail, exercising the "narrow upward" (minGasLimit = mid) paths.
+		const threshold = 200_000n;
+		const gasUsed = 100_000n;
+
+		const simulate = stub(evm, "simulate").callsFake(async (context: any) => ({
+			receipt: {
+				gasRefunded: 0n,
+				gasUsed,
+				status: context.gasLimit >= threshold ? 1 : 0,
+			},
+		}));
+
+		const result = await action.handle([{ data: "0x1234", from, to: contract }]);
+
+		// First execution: full block limit -> success, gasUsed reported as 100_000.
+		assert.equal(simulate.getCallArgs(0)[0].gasLimit, 30_000_000n);
+
+		// (a) optimistic limit = ((100_000 + 0 + 2300) * 64) / 63 = 103_923, which is below the true
+		// requirement (200_000) so it FAILS -> minGasLimit = 103_923 and the binary search begins.
+		assert.equal(simulate.getCallArgs(1)[0].gasLimit, 103_923n);
+
+		// (d) first mid = (30_000_000 + 103_923) / 2 = 15_051_961, which exceeds minGasLimit * 2 = 207_846,
+		// so the mid is clamped down to 207_846 (the low-side-favoring bisection). 207_846 >= threshold
+		// -> succeeds -> maxGasLimit = 207_846.
+		assert.equal(simulate.getCallArgs(2)[0].gasLimit, 207_846n);
+
+		// (b) next mid = (207_846 + 103_923) / 2 = 155_884, below threshold -> FAILS -> minGasLimit = 155_884
+		// (search narrows upward again).
+		assert.equal(simulate.getCallArgs(3)[0].gasLimit, 155_884n);
+
+		// The converged estimate must be at least the true requirement.
+		assert.true(result.startsWith("0x"));
+		assert.true(BigInt(result) >= threshold);
+	});
+
+	it("should throw RpcError on execution error raised during the optimistic execution", async ({ action, evm }) => {
+		// Call 0 = unconstrained max run (success). Call 1 = optimistic run -> raise a raw error, which
+		// must surface as an RpcError (the "this should not happen" defensive branch).
+		let call = 0;
+		stub(evm, "simulate").callsFake(async () => {
+			const current = call++;
+			if (current === 1) {
+				throw new Error("reverted optimistic");
+			}
+			return { receipt: { gasRefunded: 0n, gasUsed: 21_000n, status: 1 } };
+		});
+
+		try {
+			await action.handle([{ data: "0x1234", from, to: contract }]);
+			assert.fail("should have thrown");
+		} catch (error) {
+			assert.instance(error, RpcError);
+			assert.equal(error.message, "execution reverted: reverted optimistic");
+		}
+	});
+
+	it("should throw RpcError on execution error raised during a binary-search iteration", async ({ action, evm }) => {
+		// Call 0 = unconstrained max run (success), call 1 = optimistic run (success), call 2 = first
+		// binary-search iteration -> raise a raw error, which must surface as an RpcError.
+		let call = 0;
+		stub(evm, "simulate").callsFake(async () => {
+			const current = call++;
+			if (current >= 2) {
+				throw new Error("reverted mid-search");
+			}
+			return { receipt: { gasRefunded: 0n, gasUsed: 21_000n, status: 1 } };
+		});
+
+		try {
+			await action.handle([{ data: "0x1234", from, to: contract }]);
+			assert.fail("should have thrown");
+		} catch (error) {
+			assert.instance(error, RpcError);
+			assert.equal(error.message, "execution reverted: reverted mid-search");
+		}
+	});
 });

@@ -56,7 +56,7 @@ describe<{
 		assert.equal(result.gasLimit, "0x1c9c380");
 		assert.equal(result.gasUsed, "0x5208");
 		assert.equal(result.timestamp, "0x1000");
-		assert.equal(result.transactions, ["aa", "bb"]);
+		assert.equal(result.transactions, ["0xaa", "0xbb"]);
 		assert.equal(result.uncles, []);
 	});
 

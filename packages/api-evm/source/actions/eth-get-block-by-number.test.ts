@@ -105,6 +105,6 @@ describe<{
 
 		assert.equal(result.number, "0x14");
 		assert.equal(result.hash, "0xabcd");
-		assert.equal(result.transactions, ["aa", "bb"]);
+		assert.equal(result.transactions, ["0xaa", "0xbb"]);
 	});
 });

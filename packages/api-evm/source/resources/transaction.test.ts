@@ -52,10 +52,24 @@ describe<{
 		assert.equal(result.s, "0x3c4d");
 	});
 
-	it("should set to = null when to is falsy (contract creation)", async ({ resource }) => {
+	it("should set to = null when to is undefined (contract creation)", async ({ resource }) => {
 		const result: any = await resource.transform(makeTransaction({ to: undefined }));
 
 		assert.null(result.to);
+	});
+
+	it("should set to = null when to is an empty string", async ({ resource }) => {
+		const result: any = await resource.transform(makeTransaction({ to: "" }));
+
+		assert.null(result.to);
+	});
+
+	it("should keep to when a recipient address is present", async ({ resource }) => {
+		const result: any = await resource.transform(
+			makeTransaction({ to: "0x3333333333333333333333333333333333333333" }),
+		);
+
+		assert.equal(result.to, "0x3333333333333333333333333333333333333333");
 	});
 
 	it("should always report type 0x0", async ({ resource }) => {

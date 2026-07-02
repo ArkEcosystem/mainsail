@@ -3,6 +3,8 @@ import { Application, Providers } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 
 import { defaults } from "./defaults.js";
+import Handlers from "./handlers.js";
+import { Server } from "./server.js";
 import { ServiceProvider } from "./service-provider.js";
 
 const makeConfig = () => ({
@@ -166,5 +168,25 @@ describe<{
 
 		// rpcResponseHandler has no options
 		assert.undefined(plugins[2].options);
+	});
+
+	it("httpIdentifier should return Identifiers.Evm.API.HTTP", ({ serviceProvider }) => {
+		assert.is((serviceProvider as any).httpIdentifier(), Identifiers.Evm.API.HTTP);
+	});
+
+	it("httpsIdentifier should return Identifiers.Evm.API.HTTPS", ({ serviceProvider }) => {
+		assert.is((serviceProvider as any).httpsIdentifier(), Identifiers.Evm.API.HTTPS);
+	});
+
+	it("getServerConstructor should return the Server class", ({ serviceProvider }) => {
+		assert.is((serviceProvider as any).getServerConstructor(), Server);
+	});
+
+	it("getHandlers should return the Handlers plugin", ({ serviceProvider }) => {
+		assert.is((serviceProvider as any).getHandlers(), Handlers);
+	});
+
+	it("boot should resolve", async ({ serviceProvider }) => {
+		await assert.resolves(() => serviceProvider.boot());
 	});
 });

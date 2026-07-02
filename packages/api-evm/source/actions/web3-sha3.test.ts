@@ -31,14 +31,18 @@ describe<{
 			maxItems: 1,
 			minItems: 1,
 
-			prefixItems: [{ $ref: "prefixedQuantityHex" }],
+			prefixItems: [{ $ref: "prefixedDataHex" }],
 			type: "array",
 		});
 
 		validator.addSchema(action.schema);
 
-		assert.undefined(validator.validate("jsonRpc_web3_sha3", ["0x0"]).errors);
-		assert.defined(validator.validate("jsonRpc_web3_sha3", ["0x0", ""]).errors);
+		// DATA is a byte string: empty "0x" and even-length hex are valid.
+		assert.undefined(validator.validate("jsonRpc_web3_sha3", ["0x"]).errors);
+		assert.undefined(validator.validate("jsonRpc_web3_sha3", ["0x00"]).errors);
+		// odd-length hex is not a valid byte string.
+		assert.defined(validator.validate("jsonRpc_web3_sha3", ["0x0"]).errors);
+		assert.defined(validator.validate("jsonRpc_web3_sha3", ["0x00", ""]).errors);
 		assert.defined(validator.validate("jsonRpc_web3_sha3", [1]).errors);
 		assert.defined(validator.validate("jsonRpc_web3_sha3", {}).errors);
 	});
