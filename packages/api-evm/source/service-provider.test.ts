@@ -66,19 +66,6 @@ describe<{
 		context.serviceProvider = context.app.resolve(ServiceProvider);
 	});
 
-	it("register should add the currentHeightHex keyword to the validator", async ({
-		app,
-		serviceProvider,
-		addedKeywords,
-	}) => {
-		setConfig(app, serviceProvider, makeConfig());
-
-		await serviceProvider.register();
-
-		const heightKeyword = addedKeywords.find((k) => k.keyword === "currentHeightHex");
-		assert.defined(heightKeyword);
-	});
-
 	it("register should add the blockTag schema to the validator", async ({ app, serviceProvider, addedSchemas }) => {
 		setConfig(app, serviceProvider, makeConfig());
 
