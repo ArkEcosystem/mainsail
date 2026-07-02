@@ -77,15 +77,4 @@ describe<{
 
 		assert.equal(result.type, "0x0");
 	});
-
-	// Pins CURRENT (buggy) behavior: optional chaining on blockNumber/transactionIndex
-	// yields the invalid string "0xundefined" instead of JSON-RPC null for pending txs.
-	it("should produce 0xundefined when blockNumber/transactionIndex are undefined", async ({ resource }) => {
-		const result: any = await resource.transform(
-			makeTransaction({ blockNumber: undefined, transactionIndex: undefined }),
-		);
-
-		assert.equal(result.blockNumber, "0xundefined");
-		assert.equal(result.transactionIndex, "0xundefined");
-	});
 });

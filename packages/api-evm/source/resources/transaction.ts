@@ -8,7 +8,7 @@ export class TransactionResource {
 		/* eslint-disable perfectionist/sort-objects */
 		return {
 			blockHash: `0x${transaction.blockHash}`,
-			blockNumber: `0x${transaction.blockNumber?.toString(16)}`,
+			blockNumber: `0x${transaction.blockNumber.toString(16)}`,
 			chainId: `0x${transaction.network.toString(16)}`,
 			from: transaction.from,
 			gas: `0x${transaction.gasLimit.toString(16)}`,
@@ -18,7 +18,7 @@ export class TransactionResource {
 			nonce: `0x${transaction.nonce.toString(16)}`,
 			// eslint-disable-next-line unicorn/no-null
 			to: transaction.to || null,
-			transactionIndex: `0x${transaction.transactionIndex?.toString(16)}`,
+			transactionIndex: `0x${transaction.transactionIndex.toString(16)}`,
 			value: `0x${transaction.value.toString(16)}`,
 			type: `0x0`,
 			v: `0x${transaction.v}`,
