@@ -4,11 +4,10 @@ import { describe } from "@mainsail/test-runner";
 import { getCreateAddress } from "viem";
 
 import { Deployer } from "./deployer.js";
-import { Identifiers as EvmConsensusIdentifiers } from "./identifiers.js";
 
-const DEPLOYER = "0x0000000000000000000000000000000000000001";
+const DEPLOYER_ADDRESS = "0x0000000000000000000000000000000000000001";
 const WRONG_ADDRESS = "0x00000000000000000000000000000000000000ff";
-const addressForNonce = (nonce: bigint | number): string => getCreateAddress({ from: DEPLOYER, nonce: BigInt(nonce) });
+const addressForNonce = (nonce: bigint | number): string => getCreateAddress({ from: DEPLOYER_ADDRESS, nonce: BigInt(nonce) });
 
 describe<{
 	app: Application;
@@ -45,7 +44,7 @@ describe<{
 		context.hashFactory = { sha256: () => Buffer.from("00", "hex") };
 		context.genesisInfo = {
 			account: "0xacc",
-			deployerAccount: DEPLOYER,
+			deployerAccount: DEPLOYER_ADDRESS,
 			initialBlockNumber: 0n,
 			initialSupply: 1000n,
 			timestamp: 123n,
@@ -59,11 +58,11 @@ describe<{
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.app.bind(Identifiers.Cryptography.Hash.Factory).toConstantValue(context.hashFactory);
 		context.app.bind(Identifiers.Evm.Instance).toConstantValue(context.evm);
-		context.app.bind(EvmConsensusIdentifiers.Internal.Addresses.Deployer).toConstantValue(DEPLOYER);
-		context.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue(context.genesisInfo);
-		context.app.bind(EvmConsensusIdentifiers.Contracts.Addresses.Consensus).toConstantValue(consensus);
-		context.app.bind(EvmConsensusIdentifiers.Contracts.Addresses.Usernames).toConstantValue(usernames);
-		context.app.bind(EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment).toConstantValue(multiPayment);
+		context.app.bind(Identifiers.EvmConsensus.DeployerAddress).toConstantValue(DEPLOYER_ADDRESS);
+		context.app.bind(Identifiers.EvmConsensus.GenesisInfo).toConstantValue(context.genesisInfo);
+		context.app.bind(Identifiers.EvmConsensus.Contracts.Consensus).toConstantValue(consensus);
+		context.app.bind(Identifiers.EvmConsensus.Contracts.Usernames).toConstantValue(usernames);
+		context.app.bind(Identifiers.EvmConsensus.Contracts.MultiPayment).toConstantValue(multiPayment);
 
 		context.deployer = context.app.resolve(Deployer);
 	};
