@@ -13,7 +13,6 @@ import { ValidatorSet } from "./validator-set.js";
 
 const DEPLOYER_ADDRESS: Address = "0x0000000000000000000000000000000000000001";
 
-
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
@@ -72,4 +71,3 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 }
 
-export { Deployer } from "./deployer.js";

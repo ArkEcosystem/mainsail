@@ -15,7 +15,7 @@ interface ProxyDeployment {
 }
 
 @injectable()
-export class Deployer {
+export class Deployer implements Contracts.EvmConsensus.Deployer {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
