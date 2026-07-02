@@ -55,8 +55,6 @@ export class GenesisBlockGenerator {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	#consensusProxyContractAddress!: string;
-
 	async generate(
 		genesisMnemonic: string,
 		validatorsMnemonics: string[],
@@ -125,13 +123,9 @@ export class GenesisBlockGenerator {
 			validatorContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus), // PROXY Uses nonce 1
 		};
 
-		this.app.bind(Identifiers.EvmConsensus.GenesisInfo).toConstantValue(genesisInfo);
+		this.app.rebind(Identifiers.EvmConsensus.GenesisInfo).toConstantValue(genesisInfo);
 
-		await this.app.resolve(Deployer).deploy();
-
-		this.#consensusProxyContractAddress = this.app.get<string>(
-			Identifiers.EvmConsensus.Contracts.Consensus,
-		);
+		await this.app.get<Contracts.EvmConsensus.Deployer>(Identifiers.EvmConsensus.Deployer).deploy();
 	}
 
 	async #createTransferTransaction(
@@ -191,7 +185,7 @@ export class GenesisBlockGenerator {
 				await this.app
 					.resolve(TransactionBuilder)
 					.network(chainId)
-					.recipientAddress(this.#consensusProxyContractAddress)
+					.recipientAddress(this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus))
 					.nonce("0") // validator registration tx is always the first one from sender
 					.payload(data)
 					.value(value)
@@ -218,7 +212,7 @@ export class GenesisBlockGenerator {
 				await this.app
 					.resolve(TransactionBuilder)
 					.network(chainId)
-					.recipientAddress(this.#consensusProxyContractAddress)
+					.recipientAddress(this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus))
 					.nonce("1") // vote transaction is always the 2nd tx from sender (1st one is validator registration)
 					.payload(data)
 					.gasPrice(0)
