@@ -80,12 +80,12 @@ export class Extension {
 
 		let pageCount = 1;
 		if (totalCount) {
-			/* istanbul ignore next */
+			/* c8 ignore next */
 			pageCount = Math.trunc(totalCount / currentLimit) + (totalCount % currentLimit === 0 ? 0 : 1);
 		}
 
 		const getUri = (page: number | null): string | null =>
-			/* istanbul ignore next */
+			/* c8 ignore next 2 */
 			// tslint:disable-next-line: no-null-keyword
 			page ? baseUri + Qs.stringify(applyToDefaults({ ...query, ...request.orig.query }, { page })) : null;
 
@@ -100,7 +100,7 @@ export class Extension {
 				last: getUri(pageCount),
 
 				// tslint:disable-next-line: no-null-keyword
-				/* istanbul ignore next */
+				/* c8 ignore next */
 				next: totalCount && currentPage < pageCount ? getUri(currentPage + 1) : null,
 				pageCount: pageCount,
 
@@ -118,7 +118,7 @@ export class Extension {
 			const keys = Object.keys(source["response"]);
 
 			for (const key of keys) {
-				/* istanbul ignore next */
+				/* c8 ignore next 3 */
 				if (key !== "meta" && key !== "data") {
 					newSource[key] = source["response"][key];
 				}
