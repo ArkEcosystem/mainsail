@@ -8,6 +8,10 @@ import { inject, injectable } from "@mainsail/container";
 
 import { TransactionResource } from "../resources/index.js";
 
+// Pool addresses are EIP-55 checksummed while queries may use any casing.
+const matchesAddress = (value: string | undefined, parameter: string): boolean =>
+	value !== undefined && parameter.toLowerCase() === value.toLowerCase();
+
 @injectable()
 export class TransactionsController extends AbstractController {
 	@inject(Identifiers.TransactionPool.Processor)
@@ -42,7 +46,9 @@ export class TransactionsController extends AbstractController {
 			key: Extract<keyof Contracts.Crypto.TransactionData, "to" | "from">,
 			parameter: string | string[],
 		): Promise<boolean> =>
-			Array.isArray(parameter) ? parameter.includes(transaction[key]!) : parameter === transaction[key];
+			Array.isArray(parameter)
+				? parameter.some((item) => matchesAddress(transaction[key], item))
+				: matchesAddress(transaction[key], parameter);
 
 		if (request.query.from) {
 			poolQuery.wherePredicate(async (t) => makePredicate(t, "from", request.query.from));
