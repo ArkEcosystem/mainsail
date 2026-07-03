@@ -440,8 +440,11 @@ describe<{
 
 	it("GET /api/transactions/unconfirmed - keeps the default limit within a lower configured maximum", async ({
 		processor,
-		transactions,
 	}) => {
+		// More transactions than the configured maximum, so the response size proves which
+		// default was applied (50 from the schema default vs the controller's 100 fallback).
+		const transactions = Array.from({ length: 60 }, (_, index) => makeTransaction(index + 1));
+
 		const app = new Application();
 		bindDependencies(app, { processor, transactions });
 
@@ -453,7 +456,10 @@ describe<{
 
 		const bare = await server.inject({ method: "GET", url: "/api/transactions/unconfirmed" });
 		assert.is(bare.statusCode, 200);
-		assert.length(JSON.parse(bare.payload).data, 2);
+
+		const body = JSON.parse(bare.payload);
+		assert.is(body.meta.totalCount, 60);
+		assert.length(body.data, 50);
 
 		const aboveMaximum = await server.inject({
 			method: "GET",
