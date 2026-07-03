@@ -162,6 +162,23 @@ describe<{ subject: Extension }>("Extension", ({ it, beforeEach, assert }) => {
 		assert.equal(newSource.meta.previous, null);
 	});
 
+	it("onPostHandler should link the previous page and an exact page count on later pages", ({ subject }) => {
+		const h = fakeH();
+		const results = [{ id: 11 }, { id: 12 }];
+		const request: any = makePostRequest({ results, totalCount: 20 });
+		request.query.page = 2;
+
+		subject.onPostHandler(request, h as any);
+
+		const newSource = request.response.source;
+		// pageCount = trunc(20/10) + (20%10===0?0:1) = 2 + 0 = 2
+		assert.is(newSource.meta.pageCount, 2);
+		assert.equal(newSource.meta.previous, "/blocks?limit=10&page=1");
+		assert.equal(newSource.meta.self, "/blocks?limit=10&page=2");
+		// The last page has no next page.
+		assert.equal(newSource.meta.next, null);
+	});
+
 	it("onPostHandler should handle source as an array", ({ subject }) => {
 		const h = fakeH();
 		const results = [{ id: 1 }, { id: 2 }, { id: 3 }];

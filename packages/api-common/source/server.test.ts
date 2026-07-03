@@ -224,6 +224,52 @@ describe<{
 		error.calledTimes(2);
 	});
 
+	it("onPreResponse - falls back to the error message when the error has no stack", async ({ subject, logger }) => {
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		await subject.route({
+			handler() {
+				const error = new Error("no stack here");
+				error.stack = undefined;
+				throw error;
+			},
+			method: "GET",
+			path: "/no-stack",
+		});
+
+		const error = spy(logger, "error");
+
+		const response = await subject.inject({ method: "GET", url: "/no-stack" });
+		assert.is(response.statusCode, 500);
+		error.calledOnce();
+		assert.true((error.getCallArgs(0)[0] as string).includes("/no-stack - no stack here"));
+	});
+
+	it("logs request error events carrying non-error values and errors without stacks", async ({ subject, logger }) => {
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		const error = spy(logger, "error");
+		const internalServer = (subject as any)["server"];
+
+		await internalServer.events.emit({ channel: "error", name: "request" }, [
+			{ app: {}, path: "/synthetic" },
+			{ error: "plain failure" },
+			{},
+		]);
+
+		const stackless = new Error("stackless failure");
+		stackless.stack = undefined;
+		await internalServer.events.emit({ channel: "error", name: "request" }, [
+			{ app: {}, path: "/synthetic" },
+			{ error: stackless },
+			{},
+		]);
+
+		error.calledTimes(2);
+		assert.true((error.getCallArgs(0)[0] as string).includes("/synthetic - plain failure"));
+		assert.true((error.getCallArgs(1)[0] as string).includes("/synthetic - stackless failure"));
+	});
+
 	it("onPreResponse - passes through a normal 200 response", async ({ subject, logger }) => {
 		await subject.initialize(Enums.Api.ServerType.Http, {});
 

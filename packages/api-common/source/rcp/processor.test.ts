@@ -67,6 +67,28 @@ describe<{
 		assert.equal(result, { id: 1, jsonrpc: "2.0", result: "RESULT" });
 	});
 
+	it("process should validate missing params as an empty array", async ({ subject, validator }) => {
+		const validated: unknown[][] = [];
+		validator.validate = (schemaId: string, data: unknown) => {
+			validated.push([schemaId, data]);
+			// eslint-disable-next-line unicorn/no-null
+			return { error: null, value: data };
+		};
+
+		subject.registerAction({
+			handle: async () => "RESULT",
+			name: "m",
+			schema: { $id: "s" },
+		} as any);
+
+		const result = await subject.process({
+			payload: { id: 1, jsonrpc: "2.0", method: "m" },
+		} as any);
+
+		assert.equal(result, { id: 1, jsonrpc: "2.0", result: "RESULT" });
+		assert.true(validated.some(([schemaId, data]) => schemaId === "s" && Array.isArray(data) && data.length === 0));
+	});
+
 	it("process should handle a batch/array payload", async ({ subject }) => {
 		subject.registerAction({
 			handle: async (parameters: any[]) => `R-${parameters[0]}`,
