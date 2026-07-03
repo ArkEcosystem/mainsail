@@ -33,7 +33,9 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		method: "POST",
 		options: {
 			payload: {
-				maxBytes: 100 + maxTransactionsPerRequest * maxTransactionBytes * 2,
+				// Each transaction is hex encoded (2 chars per byte) and carries ~4 bytes
+				// of JSON overhead (quotes and comma), plus 100 bytes for the envelope.
+				maxBytes: 100 + maxTransactionsPerRequest * (maxTransactionBytes * 2 + 4),
 			},
 			validate: {
 				payload: Joi.object({
