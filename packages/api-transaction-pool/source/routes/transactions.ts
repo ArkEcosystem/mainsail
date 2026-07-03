@@ -45,7 +45,8 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 								.max(maxTransactionBytes * 2),
 						)
 						.min(1)
-						.max(maxTransactionsPerRequest),
+						.max(maxTransactionsPerRequest)
+						.required(),
 				}),
 			},
 		},
