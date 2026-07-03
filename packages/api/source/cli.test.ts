@@ -1,4 +1,4 @@
-import { Services } from "@mainsail/cli";
+import { Commands, Services } from "@mainsail/cli";
 import prompts from "prompts";
 
 import { describe } from "@mainsail/test-runner";
@@ -57,5 +57,31 @@ describe("CLI", ({ beforeEach, it, assert, stub }) => {
 		await assert.resolves(() => cli.execute("distribution"));
 
 		mockExit.neverCalled();
+	});
+
+	it("should set NODE_PATH when it is not set", async () => {
+		delete process.env.NODE_PATH;
+
+		const cli = new CommandLineInterface(["help"]);
+
+		await assert.resolves(() => cli.execute("distribution"));
+		assert.string(process.env.NODE_PATH);
+	});
+
+	it("should execute a command discovered from plugins", async () => {
+		let executed = false;
+		stub(Commands.DiscoverCommands.prototype, "from").resolvedValue({
+			"plugin:test": {
+				register: () => {},
+				run: async () => {
+					executed = true;
+				},
+			},
+		});
+
+		const cli = new CommandLineInterface(["plugin:test"]);
+
+		await assert.resolves(() => cli.execute("distribution"));
+		assert.true(executed);
 	});
 });
