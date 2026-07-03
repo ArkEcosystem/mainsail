@@ -38,10 +38,11 @@ export class TransactionsController extends AbstractController {
 		const poolQuery = this.poolQuery.getFromHighestPriority();
 
 		const makePredicate = async (
-			{ data }: Contracts.Crypto.Transaction,
+			transaction: Contracts.Crypto.Transaction,
 			key: Extract<keyof Contracts.Crypto.TransactionData, "to" | "from">,
 			parameter: string | string[],
-		): Promise<boolean> => (Array.isArray(parameter) ? parameter.includes(data[key]!) : parameter === data[key]);
+		): Promise<boolean> =>
+			Array.isArray(parameter) ? parameter.includes(transaction[key]!) : parameter === transaction[key];
 
 		if (request.query.from) {
 			poolQuery.wherePredicate(async (t) => makePredicate(t, "from", request.query.from));
