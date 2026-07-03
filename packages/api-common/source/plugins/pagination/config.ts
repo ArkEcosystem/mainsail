@@ -11,6 +11,5 @@ export const getConfig = (options: Joi.ValidationOptions): { config?: object; er
 		}),
 	}).validate(options);
 
-	/* c8 ignore next */
 	return { config: error ? undefined : value, error: error || undefined };
 };
