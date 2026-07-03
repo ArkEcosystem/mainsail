@@ -127,10 +127,75 @@ describe<{
 		});
 
 		const warn = spy(logger, "warn");
+		const error = spy(logger, "error");
 
 		const response = await subject.inject({ method: "GET", url: "/query-failed" });
 		assert.is(response.statusCode, 400);
 		warn.calledOnce();
+		error.neverCalled();
+	});
+
+	it("logs an error thrown from a request extension exactly once", async ({ subject, logger }) => {
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		await subject.registerPlugins([
+			{
+				name: "throwing-extension",
+				register(server: any) {
+					server.ext("onPostAuth", () => {
+						throw new Error("extension boom");
+					});
+				},
+				version: "1.0.0",
+			},
+		]);
+
+		const error = spy(logger, "error");
+
+		const response = await subject.inject({ method: "GET", url: "/" });
+		assert.is(response.statusCode, 500);
+		error.calledOnce();
+	});
+
+	it("logs a server error returned from a request extension exactly once", async ({ subject, logger }) => {
+		const { internal } = await import("@hapi/boom");
+
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		await subject.registerPlugins([
+			{
+				name: "boom-extension",
+				register(server: any) {
+					server.ext("onPostAuth", () => internal("extension internal"));
+				},
+				version: "1.0.0",
+			},
+		]);
+
+		const error = spy(logger, "error");
+
+		const response = await subject.inject({ method: "GET", url: "/" });
+		assert.is(response.statusCode, 500);
+		error.calledOnce();
+	});
+
+	it("does not forward request.log app-channel events to the logger", async ({ subject, logger }) => {
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		await subject.route({
+			handler(request: any) {
+				request.log(["error"], new Error("app channel"));
+				return { data: "ok" };
+			},
+			method: "GET",
+			path: "/app-log",
+		});
+
+		const error = spy(logger, "error");
+
+		const response = await subject.inject({ method: "GET", url: "/app-log" });
+		assert.is(response.statusCode, 200);
+		error.neverCalled();
 	});
 
 	it("logs errors raised while serializing the response body", async ({ subject, logger }) => {
@@ -153,6 +218,10 @@ describe<{
 		assert.true(
 			error.getCallArgs(0)[0].includes("/marshal-error - TypeError: Do not know how to serialize a BigInt"),
 		);
+
+		// The dedupe flag lives on the request, so the next failing request logs again.
+		await subject.inject({ method: "GET", url: "/marshal-error" });
+		error.calledTimes(2);
 	});
 
 	it("onPreResponse - passes through a normal 200 response", async ({ subject, logger }) => {
