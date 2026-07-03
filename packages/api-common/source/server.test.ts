@@ -133,6 +133,28 @@ describe<{
 		warn.calledOnce();
 	});
 
+	it("logs errors raised while serializing the response body", async ({ subject, logger }) => {
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		await subject.route({
+			handler() {
+				// BigInt cannot be JSON serialized; the failure happens after onPreResponse.
+				return { value: 1n };
+			},
+			method: "GET",
+			path: "/marshal-error",
+		});
+
+		const error = spy(logger, "error");
+
+		const response = await subject.inject({ method: "GET", url: "/marshal-error" });
+		assert.is(response.statusCode, 500);
+		error.calledOnce();
+		assert.true(
+			error.getCallArgs(0)[0].includes("/marshal-error - TypeError: Do not know how to serialize a BigInt"),
+		);
+	});
+
 	it("onPreResponse - passes through a normal 200 response", async ({ subject, logger }) => {
 		await subject.initialize(Enums.Api.ServerType.Http, {});
 
