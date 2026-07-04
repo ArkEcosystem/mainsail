@@ -86,13 +86,13 @@ describe<{
 	it("should return null when transaction not found", async ({ action, database }) => {
 		stub(database, "getTransactionByHash").resolvedValue(undefined);
 
-		assert.null(await action.handle([`0x${"bb".repeat(32)}`, true]));
+		assert.null(await action.handle([`0x${"bb".repeat(32)}`]));
 	});
 
 	it("should strip the 0x prefix before looking up the transaction", async ({ action, database }) => {
 		const spy = stub(database, "getTransactionByHash").resolvedValue(undefined);
 
-		await action.handle([`0x${"bb".repeat(32)}`, true]);
+		await action.handle([`0x${"bb".repeat(32)}`]);
 
 		spy.calledWith("bb".repeat(32));
 	});
@@ -100,25 +100,25 @@ describe<{
 	it("should return null when block header not found", async ({ action, database }) => {
 		stub(database, "getBlockHeader").resolvedValue(undefined);
 
-		assert.null(await action.handle([`0x${"bb".repeat(32)}`, true]));
+		assert.null(await action.handle([`0x${"bb".repeat(32)}`]));
 	});
 
 	it("should return null when receipt is missing", async ({ action, evm }) => {
 		stub(evm, "getReceipt").resolvedValue({ receipt: undefined });
 
-		assert.null(await action.handle([`0x${"bb".repeat(32)}`, true]));
+		assert.null(await action.handle([`0x${"bb".repeat(32)}`]));
 	});
 
 	it("should look up the receipt by block number and tx hash", async ({ action, evm }) => {
 		const spy = stub(evm, "getReceipt").resolvedValue({ receipt });
 
-		await action.handle([`0x${"bb".repeat(32)}`, true]);
+		await action.handle([`0x${"bb".repeat(32)}`]);
 
 		spy.calledWith(BigInt(16), "bb".repeat(32));
 	});
 
 	it("should return the transformed receipt when found", async ({ action }) => {
-		const result: any = await action.handle([`0x${"bb".repeat(32)}`, true]);
+		const result: any = await action.handle([`0x${"bb".repeat(32)}`]);
 
 		assert.equal(result, {
 			blockHash: `0x${"aa".repeat(32)}`,
