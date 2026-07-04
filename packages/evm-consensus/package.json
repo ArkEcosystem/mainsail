@@ -26,7 +26,6 @@
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
 		"viem": "2.48.11"
 	},
 	"devDependencies": {
