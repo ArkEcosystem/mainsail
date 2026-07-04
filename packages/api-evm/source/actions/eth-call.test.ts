@@ -103,11 +103,7 @@ describe<{
 	it("should wrap a non-RpcError thrown by simulate", async ({ action, evm }) => {
 		stub(evm, "simulate").rejectedValue(new Error("boom"));
 
-		await assert.rejects(
-			() => action.handle([{ data: "0x1234" }, "latest"]),
-			RpcError,
-			"execution reverted: boom",
-		);
+		await assert.rejects(() => action.handle([{ data: "0x1234" }, "latest"]), RpcError, "execution reverted: boom");
 	});
 
 	it("should cap gas limit above maximum down to maximum", async ({ action, evm }) => {

@@ -397,9 +397,7 @@ describe<{
 		assert.equal(result.error?.message, '"plugins.rateLimit.whitelist" is required');
 	});
 
-	it("#schemaRestrictions - plugins.socketTimeout is required && is integer && >= 0", async ({
-		serviceProvider,
-	}) => {
+	it("#schemaRestrictions - plugins.socketTimeout is required && is integer && >= 0", async ({ serviceProvider }) => {
 		const defaults = await importDefaults();
 		defaults.plugins.socketTimeout = false;
 		let result = serviceProvider.configSchema().validate(defaults);
