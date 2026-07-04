@@ -57,7 +57,7 @@ export abstract class AbstractServer {
 
 		this.server.ext("onPreResponse", (request, h) => {
 			if ("isBoom" in request.response && request.response.isBoom && request.response.isServer) {
-				request.app["errorLogged"] = true;
+				request.app.errorLogged = true;
 
 				if (request.response.name === "QueryFailedError") {
 					const message = `${request.response.name} ${request.response.message}`;
@@ -73,7 +73,7 @@ export abstract class AbstractServer {
 		// Errors raised after onPreResponse (e.g. while serializing the response body) would
 		// otherwise produce a 500 without any log entry.
 		this.server.events.on({ channels: ["error"], name: "request" }, (request, event) => {
-			if (request.app["errorLogged"]) {
+			if (request.app.errorLogged) {
 				return;
 			}
 
