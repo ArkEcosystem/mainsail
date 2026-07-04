@@ -43,7 +43,7 @@ describe<{
 		assert.equal(result.hash, "0xabcd");
 		assert.equal(result.parentHash, "0x11");
 		assert.equal(result.nonce, "0x0000000000000000");
-		assert.equal(result.sha3Uncles, "0x1dcc4de8dec75d7aab85b567b6ccd41ad4e2a311b82e5872087ed76f0f1ccf8f");
+		assert.equal(result.sha3Uncles, "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347");
 		assert.equal(result.logsBloom, "0x0f");
 		assert.equal(result.transactionsRoot, "0x33");
 		assert.equal(result.stateRoot, "0x22");
