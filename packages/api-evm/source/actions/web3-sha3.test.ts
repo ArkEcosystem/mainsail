@@ -25,7 +25,7 @@ describe<{
 		assert.equal(action.name, "web3_sha3");
 	});
 
-	it("schema should be ok", ({ action, validator }) => {
+	it("schema should validate a single prefixed data hex string", ({ action, validator }) => {
 		assert.equal(action.schema, {
 			$id: `jsonRpc_web3_sha3`,
 			maxItems: 1,

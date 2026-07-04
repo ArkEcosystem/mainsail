@@ -85,7 +85,7 @@ describe<{
 					s: "s0",
 					to: "0xto",
 					transactionIndex: 0,
-					v: "1b",
+					v: 1,
 					value: 100,
 				},
 			],

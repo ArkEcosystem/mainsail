@@ -123,7 +123,8 @@ describe<{
 		assert.equal(result, {
 			blockHash: `0x${"aa".repeat(32)}`,
 			blockNumber: "0x10",
-			contractAddress: undefined,
+			// eslint-disable-next-line unicorn/no-null
+			contractAddress: null,
 			cumulativeGasUsed: "0x5208",
 			effectiveGasPrice: "0x3b9aca00",
 			from: "0x0000000000000000000000000000000000000001",

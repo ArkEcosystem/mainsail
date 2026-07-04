@@ -13,7 +13,9 @@ describe<{
 		data: "0xabcdef",
 		from: "0x1111111111111111111111111111111111111111",
 		gasLimit: 21_000n,
-		gasPrice: 5_000_000_000n,
+		// gasPrice and v are numbers on Contracts.Crypto.BlockTransaction; v is the
+		// normalized recovery bit (0 or 1), not the EIP-155 value.
+		gasPrice: 5_000_000_000,
 		hash: "bb".repeat(32),
 		network: 30n,
 		nonce: 16n,
@@ -21,7 +23,7 @@ describe<{
 		s: "3c4d",
 		to: "0x2222222222222222222222222222222222222222",
 		transactionIndex: 2,
-		v: "1b",
+		v: 1,
 		value: 1_000_000_000_000_000_000n,
 		...overrides,
 	});
@@ -47,7 +49,7 @@ describe<{
 		assert.equal(result.transactionIndex, "0x2");
 		assert.equal(result.value, "0xde0b6b3a7640000");
 		assert.equal(result.type, "0x0");
-		assert.equal(result.v, "0x1b");
+		assert.equal(result.v, "0x1");
 		assert.equal(result.r, "0x1a2b");
 		assert.equal(result.s, "0x3c4d");
 	});

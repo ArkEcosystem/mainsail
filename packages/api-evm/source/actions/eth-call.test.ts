@@ -81,6 +81,18 @@ describe<{
 		assert.equal(await action.handle([{ data: "0x1234" }, "latest"]), "0xabcd");
 	});
 
+	it("should return 0x when simulation succeeds without output", async ({ action, evm }) => {
+		stub(evm, "simulate").resolvedValue({ receipt: { gasUsed: 21_000n, output: undefined, status: 1 } });
+
+		assert.equal(await action.handle([{ data: "0x1234" }, "latest"]), "0x");
+	});
+
+	it("should return 0x when simulation succeeds with empty output", async ({ action, evm }) => {
+		stub(evm, "simulate").resolvedValue({ receipt: { gasUsed: 21_000n, output: Buffer.alloc(0), status: 1 } });
+
+		assert.equal(await action.handle([{ data: "0x1234" }, "latest"]), "0x");
+	});
+
 	it("should throw RpcError 'execution reverted' with data when status !== 1", async ({ action, evm }) => {
 		stub(evm, "simulate").resolvedValue({ receipt: { output: Buffer.from("dead", "hex"), status: 0 } });
 

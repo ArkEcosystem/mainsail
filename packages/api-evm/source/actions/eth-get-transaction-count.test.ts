@@ -12,7 +12,7 @@ describe<{
 	action: EthGetTransactionCount;
 	validator: Contracts.Crypto.Validator;
 	evm: any;
-}>("EthGetTransactionCount", ({ beforeEach, it, assert }) => {
+}>("EthGetTransactionCount", ({ beforeEach, it, assert, spy }) => {
 	const balance = BigInt(0);
 	let nonce = BigInt(0);
 
@@ -36,7 +36,7 @@ describe<{
 		assert.equal(action.name, "eth_getTransactionCount");
 	});
 
-	it("schema should be array with 0 parameters", ({ action, validator }) => {
+	it("schema should be array with 2 parameters", ({ action, validator }) => {
 		validator.addSchema(keccak256Schemas.address);
 		validator.addSchema(schemas.blockTag);
 		validator.addSchema(action.schema);
@@ -51,10 +51,28 @@ describe<{
 		assert.defined(validator.validate("jsonRpc_eth_getTransactionCount", {}).errors);
 	});
 
-	it("should return true", async ({ action }) => {
+	it("should return the nonce as hex", async ({ action }) => {
 		assert.equal(await action.handle(["0x0000000000", "latest"]), "0x0");
 
 		nonce = BigInt(20);
 		assert.equal(await action.handle(["0x0000000000", "latest"]), "0x14");
+	});
+
+	it("should not use history for the 'latest' tag", async ({ action, evm }) => {
+		const getAccountInfo = spy(evm, "getAccountInfo");
+
+		await action.handle(["0x0000000000", "latest"]);
+
+		getAccountInfo.calledOnce();
+		getAccountInfo.calledWith("0x0000000000", undefined);
+	});
+
+	it("should query historical state for a hex blockTag", async ({ action, evm }) => {
+		const getAccountInfo = spy(evm, "getAccountInfo");
+
+		await action.handle(["0x0000000000", "0x7b"]);
+
+		getAccountInfo.calledOnce();
+		getAccountInfo.calledWith("0x0000000000", 123n);
 	});
 });
