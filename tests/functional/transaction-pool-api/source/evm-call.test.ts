@@ -1,6 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
-import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { describe } from "@mainsail/test-runner";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
 import { setup, shutdown } from "./setup.js";
@@ -467,7 +466,7 @@ describe<{
 		const randomWallet1 = await Utils.getRandomColdWallet(context);
 		const randomWallet2 = await Utils.getRandomColdWallet(context);
 
-		const multiPaymentContract = context.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment);
+		const multiPaymentContract = context.app.get<string>(Identifiers.EvmConsensus.Contracts.MultiPayment);
 
 		const recipients = [randomWallet1.address, randomWallet2.address];
 

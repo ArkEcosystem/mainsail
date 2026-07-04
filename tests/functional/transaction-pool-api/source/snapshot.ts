@@ -7,7 +7,6 @@ import {
 	Identifiers as ApiDatabaseIdentifiers
 } from "@mainsail/api-database";
 import { Events, Identifiers } from "@mainsail/constants";
-import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert } from "@mainsail/test-runner";
 import { parseAbi, parseEventLogs } from "viem";
 
@@ -397,7 +396,7 @@ export class Snapshot {
 					}
 
 					const consensusContract = this.app.get<string>(
-						EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
+						Identifiers.EvmConsensus.Contracts.Consensus,
 					);
 
 					// Refund Validator Fee
@@ -424,7 +423,7 @@ export class Snapshot {
 
 					// multipayment forwards value to recipients
 					const multiPaymentContract = this.app.get<string>(
-						EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
+						Identifiers.EvmConsensus.Contracts.MultiPayment,
 					);
 					if (transaction.to === multiPaymentContract) {
 						const paymentAbi = parseAbi([
@@ -453,7 +452,7 @@ export class Snapshot {
 			// each block increases nonce of internal address due to vote&reward updates
 			await incrementNonce(
 				block.number,
-				this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer),
+				this.app.get<string>(Identifiers.EvmConsensus.DeployerAddress),
 			);
 
 			// Validator balance
