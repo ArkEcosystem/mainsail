@@ -18,15 +18,15 @@ describe<{
 	const block = {
 		gasUsed: 21_000,
 		hash: blockHash,
-		logsBloom: "00",
+		logsBloom: "0".repeat(512),
 		number: 20,
-		parentHash: "11",
+		parentHash: "1".repeat(64),
 		payloadSize: 256,
 		proposer: "0xABCDEF0000000000000000000000000000000000",
-		stateRoot: "22",
+		stateRoot: "2".repeat(64),
 		timestamp: 1000,
-		transactions: [{ hash: "aa" }, { hash: "bb" }],
-		transactionsRoot: "33",
+		transactions: [{ hash: "a".repeat(64) }, { hash: "b".repeat(64) }],
+		transactionsRoot: "3".repeat(64),
 	};
 
 	beforeEach(async (context) => {
@@ -89,10 +89,10 @@ describe<{
 
 		assert.equal(result.number, "0x14");
 		assert.equal(result.hash, `0x${blockHash}`);
-		assert.equal(result.parentHash, "0x11");
+		assert.equal(result.parentHash, `0x${"1".repeat(64)}`);
 		assert.equal(result.gasUsed, "0x5208");
 		assert.equal(result.gasLimit, "0x1c9c380");
-		assert.equal(result.transactions, ["0xaa", "0xbb"]);
+		assert.equal(result.transactions, [`0x${"a".repeat(64)}`, `0x${"b".repeat(64)}`]);
 		assert.equal(result.uncles, []);
 		assert.equal(result.miner, "0xabcdef0000000000000000000000000000000000");
 	});
@@ -106,17 +106,17 @@ describe<{
 			transactions: [
 				{
 					data: "0x",
-					from: "0xfrom",
+					from: "0x1111111111111111111111111111111111111111",
 					gasLimit: 21_000,
 					gasPrice: 5,
-					hash: "aa",
+					hash: "a".repeat(64),
 					network: 30,
 					nonce: 1,
-					r: "r0",
-					s: "s0",
-					to: "0xto",
+					r: "e".repeat(64),
+					s: "f".repeat(64),
+					to: "0x2222222222222222222222222222222222222222",
 					transactionIndex: 0,
-					v: "1b",
+					v: 1,
 					value: 100,
 				},
 			],
@@ -126,9 +126,9 @@ describe<{
 		const result: any = await action.handle([`0x${blockHash}`, true]);
 
 		assert.equal(result.transactions.length, 1);
-		assert.equal(result.transactions[0].hash, "0xaa");
+		assert.equal(result.transactions[0].hash, `0x${"a".repeat(64)}`);
 		assert.equal(result.transactions[0].blockHash, `0x${blockHash}`);
 		assert.equal(result.transactions[0].blockNumber, "0x14");
-		assert.equal(result.transactions[0].from, "0xfrom");
+		assert.equal(result.transactions[0].from, "0x1111111111111111111111111111111111111111");
 	});
 });

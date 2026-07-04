@@ -8,7 +8,7 @@ describe<{
 	resource: TransactionResource;
 }>("TransactionResource", ({ beforeEach, it, assert }) => {
 	const makeTransaction = (overrides: object = {}): any => ({
-		blockHash: "aa".repeat(32),
+		blockHash: "a".repeat(64),
 		blockNumber: 255n,
 		data: "0xabcdef",
 		from: "0x1111111111111111111111111111111111111111",
@@ -16,11 +16,11 @@ describe<{
 		// gasPrice and v are numbers on Contracts.Crypto.BlockTransaction; v is the
 		// normalized recovery bit (0 or 1), not the EIP-155 value.
 		gasPrice: 5_000_000_000,
-		hash: "bb".repeat(32),
+		hash: "b".repeat(64),
 		network: 30n,
 		nonce: 16n,
-		r: "1a2b",
-		s: "3c4d",
+		r: "e".repeat(64),
+		s: "f".repeat(64),
 		to: "0x2222222222222222222222222222222222222222",
 		transactionIndex: 2,
 		v: 1,
@@ -36,13 +36,13 @@ describe<{
 	it("should transform into the 0x-prefixed JSON-RPC shape", async ({ resource }) => {
 		const result: any = await resource.transform(makeTransaction());
 
-		assert.equal(result.blockHash, `0x${"aa".repeat(32)}`);
+		assert.equal(result.blockHash, `0x${"a".repeat(64)}`);
 		assert.equal(result.blockNumber, "0xff");
 		assert.equal(result.chainId, "0x1e");
 		assert.equal(result.from, "0x1111111111111111111111111111111111111111");
 		assert.equal(result.gas, "0x5208");
 		assert.equal(result.gasPrice, "0x12a05f200");
-		assert.equal(result.hash, `0x${"bb".repeat(32)}`);
+		assert.equal(result.hash, `0x${"b".repeat(64)}`);
 		assert.equal(result.input, "0xabcdef");
 		assert.equal(result.nonce, "0x10");
 		assert.equal(result.to, "0x2222222222222222222222222222222222222222");
@@ -50,8 +50,8 @@ describe<{
 		assert.equal(result.value, "0xde0b6b3a7640000");
 		assert.equal(result.type, "0x0");
 		assert.equal(result.v, "0x1");
-		assert.equal(result.r, "0x1a2b");
-		assert.equal(result.s, "0x3c4d");
+		assert.equal(result.r, `0x${"e".repeat(64)}`);
+		assert.equal(result.s, `0x${"f".repeat(64)}`);
 	});
 
 	it("should set to = null when to is undefined (contract creation)", async ({ resource }) => {

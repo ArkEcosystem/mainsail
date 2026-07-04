@@ -16,16 +16,16 @@ describe<{
 }>("EthGetBlockByNumberAction", ({ beforeEach, it, assert, stub }) => {
 	const block = {
 		gasUsed: 21_000,
-		hash: "abcd",
-		logsBloom: "00",
+		hash: "4".repeat(64),
+		logsBloom: "0".repeat(512),
 		number: 20,
-		parentHash: "11",
+		parentHash: "1".repeat(64),
 		payloadSize: 256,
 		proposer: "0xABCDEF0000000000000000000000000000000000",
-		stateRoot: "22",
+		stateRoot: "2".repeat(64),
 		timestamp: 1000,
-		transactions: [{ hash: "aa" }, { hash: "bb" }],
-		transactionsRoot: "33",
+		transactions: [{ hash: "a".repeat(64) }, { hash: "b".repeat(64) }],
+		transactionsRoot: "3".repeat(64),
 	};
 
 	beforeEach(async (context) => {
@@ -104,7 +104,7 @@ describe<{
 		const result: any = await action.handle(["0x14", false]);
 
 		assert.equal(result.number, "0x14");
-		assert.equal(result.hash, "0xabcd");
-		assert.equal(result.transactions, ["0xaa", "0xbb"]);
+		assert.equal(result.hash, `0x${"4".repeat(64)}`);
+		assert.equal(result.transactions, [`0x${"a".repeat(64)}`, `0x${"b".repeat(64)}`]);
 	});
 });

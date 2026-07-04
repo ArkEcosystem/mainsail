@@ -12,10 +12,10 @@ describe<{
 	validator: Contracts.Crypto.Validator;
 	database: any;
 }>("EthGetTransactionByHash", ({ beforeEach, it, assert, stub }) => {
-	const txHash = "aa".repeat(32);
+	const txHash = "a".repeat(64);
 
 	const makeTransaction = (): any => ({
-		blockHash: "bb".repeat(32),
+		blockHash: "b".repeat(64),
 		blockNumber: 1n,
 		data: "0x",
 		from: "0x1111111111111111111111111111111111111111",
@@ -24,11 +24,11 @@ describe<{
 		hash: txHash,
 		network: 30n,
 		nonce: 0n,
-		r: "1a",
-		s: "2b",
+		r: "e".repeat(64),
+		s: "f".repeat(64),
 		to: "0x2222222222222222222222222222222222222222",
 		transactionIndex: 0,
-		v: "1b",
+		v: 1,
 		value: 0n,
 	});
 

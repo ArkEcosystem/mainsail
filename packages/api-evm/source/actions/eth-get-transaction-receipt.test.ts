@@ -21,16 +21,16 @@ describe<{
 	evm: any;
 }>("EthGetTransactionReceipt", ({ beforeEach, it, assert, stub }) => {
 	const transaction = {
-		blockHash: "aa".repeat(32),
+		blockHash: "a".repeat(64),
 		blockNumber: 16,
 		from: "0x0000000000000000000000000000000000000001",
 		gasPrice: 1_000_000_000,
-		hash: "bb".repeat(32),
+		hash: "b".repeat(64),
 		to: "0x0000000000000000000000000000000000000002",
 		transactionIndex: 0,
 	};
 
-	const header = { logsBloom: "cc".repeat(256) };
+	const header = { logsBloom: "c".repeat(512) };
 
 	const receipt = {
 		contractAddress: undefined,
@@ -68,13 +68,11 @@ describe<{
 		validator.addSchema(prefixedTransactionHash);
 		validator.addSchema(action.schema);
 
-		const good = [`0x${"bb".repeat(32)}`];
+		const good = [`0x${"b".repeat(64)}`];
 		assert.undefined(validator.validate("jsonRpc_eth_getTransactionReceipt", good).errors);
 
 		// too many items
-		assert.defined(
-			validator.validate("jsonRpc_eth_getTransactionReceipt", [`0x${"bb".repeat(32)}`, "0x00"]).errors,
-		);
+		assert.defined(validator.validate("jsonRpc_eth_getTransactionReceipt", [`0x${"b".repeat(64)}`, "0x00"]).errors);
 		// empty
 		assert.defined(validator.validate("jsonRpc_eth_getTransactionReceipt", []).errors);
 		// wrong type
@@ -86,42 +84,42 @@ describe<{
 	it("should return null when transaction not found", async ({ action, database }) => {
 		stub(database, "getTransactionByHash").resolvedValue(undefined);
 
-		assert.null(await action.handle([`0x${"bb".repeat(32)}`]));
+		assert.null(await action.handle([`0x${"b".repeat(64)}`]));
 	});
 
 	it("should strip the 0x prefix before looking up the transaction", async ({ action, database }) => {
 		const spy = stub(database, "getTransactionByHash").resolvedValue(undefined);
 
-		await action.handle([`0x${"bb".repeat(32)}`]);
+		await action.handle([`0x${"b".repeat(64)}`]);
 
-		spy.calledWith("bb".repeat(32));
+		spy.calledWith("b".repeat(64));
 	});
 
 	it("should return null when block header not found", async ({ action, database }) => {
 		stub(database, "getBlockHeader").resolvedValue(undefined);
 
-		assert.null(await action.handle([`0x${"bb".repeat(32)}`]));
+		assert.null(await action.handle([`0x${"b".repeat(64)}`]));
 	});
 
 	it("should return null when receipt is missing", async ({ action, evm }) => {
 		stub(evm, "getReceipt").resolvedValue({ receipt: undefined });
 
-		assert.null(await action.handle([`0x${"bb".repeat(32)}`]));
+		assert.null(await action.handle([`0x${"b".repeat(64)}`]));
 	});
 
 	it("should look up the receipt by block number and tx hash", async ({ action, evm }) => {
 		const spy = stub(evm, "getReceipt").resolvedValue({ receipt });
 
-		await action.handle([`0x${"bb".repeat(32)}`]);
+		await action.handle([`0x${"b".repeat(64)}`]);
 
-		spy.calledWith(BigInt(16), "bb".repeat(32));
+		spy.calledWith(BigInt(16), "b".repeat(64));
 	});
 
 	it("should return the transformed receipt when found", async ({ action }) => {
-		const result: any = await action.handle([`0x${"bb".repeat(32)}`]);
+		const result: any = await action.handle([`0x${"b".repeat(64)}`]);
 
 		assert.equal(result, {
-			blockHash: `0x${"aa".repeat(32)}`,
+			blockHash: `0x${"a".repeat(64)}`,
 			blockNumber: "0x10",
 			// eslint-disable-next-line unicorn/no-null
 			contractAddress: null,
@@ -130,10 +128,10 @@ describe<{
 			from: "0x0000000000000000000000000000000000000001",
 			gasUsed: "0x5208",
 			logs: [],
-			logsBloom: `0x${"cc".repeat(256)}`,
+			logsBloom: `0x${"c".repeat(512)}`,
 			status: "0x1",
 			to: "0x0000000000000000000000000000000000000002",
-			transactionHash: `0x${"bb".repeat(32)}`,
+			transactionHash: `0x${"b".repeat(64)}`,
 			transactionIndex: "0x0",
 			type: "0x0",
 		});

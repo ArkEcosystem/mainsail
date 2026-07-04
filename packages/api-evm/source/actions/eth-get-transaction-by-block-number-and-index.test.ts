@@ -13,20 +13,20 @@ describe<{
 	database: any;
 }>("EthGetTransactionByBlockNumberAndIndex", ({ beforeEach, it, assert, stub }) => {
 	const makeTransaction = (): any => ({
-		blockHash: "cc".repeat(32),
+		blockHash: "c".repeat(64),
 		blockNumber: 16n,
 		data: "0x",
 		from: "0x1111111111111111111111111111111111111111",
 		gasLimit: 21_000n,
 		gasPrice: 1n,
-		hash: "dd".repeat(32),
+		hash: "d".repeat(64),
 		network: 30n,
 		nonce: 3n,
-		r: "1a",
-		s: "2b",
+		r: "e".repeat(64),
+		s: "f".repeat(64),
 		to: "0x2222222222222222222222222222222222222222",
 		transactionIndex: 3,
-		v: "1b",
+		v: 1,
 		value: 0n,
 	});
 

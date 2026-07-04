@@ -11,16 +11,16 @@ describe<{
 }>("BlockResource", ({ beforeEach, it, assert, stub }) => {
 	const block: any = {
 		gasUsed: 21_000,
-		hash: "abcd",
-		logsBloom: "0f",
+		hash: "4".repeat(64),
+		logsBloom: "0".repeat(512),
 		number: 255,
-		parentHash: "11",
+		parentHash: "1".repeat(64),
 		payloadSize: 256,
 		proposer: "0xABCDEF0000000000000000000000000000000000",
-		stateRoot: "22",
+		stateRoot: "2".repeat(64),
 		timestamp: 4096,
-		transactions: [{ hash: "aa" }, { hash: "bb" }],
-		transactionsRoot: "33",
+		transactions: [{ hash: "a".repeat(64) }, { hash: "b".repeat(64) }],
+		transactionsRoot: "3".repeat(64),
 	};
 
 	beforeEach((context) => {
@@ -40,14 +40,14 @@ describe<{
 		const result: any = await resource.transform(block, false);
 
 		assert.equal(result.number, "0xff");
-		assert.equal(result.hash, "0xabcd");
-		assert.equal(result.parentHash, "0x11");
+		assert.equal(result.hash, `0x${"4".repeat(64)}`);
+		assert.equal(result.parentHash, `0x${"1".repeat(64)}`);
 		assert.equal(result.nonce, "0x0000000000000000");
 		assert.equal(result.sha3Uncles, "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347");
-		assert.equal(result.logsBloom, "0x0f");
-		assert.equal(result.transactionsRoot, "0x33");
-		assert.equal(result.stateRoot, "0x22");
-		assert.equal(result.receiptsRoot, "0x22");
+		assert.equal(result.logsBloom, `0x${"0".repeat(512)}`);
+		assert.equal(result.transactionsRoot, `0x${"3".repeat(64)}`);
+		assert.equal(result.stateRoot, `0x${"2".repeat(64)}`);
+		assert.equal(result.receiptsRoot, `0x${"2".repeat(64)}`);
 		assert.equal(result.miner, "0xabcdef0000000000000000000000000000000000");
 		assert.equal(result.difficulty, "0x0");
 		assert.equal(result.totalDifficulty, "0x0");
@@ -56,7 +56,7 @@ describe<{
 		assert.equal(result.gasLimit, "0x1c9c380");
 		assert.equal(result.gasUsed, "0x5208");
 		assert.equal(result.timestamp, "0x1000");
-		assert.equal(result.transactions, ["0xaa", "0xbb"]);
+		assert.equal(result.transactions, [`0x${"a".repeat(64)}`, `0x${"b".repeat(64)}`]);
 		assert.equal(result.uncles, []);
 	});
 
@@ -75,15 +75,15 @@ describe<{
 			transactions: [
 				{
 					data: "0x1234",
-					from: "0xfrom",
+					from: "0x1111111111111111111111111111111111111111",
 					gasLimit: 21_000,
 					gasPrice: 5,
-					hash: "aa",
+					hash: "a".repeat(64),
 					network: 30,
 					nonce: 1,
-					r: "r0",
-					s: "s0",
-					to: "0xto",
+					r: "e".repeat(64),
+					s: "f".repeat(64),
+					to: "0x2222222222222222222222222222222222222222",
 					transactionIndex: 0,
 					v: 1,
 					value: 100,
@@ -95,11 +95,11 @@ describe<{
 
 		assert.equal(result.transactions.length, 1);
 		const tx = result.transactions[0];
-		assert.equal(tx.hash, "0xaa");
-		assert.equal(tx.blockHash, "0xabcd");
+		assert.equal(tx.hash, `0x${"a".repeat(64)}`);
+		assert.equal(tx.blockHash, `0x${"4".repeat(64)}`);
 		assert.equal(tx.blockNumber, "0xff");
-		assert.equal(tx.from, "0xfrom");
-		assert.equal(tx.to, "0xto");
+		assert.equal(tx.from, "0x1111111111111111111111111111111111111111");
+		assert.equal(tx.to, "0x2222222222222222222222222222222222222222");
 		assert.equal(tx.input, "0x1234");
 		assert.equal(tx.gas, "0x5208");
 		assert.equal(tx.value, "0x64");

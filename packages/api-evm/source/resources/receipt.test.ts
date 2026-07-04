@@ -8,17 +8,17 @@ describe<{
 	resource: ReceiptResource;
 }>("ReceiptResource", ({ beforeEach, it, assert }) => {
 	const transaction = {
-		blockHash: "aa".repeat(32),
+		blockHash: "a".repeat(64),
 		blockNumber: 255,
 		from: "0x0000000000000000000000000000000000000001",
 		gasPrice: 1_000_000_000,
-		hash: "bb".repeat(32),
+		hash: "b".repeat(64),
 		to: "0x0000000000000000000000000000000000000002",
 		transactionIndex: 3,
 	} as any;
 
 	const header = {
-		logsBloom: "cc".repeat(256),
+		logsBloom: "c".repeat(512),
 	} as any;
 
 	beforeEach((context) => {
@@ -38,7 +38,7 @@ describe<{
 		const result: any = await resource.transform(transaction, header, receipt);
 
 		assert.equal(result, {
-			blockHash: `0x${"aa".repeat(32)}`,
+			blockHash: `0x${"a".repeat(64)}`,
 			blockNumber: "0xff",
 			contractAddress: "0x0000000000000000000000000000000000000003",
 			cumulativeGasUsed: "0x5208",
@@ -46,10 +46,10 @@ describe<{
 			from: "0x0000000000000000000000000000000000000001",
 			gasUsed: "0x3e8",
 			logs: [{ address: "0x0000000000000000000000000000000000000004" }],
-			logsBloom: `0x${"cc".repeat(256)}`,
+			logsBloom: `0x${"c".repeat(512)}`,
 			status: "0x1",
 			to: "0x0000000000000000000000000000000000000002",
-			transactionHash: `0x${"bb".repeat(32)}`,
+			transactionHash: `0x${"b".repeat(64)}`,
 			transactionIndex: "0x3",
 			type: "0x0",
 		});
