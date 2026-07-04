@@ -12,9 +12,9 @@ export class ReceiptResource {
 		/* eslint-disable perfectionist/sort-objects */
 		return {
 			transactionHash: `0x${transaction.hash}`,
-			transactionIndex: `0x${transaction.transactionIndex?.toString(16)}`,
+			transactionIndex: `0x${transaction.transactionIndex.toString(16)}`,
 			blockHash: `0x${transaction.blockHash}`,
-			blockNumber: `0x${transaction.blockNumber?.toString(16)}`,
+			blockNumber: `0x${transaction.blockNumber.toString(16)}`,
 			from: transaction.from,
 			// eslint-disable-next-line unicorn/no-null
 			to: transaction.to ?? null,
