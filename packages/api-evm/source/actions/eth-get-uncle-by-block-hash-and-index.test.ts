@@ -26,7 +26,7 @@ describe<{
 	});
 
 	it("should return null when the block exists (no uncles)", async ({ action }) => {
-		assert.null(await action.handle(["0xabc"]));
+		assert.null(await action.handle(["0xabc", "0x0"]));
 	});
 
 	it("should pass the hash without 0x prefix to the database", async ({ action, database }) => {
@@ -36,7 +36,7 @@ describe<{
 			return true;
 		};
 
-		await action.handle(["0xdeadbeef"]);
+		await action.handle(["0xdeadbeef", "0x0"]);
 
 		assert.equal(received, "deadbeef");
 	});
@@ -44,6 +44,6 @@ describe<{
 	it("should throw when the block is not found", async ({ action, database }) => {
 		database.hasCommitByHash = async () => false;
 
-		await assert.rejects(() => action.handle(["0xabc"]), RpcError);
+		await assert.rejects(() => action.handle(["0xabc", "0x0"]), RpcError);
 	});
 });
