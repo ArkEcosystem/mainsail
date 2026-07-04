@@ -16,10 +16,6 @@ const isRateLimiterResponse = (value: unknown): value is RateLimiterRes =>
 	typeof value === "object" && value !== null && "remainingPoints" in value && "msBeforeNext" in value;
 
 const isListed = (ip: string, patterns: string[]): boolean => {
-	if (!Array.isArray(patterns)) {
-		return true;
-	}
-
 	for (const pattern of patterns) {
 		if (mm.isMatch(ip, pattern)) {
 			return true;
@@ -49,8 +45,8 @@ export const rateLimit = {
 
 		const rateLimiter = new RLWrapperBlackAndWhite({
 			blackList: options.blacklist || [],
-			isBlackListed: (ip: string) => isListed(ip, options.blacklist),
-			isWhiteListed: (ip: string) => isListed(ip, options.whitelist),
+			isBlackListed: (ip: string) => isListed(ip, options.blacklist || []),
+			isWhiteListed: (ip: string) => isListed(ip, options.whitelist || ["*"]),
 			limiter: new RateLimiterMemory({ duration: options.duration, points: options.points }),
 			runActionAnyway: false,
 			whiteList: options.whitelist || ["*"],

@@ -127,10 +127,147 @@ describe<{
 		});
 
 		const warn = spy(logger, "warn");
+		const error = spy(logger, "error");
 
 		const response = await subject.inject({ method: "GET", url: "/query-failed" });
 		assert.is(response.statusCode, 400);
 		warn.calledOnce();
+		error.neverCalled();
+	});
+
+	it("logs an error thrown from a request extension exactly once", async ({ subject, logger }) => {
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		await subject.registerPlugins([
+			{
+				name: "throwing-extension",
+				register(server: any) {
+					server.ext("onPostAuth", () => {
+						throw new Error("extension boom");
+					});
+				},
+				version: "1.0.0",
+			},
+		]);
+
+		const error = spy(logger, "error");
+
+		const response = await subject.inject({ method: "GET", url: "/" });
+		assert.is(response.statusCode, 500);
+		error.calledOnce();
+	});
+
+	it("logs a server error returned from a request extension exactly once", async ({ subject, logger }) => {
+		const { internal } = await import("@hapi/boom");
+
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		await subject.registerPlugins([
+			{
+				name: "boom-extension",
+				register(server: any) {
+					server.ext("onPostAuth", () => internal("extension internal"));
+				},
+				version: "1.0.0",
+			},
+		]);
+
+		const error = spy(logger, "error");
+
+		const response = await subject.inject({ method: "GET", url: "/" });
+		assert.is(response.statusCode, 500);
+		error.calledOnce();
+	});
+
+	it("does not forward request.log app-channel events to the logger", async ({ subject, logger }) => {
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		await subject.route({
+			handler(request: any) {
+				request.log(["error"], new Error("app channel"));
+				return { data: "ok" };
+			},
+			method: "GET",
+			path: "/app-log",
+		});
+
+		const error = spy(logger, "error");
+
+		const response = await subject.inject({ method: "GET", url: "/app-log" });
+		assert.is(response.statusCode, 200);
+		error.neverCalled();
+	});
+
+	it("logs errors raised while serializing the response body", async ({ subject, logger }) => {
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		await subject.route({
+			handler() {
+				// BigInt cannot be JSON serialized; the failure happens after onPreResponse.
+				return { value: 1n };
+			},
+			method: "GET",
+			path: "/marshal-error",
+		});
+
+		const error = spy(logger, "error");
+
+		const response = await subject.inject({ method: "GET", url: "/marshal-error" });
+		assert.is(response.statusCode, 500);
+		error.calledOnce();
+		assert.true(
+			error.getCallArgs(0)[0].includes("/marshal-error - TypeError: Do not know how to serialize a BigInt"),
+		);
+
+		// The dedupe flag lives on the request, so the next failing request logs again.
+		await subject.inject({ method: "GET", url: "/marshal-error" });
+		error.calledTimes(2);
+	});
+
+	it("onPreResponse - falls back to the error message when the error has no stack", async ({ subject, logger }) => {
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		await subject.route({
+			handler() {
+				const error = new Error("no stack here");
+				error.stack = undefined;
+				throw error;
+			},
+			method: "GET",
+			path: "/no-stack",
+		});
+
+		const error = spy(logger, "error");
+
+		const response = await subject.inject({ method: "GET", url: "/no-stack" });
+		assert.is(response.statusCode, 500);
+		error.calledOnce();
+		assert.true((error.getCallArgs(0)[0] as string).includes("/no-stack - no stack here"));
+	});
+
+	it("logs request error events carrying non-error values and errors without stacks", async ({ subject, logger }) => {
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		const error = spy(logger, "error");
+		const internalServer = (subject as any)["server"];
+
+		await internalServer.events.emit({ channel: "error", name: "request" }, [
+			{ app: {}, path: "/synthetic" },
+			{ error: "plain failure" },
+			{},
+		]);
+
+		const stackless = new Error("stackless failure");
+		stackless.stack = undefined;
+		await internalServer.events.emit({ channel: "error", name: "request" }, [
+			{ app: {}, path: "/synthetic" },
+			{ error: stackless },
+			{},
+		]);
+
+		error.calledTimes(2);
+		assert.true((error.getCallArgs(0)[0] as string).includes("/synthetic - plain failure"));
+		assert.true((error.getCallArgs(1)[0] as string).includes("/synthetic - stackless failure"));
 	});
 
 	it("onPreResponse - passes through a normal 200 response", async ({ subject, logger }) => {

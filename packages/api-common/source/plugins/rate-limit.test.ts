@@ -179,6 +179,36 @@ describe<{
 		assert.is(response.statusCode, 429);
 	});
 
+	it("should fall back to an empty blacklist and a wildcard whitelist when the lists are missing", async () => {
+		const server = await makeServer({
+			duration: 60,
+			enabled: true,
+			points: 1,
+			trustProxy: false,
+		});
+
+		// The default whitelist is "*", so the limit of 1 point never kicks in.
+		const first = await server.inject({ method: "GET", remoteAddress: REMOTE, url: "/" });
+		const second = await server.inject({ method: "GET", remoteAddress: REMOTE, url: "/" });
+
+		assert.is(first.statusCode, 200);
+		assert.is(second.statusCode, 200);
+	});
+
+	it("should not block requests when the blacklist is missing", async () => {
+		const server = await makeServer({
+			duration: 60,
+			enabled: true,
+			points: 5,
+			trustProxy: false,
+			whitelist: [],
+		});
+
+		const response = await server.inject({ method: "GET", remoteAddress: REMOTE, url: "/" });
+
+		assert.is(response.statusCode, 200);
+	});
+
 	it("should return Boom.internal when the limiter rejects with a real Error", async () => {
 		const consume = stub(RLWrapperBlackAndWhite.prototype, "consume").rejectedValue(new Error("boom-internal"));
 
