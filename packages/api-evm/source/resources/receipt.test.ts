@@ -70,7 +70,7 @@ describe<{
 		assert.is(result.cumulativeGasUsed, "0x0");
 		assert.is(result.gasUsed, "0x0");
 		assert.is(result.effectiveGasPrice, "0x3b9aca00");
-		assert.undefined(result.contractAddress);
+		assert.null(result.contractAddress);
 		assert.equal(result.logs, []);
 	});
 
@@ -87,5 +87,51 @@ describe<{
 
 		assert.is(result.cumulativeGasUsed, "0xff");
 		assert.is(result.gasUsed, "0x10");
+	});
+
+	it("should return to = null and keep contractAddress for a contract creation", async ({ resource }) => {
+		const receipt = {
+			contractAddress: "0x0000000000000000000000000000000000000005",
+			cumulativeGasUsed: BigInt(21_000),
+			gasUsed: BigInt(21_000),
+			logs: [],
+			status: 1,
+		} as any;
+
+		const result: any = await resource.transform({ ...transaction, to: undefined }, header, receipt);
+
+		assert.is(result.contractAddress, "0x0000000000000000000000000000000000000005");
+		assert.null(result.to);
+	});
+
+	it("should return contractAddress = null and keep to for a non-creation transaction", async ({ resource }) => {
+		const receipt = {
+			contractAddress: undefined,
+			cumulativeGasUsed: BigInt(21_000),
+			gasUsed: BigInt(21_000),
+			logs: [],
+			status: 1,
+		} as any;
+
+		const result: any = await resource.transform(transaction, header, receipt);
+
+		assert.null(result.contractAddress);
+		assert.is(result.to, "0x0000000000000000000000000000000000000002");
+	});
+
+	// Documents current behavior: logs are passed through as delivered by the EVM,
+	// including null when the receipt has none; the eth JSON-RPC spec expects [].
+	it("should pass through null logs unchanged", async ({ resource }) => {
+		const receipt = {
+			contractAddress: undefined,
+			cumulativeGasUsed: BigInt(0),
+			gasUsed: BigInt(0),
+			logs: null,
+			status: 1,
+		} as any;
+
+		const result: any = await resource.transform(transaction, header, receipt);
+
+		assert.null(result.logs);
 	});
 });
