@@ -67,9 +67,11 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action<[TxData]> 
 
 		const accountInfo = await this.evm.getAccountInfo(data.from);
 
-		// Skip estimation if it's a vanilla transfer and recipient is not a contract
-		if (!data.data || data.data === "0x") {
-			const targetCode = await this.evm.codeAt(data.to ?? "0x0000000000000000000000000000000000000000");
+		// Skip estimation if it's a vanilla transfer and recipient is not a contract.
+		// A missing recipient means contract deployment (CREATE), which costs more
+		// than the default gas even with empty data, so it must go through estimation.
+		if ((!data.data || data.data === "0x") && data.to) {
+			const targetCode = await this.evm.codeAt(data.to);
 			if (targetCode === "0x") {
 				return `0x${defaultGas.toString(16)}`;
 			}
