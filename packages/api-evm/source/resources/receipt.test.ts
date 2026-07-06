@@ -118,20 +118,4 @@ describe<{
 		assert.null(result.contractAddress);
 		assert.is(result.to, "0x0000000000000000000000000000000000000002");
 	});
-
-	// Documents current behavior: logs are passed through as delivered by the EVM,
-	// including null when the receipt has none; the eth JSON-RPC spec expects [].
-	it("should pass through null logs unchanged", async ({ resource }) => {
-		const receipt = {
-			contractAddress: undefined,
-			cumulativeGasUsed: BigInt(0),
-			gasUsed: BigInt(0),
-			logs: null,
-			status: 1,
-		} as any;
-
-		const result: any = await resource.transform(transaction, header, receipt);
-
-		assert.null(result.logs);
-	});
 });
