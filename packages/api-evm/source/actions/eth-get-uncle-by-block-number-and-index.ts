@@ -5,7 +5,7 @@ import { inject, injectable } from "@mainsail/container";
 import { RpcError } from "@mainsail/exceptions";
 
 @injectable()
-export class EthGetUncleByBlockNumberAndIndex implements Contracts.Api.RPC.Action<[string]> {
+export class EthGetUncleByBlockNumberAndIndex implements Contracts.Api.RPC.Action<[string, string]> {
 	@inject(Identifiers.State.Store)
 	private readonly stateStore!: Contracts.State.Store;
 
@@ -20,7 +20,7 @@ export class EthGetUncleByBlockNumberAndIndex implements Contracts.Api.RPC.Actio
 		type: "array",
 	};
 
-	public async handle(parameters: [string]): Promise<null> {
+	public async handle(parameters: [string, string]): Promise<null> {
 		if (this.stateStore.getBlockNumber() < Number(parameters[0])) {
 			throw new RpcError("Block not found");
 		}

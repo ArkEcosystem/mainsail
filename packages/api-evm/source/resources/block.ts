@@ -22,7 +22,7 @@ export class BlockResource {
 			hash: `0x${block.hash}`,
 			parentHash: `0x${block.parentHash}`,
 			nonce: "0x0000000000000000",
-			sha3Uncles: "0x1dcc4de8dec75d7aab85b567b6ccd41ad4e2a311b82e5872087ed76f0f1ccf8f", // No uncles in ARK, this is hash of empty list
+			sha3Uncles: "0x1dcc4de8dec75d7aab85b567b6ccd41ad312451b948a7413f0a142fd40d49347", // No uncles in ARK, this is hash of empty list
 			logsBloom: `0x${block.logsBloom}`,
 			transactionsRoot: `0x${block.transactionsRoot}`,
 			stateRoot: `0x${block.stateRoot}`,
@@ -38,7 +38,7 @@ export class BlockResource {
 			timestamp: `0x${block.timestamp.toString(16)}`,
 			transactions: transactionObject
 				? await this.#transformTransactions(block)
-				: block.transactions.map((transaction) => transaction.hash),
+				: block.transactions.map((transaction) => `0x${transaction.hash}`),
 			uncles: [],
 		};
 		/* eslint-enable perfectionist/sort-objects */

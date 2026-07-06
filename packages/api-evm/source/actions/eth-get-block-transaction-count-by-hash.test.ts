@@ -29,7 +29,7 @@ describe<{
 		assert.equal(action.name, "eth_getBlockTransactionCountByHash");
 	});
 
-	it("schema should be array with 0 parameters", ({ action, validator }) => {
+	it("schema should be array with 1 parameter", ({ action, validator }) => {
 		validator.addSchema(cryptoBlockSchemas.prefixedBlockHash);
 		validator.addSchema(action.schema);
 
@@ -52,7 +52,7 @@ describe<{
 		assert.null(await action.handle(["0x0000000000000000000000000000000000000000000000000000000000000000"]));
 	});
 
-	it("should return 0x0", async ({ action, database }) => {
+	it("should return 0x0 for a block with no transactions", async ({ action, database }) => {
 		const spyGetBlockHeaderByHash = stub(database, "getBlockHeaderByHash").returnValue({ transactionsCount: 0 });
 
 		assert.equal(
@@ -64,7 +64,7 @@ describe<{
 		spyGetBlockHeaderByHash.calledWith("0000000000000000000000000000000000000000000000000000000000000000");
 	});
 
-	it("should return 0x14", async ({ action, database }) => {
+	it("should return 0x14 for a block with 20 transactions", async ({ action, database }) => {
 		const spyGetBlockHeaderByHash = stub(database, "getBlockHeaderByHash").returnValue({ transactionsCount: 20 });
 
 		assert.equal(
