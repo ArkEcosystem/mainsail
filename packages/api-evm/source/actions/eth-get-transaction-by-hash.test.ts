@@ -1,5 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { Contracts } from "@mainsail/contracts";
+import { schemas as cryptoTransactionSchemas } from "@mainsail/crypto-transaction";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
@@ -50,11 +51,7 @@ describe<{
 	});
 
 	it("schema should validate a single prefixed transaction hash", ({ action, validator }) => {
-		validator.addSchema({
-			$id: "prefixedTransactionHash",
-			allOf: [{ maxLength: 66, minLength: 66 }, { $ref: "prefixedQuantityHex" }],
-			type: "string",
-		});
+		validator.addSchema(cryptoTransactionSchemas.prefixedTransactionHash);
 		validator.addSchema(action.schema);
 
 		assert.undefined(validator.validate("jsonRpc_eth_getTransactionByHash", [`0x${txHash}`]).errors);

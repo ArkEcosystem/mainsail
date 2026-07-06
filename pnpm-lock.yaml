@@ -373,6 +373,9 @@ importers:
       '@mainsail/crypto-block':
         specifier: workspace:*
         version: link:../crypto-block
+      '@mainsail/crypto-transaction':
+        specifier: workspace:*
+        version: link:../crypto-transaction
       '@mainsail/evm-service':
         specifier: workspace:*
         version: link:../evm-service

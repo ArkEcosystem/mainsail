@@ -38,6 +38,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",
+		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/evm-service": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/validation": "workspace:*",
