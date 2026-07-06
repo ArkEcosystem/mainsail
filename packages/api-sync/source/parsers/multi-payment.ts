@@ -17,7 +17,7 @@ export function parseMultiPayments(
 	const payments = parseEventLogs({
 		abi: paymentAbi,
 		eventName: "Payment",
-		logs: receipt.logs ?? [],
+		logs: receipt.logs,
 	});
 
 	return payments.map((payment, logIndex) => {

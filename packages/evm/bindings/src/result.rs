@@ -131,7 +131,7 @@ impl JsTransactionReceipt {
             logs: receipt
                 .logs
                 .map(|l| serde_json::to_value(l).unwrap())
-                .unwrap_or_else(|| serde_json::Value::Null), // TODO: check if null is correct
+                .unwrap_or_else(|| serde_json::json!([])),
             output: receipt.output.map(|o| utils::convert_bytes_to_js_buffer(o)),
             block_number: None,
             tx_hash: None,

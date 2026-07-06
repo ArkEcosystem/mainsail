@@ -407,7 +407,7 @@ export class Snapshot {
 						const resignations = parseEventLogs({
 							abi: consensusAbi,
 							eventName: "ValidatorResigned",
-							logs: receipt.receipt.logs ?? [],
+							logs: receipt.receipt.logs,
 						});
 
 						for (const resignation of resignations) {
@@ -434,7 +434,7 @@ export class Snapshot {
 						const payments = parseEventLogs({
 							abi: paymentAbi,
 							eventName: "Payment",
-							logs: receipt.receipt.logs ?? [],
+							logs: receipt.receipt.logs,
 						});
 
 						for (const payment of payments) {
