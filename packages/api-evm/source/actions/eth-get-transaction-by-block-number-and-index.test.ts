@@ -20,7 +20,7 @@ describe<{
 		gasLimit: 21_000n,
 		gasPrice: 1n,
 		hash: "d".repeat(64),
-		network: 30n,
+		network: 30,
 		nonce: 3n,
 		r: "e".repeat(64),
 		s: "f".repeat(64),

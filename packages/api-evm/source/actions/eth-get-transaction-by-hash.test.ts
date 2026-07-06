@@ -22,7 +22,7 @@ describe<{
 		gasLimit: 21_000n,
 		gasPrice: 1n,
 		hash: txHash,
-		network: 30n,
+		network: 30,
 		nonce: 0n,
 		r: "e".repeat(64),
 		s: "f".repeat(64),

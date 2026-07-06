@@ -13,11 +13,11 @@ describe<{
 		data: "0xabcdef",
 		from: "0x1111111111111111111111111111111111111111",
 		gasLimit: 21_000n,
-		// gasPrice and v are numbers on Contracts.Crypto.BlockTransaction; v is the
-		// normalized recovery bit (0 or 1), not the EIP-155 value.
+		// gasPrice, network and v are numbers on Contracts.Crypto.BlockTransaction;
+		// v holds the parity bit (0 or 1), rendered as the EIP-155 value by the resource.
 		gasPrice: 5_000_000_000,
 		hash: "b".repeat(64),
-		network: 30n,
+		network: 30,
 		nonce: 16n,
 		r: "e".repeat(64),
 		s: "f".repeat(64),
@@ -49,7 +49,8 @@ describe<{
 		assert.equal(result.transactionIndex, "0x2");
 		assert.equal(result.value, "0xde0b6b3a7640000");
 		assert.equal(result.type, "0x0");
-		assert.equal(result.v, "0x1");
+		// EIP-155: chainId * 2 + 35 + parity = 30 * 2 + 35 + 1 = 96
+		assert.equal(result.v, "0x60");
 		assert.equal(result.r, `0x${"e".repeat(64)}`);
 		assert.equal(result.s, `0x${"f".repeat(64)}`);
 	});
@@ -78,5 +79,12 @@ describe<{
 		const result: any = await resource.transform(makeTransaction());
 
 		assert.equal(result.type, "0x0");
+	});
+
+	it("should render v as the EIP-155 value for parity 0", async ({ resource }) => {
+		const result: any = await resource.transform(makeTransaction({ v: 0 }));
+
+		// chainId * 2 + 35 + 0 = 95
+		assert.equal(result.v, "0x5f");
 	});
 });
