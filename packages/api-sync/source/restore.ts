@@ -249,10 +249,7 @@ export class Restore {
 			// 7) Write `state` table
 			await this.#ingestState(context);
 
-			// 8) Write `contracts` table
-			await this.#ingestContracts(context);
-
-			// 9) Write captured data from plugins, configuration, etc.
+			// 8) Write captured data from plugins, configuration, etc.
 			await this.listeners.flush(entityManager);
 
 			restoredHeight = context.lastBlockNumber;
@@ -930,26 +927,6 @@ export class Restore {
 				supply: context.totalSupply.toString(),
 			})
 			.execute();
-	}
-
-	async #ingestContracts(context: RestoreContext): Promise<void> {
-		// const deploymentEvents = this.app
-		// 	.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer)
-		// 	.getDeploymentEvents();
-		// await context.contractRepository
-		// 	.createQueryBuilder()
-		// 	.insert()
-		// 	.orIgnore()
-		// 	.values(
-		// 		deploymentEvents.map((event) => ({
-		// 			activeImplementation: event.activeImplementation ?? event.address,
-		// 			address: event.address,
-		// 			implementations: event.implementations,
-		// 			name: event.name,
-		// 			proxy: event.proxy,
-		// 		})) as unknown as { address: string; abi: Record<string, unknown> }[],
-		// 	)
-		// 	.execute();
 	}
 
 	async #updateValidatorRanks(context: RepositoryContext): Promise<void> {
