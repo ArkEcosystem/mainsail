@@ -8,6 +8,7 @@ import { ensureDirSync } from "fs-extra";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { apiPackageJson } from "../test/fixtures";
 import { Command } from "./database-reset";
 
 describe<{
@@ -26,9 +27,9 @@ describe<{
 	beforeEach((context) => {
 		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
-		ensureDirSync(`${process.env.MAINSAIL_PATH_CONFIG}/core`);
+		ensureDirSync(`${process.env.MAINSAIL_PATH_CONFIG}/api`);
 
-		context.cli = new Console();
+		context.cli = new Console(true, apiPackageJson);
 
 		context.dataSource = { synchronize: async () => {} };
 		context.migrations = { runMigrations: async () => {} };
@@ -41,12 +42,12 @@ describe<{
 	it("should fail if the environment file does not exist", async ({ cli }) => {
 		await assert.rejects(
 			() => cli.withFlags({ force: true }).execute(Command),
-			`No environment file found at ${process.env.MAINSAIL_PATH_CONFIG}/core/.env.`,
+			`No environment file found at ${process.env.MAINSAIL_PATH_CONFIG}/api/.env.`,
 		);
 	});
 
 	it("should fail if a database variable is missing from the environment file", async ({ cli }) => {
-		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/.env`, "MAINSAIL_DB_HOST=localhost");
+		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`, "MAINSAIL_DB_HOST=localhost");
 
 		await assert.rejects(
 			() => cli.withFlags({ force: true }).execute(Command),
@@ -55,7 +56,7 @@ describe<{
 	});
 
 	it("should abort without resetting when the confirmation is declined", async ({ cli }) => {
-		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/.env`, environment);
+		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`, environment);
 
 		const register = stub(ServiceProvider.prototype, "register");
 		const connect = stub(Pg.Client.prototype, "connect");
@@ -73,7 +74,7 @@ describe<{
 		dataSource,
 		migrations,
 	}) => {
-		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/.env`, environment);
+		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`, environment);
 
 		const register = stub(ServiceProvider.prototype, "register");
 		const dispose = stub(ServiceProvider.prototype, "dispose");
@@ -105,7 +106,7 @@ describe<{
 		cli,
 		dataSource,
 	}) => {
-		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/.env`, environment);
+		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`, environment);
 
 		stub(ServiceProvider.prototype, "register");
 		const dispose = stub(ServiceProvider.prototype, "dispose");

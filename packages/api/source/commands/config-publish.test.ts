@@ -6,6 +6,7 @@ import { ensureDirSync } from "fs-extra";
 import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { apiPackageJson } from "../test/fixtures";
 import { Command } from "./config-publish";
 
 describe<{
@@ -15,9 +16,9 @@ describe<{
 	beforeEach((context) => {
 		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
-		context.configDestination = join(process.env.MAINSAIL_PATH_CONFIG, "core");
+		context.configDestination = join(process.env.MAINSAIL_PATH_CONFIG, "api");
 
-		context.cli = new Console();
+		context.cli = new Console(true, apiPackageJson);
 	});
 
 	afterAll(() => setGracefulCleanup());
@@ -32,6 +33,9 @@ describe<{
 	});
 
 	it("should fail if the core configuration files cannot be found", async ({ cli }) => {
+		// Point the config source at a name that has no directory under bin/config.
+		cli.app.rebind(Identifiers.Application.Name).toConstantValue("unknown");
+
 		await assert.rejects(() => cli.execute(Command), "Couldn't find the core configuration files at");
 	});
 
@@ -43,8 +47,6 @@ describe<{
 	});
 
 	it("should publish the configuration", async ({ cli, configDestination }) => {
-		cli.app.rebind(Identifiers.Application.Name).toConstantValue("api");
-
 		await cli.execute(Command);
 
 		assert.true(existsSync(join(configDestination, ".env")));
@@ -52,8 +54,6 @@ describe<{
 	});
 
 	it("should overwrite the existing configuration with the reset flag", async ({ cli, configDestination }) => {
-		cli.app.rebind(Identifiers.Application.Name).toConstantValue("api");
-
 		await cli.execute(Command);
 
 		await assert.rejects(

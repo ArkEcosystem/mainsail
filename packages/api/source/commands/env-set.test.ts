@@ -1,11 +1,11 @@
 /* eslint-disable unicorn/prevent-abbreviations */
-import { Identifiers } from "@mainsail/constants";
 import { parse } from "envfile";
 import { readFileSync } from "fs";
 import { ensureFileSync, removeSync } from "fs-extra/esm";
 import { dirSync, setGracefulCleanup } from "tmp";
 import { Console } from "@mainsail/cli";
 import { describe } from "@mainsail/test-runner";
+import { apiPackageJson } from "../test/fixtures";
 import { Command } from "./env-set";
 
 describe<{
@@ -14,14 +14,13 @@ describe<{
 	beforeEach((context) => {
 		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
-		context.cli = new Console();
-		context.cli.app.rebind(Identifiers.Application.Name).toConstantValue("core");
+		context.cli = new Console(true, apiPackageJson);
 	});
 
 	afterAll(() => setGracefulCleanup());
 
 	it("should set the value of an environment variable", async ({ cli }) => {
-		const environmentFile = `${process.env.MAINSAIL_PATH_CONFIG}/core/.env`;
+		const environmentFile = `${process.env.MAINSAIL_PATH_CONFIG}/api/.env`;
 
 		removeSync(environmentFile);
 		ensureFileSync(environmentFile);

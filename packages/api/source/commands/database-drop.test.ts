@@ -7,6 +7,7 @@ import { ensureDirSync } from "fs-extra";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { apiPackageJson } from "../test/fixtures";
 import { Command } from "./database-drop";
 
 describe<{
@@ -23,9 +24,9 @@ describe<{
 	beforeEach((context) => {
 		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
-		ensureDirSync(`${process.env.MAINSAIL_PATH_CONFIG}/core`);
+		ensureDirSync(`${process.env.MAINSAIL_PATH_CONFIG}/api`);
 
-		context.cli = new Console();
+		context.cli = new Console(true, apiPackageJson);
 	});
 
 	afterAll(() => setGracefulCleanup());
@@ -33,12 +34,12 @@ describe<{
 	it("should fail if the environment file does not exist", async ({ cli }) => {
 		await assert.rejects(
 			() => cli.withFlags({ force: true }).execute(Command),
-			`No environment file found at ${process.env.MAINSAIL_PATH_CONFIG}/core/.env.`,
+			`No environment file found at ${process.env.MAINSAIL_PATH_CONFIG}/api/.env.`,
 		);
 	});
 
 	it("should fail if a database variable is missing from the environment file", async ({ cli }) => {
-		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/.env`, "MAINSAIL_DB_HOST=localhost");
+		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`, "MAINSAIL_DB_HOST=localhost");
 
 		await assert.rejects(
 			() => cli.withFlags({ force: true }).execute(Command),
@@ -47,7 +48,7 @@ describe<{
 	});
 
 	it("should abort without dropping when the confirmation is declined", async ({ cli }) => {
-		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/.env`, environment);
+		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`, environment);
 
 		const connect = stub(Pg.Client.prototype, "connect");
 		const log = spy(cli.app.get(Identifiers.Cli.Component.Log), "render");
@@ -61,7 +62,7 @@ describe<{
 	});
 
 	it("should terminate active sessions and drop the database when confirmed", async ({ cli }) => {
-		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/.env`, environment);
+		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`, environment);
 
 		const connect = stub(Pg.Client.prototype, "connect");
 		const query = stub(Pg.Client.prototype, "query");
@@ -78,7 +79,7 @@ describe<{
 	});
 
 	it("should recreate an empty database when the init flag is set", async ({ cli }) => {
-		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/.env`, environment);
+		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`, environment);
 
 		stub(Pg.Client.prototype, "connect");
 		const query = stub(Pg.Client.prototype, "query");
@@ -91,7 +92,7 @@ describe<{
 	});
 
 	it("should report a fatal error and close the connection when a query fails", async ({ cli }) => {
-		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/.env`, environment);
+		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`, environment);
 
 		stub(Pg.Client.prototype, "connect");
 		stub(Pg.Client.prototype, "query").rejectedValue(new Error("connection refused"));

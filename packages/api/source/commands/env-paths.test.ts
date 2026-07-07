@@ -4,20 +4,14 @@ import { describe } from "@mainsail/test-runner";
 import envPaths, { Paths } from "env-paths";
 import { join } from "path";
 
+import { apiPackageJson } from "../test/fixtures";
 import { Command } from "./env-paths";
 
 describe<{
 	cli: Console;
 }>("EnvPathsCommand", ({ beforeEach, it, stub, assert }) => {
 	beforeEach((context) => {
-		context.cli = new Console(true, {
-			bin: {
-				"mainsail-api": "./bin/run.js",
-			},
-			description: "API of the Mainsail Blockchain",
-			name: "@mainsail/api",
-			version: "3.0.0-next.0",
-		});
+		context.cli = new Console(true, apiPackageJson);
 		delete process.env.MAINSAIL_PATH_CONFIG;
 	});
 

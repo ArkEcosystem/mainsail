@@ -5,6 +5,7 @@ import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Console } from "@mainsail/cli";
 import { describe } from "@mainsail/test-runner";
+import { apiPackageJson } from "../test/fixtures";
 import { Command } from "./env-get";
 
 describe<{
@@ -13,15 +14,15 @@ describe<{
 	beforeEach((context) => {
 		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
-		ensureDirSync(`${process.env.MAINSAIL_PATH_CONFIG}/core`);
+		ensureDirSync(`${process.env.MAINSAIL_PATH_CONFIG}/api`);
 
-		context.cli = new Console();
+		context.cli = new Console(true, apiPackageJson);
 	});
 
 	afterAll(() => setGracefulCleanup());
 
 	it("should get the value of an environment variable", async ({ cli }) => {
-		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/.env`, "MAINSAIL_LOG_LEVEL=emergency");
+		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`, "MAINSAIL_LOG_LEVEL=emergency");
 
 		let message: string;
 		stub(console, "log").callsFake((m) => (message = m));
@@ -32,7 +33,7 @@ describe<{
 	});
 
 	it("should fail to get the value of a non-existent environment variable", async ({ cli }) => {
-		ensureFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/.env`);
+		ensureFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`);
 
 		await assert.rejects(
 			() => cli.withFlags({ key: "FAKE_KEY" }).execute(Command),
@@ -43,7 +44,7 @@ describe<{
 	it("should fail if the environment configuration doesn't exist", async ({ cli }) => {
 		await assert.rejects(
 			() => cli.withFlags({ key: "FAKE_KEY" }).execute(Command),
-			`No environment file found at ${process.env.MAINSAIL_PATH_CONFIG}/core/.env`,
+			`No environment file found at ${process.env.MAINSAIL_PATH_CONFIG}/api/.env`,
 		);
 	});
 });

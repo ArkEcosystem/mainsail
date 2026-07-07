@@ -3,28 +3,20 @@ import { BuildPackages, Identifiers } from "@mainsail/constants";
 import { Console } from "@mainsail/cli";
 
 import { describe } from "@mainsail/test-runner";
+import { apiPackageJson } from "../test/fixtures";
 import { Command } from "./config-cli";
-
-const apiPkg = {
-	bin: {
-		"mainsail-api": "./bin/run.js",
-	},
-	description: "API of the Mainsail Blockchain",
-	name: "@mainsail/api",
-	version: "3.0.0-next.0",
-};
 
 describe<{
 	cli: Console;
 	config: Contracts.Cli.Config;
 }>("ConfigCliCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
-		context.cli = new Console(true, apiPkg);
+		context.cli = new Console(true, apiPackageJson);
 		context.config = context.cli.app.get<Contracts.Cli.Config>(Identifiers.Cli.Service.Config);
 	});
 
 	it("should not update the config if the [--channel] flag is not present", async () => {
-		const cli = new Console(false, apiPkg);
+		const cli = new Console(false, apiPackageJson);
 		stub(cli.app.get(Identifiers.Cli.Service.Environment), "getPaths");
 		const spySet = stub(cli.app.get<Contracts.Cli.Config>(Identifiers.Cli.Service.Config), "set");
 

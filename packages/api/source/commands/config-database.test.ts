@@ -4,6 +4,7 @@ import { Identifiers } from "@mainsail/constants";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { apiPackageJson } from "../test/fixtures";
 import { Command } from "./config-database";
 
 describe<{
@@ -13,9 +14,9 @@ describe<{
 	beforeEach((context) => {
 		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
-		context.envFile = `${process.env.MAINSAIL_PATH_CONFIG}/core/.env`;
+		context.envFile = `${process.env.MAINSAIL_PATH_CONFIG}/api/.env`;
 
-		context.cli = new Console();
+		context.cli = new Console(true, apiPackageJson);
 	});
 
 	afterAll(() => setGracefulCleanup());
