@@ -37,13 +37,11 @@ export class Server extends AbstractServer {
 			},
 			routes: {
 				payload: {
-					/* c8 ignore next 3 */
 					async failAction(request: Hapi.Request, h: Hapi.ResponseToolkit, error: Error) {
 						return badData(error.message);
 					},
 				},
 				validate: {
-					/* c8 ignore next 3 */
 					async failAction(request: Hapi.Request, h: Hapi.ResponseToolkit, error: Error) {
 						return badData(error.message);
 					},
