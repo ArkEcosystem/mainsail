@@ -14,6 +14,8 @@ import { parse } from "envfile";
 import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
 
+import { requireEnvironmentVariable, terminateActiveSessions } from "../helpers.js";
+
 @injectable()
 export class Command extends Commands.Command {
 	public signature = "db:reset";
@@ -36,18 +38,20 @@ export class Command extends Commands.Command {
 
 		const environment: object = parse(readFileSync(environmentFile).toString("utf8"));
 
+		const fromEnvironment = (key: string): string => requireEnvironmentVariable(this.components, environment, key);
+
 		const config = {
 			applicationName: "mainsail/api",
-			database: this.#fromEnv(environment, EnvironmentVariables.MAINSAIL_DB_DATABASE),
+			database: fromEnvironment(EnvironmentVariables.MAINSAIL_DB_DATABASE),
 			dropSchema: true,
 			entityPrefix: "public.",
-			host: this.#fromEnv(environment, EnvironmentVariables.MAINSAIL_DB_HOST),
+			host: fromEnvironment(EnvironmentVariables.MAINSAIL_DB_HOST),
 			logger: "simple-console",
 			logging: false,
-			password: this.#fromEnv(environment, EnvironmentVariables.MAINSAIL_DB_PASSWORD),
-			port: Number.parseInt(this.#fromEnv(environment, EnvironmentVariables.MAINSAIL_DB_PORT)),
+			password: fromEnvironment(EnvironmentVariables.MAINSAIL_DB_PASSWORD),
+			port: Number.parseInt(fromEnvironment(EnvironmentVariables.MAINSAIL_DB_PORT)),
 			type: "postgres",
-			username: this.#fromEnv(environment, EnvironmentVariables.MAINSAIL_DB_USERNAME),
+			username: fromEnvironment(EnvironmentVariables.MAINSAIL_DB_USERNAME),
 		};
 
 		if (!this.hasFlag("force")) {
@@ -82,14 +86,7 @@ export class Command extends Commands.Command {
 						try {
 							await client.connect();
 
-							await client.query(
-								`
-			SELECT pg_terminate_backend(pid)
-			FROM pg_stat_activity
-			WHERE datname = $1 AND pid <> pg_backend_pid();
-		  `,
-								[config.database],
-							);
+							await terminateActiveSessions(client, config.database as string);
 						} finally {
 							await client.end();
 						}
@@ -125,13 +122,5 @@ export class Command extends Commands.Command {
 		} finally {
 			await database.dispose();
 		}
-	}
-
-	#fromEnv(environment: object, key: string): string {
-		if (!environment[key]) {
-			this.components.fatal(`The "${key}" doesn't exist.`);
-		}
-
-		return environment[key];
 	}
 }

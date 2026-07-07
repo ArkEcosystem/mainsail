@@ -1,15 +1,13 @@
 import { Pg } from "@mainsail/api-database";
 import { Commands } from "@mainsail/cli";
+import { EnvironmentVariables } from "@mainsail/constants";
 import { injectable, postConstruct } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 import { parse } from "envfile";
 import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
 
-// Recreate database
-// source ~/.config/mainsail/api/.env
-// sudo -i -u postgres psql -c "DROP DATABASE $MAINSAIL_DB_DATABASE;"
-// sudo -i -u postgres psql -c "CREATE DATABASE $MAINSAIL_DB_DATABASE WITH OWNER $MAINSAIL_DB_USERNAME;"
+import { requireEnvironmentVariable, terminateActiveSessions } from "../helpers.js";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -32,14 +30,28 @@ export class Command extends Commands.Command {
 
 		const environment: object = parse(readFileSync(environmentFile).toString("utf8"));
 
-		const databaseName = this.#fromEnv(environment, "MAINSAIL_DB_DATABASE");
-		const user = this.#fromEnv(environment, "MAINSAIL_DB_USERNAME");
+		const databaseName = requireEnvironmentVariable(
+			this.components,
+			environment,
+			EnvironmentVariables.MAINSAIL_DB_DATABASE,
+		);
+		const user = requireEnvironmentVariable(
+			this.components,
+			environment,
+			EnvironmentVariables.MAINSAIL_DB_USERNAME,
+		);
 
 		const config = {
 			database: "postgres",
-			host: this.#fromEnv(environment, "MAINSAIL_DB_HOST"),
-			password: this.#fromEnv(environment, "MAINSAIL_DB_PASSWORD"),
-			port: Number.parseInt(this.#fromEnv(environment, "MAINSAIL_DB_PORT")),
+			host: requireEnvironmentVariable(this.components, environment, EnvironmentVariables.MAINSAIL_DB_HOST),
+			password: requireEnvironmentVariable(
+				this.components,
+				environment,
+				EnvironmentVariables.MAINSAIL_DB_PASSWORD,
+			),
+			port: Number.parseInt(
+				requireEnvironmentVariable(this.components, environment, EnvironmentVariables.MAINSAIL_DB_PORT),
+			),
 			user,
 		};
 
@@ -68,14 +80,7 @@ export class Command extends Commands.Command {
 			await this.components.taskList([
 				{
 					task: async () => {
-						await client.query(
-							`
-    SELECT pg_terminate_backend(pid)
-    FROM pg_stat_activity
-    WHERE datname = $1 AND pid <> pg_backend_pid();
-  `,
-							[databaseName],
-						);
+						await terminateActiveSessions(client, databaseName);
 					},
 					title: "Terminate active sessions",
 				},
@@ -99,13 +104,5 @@ export class Command extends Commands.Command {
 		} finally {
 			await client.end();
 		}
-	}
-
-	#fromEnv(environment: object, key: string): string {
-		if (!environment[key]) {
-			this.components.fatal(`The "${key}" doesn't exist.`);
-		}
-
-		return environment[key];
 	}
 }

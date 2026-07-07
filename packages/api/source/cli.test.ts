@@ -12,7 +12,6 @@ describe("CLI", ({ beforeEach, it, assert, stub }) => {
 
 	it("should run successfully using valid commands", async () => {
 		const cli = new CommandLineInterface(["help"]);
-		await cli.execute("distribution");
 		await assert.resolves(() => cli.execute("distribution"));
 	});
 

@@ -29,7 +29,6 @@ export class Command extends Commands.Command {
 		}
 
 		if (await this.components.confirm("Are you sure you want to reinstall?")) {
-			//Come back to this
 			return this.#performInstall();
 		}
 
