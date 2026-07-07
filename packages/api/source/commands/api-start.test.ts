@@ -17,11 +17,16 @@ describe<{
 
 	afterAll(() => setGracefulCleanup());
 
+	// DaemonizeProcess adds node_args {max_old_space_size} to the start options on machines
+	// with < 2 GB RAM; strip it from the recorded call so the assertions are platform-independent.
+	const stripNodeArguments = (spyStart: any) => delete spyStart.getCallArgs(0)[0].node_args;
+
 	it("should start the API process", async ({ processManager, cli }) => {
 		const spyStart = stub(processManager, "start");
 
 		await cli.execute(Command);
 
+		stripNodeArguments(spyStart);
 		spyStart.calledWith(
 			{
 				args: "api:run --network='devnet' --token='ark' --v=0 --env='production' --skipPrompts=false",
@@ -48,6 +53,7 @@ describe<{
 		await cli.execute(Command);
 
 		getGlobalEntrypoint.calledWith("@mainsail/api");
+		stripNodeArguments(spyStart);
 		spyStart.calledWith(
 			{
 				args: "api:run --network='devnet' --token='ark' --v=0 --env='production' --skipPrompts=false",
@@ -71,6 +77,7 @@ describe<{
 		await cli.withFlags({ daemon: false }).execute(Command);
 
 		// The daemon flag is stripped from the args string but toggles "no-daemon" on the process options.
+		stripNodeArguments(spyStart);
 		spyStart.calledWith(
 			{
 				args: "api:run --network='devnet' --token='ark' --v=0 --env='production' --skipPrompts=false",
@@ -91,6 +98,7 @@ describe<{
 		await cli.withFlags({ daemon: true }).execute(Command);
 
 		// daemon=true is the default, so the process options must NOT carry the "no-daemon" flag.
+		stripNodeArguments(spyStart);
 		spyStart.calledWith(
 			{
 				args: "api:run --network='devnet' --token='ark' --v=0 --env='production' --skipPrompts=false",
@@ -115,7 +123,9 @@ describe<{
 		const [options] = spyStart.getCallArgs(0);
 		assert.equal(options.env.MAINSAIL_ENV, "test");
 		assert.true(options.args.includes("--env='test'"));
-		// A boolean true flag is rendered as a bare "--skipPrompts" (no "=true").
+		// A boolean true flag is rendered as a bare "--skipPrompts" (no "=true"); explicitly reject
+		// the default "=false" rendering so a dropped flag cannot satisfy this assertion.
 		assert.true(options.args.includes("--skipPrompts"));
+		assert.false(options.args.includes("--skipPrompts=false"));
 	});
 });
