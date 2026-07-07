@@ -1,8 +1,7 @@
-import { Utils } from "@mainsail/cli";
-import { sleep } from "@mainsail/utils";
-import { dirSync, setGracefulCleanup } from "tmp";
-import { Console } from "@mainsail/cli";
+import { Console, Utils } from "@mainsail/cli";
 import { describe } from "@mainsail/test-runner";
+import { dirSync, setGracefulCleanup } from "tmp";
+
 import { Command } from "./api-run";
 
 describe<{
@@ -16,13 +15,24 @@ describe<{
 
 	afterAll(() => setGracefulCleanup());
 
-	it("should throw if the process does not exist", async ({ cli }) => {
-		const spyBuildApplication = stub(Utils.Builder, "buildApplication");
+	it("should build the application with the api flags", async ({ cli }) => {
+		let buildOptions: any;
+		const buildCalled = new Promise<void>((resolve) => {
+			stub(Utils.Builder, "buildApplication").callsFake(async (options) => {
+				buildOptions = options;
+				resolve();
+			});
+		});
 
+		// api:run never resolves by design (it keeps the process in the foreground),
+		// so the execution promise is intentionally not awaited.
 		cli.execute(Command);
 
-		await sleep(200);
+		await buildCalled;
 
-		spyBuildApplication.calledOnce();
+		assert.equal(buildOptions.flags.name, "api");
+		assert.true(buildOptions.flags.allowMissingConfigFiles);
+		assert.equal(buildOptions.flags.env, "production");
+		assert.false(buildOptions.flags.skipPrompts);
 	});
 });
