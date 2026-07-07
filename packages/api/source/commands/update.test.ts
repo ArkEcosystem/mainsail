@@ -30,6 +30,7 @@ describe<{
 		await assert.resolves(() => cli.execute(Command));
 
 		spyCheck.calledOnce();
+		spyCheck.calledWith(true);
 		spyUpdate.neverCalled();
 	});
 
@@ -43,6 +44,7 @@ describe<{
 
 		spyCheck.calledOnce();
 		spyUpdate.calledOnce();
+		spyUpdate.calledWith(false, false);
 		spyRestar.neverCalled();
 		spyRestartWithPrompt.calledTimes(1);
 	});

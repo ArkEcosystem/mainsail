@@ -17,12 +17,13 @@ export class Command extends Commands.Command {
 	@postConstruct()
 	public configure(): void {
 		this.definition
+			.setFlag("force", "Force an update.", Joi.boolean().default(false))
 			.setFlag("updateProcessManager", "Update process manager.", Joi.boolean().default(false))
 			.setFlag("restart", "Restart all running processes.", Joi.boolean());
 	}
 
 	public async execute(): Promise<void> {
-		const hasNewVersion: boolean = await this.updater.check();
+		const hasNewVersion: boolean = await this.updater.check(true);
 
 		if (hasNewVersion) {
 			await this.updater.update(this.getFlag<boolean>("updateProcessManager"), this.getFlag<boolean>("force"));
