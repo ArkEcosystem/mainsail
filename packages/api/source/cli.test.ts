@@ -59,12 +59,24 @@ describe("CLI", ({ beforeEach, it, assert, stub }) => {
 	});
 
 	it("should set NODE_PATH when it is not set", async () => {
-		delete process.env.NODE_PATH;
+		// uvu runs every suite in one process: restore NODE_PATH afterwards so the
+		// mutation does not leak into subsequent tests.
+		const originalNodePath = process.env.NODE_PATH;
 
-		const cli = new CommandLineInterface(["help"]);
+		try {
+			delete process.env.NODE_PATH;
 
-		await assert.resolves(() => cli.execute("distribution"));
-		assert.string(process.env.NODE_PATH);
+			const cli = new CommandLineInterface(["help"]);
+
+			await assert.resolves(() => cli.execute("distribution"));
+			assert.true((process.env.NODE_PATH ?? "").length > 0);
+		} finally {
+			if (originalNodePath === undefined) {
+				delete process.env.NODE_PATH;
+			} else {
+				process.env.NODE_PATH = originalNodePath;
+			}
+		}
 	});
 
 	it("should execute a command discovered from plugins", async () => {
