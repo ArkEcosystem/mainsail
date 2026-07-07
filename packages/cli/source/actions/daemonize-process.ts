@@ -23,8 +23,8 @@ export class DaemonizeProcess {
 		const processName: string = options.name;
 
 		if (this.processManager.has(processName)) {
-			this.app.get<AbortRunningProcess>(Identifiers.Cli.Action.AbortUnknownProcess).execute(processName);
-			this.app.get<AbortUnknownProcess>(Identifiers.Cli.Action.AbortRunningProcess).execute(processName);
+			this.app.get<AbortUnknownProcess>(Identifiers.Cli.Action.AbortUnknownProcess).execute(processName);
+			this.app.get<AbortRunningProcess>(Identifiers.Cli.Action.AbortRunningProcess).execute(processName);
 		}
 
 		let spinner;
