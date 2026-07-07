@@ -5,23 +5,32 @@ import { Console } from "@mainsail/cli";
 import { describe } from "@mainsail/test-runner";
 import { Command } from "./config-cli";
 
+const apiPkg = {
+	bin: {
+		"mainsail-api": "./bin/run.js",
+	},
+	description: "API of the Mainsail Blockchain",
+	name: "@mainsail/api",
+	version: "3.0.0-next.0",
+};
+
 describe<{
 	cli: Console;
 	config: Contracts.Cli.Config;
 }>("ConfigCliCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
-		context.cli = new Console();
+		context.cli = new Console(true, apiPkg);
 		context.config = context.cli.app.get<Contracts.Cli.Config>(Identifiers.Cli.Service.Config);
 	});
 
-	it("should not set config token if no token is passed to command", async ({ config }) => {
-		const cli = new Console(false);
+	it("should not update the config if the [--channel] flag is not present", async () => {
+		const cli = new Console(false, apiPkg);
 		stub(cli.app.get(Identifiers.Cli.Service.Environment), "getPaths");
-		const spySetToken = stub(config, "set");
+		const spySet = stub(cli.app.get<Contracts.Cli.Config>(Identifiers.Cli.Service.Config), "set");
 
 		await assert.resolves(() => cli.execute(Command));
 
-		spySetToken.neverCalled();
+		spySet.neverCalled();
 	});
 
 	it("should change the channel and install the new version", async ({ cli, config }) => {
@@ -35,7 +44,7 @@ describe<{
 		await cli.withFlags({ channel: "next" }).execute(Command);
 
 		assert.equal(config.get("channel"), "next");
-		install.calledWith("@mainsail/core", BuildPackages, "next");
+		install.calledWith("@mainsail/api", BuildPackages, "next");
 	});
 
 	it("should fail to change the channel if the new and old are the same", async ({ cli, config }) => {
