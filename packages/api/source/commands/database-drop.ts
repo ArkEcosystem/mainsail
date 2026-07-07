@@ -15,11 +15,7 @@ export class Command extends Commands.Command {
 
 	@postConstruct()
 	public configure(): void {
-		this.definition.setFlag(
-			"force",
-			"Force drop of database without confirmation.",
-			Joi.boolean().default(false),
-		);
+		this.definition.setFlag("force", "Force drop of database without confirmation.", Joi.boolean().default(false));
 		this.definition.setFlag("init", "Initialize empty database after drop.", Joi.boolean().default(false));
 	}
 

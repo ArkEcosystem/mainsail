@@ -22,11 +22,7 @@ export class Command extends Commands.Command {
 
 	@postConstruct()
 	public configure(): void {
-		this.definition.setFlag(
-			"force",
-			"Force reset of database without confirmation.",
-			Joi.boolean().default(false),
-		);
+		this.definition.setFlag("force", "Force reset of database without confirmation.", Joi.boolean().default(false));
 	}
 
 	public async execute(): Promise<void> {
