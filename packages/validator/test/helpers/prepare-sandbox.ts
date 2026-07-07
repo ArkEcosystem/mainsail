@@ -15,7 +15,6 @@ import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-sign
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
-import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ServiceProvider as Forger } from "@mainsail/forger";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
@@ -87,7 +86,7 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 		apply: async () => ({ gasRefunded: 0n, gasUsed: 0n, logs: [], status: 1 }),
 	});
 
-	context.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue({});
+	context.app.bind(Identifiers.EvmConsensus.GenesisInfo).toConstantValue({});
 
 	context.app.bind(Identifiers.State.Store).toConstantValue({
 		getGenesisCommit: () => ({

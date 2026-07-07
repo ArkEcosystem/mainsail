@@ -4,7 +4,6 @@ import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
-import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { Application } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
@@ -54,8 +53,6 @@ export class GenesisBlockGenerator {
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
-
-	#consensusProxyContractAddress!: string;
 
 	async generate(
 		genesisMnemonic: string,
@@ -110,20 +107,24 @@ export class GenesisBlockGenerator {
 		validatorsCount: number,
 		options: Contracts.NetworkGenerator.InternalOptions,
 	) {
-		await this.app.resolve(Deployer).deploy({
-			generatorAddress: genesisWalletAddress,
-			initialBlockNumber: options.initialBlockNumber,
+		const genesisInfo: Contracts.Evm.GenesisInfo = {
+			account: genesisWalletAddress,
+			deployerAccount: this.app.get<string>(Identifiers.EvmConsensus.DeployerAddress),
+			initialBlockNumber: BigInt(options.initialBlockNumber),
 			// Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`).
 			// In snapshot mode premine is "0", so this mints nothing and the snapshot importer supplies the state.
 			initialSupply: options.snapshot
-				? "0"
-				: ((BigInt(options.premine) / BigInt(validatorsCount)) * BigInt(validatorsCount)).toString(),
-			timestamp: dayjs(options.epoch).valueOf(),
-		});
+				? 0n
+				: (BigInt(options.premine) / BigInt(validatorsCount)) * BigInt(validatorsCount),
+			timestamp: BigInt(dayjs(options.epoch).valueOf()),
 
-		this.#consensusProxyContractAddress = this.app.get<string>(
-			EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
-		);
+			usernameContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Usernames), // PROXY Uses nonce 3
+			validatorContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus), // PROXY Uses nonce 1
+		};
+
+		this.app.rebind(Identifiers.EvmConsensus.GenesisInfo).toConstantValue(genesisInfo);
+
+		await this.app.get<Contracts.EvmConsensus.Deployer>(Identifiers.EvmConsensus.Deployer).deploy();
 	}
 
 	async #createTransferTransaction(
@@ -183,7 +184,7 @@ export class GenesisBlockGenerator {
 				await this.app
 					.resolve(TransactionBuilder)
 					.network(chainId)
-					.recipientAddress(this.#consensusProxyContractAddress)
+					.recipientAddress(this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus))
 					.nonce("0") // validator registration tx is always the first one from sender
 					.payload(data)
 					.value(value)
@@ -210,7 +211,7 @@ export class GenesisBlockGenerator {
 				await this.app
 					.resolve(TransactionBuilder)
 					.network(chainId)
-					.recipientAddress(this.#consensusProxyContractAddress)
+					.recipientAddress(this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus))
 					.nonce("1") // vote transaction is always the 2nd tx from sender (1st one is validator registration)
 					.payload(data)
 					.gasPrice(0)

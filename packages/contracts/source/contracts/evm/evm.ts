@@ -8,6 +8,7 @@ export interface GenesisInfo {
 	readonly usernameContract: string;
 	readonly initialBlockNumber: bigint;
 	readonly initialSupply: bigint;
+	readonly timestamp: bigint;
 }
 
 export interface ProcessResult {

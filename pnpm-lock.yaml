@@ -458,9 +458,6 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/evm-consensus':
-        specifier: workspace:*
-        version: link:../evm-consensus
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
@@ -2094,9 +2091,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
       viem:
         specifier: 2.48.11
         version: 2.48.11(typescript@6.0.3)(zod@4.4.3)
@@ -2265,9 +2259,6 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/evm-consensus':
-        specifier: workspace:*
-        version: link:../evm-consensus
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2326,6 +2317,9 @@ importers:
       '@mainsail/crypto-wif':
         specifier: workspace:*
         version: link:../crypto-wif
+      '@mainsail/evm-consensus':
+        specifier: workspace:*
+        version: link:../evm-consensus
       '@mainsail/serializer':
         specifier: workspace:*
         version: link:../serializer
@@ -2831,9 +2825,6 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/evm-consensus':
-        specifier: workspace:*
-        version: link:../evm-consensus
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
@@ -3021,9 +3012,6 @@ importers:
       '@mainsail/crypto-transaction':
         specifier: workspace:*
         version: link:../crypto-transaction
-      '@mainsail/evm-consensus':
-        specifier: workspace:*
-        version: link:../evm-consensus
       '@mainsail/evm-contracts':
         specifier: workspace:*
         version: link:../evm-contracts
@@ -3329,9 +3317,6 @@ importers:
       '@mainsail/crypto-validation':
         specifier: workspace:*
         version: link:../crypto-validation
-      '@mainsail/evm-consensus':
-        specifier: workspace:*
-        version: link:../evm-consensus
       '@mainsail/forger':
         specifier: workspace:*
         version: link:../forger

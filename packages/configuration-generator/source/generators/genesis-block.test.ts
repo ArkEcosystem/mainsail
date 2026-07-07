@@ -39,14 +39,12 @@ describe<{
 			{
 				genesisBlock: {
 					block: {
-						height: 0,
+						number: 0,
 					},
 				},
 				milestones: [
 					{
-						address: { bech32m: "ark" },
 						block: { maxGasLimit: 30_000_000, maxPayload: 2_097_152, version: 1 },
-						blockTime: 8000,
 						evmSpec: Enums.Evm.SpecId.SHANGHAI,
 						// @ts-ignore
 						gas: {

@@ -83,7 +83,6 @@ export const makeApplication = async (
 	await app.resolve(CoreCryptoKeyPairBls).register();
 	await app.resolve(CoreCryptoWif).register();
 	await app.resolve(CoreCryptoBlock).register();
-	await app.resolve(CoreEvmConsensus).register();
 	await app.resolve(CoreCryptoTransaction).register();
 	await app.resolve(CoreSnapshotLegacyImporter).register();
 	await app.resolve(EvmService).register();
@@ -94,6 +93,8 @@ export const makeApplication = async (
 				// @ts-ignore
 				block: {
 					number: 0,
+					timestamp: 0,
+					transactions: [],
 				},
 			},
 			milestones: [
@@ -112,6 +113,8 @@ export const makeApplication = async (
 		},
 		false,
 	);
+
+	await app.resolve(CoreEvmConsensus).register();
 
 	app.bind(InternalIdentifiers.Application).toConstantValue(app);
 	app.bind(InternalIdentifiers.ConfigurationGenerator).to(ConfigurationGenerator);
