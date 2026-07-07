@@ -61,6 +61,21 @@ describe<{
 		log.calledWith("Aborting. Database was not dropped.");
 	});
 
+	it("should still prompt for confirmation when the force flag is explicitly false", async ({ cli }) => {
+		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`, environment);
+
+		const connect = stub(Pg.Client.prototype, "connect");
+		const log = spy(cli.app.get(Identifiers.Cli.Component.Log), "render");
+
+		prompts.inject([false]);
+
+		// --force=false must NOT bypass the confirmation (regression: hasFlag treated presence as true).
+		await cli.withFlags({ force: false }).execute(Command);
+
+		connect.neverCalled();
+		log.calledWith("Aborting. Database was not dropped.");
+	});
+
 	it("should terminate active sessions and drop the database when confirmed", async ({ cli }) => {
 		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`, environment);
 
@@ -88,7 +103,23 @@ describe<{
 		await cli.withFlags({ force: true, init: true }).execute(Command);
 
 		query.calledTimes(3);
+		query.calledNthWith(1, 'DROP DATABASE IF EXISTS "test_db"');
 		query.calledNthWith(2, 'CREATE DATABASE "test_db" WITH OWNER "test_user"');
+	});
+
+	it("should not recreate the database when the init flag is explicitly false", async ({ cli }) => {
+		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`, environment);
+
+		stub(Pg.Client.prototype, "connect");
+		const query = stub(Pg.Client.prototype, "query");
+		stub(Pg.Client.prototype, "end");
+
+		// --init=false must skip the CREATE task (regression: hasFlag treated presence as true).
+		await cli.withFlags({ force: true, init: false }).execute(Command);
+
+		// Only terminate + drop run; no CREATE DATABASE.
+		query.calledTimes(2);
+		query.calledNthWith(1, 'DROP DATABASE IF EXISTS "test_db"');
 	});
 
 	it("should report a fatal error and close the connection when a query fails", async ({ cli }) => {

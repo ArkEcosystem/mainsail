@@ -17,8 +17,12 @@ export class Command extends Commands.Command {
 
 	@postConstruct()
 	public configure(): void {
-		this.definition.setFlag("force", "Force drop of database without confirmation.", Joi.boolean());
-		this.definition.setFlag("init", "Initialize empty database after drop.", Joi.boolean());
+		this.definition.setFlag(
+			"force",
+			"Force drop of database without confirmation.",
+			Joi.boolean().default(false),
+		);
+		this.definition.setFlag("init", "Initialize empty database after drop.", Joi.boolean().default(false));
 	}
 
 	public async execute(): Promise<void> {
@@ -55,7 +59,7 @@ export class Command extends Commands.Command {
 			user,
 		};
 
-		if (!this.hasFlag("force")) {
+		if (!this.getFlag<boolean>("force")) {
 			if (
 				!(await this.components.confirm(
 					`⚠️  You are about to DROP the database "${databaseName}". All data will be LOST. Continue?`,
@@ -91,7 +95,7 @@ export class Command extends Commands.Command {
 					title: `Drop database "${databaseName}"`,
 				},
 				{
-					skip: () => !this.hasFlag("init"),
+					skip: () => !this.getFlag<boolean>("init"),
 					task: async () => {
 						await client.query(`CREATE DATABASE "${databaseName}" WITH OWNER "${user}"`);
 					},
