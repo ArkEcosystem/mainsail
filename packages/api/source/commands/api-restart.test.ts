@@ -7,7 +7,7 @@ import { Command } from "./api-restart";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("CoreRestartCommand", ({ beforeEach, it, assert, stub }) => {
+}>("ApiRestartCommand", ({ beforeEach, it, assert, stub }) => {
 	beforeEach((context) => {
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Identifiers.Cli.Service.ProcessManager);

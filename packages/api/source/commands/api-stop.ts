@@ -13,7 +13,7 @@ export class Command extends Commands.Command {
 
 	@postConstruct()
 	public configure(): void {
-		this.definition.setFlag("daemon", "Stop the Core process or daemon.", Joi.boolean());
+		this.definition.setFlag("daemon", "Stop the API process or daemon.", Joi.boolean());
 	}
 
 	public async execute(): Promise<void> {

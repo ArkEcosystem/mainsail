@@ -53,7 +53,7 @@ describe<{
 		spyOnUpdate.neverCalled();
 	});
 
-	it("should should ask to restart processes if they are online", async ({ cli, installer, processManager }) => {
+	it("should ask to restart processes if they are online", async ({ cli, installer, processManager }) => {
 		const spyOnInstall = stub(installer, "install");
 		const spyOnUpdate = stub(processManager, "update");
 		const spyOnIsOnline = stub(processManager, "isOnline").returnValue(true);

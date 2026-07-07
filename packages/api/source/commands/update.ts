@@ -12,7 +12,7 @@ export class Command extends Commands.Command {
 
 	public signature = "update";
 
-	public description = "Update the Core installation.";
+	public description = "Update the API installation.";
 
 	@postConstruct()
 	public configure(): void {

@@ -6,7 +6,7 @@ import { Command } from "./api-log";
 
 describe<{
 	cli: Console;
-}>("ApiLogCommnad", ({ beforeEach, it, stub }) => {
+}>("ApiLogCommand", ({ beforeEach, it, stub }) => {
 	const process = {
 		log: () => {},
 	};

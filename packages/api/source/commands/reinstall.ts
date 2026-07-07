@@ -16,7 +16,7 @@ export class Command extends Commands.Command {
 
 	public signature = "reinstall";
 
-	public description = "Reinstall the Core installation";
+	public description = "Reinstall the API installation.";
 
 	@postConstruct()
 	public configure(): void {

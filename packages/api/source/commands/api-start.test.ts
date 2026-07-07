@@ -17,7 +17,7 @@ describe<{
 
 	afterAll(() => setGracefulCleanup());
 
-	it("should throw if the process does not exist", async ({ processManager, cli }) => {
+	it("should start the API process", async ({ processManager, cli }) => {
 		const spyStart = stub(processManager, "start");
 
 		await cli.execute(Command);
