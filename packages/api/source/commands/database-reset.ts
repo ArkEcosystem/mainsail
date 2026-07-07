@@ -10,11 +10,9 @@ import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { injectable, postConstruct } from "@mainsail/container";
 import { Providers, Services } from "@mainsail/kernel";
 import { ensureError } from "@mainsail/utils";
-import { parse } from "envfile";
-import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
 
-import { requireEnvironmentVariable, terminateActiveSessions } from "../helpers.js";
+import { loadEnvironmentFile, requireEnvironmentVariable, terminateActiveSessions } from "../helpers.js";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -32,15 +30,9 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const environmentFile: string = this.app.getCorePath("config", ".env");
-
-		if (!existsSync(environmentFile)) {
-			this.components.fatal(`No environment file found at ${environmentFile}.`);
-		}
+		const environment = loadEnvironmentFile(this.app, this.components);
 
 		this.app.rebind(Identifiers.Services.Log.Service).to(Services.Log.NullLogger);
-
-		const environment: object = parse(readFileSync(environmentFile).toString("utf8"));
 
 		const fromEnvironment = (key: string): string => requireEnvironmentVariable(this.components, environment, key);
 

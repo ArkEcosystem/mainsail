@@ -22,7 +22,7 @@ export class Command extends Commands.Command {
 		this.definition.setFlag(
 			"reset",
 			"Using the --reset flag will overwrite existing configuration.",
-			Joi.boolean(),
+			Joi.boolean().default(false),
 		);
 	}
 

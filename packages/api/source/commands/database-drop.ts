@@ -3,11 +3,9 @@ import { Commands } from "@mainsail/cli";
 import { EnvironmentVariables } from "@mainsail/constants";
 import { injectable, postConstruct } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
-import { parse } from "envfile";
-import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
 
-import { requireEnvironmentVariable, terminateActiveSessions } from "../helpers.js";
+import { loadEnvironmentFile, requireEnvironmentVariable, terminateActiveSessions } from "../helpers.js";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -26,36 +24,18 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const environmentFile: string = this.app.getCorePath("config", ".env");
+		const environment = loadEnvironmentFile(this.app, this.components);
 
-		if (!existsSync(environmentFile)) {
-			this.components.fatal(`No environment file found at ${environmentFile}.`);
-		}
+		const fromEnvironment = (key: string): string => requireEnvironmentVariable(this.components, environment, key);
 
-		const environment: object = parse(readFileSync(environmentFile).toString("utf8"));
-
-		const databaseName = requireEnvironmentVariable(
-			this.components,
-			environment,
-			EnvironmentVariables.MAINSAIL_DB_DATABASE,
-		);
-		const user = requireEnvironmentVariable(
-			this.components,
-			environment,
-			EnvironmentVariables.MAINSAIL_DB_USERNAME,
-		);
+		const databaseName = fromEnvironment(EnvironmentVariables.MAINSAIL_DB_DATABASE);
+		const user = fromEnvironment(EnvironmentVariables.MAINSAIL_DB_USERNAME);
 
 		const config = {
 			database: "postgres",
-			host: requireEnvironmentVariable(this.components, environment, EnvironmentVariables.MAINSAIL_DB_HOST),
-			password: requireEnvironmentVariable(
-				this.components,
-				environment,
-				EnvironmentVariables.MAINSAIL_DB_PASSWORD,
-			),
-			port: Number.parseInt(
-				requireEnvironmentVariable(this.components, environment, EnvironmentVariables.MAINSAIL_DB_PORT),
-			),
+			host: fromEnvironment(EnvironmentVariables.MAINSAIL_DB_HOST),
+			password: fromEnvironment(EnvironmentVariables.MAINSAIL_DB_PASSWORD),
+			port: Number.parseInt(fromEnvironment(EnvironmentVariables.MAINSAIL_DB_PORT)),
 			user,
 		};
 
