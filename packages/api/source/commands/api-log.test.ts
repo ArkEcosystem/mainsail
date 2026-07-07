@@ -24,6 +24,6 @@ describe<{
 		await cli.execute(Command);
 
 		spyLog.calledOnce();
-		spyLog.calledWith(undefined, 15);
+		spyLog.calledWith(false, 15);
 	});
 });
