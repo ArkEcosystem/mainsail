@@ -53,12 +53,45 @@ describe<{
 		["data", "config", "cache", "log", "temp"],
 	);
 
+	each(
+		"should clear the %s path even when all is set to false",
+		async ({ context: { cli, paths }, dataset }) => {
+			const log = spy(cli.app.get(Identifiers.Cli.Component.Log), "render");
+
+			await cli.withFlags({ [dataset]: true, all: false }).execute(Command);
+
+			for (const [name, path] of Object.entries(paths)) {
+				assert.length(readdirSync(path), name === dataset ? 0 : 1);
+			}
+
+			log.calledOnce();
+		},
+		["data", "config", "cache", "log", "temp"],
+	);
+
 	it("should clear all paths with the all flag", async ({ cli, paths }) => {
+		const log = spy(cli.app.get(Identifiers.Cli.Component.Log), "render");
+
 		await cli.withFlags({ all: true }).execute(Command);
 
 		for (const path of Object.values(paths)) {
 			assert.length(readdirSync(path), 0);
 		}
+
+		log.calledTimes(5);
+	});
+
+	it("should not clear any path when the flags are explicitly false", async ({ cli, paths }) => {
+		const log = spy(cli.app.get(Identifiers.Cli.Component.Log), "render");
+
+		// --data=false / --all=false must NOT clear (regression: hasFlag treated presence as true).
+		await cli.withFlags({ all: false, data: false }).execute(Command);
+
+		for (const path of Object.values(paths)) {
+			assert.length(readdirSync(path), 1);
+		}
+
+		log.neverCalled();
 	});
 
 	it("should clear the plugins path", async ({ cli, paths }) => {
