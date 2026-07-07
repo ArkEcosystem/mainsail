@@ -81,7 +81,8 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		options: {
 			validate: {
 				params: Joi.object({
-					hash: Joi.string().hex().length(64),
+					// The pool stores hashes lowercase; accept any casing like the address filters do.
+					hash: Joi.string().lowercase().hex().length(64),
 				}),
 			},
 		},

@@ -464,6 +464,22 @@ describe<{
 		assert.is(response.statusCode, 422);
 	});
 
+	it("GET /api/transactions/unconfirmed/{hash} - matches the hash case-insensitively", async ({
+		server,
+		transactions,
+	}) => {
+		// 0xab yields a hash containing letters, so the uppercase lookup actually differs.
+		transactions.splice(0, transactions.length, makeTransaction(0xab));
+
+		const response = await server.inject({
+			method: "GET",
+			url: `/api/transactions/unconfirmed/${"ab".repeat(32).toUpperCase()}`,
+		});
+
+		assert.is(response.statusCode, 200);
+		assert.equal(JSON.parse(response.payload).data.hash, "ab".repeat(32));
+	});
+
 	it("#register - rate limits requests when the rate limiter is enabled", async ({ processor, transactions }) => {
 		const app = new Application();
 		bindDependencies(app, { processor, transactions });
