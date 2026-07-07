@@ -69,6 +69,21 @@ describe<{
 		connect.neverCalled();
 	});
 
+	it("should still prompt for confirmation when the force flag is explicitly false", async ({ cli }) => {
+		writeFileSync(`${process.env.MAINSAIL_PATH_CONFIG}/api/.env`, environment);
+
+		const register = stub(ServiceProvider.prototype, "register");
+		const connect = stub(Pg.Client.prototype, "connect");
+
+		prompts.inject([false]);
+
+		// --force=false must NOT bypass the confirmation (regression: hasFlag treated presence as true).
+		await cli.withFlags({ force: false }).execute(Command);
+
+		register.neverCalled();
+		connect.neverCalled();
+	});
+
 	it("should resynchronize the database and run migrations when confirmed", async ({
 		cli,
 		dataSource,

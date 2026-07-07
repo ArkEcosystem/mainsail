@@ -24,7 +24,11 @@ export class Command extends Commands.Command {
 
 	@postConstruct()
 	public configure(): void {
-		this.definition.setFlag("force", "Force reset of database without confirmation.", Joi.boolean());
+		this.definition.setFlag(
+			"force",
+			"Force reset of database without confirmation.",
+			Joi.boolean().default(false),
+		);
 	}
 
 	public async execute(): Promise<void> {
@@ -54,7 +58,7 @@ export class Command extends Commands.Command {
 			username: fromEnvironment(EnvironmentVariables.MAINSAIL_DB_USERNAME),
 		};
 
-		if (!this.hasFlag("force")) {
+		if (!this.getFlag<boolean>("force")) {
 			if (
 				!(await this.components.confirm(
 					`⚠️  You are about to RESET the database "${config.database}". All data will be LOST. Continue?`,
