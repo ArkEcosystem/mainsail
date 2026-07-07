@@ -1,4 +1,4 @@
-import { Pg } from "@mainsail/api-database";
+import type { Pg } from "@mainsail/api-database";
 
 export const requireEnvironmentVariable = (
 	components: { fatal(message: string): void },

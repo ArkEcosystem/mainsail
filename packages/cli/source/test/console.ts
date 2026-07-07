@@ -24,11 +24,11 @@ export class Console {
 
 	#useDefaultFlags: boolean;
 
-	public constructor(useDefaultFlags: boolean = true, pkg?: Contracts.Types.PackageJson) {
+	public constructor(useDefaultFlags: boolean = true, package_?: Contracts.Types.PackageJson) {
 		this.#useDefaultFlags = useDefaultFlags;
 
-		if (pkg) {
-			this.pkg = pkg;
+		if (package_) {
+			this.pkg = package_;
 		}
 
 		this.app = this.#createApplication();
