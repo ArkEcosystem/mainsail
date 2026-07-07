@@ -20,11 +20,11 @@ export class Command extends Commands.Command {
 
 	@postConstruct()
 	public configure(): void {
-		this.definition.setFlag("force", "Force a reinstall.", Joi.boolean());
+		this.definition.setFlag("force", "Force a reinstall.", Joi.boolean().default(false));
 	}
 
 	public async execute(): Promise<void> {
-		if (this.getFlag("force")) {
+		if (this.getFlag<boolean>("force")) {
 			return this.#performInstall();
 		}
 
