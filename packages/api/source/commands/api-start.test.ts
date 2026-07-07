@@ -85,6 +85,26 @@ describe<{
 		);
 	});
 
+	it("should daemonize the process when the [--daemon] flag is true", async ({ processManager, cli }) => {
+		const spyStart = stub(processManager, "start");
+
+		await cli.withFlags({ daemon: true }).execute(Command);
+
+		// daemon=true is the default, so the process options must NOT carry the "no-daemon" flag.
+		spyStart.calledWith(
+			{
+				args: "api:run --network='devnet' --token='ark' --v=0 --env='production' --skipPrompts=false",
+				env: {
+					MAINSAIL_ENV: "production",
+					NODE_ENV: "production",
+				},
+				name: "mainsail-api",
+				script: match.string,
+			},
+			{ "kill-timeout": 30_000, "max-restarts": 5, name: "mainsail-api" },
+		);
+	});
+
 	it("should pass the [--env] and [--skipPrompts] flags through to the process", async ({ processManager, cli }) => {
 		const spyStart = stub(processManager, "start");
 
