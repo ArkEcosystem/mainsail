@@ -5,7 +5,7 @@ import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Console } from "@mainsail/cli";
 import { describe } from "@mainsail/test-runner";
-import { apiPackageJson } from "../test/fixtures";
+import { apiPackageJson } from "../../test/fixtures";
 import { Command } from "./env-list";
 
 describe<{

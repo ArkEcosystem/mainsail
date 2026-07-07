@@ -3,7 +3,7 @@ import { BuildPackages, Identifiers } from "@mainsail/constants";
 import { Console } from "@mainsail/cli";
 
 import { describe } from "@mainsail/test-runner";
-import { apiPackageJson } from "../test/fixtures";
+import { apiPackageJson } from "../../test/fixtures";
 import { Command } from "./config-cli";
 
 describe<{

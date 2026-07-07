@@ -4,7 +4,7 @@ import { Identifiers } from "@mainsail/constants";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { apiPackageJson } from "../test/fixtures";
+import { apiPackageJson } from "../../test/fixtures";
 import { Command } from "./config-database";
 
 describe<{

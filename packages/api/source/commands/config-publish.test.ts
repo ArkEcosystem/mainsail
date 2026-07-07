@@ -6,7 +6,7 @@ import { ensureDirSync } from "fs-extra";
 import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { apiPackageJson } from "../test/fixtures";
+import { apiPackageJson } from "../../test/fixtures";
 import { Command } from "./config-publish";
 
 describe<{

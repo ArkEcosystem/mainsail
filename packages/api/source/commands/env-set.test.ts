@@ -1,11 +1,10 @@
-/* eslint-disable unicorn/prevent-abbreviations */
 import { parse } from "envfile";
 import { readFileSync } from "fs";
 import { ensureFileSync, removeSync } from "fs-extra/esm";
 import { dirSync, setGracefulCleanup } from "tmp";
 import { Console } from "@mainsail/cli";
 import { describe } from "@mainsail/test-runner";
-import { apiPackageJson } from "../test/fixtures";
+import { apiPackageJson } from "../../test/fixtures";
 import { Command } from "./env-set";
 
 describe<{

@@ -4,7 +4,7 @@ import { describe } from "@mainsail/test-runner";
 import envPaths, { Paths } from "env-paths";
 import { join } from "path";
 
-import { apiPackageJson } from "../test/fixtures";
+import { apiPackageJson } from "../../test/fixtures";
 import { Command } from "./env-paths";
 
 describe<{
