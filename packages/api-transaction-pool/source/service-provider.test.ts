@@ -4,6 +4,7 @@ import { Identifiers } from "@mainsail/constants";
 import { Application, Providers } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 
+import { makeQueryIterable, makeTransaction } from "../test/fixtures/transactions";
 import { Server } from "./server";
 import { ServiceProvider } from "./service-provider";
 
@@ -27,60 +28,6 @@ const poolConfiguration = {
 	maxTransactionsInPool: 15_000,
 	maxTransactionsPerRequest: 2,
 	maxTransactionsPerSender: 150,
-};
-
-const makeTransaction = (n: number) => {
-	const data = {
-		data: "",
-		from: `0x${n.toString(16).repeat(40)}`,
-		gasLimit: 21_000,
-		gasPrice: 5,
-		hash: `${n.toString(16)}`.repeat(64),
-		network: 30,
-		nonce: BigInt(n),
-		r: "r".repeat(64),
-		s: "s".repeat(64),
-		senderPublicKey: "03287bfebba4c7881a0509717e71b34b63f31e40021c321f89ae04f84be6d6ac37",
-		to: `0x${(n + 4).toString(16).repeat(40)}`,
-		v: 1,
-		value: BigInt(n) * 100_000n,
-	};
-
-	return {
-		...data,
-		serialized: Buffer.from("deadbeef", "hex"),
-		toData: () => data,
-	};
-};
-
-const makeQueryIterable = (transactions: unknown[]) => {
-	const predicates: Array<(t: unknown) => Promise<boolean>> = [];
-	const iterable = {
-		all: async () => {
-			const result: unknown[] = [];
-			for (const transaction of transactions) {
-				let matches = true;
-				for (const predicate of predicates) {
-					matches = matches && (await predicate(transaction));
-				}
-				if (matches) {
-					result.push(transaction);
-				}
-			}
-			return result;
-		},
-		first: async () => (await iterable.all())[0],
-		has: async () => (await iterable.all()).length > 0,
-		whereHash: (hash: string) => {
-			predicates.push(async (t: any) => t.hash === hash);
-			return iterable;
-		},
-		wherePredicate: (predicate: (t: unknown) => Promise<boolean>) => {
-			predicates.push(predicate);
-			return iterable;
-		},
-	};
-	return iterable;
 };
 
 const bindDependencies = (app: Application, context: { processor: object; transactions: unknown[] }): void => {
