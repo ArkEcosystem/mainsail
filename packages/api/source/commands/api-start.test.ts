@@ -61,4 +61,41 @@ describe<{
 			{ "kill-timeout": 30_000, "max-restarts": 5, name: "mainsail-api" },
 		);
 	});
+
+	it("should start the process without daemonizing when the [--daemon] flag is false", async ({
+		processManager,
+		cli,
+	}) => {
+		const spyStart = stub(processManager, "start");
+
+		await cli.withFlags({ daemon: false }).execute(Command);
+
+		// The daemon flag is stripped from the args string but toggles "no-daemon" on the process options.
+		spyStart.calledWith(
+			{
+				args: "api:run --network='devnet' --token='ark' --v=0 --env='production' --skipPrompts=false",
+				env: {
+					MAINSAIL_ENV: "production",
+					NODE_ENV: "production",
+				},
+				name: "mainsail-api",
+				script: match.string,
+			},
+			{ "kill-timeout": 30_000, "max-restarts": 5, "no-daemon": true, name: "mainsail-api" },
+		);
+	});
+
+	it("should pass the [--env] and [--skipPrompts] flags through to the process", async ({ processManager, cli }) => {
+		const spyStart = stub(processManager, "start");
+
+		await cli.withFlags({ env: "test", skipPrompts: true }).execute(Command);
+
+		// The order flags appear in the args string is not stable across overrides, so assert the
+		// meaningful parts: env propagates to MAINSAIL_ENV and both flags reach the api:run args.
+		const [options] = spyStart.getCallArgs(0);
+		assert.equal(options.env.MAINSAIL_ENV, "test");
+		assert.true(options.args.includes("--env='test'"));
+		// A boolean true flag is rendered as a bare "--skipPrompts" (no "=true").
+		assert.true(options.args.includes("--skipPrompts"));
+	});
 });

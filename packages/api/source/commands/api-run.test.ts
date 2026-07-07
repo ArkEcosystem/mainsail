@@ -35,4 +35,23 @@ describe<{
 		assert.equal(buildOptions.flags.env, "production");
 		assert.false(buildOptions.flags.skipPrompts);
 	});
+
+	it("should build the application with the [--env] and [--skipPrompts] flags", async ({ cli }) => {
+		let buildOptions: any;
+		const buildCalled = new Promise<void>((resolve) => {
+			stub(Utils.Builder, "buildApplication").callsFake(async (options) => {
+				buildOptions = options;
+				resolve();
+			});
+		});
+
+		// api:run never resolves by design (it keeps the process in the foreground),
+		// so the execution promise is intentionally not awaited.
+		cli.withFlags({ env: "test", skipPrompts: true }).execute(Command);
+
+		await buildCalled;
+
+		assert.equal(buildOptions.flags.env, "test");
+		assert.true(buildOptions.flags.skipPrompts);
+	});
 });
