@@ -51,7 +51,7 @@ export class Command extends Commands.Command {
 					}
 
 					if (!existsSync(configSource)) {
-						this.components.fatal(`Couldn't find the core configuration files at ${configSource}.`);
+						this.components.fatal(`Couldn't find the api configuration files at ${configSource}.`);
 					}
 
 					ensureDirSync(configDestination);

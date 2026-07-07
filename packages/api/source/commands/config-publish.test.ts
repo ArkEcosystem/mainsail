@@ -36,7 +36,7 @@ describe<{
 		// Point the config source at a name that has no directory under bin/config.
 		cli.app.rebind(Identifiers.Application.Name).toConstantValue("unknown");
 
-		await assert.rejects(() => cli.execute(Command), "Couldn't find the core configuration files at");
+		await assert.rejects(() => cli.execute(Command), "Couldn't find the api configuration files at");
 	});
 
 	it("should fail if the environment file cannot be found", async ({ cli }) => {
