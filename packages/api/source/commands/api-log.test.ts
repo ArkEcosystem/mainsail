@@ -26,4 +26,13 @@ describe<{
 		spyLog.calledOnce();
 		spyLog.calledWith(false, 15);
 	});
+
+	it("should call process log with the [--error] and [--lines] flags", async ({ cli }) => {
+		const spyLog = stub(processMock, "log");
+
+		await cli.withFlags({ error: true, lines: 100 }).execute(Command);
+
+		spyLog.calledOnce();
+		spyLog.calledWith(true, 100);
+	});
 });
