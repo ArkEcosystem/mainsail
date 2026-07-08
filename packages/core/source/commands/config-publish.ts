@@ -28,7 +28,11 @@ export class Command extends Commands.Command {
 		this.definition
 			.setFlag("token", "The name of the token.", Joi.string())
 			.setFlag("network", "The name of the network.", Joi.string())
-			.setFlag("reset", "Using the --reset flag will overwrite existing configuration.", Joi.boolean());
+			.setFlag(
+				"reset",
+				"Using the --reset flag will overwrite existing configuration.",
+				Joi.boolean().default(false),
+			);
 	}
 
 	public async execute(): Promise<void> {
