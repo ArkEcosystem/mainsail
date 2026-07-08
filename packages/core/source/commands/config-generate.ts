@@ -21,10 +21,6 @@ type Flag = {
 type Flags = Omit<AppContracts.NetworkGenerator.Options, "peers" | "rewardAmount"> & {
 	peers: string;
 	rewardAmount: number | string;
-
-	address: "base58" | "bech32m" | "keccak256";
-	base58Prefix: number;
-	bech32mPrefix: string;
 };
 
 @injectable()
@@ -140,24 +136,6 @@ export class Command extends Commands.Command {
 			description: "Start time of the network.",
 			schema: Joi.date(),
 			default: new Date(),
-		},
-		{
-			name: "address",
-			description: "The desired address format of the network.",
-			schema: Joi.valid("bech32m", "base58", "keccak256"),
-			default: "keccak256",
-		},
-		{
-			name: "base58Prefix",
-			description: "The desired address prefix when using base58.",
-			schema: Joi.number().min(1).max(255),
-			default: 30,
-		},
-		{
-			name: "bech32mPrefix",
-			description: "The desired address prefix when using bech32m.",
-			schema: Joi.string().min(3).max(3),
-			default: "ark",
 		},
 		// Env
 		{ name: "coreP2PPort", description: "Core P2P port.", schema: Joi.number(), default: 4000 },
