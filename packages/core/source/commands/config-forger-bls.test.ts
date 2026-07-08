@@ -24,6 +24,10 @@ describe<{
 
 	afterAll(() => setGracefulCleanup());
 
+	it("should declare the privateKey flag", ({ cli }) => {
+		assert.true(cli.app.resolve(Command).definition.hasFlag("privateKey"));
+	});
+
 	it("should configure from flags", async ({ cli }) => {
 		await cli.withFlags({ privateKey }).execute(Command);
 
