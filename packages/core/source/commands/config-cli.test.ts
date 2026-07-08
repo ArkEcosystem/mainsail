@@ -14,12 +14,20 @@ describe<{
 		context.config = context.cli.app.get<Contracts.Cli.Config>(Identifiers.Cli.Service.Config);
 	});
 
-	it("should not update the config if the [--channel] flag is not present", async () => {
+	it("should fail if the [--channel] flag is not present", async () => {
 		const cli = new Console(false);
 		stub(cli.app.get(Identifiers.Cli.Service.Environment), "getPaths");
 		const spySet = stub(cli.app.get<Contracts.Cli.Config>(Identifiers.Cli.Service.Config), "set");
 
-		await assert.resolves(() => cli.execute(Command));
+		await assert.rejects(() => cli.execute(Command), '"channel" is required');
+
+		spySet.neverCalled();
+	});
+
+	it("should fail if the channel is not a known channel", async ({ cli, config }) => {
+		const spySet = stub(config, "set");
+
+		await assert.rejects(() => cli.withFlags({ channel: "nonexistent" }).execute(Command), '"channel" must be');
 
 		spySet.neverCalled();
 	});
