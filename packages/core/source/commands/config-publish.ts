@@ -9,7 +9,6 @@ import Joi from "joi";
 import { resolve } from "path";
 
 interface Flags {
-	readonly token: string;
 	readonly network: string;
 	readonly reset: boolean;
 }
@@ -26,7 +25,6 @@ export class Command extends Commands.Command {
 	@postConstruct()
 	public configure(): void {
 		this.definition
-			.setFlag("token", "The name of the token.", Joi.string())
 			.setFlag("network", "The name of the network.", Joi.string())
 			.setFlag(
 				"reset",
