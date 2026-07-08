@@ -29,7 +29,7 @@ describe<{
 
 		spyStart.calledWith(
 			{
-				args: "core:run --network='devnet' --token='ark' --v=0 --env='production' --skipPrompts=false",
+				args: "core:run --network='devnet' --token='ark' --v=0 --env='production' --disableDiscovery=false --skipDiscovery=false --ignoreMinimumNetworkReach=false --skipPrompts=false",
 				env: {
 					MAINSAIL_ENV: "production",
 					NODE_ENV: "production",

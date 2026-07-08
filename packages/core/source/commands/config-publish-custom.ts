@@ -58,8 +58,16 @@ export class Command extends Commands.Command {
 			.setFlag("peers", "The link to the peers.json file.", Joi.string().uri(URI_OPTIONS))
 			.setFlag("crypto", "The link to the app.json file.", Joi.string().uri(URI_OPTIONS))
 			.setFlag("snapshot", "The link to the <snapshot>.compressed file.", Joi.string().uri())
-			.setFlag("reset", "Using the --reset flag will remove existing configuration.", Joi.boolean())
-			.setFlag("overwrite", "Using the --overwrite will overwrite existing configuration.", Joi.boolean());
+			.setFlag(
+				"reset",
+				"Using the --reset flag will remove existing configuration.",
+				Joi.boolean().default(false),
+			)
+			.setFlag(
+				"overwrite",
+				"Using the --overwrite will overwrite existing configuration.",
+				Joi.boolean().default(false),
+			);
 	}
 
 	public async execute(): Promise<void> {
