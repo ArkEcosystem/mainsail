@@ -38,7 +38,7 @@ describe<{
 		await assert.rejects(() => cli.execute(Command), 'The "mainsail" process is not running.');
 	});
 
-	it("should stop the process if the [--daemon] flag is not present", async ({ processManager, cli }) => {
+	it("should delete the process if the [--daemon] flag is present", async ({ processManager, cli }) => {
 		const missing = stub(processManager, "missing").returnValue(false);
 		const isUnknown = stub(processManager, "isUnknown").returnValue(false);
 		const isStopped = stub(processManager, "isStopped").returnValue(false);
@@ -49,7 +49,7 @@ describe<{
 		deleteSpy.calledOnce();
 	});
 
-	it("should delete the process if the [--daemon] flag is present", async ({ processManager, cli }) => {
+	it("should stop the process if the [--daemon] flag is not present", async ({ processManager, cli }) => {
 		const missing = stub(processManager, "missing").returnValue(false);
 		const isUnknown = stub(processManager, "isUnknown").returnValue(false);
 		const isStopped = stub(processManager, "isStopped").returnValue(false);
