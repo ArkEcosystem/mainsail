@@ -36,6 +36,12 @@ describe<{
 
 		assert.equal(config.get("channel"), "next");
 		install.calledWith("@mainsail/core", BuildPackages, "next");
+
+		// And back again.
+		await cli.withFlags({ channel: "latest" }).execute(Command);
+
+		assert.equal(config.get("channel"), "latest");
+		install.calledWith("@mainsail/core", BuildPackages, "latest");
 	});
 
 	it("should fail to change the channel if the new and old are the same", async ({ cli, config }) => {

@@ -12,7 +12,7 @@ import { Command } from "./config-publish";
 describe<{
 	cli: Console;
 	configDestination: string;
-}>("ConfigPublishCommand", ({ beforeEach, afterAll, it, assert }) => {
+}>("ConfigPublishCommand", ({ beforeEach, afterAll, it, assert, stub }) => {
 	beforeEach((context) => {
 		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
@@ -77,5 +77,25 @@ describe<{
 		prompts.inject([true]);
 
 		await assert.rejects(() => promptCli.execute(Command), "You'll need to select the network to continue.");
+	});
+
+	it("should fail if the network is invalid", async ({ cli }) => {
+		await assert.rejects(
+			() => cli.withFlags({ network: "nonexistent" }).execute(Command),
+			"Couldn't find the core configuration files at",
+		);
+	});
+
+	it("should fail when the prompted network is not confirmed", async () => {
+		// The confirm fatal is unreachable through the real prompt (the network select is
+		// commented out, so response.network is always undefined and fatals first); stub the
+		// prompt component to pin the branch anyway.
+		const promptCli = new Console(false);
+		stub(promptCli.app.get(Identifiers.Cli.Component.Prompt), "render").returnValue({
+			confirm: false,
+			network: "devnet",
+		});
+
+		await assert.rejects(() => promptCli.execute(Command), "You'll need to confirm the network to continue.");
 	});
 });
