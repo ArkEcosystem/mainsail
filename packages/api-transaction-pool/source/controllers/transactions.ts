@@ -69,11 +69,8 @@ export class TransactionsController extends AbstractController {
 			});
 		}
 
-		const all: Contracts.Crypto.Transaction[] = await poolQuery.all();
-		const transactions: Contracts.Crypto.Transaction[] = all.slice(
-			pagination.offset,
-			pagination.offset + pagination.limit,
-		);
+		const all = await poolQuery.all();
+		const transactions = all.slice(pagination.offset, pagination.offset + pagination.limit);
 		const resultsPage = {
 			results: transactions,
 			totalCount: all.length,
@@ -83,15 +80,13 @@ export class TransactionsController extends AbstractController {
 	}
 
 	public async showUnconfirmed(request: Types.HapiRequest): Promise<object> {
-		const transactionQuery: Contracts.TransactionPool.QueryIterable = this.poolQuery
-			.getFromHighestPriority()
-			.whereHash(request.params.hash);
+		const transactionQuery = this.poolQuery.getFromHighestPriority().whereHash(request.params.hash);
 
 		if ((await transactionQuery.has()) === false) {
 			return notFound("Transaction not found");
 		}
 
-		const transaction: Contracts.Crypto.Transaction = await transactionQuery.first();
+		const transaction = await transactionQuery.first();
 
 		return super.respondWithResource(transaction, TransactionResource);
 	}
