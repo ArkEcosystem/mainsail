@@ -168,7 +168,7 @@ describe<{
 		});
 	});
 
-	it("#Prompts - should not update without a confirmation", async ({ cli, envFile }) => {
+	it("#Prompts - should not update without a confirmation", async ({ cli }) => {
 		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Cli.Service.Environment), "updateVariables");
 
 		prompts.inject([undefined, undefined, undefined, undefined, "dummy", false]);
