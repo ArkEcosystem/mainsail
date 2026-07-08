@@ -40,9 +40,6 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				points: number;
 				whitelist: string[];
 			};
-			pagination: {
-				limit: number;
-			};
 		}>("plugins");
 
 		return [
@@ -61,16 +58,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				},
 				plugin: Plugins.rateLimit,
 			},
-			{
-				options: {
-					query: {
-						limit: {
-							default: config.pagination.limit,
-						},
-					},
-				},
-				plugin: Plugins.pagination,
-			},
+			{ plugin: Plugins.pagination },
 		] as unknown as Plugin<unknown>[];
 	}
 

@@ -252,6 +252,62 @@ describe<{}>("Schemas", ({ it, assert }) => {
 			assert.defined(result.error);
 		});
 
+		it("should cap the default limit at a configured max below 100", () => {
+			const result = schemas.pagination.validate(
+				{},
+				{ context: { configuration: { plugins: { pagination: { limit: 50 } } } } },
+			);
+
+			assert.undefined(result.error);
+			assert.is(result.value.limit, 50);
+		});
+
+		it("should keep the default limit at 100 when the configured max is higher", () => {
+			const result = schemas.pagination.validate(
+				{},
+				{ context: { configuration: { plugins: { pagination: { limit: 500 } } } } },
+			);
+
+			assert.undefined(result.error);
+			assert.is(result.value.limit, 100);
+		});
+
+		it("should default the limit to 100 when the configuration context is missing", () => {
+			const result = schemas.pagination.validate({});
+
+			assert.undefined(result.error);
+			assert.is(result.value.limit, 100);
+		});
+
+		it("should clamp the default limit to 1 when the configured max is 0", () => {
+			const result = schemas.pagination.validate(
+				{},
+				{ context: { configuration: { plugins: { pagination: { limit: 0 } } } } },
+			);
+
+			assert.undefined(result.error);
+			assert.is(result.value.limit, 1);
+		});
+
+		it("should allow max limit", () => {
+			const result = schemas.pagination.validate(
+				{ limit: 500 },
+				{ context: { configuration: { plugins: { pagination: { limit: 500 } } } } },
+			);
+
+			assert.undefined(result.error);
+			assert.is(result.value.limit, 500);
+		});
+
+		it("should reject > max limit", () => {
+			const result = schemas.pagination.validate(
+				{ limit: 501 },
+				{ context: { configuration: { plugins: { pagination: { limit: 500 } } } } },
+			);
+
+			assert.defined(result.error);
+		});
+
 		it("should reject a non-positive page", () => {
 			const result = schemas.pagination.validate({ page: 0 }, context);
 
