@@ -20,7 +20,7 @@ describe<{
 
 	afterAll(() => setGracefulCleanup());
 
-	it("should throw if the process does not exist", async ({ cli }) => {
+	it("should build the application with the core flags", async ({ cli }) => {
 		const spyBuildApplication = stub(Utils.Builder, "buildApplication");
 		const spyBuildPeerFlags = stub(Utils.Builder, "buildPeerFlags").returnValue({});
 
