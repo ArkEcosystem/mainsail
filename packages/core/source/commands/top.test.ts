@@ -54,6 +54,9 @@ describe<{
 				message.includes(column),
 			),
 		);
+
+		// Processes that do not start with "mainsail" are filtered out.
+		assert.false(message.includes("some-process"));
 	});
 
 	it("should throw if no processes are running", async ({ processManager, cli }) => {
