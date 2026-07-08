@@ -78,8 +78,19 @@ export const createSortingSchema = (schemaObject: SchemaObject, wildcardPaths: s
 	return Joi.object({ orderBy });
 };
 
+// Joi applies defaults without validating them against the rules, so cap the default
+// at the configured maximum (clamped to at least 1, since configSchema permits a limit
+// of 0) to keep bare requests from silently exceeding a lower cap.
+export const paginationLimit = Joi.number()
+	.integer()
+	.min(1)
+	.default((_, helpers) =>
+		Math.max(1, Math.min(100, helpers.prefs.context?.configuration?.plugins?.pagination?.limit ?? 100)),
+	)
+	.max(Joi.ref("$configuration.plugins.pagination.limit"));
+
 export const pagination = Joi.object({
-	limit: Joi.number().integer().min(1).default(100).max(Joi.ref("$configuration.plugins.pagination.limit")),
+	limit: paginationLimit,
 	offset: Joi.number().integer().min(0),
 	page: Joi.number().integer().positive().default(1),
 });
