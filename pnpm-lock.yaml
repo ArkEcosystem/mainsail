@@ -507,9 +507,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
       joi:
         specifier: 18.2.1
         version: 18.2.1
