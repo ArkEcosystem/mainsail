@@ -30,6 +30,7 @@ describe<{
 		await assert.resolves(() => cli.execute(Command));
 
 		spyCheck.calledOnce();
+		spyCheck.calledWith(true);
 		spyUpdate.neverCalled();
 	});
 
@@ -43,6 +44,7 @@ describe<{
 
 		spyCheck.calledOnce();
 		spyUpdate.calledOnce();
+		spyUpdate.calledWith(false, false);
 		spyRestar.neverCalled();
 		spyRestartWithPrompt.calledTimes(1);
 	});
@@ -77,6 +79,21 @@ describe<{
 		spyUpdate.calledWith(true, true);
 		spyRestar.neverCalled();
 		spyRestartWithPrompt.neverCalled();
+	});
+
+	it("should prompt to restart when the [--restart] flag is explicitly false", async ({ cli }) => {
+		const spyCheck = stub(updater, "check").resolvedValue(true);
+		const spyUpdate = stub(updater, "update");
+		const spyRestar = stub(actionFactory, "restartRunningProcess");
+		const spyRestartWithPrompt = stub(actionFactory, "restartRunningProcessWithPrompt");
+
+		// --restart=false must NOT force a restart (regression: hasFlag treated presence as true).
+		await assert.resolves(() => cli.withFlags({ restart: false }).execute(Command));
+
+		spyCheck.calledOnce();
+		spyUpdate.calledOnce();
+		spyRestar.neverCalled();
+		spyRestartWithPrompt.calledTimes(1);
 	});
 
 	it("should update and restart without a prompt if the [--force --restart] flag is present", async ({ cli }) => {
