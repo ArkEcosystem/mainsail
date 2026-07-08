@@ -57,7 +57,7 @@ describe<{
 	it("#configuration - reflects the current state store block number", async ({ controller, stateStore }) => {
 		stub(stateStore, "getBlockNumber").returnValue(1337);
 
-		const result: any = await controller.configuration();
+		const result = await controller.configuration();
 
 		assert.equal(result.data.blockNumber, 1337);
 	});
@@ -77,7 +77,7 @@ describe<{
 				})[key],
 		);
 
-		const result: any = await controller.configuration();
+		const result = await controller.configuration();
 
 		assert.equal(result.data.transactionPool, {
 			maxTransactionAge: 1,
