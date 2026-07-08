@@ -8,6 +8,10 @@ import { copySync, ensureDirSync, removeSync } from "fs-extra/esm";
 import Joi from "joi";
 import { resolve } from "path";
 
+interface Flags {
+	readonly reset: boolean;
+}
+
 @injectable()
 export class Command extends Commands.Command {
 	@inject(Identifiers.Cli.Service.Environment)
@@ -30,7 +34,7 @@ export class Command extends Commands.Command {
 		await this.#performPublishment(this.getFlags());
 	}
 
-	async #performPublishment(flags: Contracts.Cli.AnyObject): Promise<void> {
+	async #performPublishment(flags: Flags): Promise<void> {
 		this.app.rebind(Identifiers.Cli.Paths.Application).toConstantValue(this.environment.getPaths());
 
 		const configDestination = this.app.getCorePath("config");
