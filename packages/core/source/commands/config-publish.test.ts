@@ -4,7 +4,6 @@ import { describe } from "@mainsail/test-runner";
 import { existsSync } from "fs";
 import { ensureDirSync } from "fs-extra/esm";
 import { join } from "path";
-import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Command } from "./config-publish";
@@ -12,14 +11,12 @@ import { Command } from "./config-publish";
 describe<{
 	cli: Console;
 	configDestination: string;
-}>("ConfigPublishCommand", ({ beforeEach, afterAll, it, assert, stub }) => {
+}>("ConfigPublishCommand", ({ beforeEach, afterAll, it, assert }) => {
 	beforeEach((context) => {
 		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
 		context.configDestination = join(process.env.MAINSAIL_PATH_CONFIG, "core");
 
-		// The Console default flags include network=devnet, so tests run the flag path
-		// unless they opt out with `new Console(false)`.
 		context.cli = new Console();
 	});
 
@@ -69,14 +66,15 @@ describe<{
 		assert.true(existsSync(join(configDestination, "app.json")));
 	});
 
-	it("should fail when no network is selected via the prompt", async ({ cli }) => {
-		// Without the default flags there is no --network, which takes the prompt path; the
-		// network select is commented out in the command, so this always fails after the confirm.
-		const promptCli = new Console(false);
+	it("should default to the develop network when no network flag is given", async () => {
+		// No config is shipped under bin/config/develop, so the default is visible in the failure path.
+		const cli = new Console(false);
 
-		prompts.inject([true]);
-
-		await assert.rejects(() => promptCli.execute(Command), "You'll need to select the network to continue.");
+		await assert.rejects(
+			() => cli.execute(Command),
+			"Couldn't find the core configuration files at",
+			join("bin", "config", "develop", "core"),
+		);
 	});
 
 	it("should fail if the network is invalid", async ({ cli }) => {
@@ -84,18 +82,5 @@ describe<{
 			() => cli.withFlags({ network: "nonexistent" }).execute(Command),
 			"Couldn't find the core configuration files at",
 		);
-	});
-
-	it("should fail when the prompted network is not confirmed", async () => {
-		// The confirm fatal is unreachable through the real prompt (the network select is
-		// commented out, so response.network is always undefined and fatals first); stub the
-		// prompt component to pin the branch anyway.
-		const promptCli = new Console(false);
-		stub(promptCli.app.get(Identifiers.Cli.Component.Prompt), "render").returnValue({
-			confirm: false,
-			network: "devnet",
-		});
-
-		await assert.rejects(() => promptCli.execute(Command), "You'll need to confirm the network to continue.");
 	});
 });
