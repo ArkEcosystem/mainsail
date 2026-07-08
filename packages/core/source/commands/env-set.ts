@@ -1,3 +1,4 @@
+// eslint-disable-next-line unicorn/prevent-abbreviations
 import type { Contracts } from "@mainsail/contracts";
 
 import { Commands } from "@mainsail/cli";
@@ -31,7 +32,7 @@ export class Command extends Commands.Command {
 
 	public async execute(): Promise<void> {
 		this.environment.updateVariables(this.app.getCorePath("config", ".env"), {
-			[this.getFlag("key") as string]: this.getFlag("value"),
+			[this.getFlag<string>("key")]: this.getFlag("value"),
 		});
 	}
 }

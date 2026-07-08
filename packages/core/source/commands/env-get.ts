@@ -1,4 +1,4 @@
-/* eslint-disable unicorn/prevent-abbreviations */
+// eslint-disable-next-line unicorn/prevent-abbreviations
 import { Commands } from "@mainsail/cli";
 import { injectable, postConstruct } from "@mainsail/container";
 import Joi from "joi";

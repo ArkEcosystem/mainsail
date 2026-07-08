@@ -16,7 +16,7 @@ export class Command extends Commands.Command {
 
 	public signature = "reinstall";
 
-	public description = "Reinstall the Core installation";
+	public description = "Reinstall the Core installation.";
 
 	@postConstruct()
 	public configure(): void {
@@ -29,7 +29,6 @@ export class Command extends Commands.Command {
 		}
 
 		if (await this.components.confirm("Are you sure you want to reinstall?")) {
-			//Come back to this
 			return this.#performInstall();
 		}
 
