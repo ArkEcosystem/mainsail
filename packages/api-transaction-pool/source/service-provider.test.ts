@@ -1,5 +1,3 @@
-import type { Contracts } from "@mainsail/contracts";
-
 import { Identifiers } from "@mainsail/constants";
 import { Application, Providers } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
