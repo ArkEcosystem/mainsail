@@ -1,3 +1,4 @@
+import { Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
 export type SchemaObject = {
@@ -5,7 +6,7 @@ export type SchemaObject = {
 };
 
 export const pagination = Joi.object({
-	limit: Joi.number().integer().min(1).default(100).max(Joi.ref("$configuration.plugins.pagination.limit")),
+	limit: Schemas.paginationLimit,
 	page: Joi.number().integer().positive().default(1),
 });
 
