@@ -31,7 +31,7 @@ describe<{
 
 	it("exposes the plugin name and version", () => {
 		assert.equal(Handlers.name, "Transaction Pool API");
-		assert.equal(Handlers.version, "2.0.0");
+		assert.equal(Handlers.version, "1.0.0");
 	});
 
 	it("registers the configuration and transaction routes", async ({ server, routes }) => {
