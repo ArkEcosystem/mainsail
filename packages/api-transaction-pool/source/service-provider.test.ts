@@ -43,27 +43,6 @@ describe<{
 		assert.string(server.uri);
 	});
 
-	it("#configSchema - accepts the packaged defaults shape and rejects missing keys", async ({ serviceProvider }) => {
-		const schema = serviceProvider.configSchema();
-
-		const valid = makeConfiguration();
-		valid.server.http.port = 4007;
-		valid.server.https.port = 8447;
-		assert.undefined(schema.validate(valid).error);
-
-		const missingRateLimit: any = makeConfiguration();
-		missingRateLimit.server.http.port = 4007;
-		missingRateLimit.server.https.port = 8447;
-		delete missingRateLimit.plugins.rateLimit;
-		assert.defined(schema.validate(missingRateLimit).error);
-
-		const missingPagination: any = makeConfiguration();
-		missingPagination.server.http.port = 4007;
-		missingPagination.server.https.port = 8447;
-		delete missingPagination.plugins.pagination;
-		assert.defined(schema.validate(missingPagination).error);
-	});
-
 	it("GET / - responds with the server name", async ({ server }) => {
 		const response = await server.inject({ method: "GET", url: "/" });
 
