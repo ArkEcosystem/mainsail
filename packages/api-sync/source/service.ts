@@ -8,7 +8,6 @@ import {
 } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { parseTransactionError } from "@mainsail/evm-contracts";
 import { assert, chunk, ensureError, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
@@ -94,6 +93,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
+	@inject(Identifiers.EvmConsensus.Contracts.MultiPayment)
+	private readonly multiPaymentContractAddress!: string;
+
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
 
@@ -168,10 +170,6 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		const receipts = unit.getProcessorResult().receipts;
 
-		const multiPaymentContractAddress = this.app.get<string>(
-			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
-		);
-
 		for (const transaction of blockTransactions) {
 			const { senderPublicKey } = transaction;
 			if (!publicKeyToAddress[senderPublicKey]) {
@@ -183,7 +181,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			const receipt = receipts?.get(transaction.hash);
 			assert.defined(receipt);
 
-			const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
+			const parsedMultiPayments = parseMultiPayments(this.multiPaymentContractAddress, transaction, receipt);
 			const {
 				tokenActions: parsedTokenActions,
 				tokenHolders: parsedTokenHolders,

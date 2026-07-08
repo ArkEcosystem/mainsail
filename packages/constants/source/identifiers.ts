@@ -173,6 +173,18 @@ export const Identifiers = {
 			Factory: Symbol("Evm<WorkerSubprocess.Factory>"),
 		},
 	},
+	EvmConsensus: {
+		ConsensusContractCaller: Symbol("EvmConsensus<ConsensusContractCaller>"),
+		Contracts: {
+			Consensus: Symbol("EvmConsensus<Contracts.Consensus>"),
+			MultiPayment: Symbol("<EvmConsensus.MultiPayment>"),
+			Usernames: Symbol("EvmConsensus<Contracts.Usernames>"),
+		},
+		Deployer: Symbol("EvmConsensus<Deployer>"),
+		DeployerAddress: Symbol("EvmConsensus<DeployerAddress>"),
+		GenesisInfo: Symbol("EvmConsensus<GenesisInfo>"),
+		ValidatorSet: Symbol("EvmConsensus<ValidatorSet>"),
+	},
 	Forger: {
 		Block: Symbol("Forger<Block>"),
 	},

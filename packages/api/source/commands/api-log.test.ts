@@ -6,23 +6,33 @@ import { Command } from "./api-log";
 
 describe<{
 	cli: Console;
-}>("ApiLogCommnad", ({ beforeEach, it, stub }) => {
-	const process = {
+}>("ApiLogCommand", ({ beforeEach, it, stub }) => {
+	const processMock = {
 		log: () => {},
 	};
 
 	beforeEach((context) => {
 		context.cli = new Console();
 
-		context.cli.app.rebind(Identifiers.Cli.ProcessFactory).toFactory(() => () => process);
+		context.cli.app.rebind(Identifiers.Cli.ProcessFactory).toFactory(() => () => processMock);
 		context.cli.app.rebind(Identifiers.Cli.Application.Name).toConstantValue("mainsail-api");
 	});
 
-	it("should call process log", async ({ cli }) => {
-		const spyLog = stub(process, "log");
+	it("should call process log with the lines flag default", async ({ cli }) => {
+		const spyLog = stub(processMock, "log");
 
 		await cli.execute(Command);
 
 		spyLog.calledOnce();
+		spyLog.calledWith(false, 15);
+	});
+
+	it("should call process log with the [--error] and [--lines] flags", async ({ cli }) => {
+		const spyLog = stub(processMock, "log");
+
+		await cli.withFlags({ error: true, lines: 100 }).execute(Command);
+
+		spyLog.calledOnce();
+		spyLog.calledWith(true, 100);
 	});
 });

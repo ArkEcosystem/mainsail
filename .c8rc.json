@@ -1,4 +1,4 @@
 {
 	"lines": 0,
-	"exclude": ["**/dist/**", "**/coverage/**", "**/*.d.ts", "**/*.test.ts", "**/test/**"]
+	"exclude": ["**/bin/**", "**/distribution/**", "**/coverage/**", "**/*.d.ts", "**/*.test.ts", "**/test/**"]
 }

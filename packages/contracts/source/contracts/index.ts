@@ -6,6 +6,7 @@ export * as ConsensusStorage from "./consensus-storage.js";
 export * as Consensus from "./consensus/index.js";
 export * as Crypto from "./crypto/index.js";
 export * as Database from "./database.js";
+export * as EvmConsensus from "./evm-consensus.js";
 export * as Evm from "./evm/index.js";
 export * as Forger from "./forger.js";
 export * as Kernel from "./kernel/index.js";

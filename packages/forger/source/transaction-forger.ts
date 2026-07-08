@@ -2,7 +2,6 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ensureError } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
@@ -34,7 +33,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	@inject(Identifiers.State.Store)
 	protected readonly stateStore!: Contracts.State.Store;
 
-	@inject(EvmConsensusIdentifiers.Internal.GenesisInfo)
+	@inject(Identifiers.EvmConsensus.GenesisInfo)
 	private readonly genesisInfo!: Contracts.Evm.GenesisInfo;
 
 	@inject(Identifiers.BlockchainUtils.RoundCalculator)

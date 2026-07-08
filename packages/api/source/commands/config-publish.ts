@@ -22,7 +22,7 @@ export class Command extends Commands.Command {
 		this.definition.setFlag(
 			"reset",
 			"Using the --reset flag will overwrite existing configuration.",
-			Joi.boolean(),
+			Joi.boolean().default(false),
 		);
 	}
 
@@ -51,7 +51,7 @@ export class Command extends Commands.Command {
 					}
 
 					if (!existsSync(configSource)) {
-						this.components.fatal(`Couldn't find the core configuration files at ${configSource}.`);
+						this.components.fatal(`Couldn't find the api configuration files at ${configSource}.`);
 					}
 
 					ensureDirSync(configDestination);
