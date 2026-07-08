@@ -1,9 +1,9 @@
 /* eslint-disable unicorn/prevent-abbreviations */
 import { Commands } from "@mainsail/cli";
 import { injectable, postConstruct } from "@mainsail/container";
-import { parse } from "envfile";
-import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
+
+import { loadEnvironmentFile } from "../helpers.js";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -21,13 +21,7 @@ export class Command extends Commands.Command {
 	}
 
 	public async execute(): Promise<void> {
-		const environmentFile: string = this.app.getCorePath("config", ".env");
-
-		if (!existsSync(environmentFile)) {
-			this.components.fatal(`No environment file found at ${environmentFile}.`);
-		}
-
-		const environment: object = parse(readFileSync(environmentFile).toString("utf8"));
+		const environment = loadEnvironmentFile(this.app, this.components);
 		const key: string = this.getFlag("key");
 
 		if (!environment[key]) {
