@@ -299,7 +299,6 @@ describe<{}>("Schemas", ({ it, assert }) => {
 			assert.is(result.value.limit, 500);
 		});
 
-
 		it("should reject > max limit", () => {
 			const result = schemas.pagination.validate(
 				{ limit: 501 },
