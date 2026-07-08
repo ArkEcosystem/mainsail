@@ -121,7 +121,17 @@ describe<{
 	it("should allow empty peers", async ({ cli, configPath }) => {
 		await cli.withFlags(generateFlags(configPath, { peers: "" })).execute(Command);
 
-		assert.equal(readJSONSync(join(configPath, "devnet", "peers.json")).list, [{ ip: "", port: 4000 }]);
+		assert.equal(readJSONSync(join(configPath, "devnet", "peers.json")).list, []);
+	});
+
+	it("should trim whitespace around the peer entries", async ({ cli, configPath }) => {
+		await cli.withFlags(generateFlags(configPath, { peers: "127.0.0.1, 127.0.0.2, 127.0.0.3" })).execute(Command);
+
+		assert.equal(readJSONSync(join(configPath, "devnet", "peers.json")).list, [
+			{ ip: "127.0.0.1", port: 4000 },
+			{ ip: "127.0.0.2", port: 4000 },
+			{ ip: "127.0.0.3", port: 4000 },
+		]);
 	});
 
 	it("should write the p2p port to the environment file and the peer list", async ({ cli, configPath }) => {

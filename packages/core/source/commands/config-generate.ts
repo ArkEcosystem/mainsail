@@ -292,7 +292,12 @@ export class Command extends Commands.Command {
 	#convertFlags(options: Flags): AppContracts.NetworkGenerator.Options {
 		return {
 			...options,
-			peers: options.peers.replace(" ", "").split(","),
+			// Trim each entry and drop empty ones: --peers="" means no peers, and
+			// "a, b, c" must not keep leading spaces past the first entry.
+			peers: options.peers
+				.split(",")
+				.map((peer) => peer.trim())
+				.filter((peer) => peer.length > 0),
 			rewardAmount: options.rewardAmount.toString(),
 		};
 	}
