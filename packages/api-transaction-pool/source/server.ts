@@ -21,16 +21,6 @@ export class Server extends AbstractServer {
 	}
 
 	protected defaultOptions(): Record<string, unknown> {
-		const validateContext = {
-			configuration: {
-				plugins: {
-					pagination: {
-						limit: this.configuration.getRequired<number>("plugins.pagination.limit"),
-					},
-				},
-			},
-		};
-
 		return {
 			router: {
 				stripTrailingSlash: true,
@@ -46,7 +36,15 @@ export class Server extends AbstractServer {
 						return badData(error.message);
 					},
 					options: {
-						context: validateContext,
+						context: {
+							configuration: {
+								plugins: {
+									pagination: {
+										limit: this.configuration.getRequired<number>("plugins.pagination.limit"),
+									},
+								},
+							},
+						},
 					},
 				},
 			},
