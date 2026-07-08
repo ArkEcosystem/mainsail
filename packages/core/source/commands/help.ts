@@ -2,18 +2,21 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Commands } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
-import { injectable } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import boxen from "boxen";
 import { blue, bold, cyan } from "kleur/colors";
 
 @injectable()
 export class Command extends Commands.Command {
+	@inject(Identifiers.Cli.Service.Logger)
+	private readonly logger!: Contracts.Cli.Logger;
+
 	public signature = "help";
 
 	public description = "Displays detailed information on all commands available via CLI.";
 
 	public async execute(): Promise<void> {
-		const commands = this.app.get<Contracts.Cli.CommandList>(Identifiers.Cli.Commands);
+		const commands: Contracts.Cli.CommandList = this.app.get(Identifiers.Cli.Commands);
 
 		// figure out the longest signature
 		const signatures: string[] = Object.keys(commands);
@@ -43,7 +46,7 @@ export class Command extends Commands.Command {
 			}
 		}
 
-		console.log(
+		this.logger.info(
 			boxen(
 				this.components.appHeader() +
 					`
