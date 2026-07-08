@@ -25,6 +25,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 		return Handlers as unknown as NamedPlugin<unknown>;
 	}
 
+	// Booted in transaction-pool-worker/source/handlers/start.ts
 	public async boot(): Promise<void> {}
 
 	protected getPlugins(): Plugin<unknown>[] {
