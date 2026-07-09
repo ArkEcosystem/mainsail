@@ -77,6 +77,7 @@
 		"typescript": "6.0.3",
 		"typescript-eslint": "^8.59.3",
 		"typesync": "0.14.3",
+		"monocart-coverage-reports": "2.12.12",
 		"yaml": "2.9.0"
 	}
 }
