@@ -11,6 +11,7 @@ import { describe } from "@mainsail/test-runner";
 import { wallets } from "../../test/fixtures/wallets";
 import { commitGenesis, processGenesis } from "../../test/helpers/commit-genesis";
 import { prepareSandbox } from "../../test/helpers/prepare-sandbox";
+import * as MainsailERC20 from "../../test/fixtures/MainsailERC20.json";
 import { EvmInstance } from "./evm";
 
 describe<{
@@ -202,7 +203,7 @@ describe<{
 				instance.importAccountInfos([
 					{ address: wallets[0].address, balance: -1n, legacyAttributes: {}, nonce: 0n },
 				]),
-			"balance",
+			"balance: expected an unsigned bigint",
 		);
 	});
 
@@ -349,7 +350,8 @@ describe<{
 					timestamp: 12_345n,
 					validatorAddress: wallets[1].address,
 				}),
-			"calculate_round_validators reverted",
+			// The reverted call surfaces as a rejection carrying the Rust panic message.
+			"calculate_round_validators unsuccessful",
 		);
 
 		const reward = 1_000_000n;
@@ -362,7 +364,7 @@ describe<{
 					timestamp: 12_345n,
 					validatorAddress: wallets[1].address,
 				}),
-			"vote_update reverted",
+			"vote_update unsuccessful",
 		);
 
 		// The failed block is never reused: the processor re-enters via prepareNextCommit,
