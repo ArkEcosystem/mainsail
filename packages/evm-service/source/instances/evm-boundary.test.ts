@@ -62,4 +62,19 @@ describe<{
 		await instance.onCommit(makeUnit(genesisCommit));
 		assert.defined(await instance.getCommitData(0));
 	});
+
+	it("onCommit rejects a transactionsCount mismatch and stays usable", async ({ app, instance }) => {
+		const { genesisCommit } = await processGenesis(app, instance);
+
+		// transactionsCount is readonly on the Block contract; the test corrupts it on purpose.
+		const header = genesisCommit.block as unknown as Record<"transactionsCount", number>;
+		const original = header.transactionsCount;
+
+		header.transactionsCount = original + 1;
+		await assert.rejects(() => instance.onCommit(makeUnit(genesisCommit)), "transactions count mismatch");
+
+		header.transactionsCount = original;
+		await instance.onCommit(makeUnit(genesisCommit));
+		assert.defined(await instance.getCommitData(0));
+	});
 });

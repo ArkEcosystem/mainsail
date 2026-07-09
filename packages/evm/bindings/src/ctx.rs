@@ -438,7 +438,13 @@ impl TryFrom<JsCommitData> for CommitData {
             transactions.push(data.try_into()?);
         }
 
-        assert_eq!(header.transactions_count, transactions.len() as u16);
+        if header.transactions_count as usize != transactions.len() {
+            anyhow::bail!(
+                "transactions count mismatch: header says {}, got {}",
+                header.transactions_count,
+                transactions.len()
+            );
+        }
 
         Ok(CommitData {
             proof,
