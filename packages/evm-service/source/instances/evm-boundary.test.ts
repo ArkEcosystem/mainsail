@@ -206,6 +206,25 @@ describe<{
 		);
 	});
 
+	it("imports reject balances that do not fit into u128", async ({ app, instance }) => {
+		await processGenesis(app, instance);
+
+		const fresh = `0x${randomBytes(20).toString("hex")}`;
+		await assert.rejects(
+			() =>
+				instance.importAccountInfos([{ address: fresh, balance: 2n ** 128n, legacyAttributes: {}, nonce: 0n }]),
+			"does not fit into u128",
+		);
+
+		await assert.rejects(
+			() =>
+				instance.importLegacyColdWallets([
+					{ address: "DJmvhhiQFSrEQCq9FUxvcLcpcBjx7K3yLt", balance: 2n ** 128n, legacyAttributes: {} },
+				]),
+			"does not fit into u128",
+		);
+	});
+
 	it("process rejects a transaction hash that was already committed", async ({ app, instance }) => {
 		const genesisCommit = await commitGenesis(app, instance);
 		const transaction = genesisCommit.block.transactions[0];

@@ -471,7 +471,13 @@ impl EvmInner {
             }
 
             let (address, info, legacy_attributes) = info.into_parts();
-            pending.import_account(address, info, legacy_attributes);
+            let balance = u128::try_from(info.balance).map_err(|_| {
+                EVMError::Custom(format!(
+                    "import_account_infos: balance of {} does not fit into u128",
+                    address
+                ))
+            })?;
+            pending.import_account(address, balance, legacy_attributes);
         }
 
         Ok(())
@@ -497,6 +503,13 @@ impl EvmInner {
             if pending.legacy_cold_wallets.contains_key(&wallet.address) {
                 return Err(EVMError::Custom(format!(
                     "import_legacy_cold_wallets: duplicate wallet {:?}",
+                    wallet.address
+                )));
+            }
+
+            if u128::try_from(wallet.balance).is_err() {
+                return Err(EVMError::Custom(format!(
+                    "import_legacy_cold_wallets: balance of {:?} does not fit into u128",
                     wallet.address
                 )));
             }
@@ -631,7 +644,12 @@ impl EvmInner {
                     let mut legacy_balances = HashMap::<Address, u128>::default();
                     legacy_balances.insert(
                         ctx.from,
-                        legacy_cold_wallet.balance.try_into().expect("fit u128"),
+                        legacy_cold_wallet.balance.try_into().map_err(|_| {
+                            EVMError::Custom(format!(
+                                "legacy cold wallet balance of {:?} does not fit into u128",
+                                legacy_cold_wallet.address
+                            ))
+                        })?,
                     );
                     state_commit::apply_rewards(
                         &self.persistent_db,
@@ -799,7 +817,12 @@ impl EvmInner {
                             let mut legacy_balances = HashMap::<Address, u128>::default();
                             legacy_balances.insert(
                                 tx_ctx.from,
-                                legacy_cold_wallet.balance.try_into().expect("fit u128"),
+                                legacy_cold_wallet.balance.try_into().map_err(|_| {
+                                    EVMError::Custom(format!(
+                                        "legacy cold wallet balance of {:?} does not fit into u128",
+                                        legacy_cold_wallet.address
+                                    ))
+                                })?,
                             );
 
                             state_commit::apply_rewards(

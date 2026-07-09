@@ -1503,7 +1503,7 @@ impl PendingCommit {
     pub fn import_account(
         &mut self,
         address: Address,
-        info: AccountInfo,
+        balance: u128,
         legacy_attributes: Option<LegacyAccountAttributes>,
     ) {
         let mut state = revm::database::State::builder()
@@ -1515,7 +1515,6 @@ impl PendingCommit {
             .load_cache_account(address)
             .expect("load_cache_account");
 
-        let balance = info.balance.try_into().expect("fit u128");
         let transition_account = account
             .increment_balance(balance)
             .unwrap_or_else(|| TransitionAccount::new_empty_eip161(Default::default()));
@@ -2194,14 +2193,6 @@ mod tests {
         let key = CommitKey(0, 0, B256::ZERO);
         let mut pending = PendingCommit::new(key);
 
-        let info = AccountInfo {
-            balance: U256::ONE,
-            nonce: 1,
-            code_hash: b256!("0000000000000000000000000000000000000000000000000000000000000001"),
-            account_id: None,
-            code: None,
-        };
-
         let attributes = LegacyAccountAttributes {
             legacy_nonce: Some(0),
             second_public_key: Some("key".into()),
@@ -2210,20 +2201,13 @@ mod tests {
 
         pending.import_account(
             address!("0000000000000000000000000000000000000001"),
-            info,
+            1,
             Some(attributes),
         );
 
-        let info = AccountInfo {
-            balance: U256::ZERO,
-            nonce: 0,
-            code_hash: B256::ZERO,
-            account_id: None,
-            code: None,
-        };
         pending.import_account(
             address!("0000000000000000000000000000000000000002"),
-            info,
+            0,
             None,
         );
 
