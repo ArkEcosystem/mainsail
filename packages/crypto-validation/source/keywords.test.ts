@@ -29,37 +29,6 @@ describe<{
 		}
 	});
 
-	it("keyword maxBytes should be ok", (context) => {
-		const schema = {
-			$id: "test",
-			maxBytes: 64,
-			type: "string",
-		};
-		context.validator.addSchema(schema);
-
-		assert.undefined(context.validator.validate("test", "1234").error);
-		assert.undefined(context.validator.validate("test", "a".repeat(64)).error);
-		assert.undefined(context.validator.validate("test", "⊁".repeat(21)).error);
-
-		assert.defined(context.validator.validate("test", "a".repeat(65)).error);
-		assert.defined(context.validator.validate("test", "⊁".repeat(22)).error);
-		assert.defined(context.validator.validate("test", {}).error);
-		assert.defined(context.validator.validate("test", null).error);
-		assert.defined(context.validator.validate("test", undefined).error);
-		assert.defined(context.validator.validate("test", 123).error);
-	});
-
-	it("keyword maxBytes - minimum bytes should be 0", (context) => {
-		const schema = {
-			$id: "test",
-			maxBytes: -1,
-			type: "string",
-		};
-		context.validator.addSchema(schema);
-
-		assert.true(context.validator.validate("test", "1234").error!.includes("data must be >= 0"));
-	});
-
 	it("keyword bigInt should be ok if only one possible value is allowed", (context) => {
 		const schema = {
 			$id: "test",

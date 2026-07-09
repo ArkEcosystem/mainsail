@@ -6,23 +6,11 @@ import { parseBlockNumber } from "./parse-block-number.js";
 export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
 ): {
-	maxBytes: FuncKeywordDefinition;
 	bigInt: FuncKeywordDefinition;
 	buffer: FuncKeywordDefinition;
 	isValidatorIndex: FuncKeywordDefinition;
 	limitToRoundValidators: FuncKeywordDefinition;
 } => {
-	const maxBytes: FuncKeywordDefinition = {
-		compile: (schema) => (data) => Buffer.byteLength(data, "utf8") <= schema,
-		errors: false,
-		keyword: "maxBytes",
-		metaSchema: {
-			minimum: 0,
-			type: "integer",
-		},
-		type: "string",
-	};
-
 	const bigInt: FuncKeywordDefinition = {
 		compile: (schema) => (data) => {
 			const minimum = schema.minimum !== undefined ? schema.minimum : 0n;
@@ -122,5 +110,5 @@ export const makeKeywords = (
 		},
 	};
 
-	return { bigInt, buffer, isValidatorIndex, limitToRoundValidators, maxBytes };
+	return { bigInt, buffer, isValidatorIndex, limitToRoundValidators };
 };
