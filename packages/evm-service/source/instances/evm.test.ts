@@ -563,7 +563,7 @@ describe<{
 				}),
 				setAccountUpdates: () => {},
 			} as any);
-		}, "assertion failed: self.pending_commits.contains_key(&commit_key)");
+		}, "commit is missing commit key");
 
 		// Balance updated correctly
 		const balance = await getBalance(instance, contractAddress!, recipient.address);
@@ -642,7 +642,7 @@ describe<{
 				txHash: randomTxHash,
 				...deployConfig,
 			});
-		}, "assertion failed: !committed");
+		}, `cannot process transaction 0x${randomTxHash}: block 0 was already committed`);
 	});
 
 	it("should deploy, transfer multipe times and update balance correctly", async ({ instance }) => {

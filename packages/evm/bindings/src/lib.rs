@@ -218,18 +218,14 @@ impl EvmInner {
         &mut self,
         ctx: CalculateRoundValidatorsContext,
     ) -> std::result::Result<(), EVMError<String>> {
-        assert!(
-            self.pending_commits.contains_key(&ctx.commit_key),
-            "calculate_round_validators is missing commit key {:?}",
-            ctx.commit_key
-        );
+        if !self.pending_commits.contains_key(&ctx.commit_key) {
+            return Err(EVMError::Custom(format!(
+                "calculate_round_validators is missing commit key {:?}",
+                ctx.commit_key
+            )));
+        }
 
-        let genesis_info = self
-            .persistent_db
-            .genesis_info
-            .as_ref()
-            .expect("genesis info")
-            .clone();
+        let genesis_info = self.genesis_info()?;
 
         let abi = ethers_contract::BaseContract::from(
             ethers_core::abi::parse_abi(&["function calculateRoundValidators(uint8 n) external"])
@@ -287,24 +283,18 @@ impl EvmInner {
         &mut self,
         ctx: UpdateRewardsAndVotesContext,
     ) -> std::result::Result<(), EVMError<String>> {
-        assert!(
-            self.pending_commits.contains_key(&ctx.commit_key),
-            "update_rewards_and_votes is missing commit key {:?}",
-            ctx.commit_key
-        );
-
-        let genesis_info = self
-            .persistent_db
-            .genesis_info
-            .as_ref()
-            .expect("genesis info")
-            .clone();
+        let genesis_info = self.genesis_info()?;
 
         let nonce = self
             .get_account_nonce(&ctx.commit_key, genesis_info.deployer_account)
             .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
 
-        let mut pending_commit = self.pending_commits.get_mut(&ctx.commit_key).expect("ok");
+        let Some(mut pending_commit) = self.pending_commits.get_mut(&ctx.commit_key) else {
+            return Err(EVMError::Custom(format!(
+                "update_rewards_and_votes is missing commit key {:?}",
+                ctx.commit_key
+            )));
+        };
         let mut rewards = HashMap::<Address, u128>::default();
         rewards.insert(ctx.validator_address, ctx.block_reward);
 
@@ -462,14 +452,23 @@ impl EvmInner {
     ) -> std::result::Result<(), EVMError<String>> {
         let genesis_block_number = self.genesis_block_number();
 
-        let (_, pending) = self
+        let Some((_, pending)) = self
             .pending_commits
             .iter_mut()
             .find(|(key, _)| key.0 == genesis_block_number)
-            .expect("genesis commit");
+        else {
+            return Err(EVMError::Custom(
+                "import_account_infos requires the genesis pending commit; call prepare_next_commit first".into(),
+            ));
+        };
 
         for info in infos {
-            assert!(!pending.cache.accounts.contains_key(&info.address));
+            if pending.cache.accounts.contains_key(&info.address) {
+                return Err(EVMError::Custom(format!(
+                    "import_account_infos: duplicate account {}",
+                    info.address
+                )));
+            }
 
             let (address, info, legacy_attributes) = info.into_parts();
             pending.import_account(address, info, legacy_attributes);
@@ -484,14 +483,23 @@ impl EvmInner {
     ) -> std::result::Result<(), EVMError<String>> {
         let genesis_block_number = self.genesis_block_number();
 
-        let (_, pending) = self
+        let Some((_, pending)) = self
             .pending_commits
             .iter_mut()
             .find(|(key, _)| key.0 == genesis_block_number)
-            .expect("genesis commit");
+        else {
+            return Err(EVMError::Custom(
+                "import_legacy_cold_wallets requires the genesis pending commit; call prepare_next_commit first".into(),
+            ));
+        };
 
         for wallet in wallets {
-            assert!(!pending.legacy_cold_wallets.contains_key(&wallet.address));
+            if pending.legacy_cold_wallets.contains_key(&wallet.address) {
+                return Err(EVMError::Custom(format!(
+                    "import_legacy_cold_wallets: duplicate wallet {:?}",
+                    wallet.address
+                )));
+            }
             pending.legacy_cold_wallets.insert(wallet.address, wallet);
         }
 
@@ -739,7 +747,12 @@ impl EvmInner {
             .persistent_db
             .get_receipt(commit_key.0, tx_ctx.tx_hash)
             .map_err(|err| EVMError::Database(format!("commit receipt lookup: {}", err).into()))?;
-        assert!(!committed);
+        if committed {
+            return Err(EVMError::Custom(format!(
+                "cannot process transaction {}: block {} was already committed",
+                tx_ctx.tx_hash, commit_key.0
+            )));
+        }
 
         // A legacy cold-wallet merge mutates the pending commit *before* the transaction
         // executes (so the tx can spend the merged balance). If the tx then fails it is
@@ -841,7 +854,12 @@ impl EvmInner {
         commit_key: CommitKey,
         commit_data: Option<CommitData>,
     ) -> std::result::Result<Vec<AccountUpdate>, EVMError<String>> {
-        assert!(self.pending_commits.contains_key(&commit_key));
+        if !self.pending_commits.contains_key(&commit_key) {
+            return Err(EVMError::Custom(format!(
+                "commit is missing commit key {:?}",
+                commit_key
+            )));
+        }
 
         let pending_commit = self.take_pending_commit(commit_key);
 
@@ -865,18 +883,18 @@ impl EvmInner {
         commit_key: CommitKey,
         current_hash: B256,
     ) -> std::result::Result<String, EVMError<String>> {
-        let pending_commit = self
-            .pending_commits
-            .get_mut(&commit_key)
-            .expect("pending commit exists");
+        let Some(genesis_info) = self.persistent_db.genesis_info.as_ref() else {
+            return Err(EVMError::Custom("genesis not initialized".into()));
+        };
 
-        let genesis_info = self
-            .persistent_db
-            .genesis_info
-            .as_ref()
-            .expect("genesis info exists");
+        let Some(pending_commit) = self.pending_commits.get_mut(&commit_key) else {
+            return Err(EVMError::Custom(format!(
+                "state_root is missing commit key {:?}",
+                commit_key
+            )));
+        };
 
-        let result = state_root::calculate(&genesis_info, pending_commit, current_hash);
+        let result = state_root::calculate(genesis_info, pending_commit, current_hash);
 
         match result {
             Ok(result) => Ok(result.encode_hex()),
@@ -890,10 +908,12 @@ impl EvmInner {
         &self,
         commit_key: CommitKey,
     ) -> std::result::Result<String, EVMError<String>> {
-        let pending_commit = self
-            .pending_commits
-            .get(&commit_key)
-            .expect("pending commit exists");
+        let Some(pending_commit) = self.pending_commits.get(&commit_key) else {
+            return Err(EVMError::Custom(format!(
+                "logs_bloom is missing commit key {:?}",
+                commit_key
+            )));
+        };
 
         let result = logs_bloom::calculate(pending_commit);
 
@@ -1063,7 +1083,12 @@ impl EvmInner {
 
         match self.snapshot.take() {
             Some(commit) if commit.key == commit_key => {
-                assert!(self.pending_commits.contains_key(&commit_key));
+                if !self.pending_commits.contains_key(&commit_key) {
+                    return Err(EVMError::Custom(format!(
+                        "rollback is missing commit key {:?}",
+                        commit_key
+                    )));
+                }
                 self.pending_commits.insert(commit_key, commit);
 
                 Ok(())
@@ -1312,6 +1337,14 @@ impl EvmInner {
             .cloned()
             .unwrap_or_default()
             .initial_block_number
+    }
+
+    fn genesis_info(&self) -> std::result::Result<GenesisInfo, EVMError<String>> {
+        self.persistent_db
+            .genesis_info
+            .as_ref()
+            .cloned()
+            .ok_or_else(|| EVMError::Custom("genesis not initialized".into()))
     }
 }
 

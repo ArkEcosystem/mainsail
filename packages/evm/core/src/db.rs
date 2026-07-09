@@ -1185,10 +1185,20 @@ impl PersistentDB {
                 let mut legacy_cold_wallet = inner
                     .legacy_cold_wallets
                     .get(&rwtxn, key)?
-                    .expect("legacy cold wallet to be found")
+                    .ok_or_else(|| {
+                        Error::State(format!(
+                            "merged legacy cold wallet {:?} not found",
+                            legacy.1
+                        ))
+                    })?
                     .0;
 
-                assert!(legacy_cold_wallet.merge_info.is_none());
+                if legacy_cold_wallet.merge_info.is_some() {
+                    return Err(Error::State(format!(
+                        "legacy cold wallet {:?} was already merged",
+                        legacy.1
+                    )));
+                }
                 legacy_cold_wallet.merge_info.replace((legacy.0, *address));
 
                 inner

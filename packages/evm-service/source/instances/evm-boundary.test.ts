@@ -5,11 +5,11 @@ import type { Contracts } from "@mainsail/contracts";
 import { Evm } from "@mainsail/evm";
 import { Application } from "@mainsail/kernel";
 import { setGracefulCleanup } from "tmp";
-import { zeroAddress } from "viem";
+import { zeroAddress, zeroHash } from "viem";
 
 import { describe } from "@mainsail/test-runner";
 import { wallets } from "../../test/fixtures/wallets";
-import { processGenesis } from "../../test/helpers/commit-genesis";
+import { commitGenesis, processGenesis } from "../../test/helpers/commit-genesis";
 import { prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { EvmInstance } from "./evm";
 
@@ -152,6 +152,164 @@ describe<{
 					{ address: wallets[0].address, balance: -1n, legacyAttributes: {}, nonce: 0n },
 				]),
 			"balance",
+		);
+	});
+
+	it("rejects stale or unknown commit keys and bad sequencing with clean errors", async ({ app, instance }) => {
+		const unknownKey = { blockNumber: 9n, round: 0n };
+
+		await assert.rejects(
+			() =>
+				instance.updateRewardsAndVotes({
+					blockReward: 0n,
+					commitKey: unknownKey,
+					specId: Enums.Evm.SpecId.SHANGHAI,
+					timestamp: 0n,
+					validatorAddress: zeroAddress,
+				}),
+			"genesis not initialized",
+		);
+
+		await assert.rejects(
+			() =>
+				instance.calculateRoundValidators({
+					commitKey: unknownKey,
+					roundValidators: 1n,
+					specId: Enums.Evm.SpecId.SHANGHAI,
+					timestamp: 0n,
+					validatorAddress: zeroAddress,
+				}),
+			"calculate_round_validators is missing commit key",
+		);
+
+		await assert.rejects(
+			() =>
+				instance.importAccountInfos([
+					{ address: wallets[0].address, balance: 0n, legacyAttributes: {}, nonce: 0n },
+				]),
+			"requires the genesis pending commit",
+		);
+
+		await processGenesis(app, instance);
+
+		await assert.rejects(() => instance.stateRoot(unknownKey, zeroHash), "state_root is missing commit key");
+		await assert.rejects(() => instance.logsBloom(unknownKey), "logs_bloom is missing commit key");
+
+		const fresh = `0x${randomBytes(20).toString("hex")}`;
+		await assert.rejects(
+			() =>
+				instance.importAccountInfos([
+					{ address: fresh, balance: 0n, legacyAttributes: {}, nonce: 0n },
+					{ address: fresh, balance: 1n, legacyAttributes: {}, nonce: 0n },
+				]),
+			"duplicate account",
+		);
+	});
+
+	it("process rejects a transaction hash that was already committed", async ({ app, instance }) => {
+		const genesisCommit = await commitGenesis(app, instance);
+		const transaction = genesisCommit.block.transactions[0];
+		assert.defined(transaction);
+
+		await assert.rejects(
+			() =>
+				instance.process({
+					commitKey: { blockNumber: 0n, round: 0n },
+					data: Buffer.alloc(0),
+					from: transaction.from,
+					gasLimit: 21_000n,
+					gasPrice: 0n,
+					nonce: 0n,
+					specId: Enums.Evm.SpecId.SHANGHAI,
+					to: wallets[1].address,
+					txHash: transaction.hash,
+					value: 0n,
+				}),
+			"already committed",
+		);
+	});
+
+	it("rolls back the pending commit when a consensus contract call reverts", async ({ instance }) => {
+		// The ERC20 fixture has no updateVoters/calculateRoundValidators and no fallback,
+		// so pointing the "validator contract" at its (deterministic) deploy address makes
+		// every consensus call revert.
+		const validatorContract = "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a"; // wallets[0], nonce 0
+		await instance.initializeGenesis({
+			account: wallets[0].address,
+			deployerAccount: "0x0000000000000000000000000000000000000001",
+			initialBlockNumber: 0n,
+			initialSupply: 0n,
+			timestamp: 0n,
+			usernameContract: "0x0000000000000000000000000000000000000002",
+			validatorContract,
+		});
+
+		// Block 1, not 0: at the genesis block number prepareNextCommit deliberately keeps
+		// an existing pending commit (bootstrap guard), which would defeat the rebuild below.
+		const commitKey = { blockNumber: 1n, round: 0n };
+		await instance.prepareNextCommit({
+			blockContext: { commitKey, gasLimit: 10_000_000n, timestamp: 12_345n, validatorAddress: zeroAddress },
+		});
+
+		const { receipt } = await instance.process({
+			commitKey,
+			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
+			from: wallets[0].address,
+			gasLimit: 1_000_000n,
+			gasPrice: 0n,
+			nonce: 0n,
+			specId: Enums.Evm.SpecId.SHANGHAI,
+			txHash: randomBytes(32).toString("hex"),
+			value: 0n,
+		});
+		assert.equal(receipt.status, 1);
+		assert.equal(receipt.contractAddress, validatorContract);
+
+		await assert.rejects(
+			() =>
+				instance.calculateRoundValidators({
+					commitKey,
+					roundValidators: 1n,
+					specId: Enums.Evm.SpecId.SHANGHAI,
+					timestamp: 12_345n,
+					validatorAddress: wallets[1].address,
+				}),
+			"calculate_round_validators reverted",
+		);
+
+		const reward = 1_000_000n;
+		await assert.rejects(
+			() =>
+				instance.updateRewardsAndVotes({
+					blockReward: reward,
+					commitKey,
+					specId: Enums.Evm.SpecId.SHANGHAI,
+					timestamp: 12_345n,
+					validatorAddress: wallets[1].address,
+				}),
+			"vote_update reverted",
+		);
+
+		// The failed block is never reused: the processor re-enters via prepareNextCommit,
+		// which replaces the dirty pending commit with a fresh one. The applied-then-
+		// abandoned reward must not survive that — spending it fails.
+		await instance.prepareNextCommit({
+			blockContext: { commitKey, gasLimit: 10_000_000n, timestamp: 12_345n, validatorAddress: zeroAddress },
+		});
+
+		await assert.rejects(() =>
+			instance.process({
+				commitKey,
+				data: Buffer.alloc(0),
+				from: wallets[1].address,
+				gasLimit: 21_000n,
+				gasPrice: 0n,
+				nonce: 0n,
+				specId: Enums.Evm.SpecId.SHANGHAI,
+				to: wallets[0].address,
+				txHash: randomBytes(32).toString("hex"),
+				value: reward,
+			}),
 		);
 	});
 });
