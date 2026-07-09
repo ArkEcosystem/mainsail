@@ -142,7 +142,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 			throw new NotImplemented(this.constructor.name, schema.type);
 		}
 
-		return result.toBuffer();
+		return result.getResult();
 	}
 
 	public async deserialize<T>(
