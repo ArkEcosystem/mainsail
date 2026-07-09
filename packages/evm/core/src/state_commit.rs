@@ -143,28 +143,31 @@ fn collect_dirty_accounts(
     let mut dirty_accounts = HashMap::with_capacity(commit.change_set.accounts.len());
 
     for (address, account) in commit.change_set.accounts {
-        if let Some(account) = account {
-            dirty_accounts.insert(
+        // A destroyed (selfdestructed) account comes through as `None`; surface it as a
+        // zeroed update so consumers drop the stale balance — mirroring the history
+        // table, which records deletions as a default account.
+        let account = account.unwrap_or_default();
+
+        dirty_accounts.insert(
+            address,
+            AccountUpdate {
                 address,
-                AccountUpdate {
-                    address,
-                    balance: account.balance,
-                    nonce: account.nonce,
-                    vote: None,
-                    unvote: None,
-                    username: None,
-                    username_resigned: false,
-                    merge_info: commit
-                        .change_set
-                        .merged_legacy_cold_wallets
-                        .get(&address)
-                        .map(|value| AccountMergeInfo {
-                            legacy_address: value.1,
-                            transaction_hash: value.0,
-                        }),
-                },
-            );
-        }
+                balance: account.balance,
+                nonce: account.nonce,
+                vote: None,
+                unvote: None,
+                username: None,
+                username_resigned: false,
+                merge_info: commit
+                    .change_set
+                    .merged_legacy_cold_wallets
+                    .get(&address)
+                    .map(|value| AccountMergeInfo {
+                        legacy_address: value.1,
+                        transaction_hash: value.0,
+                    }),
+            },
+        );
     }
 
     if let Some(info) = genesis_info {
@@ -457,6 +460,46 @@ mod tests {
                     username: None,
                     username_resigned: true,
                     merge_info: None
+                }
+            ]
+        );
+    }
+
+    #[test]
+    fn test_collect_dirty_accounts_includes_destroyed_accounts() {
+        let destroyed = address!("0000000000000000000000000000000000000001");
+        let alive = address!("0000000000000000000000000000000000000002");
+
+        let mut change_set = StateChangeset::default();
+        change_set.accounts.push((destroyed, None));
+        change_set
+            .accounts
+            .push((alive, Some(AccountInfo::from_balance(U256::from(7)))));
+
+        let state = StateCommit {
+            change_set,
+            ..Default::default()
+        };
+
+        let mut account_updates = collect_dirty_accounts(state, &None);
+        account_updates.sort_by_key(|u| u.address);
+
+        // A selfdestructed account must surface as a zeroed update — consumers (api-sync
+        // wallet table) would otherwise keep the stale pre-destruction balance forever.
+        assert_eq!(
+            account_updates,
+            vec![
+                AccountUpdate {
+                    address: destroyed,
+                    balance: U256::ZERO,
+                    nonce: 0,
+                    ..Default::default()
+                },
+                AccountUpdate {
+                    address: alive,
+                    balance: U256::from(7),
+                    nonce: 0,
+                    ..Default::default()
                 }
             ]
         );
