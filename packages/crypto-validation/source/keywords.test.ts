@@ -247,4 +247,112 @@ describe<{
 		assert.defined(context.validator.validate("test", "a").error);
 		assert.defined(context.validator.validate("test", undefined).error);
 	});
+
+	it("keyword limitToRoundValidators - should reject when below an explicit non-zero minimum", (context) => {
+		const schema = {
+			$id: "test",
+			limitToRoundValidators: {
+				minimum: 5,
+			},
+		};
+		context.validator.addSchema(schema);
+
+		// length 4 < explicit minimum 5 -> rejected (lower-bound branch with a non-zero minimum)
+		assert.defined(context.validator.validate("test", new Array(4).fill(true)).error);
+		// length 5 == minimum -> ok
+		assert.undefined(context.validator.validate("test", new Array(5).fill(true)).error);
+	});
+
+	it("keyword limitToRoundValidators - should reject above roundValidators with a minimum present", (context) => {
+		const schema = {
+			$id: "test",
+			limitToRoundValidators: {
+				minimum: 1,
+			},
+		};
+		context.validator.addSchema(schema);
+
+		const { roundValidators } = context.app
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.getMilestone(1);
+
+		// within [minimum, roundValidators] -> ok
+		assert.undefined(context.validator.validate("test", new Array(roundValidators).fill(true)).error);
+		// length > roundValidators -> rejected (upper-bound branch, minimum present)
+		assert.defined(context.validator.validate("test", new Array(roundValidators + 1).fill(true)).error);
+	});
+});
+
+describe<{
+	app: Application;
+	validator: Contracts.Crypto.Validator;
+}>("Keywords - milestone boundary", ({ it, beforeEach, assert }) => {
+	beforeEach(async (context) => {
+		context.app = new Application();
+		await context.app.resolve(ValidationServiceProvider).register();
+		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);
+
+		// Stub milestones so roundValidators depends on the block number: 4 from height 100, otherwise 53.
+		// This proves the keyword resolves roundValidators from the block number found at `blockNumberPath`,
+		// not from the node's current height (which is the fallback when no path resolves).
+		const configuration = {
+			getMilestone: (height?: number) => ({
+				roundValidators: height !== undefined && height >= 100 ? 4 : 53,
+			}),
+		} as unknown as Contracts.Crypto.Configuration;
+
+		for (const keyword of Object.values(makeKeywords(configuration))) {
+			context.validator.addKeyword(keyword);
+		}
+	});
+
+	it("keyword isValidatorIndex - resolves roundValidators from the block number at blockNumberPath", (context) => {
+		context.validator.addSchema({
+			$id: "test",
+			properties: {
+				blockNumber: { type: "integer" },
+				validatorIndex: { isValidatorIndex: { blockNumberPath: "blockNumber" } },
+			},
+			type: "object",
+		});
+
+		// height 100 -> 4 validators: index 3 valid, index 4 rejected
+		assert.undefined(context.validator.validate("test", { blockNumber: 100, validatorIndex: 3 }).error);
+		assert.defined(context.validator.validate("test", { blockNumber: 100, validatorIndex: 4 }).error);
+
+		// index 4 is accepted when the path resolves to a height with 53 validators, so the resolved
+		// boundary height - not the current-height fallback - drives the result
+		assert.undefined(context.validator.validate("test", { blockNumber: 1, validatorIndex: 4 }).error);
+	});
+
+	it("keyword limitToRoundValidators - resolves roundValidators from the block number at blockNumberPath", (context) => {
+		context.validator.addSchema({
+			$id: "test",
+			properties: {
+				blockNumber: { type: "integer" },
+				validators: {
+					items: { type: "boolean" },
+					limitToRoundValidators: { blockNumberPath: "blockNumber" },
+					type: "array",
+				},
+			},
+			type: "object",
+		});
+
+		// height 100 -> 4 validators: exactly 4 valid, 5 and 53 rejected
+		assert.undefined(
+			context.validator.validate("test", { blockNumber: 100, validators: new Array(4).fill(true) }).error,
+		);
+		assert.defined(
+			context.validator.validate("test", { blockNumber: 100, validators: new Array(5).fill(true) }).error,
+		);
+		assert.defined(
+			context.validator.validate("test", { blockNumber: 100, validators: new Array(53).fill(true) }).error,
+		);
+
+		// height 1 -> 53 validators: an array of 53 is accepted, proving the path (not the fallback) is used
+		assert.undefined(
+			context.validator.validate("test", { blockNumber: 1, validators: new Array(53).fill(true) }).error,
+		);
+	});
 });
