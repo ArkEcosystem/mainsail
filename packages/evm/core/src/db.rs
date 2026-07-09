@@ -1039,7 +1039,7 @@ impl PersistentDB {
         results: &BTreeMap<B256, (ExecutionResult, u64)>,
     ) -> Result<(), Error> {
         self.with_write_txn(|rwtxn| {
-            if self.is_block_committed(&rwtxn, key.0) {
+            if self.is_block_committed(rwtxn, key.0)? {
                 return Err(Error::State("block already committed".into()));
             }
 
@@ -1270,11 +1270,8 @@ impl PersistentDB {
         })
     }
 
-    pub fn is_block_committed(&self, rtxn: &heed::RoTxn, block_number: u64) -> bool {
-        self.inner
-            .commits
-            .get(rtxn, &block_number)
-            .is_ok_and(|v| v.is_some())
+    pub fn is_block_committed(&self, rtxn: &heed::RoTxn, block_number: u64) -> Result<bool, Error> {
+        Ok(self.inner.commits.get(rtxn, &block_number)?.is_some())
     }
 
     pub fn get_receipt(
@@ -1579,6 +1576,31 @@ mod tests {
             )
             .is_ok()
         );
+    }
+
+    #[test]
+    fn test_is_block_committed_propagates_decode_errors() {
+        let db = create_temp_database();
+
+        // Plant a corrupt row in the commits table (unknown compression tag), simulating
+        // on-disk corruption of an already-committed block.
+        db.with_write_txn(|rwtxn| {
+            db.inner
+                .commits
+                .remap_data_type::<heed::types::Bytes>()
+                .put(rwtxn, &5, &[0xff, 0xff, 0xff])?;
+            Ok(())
+        })
+        .unwrap();
+
+        db.with_read_txn(|rtxn| {
+            // The decode error must surface, not read as "not committed" (which would
+            // disarm the double-commit guard on `total_round`).
+            assert!(db.is_block_committed(rtxn, 5).is_err());
+            assert!(!db.is_block_committed(rtxn, 6).unwrap());
+            Ok(())
+        })
+        .unwrap();
     }
 
     #[test]
