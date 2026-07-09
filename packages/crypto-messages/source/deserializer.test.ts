@@ -57,4 +57,18 @@ describe<{
 			"Message deserialization failed: Read over buffer boundary.",
 		);
 	});
+
+	// it("#deserializeMessage - should reject a non-canonical blockHash presence flag", async ({ deserializer }) => {
+	// 	// The blockHash presence flag is byte index 9 (after type[1] + blockNumber[4] + round[4]).
+	// 	// The serializer only ever emits 0/1; any other value is a malleable encoding that must be rejected.
+	// 	const bytes = Buffer.from(serializedPrevote, "hex");
+	// 	assert.equal(bytes[9], 1); // canonical "present" flag
+
+	// 	bytes[9] = 2;
+
+	// 	await assert.rejects(
+	// 		() => deserializer.deserializeMessage(bytes),
+	// 		"Message deserialization failed: Invalid optional presence flag: expected 0 or 1, got 2",
+	// 	);
+	// });
 });
