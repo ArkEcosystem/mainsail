@@ -126,6 +126,25 @@ describe<{
 		assert.equal(receipt.status, 1);
 	});
 
+	it("process rejects an unknown commit key instead of fabricating a receipt", async ({ instance }) => {
+		await assert.rejects(
+			() =>
+				instance.process({
+					commitKey: { blockNumber: 99n, round: 0n },
+					data: Buffer.alloc(0),
+					from: wallets[0].address,
+					gasLimit: 21_000n,
+					gasPrice: 0n,
+					nonce: 0n,
+					specId: Enums.Evm.SpecId.SHANGHAI,
+					to: wallets[1].address,
+					txHash: randomBytes(32).toString("hex"),
+					value: 0n,
+				}),
+			"unknown commit key",
+		);
+	});
+
 	it("importAccountInfos rejects a negative balance", async ({ instance }) => {
 		await assert.rejects(
 			() =>

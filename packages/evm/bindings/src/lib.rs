@@ -749,10 +749,19 @@ impl EvmInner {
         // a legacy sender — a one-time, migration-era event — so the clone is not a hot path.
         let mut merge_restore: Option<PendingCommit> = None;
 
-        let mut block_context = None;
-        if let Some(mut pending) = self.pending_commits.get_mut(&commit_key) {
-            block_context = Some(pending.block_context.clone());
+        // Without a pending commit there is no block env to execute against and no
+        // state write-back — the tx would run against block 0 and return a plausible
+        // receipt while never entering the block. Fail loudly instead.
+        let Some(mut pending) = self.pending_commits.get_mut(&commit_key) else {
+            return Err(EVMError::Custom(format!(
+                "process called with unknown commit key {:?}; call prepare_next_commit first",
+                commit_key
+            )));
+        };
 
+        let block_context = Some(pending.block_context.clone());
+
+        {
             // Make legacy cold wallet balance available to pending commit if not already present
             if let Some(legacy_address) = tx_ctx.legacy_address {
                 if !pending
