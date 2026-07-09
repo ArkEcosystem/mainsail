@@ -28,8 +28,10 @@ pub(crate) fn convert_string_to_bls_sig(str: String) -> anyhow::Result<BlsSig> {
     )?)
 }
 
-pub(crate) fn convert_hex_to_u256(str: &str) -> U256 {
-    U256::from_le_slice(&hex::decode(&str).expect("valid hex")[..])
+pub(crate) fn convert_hex_to_u256(str: &str) -> anyhow::Result<U256> {
+    let bytes = hex::decode(str)?;
+    U256::try_from_le_slice(&bytes[..])
+        .ok_or_else(|| anyhow::anyhow!("value does not fit in u256: {} bytes", bytes.len()))
 }
 
 pub(crate) fn convert_u256_to_hex(value: U256) -> String {

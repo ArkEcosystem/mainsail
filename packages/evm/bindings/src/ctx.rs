@@ -418,8 +418,10 @@ impl TryFrom<JsTransactionData> for TransactionData {
             index: value.index,
             legacy_second_signature: value.legacy_second_signature,
             v: value.v,
-            r: utils::convert_hex_to_u256(&value.r),
-            s: utils::convert_hex_to_u256(&value.s),
+            r: utils::convert_hex_to_u256(&value.r)
+                .map_err(|err| anyhow::anyhow!("transaction r: {err}"))?,
+            s: utils::convert_hex_to_u256(&value.s)
+                .map_err(|err| anyhow::anyhow!("transaction s: {err}"))?,
         })
     }
 }
