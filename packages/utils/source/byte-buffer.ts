@@ -23,9 +23,7 @@ export class ByteBuffer {
 		}
 
 		if (value < 0 || value > 255) {
-			throw new Error(
-				`The value of "value" is out of range. It must be >= 0 and <= 255. Received ${value}`,
-			);
+			throw new Error(`The value of "value" is out of range. It must be >= 0 and <= 255. Received ${value}`);
 		}
 
 		this.#offset = this.#buffer.writeUInt8(value, this.#offset);
@@ -42,10 +40,8 @@ export class ByteBuffer {
 			throw new Error("value must be a number");
 		}
 
-		if (value < 0 || value > 2**16 - 1) {
-			throw new Error(
-				`The value of "value" is out of range. It must be >= 0 and < 2 ** 16. Received ${value}`,
-			);
+		if (value < 0 || value > 2 ** 16 - 1) {
+			throw new Error(`The value of "value" is out of range. It must be >= 0 and < 2 ** 16. Received ${value}`);
 		}
 
 		this.#offset = this.#buffer.writeUInt16LE(value, this.#offset);
@@ -62,10 +58,8 @@ export class ByteBuffer {
 			throw new Error("value must be a number");
 		}
 
-		if (value < 0 || value > 2**32 - 1) {
-			throw new Error(
-				`The value of "value" is out of range. It must be >= 0 and < 2 ** 32. Received ${value}`,
-			);
+		if (value < 0 || value > 2 ** 32 - 1) {
+			throw new Error(`The value of "value" is out of range. It must be >= 0 and < 2 ** 32. Received ${value}`);
 		}
 
 		this.#offset = this.#buffer.writeUInt32LE(value, this.#offset);
@@ -83,9 +77,7 @@ export class ByteBuffer {
 		}
 
 		if (value < 0 || value > 2 ** 48 - 1) {
-			throw new Error(
-				`The value of "value" is out of range. It must be >= 0 and < 2 ** 48. Received ${value}`,
-			);
+			throw new Error(`The value of "value" is out of range. It must be >= 0 and < 2 ** 48. Received ${value}`);
 		}
 
 		this.#offset = this.#buffer.writeUIntLE(value, this.#offset, 6);
