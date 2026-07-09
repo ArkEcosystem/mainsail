@@ -30,12 +30,14 @@ pub(crate) fn convert_string_to_bls_sig(str: String) -> anyhow::Result<BlsSig> {
 
 pub(crate) fn convert_hex_to_u256(str: &str) -> anyhow::Result<U256> {
     let bytes = hex::decode(str)?;
-    U256::try_from_le_slice(&bytes[..])
-        .ok_or_else(|| anyhow::anyhow!("value does not fit in u256: {} bytes", bytes.len()))
+    if bytes.len() != 32 {
+        anyhow::bail!("expected exactly 32 bytes, got {}", bytes.len());
+    }
+    Ok(U256::from_le_slice(&bytes[..]))
 }
 
 pub(crate) fn convert_u256_to_hex(value: U256) -> String {
-    hex::encode(value.to_le_bytes_vec())
+    hex::encode(value.to_le_bytes::<32>())
 }
 
 pub(crate) fn convert_bigint_to_u64(bigint: BigInt, field: &str) -> anyhow::Result<u64> {

@@ -1,6 +1,6 @@
 import { randomBytes } from "node:crypto";
 
-import { Enums } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { Evm } from "@mainsail/evm";
 import { Application } from "@mainsail/kernel";
@@ -82,6 +82,57 @@ describe<{
 		header.transactionsCount = original;
 		await instance.onCommit(makeUnit(genesisCommit));
 		assert.defined(await instance.getCommitData(0));
+	});
+
+	it("serves byte-identical commits from storage (the block-sync path)", async ({ app, instance }) => {
+		const genesisCommit = await commitGenesis(app, instance);
+
+		const stored = await instance.getCommitData(0);
+		assert.defined(stored);
+
+		const commitFactory = app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
+		const restored = await commitFactory.fromStorage(stored!);
+
+		assert.equal(restored.serialized, genesisCommit.serialized);
+	});
+
+	it("stores and returns transaction r/s verbatim, including leading zeros", async ({ app, instance }) => {
+		const { genesisCommit } = await processGenesis(app, instance);
+		const transaction = genesisCommit.block.transactions[0];
+		assert.defined(transaction);
+
+		const mutable = transaction as unknown as Record<"r" | "s", string>;
+
+		// r/s are always exactly 32 bytes, leading zeros included (the ECDSA signer pads,
+		// and RLP carries them as 32-byte strings). ~1 in 128 transactions has a leading
+		// zero byte in r or s — those bytes must survive the storage round-trip, or the
+		// re-serialized block served to syncing peers differs from the original.
+		const r = "00" + "ab".repeat(31);
+		const s = "00".repeat(24) + "0123456789abcdef";
+		mutable.r = r;
+		mutable.s = s;
+
+		await instance.onCommit(makeUnit(genesisCommit));
+
+		const key = await instance.getTransactionKeyByHash(transaction.hash);
+		assert.defined(key);
+		const data = await instance.getTransactionData(key!);
+		assert.defined(data);
+		assert.equal(data!.r, r);
+		assert.equal(data!.s, s);
+	});
+
+	it("onCommit rejects r/s that are not exactly 32 bytes", async ({ app, instance }) => {
+		const { genesisCommit } = await processGenesis(app, instance);
+		const transaction = genesisCommit.block.transactions[0];
+		assert.defined(transaction);
+
+		const mutable = transaction as unknown as Record<"r", string>;
+
+		// The honest pipeline can never produce these; a doctored payload must not be
+		// silently normalized into different bytes.
+		mutable.r = "ab".repeat(31); // 31 bytes
+		await assert.rejects(() => instance.onCommit(makeUnit(genesisCommit)), "expected exactly 32 bytes");
 	});
 
 	it("constructor throws on an unusable path instead of crashing", () => {
