@@ -158,7 +158,7 @@ describe("writeUint16", ({ each, it, assert }) => {
 
 			assert.throws(() => {
 				byteBuffer.writeUint16(dataset);
-			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			}, `The value of "value" is out of range. It must be >= 0 and < 2 ** 16. Received ${dataset}`);
 			assert.equal(byteBuffer.getResultLength(), 0);
 		},
 		invalidValues,
@@ -205,7 +205,7 @@ describe("writeUint32", ({ each, it, assert }) => {
 
 			assert.throws(() => {
 				byteBuffer.writeUint32(dataset);
-			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			}, `The value of "value" is out of range. It must be >= 0 and < 2 ** 32. Received ${dataset}`);
 			assert.equal(byteBuffer.getResultLength(), 0);
 		},
 		invalidValues,
@@ -252,7 +252,7 @@ describe("writeUint48", ({ each, assert }) => {
 
 			assert.throws(() => {
 				byteBuffer.writeUint48(dataset);
-			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			}, `The value of "value" is out of range. It must be >= 0 and < 2 ** 48. Received ${dataset}`);
 			assert.equal(byteBuffer.getResultLength(), 0);
 		},
 		invalidValues,
@@ -289,14 +289,10 @@ describe("writeUint64", ({ each, it, assert }) => {
 			const buffer = Buffer.alloc(bufferSize);
 
 			const byteBuffer = ByteBuffer.fromBuffer(buffer);
-			const error = `The value of "value" is out of range. It must be >= 0n and < 2n ** 64n. Received ${dataset
-				.toLocaleString()
-				.replace(new RegExp(",", "g"), "_")}n`;
 
-			assert.throws(
-				() => byteBuffer.writeUint64(dataset),
-				(e) => e.message === error,
-			);
+			assert.throws(() => {
+				byteBuffer.writeUint64(dataset);
+			}, `The value of "value" is out of range. It must be >= 0n and < 2n ** 64n. Received ${dataset}`);
 			assert.equal(byteBuffer.getResultLength(), 0);
 		},
 		invalidValues,

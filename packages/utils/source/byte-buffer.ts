@@ -44,7 +44,7 @@ export class ByteBuffer {
 
 		if (value < 0 || value > 2**16 - 1) {
 			throw new Error(
-				`The value of "value" is out of range. It must be >= 0 and <= ${2**16 - 1}. Received ${value}`,
+				`The value of "value" is out of range. It must be >= 0 and < 2 ** 16. Received ${value}`,
 			);
 		}
 
@@ -64,7 +64,7 @@ export class ByteBuffer {
 
 		if (value < 0 || value > 2**32 - 1) {
 			throw new Error(
-				`The value of "value" is out of range. It must be >= 0 and <= ${2**32-1}. Received ${value}`,
+				`The value of "value" is out of range. It must be >= 0 and < 2 ** 32. Received ${value}`,
 			);
 		}
 
@@ -80,7 +80,7 @@ export class ByteBuffer {
 	public writeUint48(value: number): void {
 		if (value < 0 || value > 2 ** 48 - 1) {
 			throw new Error(
-				`The value of "value" is out of range. It must be >= 0 and <= ${2 ** 48 - 1}. Received ${value}`,
+				`The value of "value" is out of range. It must be >= 0 and < 2 ** 48. Received ${value}`,
 			);
 		}
 
@@ -100,7 +100,7 @@ export class ByteBuffer {
 
 		if (value < 0n || value > 2n ** 64n - 1n) {
 			throw new Error(
-				`The value of "value" is out of range. It must be >= 0 and <= ${2n ** 64n - 1n}. Received ${value}`,
+				`The value of "value" is out of range. It must be >= 0n and < 2n ** 64n. Received ${value}`,
 			);
 		}
 
