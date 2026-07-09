@@ -18,8 +18,8 @@ export class ByteBuffer {
 	}
 
 	public writeUint8(value: number): void {
-		if (typeof value !== "number") {
-			throw new Error("value must be a number");
+		if (!Number.isSafeInteger(value)) {
+			throw new Error("value must be a safe integer");
 		}
 
 		if (value < 0 || value > 255) {
@@ -36,8 +36,8 @@ export class ByteBuffer {
 	}
 
 	public writeUint16(value: number): void {
-		if (typeof value !== "number") {
-			throw new Error("value must be a number");
+		if (!Number.isSafeInteger(value)) {
+			throw new Error("value must be a safe integer");
 		}
 
 		if (value < 0 || value > 2 ** 16 - 1) {
@@ -54,8 +54,8 @@ export class ByteBuffer {
 	}
 
 	public writeUint32(value: number): void {
-		if (typeof value !== "number") {
-			throw new Error("value must be a number");
+		if (!Number.isSafeInteger(value)) {
+			throw new Error("value must be a safe integer");
 		}
 
 		if (value < 0 || value > 2 ** 32 - 1) {
@@ -72,8 +72,8 @@ export class ByteBuffer {
 	}
 
 	public writeUint48(value: number): void {
-		if (typeof value !== "number") {
-			throw new Error("value must be a number");
+		if (!Number.isSafeInteger(value)) {
+			throw new Error("value must be a safe integer");
 		}
 
 		if (value < 0 || value > 2 ** 48 - 1) {
@@ -134,7 +134,7 @@ export class ByteBuffer {
 	}
 
 	public writeBytes(value: Buffer): void {
-		if (value instanceof Buffer === false) {
+		if (!Buffer.isBuffer(value)) {
 			throw new Error("value must be a buffer");
 		}
 

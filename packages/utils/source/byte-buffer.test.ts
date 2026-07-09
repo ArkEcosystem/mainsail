@@ -77,7 +77,7 @@ describe("ByteBuffer", ({ it, assert }) => {
 	});
 });
 
-describe("writeUint8", ({ each, it, assert }) => {
+describe("writeUint8", ({ each, assert }) => {
 	const bufferSize = 1;
 	const min = 0;
 	const max = 255;
@@ -117,15 +117,19 @@ describe("writeUint8", ({ each, it, assert }) => {
 		invalidValues,
 	);
 
-	it("should fail when value is not a number", () => {
-		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
+	each(
+		"should fail when value is not a safe integer: ",
+		({ dataset }) => {
+			const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
 
-		assert.throws(() => byteBuffer.writeUint8("1" as any), "value must be a number");
-		assert.equal(byteBuffer.getResultLength(), 0);
-	});
+			assert.throws(() => byteBuffer.writeUint8(dataset as any), "value must be a safe integer");
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		["1", Number.NaN, 1.5, Number.POSITIVE_INFINITY],
+	);
 });
 
-describe("writeUint16", ({ each, it, assert }) => {
+describe("writeUint16", ({ each, assert }) => {
 	const bufferSize = 2;
 	const min = 0;
 	const max = 65_535;
@@ -164,15 +168,19 @@ describe("writeUint16", ({ each, it, assert }) => {
 		invalidValues,
 	);
 
-	it("should fail when value is not a number", () => {
-		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
+	each(
+		"should fail when value is not a safe integer: ",
+		({ dataset }) => {
+			const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
 
-		assert.throws(() => byteBuffer.writeUint16("1" as any), "value must be a number");
-		assert.equal(byteBuffer.getResultLength(), 0);
-	});
+			assert.throws(() => byteBuffer.writeUint16(dataset as any), "value must be a safe integer");
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		["1", Number.NaN, 1.5, Number.POSITIVE_INFINITY],
+	);
 });
 
-describe("writeUint32", ({ each, it, assert }) => {
+describe("writeUint32", ({ each, assert }) => {
 	const bufferSize = 4;
 	const min = 0;
 	const max = 4_294_967_295;
@@ -211,15 +219,19 @@ describe("writeUint32", ({ each, it, assert }) => {
 		invalidValues,
 	);
 
-	it("should fail when value is not a number", () => {
-		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
+	each(
+		"should fail when value is not a safe integer: ",
+		({ dataset }) => {
+			const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
 
-		assert.throws(() => byteBuffer.writeUint32("1" as any), "value must be a number");
-		assert.equal(byteBuffer.getResultLength(), 0);
-	});
+			assert.throws(() => byteBuffer.writeUint32(dataset as any), "value must be a safe integer");
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		["1", Number.NaN, 1.5, Number.POSITIVE_INFINITY],
+	);
 });
 
-describe("writeUint48", ({ each, it, assert }) => {
+describe("writeUint48", ({ each, assert }) => {
 	const bufferSize = 6;
 	const min = 0;
 	const max = 281_474_976_710_655;
@@ -258,12 +270,16 @@ describe("writeUint48", ({ each, it, assert }) => {
 		invalidValues,
 	);
 
-	it("should fail when value is not a number", () => {
-		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
+	each(
+		"should fail when value is not a safe integer: ",
+		({ dataset }) => {
+			const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
 
-		assert.throws(() => byteBuffer.writeUint48("1" as any), "value must be a number");
-		assert.equal(byteBuffer.getResultLength(), 0);
-	});
+			assert.throws(() => byteBuffer.writeUint48(dataset as any), "value must be a safe integer");
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		["1", Number.NaN, 1.5, Number.POSITIVE_INFINITY],
+	);
 });
 
 describe("writeUint64", ({ each, it, assert }) => {
