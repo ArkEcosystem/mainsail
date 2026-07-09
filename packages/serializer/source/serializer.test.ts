@@ -71,7 +71,7 @@ describe<{
 			uint16Value: 0x0203,
 			uint32Value: 0x04050607,
 			uint48Value: 0x010203040506,
-			uint64Value: 123_456_789,
+			uint64Value: 123_456_789n,
 			uint256Value: 12345678901234567890n,
 			bigintValue: 987654321n,
 
