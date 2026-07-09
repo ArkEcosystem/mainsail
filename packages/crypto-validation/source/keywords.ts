@@ -36,6 +36,7 @@ export const makeKeywords = (
 		errors: false,
 		keyword: "bigInt",
 		metaSchema: {
+			additionalProperties: false,
 			properties: {
 				maximum: { type: "integer" },
 				minimum: { type: "integer" },
@@ -74,6 +75,7 @@ export const makeKeywords = (
 		errors: false,
 		keyword: "limitToRoundValidators",
 		metaSchema: {
+			additionalProperties: false,
 			properties: {
 				blockNumberPath: { type: "string" },
 				minimum: { type: "integer" },
@@ -103,6 +105,7 @@ export const makeKeywords = (
 		errors: false,
 		keyword: "isValidatorIndex",
 		metaSchema: {
+			additionalProperties: false,
 			properties: {
 				blockNumberPath: { type: "string" },
 			},

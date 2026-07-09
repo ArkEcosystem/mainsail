@@ -91,6 +91,22 @@ describe<{
 		assert.defined(context.validator.validate("test", BigInt(UINT256_MAX) + 1n).error);
 	});
 
+	it("keyword bigInt should reject a schema with misspelled properties", (context) => {
+		const schema = {
+			$id: "test",
+			bigInt: { minimun: 20 },
+		};
+		context.validator.addSchema(schema);
+
+		// The schema itself is invalid, so validation errors for any data —
+		// including values the misspelled constraint was meant to allow or reject.
+		const { error } = context.validator.validate("test", 25n);
+		assert.defined(error);
+		assert.true(error?.includes("must NOT have additional properties"));
+
+		assert.defined(context.validator.validate("test", 19n).error);
+	});
+
 	it("keyword buffer should be ok", (context) => {
 		const schema = {
 			$id: "test",
@@ -175,6 +191,38 @@ describe<{
 
 		let matrix = new Array(roundValidators + 1).fill(true);
 		assert.defined(context.validator.validate("test", matrix).error);
+	});
+
+	it("keyword limitToRoundValidators - should reject a schema with misspelled properties", (context) => {
+		const schema = {
+			$id: "test",
+			limitToRoundValidators: { minimun: 0 },
+		};
+		context.validator.addSchema(schema);
+
+		const { roundValidators } = context.app
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.getMilestone(1);
+
+		// Even a matrix that satisfies the intended constraint errors out,
+		// because the misspelled property invalidates the schema itself.
+		const { error } = context.validator.validate("test", new Array(roundValidators).fill(true));
+		assert.defined(error);
+		assert.true(error?.includes("must NOT have additional properties"));
+
+		assert.defined(context.validator.validate("test", []).error);
+	});
+
+	it("keyword isValidatorIndex - should reject a schema with misspelled properties", (context) => {
+		const schema = {
+			$id: "test",
+			isValidatorIndex: { blockNumberPat: "x" },
+		};
+		context.validator.addSchema(schema);
+
+		const { error } = context.validator.validate("test", 0);
+		assert.defined(error);
+		assert.true(error?.includes("must NOT have additional properties"));
 	});
 
 	it("keyword isValidatorIndex - should be ok", (context) => {
