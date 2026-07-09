@@ -12,11 +12,11 @@ export const makeKeywords = (
 	limitToRoundValidators: FuncKeywordDefinition;
 } => {
 	const bigInt: FuncKeywordDefinition = {
-		compile: (schema) => (data) => {
-			const minimum = schema.minimum !== undefined ? schema.minimum : 0n;
+		compile: (schema: { minimum?: number; maximum?: number }) => (data) => {
+			const minimum = schema.minimum !== undefined ? BigInt(schema.minimum) : 0n;
 			const maximum =
 				schema.maximum !== undefined
-					? schema.maximum
+					? BigInt(schema.maximum)
 					: BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
 
 			if (typeof data !== "bigint") {
