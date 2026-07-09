@@ -18,6 +18,16 @@ export class ByteBuffer {
 	}
 
 	public writeUint8(value: number): void {
+		if (typeof value !== "number") {
+			throw new Error("value must be a number");
+		}
+
+		if (value < 0 || value > 255) {
+			throw new Error(
+				`The value of "value" is out of range. It must be >= 0 and <= 255. Received ${value}`,
+			);
+		}
+
 		this.#offset = this.#buffer.writeUInt8(value, this.#offset);
 	}
 
@@ -28,6 +38,16 @@ export class ByteBuffer {
 	}
 
 	public writeUint16(value: number): void {
+		if (typeof value !== "number") {
+			throw new Error("value must be a number");
+		}
+
+		if (value < 0 || value > 2**16 - 1) {
+			throw new Error(
+				`The value of "value" is out of range. It must be >= 0 and <= ${2**16 - 1}. Received ${value}`,
+			);
+		}
+
 		this.#offset = this.#buffer.writeUInt16LE(value, this.#offset);
 	}
 
@@ -38,6 +58,16 @@ export class ByteBuffer {
 	}
 
 	public writeUint32(value: number): void {
+		if (typeof value !== "number") {
+			throw new Error("value must be a number");
+		}
+
+		if (value < 0 || value > 2**32 - 1) {
+			throw new Error(
+				`The value of "value" is out of range. It must be >= 0 and <= ${2**32-1}. Received ${value}`,
+			);
+		}
+
 		this.#offset = this.#buffer.writeUInt32LE(value, this.#offset);
 	}
 
@@ -65,7 +95,13 @@ export class ByteBuffer {
 
 	public writeUint64(value: bigint): void {
 		if (typeof value !== "bigint") {
-			value = BigInt(value);
+			throw new Error("value must be a bigint");
+		}
+
+		if (value < 0n || value > 2n ** 64n - 1n) {
+			throw new Error(
+				`The value of "value" is out of range. It must be >= 0 and <= ${2n ** 64n - 1n}. Received ${value}`,
+			);
 		}
 
 		this.#offset = this.#buffer.writeBigUInt64LE(value, this.#offset);
@@ -73,7 +109,11 @@ export class ByteBuffer {
 
 	public writeUint256(value: bigint): void {
 		if (typeof value !== "bigint") {
-			value = BigInt(value);
+			throw new Error("value must be a bigint");
+		}
+
+		if (value < 0n) {
+			throw new Error("value must be non-negative");
 		}
 
 		const bytes = toBytes(value);
