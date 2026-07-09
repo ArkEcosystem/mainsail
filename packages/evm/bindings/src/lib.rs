@@ -61,8 +61,9 @@ pub struct EvmInner {
 }
 
 impl EvmInner {
-    pub fn new(opts: EvmOptions) -> Self {
-        let logger = JsLogger::new(opts.logger_callback).expect("logger ok");
+    pub fn new(opts: EvmOptions) -> anyhow::Result<Self> {
+        let logger = JsLogger::new(opts.logger_callback)
+            .map_err(|err| anyhow::anyhow!("failed to create logger: {err}"))?;
 
         let mut db_opts = PersistentDBOptions::new(opts.path).with_logger(logger.inner());
 
@@ -72,14 +73,15 @@ impl EvmInner {
             }
         }
 
-        let persistent_db = PersistentDB::new(db_opts).expect("path ok");
+        let persistent_db = PersistentDB::new(db_opts)
+            .map_err(|err| anyhow::anyhow!("failed to open EVM database: {err}"))?;
 
-        EvmInner {
+        Ok(EvmInner {
             persistent_db,
             pending_commits: Default::default(),
             snapshot: None,
             logger,
-        }
+        })
     }
 
     pub fn prepare_next_commit(&mut self, ctx: PrepareNextCommitContext) -> Result<()> {
@@ -1341,7 +1343,7 @@ impl JsEvmWrapper {
             .map(|n| Arc::new(Semaphore::new(n as usize)));
 
         Ok(JsEvmWrapper {
-            evm: Arc::new(parking_lot::RwLock::new(EvmInner::new(opts))),
+            evm: Arc::new(parking_lot::RwLock::new(EvmInner::new(opts)?)),
             concurrency,
         })
     }

@@ -1,4 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
+import { Evm } from "@mainsail/evm";
 import { Application } from "@mainsail/kernel";
 import { setGracefulCleanup } from "tmp";
 
@@ -76,5 +77,10 @@ describe<{
 		header.transactionsCount = original;
 		await instance.onCommit(makeUnit(genesisCommit));
 		assert.defined(await instance.getCommitData(0));
+	});
+
+	it("constructor throws on an unusable path instead of crashing", () => {
+		// /dev/null is a file, so create_dir_all fails with ENOTDIR — even when running as root.
+		assert.throws(() => new Evm({ path: "/dev/null/evm" }), "failed to open EVM database");
 	});
 });
