@@ -219,7 +219,7 @@ describe("writeUint32", ({ each, it, assert }) => {
 	});
 });
 
-describe("writeUint48", ({ each, assert }) => {
+describe("writeUint48", ({ each, it, assert }) => {
 	const bufferSize = 6;
 	const min = 0;
 	const max = 281_474_976_710_655;
@@ -257,6 +257,13 @@ describe("writeUint48", ({ each, assert }) => {
 		},
 		invalidValues,
 	);
+
+	it("should fail when value is not a number", () => {
+		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
+
+		assert.throws(() => byteBuffer.writeUint48("1" as any), "value must be a number");
+		assert.equal(byteBuffer.getResultLength(), 0);
+	});
 });
 
 describe("writeUint64", ({ each, it, assert }) => {
@@ -320,6 +327,14 @@ describe("buffer", ({ it, assert }) => {
 		byteBuffer.reset();
 		assert.equal(bufferToCompare.compare(byteBuffer.readBytes(bufferSize)), 0);
 		assert.equal(byteBuffer.getResultLength(), bufferSize);
+	});
+
+	it("should throw when writing a non-buffer value", () => {
+		const buffer = Buffer.alloc(5);
+		const byteBuffer = ByteBuffer.fromBuffer(buffer);
+
+		assert.throws(() => byteBuffer.writeBytes("1" as any), "value must be a buffer");
+		assert.equal(byteBuffer.getResultLength(), 0);
 	});
 
 	it("should throw when writing over boundary", () => {

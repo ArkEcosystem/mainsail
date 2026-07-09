@@ -78,6 +78,10 @@ export class ByteBuffer {
 	}
 
 	public writeUint48(value: number): void {
+		if (typeof value !== "number") {
+			throw new Error("value must be a number");
+		}
+
 		if (value < 0 || value > 2 ** 48 - 1) {
 			throw new Error(
 				`The value of "value" is out of range. It must be >= 0 and < 2 ** 48. Received ${value}`,
@@ -138,6 +142,10 @@ export class ByteBuffer {
 	}
 
 	public writeBytes(value: Buffer): void {
+		if (value instanceof Buffer === false) {
+			throw new Error("value must be a buffer");
+		}
+
 		if (value.length > this.getRemainderLength()) {
 			throw new Error(
 				"Write over buffer boundary. (length: " +
