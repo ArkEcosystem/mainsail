@@ -13,11 +13,10 @@ export const makeKeywords = (
 } => {
 	const bigInt: FuncKeywordDefinition = {
 		compile: (schema: { minimum?: number; maximum?: number }) => (data) => {
-			const minimum = schema.minimum !== undefined ? BigInt(schema.minimum) : 0n;
-			const maximum =
-				schema.maximum !== undefined
-					? BigInt(schema.maximum)
-					: BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+			const minimum = BigInt(schema.minimum ?? 0);
+			const maximum = BigInt(
+				schema.maximum ?? "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+			);
 
 			if (typeof data !== "bigint") {
 				return false;
@@ -63,7 +62,7 @@ export const makeKeywords = (
 
 				const blockNumber = parseBlockNumber(schema.blockNumberPath, parentSchema);
 				const { roundValidators } = configuration.getMilestone(blockNumber);
-				const minimum = schema.minimum !== undefined ? schema.minimum : roundValidators;
+				const minimum = schema.minimum ?? roundValidators;
 
 				if (data.length < minimum || data.length > roundValidators) {
 					return false;
