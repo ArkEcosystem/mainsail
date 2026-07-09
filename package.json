@@ -69,6 +69,7 @@
 		"lerna": "9.0.7",
 		"lint-staged": "17.0.4",
 		"madge": "8.0.0",
+		"monocart-coverage-reports": "2.12.12",
 		"npm-check-updates": "22.2.0",
 		"prettier": "3.8.3",
 		"sort-package-json": "3.6.1",
