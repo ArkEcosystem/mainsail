@@ -3,6 +3,8 @@ import type { FuncKeywordDefinition } from "ajv";
 
 import { parseBlockNumber } from "./parse-block-number.js";
 
+const isInteger = (data: unknown): data is number => Number.isInteger(data);
+
 export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
 ): {
@@ -87,7 +89,7 @@ export const makeKeywords = (
 	const isValidatorIndex: FuncKeywordDefinition = {
 		compile(schema: { blockNumberPath?: string }) {
 			return (data, parentSchema) => {
-				if (!Number.isInteger(data)) {
+				if (!isInteger(data)) {
 					return false;
 				}
 
