@@ -99,7 +99,6 @@
 		"@types/prompts": "2.4.9",
 		"@types/tmp": "0.2.6",
 		"cross-env": "10.1.0",
-		"execa": "9.6.1",
 		"tmp": "0.2.5",
 		"uvu": "0.5.6"
 	},
