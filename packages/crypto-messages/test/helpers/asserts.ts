@@ -1,5 +1,5 @@
 export const assertMessage = (assert, data1, data2) => {
-	const fields = ["blockNumber", "round", "blockHash", "validatorIndex", "signature"];
+	const fields = ["type", "blockNumber", "round", "blockHash", "validatorIndex", "signature"];
 	for (const field of fields) {
 		const v1 = data1[field];
 		const v2 = data2[field];
