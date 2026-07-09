@@ -1470,7 +1470,7 @@ impl JsEvmWrapper {
         let address = utils::create_address_from_string(&address)?;
 
         let block_number = match block_number {
-            Some(block_number) => Some(block_number.get_u64().1),
+            Some(block_number) => Some(utils::convert_bigint_to_u64(block_number, "blockNumber")?),
             None => None,
         };
 
@@ -1545,8 +1545,8 @@ impl JsEvmWrapper {
         offset: BigInt,
         limit: BigInt,
     ) -> Result<PromiseRaw<'env, result::JsGetAccounts>> {
-        let offset = offset.get_u64().1;
-        let limit = limit.get_u64().1;
+        let offset = utils::convert_bigint_to_u64(offset, "offset")?;
+        let limit = utils::convert_bigint_to_u64(limit, "limit")?;
 
         self.read(
             env,
@@ -1588,8 +1588,8 @@ impl JsEvmWrapper {
         offset: BigInt,
         limit: BigInt,
     ) -> Result<PromiseRaw<'env, result::JsGetLegacyColdWallets>> {
-        let offset = offset.get_u64().1;
-        let limit = limit.get_u64().1;
+        let offset = utils::convert_bigint_to_u64(offset, "offset")?;
+        let limit = utils::convert_bigint_to_u64(limit, "limit")?;
 
         self.read(
             env,
@@ -1605,8 +1605,8 @@ impl JsEvmWrapper {
         offset: BigInt,
         limit: BigInt,
     ) -> Result<PromiseRaw<'env, result::JsGetReceipts>> {
-        let offset = offset.get_u64().1;
-        let limit = limit.get_u64().1;
+        let offset = utils::convert_bigint_to_u64(offset, "offset")?;
+        let limit = utils::convert_bigint_to_u64(limit, "limit")?;
 
         self.read(
             env,
@@ -1621,7 +1621,7 @@ impl JsEvmWrapper {
         env: &'env Env,
         block_number: BigInt,
     ) -> Result<PromiseRaw<'env, HashMap<String, result::JsTransactionReceipt>>> {
-        let block_number = block_number.get_u64().1;
+        let block_number = utils::convert_bigint_to_u64(block_number, "blockNumber")?;
 
         self.read(
             env,
@@ -1642,8 +1642,8 @@ impl JsEvmWrapper {
         from_block_number: BigInt,
         to_block_number: BigInt,
     ) -> Result<PromiseRaw<'env, result::JsGetReceipts>> {
-        let from_block_number = from_block_number.get_u64().1;
-        let to_block_number = to_block_number.get_u64().1;
+        let from_block_number = utils::convert_bigint_to_u64(from_block_number, "fromBlockNumber")?;
+        let to_block_number = utils::convert_bigint_to_u64(to_block_number, "toBlockNumber")?;
 
         self.read(
             env,
@@ -1659,7 +1659,7 @@ impl JsEvmWrapper {
         block_number: BigInt,
         tx_hash: String,
     ) -> Result<PromiseRaw<'env, result::JsGetReceipt>> {
-        let block_number = block_number.get_u64().1;
+        let block_number = utils::convert_bigint_to_u64(block_number, "blockNumber")?;
         let tx_hash = utils::convert_string_to_b256(tx_hash)?;
 
         self.read(
@@ -1678,7 +1678,7 @@ impl JsEvmWrapper {
     ) -> Result<PromiseRaw<'env, String>> {
         let address = utils::create_address_from_string(&address)?;
         let block_number = match block_number {
-            Some(block_number) => Some(block_number.get_u64().1),
+            Some(block_number) => Some(utils::convert_bigint_to_u64(block_number, "blockNumber")?),
             None => None,
         };
 
@@ -1697,7 +1697,7 @@ impl JsEvmWrapper {
         slot: BigInt,
     ) -> Result<PromiseRaw<'env, String>> {
         let address = utils::create_address_from_string(&address)?;
-        let slot = utils::convert_bigint_to_u256(slot)?;
+        let slot = utils::convert_bigint_to_u256(slot, "slot")?;
 
         self.read(
             env,
@@ -1787,7 +1787,7 @@ impl JsEvmWrapper {
         env: &'env Env,
         block_number: BigInt,
     ) -> Result<PromiseRaw<'env, Option<JsBlockHeaderData>>> {
-        let block_number = block_number.get_u64().1;
+        let block_number = utils::convert_bigint_to_u64(block_number, "blockNumber")?;
 
         self.read(
             env,
@@ -1827,7 +1827,7 @@ impl JsEvmWrapper {
         env: &'env Env,
         block_number: BigInt,
     ) -> Result<PromiseRaw<'env, Option<JsCommitData>>> {
-        let block_number = block_number.get_u64().1;
+        let block_number = utils::convert_bigint_to_u64(block_number, "blockNumber")?;
 
         self.read(
             env,
@@ -1849,9 +1849,9 @@ impl JsEvmWrapper {
         to_block_number: BigInt,
         max_bytes: BigInt,
     ) -> Result<PromiseRaw<'env, Vec<JsCommitData>>> {
-        let from_block_number = from_block_number.get_u64().1;
-        let to_block_number = to_block_number.get_u64().1;
-        let max_bytes = max_bytes.get_u64().1;
+        let from_block_number = utils::convert_bigint_to_u64(from_block_number, "fromBlockNumber")?;
+        let to_block_number = utils::convert_bigint_to_u64(to_block_number, "toBlockNumber")?;
+        let max_bytes = utils::convert_bigint_to_u64(max_bytes, "maxBytes")?;
 
         self.read(
             env,
