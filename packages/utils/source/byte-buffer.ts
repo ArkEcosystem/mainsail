@@ -107,6 +107,12 @@ export class ByteBuffer {
 		this.#offset = this.#buffer.writeBigUInt64LE(value, this.#offset);
 	}
 
+	public readUint64(): bigint {
+		const value = this.#buffer.readBigUInt64LE(this.#offset);
+		this.#offset += 8;
+		return value;
+	}
+
 	public writeUint256(value: bigint): void {
 		if (typeof value !== "bigint") {
 			throw new Error("value must be a bigint");
@@ -123,12 +129,6 @@ export class ByteBuffer {
 
 		const padded = padBytes(bytes, { size: 32 });
 		this.writeBytes(Buffer.from(padded));
-	}
-
-	public readUint64(): bigint {
-		const value = this.#buffer.readBigUInt64LE(this.#offset);
-		this.#offset += 8;
-		return value;
 	}
 
 	public readUint256(): bigint {
