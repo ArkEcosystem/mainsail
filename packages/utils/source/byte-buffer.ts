@@ -196,7 +196,7 @@ export class ByteBuffer {
 	}
 
 	public reset(): void {
-		this.#offset = this.#marker ?? 0;
+		this.#offset = this.#marker;
 	}
 
 	public skip(length: number): void {
