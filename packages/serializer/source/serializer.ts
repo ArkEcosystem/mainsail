@@ -262,6 +262,11 @@ export class Serializer implements Contracts.Serializer.Serializer {
 			if (isPresent === 0) {
 				return undefined;
 			}
+			// Enforce canonical encoding: the writer only ever writes 0 or 1, so any other
+			// value is a non-canonical (malleable) presence flag and must be rejected.
+			if (isPresent !== 1) {
+				throw new Error(`Invalid optional presence flag: expected 0 or 1, got ${isPresent}`);
+			}
 		}
 		return read();
 	};
