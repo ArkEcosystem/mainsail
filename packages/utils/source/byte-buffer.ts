@@ -208,6 +208,6 @@ export class ByteBuffer {
 	}
 
 	public toBuffer(): Buffer {
-		return Buffer.from(this.#buffer.buffer);
+		return Buffer.from(this.#buffer);
 	}
 }
