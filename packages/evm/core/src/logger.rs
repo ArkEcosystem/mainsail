@@ -1,20 +1,25 @@
 use std::sync::mpsc::Sender;
 
+pub enum LoggerCommand {
+    Log(LogLevel, String),
+    Shutdown,
+}
+
 #[derive(Default, Clone)]
 pub struct Logger {
     // A channel is optional and if not present, log output is written via println!
-    pub sender: Option<Sender<(LogLevel, String)>>,
+    pub sender: Option<Sender<LoggerCommand>>,
 }
 
 impl Logger {
-    pub fn new(sender: Option<Sender<(LogLevel, String)>>) -> Self {
+    pub fn new(sender: Option<Sender<LoggerCommand>>) -> Self {
         Self { sender }
     }
 
     pub fn log(&self, level: LogLevel, message: String) {
         match &self.sender {
             Some(sender) => {
-                if let Err(err) = sender.send((level, message)) {
+                if let Err(err) = sender.send(LoggerCommand::Log(level, message)) {
                     eprintln!("failed to send log message: {}", err);
                 }
             }
@@ -51,7 +56,7 @@ impl std::fmt::Display for LogLevel {
 mod tests {
     use std::{sync::mpsc::channel, time::Duration};
 
-    use crate::logger::{LogLevel, Logger};
+    use crate::logger::{LogLevel, Logger, LoggerCommand};
 
     #[test]
     fn test_logger_sends_log_message_through_channel() {
@@ -60,9 +65,13 @@ mod tests {
 
         logger.log(LogLevel::Info, "hello world".to_string());
 
-        let (level, message) = rx.recv_timeout(Duration::from_millis(100)).unwrap();
-        assert_eq!(level.to_string(), "INFO");
-        assert_eq!(message, "hello world");
+        match rx.recv_timeout(Duration::from_millis(100)).unwrap() {
+            LoggerCommand::Log(level, message) => {
+                assert_eq!(level.to_string(), "INFO");
+                assert_eq!(message, "hello world");
+            }
+            LoggerCommand::Shutdown => panic!("expected a log entry"),
+        }
     }
 
     #[test]

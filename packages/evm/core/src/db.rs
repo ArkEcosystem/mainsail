@@ -44,7 +44,7 @@ impl heed::BytesDecode<'_> for AddressWrapper {
     type DItem = AddressWrapper;
 
     fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
-        Ok(AddressWrapper(Address::from_slice(bytes)))
+        Ok(AddressWrapper(Address::try_from(bytes)?))
     }
 }
 
@@ -62,7 +62,7 @@ impl heed::BytesDecode<'_> for LegacyAddressWrapper {
     type DItem = LegacyAddressWrapper;
 
     fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
-        Ok(LegacyAddressWrapper(LegacyAddress::from_slice(bytes)))
+        Ok(LegacyAddressWrapper(LegacyAddress::try_from(bytes)?))
     }
 }
 
@@ -166,6 +166,9 @@ impl heed::BytesDecode<'_> for StorageEntryWrapper {
     type DItem = StorageEntryWrapper;
 
     fn bytes_decode(bytes: &'_ [u8]) -> Result<Self::DItem, heed::BoxedError> {
+        if bytes.len() != 64 {
+            return Err(format!("StorageEntry: expected 64 bytes, got {}", bytes.len()).into());
+        }
         let a = U256::from_le_slice(&bytes[0..32]);
         let b = U256::from_le_slice(&bytes[32..]);
         Ok(StorageEntryWrapper(a, b))
@@ -178,6 +181,13 @@ impl Comparator for StorageEntryDupSortCmp {
     fn compare(a: &[u8], b: &[u8]) -> Ordering {
         // The compared values are tuples of `StorageEntry` and sorted by the first tuple value (=32 byte)
         // which corresponds to the storage slot location. The second half of the tuple is ignored.
+        //
+        // Runs inside LMDB's C callback, where unwinding is undefined behavior — a corrupt
+        // (short) entry must not panic. Falling back to a whole-slice compare keeps the
+        // order total and deterministic; the decode path reports the corruption.
+        if a.len() < 32 || b.len() < 32 {
+            return a.cmp(b);
+        }
         a[..32].cmp(&b[..32])
     }
 }
@@ -378,7 +388,8 @@ static ENV: LazyLock<RwLock<HashMap<PathBuf, (heed::Env, Arc<RwLock<()>>)>>> =
     LazyLock::new(RwLock::default);
 
 impl PersistentDB {
-    const MAX_DBS: u32 = 12;
+    // 12 base tables + the optional accounts-history table.
+    const MAX_DBS: u32 = 13;
 
     // WithTls binds one reader slot per *thread* for that thread's lifetime, and the table is shared
     // (lock file) across every EVM instance in this process AND every other process on this env
@@ -397,12 +408,7 @@ impl PersistentDB {
             None => {
                 let mut env_builder = EnvOpenOptions::new();
 
-                let mut max_dbs = Self::MAX_DBS;
-                if opts.history_size.is_some() {
-                    max_dbs += 1;
-                }
-
-                env_builder.max_dbs(max_dbs);
+                env_builder.max_dbs(Self::MAX_DBS);
                 env_builder.max_readers(opts.max_readers.unwrap_or(Self::MAX_READERS));
                 env_builder.map_size(1 * MAP_SIZE_UNIT);
                 unsafe { env_builder.flags(EnvFlags::NO_SUB_DIR) };
@@ -675,10 +681,11 @@ impl PersistentDB {
         from_block_number: u64,
         to_block_number: u64,
     ) -> Result<Vec<(u64, Vec<(B256, TxReceipt)>)>, Error> {
-        assert!(
-            from_block_number <= to_block_number,
-            "from_block_number ({from_block_number}) must be <= to_block_number ({to_block_number})"
-        );
+        if from_block_number > to_block_number {
+            return Err(Error::State(format!(
+                "from_block_number ({from_block_number}) must be <= to_block_number ({to_block_number})"
+            )));
+        }
 
         self.with_read_txn(|tx_env| {
             let inner = &self.inner;
@@ -702,11 +709,14 @@ impl PersistentDB {
         to_block_number: u64,
         max_bytes: u64,
     ) -> Result<Vec<(ProofData, BlockHeaderData, Vec<TransactionData>)>, Error> {
-        assert!(
-            from_block_number <= to_block_number,
-            "from_block_number ({from_block_number}) must be <= to_block_number ({to_block_number})"
-        );
-        assert!(max_bytes > 0, "max_bytes ({max_bytes}) must be > 0");
+        if from_block_number > to_block_number {
+            return Err(Error::State(format!(
+                "from_block_number ({from_block_number}) must be <= to_block_number ({to_block_number})"
+            )));
+        }
+        if max_bytes == 0 {
+            return Err(Error::State("max_bytes must be > 0".into()));
+        }
 
         // Per-commit fixed cost charged against the budget on top of the block's transaction payload,
         // so that a long run of (near-)empty blocks is still bounded by block count, not just bytes.
@@ -846,7 +856,11 @@ impl PersistentDB {
         F: Fn(Option<I>) -> Result<Option<T>, Error>,
     {
         let limit = limit as usize;
-        let mut items = Vec::with_capacity(limit);
+        if limit == 0 {
+            return Ok((None, Vec::new()));
+        }
+
+        let mut items = Vec::with_capacity(limit.min(1024));
 
         loop {
             let item = map(iter.next())?;
@@ -1253,7 +1267,7 @@ impl PersistentDB {
                 // Update state
                 let total_round_key = StaticStringWrapper("total_round");
                 let current_total_round =
-                    read_total_round(inner.state.get(rwtxn, &total_round_key)?);
+                    read_total_round(inner.state.get(rwtxn, &total_round_key)?)?;
 
                 inner.state.put(
                     rwtxn,
@@ -1304,7 +1318,7 @@ impl PersistentDB {
             let inner = &self.inner;
 
             let total_round =
-                read_total_round(inner.state.get(rtxn, &StaticStringWrapper("total_round"))?);
+                read_total_round(inner.state.get(rtxn, &StaticStringWrapper("total_round"))?)?;
 
             let block_number = match inner.blocks.last(rtxn)? {
                 Some((block_number, _)) => block_number,
@@ -1472,15 +1486,18 @@ impl PersistentDB {
     }
 }
 
-fn read_total_round(item: Option<Bytes>) -> u64 {
+fn read_total_round(item: Option<Bytes>) -> Result<u64, Error> {
     match item {
         Some(total_round) => {
-            assert_eq!(total_round.len(), 8);
-            let mut buffer = [0u8; 8];
-            buffer[..8].copy_from_slice(&total_round[..8]);
-            u64::from_le_bytes(buffer)
+            let buffer: [u8; 8] = total_round[..].try_into().map_err(|_| {
+                Error::State(format!(
+                    "total_round: expected 8 bytes, got {}",
+                    total_round.len()
+                ))
+            })?;
+            Ok(u64::from_le_bytes(buffer))
         }
-        None => 0,
+        None => Ok(0),
     }
 }
 
@@ -1859,6 +1876,72 @@ mod tests {
         // - index 2 remains unchanged
         account_storage = db.storage(address, U256::from(2)).expect("storage");
         assert_eq!(account_storage, U256::from(2));
+    }
+
+    #[test]
+    fn test_range_guards_error_instead_of_panicking() {
+        let db = create_temp_database();
+
+        assert!(db.get_receipts_by_block_range(5, 1).is_err());
+        assert!(db.get_commits_by_block_range(5, 1, 100).is_err());
+        assert!(db.get_commits_by_block_range(1, 5, 0).is_err());
+    }
+
+    #[test]
+    fn test_get_items_zero_limit_returns_nothing() {
+        let db = create_temp_database();
+
+        // A zero limit used to disable the length break and read the whole table.
+        let (next, accounts) = db.get_accounts(0, 0).expect("ok");
+        assert!(next.is_none());
+        assert!(accounts.is_empty());
+    }
+
+    #[test]
+    fn test_decoders_error_on_malformed_bytes() {
+        assert!(AddressWrapper::bytes_decode(&[0u8; 5]).is_err());
+        assert!(AddressWrapper::bytes_decode(&[0u8; 20]).is_ok());
+        assert!(LegacyAddressWrapper::bytes_decode(&[0u8; 5]).is_err());
+        assert!(LegacyAddressWrapper::bytes_decode(&[0u8; 21]).is_ok());
+        assert!(StorageEntryWrapper::bytes_decode(&[0u8; 10]).is_err());
+        assert!(StorageEntryWrapper::bytes_decode(&[0u8; 64]).is_ok());
+
+        // The dup-sort comparator runs inside LMDB's C callback where unwinding is UB:
+        // it must stay total and panic-free even for corrupt (short) entries, and a
+        // short entry must order consistently against well-formed 64-byte entries
+        // (equivalent to a truncate-to-32 lexicographic compare, shorter-is-less).
+        use crate::db::StorageEntryDupSortCmp;
+        use heed::Comparator;
+        use std::cmp::Ordering;
+        assert_eq!(StorageEntryDupSortCmp::compare(&[1], &[1]), Ordering::Equal);
+        assert_eq!(StorageEntryDupSortCmp::compare(&[0], &[1]), Ordering::Less);
+
+        let valid = [1u8; 64];
+        assert_eq!(
+            StorageEntryDupSortCmp::compare(&[1], &valid),
+            Ordering::Less
+        );
+        assert_eq!(
+            StorageEntryDupSortCmp::compare(&valid, &[1]),
+            Ordering::Greater
+        );
+        assert_eq!(
+            StorageEntryDupSortCmp::compare(&[2], &valid),
+            Ordering::Greater
+        );
+    }
+
+    #[test]
+    fn test_read_total_round_errors_on_malformed_value() {
+        use crate::db::read_total_round;
+
+        assert_eq!(read_total_round(None).expect("ok"), 0);
+        assert_eq!(
+            read_total_round(Some(Bytes::from_iter(42u64.to_le_bytes()))).expect("ok"),
+            42
+        );
+        // A value carried over in a wrong format must error, not abort mid-commit.
+        assert!(read_total_round(Some(Bytes::from_iter([1u8, 2, 3]))).is_err());
     }
 
     #[test]
@@ -2452,19 +2535,8 @@ mod tests {
         assert!(commits.is_empty());
     }
 
-    #[test]
-    #[should_panic(expected = "must be <= to_block_number")]
-    fn test_get_commits_by_block_range_panics_when_from_exceeds_to() {
-        let db = create_temp_database();
-        let _ = db.get_commits_by_block_range(3, 1, u64::MAX);
-    }
-
-    #[test]
-    #[should_panic(expected = "must be > 0")]
-    fn test_get_commits_by_block_range_panics_when_max_bytes_0() {
-        let db = create_temp_database();
-        let _ = db.get_commits_by_block_range(1, 3, 0);
-    }
+    // Invalid ranges now return errors instead of panicking;
+    // see `test_range_guards_error_instead_of_panicking`.
 
     #[test]
     fn test_get_commits_by_block_range_respects_max_bytes() {
@@ -2865,13 +2937,6 @@ mod tests {
         assert_eq!(receipts.len(), 2);
         assert_eq!(receipts[0].0, 2);
         assert_eq!(receipts[1].0, 3);
-    }
-
-    #[test]
-    #[should_panic(expected = "must be <= to_block_number")]
-    fn test_get_receipts_by_block_range_panics_when_from_exceeds_to() {
-        let db = create_temp_database();
-        let _ = db.get_receipts_by_block_range(3, 1);
     }
 
     #[test]

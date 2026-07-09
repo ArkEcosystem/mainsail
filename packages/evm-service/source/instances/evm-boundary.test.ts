@@ -168,7 +168,7 @@ describe<{
 		] as const) {
 			await assert.rejects(
 				() => instance.process({ ...base, [field]: bad, txHash: randomBytes(32).toString("hex") }),
-				field,
+				`${field}: expected an unsigned bigint`,
 			);
 		}
 
@@ -208,18 +208,15 @@ describe<{
 
 	it("rejects stale or unknown commit keys and bad sequencing with clean errors", async ({ app, instance }) => {
 		const unknownKey = { blockNumber: 9n, round: 0n };
+		const updateContext = {
+			blockReward: 0n,
+			commitKey: unknownKey,
+			specId: Enums.Evm.SpecId.SHANGHAI,
+			timestamp: 0n,
+			validatorAddress: zeroAddress,
+		};
 
-		await assert.rejects(
-			() =>
-				instance.updateRewardsAndVotes({
-					blockReward: 0n,
-					commitKey: unknownKey,
-					specId: Enums.Evm.SpecId.SHANGHAI,
-					timestamp: 0n,
-					validatorAddress: zeroAddress,
-				}),
-			"genesis not initialized",
-		);
+		await assert.rejects(() => instance.updateRewardsAndVotes(updateContext), "genesis not initialized");
 
 		await assert.rejects(
 			() =>
@@ -243,8 +240,16 @@ describe<{
 
 		await processGenesis(app, instance);
 
+		// With genesis in place the unknown key is what fails.
+		await assert.rejects(
+			() => instance.updateRewardsAndVotes(updateContext),
+			"update_rewards_and_votes is missing commit key",
+		);
+
 		await assert.rejects(() => instance.stateRoot(unknownKey, zeroHash), "state_root is missing commit key");
 		await assert.rejects(() => instance.logsBloom(unknownKey), "logs_bloom is missing commit key");
+
+		await assert.rejects(() => instance.snapshot(unknownKey), "snapshot is missing commit key");
 
 		const fresh = `0x${randomBytes(20).toString("hex")}`;
 		await assert.rejects(
@@ -367,19 +372,21 @@ describe<{
 			blockContext: { commitKey, gasLimit: 10_000_000n, timestamp: 12_345n, validatorAddress: zeroAddress },
 		});
 
-		await assert.rejects(() =>
-			instance.process({
-				commitKey,
-				data: Buffer.alloc(0),
-				from: wallets[1].address,
-				gasLimit: 21_000n,
-				gasPrice: 0n,
-				nonce: 0n,
-				specId: Enums.Evm.SpecId.SHANGHAI,
-				to: wallets[0].address,
-				txHash: randomBytes(32).toString("hex"),
-				value: reward,
-			}),
+		await assert.rejects(
+			() =>
+				instance.process({
+					commitKey,
+					data: Buffer.alloc(0),
+					from: wallets[1].address,
+					gasLimit: 21_000n,
+					gasPrice: 0n,
+					nonce: 0n,
+					specId: Enums.Evm.SpecId.SHANGHAI,
+					to: wallets[0].address,
+					txHash: randomBytes(32).toString("hex"),
+					value: reward,
+				}),
+			"lack of funds",
 		);
 	});
 });

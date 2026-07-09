@@ -31,7 +31,6 @@ pub struct JsTransactionContext {
     pub nonce: BigInt,
     pub data: Buffer,
     pub tx_hash: String,
-    pub index: Option<u32>,
     pub commit_key: JsCommitKey,
     pub spec_id: String,
 }

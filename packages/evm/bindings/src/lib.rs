@@ -129,6 +129,11 @@ impl EvmInner {
                     output: r.into_output(),
                 }
             }
+            Err(EVMError::Database(err)) => {
+                return Err(napi::Error::from_reason(format!(
+                    "view call failed reading state: {err:?}"
+                )));
+            }
             Err(err) => {
                 self.logger.log(
                     LogLevel::Warn,
@@ -1085,15 +1090,19 @@ impl EvmInner {
     }
 
     pub fn snapshot(&mut self, commit_key: CommitKey) -> std::result::Result<(), EVMError<String>> {
+        let Some(pending) = self.pending_commits.get(&commit_key) else {
+            return Err(EVMError::Custom(format!(
+                "snapshot is missing commit key {:?}",
+                commit_key
+            )));
+        };
+
         self.logger.inner().log(
             LogLevel::Debug,
             format!("taking snapshot of commit {:?}", commit_key),
         );
 
-        let _ = std::mem::replace(
-            &mut self.snapshot,
-            self.pending_commits.get(&commit_key).cloned(),
-        );
+        self.snapshot.replace(pending.clone());
 
         Ok(())
     }
@@ -1104,7 +1113,9 @@ impl EvmInner {
             format!("rolling back to commit {:?}", commit_key),
         );
 
-        match self.snapshot.take() {
+        // Validate before consuming: a failed rollback must not destroy the snapshot,
+        // or a retry gets "rollback to non-existent commit" instead of the real error.
+        match self.snapshot.as_ref() {
             Some(commit) if commit.key == commit_key => {
                 if !self.pending_commits.contains_key(&commit_key) {
                     return Err(EVMError::Custom(format!(
@@ -1112,6 +1123,7 @@ impl EvmInner {
                         commit_key
                     )));
                 }
+                let commit = self.snapshot.take().expect("checked above");
                 self.pending_commits.insert(commit_key, commit);
 
                 Ok(())
