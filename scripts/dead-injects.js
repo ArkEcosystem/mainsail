@@ -1,5 +1,7 @@
 import chalk from "chalk";
-import ts from "typescript";
+// The `typescript` package (7+, native compiler) no longer ships the JS compiler
+// API this script is built on; `typescript-legacy` aliases the last JS-based line.
+import ts from "typescript-legacy";
 import { readdirSync, statSync, readFileSync } from "fs";
 import { join, relative, resolve } from "path";
 
