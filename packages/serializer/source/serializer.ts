@@ -142,7 +142,7 @@ export class Serializer implements Contracts.Serializer.Serializer {
 			throw new NotImplemented(this.constructor.name, schema.type);
 		}
 
-		return result.toBuffer();
+		return result.getResult();
 	}
 
 	public async deserialize<T>(
@@ -172,12 +172,12 @@ export class Serializer implements Contracts.Serializer.Serializer {
 			}
 
 			if (schema.type === "uint64") {
-				target[property] = this.#readOptional<number>(schema, source, () => +source.readUint64().toString());
+				target[property] = this.#readOptional<bigint>(schema, source, () => source.readUint64());
 				continue;
 			}
 
 			if (schema.type === "uint256") {
-				target[property] = this.#readOptional<bigint>(schema, source, () => BigInt(source.readUint256()));
+				target[property] = this.#readOptional<bigint>(schema, source, () => source.readUint256());
 				continue;
 			}
 
