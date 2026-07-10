@@ -137,7 +137,6 @@ describe<{
 
 			// genesis sets the deployer/validator contract addresses updateRewardsAndVotes needs.
 			await instance.initializeGenesis({
-				timestamp: 0n,
 				account: proposer,
 				deployerAccount: "0x0000000000000000000000000000000000000001",
 				initialBlockNumber: 0n,
@@ -188,7 +187,6 @@ describe<{
 			const commitKey = { blockNumber: 0n, round: 0n };
 
 			await instance.initializeGenesis({
-				timestamp: 0n,
 				account: proposer,
 				deployerAccount: "0x0000000000000000000000000000000000000001",
 				initialBlockNumber: 0n,

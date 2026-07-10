@@ -45,13 +45,16 @@ export class Deployer implements Contracts.EvmConsensus.Deployer {
 	#needsCommit = false;
 
 	public async deploy(): Promise<void> {
+		const cryptoConfig = this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
+
+		const genesisBlock = cryptoConfig.getGenesisCommit().block;
 		const milestone = this.configuration.getMilestone();
 
 		await this.evm.prepareNextCommit({
 			blockContext: {
 				commitKey: this.#getCommitKey(),
 				gasLimit: BigInt(milestone.block.maxGasLimit),
-				timestamp: BigInt(this.genesisBlockInfo.timestamp),
+				timestamp: BigInt(genesisBlock.timestamp),
 				validatorAddress: this.deployerAddress,
 			},
 		});

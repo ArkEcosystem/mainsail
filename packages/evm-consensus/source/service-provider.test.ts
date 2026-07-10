@@ -71,7 +71,6 @@ describe<{
 			deployerAccount: DEPLOYER,
 			initialBlockNumber: 0n,
 			initialSupply: 800n, // 500 + 300, excluding the transaction not sent by the generator
-			timestamp: 1000n,
 			usernameContract: getCreateAddress({ from: DEPLOYER, nonce: 3n }),
 			validatorContract: getCreateAddress({ from: DEPLOYER, nonce: 1n }),
 		});

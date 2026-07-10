@@ -19,6 +19,7 @@ import {
 	WalletGenerator,
 } from "./generators/index.js";
 import { Identifiers as InternalIdentifiers } from "./identifiers.js";
+import dayjs from "dayjs";
 
 @injectable()
 export class ConfigurationGenerator {
@@ -128,6 +129,7 @@ export class ConfigurationGenerator {
 								// @ts-ignore
 								block: {
 									number: internalOptions.initialBlockNumber,
+									timestamp: dayjs(internalOptions.epoch).valueOf(),
 								},
 							},
 							milestones,

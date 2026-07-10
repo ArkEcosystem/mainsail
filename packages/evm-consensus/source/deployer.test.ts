@@ -40,6 +40,11 @@ describe<{
 		context.events = { dispatch: async () => {} };
 		context.logger = { info: () => {} };
 		context.configuration = {
+			getGenesisCommit: () => ({
+				block: {
+					timestamp: 123n,
+				},
+			}),
 			getMilestone: () => ({
 				block: { maxGasLimit: 30_000_000 },
 				evmSpec: "shanghai",
@@ -52,7 +57,6 @@ describe<{
 			deployerAccount: DEPLOYER_ADDRESS,
 			initialBlockNumber: 0n,
 			initialSupply: 1000n,
-			timestamp: 123n,
 			usernameContract: usernames,
 			validatorContract: consensus,
 		};
