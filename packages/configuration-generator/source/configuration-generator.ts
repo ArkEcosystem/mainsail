@@ -3,6 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Application } from "@mainsail/kernel";
+import dayjs from "dayjs";
 import { ensureDirSync, pathExistsSync } from "fs-extra/esm";
 import { join } from "path";
 
@@ -19,7 +20,6 @@ import {
 	WalletGenerator,
 } from "./generators/index.js";
 import { Identifiers as InternalIdentifiers } from "./identifiers.js";
-import dayjs from "dayjs";
 
 @injectable()
 export class ConfigurationGenerator {
