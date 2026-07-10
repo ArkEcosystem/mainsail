@@ -16,7 +16,7 @@
 		"release": "pnpm publish --access public",
 		"release:prepare": "napi prepublish -t pnpm --skip-optional-publish --no-gh-release",
 		"test": "cargo test --release",
-		"test:coverage": "mkdir -p coverage && cargo llvm-cov --lcov --output-path coverage/lcov.info --remap-path-prefix",
+		"test:coverage": "bash ./scripts/coverage.sh",
 		"test:coverage:html": "mkdir -p coverage && cargo llvm-cov --html --output-dir coverage/ --remap-path-prefix",
 		"version": "napi version"
 	},
