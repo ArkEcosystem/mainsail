@@ -350,8 +350,8 @@ describe<{
 					timestamp: 12_345n,
 					validatorAddress: wallets[1].address,
 				}),
-			// The reverted call surfaces as a rejection carrying the Rust panic message.
-			"calculate_round_validators unsuccessful",
+			// A reverted system call surfaces as a rejection carrying the EVM error, not a panic.
+			"calculate_round_validators reverted",
 		);
 
 		const reward = 1_000_000n;
@@ -364,7 +364,7 @@ describe<{
 					timestamp: 12_345n,
 					validatorAddress: wallets[1].address,
 				}),
-			"vote_update unsuccessful",
+			"vote_update reverted",
 		);
 
 		// The failed block is never reused: the processor re-enters via prepareNextCommit,

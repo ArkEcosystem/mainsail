@@ -272,10 +272,11 @@ impl EvmInner {
                     ),
                 );
 
-                assert!(
-                    receipt.is_success(),
-                    "calculate_round_validators unsuccessful"
-                );
+                if !receipt.is_success() {
+                    return Err(EVMError::Custom(format!(
+                        "calculate_round_validators reverted: {receipt:?}"
+                    )));
+                }
                 Ok(())
             }
             Err(err) => Err(EVMError::Database(
@@ -353,7 +354,11 @@ impl EvmInner {
                             ),
                         );
 
-                        assert!(receipt.is_success(), "vote_update unsuccessful");
+                        if !receipt.is_success() {
+                            return Err(EVMError::Custom(format!(
+                                "vote_update reverted: {receipt:?}"
+                            )));
+                        }
                         Ok(())
                     }
                     Err(err) => Err(EVMError::Database(
