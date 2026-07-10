@@ -2,9 +2,16 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { serializeTransaction } from "viem";
+import { keccak256, serializeTransaction } from "viem";
 import { Serialized, Transactions } from "../test/fixtures/index";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
+import { TransactionBuilder } from "./builder.js";
+
+const wallet = {
+	address: "0xa92D8ba95B46bcFD0177E203C515885E91DF03F4",
+	privateKey: "9be3cd2b0efa7b4d82d68496cf95f0a6c69155a410c7c29e6ec47b27478dec63",
+	publicKey: "02f0f1217bace23ac2ac9438b65a8dcc693905bee511b49d5ade499a8c8da8a3e4",
+};
 
 describe<{
 	app: Application;
@@ -121,5 +128,60 @@ describe<{
 			const viemSerialized = serializeTransaction(viemTransaction, signature);
 			assert.equal("0x" + ownSerialized.toString("hex"), viemSerialized);
 		}
+	});
+
+	it("#serialize - should match viem (and the standard hash) when r/s has a leading zero", async ({
+		app,
+		serializer,
+	}) => {
+		const hashFactory = app.get<Contracts.Crypto.TransactionHashFactory>(
+			Identifiers.Cryptography.Transaction.HashFactory,
+		);
+
+		// Sign until r or s has a leading zero byte (~1 in 128), the case where minimal-RLP
+		// encoding is strictly shorter than 32 bytes and standard tooling and mainsail could
+		// otherwise disagree.
+		const builder = app.resolve(TransactionBuilder);
+		builder.recipientAddress(wallet.address);
+
+		let canonical: Contracts.Crypto.TransactionData | undefined;
+		for (let nonce = 0; nonce < 5000; nonce++) {
+			builder.nonce(String(nonce));
+			await builder.signWithKeyPair({
+				compressed: false,
+				privateKey: wallet.privateKey,
+				publicKey: wallet.publicKey,
+			});
+			const struct = await builder.getStruct();
+			if (struct.r.startsWith("00") || struct.s.startsWith("00")) {
+				canonical = struct;
+				break;
+			}
+		}
+		assert.defined(canonical);
+
+		const ownSerialized = await serializer.serialize(canonical!);
+
+		const viemSerialized = serializeTransaction(
+			{
+				chainId: canonical!.network,
+				data: canonical!.data === "0x" ? undefined : (canonical!.data as `0x${string}`),
+				gas: BigInt(canonical!.gasLimit.toString()),
+				gasPrice: BigInt(canonical!.gasPrice.toString()),
+				nonce: Number(canonical!.nonce.toString()),
+				to: canonical!.to as `0x${string}`,
+				value: canonical!.value,
+			},
+			{
+				r: `0x${canonical!.r}`,
+				s: `0x${canonical!.s}`,
+				v: BigInt(canonical!.v + (2 * 10000 + 35)),
+			},
+		);
+
+		// Byte-identical to canonical Ethereum, so the transaction hash (keccak of the
+		// serialized bytes) is what MetaMask/ethers/viem compute — interoperable out of the box.
+		assert.equal("0x" + ownSerialized.toString("hex"), viemSerialized);
+		assert.equal("0x" + (await hashFactory.toHash(canonical!)).toString("hex"), keccak256(viemSerialized));
 	});
 });

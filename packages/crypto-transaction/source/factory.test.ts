@@ -6,6 +6,13 @@ import { TransactionSchemaError } from "@mainsail/exceptions";
 
 import { Serialized, Transactions, Storage, Json } from "../test/fixtures/index.js";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
+import { TransactionBuilder } from "./builder.js";
+
+const wallet = {
+	address: "0xa92D8ba95B46bcFD0177E203C515885E91DF03F4",
+	privateKey: "9be3cd2b0efa7b4d82d68496cf95f0a6c69155a410c7c29e6ec47b27478dec63",
+	publicKey: "02f0f1217bace23ac2ac9438b65a8dcc693905bee511b49d5ade499a8c8da8a3e4",
+};
 
 describe<{
 	app: Application;
@@ -84,6 +91,50 @@ describe<{
 				"Failed to deserialize transaction, encountered invalid bytes: decode RLP not a list",
 			);
 		}
+	});
+
+	it("fromHex - should accept an externally-signed transaction with stripped (minimal-RLP) r/s", async ({
+		app,
+		factory,
+		serializer,
+	}) => {
+		// Sign until a signature has a leading zero byte in r or s (~1 in 128), so the standard
+		// minimal-RLP encoding a canonical Ethereum wallet emits is shorter than 32 bytes.
+		const builder = app.resolve(TransactionBuilder);
+		builder.recipientAddress(wallet.address);
+
+		let canonical: Contracts.Crypto.TransactionData | undefined;
+		for (let nonce = 0; nonce < 5000; nonce++) {
+			builder.nonce(String(nonce));
+			await builder.signWithKeyPair({
+				compressed: false,
+				privateKey: wallet.privateKey,
+				publicKey: wallet.publicKey,
+			});
+			const struct = await builder.getStruct();
+			if (struct.r.startsWith("00") || struct.s.startsWith("00")) {
+				canonical = struct;
+				break;
+			}
+		}
+		assert.defined(canonical);
+
+		// The serialized wire form is now minimal-RLP — byte-identical to a canonical Ethereum
+		// wallet's, so at least one of r/s is under 32 bytes on the wire.
+		const wireHex = (await serializer.serialize(canonical!)).toString("hex");
+
+		// Before the deserializer left-pad, this rejected: the 63-byte r||s buffer made recovery
+		// throw and the sub-64-hex r/s failed the schema.
+		const transaction = await factory.fromHex(wireHex);
+
+		// The stripped wire r/s are normalized back to 32 bytes, the correct sender is recovered,
+		// and the hash equals the one computed at signing time (the standard Ethereum hash).
+		assert.equal(transaction.r, canonical!.r);
+		assert.equal(transaction.s, canonical!.s);
+		assert.equal(transaction.r.length, 64);
+		assert.equal(transaction.s.length, 64);
+		assert.equal(transaction.from, wallet.address);
+		assert.equal(transaction.hash, canonical!.hash);
 	});
 
 	it("fromHex - should reject transaction with schema errors", async ({ factory, serializer }) => {
