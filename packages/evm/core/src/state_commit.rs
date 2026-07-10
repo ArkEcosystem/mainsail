@@ -173,7 +173,10 @@ fn collect_dirty_accounts(
     if let Some(info) = genesis_info {
         // `results` is keyed by tx hash, but the "last event wins" folds below must see
         // events in execution order. Cumulative gas is strictly increasing per executed
-        // transaction, so it recovers that order.
+        // transaction, so it recovers that order: every executed transaction consumes at
+        // least the 21000-gas intrinsic cost, so each entry's cumulative total is strictly
+        // greater than the previous one's — the key is guaranteed unique and monotonic,
+        // never tied.
         let mut results: Vec<&(ExecutionResult, u64)> = commit.results.values().collect();
         results.sort_by_key(|(_, cumulative_gas_used)| *cumulative_gas_used);
 
