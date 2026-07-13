@@ -41,13 +41,14 @@ export class Deployer implements Contracts.EvmConsensus.Deployer {
 	@inject(Identifiers.EvmConsensus.GenesisInfo)
 	private readonly genesisBlockInfo!: Contracts.Evm.GenesisInfo;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfig!: Contracts.Crypto.Configuration;
+
 	#nonce = 0;
 	#needsCommit = false;
 
 	public async deploy(): Promise<void> {
-		const cryptoConfig = this.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
-
-		const genesisBlock = cryptoConfig.getGenesisCommit().block;
+		const genesisBlock = this.cryptoConfig.getGenesisCommit().block;
 		const milestone = this.configuration.getMilestone();
 
 		await this.evm.prepareNextCommit({
