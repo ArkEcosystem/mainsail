@@ -4,46 +4,8 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { parseTransaction } from "viem";
 import { Deserialized, Serialized } from "../test/fixtures/index.js";
+import { signTransfer, signUntilLeadingZeroRS } from "../test/helpers/canonical-transaction";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
-import { TransactionBuilder } from "./builder.js";
-
-const wallet = {
-	address: "0xa92D8ba95B46bcFD0177E203C515885E91DF03F4",
-	privateKey: "9be3cd2b0efa7b4d82d68496cf95f0a6c69155a410c7c29e6ec47b27478dec63",
-	publicKey: "02f0f1217bace23ac2ac9438b65a8dcc693905bee511b49d5ade499a8c8da8a3e4",
-};
-
-// Standard Ethereum wallets RLP-encode r/s as minimal integers, stripping leading zero bytes.
-const stripLeadingZeroBytes = (hex: string): string => {
-	let stripped = hex;
-	while (stripped.length > 2 && stripped.startsWith("00")) {
-		stripped = stripped.slice(2);
-	}
-	return stripped;
-};
-
-// Sign transfers with increasing nonces until one has a leading zero byte in r or s
-// (~1 in 128 signatures), so the minimal-RLP encoding is strictly shorter than 32 bytes.
-const signUntilLeadingZeroRS = async (app: Application): Promise<Contracts.Crypto.TransactionData> => {
-	const builder = app.resolve(TransactionBuilder);
-	builder.recipientAddress(wallet.address);
-
-	for (let nonce = 0; nonce < 5000; nonce++) {
-		builder.nonce(String(nonce));
-		await builder.signWithKeyPair({
-			compressed: false,
-			privateKey: wallet.privateKey,
-			publicKey: wallet.publicKey,
-		});
-
-		const struct = await builder.getStruct();
-		if (stripLeadingZeroBytes(struct.r) !== struct.r || stripLeadingZeroBytes(struct.s) !== struct.s) {
-			return struct;
-		}
-	}
-
-	throw new Error("could not find a signature with a leading-zero r/s byte");
-};
 
 describe<{
 	app: Application;
@@ -132,13 +94,7 @@ describe<{
 			Identifiers.Cryptography.Transaction.Serializer,
 		);
 
-		const builder = app.resolve(TransactionBuilder);
-		await builder.signWithKeyPair({
-			compressed: false,
-			privateKey: wallet.privateKey,
-			publicKey: wallet.publicKey,
-		});
-		const canonical = await builder.getStruct();
+		const canonical = await signTransfer(app);
 
 		// Prepend a byte so r is 33 bytes on the wire — impossible for a valid signature.
 		const oversized = await serializer.serialize({ ...canonical, r: "ff" + canonical.r });
