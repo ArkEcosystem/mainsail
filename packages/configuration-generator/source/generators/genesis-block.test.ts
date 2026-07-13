@@ -40,6 +40,7 @@ describe<{
 				genesisBlock: {
 					block: {
 						number: 0,
+						timestamp: 0,
 					},
 				},
 				milestones: [

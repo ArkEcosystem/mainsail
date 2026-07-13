@@ -116,6 +116,17 @@ describe("writeUint8", ({ each, assert }) => {
 		},
 		invalidValues,
 	);
+
+	each(
+		"should fail when value is not a safe integer: ",
+		({ dataset }) => {
+			const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
+
+			assert.throws(() => byteBuffer.writeUint8(dataset as any), "value must be a safe integer");
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		["1", Number.NaN, 1.5, Number.POSITIVE_INFINITY],
+	);
 });
 
 describe("writeUint16", ({ each, assert }) => {
@@ -151,10 +162,21 @@ describe("writeUint16", ({ each, assert }) => {
 
 			assert.throws(() => {
 				byteBuffer.writeUint16(dataset);
-			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			}, `The value of "value" is out of range. It must be >= 0 and < 2 ** 16. Received ${dataset}`);
 			assert.equal(byteBuffer.getResultLength(), 0);
 		},
 		invalidValues,
+	);
+
+	each(
+		"should fail when value is not a safe integer: ",
+		({ dataset }) => {
+			const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
+
+			assert.throws(() => byteBuffer.writeUint16(dataset as any), "value must be a safe integer");
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		["1", Number.NaN, 1.5, Number.POSITIVE_INFINITY],
 	);
 });
 
@@ -191,10 +213,21 @@ describe("writeUint32", ({ each, assert }) => {
 
 			assert.throws(() => {
 				byteBuffer.writeUint32(dataset);
-			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			}, `The value of "value" is out of range. It must be >= 0 and < 2 ** 32. Received ${dataset}`);
 			assert.equal(byteBuffer.getResultLength(), 0);
 		},
 		invalidValues,
+	);
+
+	each(
+		"should fail when value is not a safe integer: ",
+		({ dataset }) => {
+			const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
+
+			assert.throws(() => byteBuffer.writeUint32(dataset as any), "value must be a safe integer");
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		["1", Number.NaN, 1.5, Number.POSITIVE_INFINITY],
 	);
 });
 
@@ -231,14 +264,25 @@ describe("writeUint48", ({ each, assert }) => {
 
 			assert.throws(() => {
 				byteBuffer.writeUint48(dataset);
-			}, `The value of "value" is out of range. It must be >= ${min} and <= ${max}. Received ${dataset}`);
+			}, `The value of "value" is out of range. It must be >= 0 and < 2 ** 48. Received ${dataset}`);
 			assert.equal(byteBuffer.getResultLength(), 0);
 		},
 		invalidValues,
 	);
+
+	each(
+		"should fail when value is not a safe integer: ",
+		({ dataset }) => {
+			const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
+
+			assert.throws(() => byteBuffer.writeUint48(dataset as any), "value must be a safe integer");
+			assert.equal(byteBuffer.getResultLength(), 0);
+		},
+		["1", Number.NaN, 1.5, Number.POSITIVE_INFINITY],
+	);
 });
 
-describe("writeUint64", ({ each, assert }) => {
+describe("writeUint64", ({ each, it, assert }) => {
 	const bufferSize = 8;
 	const min = 0n;
 	const max = 18_446_744_073_709_551_615n;
@@ -268,18 +312,21 @@ describe("writeUint64", ({ each, assert }) => {
 			const buffer = Buffer.alloc(bufferSize);
 
 			const byteBuffer = ByteBuffer.fromBuffer(buffer);
-			const error = `The value of "value" is out of range. It must be >= 0n and < 2n ** 64n. Received ${dataset
-				.toLocaleString()
-				.replace(new RegExp(",", "g"), "_")}n`;
 
-			assert.throws(
-				() => byteBuffer.writeUint64(dataset),
-				(e) => e.message === error,
-			);
+			assert.throws(() => {
+				byteBuffer.writeUint64(dataset);
+			}, `The value of "value" is out of range. It must be >= 0n and < 2n ** 64n. Received ${dataset}`);
 			assert.equal(byteBuffer.getResultLength(), 0);
 		},
 		invalidValues,
 	);
+
+	it("should fail when value is not a bigint", () => {
+		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
+
+		assert.throws(() => byteBuffer.writeUint64(1 as any), "value must be a bigint");
+		assert.equal(byteBuffer.getResultLength(), 0);
+	});
 });
 
 describe("buffer", ({ it, assert }) => {
@@ -298,6 +345,14 @@ describe("buffer", ({ it, assert }) => {
 		assert.equal(byteBuffer.getResultLength(), bufferSize);
 	});
 
+	it("should throw when writing a non-buffer value", () => {
+		const buffer = Buffer.alloc(5);
+		const byteBuffer = ByteBuffer.fromBuffer(buffer);
+
+		assert.throws(() => byteBuffer.writeBytes("1" as any), "value must be a buffer");
+		assert.equal(byteBuffer.getResultLength(), 0);
+	});
+
 	it("should throw when writing over boundary", () => {
 		const buffer = Buffer.alloc(5);
 		const byteBuffer = ByteBuffer.fromBuffer(buffer);
@@ -310,5 +365,128 @@ describe("buffer", ({ it, assert }) => {
 		const byteBuffer = ByteBuffer.fromBuffer(buffer);
 
 		assert.throws(() => byteBuffer.readBytes(6), "Read over buffer boundary.");
+	});
+});
+
+describe("writeUint256", ({ it, each, assert }) => {
+	const bufferSize = 32;
+	const validValues = [0n, 1n, 255n, 256n, 2n ** 128n, 2n ** 256n - 1n];
+
+	each(
+		"should write and read value: ",
+		({ dataset }) => {
+			const buffer = Buffer.alloc(bufferSize);
+
+			const byteBuffer = ByteBuffer.fromBuffer(buffer);
+
+			byteBuffer.writeUint256(dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+
+			byteBuffer.reset();
+			assert.equal(byteBuffer.readUint256(), dataset);
+			assert.equal(byteBuffer.getResultLength(), bufferSize);
+		},
+		validValues,
+	);
+
+	it("should fail writing a non-bigint value", () => {
+		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
+
+		assert.throws(() => byteBuffer.writeUint256(1 as any), "value must be a bigint");
+		assert.equal(byteBuffer.getResultLength(), 0);
+	});
+
+	it("should fail writing a negative value", () => {
+		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
+
+		assert.throws(() => byteBuffer.writeUint256(-1n), "value must be non-negative");
+		assert.equal(byteBuffer.getResultLength(), 0);
+	});
+
+	it("should fail writing a value that does not fit into uint256", () => {
+		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
+
+		assert.throws(() => byteBuffer.writeUint256(2n ** 256n), "value must fit into uint256");
+		assert.equal(byteBuffer.getResultLength(), 0);
+	});
+});
+
+describe("readHex", ({ it, assert }) => {
+	it("should read the requested number of bytes", () => {
+		const bufferSize = 4;
+		const bufferToCompare = Buffer.from("0badf00d", "hex");
+
+		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(bufferSize));
+
+		byteBuffer.writeBytes(bufferToCompare);
+		byteBuffer.reset();
+
+		assert.equal(bufferToCompare.compare(byteBuffer.readHex(bufferSize)), 0);
+	});
+});
+
+describe("mark", ({ it, assert }) => {
+	it("should reset to the previously marked offset", () => {
+		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(4));
+
+		byteBuffer.writeUint8(1);
+		byteBuffer.mark();
+		byteBuffer.writeUint8(2);
+
+		assert.equal(byteBuffer.getResultLength(), 2);
+
+		byteBuffer.reset();
+		assert.equal(byteBuffer.getResultLength(), 1);
+
+		byteBuffer.writeUint8(3);
+		byteBuffer.reset();
+		assert.equal(byteBuffer.readUint8(), 3);
+	});
+});
+
+describe("fromSize", ({ it, assert }) => {
+	it("should allocate a zero-filled buffer of the given size", () => {
+		const bufferSize = 4;
+		const byteBuffer = ByteBuffer.fromSize(bufferSize);
+
+		assert.equal(byteBuffer.getRemainderLength(), bufferSize);
+		assert.equal(Buffer.alloc(bufferSize).compare(byteBuffer.getRemainder()), 0);
+	});
+});
+
+describe("toBuffer", ({ it, assert }) => {
+	it("should return the full underlying buffer", () => {
+		const bufferSize = 4;
+		const byteBuffer = ByteBuffer.fromSize(bufferSize);
+
+		byteBuffer.writeUint8(0xaa);
+		byteBuffer.writeUint8(0xbb);
+
+		assert.equal(Buffer.from("aabb0000", "hex").compare(byteBuffer.toBuffer()), 0);
+	});
+
+	it("should not leak memory outside a wrapped subarray", () => {
+		const parent = Buffer.alloc(16);
+		for (let index = 0; index < parent.length; index++) {
+			parent[index] = index;
+		}
+
+		const byteBuffer = ByteBuffer.fromBuffer(parent.subarray(4, 12));
+		byteBuffer.writeUint8(0xff);
+
+		const result = byteBuffer.toBuffer();
+		assert.equal(result.length, 8);
+		assert.equal(Buffer.from("ff05060708090a0b", "hex").compare(result), 0);
+	});
+
+	it("should return an independent copy", () => {
+		const byteBuffer = ByteBuffer.fromBuffer(Buffer.alloc(2));
+		byteBuffer.writeUint8(1);
+		byteBuffer.writeUint8(2);
+
+		const result = byteBuffer.toBuffer();
+		result[0] = 0x99;
+
+		assert.equal(Buffer.from("0102", "hex").compare(byteBuffer.getResult()), 0);
 	});
 });
