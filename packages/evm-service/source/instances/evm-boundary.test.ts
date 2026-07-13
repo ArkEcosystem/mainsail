@@ -39,6 +39,11 @@ describe<{
 			setAccountUpdates: () => {},
 		}) as unknown as Contracts.Processor.ProcessableUnit;
 
+	// Valid legacy (base58check) addresses: one imported as a cold wallet by the tests
+	// below, and one nothing is ever imported under.
+	const coldWalletAddress = "DJmvhhiQFSrEQCq9FUxvcLcpcBjx7K3yLt";
+	const unknownLegacyAddress = "DBcN6tLzebNYT9oAfXtUYS7WhSTfcfM19C";
+
 	it("onCommit rejects malformed transaction r/s and stays usable", async ({ app, instance }) => {
 		const { genesisCommit } = await processGenesis(app, instance);
 		const transaction = genesisCommit.block.transactions[0];
@@ -239,6 +244,11 @@ describe<{
 			"requires the genesis pending commit",
 		);
 
+		await assert.rejects(
+			() => instance.importLegacyColdWallets([{ address: coldWalletAddress, balance: 0n, legacyAttributes: {} }]),
+			"requires the genesis pending commit",
+		);
+
 		await processGenesis(app, instance);
 
 		// With genesis in place the unknown key is what fails.
@@ -260,6 +270,28 @@ describe<{
 					{ address: fresh, balance: 1n, legacyAttributes: {}, nonce: 0n },
 				]),
 			"duplicate account",
+		);
+
+		await assert.rejects(
+			() =>
+				instance.importLegacyColdWallets([
+					{ address: coldWalletAddress, balance: 0n, legacyAttributes: {} },
+					{ address: coldWalletAddress, balance: 1n, legacyAttributes: {} },
+				]),
+			"duplicate wallet",
+		);
+
+		// roundValidators is a u8 on the wire; anything wider fails argument conversion.
+		await assert.rejects(
+			() =>
+				instance.calculateRoundValidators({
+					commitKey: unknownKey,
+					roundValidators: 300n,
+					specId: Enums.Evm.SpecId.SHANGHAI,
+					timestamp: 0n,
+					validatorAddress: zeroAddress,
+				}),
+			"out of range",
 		);
 	});
 
@@ -390,5 +422,356 @@ describe<{
 				}),
 			"lack of funds",
 		);
+	});
+
+	it("serves receipts and commits by block range and rejects invalid ranges", async ({ app, instance }) => {
+		const genesisCommit = await commitGenesis(app, instance);
+
+		const { receipts } = await instance.getReceiptsByBlockRange(0n, 0n);
+		assert.equal(receipts.length, genesisCommit.block.transactions.length);
+
+		const empty = await instance.getReceiptsByBlockRange(5n, 9n);
+		assert.equal(empty.receipts.length, 0);
+
+		await assert.rejects(() => instance.getReceiptsByBlockRange(3n, 1n), "must be <= to_block_number");
+
+		const commits = await instance.getCommitsByBlockRange(0, 0, 10_000_000);
+		assert.equal(commits.length, 1);
+		assert.equal(commits[0], (await instance.getCommitData(0))!);
+
+		assert.equal(await instance.getCommitsByBlockRange(1, 5, 10_000_000), []);
+
+		await assert.rejects(() => instance.getCommitsByBlockRange(0, 0, 0), "max_bytes");
+	});
+
+	it("returns legacy attributes from accounts and falls back to cold wallets", async ({ app, instance }) => {
+		const { commitKey, genesisCommit } = await processGenesis(app, instance);
+
+		// Fresh addresses, untouched by genesis transactions (imports reject duplicates).
+		const imported = "0x1111111111111111111111111111111111111111";
+		const stranger = "0x2222222222222222222222222222222222222222";
+
+		const multiSignature = { min: 2, publicKeys: ["first-public-key", "second-public-key"] };
+
+		await instance.importAccountInfos([
+			{
+				address: imported,
+				balance: 0n,
+				legacyAttributes: { legacyNonce: 7n, multiSignature, secondPublicKey: "second-public-key" },
+				nonce: 0n,
+			},
+		]);
+		await instance.importLegacyColdWallets([
+			{ address: coldWalletAddress, balance: 123n, legacyAttributes: { legacyNonce: 3n } },
+		]);
+
+		// Re-preparing the exact genesis commit key (including the block hash) must keep
+		// the pending bootstrap commit — and with it the imports above — instead of
+		// replacing it like every other re-prepare (the deliberate genesis exception).
+		await instance.prepareNextCommit({
+			blockContext: {
+				commitKey,
+				gasLimit: 10_000_000n,
+				timestamp: BigInt(genesisCommit.block.timestamp),
+				validatorAddress: genesisCommit.block.proposer,
+			},
+		});
+
+		await instance.onCommit(makeUnit(genesisCommit));
+
+		// Attributes imported on the account itself round-trip, including multi-signature.
+		const direct = await instance.getLegacyAttributes(imported);
+		assert.defined(direct);
+		assert.equal(direct!.legacyNonce, 7n);
+		assert.equal(direct!.secondPublicKey, "second-public-key");
+		assert.equal(direct!.multiSignature, multiSignature);
+
+		// No account attributes: falls back to the cold wallet keyed by the legacy address.
+		const fallback = await instance.getLegacyAttributes(stranger, coldWalletAddress);
+		assert.defined(fallback);
+		assert.equal(fallback!.legacyNonce, 3n);
+
+		assert.undefined(await instance.getLegacyAttributes(stranger));
+
+		// The extended account view uses the same cold-wallet fallback.
+		const extended = await instance.getAccountInfoExtended(stranger, coldWalletAddress);
+		assert.equal(extended.legacyAttributes.legacyNonce, 3n);
+	});
+
+	it("merges a legacy cold wallet balance into the sender on first use", async ({ app, instance }) => {
+		const { genesisCommit } = await processGenesis(app, instance);
+
+		await instance.importLegacyColdWallets([
+			{ address: coldWalletAddress, balance: 10n ** 18n, legacyAttributes: {} },
+		]);
+		await instance.onCommit(makeUnit(genesisCommit));
+
+		const sender = "0x3333333333333333333333333333333333333333";
+		const recipient = "0x4444444444444444444444444444444444444444";
+
+		// Preverification resolves the legacy cold wallet but only validates intrinsic
+		// gas — balance checks happen at process time. Well-formed passes...
+		const preverify = (legacyAddress: string, gasLimit: bigint) =>
+			instance.preverifyTransaction({
+				blockGasLimit: 10_000_000n,
+				data: Buffer.alloc(0),
+				from: sender,
+				gasLimit,
+				gasPrice: 0n,
+				legacyAddress,
+				nonce: 0n,
+				specId: Enums.Evm.SpecId.SHANGHAI,
+				to: recipient,
+				txHash: randomBytes(32).toString("hex"),
+				value: 10n,
+			});
+		assert.equal(await preverify(coldWalletAddress, 21_000n), { initialGasUsed: 21_000n, success: true });
+
+		// ...and a gas limit below the intrinsic cost fails, wallet or not.
+		const failed = await preverify(unknownLegacyAddress, 1n);
+		assert.false(failed.success);
+		assert.true(failed.error!.includes("preverify failed"));
+
+		const commitKey = { blockNumber: 1n, round: 0n };
+		await instance.prepareNextCommit({
+			blockContext: { commitKey, gasLimit: 10_000_000n, timestamp: 12_345n, validatorAddress: zeroAddress },
+		});
+
+		const transfer = (nonce: bigint, from: string, legacyAddress: string) =>
+			instance.process({
+				commitKey,
+				data: Buffer.alloc(0),
+				from,
+				gasLimit: 21_000n,
+				gasPrice: 0n,
+				legacyAddress,
+				nonce,
+				specId: Enums.Evm.SpecId.SHANGHAI,
+				to: recipient,
+				txHash: randomBytes(32).toString("hex"),
+				value: 10n,
+			});
+
+		// A transaction that fails after its merge was applied must roll the merge back:
+		// the wallet stays mergeable, so the follow-up transaction still gets the funds.
+		await assert.rejects(() => transfer(5n, sender, coldWalletAddress));
+
+		// First use merges the cold-wallet balance into the pending commit.
+		const first = await transfer(0n, sender, coldWalletAddress);
+		assert.equal(first.receipt.status, 1);
+
+		// Same sender again: the merge bookkeeping short-circuits the lookup.
+		const second = await transfer(1n, sender, coldWalletAddress);
+		assert.equal(second.receipt.status, 1);
+
+		// Unknown legacy address: no wallet to merge, the transfer has no funds.
+		await assert.rejects(
+			() => transfer(0n, "0x5555555555555555555555555555555555555555", unknownLegacyAddress),
+			"lack of funds",
+		);
+	});
+
+	it("restores the snapshotted pending commit on rollback", async ({ instance }) => {
+		await instance.initializeGenesis({
+			account: wallets[0].address,
+			deployerAccount: "0x0000000000000000000000000000000000000001",
+			initialBlockNumber: 0n,
+			initialSupply: 0n,
+			timestamp: 0n,
+			usernameContract: "0x0000000000000000000000000000000000000002",
+			validatorContract: "0x0000000000000000000000000000000000000003",
+		});
+
+		const commitKey = { blockNumber: 1n, round: 0n };
+		await instance.prepareNextCommit({
+			blockContext: { commitKey, gasLimit: 10_000_000n, timestamp: 12_345n, validatorAddress: zeroAddress },
+		});
+
+		const deploy = (nonce: bigint) =>
+			instance.process({
+				commitKey,
+				data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
+				from: wallets[0].address,
+				gasLimit: 2_000_000n,
+				gasPrice: 0n,
+				nonce,
+				specId: Enums.Evm.SpecId.SHANGHAI,
+				txHash: randomBytes(32).toString("hex"),
+				value: 0n,
+			});
+
+		assert.equal((await deploy(0n)).receipt.status, 1);
+
+		await instance.snapshot(commitKey);
+
+		assert.equal((await deploy(1n)).receipt.status, 1);
+
+		// A mismatching key must not consume the snapshot...
+		await assert.rejects(() => instance.rollback({ blockNumber: 2n, round: 0n }), "rollback commit key mismatch");
+
+		// ...so the rollback still succeeds and rewinds the sender nonce: re-processing
+		// nonce 1 works again (without the rollback it would be a wrong-nonce error).
+		await instance.rollback(commitKey);
+		assert.equal((await deploy(1n)).receipt.status, 1);
+
+		// The consumed snapshot is gone.
+		await assert.rejects(() => instance.rollback(commitKey), "rollback to non-existent commit");
+	});
+
+	it("exposes state, account, code and storage getters", async ({ app, instance }) => {
+		assert.true(await instance.isEmpty());
+
+		await assert.rejects(
+			() => instance.stateRoot({ blockNumber: 0n, round: 0n }, "00".repeat(32)),
+			"genesis not initialized",
+		);
+
+		const genesisCommit = await commitGenesis(app, instance);
+		assert.false(await instance.isEmpty());
+
+		const state = await instance.getState();
+		assert.equal(state.blockNumber, 0);
+
+		// Latest and historical (block 0 is within the retention window) reads agree.
+		const [funded] = genesisCommit.block.transactions;
+		const latest = await instance.getAccountInfo(funded.from);
+		const historical = await instance.getAccountInfo(funded.from, 0n);
+		assert.equal(latest, historical);
+
+		// Code and storage reads work for latest state and for historical block numbers
+		// within the retention window (codeless accounts read as empty, storage as zero).
+		assert.equal(await instance.codeAt(funded.from), "0x");
+		assert.equal(await instance.codeAt(funded.from, 0n), "0x");
+		assert.equal(await instance.storageAt(funded.from, 0n), `0x${"0".repeat(64)}`);
+
+		// A view call that fails validation (gas limit below intrinsic cost) reports
+		// failure instead of throwing.
+		const view = await instance.view({
+			data: Buffer.alloc(0),
+			from: zeroAddress,
+			gasLimit: 1n,
+			specId: Enums.Evm.SpecId.SHANGHAI,
+			to: zeroAddress,
+		});
+		assert.false(view.success);
+
+		// Missing-key getters resolve to undefined rather than throwing.
+		assert.undefined(await instance.getBlockHeaderData(99));
+		assert.undefined(await instance.getBlockNumberByHash("11".repeat(32)));
+		assert.undefined(await instance.getCommitData(99));
+		assert.undefined(await instance.getTransactionKeyByHash("11".repeat(32)));
+		assert.undefined((await instance.getReceipt(0n, "11".repeat(32))).receipt);
+	});
+
+	it("paginates accounts, receipts and legacy cold wallets with a continuation offset", async ({ app, instance }) => {
+		const { genesisCommit } = await processGenesis(app, instance);
+
+		await instance.importLegacyColdWallets([
+			{ address: coldWalletAddress, balance: 1n, legacyAttributes: {} },
+			{ address: unknownLegacyAddress, balance: 2n, legacyAttributes: {} },
+		]);
+		await instance.onCommit(makeUnit(genesisCommit));
+
+		// A page smaller than the table returns a continuation offset; resuming from it
+		// yields the next disjoint page.
+		const accountsPage = await instance.getAccounts(0n, 1n);
+		assert.defined(accountsPage.nextOffset);
+		assert.equal(accountsPage.accounts.length, 1);
+		const accountsNext = await instance.getAccounts(accountsPage.nextOffset!, 1n);
+		assert.equal(accountsNext.accounts.length, 1);
+		assert.not.equal(accountsNext.accounts[0].address, accountsPage.accounts[0].address);
+
+		// Unlike its siblings, getReceipts paginates per *block*: a limit of 1 returns
+		// every receipt of the first block, flattened.
+		const receiptsPage = await instance.getReceipts(0n, 1n);
+		assert.defined(receiptsPage.nextOffset);
+		assert.equal(receiptsPage.receipts.length, genesisCommit.block.transactions.length);
+
+		const walletsPage = await instance.getLegacyColdWallets(0n, 1n);
+		assert.defined(walletsPage.nextOffset);
+		assert.equal(walletsPage.wallets.length, 1);
+		const walletsNext = await instance.getLegacyColdWallets(walletsPage.nextOffset!, 1n);
+		assert.equal(walletsNext.wallets.length, 1);
+		assert.not.equal(walletsNext.wallets[0].address, walletsPage.wallets[0].address);
+	});
+
+	it("simulates a contract deployment without a recipient", async ({ instance }) => {
+		await instance.initializeGenesis({
+			account: wallets[0].address,
+			deployerAccount: "0x0000000000000000000000000000000000000001",
+			initialBlockNumber: 0n,
+			initialSupply: 0n,
+			timestamp: 0n,
+			usernameContract: "0x0000000000000000000000000000000000000002",
+			validatorContract: "0x0000000000000000000000000000000000000003",
+		});
+
+		const { receipt } = await instance.simulate({
+			blockContext: {
+				commitKey: { blockNumber: 0n, round: 0n },
+				gasLimit: 10_000_000n,
+				timestamp: 12_345n,
+				validatorAddress: zeroAddress,
+			},
+			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
+			from: wallets[0].address,
+			gasLimit: 2_000_000n,
+			gasPrice: 0n,
+			nonce: 0n,
+			specId: Enums.Evm.SpecId.SHANGHAI,
+			value: 0n,
+		});
+
+		assert.equal(receipt.status, 1);
+		assert.defined(receipt.contractAddress);
+
+		// Simulation never persists: the deployed code is not visible afterwards.
+		assert.equal(await instance.codeAt(receipt.contractAddress!), "0x");
+	});
+
+	it("rejects malformed hashes and unsupported spec ids at the argument boundary", async ({ app, instance }) => {
+		// Not valid hex for a 32-byte hash, and valid hex of the wrong length.
+		await assert.rejects(() => instance.getBlockNumberByHash("zz"));
+		await assert.rejects(() => instance.getBlockNumberByHash("1122"));
+
+		await assert.rejects(
+			() =>
+				instance.initializeGenesis({
+					account: zeroAddress,
+					deployerAccount: zeroAddress,
+					initialBlockNumber: 2n ** 64n,
+					initialSupply: 0n,
+					timestamp: 0n,
+					usernameContract: zeroAddress,
+					validatorContract: zeroAddress,
+				}),
+			"initialBlockNumber: expected an unsigned bigint",
+		);
+
+		// A spec id revm parses but mainsail does not support, and one revm cannot parse.
+		const viewWithSpec = (specId: string) =>
+			instance.view({
+				data: Buffer.alloc(0),
+				from: zeroAddress,
+				specId: specId as Contracts.Evm.SpecId,
+				to: zeroAddress,
+			});
+		await assert.rejects(() => viewWithSpec("Prague"), "unsupported spec_id");
+		await assert.rejects(() => viewWithSpec("PRAGUE"), "invalid spec_id");
+
+		// A corrupted BLS proof signature in a commit rejects cleanly and the pending
+		// commit stays sealable with the original value.
+		const { genesisCommit } = await processGenesis(app, instance);
+		const proof = genesisCommit.proof as unknown as Record<"signature", string>;
+		const original = proof.signature;
+
+		for (const bad of ["zz", "11"]) {
+			proof.signature = bad;
+			await assert.rejects(() => instance.onCommit(makeUnit(genesisCommit)));
+		}
+
+		proof.signature = original;
+		await instance.onCommit(makeUnit(genesisCommit));
+		assert.defined(await instance.getCommitData(0));
 	});
 });
