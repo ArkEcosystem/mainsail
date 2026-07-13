@@ -12,4 +12,3 @@ target/
 
 evm.*.node
 scripts/coverage.sh
-set_optional_dependencies.js
