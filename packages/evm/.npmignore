@@ -11,4 +11,4 @@ target/
 .gitignore
 
 evm.*.node
-set_optional_dependencies.js
+scripts/coverage.sh
