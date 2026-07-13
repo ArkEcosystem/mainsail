@@ -3,6 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Application } from "@mainsail/kernel";
+import dayjs from "dayjs";
 import { ensureDirSync, pathExistsSync } from "fs-extra/esm";
 import { join } from "path";
 
@@ -128,6 +129,7 @@ export class ConfigurationGenerator {
 								// @ts-ignore
 								block: {
 									number: internalOptions.initialBlockNumber,
+									timestamp: dayjs(internalOptions.epoch).valueOf(),
 								},
 							},
 							milestones,

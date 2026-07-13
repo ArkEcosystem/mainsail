@@ -116,7 +116,6 @@ export class GenesisBlockGenerator {
 			initialSupply: options.snapshot
 				? 0n
 				: (BigInt(options.premine) / BigInt(validatorsCount)) * BigInt(validatorsCount),
-			timestamp: BigInt(dayjs(options.epoch).valueOf()),
 
 			usernameContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Usernames), // PROXY Uses nonce 3
 			validatorContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus), // PROXY Uses nonce 1

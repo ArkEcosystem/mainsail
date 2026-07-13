@@ -39,7 +39,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			deployerAccount: DEPLOYER_ADDRESS,
 			initialBlockNumber: BigInt(genesisBlock.number),
 			initialSupply: this.#calculateInitialSupply(genesisBlock),
-			timestamp: BigInt(genesisBlock.timestamp),
 
 			usernameContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Usernames), // PROXY Uses nonce 3
 			validatorContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus), // PROXY Uses nonce 1
