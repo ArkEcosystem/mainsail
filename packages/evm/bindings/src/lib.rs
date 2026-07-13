@@ -609,35 +609,6 @@ impl EvmInner {
     ) -> std::result::Result<PreverifyTxResult, EVMError<String>> {
         let mut pending_commit = PendingCommit::new(Default::default());
 
-        // Make legacy balance available to account in pending commit during preverification
-        if let Some(legacy_address) = ctx.legacy_address {
-            match self
-                .persistent_db
-                .get_legacy_cold_wallet(legacy_address)
-                .map_err(|err| {
-                    EVMError::Database(format!("failed reading legacy cold wallet: {}", err).into())
-                })? {
-                Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
-                    let mut legacy_balances = HashMap::<Address, u128>::default();
-                    legacy_balances.insert(
-                        ctx.from,
-                        legacy_cold_wallet.balance.try_into().expect("fit u128"),
-                    );
-                    state_commit::apply_rewards(
-                        &self.persistent_db,
-                        &mut pending_commit,
-                        legacy_balances,
-                    )
-                    .map_err(|err| {
-                        EVMError::Database(
-                            format!("failed to apply legacy balance: {}", err).into(),
-                        )
-                    })?;
-                }
-                _ => (),
-            }
-        }
-
         let db_reader = TxnDatabaseReader::new(&self.persistent_db).map_err(|err| {
             EVMError::Database(format!("failed to create tx database reader {}", err))
         })?;
