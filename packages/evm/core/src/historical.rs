@@ -44,7 +44,11 @@ impl AccountHistory {
         block_number: u64,
         accounts: Vec<(Address, AccountInfo)>,
     ) -> Result<(), Error> {
-        assert!(database.get(txn, &block_number)?.is_none());
+        if database.get(txn, &block_number)?.is_some() {
+            return Err(Error::State(format!(
+                "history for block {block_number} already recorded"
+            )));
+        }
 
         let count = database.len(txn)?;
         if count >= self.capacity {
