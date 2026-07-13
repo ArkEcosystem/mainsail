@@ -4,6 +4,7 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { parseTransaction } from "viem";
 import { Deserialized, Serialized } from "../test/fixtures/index.js";
+import { signTransfer, signUntilLeadingZeroRS } from "../test/helpers/canonical-transaction";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
@@ -62,5 +63,42 @@ describe<{
 			(assert.equal(ownTx.data.v, Number(viemTx.yParity)), assert.equal("0x" + ownTx.data.r, viemTx.r));
 			assert.equal("0x" + ownTx.data.s, viemTx.s);
 		}
+	});
+
+	it("should left-pad stripped (minimal-RLP) r/s back to a canonical 32 bytes", async ({ app, deserializer }) => {
+		const serializer = app.get<Contracts.Crypto.TransactionSerializer>(
+			Identifiers.Cryptography.Transaction.Serializer,
+		);
+
+		const canonical = await signUntilLeadingZeroRS(app);
+		// A leading zero byte in r or s is exactly what the minimal-RLP wire form drops.
+		assert.true(canonical.r.startsWith("00") || canonical.s.startsWith("00"));
+
+		// The serialized wire form is minimal-RLP (leading zeros stripped) — byte-identical to
+		// what a canonical Ethereum wallet emits — so at least one of r/s is under 32 bytes here.
+		const wire = await serializer.serialize(canonical);
+
+		const deserialized = await deserializer.deserialize(wire);
+
+		// The stripped wire bytes are normalized back to the exact 32-byte values — the invariant
+		// the schema and the Rust boundary rely on. Without the left-pad, the stripped component
+		// would come back as fewer than 64 hex chars.
+		assert.equal(deserialized.data.r.length, 64);
+		assert.equal(deserialized.data.s.length, 64);
+		assert.equal(deserialized.data.r, canonical.r);
+		assert.equal(deserialized.data.s, canonical.s);
+	});
+
+	it("should reject r/s longer than 32 bytes", async ({ app, deserializer }) => {
+		const serializer = app.get<Contracts.Crypto.TransactionSerializer>(
+			Identifiers.Cryptography.Transaction.Serializer,
+		);
+
+		const canonical = await signTransfer(app);
+
+		// Prepend a byte so r is 33 bytes on the wire — impossible for a valid signature.
+		const oversized = await serializer.serialize({ ...canonical, r: "ff" + canonical.r });
+
+		await assert.rejects(() => deserializer.deserialize(oversized), "exceeds 32 bytes");
 	});
 });

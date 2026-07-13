@@ -168,8 +168,13 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		const network = chainId;
 
 		const normalizedV = v - (chainId * 2 + 35);
-		const r = fields[7].slice(2);
-		const s = fields[8].slice(2);
+		// RLP encodes r/s as minimal-length integers, so canonical Ethereum wallets strip
+		// leading zero bytes (~1 in 128 signatures). Mainsail's canonical form is a fixed
+		// 32-byte r/s (its signer pads, its serializer preserves 32 bytes, the AJV schema
+		// pins 64 hex chars, and the Rust boundary requires exactly 32 bytes). Left-pad here
+		// so externally-signed transactions normalize to that form instead of being rejected.
+		const r = this.#parseSignaturePart(fields[7], "r");
+		const s = this.#parseSignaturePart(fields[8], "s");
 
 		let legacySecondSignature: string | undefined = undefined;
 
@@ -201,6 +206,14 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		/* eslint-enable perfectionist/sort-objects */
 
 		return { data: transaction, serialized };
+	}
+
+	#parseSignaturePart(value: Hex, field: "r" | "s"): string {
+		const hex = value.slice(2);
+		if (hex.length > 64) {
+			throw new Error(`decoded RLP signature ${field} exceeds 32 bytes`);
+		}
+		return hex.padStart(64, "0");
 	}
 
 	#parseNumber(value: Hex): number {

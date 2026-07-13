@@ -1,14 +1,14 @@
 {
-	"address": "0xEcC98f90285F69B65f9c306534e8C051DFc10E1c",
+	"address": "0xBDE46e6fa010CC68340A31D4DF539fF779df4474",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "0b400cc0ad44d043081e5337d5fbb05f02cfaffa5f5c9cbdb381ea054fe9adcf",
-		"publicKey": "a314cb958eefdf5c7bb7433504bee1128da171ca3fb8a8c2203995c0c985158e4cbb744936845fc263fbc5acca92a5c0"
+		"privateKey": "3c832fc0f6f219c68c0c5eaf4e6c9291cf776405b66fcee1ad6a4e780efc186b",
+		"publicKey": "af1cdd86ecb1ca690868af4b55eb6d1f1836f689a6d94c3305c0babb6a3a9cd6685e9c74e77a5eb6b3a6e3c757d4c1ac"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "8515189f5fc1c698a255404025c043fc840bf29d5400791b5a4b2af6e1e868dd",
-		"publicKey": "03df162bedbc767fb7403e0f2b32fa931e1f697d82f5546839424bb0357e73101a"
+		"privateKey": "9bfff9d0ca04017f5c134c6bfa7d0a1e19e50461cb9c0dac1a0da4f572159176",
+		"publicKey": "03c52c510d53fd1a303ce3f31b177cb7cf8921d7a6955c752aefffd01595757389"
 	},
-	"passphrase": "elephant spray erode lawsuit just hole baby slam tag general trap achieve road fish grab casino quantum snow awesome vibrant rookie grow labor young"
+	"passphrase": "spoon grunt burden actress episode broken theme huge retreat tool boil huge learn wrong dinosaur risk ocean coyote smile clarify guess protect same light"
 }

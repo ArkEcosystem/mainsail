@@ -19,14 +19,18 @@ pub struct MainsailPrecompiles {
 impl MainsailPrecompiles {
     pub fn new(spec: SpecId) -> Self {
         let eth = EthPrecompiles::new(spec);
-
-        let mut warm_addresses = eth.warm_addresses().clone();
-        warm_addresses.insert(BLS_POP_VERIFY_ADDR);
+        let warm_addresses = Self::warm_addresses_for(&eth);
 
         Self {
             eth,
             warm_addresses,
         }
+    }
+
+    fn warm_addresses_for(eth: &EthPrecompiles) -> AddressSet {
+        let mut warm_addresses = eth.warm_addresses().clone();
+        warm_addresses.insert(BLS_POP_VERIFY_ADDR);
+        warm_addresses
     }
 }
 
@@ -34,7 +38,12 @@ impl<CTX: ContextTr> PrecompileProvider<CTX> for MainsailPrecompiles {
     type Output = InterpreterResult;
 
     fn set_spec(&mut self, spec: <CTX::Cfg as Cfg>::Spec) -> bool {
-        PrecompileProvider::<CTX>::set_spec(&mut self.eth, spec)
+        let changed = PrecompileProvider::<CTX>::set_spec(&mut self.eth, spec);
+        if changed {
+            // `eth` swapped to the new spec's precompile set and needs a rebuild.
+            self.warm_addresses = Self::warm_addresses_for(&self.eth);
+        }
+        changed
     }
 
     fn run(
@@ -141,6 +150,51 @@ mod tests {
     use revm::precompile::{PrecompileHalt, PrecompileOutput, PrecompileStatus};
 
     use crate::precompiles::{POP_DST, POP_VERIFY_GAS, bls_pop_verify};
+
+    #[test]
+    fn test_set_spec_rebuilds_warm_addresses() {
+        use revm::MainContext;
+        use revm::context::Cfg;
+        use revm::context_interface::ContextTr;
+        use revm::handler::{EthPrecompiles, PrecompileProvider};
+        use revm::primitives::AddressSet;
+        use revm::primitives::hardfork::SpecId;
+
+        use crate::precompiles::{BLS_POP_VERIFY_ADDR, MainsailPrecompiles};
+
+        fn set_spec<CTX: ContextTr>(_ctx: &CTX, p: &mut MainsailPrecompiles, spec: SpecId) -> bool
+        where
+            CTX::Cfg: Cfg<Spec = SpecId>,
+        {
+            PrecompileProvider::<CTX>::set_spec(p, spec)
+        }
+
+        fn warm<CTX: ContextTr>(_ctx: &CTX, p: &MainsailPrecompiles) -> AddressSet {
+            PrecompileProvider::<CTX>::warm_addresses(p).clone()
+        }
+
+        let expected = |spec: SpecId| -> AddressSet {
+            let mut set = EthPrecompiles::new(spec).warm_addresses().clone();
+            set.insert(BLS_POP_VERIFY_ADDR);
+            set
+        };
+
+        // Prague activates EIP-2537; the specs must differ for this test to be meaningful.
+        assert_ne!(expected(SpecId::SHANGHAI), expected(SpecId::PRAGUE));
+
+        let ctx = revm::Context::mainnet();
+        let mut precompiles = MainsailPrecompiles::new(SpecId::SHANGHAI);
+        assert_eq!(warm(&ctx, &precompiles), expected(SpecId::SHANGHAI));
+
+        // Same spec: no change reported, snapshot untouched.
+        assert!(!set_spec(&ctx, &mut precompiles, SpecId::SHANGHAI));
+        assert_eq!(warm(&ctx, &precompiles), expected(SpecId::SHANGHAI));
+
+        // Spec bump: the snapshot must follow the new precompile set — otherwise newly
+        // activated precompiles are charged cold access (EIP-2929), a consensus divergence.
+        assert!(set_spec(&ctx, &mut precompiles, SpecId::PRAGUE));
+        assert_eq!(warm(&ctx, &precompiles), expected(SpecId::PRAGUE));
+    }
 
     // ── Helpers ─────────────────────────────────────────────────────────────
 
