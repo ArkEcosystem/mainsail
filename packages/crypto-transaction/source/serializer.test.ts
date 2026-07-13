@@ -2,8 +2,9 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { serializeTransaction } from "viem";
+import { keccak256, serializeTransaction } from "viem";
 import { Serialized, Transactions } from "../test/fixtures/index";
+import { signUntilLeadingZeroRS } from "../test/helpers/canonical-transaction";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
@@ -121,5 +122,43 @@ describe<{
 			const viemSerialized = serializeTransaction(viemTransaction, signature);
 			assert.equal("0x" + ownSerialized.toString("hex"), viemSerialized);
 		}
+	});
+
+	it("#serialize - should match viem (and the standard hash) when r/s has a leading zero", async ({
+		app,
+		serializer,
+	}) => {
+		const hashFactory = app.get<Contracts.Crypto.TransactionHashFactory>(
+			Identifiers.Cryptography.Transaction.HashFactory,
+		);
+
+		// Sign until r or s has a leading zero byte (~1 in 128), the case where minimal-RLP
+		// encoding is strictly shorter than 32 bytes and standard tooling and mainsail could
+		// otherwise disagree.
+		const canonical = await signUntilLeadingZeroRS(app);
+
+		const ownSerialized = await serializer.serialize(canonical);
+
+		const viemSerialized = serializeTransaction(
+			{
+				chainId: canonical.network,
+				data: canonical.data === "0x" ? undefined : (canonical.data as `0x${string}`),
+				gas: BigInt(canonical.gasLimit.toString()),
+				gasPrice: BigInt(canonical.gasPrice.toString()),
+				nonce: Number(canonical.nonce.toString()),
+				to: canonical.to as `0x${string}`,
+				value: canonical.value,
+			},
+			{
+				r: `0x${canonical.r}`,
+				s: `0x${canonical.s}`,
+				v: BigInt(canonical.v + (2 * 10000 + 35)),
+			},
+		);
+
+		// Byte-identical to canonical Ethereum, so the transaction hash (keccak of the
+		// serialized bytes) is what MetaMask/ethers/viem compute — interoperable out of the box.
+		assert.equal("0x" + ownSerialized.toString("hex"), viemSerialized);
+		assert.equal("0x" + (await hashFactory.toHash(canonical)).toString("hex"), keccak256(viemSerialized));
 	});
 });
