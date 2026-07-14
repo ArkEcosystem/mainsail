@@ -136,6 +136,16 @@ describe<{
 		await assert.rejects(() => deserializer.deserialize(encodeLegacy(fields)), "non-canonical integer");
 	});
 
+	it("should reject a zero-padded (non-minimal) r", async ({ app, deserializer }) => {
+		const canonical = await signTransfer(app);
+		const fields = legacyRlpFields(canonical);
+
+		// A 32-byte r with a leading 0x00 byte — canonical RLP would strip it to 31 bytes.
+		fields[7] = fixedWidth32("00" + "11".repeat(31));
+
+		await assert.rejects(() => deserializer.deserialize(encodeLegacy(fields)), "non-canonical integer");
+	});
+
 	it("should reject a zero-padded (non-minimal) s", async ({ app, deserializer }) => {
 		const canonical = await signTransfer(app);
 		const fields = legacyRlpFields(canonical);
