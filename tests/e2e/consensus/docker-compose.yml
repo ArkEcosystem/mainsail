@@ -2,6 +2,13 @@ version: "3.8"
 
 x-node-env: &nodeEnvironment
     MAINSAIL_CRYPTO_WORKER_COUNT: 2
+    # Workaround (flaky e2e-consensus): consensus gossip re-broadcast can briefly exceed the P2P
+    # PostMessage rate limit, and a 429 currently makes the *sender* ban the peer for peerBanTime
+    # minutes. On this small validator set that drops quorum and stalls the round for minutes.
+    # peerBanTime=0 skips blacklisting (isBanned stays false, so there's no inbound rejection or
+    # counter-ban either), so a transient rate-limit hit self-heals instead of partitioning.
+    # Proper fix (don't ban on 429 / peer scoring) is tracked separately.
+    MAINSAIL_P2P_PEER_BAN_TIME: 0
 
 x-postgres-env: &postgresEnvironment
     MAINSAIL_DB_HOST: postgres-api
@@ -105,7 +112,7 @@ services:
             - -c
             - /mainsail/packages/api/bin/run.js api:run --network=devnet
         environment:
-            <<: *postgresEnvironment
+            <<: [*postgresEnvironment, *nodeEnvironment]
             MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/consensus/nodes/api-http
             MAINSAIL_PATH_DATA: /mainsail/tests/e2e/consensus/nodes/api-http
 
