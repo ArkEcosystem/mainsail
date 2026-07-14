@@ -33,3 +33,31 @@ export const signUntilLeadingZeroRS = async (app: Application): Promise<Contract
 
 	throw new Error("could not find a signature with a leading-zero r/s byte");
 };
+
+// Minimal big-endian encoding of an integer (canonical RLP form): zero is the empty string.
+const minimalInteger = (value: bigint): Uint8Array => (value === 0n ? new Uint8Array() : toBytes(value));
+
+// The ordered legacy RLP fields (nonce, gasPrice, gasLimit, to, value, data, v, r, s) for a signed
+// struct, each in canonical minimal-integer form — byte-identical to what the serializer emits.
+// Tests overwrite a single entry with a non-canonical value, then RLP-encode with `encodeLegacy`,
+// to exercise the deserializer's decode-time guards without going through the (canonicalizing) serializer.
+export const legacyRlpFields = (transaction: Contracts.Crypto.TransactionData): Uint8Array[] => {
+	const eip155V = BigInt(transaction.network) * 2n + 35n + BigInt(transaction.v);
+
+	return [
+		minimalInteger(BigInt(transaction.nonce)),
+		minimalInteger(BigInt(transaction.gasPrice)),
+		minimalInteger(BigInt(transaction.gasLimit)),
+		transaction.to ? hexToBytes(transaction.to as `0x${string}`) : new Uint8Array(),
+		minimalInteger(BigInt(transaction.value)),
+		hexToBytes(transaction.data as `0x${string}`),
+		minimalInteger(eip155V),
+		minimalInteger(BigInt(`0x${transaction.r}`)),
+		minimalInteger(BigInt(`0x${transaction.s}`)),
+	];
+};
+
+export const encodeLegacy = (fields: Uint8Array[]): Buffer => Buffer.from(toRlp(fields).slice(2), "hex");
+
+// A 32-byte big-endian buffer for a hex string, preserving leading zero bytes (unlike minimalInteger).
+export const fixedWidth32 = (hex: string): Uint8Array => hexToBytes(`0x${hex.padStart(64, "0")}`);
