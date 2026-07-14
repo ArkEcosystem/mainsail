@@ -66,6 +66,8 @@ describe<{
 		const [sender] = wallets;
 
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+
 		const { receipt } = await instance.process({
 			from: sender.address,
 			value: 0n,
@@ -561,7 +563,7 @@ describe<{
 				}),
 				setAccountUpdates: () => {},
 			} as any);
-		}, "assertion failed: self.pending_commits.contains_key(&commit_key)");
+		}, "commit is missing commit key");
 
 		// Balance updated correctly
 		const balance = await getBalance(instance, contractAddress!, recipient.address);
@@ -640,7 +642,7 @@ describe<{
 				txHash: randomTxHash,
 				...deployConfig,
 			});
-		}, "assertion failed: !committed");
+		}, `cannot process transaction 0x${randomTxHash}: block 0 was already committed`);
 	});
 
 	it("should deploy, transfer multipe times and update balance correctly", async ({ instance }) => {
@@ -742,6 +744,9 @@ describe<{
 	it("should revert transaction if it exceeds gas limit", async ({ instance }) => {
 		const [sender] = wallets;
 
+		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+
 		await assert.rejects(
 			async () =>
 				instance.process({
@@ -749,7 +754,7 @@ describe<{
 					value: 0n,
 					nonce: 0n,
 					data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
-					commitKey: { blockNumber: BigInt(0), round: BigInt(0) },
+					commitKey,
 					txHash: getRandomTxHash(),
 					gasLimit: 30_000n,
 					gasPrice: 5n,
@@ -852,6 +857,9 @@ describe<{
 	it("should panic when transferring value without funds", async ({ instance }) => {
 		const [sender] = wallets;
 
+		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+
 		await assert.rejects(
 			async () =>
 				await instance.process({
@@ -860,7 +868,7 @@ describe<{
 					nonce: 0n,
 					data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 					txHash: getRandomTxHash(),
-					commitKey: { blockNumber: BigInt(0), round: BigInt(0) },
+					commitKey,
 					...deployConfig,
 				}),
 			"transaction validation error: lack of funds (0) for max fee (2)",
@@ -896,6 +904,9 @@ describe<{
 			setAccountUpdates: () => {},
 		} as any);
 
+		const nextCommitKey = { blockNumber: BigInt(1), round: BigInt(0) };
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey: nextCommitKey } });
+
 		await assert.rejects(
 			async () =>
 				await instance.process({
@@ -904,7 +915,7 @@ describe<{
 					nonce: 2n, // should be 1
 					data: Buffer.from("00", "hex"),
 					txHash: getRandomTxHash(),
-					commitKey: { blockNumber: BigInt(1), round: BigInt(0) },
+					commitKey: nextCommitKey,
 					...deployConfig,
 				}),
 			"transaction validation error: nonce 2 too high, expected 1",

@@ -143,32 +143,44 @@ fn collect_dirty_accounts(
     let mut dirty_accounts = HashMap::with_capacity(commit.change_set.accounts.len());
 
     for (address, account) in commit.change_set.accounts {
-        if let Some(account) = account {
-            dirty_accounts.insert(
+        // A destroyed (selfdestructed) account comes through as `None`; surface it as a
+        // zeroed update so consumers drop the stale balance — mirroring the history
+        // table, which records deletions as a default account.
+        let account = account.unwrap_or_default();
+
+        dirty_accounts.insert(
+            address,
+            AccountUpdate {
                 address,
-                AccountUpdate {
-                    address,
-                    balance: account.balance,
-                    nonce: account.nonce,
-                    vote: None,
-                    unvote: None,
-                    username: None,
-                    username_resigned: false,
-                    merge_info: commit
-                        .change_set
-                        .merged_legacy_cold_wallets
-                        .get(&address)
-                        .map(|value| AccountMergeInfo {
-                            legacy_address: value.1,
-                            transaction_hash: value.0,
-                        }),
-                },
-            );
-        }
+                balance: account.balance,
+                nonce: account.nonce,
+                vote: None,
+                unvote: None,
+                username: None,
+                username_resigned: false,
+                merge_info: commit
+                    .change_set
+                    .merged_legacy_cold_wallets
+                    .get(&address)
+                    .map(|value| AccountMergeInfo {
+                        legacy_address: value.1,
+                        transaction_hash: value.0,
+                    }),
+            },
+        );
     }
 
     if let Some(info) = genesis_info {
-        for (receipt, _) in commit.results.values() {
+        // `results` is keyed by tx hash, but the "last event wins" folds below must see
+        // events in execution order. Cumulative gas is strictly increasing per executed
+        // transaction, so it recovers that order: every executed transaction consumes at
+        // least the 21000-gas intrinsic cost, so each entry's cumulative total is strictly
+        // greater than the previous one's — the key is guaranteed unique and monotonic,
+        // never tied.
+        let mut results: Vec<&(ExecutionResult, u64)> = commit.results.values().collect();
+        results.sort_by_key(|(_, cumulative_gas_used)| *cumulative_gas_used);
+
+        for (receipt, _) in results {
             match receipt {
                 ExecutionResult::Success { logs, .. } => {
                     for log in logs {
@@ -453,6 +465,149 @@ mod tests {
                     merge_info: None
                 }
             ]
+        );
+    }
+
+    #[test]
+    fn test_collect_dirty_accounts_includes_destroyed_accounts() {
+        let destroyed = address!("0000000000000000000000000000000000000001");
+        let alive = address!("0000000000000000000000000000000000000002");
+
+        let mut change_set = StateChangeset::default();
+        change_set.accounts.push((destroyed, None));
+        change_set
+            .accounts
+            .push((alive, Some(AccountInfo::from_balance(U256::from(7)))));
+
+        let state = StateCommit {
+            change_set,
+            ..Default::default()
+        };
+
+        let mut account_updates = collect_dirty_accounts(state, &None);
+        account_updates.sort_by_key(|u| u.address);
+
+        // A selfdestructed account must surface as a zeroed update — consumers (api-sync
+        // wallet table) would otherwise keep the stale pre-destruction balance forever.
+        assert_eq!(
+            account_updates,
+            vec![
+                AccountUpdate {
+                    address: destroyed,
+                    balance: U256::ZERO,
+                    nonce: 0,
+                    ..Default::default()
+                },
+                AccountUpdate {
+                    address: alive,
+                    balance: U256::from(7),
+                    nonce: 0,
+                    ..Default::default()
+                }
+            ]
+        );
+    }
+
+    #[test]
+    fn test_collect_dirty_accounts_folds_events_in_execution_order() {
+        let voter = address!("0000000000000000000000000000000000000001");
+        let validator = address!("0000000000000000000000000000000000000002");
+
+        let genesis_info = GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            deployer_account: address!("0000000000000000000000000000000000000002"),
+            validator_contract: address!("0000000000000000000000000000000000000003"),
+            username_contract: address!("0000000000000000000000000000000000000004"),
+            initial_block_number: 0,
+            initial_supply: U256::from(1_000_000),
+        };
+
+        let mut change_set = StateChangeset::default();
+        change_set
+            .accounts
+            .push((voter, Some(AccountInfo::from_balance(U256::ONE))));
+
+        let success = |log: Log| ExecutionResult::Success {
+            reason: SuccessReason::Stop,
+            gas: ResultGas::new_with_state_gas(30000, 30000, 0, 0),
+            logs: vec![log],
+            output: Output::Call(alloy_primitives::Bytes(Bytes::new())),
+        };
+
+        // Execution order (= cumulative gas order): vote, unvote, register, resign.
+        // The tx hashes sort in exactly the reverse order, so a fold iterating the
+        // hash-keyed BTreeMap directly would end up with vote + username instead.
+        let mut results = BTreeMap::<B256, (ExecutionResult, u64)>::new();
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000004"),
+            (
+                success(Log {
+                    address: genesis_info.validator_contract,
+                    data: events::Voted { validator, voter }.encode_log_data(),
+                }),
+                21000,
+            ),
+        );
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000003"),
+            (
+                success(Log {
+                    address: genesis_info.validator_contract,
+                    data: events::Unvoted { validator, voter }.encode_log_data(),
+                }),
+                42000,
+            ),
+        );
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000002"),
+            (
+                success(Log {
+                    address: genesis_info.username_contract,
+                    data: events::UsernameRegistered {
+                        addr: voter,
+                        username: "test".into(),
+                        previousUsername: "".into(),
+                    }
+                    .encode_log_data(),
+                }),
+                63000,
+            ),
+        );
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+            (
+                success(Log {
+                    address: genesis_info.username_contract,
+                    data: events::UsernameResigned {
+                        addr: voter,
+                        username: "test".into(),
+                    }
+                    .encode_log_data(),
+                }),
+                84000,
+            ),
+        );
+
+        let state = StateCommit {
+            change_set,
+            results,
+            ..Default::default()
+        };
+
+        let account_updates = collect_dirty_accounts(state, &Some(genesis_info));
+
+        assert_eq!(
+            account_updates,
+            vec![AccountUpdate {
+                address: voter,
+                balance: U256::ONE,
+                nonce: 0,
+                vote: None,
+                unvote: Some(validator),
+                username: None,
+                username_resigned: true,
+                merge_info: None
+            }]
         );
     }
 

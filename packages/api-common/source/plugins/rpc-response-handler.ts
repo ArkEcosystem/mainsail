@@ -15,7 +15,11 @@ export const rpcResponseHandler = {
 			method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
 				const response = request.response;
 
-				if (responseIsBoom(response) && request.method === "post" && request.path === "") {
+				if (
+					responseIsBoom(response) &&
+					request.method === "post" &&
+					(request.path === "/" || request.path === "")
+				) {
 					return h.response(
 						Utilities.prepareRcpError(
 							Utilities.getRcpId(request),

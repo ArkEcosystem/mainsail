@@ -79,8 +79,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#isMnemonic(secret: string): boolean {
-		const words = secret.split(/\s+/);
-		return words.length >= 12 && words.length <= 24;
+		const words = secret.trim().split(/\s+/);
+		return [12, 15, 18, 21, 24].includes(words.length);
 	}
 
 	#isHexPrivateKey(secret: string): boolean {

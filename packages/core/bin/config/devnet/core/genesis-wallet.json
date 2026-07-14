@@ -1,14 +1,14 @@
 {
-	"address": "0xb2c71eFe47EA0615064573D9E0E26fc78b785816",
+	"address": "0x9628976Da3e4eb2573b98c36f5752019E20AB988",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "1babf3e87873f3780138d8901532f85496da97db4dade6f2e19d15796646323a",
-		"publicKey": "ab18ef7db8bb76997127cae1fe1c61be36b87859237dabdef009178fcc6c7a0b6e393b93163e45a41360bd86c6963892"
+		"privateKey": "21db9070adcdb295c96152a10cb810e3fde94a487ae62d0c3677c07336792695",
+		"publicKey": "849f445b903e3a93e04a8f3848616b24c4e9c686a8c1fc2bfcd1774fddaf01f661aa10d70c729d09626ebfe13faed434"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "eedde05db6f3cf4b1ad0922106314a2d61fd369b2b3cf85fdce6af45f95fb008",
-		"publicKey": "03eef4cbd24d314209781e0e356fb0cd1275783dd7e5ebbce05d1ec6b8a05c7eb8"
+		"privateKey": "42a435b591099e257d598ae703fa53ed54a1fa701a6ca69d3cad9af511c9d405",
+		"publicKey": "02237debf0ab2795d5f49f99032c2289059494da7339d79fd823b15e5efc0fad41"
 	},
-	"passphrase": "anchor law wet truck horror shrug detail turn defy yellow ugly bomb hidden dwarf surface parrot defense entry brief rack sell clump drift govern"
+	"passphrase": "clump mushroom glimpse kitchen surprise leaf host forum portion say wrong soccer erase antique ginger bachelor velvet hover promote energy gauge select adapt method"
 }

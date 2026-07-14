@@ -1,5 +1,5 @@
 import { Commands } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
+import { injectable, postConstruct } from "@mainsail/container";
 import { validateMnemonic } from "bip39";
 import { readJSONSync, writeJSONSync } from "fs-extra/esm";
 import Joi from "joi";
@@ -14,6 +14,7 @@ export class Command extends Commands.Command {
 
 	public description = "Configure the forging validator (BIP39).";
 
+	@postConstruct()
 	public configure(): void {
 		this.definition.setFlag("bip39", "A validator plain text passphrase. Referred to as BIP39.", Joi.string());
 	}

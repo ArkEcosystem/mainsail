@@ -1,20 +1,24 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Identifiers } from "@mainsail/constants";
-import { inject, injectable, optional, tagged } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
-import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi } from "@mainsail/evm-contracts";
+import { Application } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 import dayjs from "dayjs";
 import { bytesToHex, encodeFunctionData } from "viem";
 
 import { Wallet } from "../contracts.js";
-import { Generator } from "./generator.js";
+import { Identifiers as InternalIdentifiers } from "../identifiers.js";
+import { WalletGenerator } from "./wallet.js";
 
 @injectable()
-export class GenesisBlockGenerator extends Generator {
+export class GenesisBlockGenerator {
+	@inject(InternalIdentifiers.Application)
+	protected app!: Application;
+
 	@inject(Identifiers.Cryptography.Commit.Serializer)
 	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
 
@@ -22,24 +26,40 @@ export class GenesisBlockGenerator extends Generator {
 	private readonly transactionVerifier!: Contracts.Crypto.TransactionVerifier;
 
 	@inject(Identifiers.Snapshot.Legacy.Importer)
-	@optional()
-	private readonly snapshotLegacyImporter?: Contracts.Snapshot.LegacyImporter;
+	private readonly snapshotLegacyImporter!: Contracts.Snapshot.LegacyImporter;
 
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
+
+	@inject(InternalIdentifiers.Generator.Wallet)
+	private readonly walletGenerator!: WalletGenerator;
+
+	@inject(Identifiers.Cryptography.Block.Factory)
+	private readonly blockFactory!: Contracts.Crypto.BlockFactory;
+
+	@tagged("type", "wallet")
+	@inject(Identifiers.Cryptography.Identity.KeyPair.Factory)
+	private readonly keyPairFactoryWallet!: Contracts.Crypto.KeyPairFactory;
+
+	@inject(Identifiers.Cryptography.Identity.Address.Factory)
+	private readonly addressFactory!: Contracts.Crypto.AddressFactory;
+
+	@inject(Identifiers.Cryptography.Legacy.Identity.AddressFactory)
+	private readonly legacyAddressFactory!: Contracts.Crypto.AddressFactory;
 
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	#consensusProxyContractAddress!: string;
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	async generate(
 		genesisMnemonic: string,
 		validatorsMnemonics: string[],
 		options: Contracts.NetworkGenerator.InternalOptions,
 	): Promise<Contracts.Crypto.CommitData> {
-		const genesisWallet = await this.createWallet(genesisMnemonic);
+		const genesisWallet = await this.walletGenerator.generate(genesisMnemonic);
 
 		await this.#prepareEvm(genesisWallet.address, validatorsMnemonics.length, options);
 
@@ -49,32 +69,17 @@ export class GenesisBlockGenerator extends Generator {
 			await this.#buildFromLegacySnapshot(options);
 		} else {
 			const validators = await Promise.all(
-				validatorsMnemonics.map(async (mnemonic) => await this.createWallet(mnemonic)),
+				validatorsMnemonics.map(async (mnemonic) => await this.walletGenerator.generate(mnemonic)),
 			);
 
-			if (options.distribute) {
-				transactions = transactions.concat(
-					...(await this.#createTransferTransactions(
-						genesisWallet,
-						validators,
-						options.premine,
-						options.chainId,
-					)),
-				);
-
-				options.premine = transactions
-					.reduce((accumulator, current) => accumulator + current.value, 0n)
-					.toString();
-			} else {
-				transactions = transactions.concat(
-					await this.#createTransferTransaction(
-						genesisWallet,
-						genesisWallet,
-						options.premine,
-						options.chainId,
-					),
-				);
-			}
+			// The premine is always distributed evenly across validators; this also ensures
+			// each validator holds enough balance to pay the (payable) registration fee.
+			transactions = await this.#createTransferTransactions(
+				genesisWallet,
+				validators,
+				options.premine,
+				options.chainId,
+			);
 
 			const validatorTransactions = [
 				...(await this.#buildValidatorTransactions(
@@ -102,27 +107,23 @@ export class GenesisBlockGenerator extends Generator {
 		validatorsCount: number,
 		options: Contracts.NetworkGenerator.InternalOptions,
 	) {
-		if (options.snapshot) {
-			options.premine = "0";
-			options.distribute = false;
-		}
+		const genesisInfo: Contracts.Evm.GenesisInfo = {
+			account: genesisWalletAddress,
+			deployerAccount: this.app.get<string>(Identifiers.EvmConsensus.DeployerAddress),
+			initialBlockNumber: BigInt(options.initialBlockNumber),
+			// Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`).
+			// In snapshot mode premine is "0", so this mints nothing and the snapshot importer supplies the state.
+			initialSupply: options.snapshot
+				? 0n
+				: (BigInt(options.premine) / BigInt(validatorsCount)) * BigInt(validatorsCount),
 
-		await this.app.resolve(Deployer).deploy({
-			generatorAddress: genesisWalletAddress,
-			initialBlockNumber: options.snapshot
-				? Number(this.snapshotLegacyImporter!.genesisBlockNumber)
-				: options.initialBlockNumber,
-			initialSupply: (options.distribute
-				? // Ensure no left over remains when distributing funds from the genesis address (see `#createTransferTransactions`)
-					(BigInt(options.premine) / BigInt(validatorsCount)) * BigInt(validatorsCount)
-				: BigInt(options.premine)
-			).toString(),
-			timestamp: dayjs(options.epoch).valueOf(),
-		});
+			usernameContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Usernames), // PROXY Uses nonce 3
+			validatorContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus), // PROXY Uses nonce 1
+		};
 
-		this.#consensusProxyContractAddress = this.app.get<string>(
-			EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
-		);
+		this.app.rebind(Identifiers.EvmConsensus.GenesisInfo).toConstantValue(genesisInfo);
+
+		await this.app.get<Contracts.EvmConsensus.Deployer>(Identifiers.EvmConsensus.Deployer).deploy();
 	}
 
 	async #createTransferTransaction(
@@ -182,7 +183,7 @@ export class GenesisBlockGenerator extends Generator {
 				await this.app
 					.resolve(TransactionBuilder)
 					.network(chainId)
-					.recipientAddress(this.#consensusProxyContractAddress)
+					.recipientAddress(this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus))
 					.nonce("0") // validator registration tx is always the first one from sender
 					.payload(data)
 					.value(value)
@@ -209,8 +210,8 @@ export class GenesisBlockGenerator extends Generator {
 				await this.app
 					.resolve(TransactionBuilder)
 					.network(chainId)
-					.recipientAddress(this.#consensusProxyContractAddress)
-					.nonce("1") // vote transaction is always the 3rd tx from sender (1st one is validator registration)
+					.recipientAddress(this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus))
+					.nonce("1") // vote transaction is always the 2nd tx from sender (1st one is validator registration)
 					.payload(data)
 					.gasPrice(0)
 					.gasLimit(200_000)
@@ -305,6 +306,12 @@ export class GenesisBlockGenerator extends Generator {
 				value: transaction.value,
 			});
 
+			if (!receipt.status) {
+				throw new Error(
+					`genesis transaction ${transaction.hash} (from ${transaction.from} to ${transaction.to}) reverted during EVM execution`,
+				);
+			}
+
 			totals.fee += BigInt(transaction.gasPrice);
 			totals.gasUsed += Number(receipt.gasUsed);
 
@@ -330,12 +337,12 @@ export class GenesisBlockGenerator extends Generator {
 		});
 
 		return {
-			block: await this.app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
+			block: await this.blockFactory.make(
 				{
 					fee: totals.fee,
 					gasUsed: totals.gasUsed,
 					logsBloom: await this.evm.logsBloom(commitKey),
-					number: options.initialBlockNumber ?? 0,
+					number: options.initialBlockNumber,
 					parentHash:
 						options.snapshot?.previousGenesisBlockHash ??
 						"0000000000000000000000000000000000000000000000000000000000000000",
@@ -371,7 +378,6 @@ export class GenesisBlockGenerator extends Generator {
 
 	async #buildFromLegacySnapshot(options: Contracts.NetworkGenerator.GenesisBlockOptions) {
 		assert.defined(options.snapshot);
-		assert.defined(this.snapshotLegacyImporter);
 
 		// Load snapshot into EVM
 		const result = await this.snapshotLegacyImporter.import({
@@ -383,17 +389,16 @@ export class GenesisBlockGenerator extends Generator {
 			timestamp: dayjs(options.epoch).valueOf(),
 		});
 
-		options.initialBlockNumber = Number(this.snapshotLegacyImporter.genesisBlockNumber);
-
 		options.snapshot.snapshotHash = this.snapshotLegacyImporter.snapshotHash;
 		options.snapshot.previousGenesisBlockHash = this.snapshotLegacyImporter.previousGenesisBlockHash;
-		options.premine = "0";
 
 		this.app
 			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
 			.set("genesisBlock.block.number", options.initialBlockNumber);
 
-		console.log(result);
+		this.logger.info(
+			`Imported legacy snapshot: ${result.importedValidatorsWithBlsKey} validators with BLS key, ${result.importedValidatorsWithoutBlsKey} without, ${result.importedUsernames} usernames, ${result.importedVoters} voters (initial total supply ${result.initialTotalSupply})`,
+		);
 	}
 
 	async #createLegacyColdWallets(validatorMnemonics: string[]) {
@@ -408,20 +413,6 @@ export class GenesisBlockGenerator extends Generator {
 			legacyColdWallet: Contracts.Evm.LegacyColdWallet;
 		}[]
 	> {
-		const walletKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(
-			Identifiers.Cryptography.Identity.KeyPair.Factory,
-			"type",
-			"wallet",
-		);
-
-		const mainsailAddressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
-			Identifiers.Cryptography.Identity.Address.Factory,
-		);
-
-		const legacyAddressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
-			Identifiers.Cryptography.Legacy.Identity.AddressFactory,
-		);
-
 		const legacyColdWallets: {
 			keyPair: Contracts.Crypto.KeyPair;
 			mainsailAddress: string;
@@ -431,10 +422,10 @@ export class GenesisBlockGenerator extends Generator {
 			// use reversed secret as seed to not conflict with validators
 			const reversed = secret.split(" ").reverse().join(" ");
 
-			const walletKeyPair = await walletKeyPairFactory.fromMnemonic(reversed);
+			const walletKeyPair = await this.keyPairFactoryWallet.fromMnemonic(reversed);
 
-			const mainsailAddress = await mainsailAddressFactory.fromPublicKey(walletKeyPair.publicKey);
-			const legacyAddress = await legacyAddressFactory.fromPublicKey(walletKeyPair.publicKey);
+			const mainsailAddress = await this.addressFactory.fromPublicKey(walletKeyPair.publicKey);
+			const legacyAddress = await this.legacyAddressFactory.fromPublicKey(walletKeyPair.publicKey);
 			legacyColdWallets.push({
 				keyPair: walletKeyPair,
 				legacyColdWallet: {

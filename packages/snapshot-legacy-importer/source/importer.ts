@@ -2,7 +2,6 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, chunk, ensureError } from "@mainsail/utils";
@@ -43,16 +42,19 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
+	@inject(Identifiers.EvmConsensus.DeployerAddress)
 	private readonly deployerAddress!: string;
+
+	@inject(Identifiers.EvmConsensus.Contracts.Consensus)
+	private readonly consensusContractAddress!: string;
+
+	@inject(Identifiers.EvmConsensus.Contracts.Usernames)
+	private readonly usernameContractAddress!: string;
 
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	#prepared = false;
-
-	#consensusProxyContractAddress!: string;
-	#usernamesProxyContractAddress!: string;
 
 	#data: {
 		wallets: Contracts.Snapshot.ImportedLegacyWallet[];
@@ -308,14 +310,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const deployerAccount = await this.evm.getAccountInfo(this.deployerAddress);
 		this.#nonce = deployerAccount.nonce;
 
-		this.#consensusProxyContractAddress = this.app.get<string>(
-			EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
-		);
-
-		this.#usernamesProxyContractAddress = this.app.get<string>(
-			EvmConsensusIdentifiers.Contracts.Addresses.Usernames,
-		);
-
 		// 1) Seed account balances
 		const totalSupply = await this.#seedWallets(options);
 
@@ -448,7 +442,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				this.#getTransactionContext({
 					...options,
 					data,
-					to: this.#consensusProxyContractAddress,
+					to: this.consensusContractAddress,
 				}),
 			);
 
@@ -489,7 +483,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				this.#getTransactionContext({
 					...options,
 					data,
-					to: this.#consensusProxyContractAddress,
+					to: this.consensusContractAddress,
 				}),
 			);
 
@@ -523,7 +517,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				this.#getTransactionContext({
 					...options,
 					data,
-					to: this.#usernamesProxyContractAddress,
+					to: this.usernameContractAddress,
 				}),
 			);
 

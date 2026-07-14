@@ -15,8 +15,7 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
-		"test:coverage": "c8 -r=text -r=lcov --all pnpm run test",
-		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:coverage": "c8 --experimental-monocart -r=text -r=lcov --all pnpm run test",
 		"test:file": "pnpm run uvu source",
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
@@ -38,6 +37,8 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
 		"@mainsail/crypto-block": "workspace:*",
+		"@mainsail/crypto-transaction": "workspace:*",
+		"@mainsail/evm-service": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/semver": "7.7.1",

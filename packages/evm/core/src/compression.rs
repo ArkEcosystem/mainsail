@@ -19,6 +19,12 @@ const ZSTD_LEVEL: i32 = 3;
 // ABI-padded calldata, receipt logs, bytecode) still compress and are kept only when it shrinks them.
 const MIN_COMPRESS_LEN: usize = 256;
 
+// Ceiling for the decode-side allocation implied by a stored `orig_len` header. Every
+// persisted value is bounded far below this by protocol limits (block payload, receipts,
+// bytecode); a header claiming more can only come from corruption, and honoring it would
+// attempt a multi-GiB allocation (aborting on failure) before zstd even looks at the data.
+const MAX_DECOMPRESSED_LEN: usize = 256 * 1024 * 1024;
+
 #[derive(Debug)]
 pub struct CompactBincode<T>(pub T);
 impl<'a, T: serde::Serialize + 'a> heed::BytesEncode<'a> for CompactBincode<T> {
@@ -26,6 +32,13 @@ impl<'a, T: serde::Serialize + 'a> heed::BytesEncode<'a> for CompactBincode<T> {
 
     fn bytes_encode(item: &'a Self::EItem) -> Result<Cow<'a, [u8]>, heed::BoxedError> {
         let raw = bincode::serialize(&item.0)?;
+
+        // The compressed layout stores the original length as u32; a larger value would
+        // silently wrap the header and become unreadable. (Unreachable under protocol
+        // limits, but fail loudly at write time rather than at some later read.)
+        if u32::try_from(raw.len()).is_err() {
+            return Err(format!("CompressedBincode: value too large ({} bytes)", raw.len()).into());
+        }
 
         if raw.len() >= MIN_COMPRESS_LEN {
             let compressed = zstd::bulk::compress(&raw, ZSTD_LEVEL)?;
@@ -66,6 +79,12 @@ impl<'a, T: serde::de::DeserializeOwned + 'a> heed::BytesDecode<'a> for CompactB
                 }
                 let (len_bytes, compressed) = payload.split_at(4);
                 let orig_len = u32::from_le_bytes(len_bytes.try_into().unwrap()) as usize;
+                if orig_len > MAX_DECOMPRESSED_LEN {
+                    return Err(format!(
+                        "CompressedBincode: implausible original length {orig_len}"
+                    )
+                    .into());
+                }
                 let decompressed = zstd::bulk::decompress(compressed, orig_len)?;
                 bincode::deserialize(&decompressed)?
             }
@@ -102,6 +121,14 @@ mod tests {
         <CompactBincode<Vec<u8>> as BytesDecode>::bytes_decode(bytes)
             .unwrap()
             .0
+    }
+
+    #[test]
+    fn decode_rejects_implausible_length_header() {
+        let mut value = vec![TAG_ZSTD];
+        value.extend_from_slice(&u32::MAX.to_le_bytes());
+        value.extend_from_slice(&[0xde, 0xad]);
+        assert!(<CompactBincode<Vec<u8>> as BytesDecode>::bytes_decode(&value).is_err());
     }
 
     #[test]

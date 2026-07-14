@@ -1,14 +1,14 @@
 {
-    "address": "0xf882cE75E31ED00528a9E4B6c6e042686786CE79",
+    "address": "0xEf5B67C6a5F94D270748684548d9cE78586431A2",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "35cbe9b70846d23f856febda48a64fa6df90a8affa5de3b0244af81b3ec7bda2",
-        "publicKey": "a00fe812468108e998ded4d56bfaf59869ef198cb50260260448686d73e863798724eabc1e5dcbf0f4c3c4f3530d599e"
+        "privateKey": "3a1d329aee8a362f1e4a1617adb5b424c2ed37095730d33d38aa3f1beb0e03d8",
+        "publicKey": "a98a01aea2fc82b80cc8ff4f040e0fc5a7cc2a26596e9d8361455fe570fc6ba44ec279bcbce14dc11f08d18fb7491515"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "62222ced3836864b32dfe5506b13683d70097abd750cddabf38e2df7e117724f",
-        "publicKey": "027a7dea60049c6b0d17652f87625e18e8d1e7a5451060bc042e678a05a0200166"
+        "privateKey": "9777ac846144a752d7fade2325a8bf3e345ef1c202a5deebe180cdf8f67a1295",
+        "publicKey": "03e158109e04f5aa302ea7fb1ca6f086c2f9cf3a56695abe4dd983e2e9c40c0501"
     },
-    "passphrase": "gain link spawn anger iron property piano food flock topic music sun one soul sponsor audit reform alien primary photo unlock around eager top"
+    "passphrase": "border tissue case chalk flower pretty planet talk ecology hint race enjoy coach inherit enroll absorb blade copper neutral giraffe core female rude document"
 }

@@ -44,7 +44,7 @@ describe<{
 		assert.defined(validator.validate("jsonRpc_net_version", {}).errors);
 	});
 
-	it("should return the web3 client version", async ({ action }) => {
+	it("should return the chainId as a decimal string", async ({ action }) => {
 		assert.equal(await action.handle([]), `123`);
 	});
 });

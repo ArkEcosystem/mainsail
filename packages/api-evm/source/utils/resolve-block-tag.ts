@@ -1,9 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
-export const resolveBlockTag = async (
-	stateStore: Contracts.State.Store,
-	tag: string | Contracts.Crypto.BlockTag,
-): Promise<number> => {
+export const resolveBlockTag = async (stateStore: Contracts.State.Store, tag: string): Promise<number> => {
 	if (tag.startsWith("0x")) {
 		return Number.parseInt(tag);
 	}
@@ -20,9 +17,7 @@ export const resolveBlockTag = async (
 	}
 };
 
-export const getHistoryHeightFromBlockTag = async (
-	tag: string | Contracts.Crypto.BlockTag,
-): Promise<bigint | undefined> => {
+export const getHistoryHeightFromBlockTag = async (tag: string): Promise<bigint | undefined> => {
 	if (tag.startsWith("0x")) {
 		return BigInt(Number.parseInt(tag));
 	}

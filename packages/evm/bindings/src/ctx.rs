@@ -31,7 +31,6 @@ pub struct JsTransactionContext {
     pub nonce: BigInt,
     pub data: Buffer,
     pub tx_hash: String,
-    pub index: Option<u32>,
     pub commit_key: JsCommitKey,
     pub spec_id: String,
 }
@@ -344,8 +343,8 @@ impl TryFrom<JsCommitKey> for CommitKey {
         };
 
         Ok(CommitKey(
-            value.block_number.get_u64().1,
-            value.round.get_u64().1,
+            utils::convert_bigint_to_u64(value.block_number, "blockNumber")?,
+            utils::convert_bigint_to_u64(value.round, "round")?,
             block_hash,
         ))
     }
@@ -358,7 +357,7 @@ impl TryFrom<JsProofData> for ProofData {
         Ok(ProofData {
             round: value.round,
             signature: utils::convert_string_to_bls_sig(value.signature)?,
-            validator_set: value.validator_set.get_u128().1,
+            validator_set: utils::convert_bigint_to_u128(value.validator_set, "validatorSet")?,
         })
     }
 }
@@ -370,7 +369,7 @@ impl TryFrom<JsBlockHeaderData> for BlockHeaderData {
         Ok(BlockHeaderData {
             proposer: utils::create_address_from_string(&value.proposer)?,
             version: value.version,
-            timestamp: value.timestamp.get_u64().1,
+            timestamp: utils::convert_bigint_to_u64(value.timestamp, "timestamp")?,
             number: value.number,
             round: value.round,
             hash: utils::convert_string_to_b256(value.hash)?,
@@ -380,8 +379,8 @@ impl TryFrom<JsBlockHeaderData> for BlockHeaderData {
             transactions_root: utils::convert_string_to_b256(value.transactions_root)?,
             transactions_count: value.transactions_count,
             gas_used: value.gas_used,
-            fee: utils::convert_bigint_to_u256(value.fee)?,
-            reward: utils::convert_bigint_to_u256(value.reward)?,
+            fee: utils::convert_bigint_to_u256(value.fee, "fee")?,
+            reward: utils::convert_bigint_to_u256(value.reward, "reward")?,
             payload_size: value.payload_size,
         })
     }
@@ -408,18 +407,20 @@ impl TryFrom<JsTransactionData> for TransactionData {
             sender_public_key: value.sender_public_key,
             legacy_address,
             to,
-            gas_limit: value.gas_limit.get_u64().1,
-            gas_price: value.gas_price.get_u128().1,
-            value: utils::convert_bigint_to_u256(value.value)?,
-            nonce: value.nonce.get_u64().1,
+            gas_limit: utils::convert_bigint_to_u64(value.gas_limit, "gasLimit")?,
+            gas_price: utils::convert_bigint_to_u128(value.gas_price, "gasPrice")?,
+            value: utils::convert_bigint_to_u256(value.value, "value")?,
+            nonce: utils::convert_bigint_to_u64(value.nonce, "nonce")?,
             data: utils::convert_js_buffer_to_bytes(value.data),
             tx_hash: utils::convert_string_to_b256(value.tx_hash)?,
             block_number: value.block_number,
             index: value.index,
             legacy_second_signature: value.legacy_second_signature,
             v: value.v,
-            r: utils::convert_hex_to_u256(&value.r),
-            s: utils::convert_hex_to_u256(&value.s),
+            r: utils::convert_hex_to_u256(&value.r)
+                .map_err(|err| anyhow::anyhow!("transaction r: {err}"))?,
+            s: utils::convert_hex_to_u256(&value.s)
+                .map_err(|err| anyhow::anyhow!("transaction s: {err}"))?,
         })
     }
 }
@@ -436,7 +437,13 @@ impl TryFrom<JsCommitData> for CommitData {
             transactions.push(data.try_into()?);
         }
 
-        assert_eq!(header.transactions_count, transactions.len() as u16);
+        if header.transactions_count as usize != transactions.len() {
+            anyhow::bail!(
+                "transactions count mismatch: header says {}, got {}",
+                header.transactions_count,
+                transactions.len()
+            );
+        }
 
         Ok(CommitData {
             proof,
@@ -462,8 +469,8 @@ impl TryFrom<JsBlockContext> for BlockContext {
     fn try_from(value: JsBlockContext) -> Result<Self, Self::Error> {
         Ok(BlockContext {
             commit_key: value.commit_key.try_into()?,
-            gas_limit: value.gas_limit.get_u64().1,
-            timestamp: value.timestamp.get_u64().1,
+            gas_limit: utils::convert_bigint_to_u64(value.gas_limit, "gasLimit")?,
+            timestamp: utils::convert_bigint_to_u64(value.timestamp, "timestamp")?,
             validator_address: utils::create_address_from_string(&value.validator_address)?,
         })
     }
@@ -487,12 +494,12 @@ impl TryFrom<JsTransactionContext> for TxContext {
 
         let tx_ctx = TxContext {
             to,
-            gas_limit: value.gas_limit.get_u64().1,
-            gas_price: value.gas_price.get_u128().1,
+            gas_limit: utils::convert_bigint_to_u64(value.gas_limit, "gasLimit")?,
+            gas_price: utils::convert_bigint_to_u128(value.gas_price, "gasPrice")?,
             from: utils::create_address_from_string(&value.from)?,
             legacy_address,
-            value: utils::convert_bigint_to_u256(value.value)?,
-            nonce: value.nonce.get_u64().1,
+            value: utils::convert_bigint_to_u256(value.value, "value")?,
+            nonce: utils::convert_bigint_to_u64(value.nonce, "nonce")?,
             data: utils::convert_js_buffer_to_bytes(value.data),
             tx_hash: utils::convert_string_to_b256(value.tx_hash)?,
             spec_id: parse_spec_id(value.spec_id)?,
@@ -515,11 +522,11 @@ impl TryFrom<JsTransactionSimulateContext> for TxSimulateContext {
 
         Ok(TxSimulateContext {
             to,
-            gas_limit: value.gas_limit.get_u64().1,
-            gas_price: value.gas_price.get_u128().1,
+            gas_limit: utils::convert_bigint_to_u64(value.gas_limit, "gasLimit")?,
+            gas_price: utils::convert_bigint_to_u128(value.gas_price, "gasPrice")?,
             from: utils::create_address_from_string(&value.from)?,
-            value: utils::convert_bigint_to_u256(value.value)?,
-            nonce: value.nonce.get_u64().1,
+            value: utils::convert_bigint_to_u256(value.value, "value")?,
+            nonce: utils::convert_bigint_to_u64(value.nonce, "nonce")?,
             data: utils::convert_js_buffer_to_bytes(value.data),
             block_context: value.block_context.try_into()?,
             spec_id: parse_spec_id(value.spec_id)?,
@@ -545,15 +552,15 @@ impl TryFrom<JsPreverifyTransactionContext> for PreverifyTxContext {
 
         let tx_ctx = PreverifyTxContext {
             to,
-            gas_limit: value.gas_limit.get_u64().1,
-            gas_price: value.gas_price.get_u128().1,
+            gas_limit: utils::convert_bigint_to_u64(value.gas_limit, "gasLimit")?,
+            gas_price: utils::convert_bigint_to_u128(value.gas_price, "gasPrice")?,
             from: utils::create_address_from_string(&value.from)?,
             legacy_address,
-            value: utils::convert_bigint_to_u256(value.value)?,
-            nonce: value.nonce.get_u64().1,
+            value: utils::convert_bigint_to_u256(value.value, "value")?,
+            nonce: utils::convert_bigint_to_u64(value.nonce, "nonce")?,
             data: utils::convert_js_buffer_to_bytes(value.data),
             tx_hash: utils::convert_string_to_b256(value.tx_hash)?,
-            block_gas_limit: value.block_gas_limit.get_u64().1,
+            block_gas_limit: utils::convert_bigint_to_u64(value.block_gas_limit, "blockGasLimit")?,
             spec_id: parse_spec_id(value.spec_id)?,
         };
 
@@ -565,7 +572,10 @@ impl TryFrom<JsTransactionViewContext> for TxViewContext {
     type Error = anyhow::Error;
 
     fn try_from(value: JsTransactionViewContext) -> std::result::Result<Self, Self::Error> {
-        let gas_limit = value.gas_limit.map(|gas_limit| gas_limit.get_u64().1);
+        let gas_limit = value
+            .gas_limit
+            .map(|gas_limit| utils::convert_bigint_to_u64(gas_limit, "gasLimit"))
+            .transpose()?;
 
         let tx_ctx = TxViewContext {
             from: utils::create_address_from_string(&value.from)?,
@@ -588,8 +598,11 @@ impl TryFrom<JsGenesisContext> for GenesisContext {
             validator_contract: utils::create_address_from_string(&value.validator_contract)?,
             username_contract: utils::create_address_from_string(&value.username_contract)?,
             deployer_account: utils::create_address_from_string(&value.deployer_account)?,
-            initial_block_number: value.initial_block_number.get_u64().1,
-            initial_supply: utils::convert_bigint_to_u256(value.initial_supply)?,
+            initial_block_number: utils::convert_bigint_to_u64(
+                value.initial_block_number,
+                "initialBlockNumber",
+            )?,
+            initial_supply: utils::convert_bigint_to_u256(value.initial_supply, "initialSupply")?,
         })
     }
 }
@@ -600,7 +613,8 @@ impl TryFrom<JsEvmOptions> for EvmOptions {
     fn try_from(value: JsEvmOptions) -> Result<Self, Self::Error> {
         let history_size = value
             .history_size
-            .map(|history_size| history_size.get_u64().1);
+            .map(|history_size| utils::convert_bigint_to_u64(history_size, "historySize"))
+            .transpose()?;
 
         Ok(EvmOptions {
             path: value.path.into(),
@@ -617,9 +631,12 @@ impl TryFrom<JsCalculateRoundValidatorsContext> for CalculateRoundValidatorsCont
     fn try_from(value: JsCalculateRoundValidatorsContext) -> Result<Self, Self::Error> {
         Ok(CalculateRoundValidatorsContext {
             commit_key: value.commit_key.try_into()?,
-            timestamp: value.timestamp.get_u64().1,
+            timestamp: utils::convert_bigint_to_u64(value.timestamp, "timestamp")?,
             validator_address: utils::create_address_from_string(&value.validator_address)?,
-            round_validators: u8::try_from(value.round_validators.get_u64().1)?,
+            round_validators: u8::try_from(utils::convert_bigint_to_u64(
+                value.round_validators,
+                "roundValidators",
+            )?)?,
             spec_id: parse_spec_id(value.spec_id)?,
         })
     }
@@ -631,9 +648,9 @@ impl TryFrom<JsUpdateRewardsAndVotesContext> for UpdateRewardsAndVotesContext {
     fn try_from(value: JsUpdateRewardsAndVotesContext) -> Result<Self, Self::Error> {
         Ok(UpdateRewardsAndVotesContext {
             commit_key: value.commit_key.try_into()?,
-            timestamp: value.timestamp.get_u64().1,
+            timestamp: utils::convert_bigint_to_u64(value.timestamp, "timestamp")?,
             validator_address: utils::create_address_from_string(&value.validator_address)?,
-            block_reward: value.block_reward.get_u128().1,
+            block_reward: utils::convert_bigint_to_u128(value.block_reward, "blockReward")?,
             spec_id: parse_spec_id(value.spec_id)?,
         })
     }

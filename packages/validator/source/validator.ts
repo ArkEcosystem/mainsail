@@ -15,7 +15,7 @@ export class Validator implements Contracts.Validator.Validator {
 	private readonly proposalFactory!: Contracts.Crypto.ProposalFactory;
 
 	@inject(Identifiers.State.Store)
-	protected readonly stateStore!: Contracts.State.Store;
+	private readonly stateStore!: Contracts.State.Store;
 
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 

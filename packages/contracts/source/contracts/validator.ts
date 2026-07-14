@@ -17,13 +17,13 @@ export interface Validator {
 	): Promise<Proposal>;
 	prevote(
 		validatorIndex: number,
-		blockHeight: number,
+		blockNumber: number,
 		round: number,
 		blockHash: string | undefined,
 	): Promise<Message>;
 	precommit(
 		validatorIndex: number,
-		blockHeight: number,
+		blockNumber: number,
 		round: number,
 		blockHash: string | undefined,
 	): Promise<Message>;

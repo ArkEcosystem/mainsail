@@ -1,235 +1,294 @@
+import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
-import envPaths from "env-paths";
-import fs from "fs-extra/esm";
+import { existsSync, readFileSync, writeFileSync } from "fs";
+import { ensureDirSync, readJSONSync } from "fs-extra/esm";
 import { join } from "path";
+import { dirSync, setGracefulCleanup } from "tmp";
 
 import { describe } from "@mainsail/test-runner";
 import { makeApplication } from "./application-factory";
 import { ConfigurationGenerator } from "./configuration-generator";
 import { Identifiers as InternalIdentifiers } from "./identifiers";
 
+// A representative genesis commit using the *current* block schema. The orchestrator forwards
+// whatever the genesis generator returns straight into crypto.json, so this both documents the
+// schema and lets us verify the writer serializes bigint fields (fee/reward) to strings.
+const GENESIS_COMMIT = {
+	block: {
+		fee: 0n,
+		gasUsed: 0,
+		hash: "a".repeat(64),
+		logsBloom: "0".repeat(512),
+		number: 0,
+		parentHash: "0".repeat(64),
+		payloadSize: 8,
+		proposer: `0x${"0".repeat(40)}`,
+		reward: 0n,
+		round: 0,
+		stateRoot: "0".repeat(64),
+		timestamp: 0,
+		transactions: [],
+		transactionsCount: 2,
+		transactionsRoot: "b".repeat(64),
+		version: 1,
+	},
+	proof: { round: 0, signature: "0".repeat(192), validators: [] },
+	serialized: "deadbeef",
+};
+
 describe<{
 	app: Application;
+	configPath: string;
 	generator: ConfigurationGenerator;
-}>("NetworkGenerator", ({ beforeEach, it, assert, stub, match }) => {
-	const paths = envPaths("myn", { suffix: "core" });
-	const configCore = join(paths.config, "devnet");
+	genesis: { generate: (...arguments_: unknown[]) => Promise<unknown> };
+}>("ConfigurationGenerator", ({ beforeAll, beforeEach, afterEach, it, assert, spy, stub }) => {
+	const options = (overrides: Record<string, unknown> = {}) => ({
+		chainId: 10_000,
+		network: "devnet",
+		symbol: "my",
+		token: "myn",
+		...overrides,
+	});
+
+	beforeAll(() => setGracefulCleanup());
 
 	beforeEach(async (context) => {
-		context.app = await makeApplication(configCore);
+		// A fresh, non-existent destination inside a throwaway temp directory.
+		context.configPath = join(dirSync().name, "devnet");
+
+		context.app = await makeApplication(context.configPath);
+
+		// Silence the default console logger; the logging test re-stubs this binding.
+		context.app.rebind(Identifiers.Services.Log.Service).toConstantValue({
+			debug: () => {},
+			error: () => {},
+			info: () => {},
+			warning: () => {},
+		});
+
+		// The genesis block generator is the only dependency that boots the Rust EVM. Stub it so the
+		// orchestrator can be exercised end-to-end; every other generator and the writer run for real.
+		context.genesis = { generate: async () => GENESIS_COMMIT };
+		context.app.rebind(InternalIdentifiers.Generator.GenesisBlock).toConstantValue(context.genesis);
+
 		context.generator = context.app.get<ConfigurationGenerator>(InternalIdentifiers.ConfigurationGenerator);
 	});
 
-	// TODO: fix stubs
-	it.skip("should generate a new configuration", async ({ generator }) => {
-		const existsSync = stub(fs, "pathExistsSync");
-		const ensureDirSync = stub(fs, "ensureDirSync");
-		const writeJSONSync = stub(fs, "writeJSONSync");
-		const writeFileSync = stub(fs, "writeFileSync");
+	// makeApplication wires up the Rust EVM addon, whose native runtime keeps the event loop
+	// alive until an instance is disposed. Tear it down so the test process exits cleanly.
+	afterEach(async ({ app }) => {
+		await app.getTagged<{ dispose(): Promise<void> }>(Identifiers.Evm.Instance, "instance", "evm").dispose();
+	});
 
-		await generator.generate({
-			network: "devnet",
-			symbol: "my",
-			token: "myn",
+	it("should generate a complete configuration with default options", async ({ generator, configPath }) => {
+		await generator.generate(options());
+
+		assert.true(existsSync(configPath));
+		for (const file of [
+			"genesis-wallet.json",
+			"crypto.json",
+			"peers.json",
+			"validators.json",
+			".env",
+			"app.json",
+		]) {
+			assert.true(existsSync(join(configPath, file)));
+		}
+		// No snapshot was requested.
+		assert.false(existsSync(join(configPath, "snapshot")));
+
+		const crypto = readJSONSync(join(configPath, "crypto.json"));
+
+		// Genesis block is forwarded verbatim, with bigint fields serialized to strings.
+		assert.equal(crypto.genesisBlock.serialized, "deadbeef");
+		assert.equal(crypto.genesisBlock.block.transactionsCount, 2);
+		assert.equal(crypto.genesisBlock.block.parentHash, "0".repeat(64));
+		assert.equal(crypto.genesisBlock.block.transactionsRoot, "b".repeat(64));
+		assert.equal(crypto.genesisBlock.block.fee, "0");
+		assert.equal(crypto.genesisBlock.block.reward, "0");
+
+		// Default milestones: genesis, the round-validator milestone at height 1, and the reward milestone.
+		assert.length(crypto.milestones, 3);
+		assert.equal(crypto.milestones[0].height, 0);
+		assert.equal(crypto.milestones[0].roundValidators, 0);
+		assert.equal(crypto.milestones[0].timeouts.blockTime, 8000);
+		assert.equal(crypto.milestones[0].timeouts.blockPrepareTime, 4000);
+		assert.equal(crypto.milestones[0].timeouts.stageTimeout, 2000);
+		assert.equal(crypto.milestones[0].timeouts.stageTimeoutIncrease, 2000);
+		assert.equal(crypto.milestones[1], { height: 1, roundValidators: 53 });
+		assert.equal(crypto.milestones[2], { height: 75_600, reward: "2000000000000000000" });
+
+		// Network reflects the requested token/symbol and the default key/wif prefixes.
+		assert.equal(crypto.network.chainId, 10_000);
+		assert.equal(crypto.network.client, { explorer: "", symbol: "my", token: "myn" });
+		assert.equal(crypto.network.name, "devnet");
+		assert.equal(crypto.network.pubKeyHash, 30);
+		assert.equal(crypto.network.wif, 186);
+		assert.length(crypto.network.nethash, 64);
+
+		// 53 validator secrets by default.
+		assert.length(readJSONSync(join(configPath, "validators.json")).secrets, 53);
+
+		// Peers use the default p2p port.
+		assert.equal(readJSONSync(join(configPath, "peers.json")), { list: [{ ip: "127.0.0.1", port: 4000 }] });
+
+		// genesis-wallet holds a derived address and its passphrase.
+		const wallet = readJSONSync(join(configPath, "genesis-wallet.json"));
+		assert.string(wallet.address);
+		assert.string(wallet.passphrase);
+
+		// .env carries the core defaults.
+		assert.true(readFileSync(join(configPath, ".env")).toString().includes("MAINSAIL_P2P_PORT=4000"));
+	});
+
+	it("should log every task and the completion message when a logger is bound", async ({
+		app,
+		generator,
+		configPath,
+	}) => {
+		const info = stub(app.get(Identifiers.Services.Log.Service), "info");
+
+		await generator.generate(options());
+
+		// 7 task titles (prepare, genesis-wallet, crypto, peers, validators, .env, app) + the completion line.
+		info.calledTimes(8);
+		info.calledWith("Preparing directories.");
+		info.calledWith("Writing crypto.json in core config path.");
+		info.calledWith("Writing .env in core config path.");
+		info.calledWith(`Configuration generated on location: ${configPath}`);
+	});
+
+	it("should throw if the configuration destination already exists", async ({ generator, configPath }) => {
+		ensureDirSync(configPath);
+
+		await assert.rejects(() => generator.generate(options()), `${configPath} already exists.`);
+
+		// It bails on the first task, before writing any config files.
+		assert.false(existsSync(join(configPath, "crypto.json")));
+	});
+
+	it("should overwrite an existing destination when overwriteConfig is set", async ({ generator, configPath }) => {
+		ensureDirSync(configPath);
+
+		await assert.resolves(() => generator.generate(options({ overwriteConfig: true })));
+		assert.true(existsSync(join(configPath, "crypto.json")));
+	});
+
+	it("should apply custom network, milestone and reward options", async ({ generator, configPath, genesis }) => {
+		const generate = spy(genesis, "generate");
+
+		await generator.generate(
+			options({
+				blockTime: 9000,
+				explorer: "myex.io",
+				pubKeyHash: 168,
+				rewardAmount: "200000000",
+				rewardHeight: 23_000,
+				validators: 7,
+				wif: 27,
+			}),
+		);
+
+		const crypto = readJSONSync(join(configPath, "crypto.json"));
+
+		assert.equal(crypto.milestones[0].timeouts.blockTime, 9000);
+		assert.equal(crypto.milestones[0].timeouts.blockPrepareTime, 4500);
+		assert.equal(crypto.milestones[1], { height: 1, roundValidators: 7 });
+		assert.equal(crypto.milestones[2], { height: 23_000, reward: "200000000" });
+
+		assert.equal(crypto.network.client.explorer, "myex.io");
+		assert.equal(crypto.network.pubKeyHash, 168);
+		assert.equal(crypto.network.wif, 27);
+
+		assert.length(readJSONSync(join(configPath, "validators.json")).secrets, 7);
+
+		// The orchestrator forwards the merged options (custom + defaults) and validator mnemonics.
+		const [, validatorMnemonics, internalOptions] = generate.getCallArgs(0) as [string, string[], any];
+		assert.length(validatorMnemonics, 7);
+		assert.equal(internalOptions.blockTime, 9000);
+		assert.equal(internalOptions.premine, "125000000000000000000000000");
+	});
+
+	it("should write database settings to .env when all DB options are provided", async ({ generator, configPath }) => {
+		await generator.generate(
+			options({
+				coreDBDatabase: "mydb",
+				coreDBHost: "db-host",
+				coreDBPassword: "pass",
+				coreDBPort: 6543,
+				coreDBUsername: "user",
+			}),
+		);
+
+		const environment = readFileSync(join(configPath, ".env")).toString();
+		assert.true(environment.includes("MAINSAIL_DB_HOST=db-host"));
+		assert.true(environment.includes("MAINSAIL_DB_PORT=6543"));
+		assert.true(environment.includes("MAINSAIL_DB_USERNAME=user"));
+		assert.true(environment.includes("MAINSAIL_DB_PASSWORD=pass"));
+		assert.true(environment.includes("MAINSAIL_DB_DATABASE=mydb"));
+	});
+
+	it("should build a snapshot-based configuration with mock validator keys", async ({ app, configPath }) => {
+		const snapshotSource = join(dirSync().name, "snap.compressed");
+		writeFileSync(snapshotSource, "snapshot-bytes");
+
+		const importer = {
+			genesisBlockNumber: 100n,
+			prepare: async () => {},
+			previousGenesisBlockHash: "b".repeat(64),
+			snapshotHash: "a".repeat(64),
+			validators: [
+				{ blsPublicKey: "", username: "alice" },
+				{ blsPublicKey: "", username: "bob" },
+			],
+		};
+		app.rebind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(importer);
+		const generator = app.get<ConfigurationGenerator>(InternalIdentifiers.ConfigurationGenerator);
+
+		await generator.generate(
+			options({
+				mockFakeValidatorBlsKeys: true,
+				snapshot: { path: snapshotSource, snapshotHash: "a".repeat(64) },
+				validators: 2,
+			}),
+		);
+
+		const crypto = readJSONSync(join(configPath, "crypto.json"));
+		// initialBlockNumber is taken from the importer's genesis block number.
+		assert.equal(crypto.milestones[0].height, 100);
+		assert.equal(crypto.milestones[0].snapshot, {
+			previousGenesisBlockHash: "b".repeat(64),
+			snapshotHash: "a".repeat(64),
 		});
 
-		existsSync.calledWith(configCore);
+		// The snapshot file is copied into the snapshot directory.
+		assert.true(existsSync(join(configPath, "snapshot", "snap.compressed")));
 
-		ensureDirSync.calledWith(configCore);
+		// Validator secrets are the deterministic mock mnemonics (one per imported validator).
+		assert.length(readJSONSync(join(configPath, "validators.json")).secrets, 2);
 
-		writeJSONSync.calledTimes(5);
-		writeFileSync.calledOnce();
-
-		writeJSONSync.calledWith(
-			match("crypto.json"),
-			match({
-				genesisBlock: {
-					block: {
-						generatorAddress: match.string,
-						height: 0,
-						id: match.string,
-						numberOfTransactions: 160,
-						payloadHash: match.string,
-						payloadLength: match.number,
-						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-						reward: 0n,
-						timestamp: match.number,
-						totalAmount: 12500000000000000n,
-						totalFee: 0n,
-						transactions: match.array,
-						version: 1,
-					},
-				},
-				milestones: [
-					match({
-						roundValidators: 0,
-						address: match.object,
-						block: match.object,
-						blockTime: 8000,
-						epoch: match.string,
-						height: 0,
-						reward: "0",
-						satoshi: match.object,
-					}),
-					match({
-						roundValidators: 53,
-						height: 1,
-					}),
-					match({
-						height: 75_600,
-						reward: "200000000",
-					}),
-				],
-				network: {
-					chainId: match.number,
-					client: { explorer: "", symbol: "my", token: "myn" },
-					name: "devnet",
-					nethash: match.string,
-					pubKeyHash: 30,
-					slip44: 1,
-					wif: 186,
-				},
-			}),
-			{ spaces: 4 },
+		// The mock-keys flag is propagated to the environment.
+		assert.true(
+			readFileSync(join(configPath, ".env"))
+				.toString()
+				.includes("MAINSAIL_SNAPSHOT_MOCK_FAKE_VALIDATOR_BLS_KEYS=1"),
 		);
 	});
 
-	// TODO: fix stubs
-	it.skip("should log if logger is provided", async ({ generator, app }) => {
-		const logger = {
-			info: () => {},
+	it("should throw when a snapshot is requested without a snapshot hash", async ({ app }) => {
+		const importer = {
+			genesisBlockNumber: 0n,
+			prepare: async () => {},
+			previousGenesisBlockHash: "",
+			snapshotHash: "",
+			validators: [],
 		};
-
-		app.bind(InternalIdentifiers.LogService).toConstantValue(logger);
-
-		const log = stub(logger, "info");
-		const existsSync = stub(fs, "existsSync");
-		const ensureDirSync = stub(fs, "ensureDirSync");
-		const writeJSONSync = stub(fs, "writeJSONSync");
-		const writeFileSync = stub(fs, "writeFileSync");
-
-		await generator.generate({
-			network: "devnet",
-			symbol: "my",
-			token: "myn",
-		});
-
-		existsSync.calledWith(configCore);
-		ensureDirSync.calledWith(configCore);
-		writeJSONSync.calledTimes(5);
-		writeFileSync.calledOnce();
-		log.calledTimes(8);
-	});
-
-	// TODO: fix stubs
-	it.skip("should throw if the core configuration destination already exists", async ({ generator }) => {
-		stub(fs, "existsSync").returnValueOnce(true);
+		app.rebind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(importer);
+		const generator = app.get<ConfigurationGenerator>(InternalIdentifiers.ConfigurationGenerator);
 
 		await assert.rejects(
-			() =>
-				generator.generate({
-					network: "devnet",
-					symbol: "my",
-					token: "myn",
-				}),
-			`${configCore} already exists.`,
-		);
-	});
-
-	// TODO: fix stubs
-	it.skip("should generate a new configuration with additional flags", async ({ generator }) => {
-		const existsSync = stub(fs, "existsSync");
-		const ensureDirSync = stub(fs, "ensureDirSync");
-		const writeJSONSync = stub(fs, "writeJSONSync");
-		const writeFileSync = stub(fs, "writeFileSync");
-
-		await generator.generate({
-			blockTime: 9000,
-			coreDBDatabase: "database",
-			coreDBHost: "localhost",
-			coreDBPassword: "password",
-			coreDBPort: 5432,
-			coreDBUsername: "username",
-			coreP2PPort: 4000,
-			coreWebhooksPort: 4004,
-			distribute: true,
-			epoch: new Date(new Date().toISOString().slice(0, 11) + "00:00:00.000Z"),
-			explorer: "myex.io",
-			force: false,
-			maxBlockPayload: 123_444,
-			maxTxPerBlock: 122,
-			network: "devnet",
-			overwriteConfig: false,
-			peers: ["127.0.0.1"],
-			premine: "12500000000000000",
-			pubKeyHash: 168,
-			rewardAmount: "200000000",
-			rewardHeight: 23_000,
-			symbol: "my",
-			token: "myn",
-			validators: 53,
-			wif: 27,
-		});
-
-		existsSync.calledWith(configCore);
-		ensureDirSync.calledWith(configCore);
-		writeJSONSync.calledTimes(5);
-		writeFileSync.calledOnce();
-
-		writeJSONSync.calledWith(
-			match("crypto.json"),
-			match({
-				genesisBlock: {
-					block: {
-						generatorAddress: match.string,
-						height: 0,
-						id: match.string,
-						numberOfTransactions: 212,
-						payloadHash: match.string,
-						payloadLength: match.number,
-						previousBlock: "0000000000000000000000000000000000000000000000000000000000000000",
-						reward: 0n,
-						timestamp: match.number,
-						totalAmount: 12499999999999969n,
-						totalFee: 0n,
-						transactions: match.array,
-						version: 1,
-					},
-				},
-				milestones: [
-					match({
-						roundValidators: 0,
-						address: match.object,
-						block: match.object,
-						blockTime: 9000,
-						epoch: match.string,
-						height: 0,
-						reward: "0",
-						satoshi: match.object,
-						stageTimeoutout: 2000,
-						stageTimeoutoutIncrease: 2000,
-					}),
-					match({
-						roundValidators: 53,
-						height: 1,
-					}),
-					match({
-						height: 23_000,
-						reward: "200000000",
-					}),
-				],
-				network: {
-					chainId: match.number,
-					client: { explorer: "myex.io", symbol: "my", token: "myn" },
-					name: "devnet",
-					nethash: match.string,
-
-					pubKeyHash: 168,
-					slip44: 1,
-					wif: 27,
-				},
-			}),
-			{ spaces: 4 },
+			() => generator.generate(options({ snapshot: { path: "/snapshot/path" } })),
+			"missing snapshot config",
 		);
 	});
 });

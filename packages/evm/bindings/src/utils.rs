@@ -28,22 +28,48 @@ pub(crate) fn convert_string_to_bls_sig(str: String) -> anyhow::Result<BlsSig> {
     )?)
 }
 
-pub(crate) fn convert_hex_to_u256(str: &str) -> U256 {
-    U256::from_le_slice(&hex::decode(&str).expect("valid hex")[..])
+pub(crate) fn convert_hex_to_u256(str: &str) -> anyhow::Result<U256> {
+    let bytes = hex::decode(str)?;
+    if bytes.len() != 32 {
+        anyhow::bail!("expected exactly 32 bytes, got {}", bytes.len());
+    }
+    Ok(U256::from_le_slice(&bytes[..]))
 }
 
 pub(crate) fn convert_u256_to_hex(value: U256) -> String {
-    hex::encode(value.to_le_bytes_vec())
+    hex::encode(value.to_le_bytes::<32>())
 }
 
-pub(crate) fn convert_bigint_to_u256(bigint: BigInt) -> anyhow::Result<U256> {
+pub(crate) fn convert_bigint_to_u64(bigint: BigInt, field: &str) -> anyhow::Result<u64> {
+    let (sign_bit, value, lossless) = bigint.get_u64();
+    if sign_bit || !lossless {
+        anyhow::bail!("{field}: expected an unsigned bigint fitting into 64 bits");
+    }
+    Ok(value)
+}
+
+pub(crate) fn convert_bigint_to_u128(bigint: BigInt, field: &str) -> anyhow::Result<u128> {
+    // Unlike `get_u64`, `get_u128`'s lossless flag does not account for the sign.
+    let (sign_bit, value, lossless) = bigint.get_u128();
+    if sign_bit || !lossless {
+        anyhow::bail!("{field}: expected an unsigned bigint fitting into 128 bits");
+    }
+    Ok(value)
+}
+
+pub(crate) fn convert_bigint_to_u256(bigint: BigInt, field: &str) -> anyhow::Result<U256> {
+    if bigint.sign_bit {
+        anyhow::bail!("{field}: expected an unsigned bigint");
+    }
+
     let bytes: Vec<u8> = bigint
         .words
         .iter()
         .flat_map(|word| word.to_le_bytes())
         .collect();
 
-    U256::try_from_le_slice(&bytes[..]).ok_or_else(|| anyhow::anyhow!("invalid bigint"))
+    U256::try_from_le_slice(&bytes[..])
+        .ok_or_else(|| anyhow::anyhow!("{field}: expected a bigint fitting into 256 bits"))
 }
 
 pub(crate) fn convert_bytes_to_js_buffer(bytes: Bytes) -> Buffer {

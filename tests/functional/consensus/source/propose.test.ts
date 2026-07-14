@@ -21,7 +21,7 @@ import { makeCustomProposal, makeTransactionBuilderContext } from "./custom-prop
 import { EvmCalls } from "@mainsail/test-transaction-builders";
 
 describe<{
-	nodes: Contracts.Kernel.Application[],
+	nodes: Contracts.Kernel.Application[];
 	validators: Validator[];
 	p2p: P2PRegistry;
 }>("Propose", ({ beforeEach, afterEach, it, assert, stub }) => {
@@ -99,7 +99,7 @@ describe<{
 		const node0 = nodes[0];
 		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
 
-		stubPropose.callsFake(async () => { });
+		stubPropose.callsFake(async () => {});
 
 		await runMany(nodes);
 
@@ -268,7 +268,7 @@ describe<{
 
 		const node0 = nodes[0];
 		const stubPropose = stub(nodes[0].get<Consensus>(Identifiers.Consensus.Service), "propose");
-		stubPropose.callsFake(async () => { });
+		stubPropose.callsFake(async () => {});
 
 		await runMany(nodes);
 

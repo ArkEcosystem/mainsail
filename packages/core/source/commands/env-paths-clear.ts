@@ -1,3 +1,4 @@
+/* eslint-disable unicorn/prevent-abbreviations */
 import type { Contracts } from "@mainsail/contracts";
 
 import { Commands } from "@mainsail/cli";
@@ -16,57 +17,59 @@ export class Command extends Commands.Command {
 
 	@postConstruct()
 	public configure(): void {
-		this.definition.setFlag("state-export", "Clear state exports.", Joi.boolean());
-		this.definition.setFlag("plugins", "Clear installed plugins.", Joi.boolean());
-		this.definition.setFlag("data", "Clear data.", Joi.boolean());
-		this.definition.setFlag("consensusData", "Clear consensus data.", Joi.boolean());
-		this.definition.setFlag("txPoolData", "Clear transaction pool data.", Joi.boolean());
-		this.definition.setFlag("config", "Clear config.", Joi.boolean());
-		this.definition.setFlag("cache", "Clear cache.", Joi.boolean());
-		this.definition.setFlag("log", "Clear log.", Joi.boolean());
-		this.definition.setFlag("temp", "Clear temp.", Joi.boolean());
-		this.definition.setFlag("all", "Clear all.", Joi.boolean());
+		this.definition.setFlag("state-export", "Clear state exports.", Joi.boolean().default(false));
+		this.definition.setFlag("plugins", "Clear installed plugins.", Joi.boolean().default(false));
+		this.definition.setFlag("data", "Clear data.", Joi.boolean().default(false));
+		this.definition.setFlag("consensusData", "Clear consensus data.", Joi.boolean().default(false));
+		this.definition.setFlag("txPoolData", "Clear transaction pool data.", Joi.boolean().default(false));
+		this.definition.setFlag("config", "Clear config.", Joi.boolean().default(false));
+		this.definition.setFlag("cache", "Clear cache.", Joi.boolean().default(false));
+		this.definition.setFlag("log", "Clear log.", Joi.boolean().default(false));
+		this.definition.setFlag("temp", "Clear temp.", Joi.boolean().default(false));
+		this.definition.setFlag("all", "Clear all.", Joi.boolean().default(false));
 	}
 
 	public async execute(): Promise<void> {
-		if (this.hasFlag("data") || this.hasFlag("all")) {
+		const all = this.getFlag<boolean>("all");
+
+		if (this.getFlag<boolean>("data") || all) {
 			await this.#clearDir("Data", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).data);
 		}
 
-		if (this.hasFlag("consensusData")) {
+		if (this.getFlag<boolean>("consensusData")) {
 			await this.#clearDb("consensus", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).data);
 		}
 
-		if (this.hasFlag("txPoolData")) {
+		if (this.getFlag<boolean>("txPoolData")) {
 			await this.#clearDb(
 				"transaction-pool",
 				this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).data,
 			);
 		}
 
-		if (this.hasFlag("config") || this.hasFlag("all")) {
+		if (this.getFlag<boolean>("config") || all) {
 			await this.#clearDir("Config", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).config);
 		}
 
-		if (this.hasFlag("cache") || this.hasFlag("all")) {
+		if (this.getFlag<boolean>("cache") || all) {
 			await this.#clearDir("Cache", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).cache);
 		}
 
-		if (this.hasFlag("log") || this.hasFlag("all")) {
+		if (this.getFlag<boolean>("log") || all) {
 			await this.#clearDir("Log", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).log);
 		}
-		if (this.hasFlag("temp") || this.hasFlag("all")) {
+		if (this.getFlag<boolean>("temp") || all) {
 			await this.#clearDir("Temp", this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).temp);
 		}
 
-		if (this.hasFlag("state-export")) {
+		if (this.getFlag<boolean>("state-export")) {
 			await this.#clearDir(
 				"State export",
 				join(this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).data, "state-export"),
 			);
 		}
 
-		if (this.hasFlag("plugins")) {
+		if (this.getFlag<boolean>("plugins")) {
 			await this.#clearDir(
 				"Plugins",
 				join(this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application).data, "plugins"),

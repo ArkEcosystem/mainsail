@@ -1,5 +1,5 @@
 import { Commands } from "@mainsail/cli";
-import { injectable } from "@mainsail/container";
+import { injectable, postConstruct } from "@mainsail/container";
 import { readJSONSync, writeJSONSync } from "fs-extra/esm";
 import Joi from "joi";
 
@@ -13,6 +13,7 @@ export class Command extends Commands.Command {
 
 	public description = "Configure the forging validator using BLS12-381 private key.";
 
+	@postConstruct()
 	public configure(): void {
 		this.definition.setFlag("privateKey", "A validator BLS12-381 private key.", Joi.string());
 	}

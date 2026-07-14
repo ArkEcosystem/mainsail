@@ -12,22 +12,23 @@ export class Command extends Commands.Command {
 
 	public signature = "update";
 
-	public description = "Update the Core installation.";
+	public description = "Update the API installation.";
 
 	@postConstruct()
 	public configure(): void {
 		this.definition
+			.setFlag("force", "Force an update.", Joi.boolean().default(false))
 			.setFlag("updateProcessManager", "Update process manager.", Joi.boolean().default(false))
-			.setFlag("restart", "Restart all running processes.", Joi.boolean());
+			.setFlag("restart", "Restart all running processes.", Joi.boolean().default(false));
 	}
 
 	public async execute(): Promise<void> {
-		const hasNewVersion: boolean = await this.updater.check();
+		const hasNewVersion: boolean = await this.updater.check(true);
 
 		if (hasNewVersion) {
 			await this.updater.update(this.getFlag<boolean>("updateProcessManager"), this.getFlag<boolean>("force"));
 
-			if (this.hasFlag("restart")) {
+			if (this.getFlag<boolean>("restart")) {
 				this.actions.restartRunningProcess(`mainsail-api`);
 			} else if (!this.getFlag<boolean>("force")) {
 				await this.actions.restartRunningProcessWithPrompt(`mainsail-api`);
