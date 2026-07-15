@@ -41,6 +41,7 @@ jobs:
               if: ${{ env.CODECOV_TOKEN != '' }}
               uses: codecov/codecov-action@v5
               with:
+                  working-directory: contracts
                   files: ./lcov.info
                   token: ${{ env.CODECOV_TOKEN }}
                   slug: ArkEcosystem/mainsail
