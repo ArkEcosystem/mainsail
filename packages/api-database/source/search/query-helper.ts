@@ -1,5 +1,7 @@
 import type { EntityMetadata } from "typeorm";
 
+import { escapeLiteral } from "pg";
+
 import type { Expression, JsonFieldAccessor } from "./types/expressions.js";
 
 export type SqlExpression = {
@@ -25,17 +27,21 @@ export class QueryHelper<TEntity> {
 				throw new Error(`Can't apply json field accessor to ${String(property)} column`);
 			}
 
+			// jsonb path segments are interpolated into the SQL string as quoted literals, so they
+			// must be escaped to prevent breaking out of the literal (SQL injection). escapeLiteral
+			// returns the segment as a fully-quoted literal.
+
 			// 'validatorBlock.number' => ['validatorBlock', 'number']
 			const pathFields = jsonFieldAccessor.fieldName.split(".");
 
-			// ['validatorBlock', 'number'] => ['validatorBlock']
-			const lastField = pathFields.splice(-1, 1);
+			// ['validatorBlock', 'number'] => 'number'
+			const lastField = pathFields.pop() ?? "";
 
 			// ['validatorBlock', 'nested', 'attribute'] => 'validatorBlock'->'nested'->'attribute'
-			const fieldPath = pathFields.map((f) => `'${f}'`).join("->");
+			const fieldPath = pathFields.map((f) => escapeLiteral(f)).join("->");
 
 			// 'validatorBlock'->'last' => 'validatorBlock'->'last'->>'number'
-			let fullFieldPath = `${fieldPath}${jsonFieldAccessor.operator}'${lastField}'`;
+			let fullFieldPath = `${fieldPath}${jsonFieldAccessor.operator}${escapeLiteral(lastField)}`;
 			if (fieldPath.length > 0) {
 				// 'validatorBlock'->'last'->>'number' => column->'validatorBlock'->'last'->>'number'
 				fullFieldPath = `${column.databaseName}->${fullFieldPath}`;

@@ -92,6 +92,42 @@ describe<{
 		}
 	});
 
+	it("/wallets?attributes rejects SQL injection in attribute keys", async () => {
+		await apiContext.walletRepository.save(wallets);
+
+		// Control: a legitimate attribute filter still works.
+		const legit = await request("/wallets?attributes.validatorProducedBlocks.from=1", options);
+		assert.equal(legit.statusCode, 200);
+
+		// Each payload places SQL metacharacters in the jsonb attribute KEY — the injectable position.
+		// They are rejected before any query is built/run without breaking out
+		// of the quoted jsonb path literal (blind exfiltration / pg_sleep DoS / stacked statements).
+		const injectionPaths = [
+			`/wallets?attributes.${encodeURIComponent("a'||pg_sleep(3)||'b")}=1`, // timing / boolean-blind
+			`/wallets?attributes.${encodeURIComponent("x'; DROP TABLE wallets; --")}=1`, // stacked statement
+			`/wallets?attributes.${encodeURIComponent("x') UNION SELECT 1 --")}=1`, // union
+			`/wallets?attributes.${encodeURIComponent("x\\'")}=1`, // backslash+quote (SCS=off breakout)
+			`/wallets?attributes.validatorLastBlock.${encodeURIComponent("n')::bigint--")}=1`, // nested key
+		];
+
+		for (const path of injectionPaths) {
+			let statusCode;
+			try {
+				statusCode = (await request(path, options)).statusCode; // must never be a 2xx
+			} catch (ex) {
+				statusCode = ex.response?.statusCode;
+			}
+
+			// Rejected as a client error (bad request), not accepted and not a server error.
+			assert.equal(statusCode, 400);
+		}
+
+		// The DB is intact and still queryable after the injection attempts (nothing was dropped/altered).
+		const after = await request("/wallets", options);
+		assert.equal(after.statusCode, 200);
+		assert.equal(after.data.data.length, wallets.length);
+	});
+
 	it("/wallets/top", async () => {
 		await apiContext.walletRepository.save(wallets);
 
@@ -162,6 +198,34 @@ describe<{
 			assert.equal(statusCode, 200);
 			assert.equal(data.data, result);
 		}
+	});
+
+	it("/wallets?orderBy rejects SQL injection in the sort field", async () => {
+		await apiContext.walletRepository.save(wallets);
+
+		// The sort field also feeds QueryHelper.getColumnName/escapeLiteral, so it must be rejected
+		// before it reaches the query builder. The orderBy schema (a stricter [.a-z] property guard)
+		// catches it at request validation, which surfaces as 422 rather than the 400 the attribute
+		// allowlist returns — either way it is a client error, never executed.
+		const injectionPaths = [
+			`/wallets?orderBy=attributes.${encodeURIComponent("a'||pg_sleep(3)||'b")}:asc`,
+			`/wallets?orderBy=${encodeURIComponent("attributes.x'); DROP TABLE wallets; --")}:asc`,
+		];
+
+		for (const path of injectionPaths) {
+			let statusCode;
+			try {
+				statusCode = (await request(path, options)).statusCode; // must never be a 2xx
+			} catch (ex) {
+				statusCode = ex.response?.statusCode;
+			}
+
+			assert.equal(statusCode, 422);
+		}
+
+		// A legitimate sort still works.
+		const after = await request("/wallets?orderBy=attributes.validatorRank:asc", options);
+		assert.equal(after.statusCode, 200);
 	});
 
 	it("/wallets/{id}/transactions", async () => {
