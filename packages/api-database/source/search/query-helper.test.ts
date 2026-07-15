@@ -67,6 +67,64 @@ describe<{
 		);
 	});
 
+	it("getColumnName escapes single quotes in json path segments (SQLi)", ({ helper, metadata }) => {
+		// A single quote in a path segment must be doubled so it cannot break out of the
+		// single-quoted SQL literal. Without escaping this produced `data->>'a'||pg_sleep(5)||'b'`.
+		assert.equal(helper.getColumnName(metadata, "data", { fieldName: "a'||pg_sleep(5)||'b", operator: "->>" }), {
+			isNullable: true,
+			name: `data->>'a''||pg_sleep(5)||''b'`,
+		});
+	});
+
+	it("getColumnName escapes single quotes in nested json path segments (SQLi)", ({ helper, metadata }) => {
+		assert.equal(
+			helper.getColumnName(metadata, "data", {
+				cast: "bigint",
+				fieldName: "x')::bigint--.number",
+				operator: "->>",
+			}),
+			{ isNullable: true, name: `(data->'x'')::bigint--'->>'number')::bigint` },
+		);
+	});
+
+	it("getColumnName escapes a backslash+quote segment as an E'' literal (GUC-independent, SQLi)", ({
+		helper,
+		metadata,
+	}) => {
+		// A backslash before a quote breaks out of a plain literal when standard_conforming_strings
+		// is off. escapeLiteral doubles the backslash and emits an E'' literal, which is safe for
+		// any value of that setting. `"x\\'"` is the segment x + backslash + single-quote.
+		assert.equal(helper.getColumnName(metadata, "data", { fieldName: "x\\'", operator: "->>" }), {
+			isNullable: true,
+			name: `data->> E'x\\\\'''`,
+		});
+	});
+
+	it("getColumnName neutralizes a stacked-statement payload into a single literal (SQLi)", ({ helper, metadata }) => {
+		// The `'; DROP TABLE ...; --` stays entirely inside one quoted literal — no statement break.
+		assert.equal(
+			helper.getColumnName(metadata, "data", { fieldName: "x'; DROP TABLE wallets; --", operator: "->>" }),
+			{ isNullable: true, name: `data->>'x''; DROP TABLE wallets; --'` },
+		);
+	});
+
+	it("getColumnName neutralizes a UNION-select payload into a single literal (SQLi)", ({ helper, metadata }) => {
+		assert.equal(
+			helper.getColumnName(metadata, "data", {
+				fieldName: "x') UNION SELECT secret FROM users --",
+				operator: "->>",
+			}),
+			{ isNullable: true, name: `data->>'x'') UNION SELECT secret FROM users --'` },
+		);
+	});
+
+	it("getColumnName doubles every quote in a segment with multiple quotes (SQLi)", ({ helper, metadata }) => {
+		assert.equal(helper.getColumnName(metadata, "data", { fieldName: "a''b", operator: "->>" }), {
+			isNullable: true,
+			name: `data->>'a''''b'`,
+		});
+	});
+
 	// --- getWhereExpressionSql: constants ---
 
 	it("op true -> TRUE with no parameters", ({ helper, metadata }) => {
