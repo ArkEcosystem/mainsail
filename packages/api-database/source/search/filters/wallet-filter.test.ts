@@ -131,4 +131,54 @@ describe("WalletFilter.getExpression", ({ it, assert }) => {
 			value: "alice",
 		});
 	});
+
+	it("should reject an attribute key with SQL-injection characters", async () => {
+		await assert.rejects(
+			() => WalletFilter.getExpression({ attributes: { "a'||pg_sleep(5)||'b": "1" } }),
+			"Invalid attribute key 'a'||pg_sleep(5)||'b'",
+		);
+	});
+
+	it("should reject a nested attribute key with SQL-injection characters", async () => {
+		// The injection is in the nested key, which is only visible after flattening to a dotted path.
+		await assert.rejects(
+			() => WalletFilter.getExpression({ attributes: { validatorLastBlock: { "number')::bigint--": "1" } } }),
+			"Invalid attribute key 'validatorLastBlock.number')::bigint--'",
+		);
+	});
+
+	it("should reject attribute keys containing injection metacharacters", async () => {
+		const maliciousKeys = [
+			"x'; DROP TABLE wallets; --", // stacked statement
+			"x') UNION SELECT secret FROM users --", // union
+			"x\\'", // backslash + quote (standard_conforming_strings=off breakout)
+			"a b", // whitespace
+			'a"b', // double quote
+			"a;b", // semicolon
+			"a(b)", // parentheses
+			".leadingDot", // structural: leading dot
+			"trailingDot.", // structural: trailing dot
+			"double..dot", // structural: empty segment
+		];
+
+		for (const key of maliciousKeys) {
+			await assert.rejects(
+				() => WalletFilter.getExpression({ attributes: { [key]: "1" } }),
+				`Invalid attribute key '${key}'`,
+			);
+		}
+	});
+
+	it("should accept a safe custom attribute key outside the known list", async () => {
+		// The allowlist permits letters/digits/underscore dotted paths, not only the known attributes,
+		// so an unknown-but-safe key still builds a query (with undefined cast).
+		const expression = await WalletFilter.getExpression({ attributes: { my_custom_attr0: "1" } });
+
+		assert.equal(expression, {
+			jsonFieldAccessor: { cast: undefined, fieldName: "my_custom_attr0", operator: "->>" },
+			op: "equal",
+			property: "attributes",
+			value: "1",
+		});
+	});
 });
