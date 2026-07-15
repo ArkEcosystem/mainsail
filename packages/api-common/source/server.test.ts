@@ -1,5 +1,6 @@
 import { Enums, Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
+import { InvalidCriteria } from "@mainsail/exceptions";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { mkdtempSync, writeFileSync } from "fs";
@@ -131,6 +132,27 @@ describe<{
 
 		const response = await subject.inject({ method: "GET", url: "/query-failed" });
 		assert.is(response.statusCode, 400);
+		warn.calledOnce();
+		error.neverCalled();
+	});
+
+	it("onPreResponse - converts a DatabaseException to badRequest and logs warn", async ({ subject, logger }) => {
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		await subject.route({
+			handler() {
+				throw new InvalidCriteria("Invalid attribute key 'a'||pg_sleep(5)||'b'");
+			},
+			method: "GET",
+			path: "/invalid-criteria",
+		});
+
+		const warn = spy(logger, "warn");
+		const error = spy(logger, "error");
+
+		const response = await subject.inject({ method: "GET", url: "/invalid-criteria" });
+		assert.is(response.statusCode, 400);
+		assert.is(response.result.message, "Invalid attribute key 'a'||pg_sleep(5)||'b'");
 		warn.calledOnce();
 		error.neverCalled();
 	});
