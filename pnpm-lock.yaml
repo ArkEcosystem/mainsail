@@ -253,6 +253,9 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
+      '@mainsail/exceptions':
+        specifier: workspace:*
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel

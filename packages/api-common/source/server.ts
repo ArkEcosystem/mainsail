@@ -11,6 +11,7 @@ import {
 } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { DatabaseException } from "@mainsail/exceptions";
 import { ensureError, merge } from "@mainsail/utils";
 import { readFileSync } from "fs";
 
@@ -59,8 +60,15 @@ export abstract class AbstractServer {
 			if ("isBoom" in request.response && request.response.isBoom && request.response.isServer) {
 				request.app.errorLogged = true;
 
-				if (request.response.name === "QueryFailedError") {
-					const message = `${request.response.name} ${request.response.message}`;
+				// Database-layer errors caused by bad request data — our own DatabaseException and
+				// TypeORM's QueryFailedError — are client faults: respond 400 (not 500) and log at warn
+				// without the stack. QueryFailedError is external so it can't extend DatabaseException;
+				// match it by name.
+				const isQueryFailedError = request.response.name === "QueryFailedError";
+				if (isQueryFailedError || request.response instanceof DatabaseException) {
+					const message = isQueryFailedError
+						? `${request.response.name} ${request.response.message}`
+						: request.response.message;
 					this.logger.warn(`${request.path} - ${message}`);
 					request.response = Boom.badRequest(message);
 				} else {
