@@ -165,14 +165,18 @@ describe<{
 			1,
 		];
 
-		const response = await server.inject({ method: "GET", url: `/api/tokens/${TOKEN_ADDRESS}/holders` });
+		const response = await server.inject({ method: "GET", url: `/api/tokens/${TOKEN_ADDRESS}/holders?limit=10` });
 
 		assert.is(response.statusCode, 200);
 
-		// The holders route is not wrapped by the pagination plugin.
 		const body = JSON.parse(response.payload);
-		assert.is(body.totalCount, 1);
-		assert.equal(body.results[0].address, ADDRESS_A);
+		assert.is(body.meta.totalCount, 1);
+		assert.equal(body.data[0].address, ADDRESS_A);
+
+		// The holder listing is ordered and windowed by the query pagination.
+		assert.equal(repos.tokenHolder.qb.calls.orderBy, [["balance", "DESC"]]);
+		assert.equal(repos.tokenHolder.qb.calls.offset, [[0]]);
+		assert.equal(repos.tokenHolder.qb.calls.limit, [[10]]);
 	});
 
 	it("GET /api/tokens/{address}/holders - responds 404 for an unknown token", async ({ server }) => {
