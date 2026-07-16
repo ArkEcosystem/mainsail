@@ -1,7 +1,8 @@
 import { describe } from "@mainsail/test-runner";
 
 import { makeState } from "../../test/fixtures/entities";
-import { bootstrapServer, makeRepos, Repos } from "../../test/helpers/server";
+import { bootstrapServer, makeConfiguration, makeRepos, Repos } from "../../test/helpers/server";
+import { Identifiers as ApiHttpIdentifiers } from "../identifiers";
 import { Server } from "../server";
 import { ServiceProvider } from "../service-provider";
 
@@ -23,7 +24,12 @@ describe<{
 	beforeEach(async (context) => {
 		context.repos = makeRepos();
 
-		const { server, serviceProvider } = await bootstrapServer(context.repos);
+		// A realistic port so the configuration endpoint can report it; the
+		// server is never booted in these tests, so nothing binds to it.
+		const config = makeConfiguration();
+		config.server.http.port = 4003;
+
+		const { server, serviceProvider } = await bootstrapServer(context.repos, config);
 		context.server = server;
 		context.serviceProvider = serviceProvider;
 	});
@@ -111,6 +117,15 @@ describe<{
 
 		assert.is(response.statusCode, 200);
 		assert.equal(JSON.parse(response.payload).data.evmCall, { avg: "0", max: "0", min: "0", sum: "0" });
+	});
+
+	it("GET /api/node/fees - returns zeroes without querying on a fresh database", async ({ server, repos }) => {
+		// No configuration row -> no genesis timestamp to anchor the statistics on.
+		const response = await server.inject({ method: "GET", url: "/api/node/fees" });
+
+		assert.is(response.statusCode, 200);
+		assert.equal(JSON.parse(response.payload).data.evmCall, { avg: "0", max: "0", min: "0", sum: "0" });
+		assert.undefined(repos.transaction.calls.getFeeStatistics);
 	});
 
 	it("GET /api/node/fees - rejects an out of range days parameter", async ({ server }) => {

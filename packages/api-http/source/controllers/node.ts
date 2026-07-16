@@ -54,10 +54,15 @@ export class NodeController extends Controller {
 
 	public async fees(request: Types.HapiRequest): Promise<object> {
 		const configuration = await this.getConfiguration();
-		const cryptoConfiguration = configuration.cryptoConfiguration as Contracts.Crypto.NetworkConfig;
-		const genesisTimestamp = cryptoConfiguration.genesisBlock.block.timestamp;
+		const cryptoConfiguration = configuration.cryptoConfiguration as Contracts.Crypto.NetworkConfig | undefined;
 
-		const result = await this.transactionRepositoryFactory().getFeeStatistics(genesisTimestamp, request.query.days);
+		// A fresh database has no configuration row (and no transactions yet).
+		const result = cryptoConfiguration
+			? await this.transactionRepositoryFactory().getFeeStatistics(
+					cryptoConfiguration.genesisBlock.block.timestamp,
+					request.query.days,
+				)
+			: undefined;
 
 		const grouped = {
 			evmCall: {
@@ -73,9 +78,14 @@ export class NodeController extends Controller {
 
 	public async configuration(request: Types.HapiRequest): Promise<object> {
 		const configuration = await this.getConfiguration();
-		const plugins = await this.getPlugins();
 
-		const cryptoConfiguration = configuration.cryptoConfiguration as Contracts.Crypto.NetworkConfig;
+		const cryptoConfiguration = configuration.cryptoConfiguration as Contracts.Crypto.NetworkConfig | undefined;
+		if (!cryptoConfiguration) {
+			// A fresh database has no configuration row yet.
+			return { data: {} };
+		}
+
+		const plugins = await this.getPlugins();
 		const network = cryptoConfiguration.network;
 
 		return {
