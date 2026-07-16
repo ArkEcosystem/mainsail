@@ -138,7 +138,22 @@ export class NodeController extends Controller {
 		const pluginRepository = this.pluginRepositoryFactory();
 
 		let plugins = await pluginRepository.createQueryBuilder().select().getMany();
-		plugins = [{ configuration: this.apiConfiguration.all(), name: "@mainsail/api-http" }, ...plugins];
+
+		// Report this API's own port: lift enabled/port out of the server section
+		// (http preferred, https otherwise) into the shape buildPortMapping expects.
+		// Appended last so the live configuration wins over the raw configuration
+		// row that api-sync stores for this package, which carries no top-level port.
+		const { server } = this.apiConfiguration.all() as {
+			server: { http: { enabled: boolean; port: number }; https: { enabled: boolean; port: number } };
+		};
+		const activeServer = server.http.enabled ? server.http : server.https;
+		plugins = [
+			...plugins,
+			{
+				configuration: { enabled: activeServer.enabled, port: activeServer.port },
+				name: "@mainsail/api-http",
+			} as Models.Plugin,
+		];
 
 		const mappings: Record<string, Models.Plugin> = {};
 

@@ -154,6 +154,9 @@ describe<{
 			},
 			// Plugins outside the known set are ignored.
 			{ configuration: { enabled: true, port: 9999 }, name: "@mainsail/unknown" },
+			// api-sync stores this package's raw configuration (no top-level
+			// enabled/port); the live server configuration must win over it.
+			{ configuration: { server: { http: { enabled: true, port: 9999 } } }, name: "@mainsail/api-http" },
 		];
 
 		const response = await server.inject({ method: "GET", url: "/api/node/configuration" });
@@ -169,7 +172,34 @@ describe<{
 		assert.equal(data.token, "TEST");
 		assert.equal(data.version, 30);
 		assert.equal(data.wif, 186);
-		assert.equal(data.ports, { "@mainsail/api-database": 5432, "@mainsail/p2p": 4102, "@mainsail/webhooks": 4004 });
+		assert.equal(data.ports, {
+			"@mainsail/api-database": 5432,
+			"@mainsail/api-http": 4003,
+			"@mainsail/p2p": 4102,
+			"@mainsail/webhooks": 4004,
+		});
+	});
+
+	it("GET /api/node/configuration - reports the https port when the http server is disabled", async ({ repos }) => {
+		const config = makeConfiguration();
+		config.server.http.enabled = false;
+		config.server.https.enabled = true;
+		config.server.https.port = 8443;
+
+		// Registration skips the disabled http server, so resolve the https one.
+		const { app, serviceProvider } = await bootstrapServer(repos, config);
+
+		try {
+			repos.configuration.data.one = { cryptoConfiguration: makeCryptoConfiguration() };
+
+			const httpsServer = app.get<Server>(ApiHttpIdentifiers.HTTPS);
+			const response = await httpsServer.inject({ method: "GET", url: "/api/node/configuration" });
+
+			assert.is(response.statusCode, 200);
+			assert.equal(JSON.parse(response.payload).data.ports["@mainsail/api-http"], 8443);
+		} finally {
+			await serviceProvider.dispose();
+		}
 	});
 
 	it("GET /api/node/configuration - returns an empty object on a fresh database", async ({ server, repos }) => {
