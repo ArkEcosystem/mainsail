@@ -343,7 +343,11 @@ export class TokenParserService implements TokenParser {
 							functionName: call.functionName,
 						});
 
-						tokenMetadata[call.functionName] = decoded as unknown as undefined;
+						// totalSupply decodes to a bigint; normalize to string to match the
+						// declared metadata/model contract (as balanceOf does below).
+						tokenMetadata[call.functionName] = (typeof decoded === "bigint"
+							? decoded.toString()
+							: decoded) as unknown as undefined;
 					}
 
 					continue;
