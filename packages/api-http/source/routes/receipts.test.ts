@@ -15,10 +15,31 @@ import { ServiceProvider } from "../service-provider";
 // A transaction row as production returns it for receipts: options.selection limits
 // the loaded columns, so anything outside #getReceiptColumns is absent from the entity.
 const makeSelectedReceiptRow = (overrides: Record<string, unknown> = {}) => {
-	const { decodedError, deployedContractAddress, gasRefunded, gasUsed, hash, logs, output, status } =
-		makeTransaction(overrides);
+	const {
+		blockNumber,
+		cumulativeGasUsed,
+		decodedError,
+		deployedContractAddress,
+		gasRefunded,
+		gasUsed,
+		hash,
+		logs,
+		output,
+		status,
+	} = makeTransaction(overrides);
 
-	return { decodedError, deployedContractAddress, gasRefunded, gasUsed, hash, logs, output, status };
+	return {
+		blockNumber,
+		cumulativeGasUsed,
+		decodedError,
+		deployedContractAddress,
+		gasRefunded,
+		gasUsed,
+		hash,
+		logs,
+		output,
+		status,
+	};
 };
 
 describe<{
@@ -39,7 +60,9 @@ describe<{
 	});
 
 	it("GET /api/receipts - maps transactions to receipts", async ({ server, repos }) => {
-		repos.transaction.data.page = makePage([makeTransaction({ decodedError: "reverted", status: 0 })]);
+		// Production only loads the receipt columns (options.selection resets the
+		// select), so the row carries exactly what #getReceiptColumns selects.
+		repos.transaction.data.page = makePage([makeSelectedReceiptRow({ decodedError: "reverted", status: 0 })]);
 
 		const response = await server.inject({ method: "GET", url: "/api/receipts" });
 
@@ -49,7 +72,7 @@ describe<{
 		assert.is(body.meta.totalCount, 1);
 		assert.equal(body.data[0], {
 			blockNumber: "90",
-			cumulativeGasUsed: 21_000,
+			cumulativeGasUsed: 42_000,
 			decodedError: "reverted",
 			gasRefunded: 0,
 			gasUsed: 21_000,
@@ -76,9 +99,11 @@ describe<{
 		// fullReceipt defaults to true on this route, so output and logs are selected.
 		assert.equal(options.selection, [
 			"Transaction.hash",
+			"Transaction.blockNumber",
 			"Transaction.status",
 			"Transaction.gasUsed",
 			"Transaction.gasRefunded",
+			"Transaction.cumulativeGasUsed",
 			"Transaction.deployedContractAddress",
 			"Transaction.decodedError",
 			"Transaction.output",
