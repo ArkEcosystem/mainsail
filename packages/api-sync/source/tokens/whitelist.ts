@@ -84,11 +84,13 @@ export class TokenWhitelist {
 		}
 
 		try {
-			const { data } = await http.get<string>(this.#getTokenWhitelistRemoteUrl(), {
+			const { data } = await http.get<string | WhitelistedToken[]>(this.#getTokenWhitelistRemoteUrl(), {
 				maxContentLength: 16 * Units.KILOBYTE,
 				timeout: 2500,
 			});
-			return JSON.parse(data) as WhitelistedToken[];
+			// http.get already JSON-parses responses served as application/json, so only
+			// parse when the body came back as a raw string (e.g. text/plain).
+			return (typeof data === "string" ? JSON.parse(data) : data) as WhitelistedToken[];
 		} catch (rawError) {
 			const error = ensureError(rawError);
 			this.logger.error(`fetchWhitelist failed: ${error}`);
