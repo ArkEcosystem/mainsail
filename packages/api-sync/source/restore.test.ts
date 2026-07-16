@@ -532,7 +532,7 @@ describe<Ctx>("Restore", ({ it, beforeEach, assert, spy }) => {
 		const analyzed = Object.values(repos).filter((repo: any) =>
 			repo.queries.some(([sql]: [string]) => sql.startsWith("ANALYZE")),
 		);
-		assert.equal(analyzed.length, 11);
+		assert.equal(analyzed.length, 12);
 		assert.equal(
 			entityManager.queries.map(([sql]: [string]) => sql),
 			[

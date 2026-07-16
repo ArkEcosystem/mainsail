@@ -449,11 +449,15 @@ export class Sync implements Contracts.ApiSync.Service {
 						await this.#syncToDatabase(deferredSync);
 						success = true;
 					} catch (rawError) {
+						attempts++;
+
 						const error = ensureError(rawError);
 						const nextAttemptDelay = Math.min(baseDelay + attempts * 500, maxDelay);
-						attempts++;
+						const { query } = error as { query?: string };
+						const querySuffix = query ? ` (query: ${query})` : "";
+
 						this.logger.warn(
-							`sync encountered exception: ${error.message} (query: ${(error as { query?: string }).query}). retry #${attempts} in ... ${nextAttemptDelay}ms`,
+							`sync encountered exception: ${error.message}${querySuffix}. retry #${attempts} in ${nextAttemptDelay}ms`,
 						);
 						await sleep(nextAttemptDelay);
 					}

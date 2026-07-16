@@ -944,6 +944,7 @@ export class Restore {
 		legacyColdWalletRepository,
 		multiPaymentRepository,
 		stateRepository,
+		tokenActionRepository,
 		tokenHolderRepository,
 		tokenRepository,
 		transactionRepository,
@@ -960,6 +961,7 @@ export class Restore {
 			legacyColdWalletRepository,
 			multiPaymentRepository,
 			tokenRepository,
+			tokenActionRepository,
 			tokenHolderRepository,
 			configurationRepository,
 		]) {
