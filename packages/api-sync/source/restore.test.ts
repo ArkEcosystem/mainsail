@@ -111,8 +111,8 @@ const makeTransaction = (hash: string, to: string) => ({
 	hash,
 	legacySecondSignature: undefined,
 	nonce: 1n,
-	r: "0xr",
-	s: "0xs",
+	r: "aa",
+	s: "bb",
 	senderPublicKey: "pk-sender",
 	to,
 	transactionIndex: 0,
@@ -155,6 +155,7 @@ type Ctx = {
 	legacyColdWalletPages: any[];
 	validatorRounds: any[];
 	milestone: Record<string, any>;
+	batchSize: number;
 };
 
 describe<Ctx>("Restore", ({ it, beforeEach, assert, spy }) => {
@@ -413,9 +414,10 @@ describe<Ctx>("Restore", ({ it, beforeEach, assert, spy }) => {
 		context.app.bind(Identifiers.ApiSync.TokenParser).toConstantValue(context.tokenParser);
 		context.app.bind(Identifiers.ApiSync.Listener).toConstantValue(context.listeners);
 		context.app.bind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(context.snapshotImporter);
+		context.batchSize = 100;
 		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)
-			.toConstantValue({ getRequired: () => 100 })
+			.toConstantValue({ getRequired: () => context.batchSize })
 			.whenTagged("plugin", "api-sync");
 
 		context.restore = context.app.resolve(Restore);
@@ -447,7 +449,8 @@ describe<Ctx>("Restore", ({ it, beforeEach, assert, spy }) => {
 			transactions.map((transaction: any) => transaction.hash),
 			["0xtx1", "0xtx2"],
 		);
-		assert.equal(transactions[0].signature, "0xr0xs1b");
+		// formatEcdsaSignature concatenates r || s || v (hex)
+		assert.equal(transactions[0].signature, "aabb1b");
 
 		// The multi payment on tx2 is recorded.
 		const multiPayments = repos.multiPayment.qb.calls.values[0][0];
@@ -556,6 +559,60 @@ describe<Ctx>("Restore", ({ it, beforeEach, assert, spy }) => {
 
 		// Missing crypto configuration falls back to an empty object.
 		assert.equal(repos.configuration.qb.calls.values[0][0].cryptoConfiguration, {});
+	});
+
+	it("ingests across multiple batches when the batch size is smaller than the chain", async (context) => {
+		const { repos, restore } = context;
+
+		context.batchSize = 1;
+
+		await restore.restore();
+
+		// One block insert per batch.
+		assert.equal(
+			repos.block.qb.calls.values.map(([batch]: [any[]]) => batch.map((block: any) => block.number)),
+			[["0"], ["1"]],
+		);
+
+		// The chunk size follows the batch size, so every transaction is flushed individually ...
+		assert.equal(
+			repos.transaction.qb.calls.values.map(([batch]: [any[]]) => batch.map((t: any) => t.hash)),
+			[["0xtx1"], ["0xtx2"]],
+		);
+
+		// ... and the token data is flushed as soon as it exceeds the chunk size.
+		assert.equal(repos.token.qb.calls.values.length, 2);
+
+		const multiPayments = repos.multiPayment.qb.calls.values.flatMap(([batch]: [any[]]) => batch);
+		assert.equal(multiPayments.length, 1);
+		assert.equal(multiPayments[0].hash, "0xtx2");
+	});
+
+	it("restores without a snapshot importer", async (context) => {
+		const { repos, snapshotImporter } = context;
+
+		// The importer is an optional dependency; simulate a network without a legacy snapshot.
+		context.app.rebind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(undefined);
+		const restore = context.app.resolve(Restore);
+
+		const prepareRestore = spy(snapshotImporter, "prepareRestore");
+
+		await restore.restore();
+
+		prepareRestore.neverCalled();
+
+		const walletRows = repos.wallet.qb.calls.values.flatMap(([batch]: [any[]]) => batch);
+		const byAddress = new Map(walletRows.map((row: any) => [row.address, row]));
+
+		// No snapshot: no public key mapping, no isLegacy flag and no snapshot username.
+		const legacyWallet = byAddress.get("0xlegacyuser")!;
+		assert.null(legacyWallet.publicKey);
+		assert.undefined(legacyWallet.attributes.isLegacy);
+		assert.undefined(byAddress.get("0xsnapvalidator")!.attributes.username);
+
+		// EVM-provided legacy attributes and on-chain usernames are unaffected.
+		assert.equal(legacyWallet.attributes.legacyNonce, "3");
+		assert.equal(byAddress.get(NAMED_USER)!.attributes.username, "alice");
 	});
 
 	it("skips the snapshot preparation when the milestone has no snapshot", async (context) => {

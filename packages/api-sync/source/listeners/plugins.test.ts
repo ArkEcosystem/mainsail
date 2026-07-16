@@ -95,4 +95,17 @@ describe<{
 		const [[entity]] = upsert.getCallArgs(0) as [any[]];
 		assert.equal(entity.configuration, { PASSWORD: "-", Password: "-" });
 	});
+
+	it("keeps null and array values intact while sanitizing", async (context) => {
+		const { listener, repo } = context;
+		// `typeof null === "object"` sends both into the recursive sanitizer.
+		context.pluginConfig = { database: null, servers: [{ password: "secret" }, "plain"] };
+		const upsert = spy(repo, "upsert");
+
+		await listener.handle({ data: { name: "api-http" }, name: Events.KernelEvent.ServiceProviderBooted });
+		await listener.flush({} as any);
+
+		const [[entity]] = upsert.getCallArgs(0) as [any[]];
+		assert.equal(entity.configuration, { database: null, servers: [{ password: "-" }, "plain"] });
+	});
 });

@@ -23,6 +23,7 @@ describe<{
 	contractRepo: ReturnType<typeof makeFakeRepo>;
 	peerRepo: ReturnType<typeof makeFakeRepo>;
 	pluginRepo: ReturnType<typeof makeFakeRepo>;
+	peerFactoryArgs: unknown[];
 }>("Listeners", ({ it, beforeEach, assert, spy, clock }) => {
 	beforeEach((context) => {
 		context.events = { forget: () => {}, listen: () => {} };
@@ -41,7 +42,11 @@ describe<{
 		context.app.bind(Identifiers.ApiSync.Logger).toConstantValue({ debug: () => {}, error: () => {} });
 		context.app.bind(ApiDatabaseIdentifiers.ApiNodeRepositoryFactory).toConstantValue(() => context.apiNodeRepo);
 		context.app.bind(ApiDatabaseIdentifiers.ContractRepositoryFactory).toConstantValue(() => context.contractRepo);
-		context.app.bind(ApiDatabaseIdentifiers.PeerRepositoryFactory).toConstantValue(() => context.peerRepo);
+		context.peerFactoryArgs = [];
+		context.app.bind(ApiDatabaseIdentifiers.PeerRepositoryFactory).toConstantValue((dataSource: unknown) => {
+			context.peerFactoryArgs.push(dataSource);
+			return context.peerRepo;
+		});
 		context.app.bind(ApiDatabaseIdentifiers.PluginRepositoryFactory).toConstantValue(() => context.pluginRepo);
 		context.app.rebind(Identifiers.ServiceProvider.Repository).toConstantValue({
 			get: () => ({ config: () => ({ all: () => ({}) }) }),
@@ -84,7 +89,8 @@ describe<{
 		await listeners.dispose();
 	});
 
-	it("flush: forwards the entity manager to each listener", async ({ listeners, events, peerRepo }) => {
+	it("flush: flushes each listener through the given entity manager", async (context) => {
+		const { listeners, events, peerRepo } = context;
 		const captured: Record<string, unknown> = {};
 		events.listen = (name: string, listener: unknown) => {
 			captured[name] = listener;
@@ -100,10 +106,13 @@ describe<{
 		});
 
 		const upsert = spy(peerRepo, "upsert");
+		const entityManager = { marker: "entity-manager" };
 
-		await listeners.flush({} as any);
+		await listeners.flush(entityManager as any);
 
 		upsert.calledOnce();
+		// The repository is created against the flushed entity manager, not the base data source.
+		assert.equal(context.peerFactoryArgs, [entityManager]);
 	});
 
 	it("dispose: forgets all events and clears the listener list", async ({ listeners, events }) => {

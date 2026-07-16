@@ -72,8 +72,8 @@ const makeTransaction = () => ({
 	hash: "0xtx1",
 	legacySecondSignature: undefined,
 	nonce: 1n,
-	r: "0xr",
-	s: "0xs",
+	r: "aa",
+	s: "bb",
 	senderPublicKey: SENDER_PUBLIC_KEY,
 	to: "0xrecipient",
 	transactionIndex: 0,
@@ -348,6 +348,29 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		appResolve.restore();
 	});
 
+	it("bootstrap: clears the database when a previous restore left maintenance mode on", async (context) => {
+		const { dataSource, databaseService, systemRepo, logger, sync } = context;
+
+		// Heights are consistent, but the maintenance flag signals an interrupted restore.
+		databaseService.isEmpty = async () => false;
+		databaseService.getLastCommit = async () => ({ block: { number: 5 } });
+		context.queryResults.blocksCount = [{ count: "5" }];
+		context.queryResults.maxHeight = [{ count: "5", max_height: "5" }];
+		systemRepo.inMaintenance = async () => true;
+
+		const restore = { restore: async () => {} };
+		const appResolve = stub(context.app, "resolve").returnValue(restore);
+		const synchronize = spy(dataSource, "synchronize");
+		const warn = spy(logger, "warn");
+
+		await sync.bootstrap();
+
+		warn.calledWith("Clearing API database for full restore.");
+		synchronize.calledWith(true);
+
+		appResolve.restore();
+	});
+
 	it("bootstrap: terminates the application when the database reset fails", async (context) => {
 		const { app, dataSource, sync } = context;
 
@@ -424,7 +447,8 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		assert.equal(transactionBatch[0].hash, "0xtx1");
 		assert.equal(transactionBatch[0].blockHash, "0xblockhash");
 		assert.equal(transactionBatch[0].senderPublicKey, SENDER_PUBLIC_KEY);
-		assert.equal(transactionBatch[0].signature, "0xr0xs1b");
+		// formatEcdsaSignature concatenates r || s || v (hex)
+		assert.equal(transactionBatch[0].signature, "aabb1b");
 		assert.equal(transactionBatch[0].nonce, "1");
 		assert.undefined(transactionBatch[0].decodedError);
 
@@ -446,6 +470,27 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		assert.equal(entityManager.queries[0][0], "SELECT update_validator_ranks();");
 
 		debug.calledOnce();
+	});
+
+	it("onCommit: stores the decoded error of a failed transaction", async (context) => {
+		const { repos, sync } = context;
+		const restore = { restore: async () => {} };
+		const appResolve = stub(context.app, "resolve").returnValue(restore);
+		await sync.bootstrap();
+		appResolve.restore();
+
+		const transaction = makeTransaction();
+		// Reverted without output while consuming the full gas limit -> "out of gas".
+		const receipt = { ...makeReceipt(), gasUsed: 21_000n, status: 0 };
+
+		await sync.onCommit(
+			context.makeUnit({ receipts: new Map([[transaction.hash, receipt]]), transactions: [transaction] }),
+		);
+		await runQueuedJob(context);
+
+		const [transactionBatch] = repos.transaction.qb.calls.values[0];
+		assert.equal(transactionBatch[0].status, 0);
+		assert.equal(transactionBatch[0].decodedError, "out of gas");
 	});
 
 	it("onCommit: does not log sync progress during bootstrap", async (context) => {

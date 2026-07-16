@@ -224,14 +224,16 @@ describe<{
 		await listener.boot();
 		await clk.nextAsync();
 
+		// The loop keeps exactly one pending reschedule while running.
+		assert.equal(clk.countTimers(), 1);
+
 		await listener.dispose();
 
 		forget.calledTimes(2);
 		forget.calledWith("item.created", listener);
 		forget.calledWith("item.deleted", listener);
 
-		// No further sync runs after dispose: nextAsync resolves immediately with no timers.
-		const pendingTimers = await clk.nextAsync();
-		assert.defined(pendingTimers);
+		// The pending reschedule was cleared; nothing runs after dispose.
+		assert.equal(clk.countTimers(), 0);
 	});
 });
