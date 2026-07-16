@@ -164,7 +164,7 @@ export class TokenParserService implements TokenParser {
 		const eventLogs = parseEventLogs({
 			abi: erc20AbiEvents,
 			eventName: ["Transfer", "Approval"],
-			logs: receipt.logs,
+			logs: receipt.logs ?? [],
 		});
 
 		const dirtyAccounts = new Map<`0x${string}`, Set<string>>();
