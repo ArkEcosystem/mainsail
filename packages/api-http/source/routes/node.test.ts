@@ -169,7 +169,16 @@ describe<{
 		assert.equal(data.token, "TEST");
 		assert.equal(data.version, 30);
 		assert.equal(data.wif, 186);
-		assert.equal(data.ports, { "@mainsail/api-database": 5432, "@mainsail/p2p": 4102 });
+		assert.equal(data.ports, { "@mainsail/api-database": 5432, "@mainsail/p2p": 4102, "@mainsail/webhooks": 4004 });
+	});
+
+	it("GET /api/node/configuration - returns an empty object on a fresh database", async ({ server, repos }) => {
+		const response = await server.inject({ method: "GET", url: "/api/node/configuration" });
+
+		assert.is(response.statusCode, 200);
+		assert.equal(JSON.parse(response.payload), { data: {} });
+		// The plugin lookup is skipped entirely.
+		assert.undefined(repos.plugin.qb.calls.getMany);
 	});
 
 	it("GET /api/node/configuration/crypto - returns the full crypto configuration", async ({ server, repos }) => {
