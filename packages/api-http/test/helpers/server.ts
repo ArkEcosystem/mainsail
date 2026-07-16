@@ -109,7 +109,8 @@ export const makeRepo = () => {
 			return data.feeStatistics;
 		},
 		getLatest: async () => data.one ?? null,
-		getLatestHeight: async () => data.latestHeight ?? 0,
+		// Matches the real contract: undefined when the database is empty.
+		getLatestHeight: async () => data.latestHeight,
 		getPeerBlockNumberP90: async () => data.peerBlockNumberP90 ?? 0,
 		qb,
 	};

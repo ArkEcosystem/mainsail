@@ -12,6 +12,15 @@ import { bootstrapServer, makeRepos, Repos } from "../../test/helpers/server";
 import { Server } from "../server";
 import { ServiceProvider } from "../service-provider";
 
+// A transaction row as production returns it for receipts: options.selection limits
+// the loaded columns, so anything outside #getReceiptColumns is absent from the entity.
+const makeSelectedReceiptRow = (overrides: Record<string, unknown> = {}) => {
+	const { decodedError, deployedContractAddress, gasRefunded, gasUsed, hash, logs, output, status } =
+		makeTransaction(overrides);
+
+	return { decodedError, deployedContractAddress, gasRefunded, gasUsed, hash, logs, output, status };
+};
+
 describe<{
 	server: Server;
 	serviceProvider: ServiceProvider;
@@ -51,6 +60,32 @@ describe<{
 		});
 	});
 
+	it("GET /api/receipts - forwards the hardcoded ordering and the receipt column selection", async ({
+		server,
+		repos,
+	}) => {
+		// Note: the route schema does not even accept an orderBy parameter.
+		await server.inject({ method: "GET", url: "/api/receipts" });
+
+		// The controller hardcodes the listing order.
+		const [, , sorting, , options] = repos.transaction.calls.findManyByCriteria[0];
+		assert.equal(sorting, [
+			{ direction: "desc", property: "timestamp" },
+			{ direction: "desc", property: "transactionIndex" },
+		]);
+		// fullReceipt defaults to true on this route, so output and logs are selected.
+		assert.equal(options.selection, [
+			"Transaction.hash",
+			"Transaction.status",
+			"Transaction.gasUsed",
+			"Transaction.gasRefunded",
+			"Transaction.deployedContractAddress",
+			"Transaction.decodedError",
+			"Transaction.output",
+			"Transaction.logs",
+		]);
+	});
+
 	it("GET /api/receipts - scopes the criteria to hash and contract", async ({ server, repos }) => {
 		await server.inject({
 			method: "GET",
@@ -74,6 +109,17 @@ describe<{
 
 		const [, criteria] = repos.transaction.calls.findManyByCriteria[0];
 		assert.equal(criteria.senderPublicKey, PUBLIC_KEY);
+		assert.undefined(criteria.from);
+	});
+
+	it("GET /api/receipts - treats a 0x-prefixed sender that is not 42 characters long as a public key", async ({
+		server,
+		repos,
+	}) => {
+		await server.inject({ method: "GET", url: "/api/receipts?from=0xabc" });
+
+		const [, criteria] = repos.transaction.calls.findManyByCriteria[0];
+		assert.equal(criteria.senderPublicKey, "0xabc");
 		assert.undefined(criteria.from);
 	});
 

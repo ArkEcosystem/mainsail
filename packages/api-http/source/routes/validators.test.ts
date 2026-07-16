@@ -16,6 +16,23 @@ describe<{
 	serviceProvider: ServiceProvider;
 	repos: Repos;
 }>("Validators routes", ({ it, assert, beforeEach, afterEach }) => {
+	const replayBrackets = (bracket: any): any[][] => {
+		const replayed: any[][] = [];
+		const recorder: any = {
+			orWhere: (...args: any[]) => {
+				replayed.push(args);
+				return recorder;
+			},
+			where: (...args: any[]) => {
+				replayed.push(args);
+				return recorder;
+			},
+		};
+		bracket.whereFactory(recorder);
+
+		return replayed;
+	};
+
 	beforeEach(async (context) => {
 		context.repos = makeRepos();
 
@@ -54,6 +71,21 @@ describe<{
 
 		assert.is(response.statusCode, 200);
 		assert.equal(JSON.parse(response.payload).data.address, ADDRESS_A);
+
+		// Unlike the wallets lookup, only wallets with a registered validator public key match.
+		assert.equal(repos.wallet.qb.calls.where, [
+			["attributes ? :validatorPublicKey", { validatorPublicKey: "validatorPublicKey" }],
+		]);
+		assert.equal(repos.wallet.qb.calls.andWhere[0], [
+			"attributes->>:validatorPublicKey <> ''",
+			{ validatorPublicKey: "validatorPublicKey" },
+		]);
+		// The id is matched against address, public key and username alternatives.
+		assert.equal(replayBrackets(repos.wallet.qb.calls.andWhere[1][0]), [
+			["address = :address", { address: ADDRESS_A }],
+			["public_key = :publicKey", { publicKey: ADDRESS_A }],
+			["attributes @> :username", { username: { username: ADDRESS_A } }],
+		]);
 	});
 
 	it("GET /api/validators/{id} - responds 404 for an unknown validator", async ({ server }) => {
@@ -67,7 +99,9 @@ describe<{
 		repos.wallet.data.one = makeValidator();
 		repos.wallet.data.page = makePage([makeWallet({ address: ADDRESS_B, attributes: { vote: ADDRESS_A } })]);
 
-		const response = await server.inject({ method: "GET", url: `/api/validators/${ADDRESS_A}/voters` });
+		// Request by username so the vote criteria provably comes from the resolved
+		// validator's address rather than from the raw path parameter.
+		const response = await server.inject({ method: "GET", url: "/api/validators/validator/voters" });
 
 		assert.is(response.statusCode, 200);
 		assert.equal(JSON.parse(response.payload).data[0].address, ADDRESS_B);
@@ -91,7 +125,8 @@ describe<{
 		repos.block.data.page = makePage([makeBlock()]);
 		repos.state.data.one = makeState({ blockNumber: "100" });
 
-		const response = await server.inject({ method: "GET", url: `/api/validators/${ADDRESS_A}/blocks` });
+		// Request by username so the proposer criteria provably comes from the wallet's address.
+		const response = await server.inject({ method: "GET", url: "/api/validators/validator/blocks" });
 
 		assert.is(response.statusCode, 200);
 

@@ -47,12 +47,13 @@ export const makeWallet = (overrides: Record<string, unknown> = {}) => ({
 export const makeTransaction = (overrides: Record<string, unknown> = {}) => ({
 	blockHash: BLOCK_HASH,
 	blockNumber: "90",
-	cumulativeGasUsed: 21_000,
+	// gas, gasUsed and cumulativeGasUsed are deliberately distinct so field swaps are detectable.
+	cumulativeGasUsed: 42_000,
 	data: "0x",
 	decodedError: undefined,
 	deployedContractAddress: undefined,
 	from: ADDRESS_A,
-	gas: 21_000,
+	gas: 25_000,
 	gasPrice: 5,
 	gasRefunded: 0,
 	gasUsed: 21_000,

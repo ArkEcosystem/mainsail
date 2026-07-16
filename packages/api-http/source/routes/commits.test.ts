@@ -42,6 +42,9 @@ describe<{
 				validators: [ADDRESS_A, ADDRESS_C],
 			},
 		});
+
+		// The round lookup uses the block's validatorRound (1), not its consensus round (0).
+		assert.equal(repos.validatorRound.qb.calls.where, [["round = :validatorRound", { validatorRound: 1 }]]);
 	});
 
 	it("GET /api/commits/{id} - returns no validators without a matching round", async ({ server, repos }) => {

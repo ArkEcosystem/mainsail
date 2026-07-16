@@ -41,6 +41,19 @@ describe<{
 		assert.equal(criteria.data, VOTE_FUNCTION_SIG);
 	});
 
+	it("GET /api/votes - a caller-supplied data filter cannot override the vote signature", async ({
+		server,
+		repos,
+	}) => {
+		// `data` is an accepted query parameter; the controller must still win the spread.
+		const response = await server.inject({ method: "GET", url: "/api/votes?data=0xdeadbeef" });
+
+		assert.is(response.statusCode, 200);
+
+		const [, criteria] = repos.transaction.calls.findManyByCriteria[0];
+		assert.equal(criteria.data, VOTE_FUNCTION_SIG);
+	});
+
 	it("GET /api/votes/{hash} - returns the vote transaction", async ({ server, repos }) => {
 		repos.transaction.data.one = makeTransaction({ data: VOTE_FUNCTION_SIG });
 		repos.state.data.one = makeState();
@@ -50,9 +63,11 @@ describe<{
 		assert.is(response.statusCode, 200);
 		assert.equal(JSON.parse(response.payload).data.hash, TRANSACTION_HASH);
 
-		// The lookup filters on the vote function signature prefix.
-		const [, parameters] = repos.transaction.qb.calls.andWhere[0];
-		assert.equal(parameters, { data: String.raw`\x6dd7d8ea` });
+		// The lookup matches the hash and filters on the vote function signature prefix.
+		assert.equal(repos.transaction.qb.calls.where, [["hash = :hash", { hash: TRANSACTION_HASH }]]);
+		assert.equal(repos.transaction.qb.calls.andWhere, [
+			["SUBSTRING(data FROM 1 FOR 4) = :data", { data: String.raw`\x6dd7d8ea` }],
+		]);
 	});
 
 	it("GET /api/votes/{hash} - responds 404 when the hash is not a vote", async ({ server }) => {

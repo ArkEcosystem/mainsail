@@ -73,6 +73,21 @@ describe<{
 		});
 	});
 
+	it("GET /api/node/syncing - falls back to id 0 on a fresh database", async ({ server, repos }) => {
+		// No state row: getState() falls back to { blockNumber: "0", supply: "0" } without an id.
+		repos.peer.data.peerBlockNumberP90 = 5;
+
+		const response = await server.inject({ method: "GET", url: "/api/node/syncing" });
+
+		assert.is(response.statusCode, 200);
+		assert.equal(JSON.parse(response.payload).data, {
+			blockNumber: 0,
+			blocks: 5,
+			id: 0,
+			syncing: true,
+		});
+	});
+
 	it("GET /api/node/fees - returns the aggregated fee statistics", async ({ server, repos }) => {
 		repos.configuration.data.one = { cryptoConfiguration: makeCryptoConfiguration() };
 		repos.transaction.data.feeStatistics = { avg: "5", max: "10", min: "1", sum: "100" };
@@ -117,8 +132,11 @@ describe<{
 			},
 			// No nested server -> top-level port.
 			{ configuration: { enabled: true, port: 5432 }, name: "@mainsail/api-database" },
-			// Disabled plugins are skipped.
-			{ configuration: { enabled: false, port: 4004 }, name: "@mainsail/webhooks" },
+			// Nested server present but disabled -> top-level port.
+			{
+				configuration: { enabled: true, port: 4004, server: { enabled: false, port: 9999 } },
+				name: "@mainsail/webhooks",
+			},
 			// Plugins outside the known set are ignored.
 			{ configuration: { enabled: true, port: 9999 }, name: "@mainsail/unknown" },
 		];

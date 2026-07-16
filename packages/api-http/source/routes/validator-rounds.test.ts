@@ -32,6 +32,11 @@ describe<{
 		const body = JSON.parse(response.payload);
 		assert.is(body.meta.totalCount, 5);
 		assert.equal(body.data[0].round, 1);
+
+		// Latest rounds first, windowed by the query pagination defaults.
+		assert.equal(repos.validatorRound.qb.calls.addOrderBy, [["round", "DESC"]]);
+		assert.equal(repos.validatorRound.qb.calls.offset, [[0]]);
+		assert.equal(repos.validatorRound.qb.calls.limit, [[100]]);
 	});
 
 	it("GET /api/rounds/{round} - returns the round", async ({ server, repos }) => {
@@ -41,6 +46,7 @@ describe<{
 
 		assert.is(response.statusCode, 200);
 		assert.equal(JSON.parse(response.payload).data.validators, [ADDRESS_A, ADDRESS_B]);
+		assert.equal(repos.validatorRound.qb.calls.where, [["round = :round", { round: 1 }]]);
 	});
 
 	it("GET /api/rounds/{round} - responds 404 for an unknown round", async ({ server }) => {
@@ -69,6 +75,9 @@ describe<{
 			// A missing vote entry falls back to zero.
 			{ address: ADDRESS_B, votes: "0" },
 		]);
+
+		// This route reads the round from the `id` path parameter.
+		assert.equal(repos.validatorRound.qb.calls.where, [["round = :round", { round: 1 }]]);
 	});
 
 	it("GET /api/rounds/{id}/validators - responds 404 for an unknown round", async ({ server }) => {

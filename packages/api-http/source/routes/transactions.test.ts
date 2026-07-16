@@ -51,7 +51,7 @@ describe<{
 		assert.equal(transaction.hash, TRANSACTION_HASH);
 		assert.equal(transaction.confirmations, 11);
 		assert.equal(transaction.receipt, {
-			cumulativeGasUsed: 21_000,
+			cumulativeGasUsed: 42_000,
 			gasRefunded: 0,
 			gasUsed: 21_000,
 			status: 1,
@@ -100,6 +100,22 @@ describe<{
 		const [transaction] = JSON.parse(response.payload).data;
 		assert.equal(transaction.receipt.logs, [{ topics: [] }]);
 		assert.equal(transaction.receipt.output, "0xdeadbeef");
+	});
+
+	it("GET /api/transactions - forwards criteria, sorting, pagination and options to the repository", async ({
+		server,
+		repos,
+	}) => {
+		await server.inject({
+			method: "GET",
+			url: `/api/transactions?from=${makeTransaction().from}&limit=25&orderBy=nonce:asc`,
+		});
+
+		const [, criteria, sorting, pagination, options] = repos.transaction.calls.findManyByCriteria[0];
+		assert.equal(criteria.from, makeTransaction().from);
+		assert.equal(sorting, [{ direction: "asc", property: "nonce" }]);
+		assert.equal(pagination, { limit: 25, offset: 0 });
+		assert.equal(options, { estimateTotalCount: true, fullReceipt: false });
 	});
 
 	it("GET /api/transactions - rejects an unknown orderBy property", async ({ server }) => {

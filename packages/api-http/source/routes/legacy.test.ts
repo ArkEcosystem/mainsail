@@ -37,6 +37,17 @@ describe<{
 		assert.equal(body.data[0].balance, "500");
 	});
 
+	it("GET /api/legacy/cold-wallets - orders by address and windows by the query pagination", async ({
+		server,
+		repos,
+	}) => {
+		await server.inject({ method: "GET", url: "/api/legacy/cold-wallets?page=2&limit=10" });
+
+		assert.equal(repos.legacyColdWallet.qb.calls.addOrderBy, [["address", "ASC"]]);
+		assert.equal(repos.legacyColdWallet.qb.calls.offset, [[10]]);
+		assert.equal(repos.legacyColdWallet.qb.calls.limit, [[10]]);
+	});
+
 	it("GET /api/legacy/cold-wallets/{address} - returns the cold wallet", async ({ server, repos }) => {
 		repos.legacyColdWallet.data.one = makeLegacyColdWallet();
 
@@ -63,6 +74,16 @@ describe<{
 		const response = await server.inject({
 			method: "GET",
 			url: "/api/legacy/cold-wallets/O0O0O0O0O0O0O0O0O0O0O0O0O0O0O0O0O",
+		});
+
+		assert.is(response.statusCode, 422);
+	});
+
+	it("GET /api/legacy/cold-wallets/{address} - rejects a too short legacy address", async ({ server }) => {
+		// Valid base58 characters, but one character short of the minimum length.
+		const response = await server.inject({
+			method: "GET",
+			url: `/api/legacy/cold-wallets/${"D".repeat(32)}`,
 		});
 
 		assert.is(response.statusCode, 422);

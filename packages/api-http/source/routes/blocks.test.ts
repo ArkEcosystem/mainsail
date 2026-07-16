@@ -91,6 +91,16 @@ describe<{
 		assert.equal(data.confirmations, 0);
 		assert.equal(data.publicKey, "");
 		assert.undefined(data.username);
+
+		// first() selects the genesis block by number, without ordering.
+		assert.equal(repos.block.qb.calls.where, [["number = :number", { number: 0 }]]);
+		assert.undefined(repos.block.qb.calls.orderBy);
+	});
+
+	it("GET /api/blocks/first - responds 404 on an empty chain", async ({ server }) => {
+		const response = await server.inject({ method: "GET", url: "/api/blocks/first" });
+
+		assert.is(response.statusCode, 404);
 	});
 
 	it("GET /api/blocks/last - enriches the block with its generator wallet", async ({ server, repos }) => {
@@ -102,6 +112,11 @@ describe<{
 
 		assert.is(response.statusCode, 200);
 		assert.equal(JSON.parse(response.payload).data.username, "proposer");
+
+		// last() takes the single highest block instead of filtering.
+		assert.equal(repos.block.qb.calls.orderBy, [["number", "DESC"]]);
+		assert.equal(repos.block.qb.calls.limit, [[1]]);
+		assert.undefined(repos.block.qb.calls.where);
 	});
 
 	it("GET /api/blocks/last - responds 404 on an empty chain", async ({ server }) => {
@@ -128,6 +143,20 @@ describe<{
 
 		assert.is(response.statusCode, 200);
 		assert.equal(repos.block.calls.findOneByCriteria[0][0], { hash: BLOCK_HASH });
+	});
+
+	it("GET /api/blocks/{id} - looks up all-digit ids beyond the safe integer range as block hashes", async ({
+		server,
+		repos,
+	}) => {
+		repos.block.data.one = makeBlock();
+		repos.state.data.one = makeState();
+
+		const digitHash = "1".repeat(64);
+		const response = await server.inject({ method: "GET", url: `/api/blocks/${digitHash}` });
+
+		assert.is(response.statusCode, 200);
+		assert.equal(repos.block.calls.findOneByCriteria[0][0], { hash: digitHash });
 	});
 
 	it("GET /api/blocks/{id} - rejects a malformed id", async ({ server }) => {

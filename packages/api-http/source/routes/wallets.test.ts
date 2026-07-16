@@ -83,7 +83,8 @@ describe<{
 		repos.transaction.data.page = makePage([makeTransaction()]);
 		repos.state.data.one = makeState();
 
-		const response = await server.inject({ method: "GET", url: `/api/wallets/${ADDRESS_A}/transactions` });
+		// Request by username so the criteria provably comes from the resolved wallet's address.
+		const response = await server.inject({ method: "GET", url: "/api/wallets/genesis/transactions" });
 
 		assert.is(response.statusCode, 200);
 		assert.equal(JSON.parse(response.payload).data[0].hash, TRANSACTION_HASH);
@@ -135,7 +136,8 @@ describe<{
 		repos.transaction.data.page = makePage([makeTransaction()]);
 		repos.state.data.one = makeState();
 
-		await server.inject({ method: "GET", url: `/api/wallets/${ADDRESS_A}/transactions/received` });
+		// Request by username so the criteria provably comes from the resolved wallet's address.
+		await server.inject({ method: "GET", url: "/api/wallets/genesis/transactions/received" });
 
 		const [, criteria] = repos.transaction.calls.findManyByCriteria[0];
 		assert.equal(criteria.to, ADDRESS_A);
@@ -265,6 +267,11 @@ describe<{
 			"th.token_address = :tokenAddress",
 			{ tokenAddress: TOKEN_ADDRESS },
 		]);
+		// Without a minBalance query parameter, the configured default applies.
+		assert.equal(repos.tokenHolder.qb.calls.andWhere[1], [
+			"th.balance / POW(10, tok.decimals) >= :minBalance",
+			{ minBalance: 0.01 },
+		]);
 	});
 
 	it("GET /api/wallets/activity - merges transactions and token actions", async ({ server, repos }) => {
@@ -339,6 +346,8 @@ describe<{
 		const result = await controller.activity({ query: { addresses: [], limit: 100, page: 1 } } as any);
 
 		assert.equal(result, { meta: { totalCountIsEstimate: false }, results: [], totalCount: 0 });
-		assert.equal(repos.dataSource.queries, []);
+		// The early return skips the query building entirely: the transaction repository
+		// query builder (the first thing the full path touches) is never used.
+		assert.undefined(repos.transaction.qb.calls.leftJoin);
 	});
 });

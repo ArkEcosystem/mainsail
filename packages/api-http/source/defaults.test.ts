@@ -106,4 +106,24 @@ describe<{
 		assert.equal(fresh.server.https.tls.cert, "/tmp/cert.pem");
 		assert.equal(fresh.server.https.tls.key, "/tmp/key.pem");
 	});
+
+	it("passes numeric environment overrides through as strings", async () => {
+		process.env.MAINSAIL_API_PORT = "8080";
+		process.env.MAINSAIL_API_SSL_HOST = "10.0.0.1";
+		process.env.MAINSAIL_API_SSL_PORT = "9443";
+		process.env.MAINSAIL_API_RATE_LIMIT_USER_EXPIRES = "120";
+		process.env.MAINSAIL_API_RATE_LIMIT_USER_LIMIT = "50";
+		process.env.MAINSAIL_API_TOKENS_DEFAULT_MINIMUM_BALANCE = "0.5";
+
+		const fresh = await importFresh();
+
+		// Environment.get performs no numeric coercion: raw strings are passed
+		// through and only coerced later by the Joi configuration schema.
+		assert.is(fresh.server.http.port, "8080");
+		assert.is(fresh.server.https.host, "10.0.0.1");
+		assert.is(fresh.server.https.port, "9443");
+		assert.is(fresh.plugins.rateLimit.duration, "120");
+		assert.is(fresh.plugins.rateLimit.points, "50");
+		assert.is(fresh.tokens.defaultMinimumBalance, "0.5");
+	});
 });

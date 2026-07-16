@@ -52,9 +52,16 @@ describe("Resources", ({ it, assert }) => {
 
 		assert.is(resource.raw(peer as any), peer);
 
-		const transformed = resource.transform(peer as any) as any;
-		assert.equal(transformed.ip, "127.0.0.1");
-		assert.false("secret" in transformed);
+		// The exact projection: every public field, nothing else.
+		assert.equal(resource.transform(peer as any), {
+			blockNumber: 95,
+			ip: "127.0.0.1",
+			latency: 10,
+			plugins: {},
+			port: 4002,
+			ports: {},
+			version: "1.0.0",
+		});
 	});
 
 	it("ReceiptResource maps a transaction to its receipt for raw and transform", () => {
@@ -99,6 +106,10 @@ describe("Resources", ({ it, assert }) => {
 		// A zero state height yields zero confirmations instead of a negative count.
 		const fresh = resource.transform({ ...enriched, state: makeState({ blockNumber: "0" }) } as any) as any;
 		assert.equal(fresh.confirmations, 0);
+
+		// A generator without attributes has no username.
+		const bare = resource.transform({ ...enriched, generator: { address: enriched.proposer } } as any) as any;
+		assert.undefined(bare.username);
 	});
 
 	it("TransactionResource strips the state from raw", () => {
@@ -108,6 +119,24 @@ describe("Resources", ({ it, assert }) => {
 		const raw = resource.raw(enriched as any) as any;
 		assert.undefined(raw.state);
 		assert.equal(raw.hash, enriched.hash);
+	});
+
+	it("TransactionResource normalizes empty data and passes other payloads through", async () => {
+		const resource = new TransactionResource();
+
+		const empty = (await resource.transform({
+			...makeTransaction(), // data: "0x"
+			fullReceipt: false,
+			state: makeState(),
+		} as any)) as any;
+		assert.is(empty.data, "");
+
+		const payload = (await resource.transform({
+			...makeTransaction({ data: "0xdeadbeef" }),
+			fullReceipt: false,
+			state: makeState(),
+		} as any)) as any;
+		assert.is(payload.data, "0xdeadbeef");
 	});
 
 	it("TransactionResource omits confirmations and timestamp for pending transactions", async () => {

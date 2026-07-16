@@ -40,6 +40,17 @@ describe<{
 			ports: { "api-http": 4003 },
 			version: "1.0.0",
 		});
+
+		// The peer listing never estimates the total count.
+		const [, , , options] = repos.peer.calls.findManyByCriteria[0];
+		assert.equal(options, { estimateTotalCount: false });
+	});
+
+	it("GET /api/peers - forwards the version filter as criteria", async ({ server, repos }) => {
+		await server.inject({ method: "GET", url: "/api/peers?version=1.0.0" });
+
+		const [criteria] = repos.peer.calls.findManyByCriteria[0];
+		assert.equal(criteria.version, "1.0.0");
 	});
 
 	it("GET /api/peers - rejects a malformed ip filter", async ({ server }) => {

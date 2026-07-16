@@ -27,7 +27,7 @@ describe<{
 			assert.is(server.prettyName, "Public API (HTTP)");
 
 			await serviceProvider.boot();
-			assert.string(server.uri);
+			assert.startsWith(server.uri, "http://");
 		} finally {
 			await serviceProvider.dispose();
 		}
@@ -81,6 +81,9 @@ describe<{
 
 		try {
 			await serviceProvider.boot();
+
+			// The http server is skipped when only https is enabled.
+			assert.false(app.isBound(ApiHttpIdentifiers.HTTP));
 
 			const server = app.get<Server>(ApiHttpIdentifiers.HTTPS);
 			assert.is(server.prettyName, "Public API (HTTPS)");
@@ -137,6 +140,11 @@ describe<{
 			(config: any) => (config.plugins.rateLimit.points = "nope"),
 			(config: any) => (config.tokens.defaultMinimumBalance = -1),
 			(config: any) => (config.server.http.port = 0),
+			// Enabling https requires tls cert and key paths.
+			(config: any) => {
+				config.server.https.enabled = true;
+				config.server.https.tls = {};
+			},
 		]) {
 			const config = makeValidatableConfiguration();
 			mutate(config);

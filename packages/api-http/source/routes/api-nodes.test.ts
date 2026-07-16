@@ -44,4 +44,17 @@ describe<{
 		assert.is(response.statusCode, 200);
 		assert.equal(JSON.parse(response.payload).data, []);
 	});
+
+	it("GET /api/api-nodes - forwards the ip filter as criteria", async ({ server, repos }) => {
+		await server.inject({ method: "GET", url: "/api/api-nodes?ip=127.0.0.1" });
+
+		const [criteria] = repos.apiNode.calls.findManyByCriteria[0];
+		assert.equal(criteria.ip, "127.0.0.1");
+	});
+
+	it("GET /api/api-nodes - rejects a malformed ip filter", async ({ server }) => {
+		const response = await server.inject({ method: "GET", url: "/api/api-nodes?ip=not-an-ip" });
+
+		assert.is(response.statusCode, 422);
+	});
 });

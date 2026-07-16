@@ -56,8 +56,12 @@ describe<{
 	it("GET /api/tokens - skips the whitelist on request", async ({ server, repos }) => {
 		repos.token.data.manyAndCount = [[makeToken()], 1];
 
-		await server.inject({ method: "GET", url: "/api/tokens?ignoreWhitelist=true" });
+		const response = await server.inject({ method: "GET", url: "/api/tokens?ignoreWhitelist=true" });
 
+		// The listing still runs and succeeds - just without any whitelist join.
+		assert.is(response.statusCode, 200);
+		assert.is(JSON.parse(response.payload).meta.totalCount, 1);
+		assert.defined(repos.token.qb.calls.getManyAndCount);
 		assert.undefined(repos.token.qb.calls.innerJoin);
 		assert.undefined(repos.token.qb.calls.leftJoin);
 	});
@@ -65,11 +69,18 @@ describe<{
 	it("GET /api/tokens - extends the whitelist with custom addresses", async ({ server, repos }) => {
 		repos.token.data.manyAndCount = [[makeToken()], 1];
 
-		await server.inject({ method: "GET", url: `/api/tokens?whitelist=${ADDRESS_A}` });
+		// Comma-separated values arrive as an array through the comma-array-query plugin.
+		await server.inject({ method: "GET", url: `/api/tokens?whitelist=${ADDRESS_A},${ADDRESS_B}` });
 
-		// A custom whitelist switches to a left join with an OR condition.
+		// A custom whitelist switches to a left join ...
 		assert.defined(repos.token.qb.calls.leftJoin);
 		assert.undefined(repos.token.qb.calls.innerJoin);
+
+		// ... and filters on "whitelisted OR explicitly allowed".
+		assert.equal(replayBrackets(repos.token.qb.calls.andWhere[0][0]), [
+			["tw.address IS NOT NULL"],
+			["tok.address IN (:...customWhitelist)", { customWhitelist: [ADDRESS_A, ADDRESS_B] }],
+		]);
 	});
 
 	const replayBrackets = (bracket: any): any[][] => {
@@ -95,23 +106,24 @@ describe<{
 		repos.token.data.manyAndCount = [[makeToken()], 1];
 
 		await server.inject({ method: "GET", url: "/api/tokens?name=te" });
-		await server.inject({ method: "GET", url: "/api/tokens?name=test" });
+		// Three characters is the boundary: already too long for the prefix index.
+		await server.inject({ method: "GET", url: "/api/tokens?name=tes" });
 
-		// Short queries use the prefix index ...
+		// Queries of up to two characters use the prefix index ...
 		assert.equal(replayBrackets(repos.token.qb.calls.andWhere[0][0]), [
 			["lower(tok.symbol) LIKE :prefix", { prefix: "te%" }],
 			["lower(tok.name) LIKE :prefix", { prefix: "te%" }],
 		]);
 		// ... longer queries the trigram index.
 		assert.equal(replayBrackets(repos.token.qb.calls.andWhere[1][0]), [
-			["tok.symbol ILIKE :like", { like: "%test%" }],
-			["tok.name ILIKE :like", { like: "%test%" }],
+			["tok.symbol ILIKE :like", { like: "%tes%" }],
+			["tok.name ILIKE :like", { like: "%tes%" }],
 		]);
 
 		// Both name searches rank prefix matches first.
 		assert.length(repos.token.qb.calls.addSelect, 2);
 		assert.equal(repos.token.qb.calls.setParameter[0], ["orderByPrefix", "te%"]);
-		assert.equal(repos.token.qb.calls.setParameter[1], ["orderByPrefix", "test%"]);
+		assert.equal(repos.token.qb.calls.setParameter[1], ["orderByPrefix", "tes%"]);
 	});
 
 	it("GET /api/tokens/transfers - excludes custom blacklisted tokens", async ({ server, repos }) => {
