@@ -37,7 +37,7 @@ export class CommitsController extends Controller {
 			// map bitmask -> indexes -> round.validators
 			const packed = BigInt(block.validatorSet);
 			const unpacked = validatorSetUnpack(packed, round.validators.length);
-			validators = unpacked.filter(Boolean).map((_, index) => round.validators[index]);
+			validators = round.validators.filter((_, index) => unpacked[index]);
 		}
 
 		return {
