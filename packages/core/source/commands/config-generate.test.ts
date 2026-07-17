@@ -98,7 +98,10 @@ describe<{
 
 		// Explicit --validators (9) conflicts with the 3 supplied mnemonics — rejected, not overridden.
 		await assert.rejects(
-			() => cli.withFlags(generateFlags(configPath, { force: true, secretsFile, validators: "9" })).execute(Command),
+			() =>
+				cli
+					.withFlags(generateFlags(configPath, { force: true, secretsFile, validators: "9" }))
+					.execute(Command),
 			"validatorMnemonics length (3) does not match the validators count (9).",
 		);
 	});

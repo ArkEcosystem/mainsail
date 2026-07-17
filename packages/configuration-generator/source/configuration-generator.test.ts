@@ -210,11 +210,9 @@ describe<{
 	});
 
 	// Three valid, distinct BIP39 mnemonics for the externally-supplied-secrets cases.
-	const MNEMONIC_A =
-		"abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about";
+	const MNEMONIC_A = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about";
 	const MNEMONIC_B = "legal winner thank year wave sausage worth useful legal winner thank yellow";
-	const MNEMONIC_C =
-		"letter advice cage absurd amount doctor acoustic avoid letter advice cage above";
+	const MNEMONIC_C = "letter advice cage absurd amount doctor acoustic avoid letter advice cage above";
 
 	it("should use externally supplied validator mnemonics matching the validator count", async ({
 		generator,
@@ -262,7 +260,8 @@ describe<{
 
 	it("should reject an invalid validator mnemonic before touching the EVM", async ({ generator, configPath }) => {
 		await assert.rejects(
-			() => generator.generate(options({ validatorMnemonics: [MNEMONIC_A, "not a real mnemonic"], validators: 2 })),
+			() =>
+				generator.generate(options({ validatorMnemonics: [MNEMONIC_A, "not a real mnemonic"], validators: 2 })),
 			"validatorMnemonics[1] is not a valid BIP39 mnemonic.",
 		);
 
@@ -295,7 +294,11 @@ describe<{
 		await assert.rejects(
 			() =>
 				generator.generate(
-					options({ genesisMnemonic: MNEMONIC_A, validatorMnemonics: [MNEMONIC_A, MNEMONIC_B], validators: 2 }),
+					options({
+						genesisMnemonic: MNEMONIC_A,
+						validatorMnemonics: [MNEMONIC_A, MNEMONIC_B],
+						validators: 2,
+					}),
 				),
 			"genesisMnemonic must not also be a validator mnemonic.",
 		);

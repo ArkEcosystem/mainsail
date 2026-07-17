@@ -285,9 +285,7 @@ export class Command extends Commands.Command {
 		// count follows the file. An explicit, conflicting --validators is left intact so the
 		// generator rejects the mismatch rather than silently overriding it.
 		const validators =
-			secrets.validatorMnemonics && !validatorsExplicit
-				? secrets.validatorMnemonics.length
-				: options.validators;
+			secrets.validatorMnemonics && !validatorsExplicit ? secrets.validatorMnemonics.length : options.validators;
 
 		return {
 			...options,
