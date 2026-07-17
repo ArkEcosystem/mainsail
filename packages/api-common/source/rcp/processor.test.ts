@@ -109,6 +109,39 @@ describe<{
 		]);
 	});
 
+	it("process should bound batch concurrency and preserve order", async ({ subject }) => {
+		let inFlight = 0;
+		let peak = 0;
+
+		subject.registerAction({
+			handle: async (parameters: any[]) => {
+				inFlight++;
+				peak = Math.max(peak, inFlight);
+				await new Promise((resolve) => setImmediate(resolve));
+				inFlight--;
+				return `R-${parameters[0]}`;
+			},
+			name: "m",
+			schema: { $id: undefined },
+		} as any);
+
+		const payload = Array.from({ length: 25 }, (_, index) => ({
+			id: index,
+			jsonrpc: "2.0",
+			method: "m",
+			params: [index],
+		}));
+
+		const result = (await subject.process({ payload } as any)) as any[];
+
+		// never more than BATCH_CONCURRENCY (10) simulations in flight at once
+		assert.true(peak <= 10);
+		assert.equal(
+			result,
+			payload.map((request) => ({ id: request.id, jsonrpc: "2.0", result: `R-${request.id}` })),
+		);
+	});
+
 	it("process should return MethodNotFound for unknown method", async ({ subject }) => {
 		const result = await subject.process({
 			payload: { id: 3, jsonrpc: "2.0", method: "unknown", params: [] },
