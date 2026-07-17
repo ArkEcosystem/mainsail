@@ -209,6 +209,98 @@ describe<{
 		assert.equal(internalOptions.premine, "125000000000000000000000000");
 	});
 
+	// Three valid, distinct BIP39 mnemonics for the externally-supplied-secrets cases.
+	const MNEMONIC_A =
+		"abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about";
+	const MNEMONIC_B = "legal winner thank year wave sausage worth useful legal winner thank yellow";
+	const MNEMONIC_C =
+		"letter advice cage absurd amount doctor acoustic avoid letter advice cage above";
+
+	it("should use externally supplied validator mnemonics matching the validator count", async ({
+		generator,
+		configPath,
+		genesis,
+	}) => {
+		const generate = spy(genesis, "generate");
+
+		await generator.generate(options({ validatorMnemonics: [MNEMONIC_A, MNEMONIC_B], validators: 2 }));
+
+		// validators.json holds exactly the supplied secrets, in order.
+		assert.equal(readJSONSync(join(configPath, "validators.json")).secrets, [MNEMONIC_A, MNEMONIC_B]);
+
+		// The active round-validator set matches the supplied list.
+		const crypto = readJSONSync(join(configPath, "crypto.json"));
+		assert.equal(crypto.milestones[1], { height: 1, roundValidators: 2 });
+
+		// The generator receives the supplied mnemonics.
+		const [, validatorMnemonics] = generate.getCallArgs(0) as [string, string[], any];
+		assert.equal(validatorMnemonics, [MNEMONIC_A, MNEMONIC_B]);
+	});
+
+	it("should reject validator mnemonics whose count differs from the validators count", async ({
+		generator,
+		configPath,
+	}) => {
+		await assert.rejects(
+			() => generator.generate(options({ validatorMnemonics: [MNEMONIC_A, MNEMONIC_B], validators: 3 })),
+			"validatorMnemonics length (2) does not match the validators count (3).",
+		);
+
+		// Rejected up front, before any config file is written.
+		assert.false(existsSync(join(configPath, "crypto.json")));
+	});
+
+	it("should use an externally supplied genesis mnemonic", async ({ generator, configPath, genesis }) => {
+		const generate = spy(genesis, "generate");
+
+		await generator.generate(options({ genesisMnemonic: MNEMONIC_C }));
+
+		// The genesis wallet is derived from the supplied mnemonic.
+		assert.equal(readJSONSync(join(configPath, "genesis-wallet.json")).passphrase, MNEMONIC_C);
+		assert.equal(generate.getCallArgs(0)[0], MNEMONIC_C);
+	});
+
+	it("should reject an invalid validator mnemonic before touching the EVM", async ({ generator, configPath }) => {
+		await assert.rejects(
+			() => generator.generate(options({ validatorMnemonics: [MNEMONIC_A, "not a real mnemonic"], validators: 2 })),
+			"validatorMnemonics[1] is not a valid BIP39 mnemonic.",
+		);
+
+		// Validation happens up front, before any config file is written.
+		assert.false(existsSync(join(configPath, "crypto.json")));
+	});
+
+	it("should reject an invalid genesis mnemonic", async ({ generator }) => {
+		await assert.rejects(
+			() => generator.generate(options({ genesisMnemonic: "nope" })),
+			"genesisMnemonic is not a valid BIP39 mnemonic.",
+		);
+	});
+
+	it("should reject an empty validator mnemonic list", async ({ generator }) => {
+		await assert.rejects(
+			() => generator.generate(options({ validatorMnemonics: [] })),
+			"validatorMnemonics must be a non-empty array.",
+		);
+	});
+
+	it("should reject duplicate validator mnemonics", async ({ generator }) => {
+		await assert.rejects(
+			() => generator.generate(options({ validatorMnemonics: [MNEMONIC_A, MNEMONIC_A], validators: 2 })),
+			"validatorMnemonics contains duplicate entries.",
+		);
+	});
+
+	it("should reject a genesis mnemonic that is also a validator mnemonic", async ({ generator }) => {
+		await assert.rejects(
+			() =>
+				generator.generate(
+					options({ genesisMnemonic: MNEMONIC_A, validatorMnemonics: [MNEMONIC_A, MNEMONIC_B], validators: 2 }),
+				),
+			"genesisMnemonic must not also be a validator mnemonic.",
+		);
+	});
+
 	it("should write database settings to .env when all DB options are provided", async ({ generator, configPath }) => {
 		await generator.generate(
 			options({

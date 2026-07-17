@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "fs";
-import { ensureDirSync, readJSONSync } from "fs-extra/esm";
+import { ensureDirSync, readJSONSync, writeJSONSync } from "fs-extra/esm";
 import { join } from "path";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
@@ -61,6 +61,60 @@ describe<{
 		assert.equal(crypto.genesisBlock.block.number, 0);
 
 		assert.length(readJSONSync(join(configPath, "devnet", "validators.json")).secrets, 3);
+	});
+
+	it("should generate genesis from an external secrets file", async ({ cli, configPath }) => {
+		const validatorMnemonics = [
+			"abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
+			"legal winner thank year wave sausage worth useful legal winner thank yellow",
+			"letter advice cage absurd amount doctor acoustic avoid letter advice cage above",
+		];
+		const genesisMnemonic = "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong";
+		const secretsFile = join(dirSync().name, "secrets.json");
+		writeJSONSync(secretsFile, { genesisMnemonic, validatorMnemonics });
+
+		// --validators is omitted, so the count is derived from the supplied list (3).
+		await cli
+			.withFlags(generateFlags(configPath, { force: true, secretsFile, validators: undefined }))
+			.execute(Command);
+
+		// validators.json holds exactly the supplied secrets, and the genesis wallet uses the supplied mnemonic.
+		assert.equal(readJSONSync(join(configPath, "devnet", "validators.json")).secrets, validatorMnemonics);
+		assert.equal(readJSONSync(join(configPath, "devnet", "genesis-wallet.json")).passphrase, genesisMnemonic);
+
+		// The genesis block was produced and the active round-validator set follows the supplied list.
+		assert.equal(readJSONSync(join(configPath, "devnet", "crypto.json")).milestones[1].roundValidators, 3);
+	});
+
+	it("should reject an explicit --validators that conflicts with the secrets file", async ({ cli, configPath }) => {
+		const secretsFile = join(dirSync().name, "secrets.json");
+		writeJSONSync(secretsFile, {
+			validatorMnemonics: [
+				"abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
+				"legal winner thank year wave sausage worth useful legal winner thank yellow",
+				"letter advice cage absurd amount doctor acoustic avoid letter advice cage above",
+			],
+		});
+
+		// Explicit --validators (9) conflicts with the 3 supplied mnemonics — rejected, not overridden.
+		await assert.rejects(
+			() => cli.withFlags(generateFlags(configPath, { force: true, secretsFile, validators: "9" })).execute(Command),
+			"validatorMnemonics length (3) does not match the validators count (9).",
+		);
+	});
+
+	it("should reject an external secrets file with an invalid mnemonic", async ({ cli, configPath }) => {
+		const secretsFile = join(dirSync().name, "bad-secrets.json");
+		writeJSONSync(secretsFile, { validatorMnemonics: ["not a valid mnemonic"] });
+
+		// --validators omitted so the count matches (1), letting the BIP39 check be the one to fire.
+		await assert.rejects(
+			() =>
+				cli
+					.withFlags(generateFlags(configPath, { force: true, secretsFile, validators: undefined }))
+					.execute(Command),
+			"validatorMnemonics[0] is not a valid BIP39 mnemonic.",
+		);
 	});
 
 	it("should throw if the configuration destination already exists", async ({ cli, configPath }) => {
