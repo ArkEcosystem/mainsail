@@ -54,10 +54,15 @@ export class NodeController extends Controller {
 
 	public async fees(request: Types.HapiRequest): Promise<object> {
 		const configuration = await this.getConfiguration();
-		const cryptoConfiguration = configuration.cryptoConfiguration as Contracts.Crypto.NetworkConfig;
-		const genesisTimestamp = cryptoConfiguration.genesisBlock.block.timestamp;
+		const cryptoConfiguration = configuration.cryptoConfiguration as Contracts.Crypto.NetworkConfig | undefined;
 
-		const result = await this.transactionRepositoryFactory().getFeeStatistics(genesisTimestamp, request.query.days);
+		// A fresh database has no configuration row (and no transactions yet).
+		const result = cryptoConfiguration
+			? await this.transactionRepositoryFactory().getFeeStatistics(
+					cryptoConfiguration.genesisBlock.block.timestamp,
+					request.query.days,
+				)
+			: undefined;
 
 		const grouped = {
 			evmCall: {
@@ -73,9 +78,14 @@ export class NodeController extends Controller {
 
 	public async configuration(request: Types.HapiRequest): Promise<object> {
 		const configuration = await this.getConfiguration();
-		const plugins = await this.getPlugins();
 
-		const cryptoConfiguration = configuration.cryptoConfiguration as Contracts.Crypto.NetworkConfig;
+		const cryptoConfiguration = configuration.cryptoConfiguration as Contracts.Crypto.NetworkConfig | undefined;
+		if (!cryptoConfiguration) {
+			// A fresh database has no configuration row yet.
+			return { data: {} };
+		}
+
+		const plugins = await this.getPlugins();
 		const network = cryptoConfiguration.network;
 
 		return {
@@ -128,7 +138,22 @@ export class NodeController extends Controller {
 		const pluginRepository = this.pluginRepositoryFactory();
 
 		let plugins = await pluginRepository.createQueryBuilder().select().getMany();
-		plugins = [{ configuration: this.apiConfiguration.all(), name: "@mainsail/api-http" }, ...plugins];
+
+		// Report this API's own port: lift enabled/port out of the server section
+		// (http preferred, https otherwise) into the shape buildPortMapping expects.
+		// Appended last so the live configuration wins over the raw configuration
+		// row that api-sync stores for this package, which carries no top-level port.
+		const { server } = this.apiConfiguration.all() as {
+			server: { http: { enabled: boolean; port: number }; https: { enabled: boolean; port: number } };
+		};
+		const activeServer = server.http.enabled ? server.http : server.https;
+		plugins = [
+			...plugins,
+			{
+				configuration: { enabled: activeServer.enabled, port: activeServer.port },
+				name: "@mainsail/api-http",
+			} as Models.Plugin,
+		];
 
 		const mappings: Record<string, Models.Plugin> = {};
 
