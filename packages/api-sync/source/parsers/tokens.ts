@@ -164,7 +164,7 @@ export class TokenParserService implements TokenParser {
 		const eventLogs = parseEventLogs({
 			abi: erc20AbiEvents,
 			eventName: ["Transfer", "Approval"],
-			logs: receipt.logs,
+			logs: receipt.logs ?? [],
 		});
 
 		const dirtyAccounts = new Map<`0x${string}`, Set<string>>();
@@ -232,7 +232,7 @@ export class TokenParserService implements TokenParser {
 					// Skip anything if not deemed a token.
 					if (!foundTokens.has(contract)) {
 						this.logger.debugExtra(
-							`Ignoring tx to contract '${receipt.contractAddress}' because it does not implemented expected ERC20 ABI.`,
+							`Ignoring tx to contract '${contract}' because it does not implement the expected ERC20 ABI.`,
 						);
 						continue;
 					} else {
@@ -343,7 +343,11 @@ export class TokenParserService implements TokenParser {
 							functionName: call.functionName,
 						});
 
-						tokenMetadata[call.functionName] = decoded as unknown as undefined;
+						// totalSupply decodes to a bigint; normalize to string to match the
+						// declared metadata/model contract (as balanceOf does below).
+						tokenMetadata[call.functionName] = (typeof decoded === "bigint"
+							? decoded.toString()
+							: decoded) as unknown as undefined;
 					}
 
 					continue;
@@ -398,7 +402,7 @@ export class TokenParserService implements TokenParser {
 			return decoded.toString();
 		} catch (rawError) {
 			const error = ensureError(rawError);
-			console.log(error.message);
+			this.logger.warn(`Failed to call balanceOf on '${contract}' for ${account}: ${error.message}`);
 		}
 
 		return "0";

@@ -19,7 +19,7 @@ export function parseUsernames(
 	const logs = parseEventLogs({
 		abi: paymentAbi,
 		//eventName: "UsernameRegistered",
-		logs: receipt.logs,
+		logs: receipt.logs ?? [],
 	});
 
 	return logs.map((l) => {
