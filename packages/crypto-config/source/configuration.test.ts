@@ -42,6 +42,21 @@ describe<{
 		);
 	});
 
+	const withRoundValidators = (value: number) => ({
+		...cryptoJson,
+		milestones: cryptoJson.milestones.map((milestone, index) =>
+			index === 1 ? { ...milestone, roundValidators: value } : milestone,
+		),
+	});
+
+	it("should reject a milestone with roundValidators above the 64 wire-format cap", ({ configManager }) => {
+		assert.throws(() => configManager.setConfig(withRoundValidators(65)));
+	});
+
+	it("should accept a milestone with roundValidators at the 64 cap", ({ configManager }) => {
+		assert.not.throws(() => configManager.setConfig(withRoundValidators(64)));
+	});
+
 	it("should throw on set before config is initialized", () => {
 		const fresh = new Configuration();
 
