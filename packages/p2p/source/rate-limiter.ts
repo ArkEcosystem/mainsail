@@ -60,10 +60,14 @@ export class RateLimiter {
 		return false;
 	}
 
-	public async hasExceededRateLimitNoConsume(ip: string, endpoint?: string): Promise<boolean> {
+	// How long to wait before the next request to `ip`/`endpoint` fits the
+	// budget again; 0 when a request may be made right away.
+	public async msBeforeNext(ip: string, endpoint?: string): Promise<number> {
+		let wait = 0;
+
 		const global = await this.#global.get(ip);
 		if (global !== null && global.remainingPoints <= 0) {
-			return true;
+			wait = Math.max(wait, global.msBeforeNext);
 		}
 
 		if (endpoint && this.#endpoints.has(endpoint)) {
@@ -73,11 +77,11 @@ export class RateLimiter {
 
 			const endpointLimiter = await endpointLimiters.get(ip);
 			if (endpointLimiter !== null && endpointLimiter.remainingPoints <= 0) {
-				return true;
+				wait = Math.max(wait, endpointLimiter.msBeforeNext);
 			}
 		}
 
-		return false;
+		return wait;
 	}
 
 	public getRateLimitedEndpoints(): string[] {
