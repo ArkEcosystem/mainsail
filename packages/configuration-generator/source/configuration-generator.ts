@@ -3,6 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Application } from "@mainsail/kernel";
+import { validateMnemonic } from "bip39";
 import dayjs from "dayjs";
 import { ensureDirSync, pathExistsSync } from "fs-extra/esm";
 import { join } from "path";
@@ -20,6 +21,12 @@ import {
 	WalletGenerator,
 } from "./generators/index.js";
 import { Identifiers as InternalIdentifiers } from "./identifiers.js";
+
+const assertMnemonic = (mnemonic: unknown, label: string): void => {
+	if (typeof mnemonic !== "string" || !validateMnemonic(mnemonic)) {
+		throw new Error(`${label} is not a valid BIP39 mnemonic.`);
+	}
+};
 
 @injectable()
 export class ConfigurationGenerator {
@@ -85,8 +92,11 @@ export class ConfigurationGenerator {
 			...options,
 		};
 
-		const genesisWalletMnemonic = this.mnemonicGenerator.generate();
-		let validatorsMnemonics = this.mnemonicGenerator.generateMany(internalOptions.validators);
+		this.#assertCustomSecrets(internalOptions);
+
+		const genesisWalletMnemonic = internalOptions.genesisMnemonic ?? this.mnemonicGenerator.generate();
+		let validatorsMnemonics =
+			internalOptions.validatorMnemonics ?? this.mnemonicGenerator.generateMany(internalOptions.validators);
 
 		const tasks: Task[] = [
 			{
@@ -148,7 +158,11 @@ export class ConfigurationGenerator {
 							snapshotHash: this.importer.snapshotHash,
 						};
 
-						if (this.importer.validators && options.mockFakeValidatorBlsKeys) {
+						if (
+							this.importer.validators &&
+							options.mockFakeValidatorBlsKeys &&
+							!internalOptions.validatorMnemonics
+						) {
 							validatorsMnemonics = await this.#prepareMockValidatorKeys(internalOptions);
 						}
 					}
@@ -222,6 +236,37 @@ export class ConfigurationGenerator {
 		}
 
 		this.logger.info(`Configuration generated on location: ${this.configurationPath}`);
+	}
+
+	#assertCustomSecrets(options: Contracts.NetworkGenerator.InternalOptions): void {
+		if (options.genesisMnemonic !== undefined) {
+			assertMnemonic(options.genesisMnemonic, "genesisMnemonic");
+		}
+
+		if (options.validatorMnemonics !== undefined) {
+			if (!Array.isArray(options.validatorMnemonics) || options.validatorMnemonics.length === 0) {
+				throw new Error("validatorMnemonics must be a non-empty array.");
+			}
+
+			if (options.validatorMnemonics.length !== options.validators) {
+				throw new Error(
+					`validatorMnemonics length (${options.validatorMnemonics.length}) does not match the validators count (${options.validators}).`,
+				);
+			}
+
+			for (const [index, mnemonic] of options.validatorMnemonics.entries()) {
+				assertMnemonic(mnemonic, `validatorMnemonics[${index}]`);
+			}
+
+			const unique = new Set(options.validatorMnemonics);
+			if (unique.size !== options.validatorMnemonics.length) {
+				throw new Error("validatorMnemonics contains duplicate entries.");
+			}
+
+			if (options.genesisMnemonic !== undefined && unique.has(options.genesisMnemonic)) {
+				throw new Error("genesisMnemonic must not also be a validator mnemonic.");
+			}
+		}
 	}
 
 	#prepareEnvironmentOptions(options: Contracts.NetworkGenerator.InternalOptions): EnvironmentData {

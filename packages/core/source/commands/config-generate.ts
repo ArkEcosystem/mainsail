@@ -6,6 +6,8 @@ import { Identifiers as AppIdentifiers, Identifiers as CliIdentifiers } from "@m
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { Contracts as AppContracts } from "@mainsail/contracts";
 import envPaths from "env-paths";
+import { existsSync } from "fs";
+import { readJSONSync } from "fs-extra/esm";
 import Joi from "joi";
 import path from "path";
 import prompts from "prompts";
@@ -21,6 +23,7 @@ type Flag = {
 type Flags = Omit<AppContracts.NetworkGenerator.Options, "peers" | "rewardAmount"> & {
 	peers: string;
 	rewardAmount: number | string;
+	secretsFile?: string;
 };
 
 @injectable()
@@ -150,6 +153,14 @@ export class Command extends Commands.Command {
 			default: "127.0.0.1",
 		},
 
+		// Externally supplied secrets
+		{
+			name: "secretsFile",
+			description:
+				'Path to a JSON file with externally-generated secrets: { "genesisMnemonic"?: string, "validatorMnemonics": string[] }. A validators.json-style { "secrets": [...] } is also accepted. When provided, the validator count follows the supplied list.',
+			schema: Joi.string(),
+		},
+
 		// General
 		{ name: "configPath", description: "Configuration path.", schema: Joi.string() },
 		{
@@ -202,7 +213,7 @@ export class Command extends Commands.Command {
 			if (flags.force || allFlagsSet) {
 				return await configurationApp
 					.get<ConfigurationGenerator>(Identifiers.ConfigurationGenerator)
-					.generate(this.#convertFlags(options));
+					.generate(this.#convertFlags(options, flags.validators !== undefined));
 			}
 
 			const response = await prompts([
@@ -256,7 +267,7 @@ export class Command extends Commands.Command {
 
 			await configurationApp
 				.get<ConfigurationGenerator>(Identifiers.ConfigurationGenerator)
-				.generate(this.#convertFlags(options));
+				.generate(this.#convertFlags(options, true));
 		} finally {
 			// The genesis generation boots the Rust EVM, whose native runtime keeps the
 			// event loop alive until the instance is disposed — without this, the process
@@ -267,9 +278,18 @@ export class Command extends Commands.Command {
 		}
 	}
 
-	#convertFlags(options: Flags): AppContracts.NetworkGenerator.Options {
+	#convertFlags(options: Flags, validatorsExplicit: boolean): AppContracts.NetworkGenerator.Options {
+		const secrets = this.#readSecrets(options);
+
+		// When validator secrets come from a file and no explicit --validators was given, the
+		// count follows the file. An explicit, conflicting --validators is left intact so the
+		// generator rejects the mismatch rather than silently overriding it.
+		const validators =
+			secrets.validatorMnemonics && !validatorsExplicit ? secrets.validatorMnemonics.length : options.validators;
+
 		return {
 			...options,
+			...secrets,
 			// Trim each entry and drop empty ones: --peers="" means no peers, and
 			// "a, b, c" must not keep leading spaces past the first entry.
 			peers: options.peers
@@ -277,7 +297,34 @@ export class Command extends Commands.Command {
 				.map((peer) => peer.trim())
 				.filter((peer) => peer.length > 0),
 			rewardAmount: options.rewardAmount.toString(),
+			validators,
 		};
+	}
+
+	#readSecrets(options: Flags): { genesisMnemonic?: string; validatorMnemonics?: string[] } {
+		if (!options.secretsFile) {
+			return {};
+		}
+
+		const resolved = path.resolve(options.secretsFile);
+		if (!existsSync(resolved)) {
+			throw new Error(`Secrets file not found: ${resolved}`);
+		}
+
+		const contents = readJSONSync(resolved);
+		const validatorMnemonics = contents.validatorMnemonics ?? contents.secrets;
+		const genesisMnemonic = contents.genesisMnemonic ?? contents.genesis;
+
+		// Shape checks only; per-mnemonic BIP39 validation happens in the generator.
+		if (validatorMnemonics !== undefined && !Array.isArray(validatorMnemonics)) {
+			throw new Error(`Secrets file ${resolved}: "validatorMnemonics" must be an array of mnemonics.`);
+		}
+
+		if (genesisMnemonic !== undefined && typeof genesisMnemonic !== "string") {
+			throw new Error(`Secrets file ${resolved}: "genesisMnemonic" must be a string.`);
+		}
+
+		return { genesisMnemonic, validatorMnemonics };
 	}
 
 	#getConfigurationPath(options: Flags, applicationName?: string): string {

@@ -68,6 +68,12 @@ export type InternalOptions = EnvironmentOptions &
 		configPath?: string;
 		overwriteConfig: boolean;
 
+		// Externally supplied secrets. When provided they are used verbatim instead of
+		// generating random ones — required e.g. for a mainnet genesis built from
+		// pre-generated validator keys. Each must be a valid BIP39 mnemonic.
+		genesisMnemonic?: string;
+		validatorMnemonics?: string[];
+
 		// Testing
 		createLegacyColdWallets?: boolean;
 	};
