@@ -698,8 +698,8 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             _voters[voter.prev].next = address(0);
             _votersTail = voter.prev;
         } else if (_votersHead == msg.sender) {
-            _voters[_votersTail].prev = address(0);
-            _votersHead = _voters[_votersHead].next;
+            _voters[voter.next].prev = address(0);
+            _votersHead = voter.next;
         } else {
             _voters[voter.prev].next = voter.next;
             _voters[voter.next].prev = voter.prev;
