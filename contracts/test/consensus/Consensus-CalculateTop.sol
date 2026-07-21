@@ -86,7 +86,7 @@ contract ConsensusTest is Base {
         address addr = address(1);
 
         registerValidator(addr);
-        consensus.addValidator(address(2), new bytes(0), false);
+        consensus.addValidator(address(2), false);
 
         // address(2) has no BLS key, so it is not eligible; only one eligible validator remains.
         vm.expectRevert(abi.encodeWithSelector(ConsensusV1.InsufficientActiveValidators.selector, 1, 2));
