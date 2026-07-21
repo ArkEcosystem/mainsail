@@ -137,8 +137,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         emit FeeUpdated(registrationFee);
     }
 
-    // TODO: import validator without bls public key
-    function addValidator(address addr, bytes calldata blsPublicKey, bool isResigned) external onlyOwner {
+    function addValidator(address addr, bool isResigned) external onlyOwner {
         if (_rounds.length > 0) {
             revert ImportIsNotAllowed();
         }
@@ -147,17 +146,8 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             revert ValidatorAlreadyRegistered();
         }
 
-        if (_blsPublicKeys[keccak256(blsPublicKey)]) {
-            revert BlsKeyAlreadyRegistered();
-        }
-
-        // Allow empty blsPublicKey for imports
-        if (blsPublicKey.length != 0) {
-            _verifyAndRegisterBlsPublicKey(blsPublicKey);
-        }
-
         ValidatorData memory validator =
-            ValidatorData({votersCount: 0, voteBalance: 0, fee: 0, isResigned: isResigned, blsPublicKey: blsPublicKey});
+            ValidatorData({votersCount: 0, voteBalance: 0, fee: 0, isResigned: isResigned, blsPublicKey: ""});
 
         _hasValidator[addr] = true;
         _validatorsData[addr] = validator;
@@ -167,11 +157,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             _resignedValidatorsCount++;
         }
 
-        if (_canBecomeActiveValidator(addr)) {
-            _addActiveValidator(addr);
-        }
-
-        emit ValidatorRegistered(addr, blsPublicKey);
+        emit ValidatorRegistered(addr, "");
     }
 
     function addVotes(address[] calldata voters, address[] calldata validators) external onlyOwner {
