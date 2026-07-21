@@ -31,7 +31,7 @@ contract ConsensusTest is Base {
         bytes memory pop = createValidPop();
 
         address addr = address(1);
-        consensus.addValidator(addr, "", false);
+        consensus.addValidator(addr, false);
         assertEq(consensus.validatorsCount(), 1);
         assertEq(consensus.activeValidatorsCount(), 0);
 

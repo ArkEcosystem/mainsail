@@ -234,5 +234,6 @@ contract ConsensusTest is Base {
         vm.startPrank(address(2));
         vm.expectRevert(ConsensusV1.BellowMinValidators.selector);
         consensus.resignValidator();
+        vm.stopPrank();
     }
 }
