@@ -44,7 +44,6 @@
 		"@mainsail/evm-contracts": "workspace:*",
 		"@mainsail/evm-service": "workspace:*",
 		"@mainsail/evm-api-worker": "workspace:*",
-		"@mainsail/transactions": "workspace:*",
 		"@mainsail/transaction-pool-service": "workspace:*",
 		"@mainsail/transaction-pool-worker": "workspace:*",
 		"@mainsail/crypto-proposal": "workspace:*",

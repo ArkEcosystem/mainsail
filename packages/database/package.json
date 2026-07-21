@@ -45,7 +45,6 @@
 		"@mainsail/processor": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
-		"@mainsail/transactions": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/tmp": "0.2.6",
 		"tmp": "0.2.5",
