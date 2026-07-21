@@ -208,16 +208,12 @@ contract ConsensusTest is Base {
 
         assertEq(consensus.validatorsCount(), 3);
 
-        // Act - higher value
+        // Act - value higher than the active validator count must revert (no duplicate-slot padding).
+        // _minValidators is left unchanged because the whole call reverts.
+        vm.expectRevert(abi.encodeWithSelector(ConsensusV1.InsufficientActiveValidators.selector, 3, 5));
         consensus.calculateRoundValidators(5);
 
-        // Test
-        vm.startPrank(addr);
-        vm.expectRevert(ConsensusV1.BellowMinValidators.selector);
-        consensus.resignValidator();
-        vm.stopPrank();
-
-        // Act - same value
+        // Act - same value as the active count sets _minValidators = 3
         consensus.calculateRoundValidators(3);
 
         // Test
