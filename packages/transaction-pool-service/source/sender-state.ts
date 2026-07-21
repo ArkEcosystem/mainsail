@@ -8,7 +8,9 @@ import {
 	TransactionFailedToVerifyError,
 	TransactionFromWrongNetworkError,
 	UnexpectedNonceError,
- TransactionFailedToPreverifyError, UnexpectedLegacySecondSignatureError } from "@mainsail/exceptions";
+	TransactionFailedToPreverifyError,
+	UnexpectedLegacySecondSignatureError,
+} from "@mainsail/exceptions";
 import { Wallets } from "@mainsail/state";
 
 @injectable()
@@ -113,9 +115,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new InsufficientBalanceError();
 		}
 
-		if (
-			!(await this.verifier.verifyHash(transaction))
-		) {
+		if (!(await this.verifier.verifyHash(transaction))) {
 			throw new TransactionFailedToVerifyError(transaction);
 		}
 
@@ -130,9 +130,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		await this.#preverify(transaction);
 	}
 
-	async #preverify(
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<void> {
+	async #preverify(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		const milestone = this.cryptoConfiguration.getMilestone();
 
 		const preverified = await this.evm.preverifyTransaction({

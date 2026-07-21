@@ -32,7 +32,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionPool.SenderState).to(SenderState);
 		this.app.bind(Identifiers.TransactionPool.Service).to(Service).inSingletonScope();
 		this.app.bind(Identifiers.TransactionPool.Storage).to(Storage).inSingletonScope();
-		this.app.bind(Identifiers.TransactionPool.Selector).to(Selector).inSingletonScope();	}
+		this.app.bind(Identifiers.TransactionPool.Selector).to(Selector).inSingletonScope();
+	}
 
 	public async boot(): Promise<void> {
 		this.app.get<Storage>(Identifiers.TransactionPool.Storage).boot();

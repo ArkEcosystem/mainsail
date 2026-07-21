@@ -75,13 +75,15 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			return;
 		}
 
-		void this.eventDispatcher.dispatch(Events.EvmEvent.TransactionReceipt, {
-			receipt,
-			sender: transaction.from,
-			transactionId: transaction.hash,
-		}).catch((rawError) => {
-			const error = ensureError(rawError);
-			this.logger.error(error.stack ?? error.message);
-		});
+		void this.eventDispatcher
+			.dispatch(Events.EvmEvent.TransactionReceipt, {
+				receipt,
+				sender: transaction.from,
+				transactionId: transaction.hash,
+			})
+			.catch((rawError) => {
+				const error = ensureError(rawError);
+				this.logger.error(error.stack ?? error.message);
+			});
 	}
 }
