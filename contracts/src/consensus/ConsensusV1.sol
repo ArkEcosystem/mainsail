@@ -714,10 +714,6 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     }
 
 	function _min(uint256 valueA, uint256 valueB) internal pure returns (uint256) {
-        if (valueA < valueB) {
-            return valueA;
-        } else {
-            return valueB;
-        }
+		return valueA < valueB ? valueA : valueB;
     }
 }
