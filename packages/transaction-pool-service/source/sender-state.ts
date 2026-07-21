@@ -5,14 +5,12 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import {
 	InsufficientBalanceError,
 	TransactionExceedsMaximumByteSizeError,
-	TransactionFailedToApplyError,
 	TransactionFailedToVerifyError,
 	TransactionFromWrongNetworkError,
 	UnexpectedNonceError,
  TransactionFailedToPreverifyError, UnexpectedLegacySecondSignatureError } from "@mainsail/exceptions";
 import { Services } from "@mainsail/kernel";
 import { Wallets } from "@mainsail/state";
-import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class SenderState implements Contracts.TransactionPool.SenderState {
@@ -122,6 +120,14 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new InsufficientBalanceError();
 		}
 
+		if (this.#wallet.hasLegacySecondPublicKey()) {
+			await this.verifier.verifyLegacySecondSignature(transaction, this.#wallet.legacySecondPublicKey());
+		} else {
+			if (transaction.legacySecondSignature) {
+				throw new UnexpectedLegacySecondSignatureError();
+			}
+		}
+
 		if (
 			!(await this.triggers.call("verifyTransaction", {
 				handler: this.transactionHandler,
@@ -131,25 +137,15 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new TransactionFailedToVerifyError(transaction);
 		}
 
-		await this.#throwIfCannotBeApplied(transaction, this.#wallet, this.evm);
+		await this.#preverify(transaction);
 	}
 
-	async #throwIfCannotBeApplied(
+	async #preverify(
 		transaction: Contracts.Crypto.Transaction,
-		sender: Contracts.State.Wallet,
-		evm: Contracts.Evm.Instance,
 	): Promise<void> {
-		if (sender.hasLegacySecondPublicKey()) {
-			await this.verifier.verifyLegacySecondSignature(transaction, sender.legacySecondPublicKey());
-		} else {
-			if (transaction.legacySecondSignature) {
-				throw new UnexpectedLegacySecondSignatureError();
-			}
-		}
-
 		const milestone = this.cryptoConfiguration.getMilestone();
 
-		const preverified = await evm.preverifyTransaction({
+		const preverified = await this.evm.preverifyTransaction({
 			blockGasLimit: BigInt(milestone.block.maxGasLimit),
 			data: Buffer.from(transaction.data.slice(2), "hex"),
 			from: transaction.from,
