@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { TransactionFailedToPreverifyError, UnexpectedLegacySecondSignatureError } from "@mainsail/exceptions";
-import { assert, ensureError } from "@mainsail/utils";
+import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class TransactionHandler implements Contracts.Transactions.TransactionHandler {
@@ -20,7 +20,6 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 	private readonly state!: Contracts.State.State;
 
 	public async verify(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
-		assert.string(transaction.from);
 		return this.verifier.verifyHash(transaction);
 	}
 
@@ -63,8 +62,6 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Evm.TransactionReceipt> {
-		assert.string(transaction.hash);
-
 		const { evmSpec } = this.configuration.getMilestone();
 
 		try {
