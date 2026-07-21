@@ -9,7 +9,6 @@ import {
 	TransactionFromWrongNetworkError,
 	UnexpectedNonceError,
  TransactionFailedToPreverifyError, UnexpectedLegacySecondSignatureError } from "@mainsail/exceptions";
-import { Services } from "@mainsail/kernel";
 import { Wallets } from "@mainsail/state";
 
 @injectable()
@@ -27,12 +26,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "transaction-pool")
 	private readonly evm!: Contracts.Evm.Instance;
-
-	@inject(Identifiers.Transaction.Handler)
-	private readonly transactionHandler!: Contracts.Transactions.TransactionHandler;
-
-	@inject(Identifiers.Services.Trigger.Service)
-	private readonly triggers!: Services.Triggers.Triggers;
 
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
@@ -120,21 +113,18 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new InsufficientBalanceError();
 		}
 
+		if (
+			!(await this.verifier.verifyHash(transaction))
+		) {
+			throw new TransactionFailedToVerifyError(transaction);
+		}
+
 		if (this.#wallet.hasLegacySecondPublicKey()) {
 			await this.verifier.verifyLegacySecondSignature(transaction, this.#wallet.legacySecondPublicKey());
 		} else {
 			if (transaction.legacySecondSignature) {
 				throw new UnexpectedLegacySecondSignatureError();
 			}
-		}
-
-		if (
-			!(await this.triggers.call("verifyTransaction", {
-				handler: this.transactionHandler,
-				transaction,
-			}))
-		) {
-			throw new TransactionFailedToVerifyError(transaction);
 		}
 
 		await this.#preverify(transaction);

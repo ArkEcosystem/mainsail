@@ -21,14 +21,14 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
-	@inject(Identifiers.Transaction.Handler)
-	private readonly transactionHandler!: Contracts.Transactions.TransactionHandler;
-
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
 
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
+
+	@inject(Identifiers.Cryptography.Transaction.Verifier)
+	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
 	async process(
 		unit: Contracts.Processor.ProcessableUnit,
@@ -36,8 +36,8 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	): Promise<Contracts.Evm.TransactionReceipt> {
 		const block = unit.getBlock();
 
-
-		if (!(await this.transactionHandler.verify(transaction))) {
+		// TODO: Move to verifiers
+		if (!(await this.verifier.verifyHash(transaction))) {
 			throw new InvalidSignatureError();
 		}
 
