@@ -129,6 +129,10 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     // External functions
     function setFee(uint128 registrationFee) external onlyOwner {
+        if (_fee == registrationFee) {
+            return;
+        }
+
         _fee = registrationFee;
         emit FeeUpdated(registrationFee);
     }
