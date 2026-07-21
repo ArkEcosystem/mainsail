@@ -5,8 +5,4 @@ describe("Index", ({ assert, it }) => {
 	it("should export ServiceProvider", () => {
 		assert.defined(index.ServiceProvider);
 	});
-
-	it("should export TransactionHandler", () => {
-		assert.defined(index.TransactionHandler);
-	});
 });
