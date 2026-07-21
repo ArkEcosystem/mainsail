@@ -190,7 +190,7 @@ contract ConsensusTest is Base {
 
     function test_vote_prevent_for_validator_without_bls_key() public {
         address addr = address(1);
-        consensus.addValidator(addr, new bytes(0), false);
+        consensus.addValidator(addr, false);
 
         vm.startPrank(addr);
         vm.expectRevert(ConsensusV1.VoteValidatorWithoutBlsPublicKey.selector);
