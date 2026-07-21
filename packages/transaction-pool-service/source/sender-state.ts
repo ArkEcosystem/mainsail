@@ -123,20 +123,15 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		}
 
 		if (
-			await this.triggers.call("verifyTransaction", {
+			!(await this.triggers.call("verifyTransaction", {
 				handler: this.transactionHandler,
 				transaction,
-			})
+			}))
 		) {
-			try {
-				await this.#throwIfCannotBeApplied(transaction, this.#wallet, this.evm);
-			} catch (rawError) {
-				const error = ensureError(rawError);
-				throw new TransactionFailedToApplyError(transaction, error);
-			}
-		} else {
 			throw new TransactionFailedToVerifyError(transaction);
 		}
+
+		await this.#throwIfCannotBeApplied(transaction, this.#wallet, this.evm);
 	}
 
 	async #throwIfCannotBeApplied(
