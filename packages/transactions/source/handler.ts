@@ -28,7 +28,6 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		sender: Contracts.State.Wallet,
 		evm: Contracts.Evm.Instance,
 	): Promise<void> {
-		// Legacy
 		if (sender.hasLegacySecondPublicKey()) {
 			await this.verifier.verifyLegacySecondSignature(transaction, sender.legacySecondPublicKey());
 		} else {
