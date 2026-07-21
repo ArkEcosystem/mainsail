@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 
-import { TransactionHandler } from "./handlers/index.js";
+import { TransactionHandler } from "./handler.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {

@@ -6,7 +6,7 @@ describe("Index", ({ assert, it }) => {
 		assert.defined(index.ServiceProvider);
 	});
 
-	it("should export Handlers", () => {
-		assert.defined(index.Handlers);
+	it("should export TransactionHandler", () => {
+		assert.defined(index.TransactionHandler);
 	});
 });
