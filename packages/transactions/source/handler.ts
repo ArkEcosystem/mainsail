@@ -16,6 +16,9 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
 
@@ -61,45 +64,40 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 		context: Contracts.Transactions.TransactionHandlerContext,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Evm.TransactionReceipt> {
-		const { evmSpec } = this.configuration.getMilestone();
+		const { commitKey, instance } = context.evm;
 
-		try {
-			const { commitKey, instance } = context.evm;
-			const data = {
-				commitKey,
-				data: Buffer.from(transaction.data.slice(2), "hex"),
-				from: transaction.from,
-				gasLimit: BigInt(transaction.gasLimit),
-				gasPrice: BigInt(transaction.gasPrice),
-				legacyAddress: transaction.senderLegacyAddress,
-				nonce: transaction.nonce,
-				specId: evmSpec,
-				to: transaction.to,
-				txHash: transaction.hash,
-				value: transaction.value,
-			};
+		const { receipt } = await instance.process({
+			commitKey,
+			data: Buffer.from(transaction.data.slice(2), "hex"),
+			from: transaction.from,
+			gasLimit: BigInt(transaction.gasLimit),
+			gasPrice: BigInt(transaction.gasPrice),
+			legacyAddress: transaction.senderLegacyAddress,
+			nonce: transaction.nonce,
+			specId: this.configuration.getMilestone().evmSpec,
+			to: transaction.to,
+			txHash: transaction.hash,
+			value: transaction.value,
+		});
 
-			const { receipt } = await instance.process(data);
+		this.#emit(Events.EvmEvent.TransactionReceipt, {
+			receipt,
+			sender: transaction.from,
+			transactionId: transaction.hash,
+		});
 
-			void this.#emit(Events.EvmEvent.TransactionReceipt, {
-				receipt,
-				sender: transaction.from,
-				transactionId: transaction.hash,
-			});
-
-			return receipt;
-		} catch (rawError) {
-			const error = ensureError(rawError);
-			throw new Error(`invalid EVM call: ${error.message}`);
-		}
+		return receipt;
 	}
 
-	async #emit<T>(event: string, data?: T): Promise<void> {
+	#emit<T>(event: string, data?: T): void {
 		if (this.state.isBootstrap()) {
 			return;
 		}
 
-		return this.events.dispatch(event, data);
+		void this.events.dispatch(event, data).catch((rawError) => {
+			const error = ensureError(rawError);
+			this.logger.error(error.stack ?? error.message);
+		});
 	}
 }
 
