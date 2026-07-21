@@ -32,21 +32,21 @@ contract ConsensusTest is Base {
     }
 
     function test_should_revert_without_validators() public {
-        vm.expectRevert(ConsensusV1.NoActiveValidators.selector);
+        vm.expectRevert(abi.encodeWithSelector(ConsensusV1.InsufficientActiveValidators.selector, 0, 1));
         consensus.calculateRoundValidators(1);
     }
 
     function test_should_revert_with_only_resigned_validators() public {
         consensus.addValidator(address(2), prepareBLSKey(address(2)), true);
 
-        vm.expectRevert(ConsensusV1.NoActiveValidators.selector);
+        vm.expectRevert(abi.encodeWithSelector(ConsensusV1.InsufficientActiveValidators.selector, 0, 1));
         consensus.calculateRoundValidators(1);
     }
 
     function test_should_revert_with_only_validators_without_public_key() public {
         consensus.addValidator(address(1), new bytes(0), false);
 
-        vm.expectRevert(ConsensusV1.NoActiveValidators.selector);
+        vm.expectRevert(abi.encodeWithSelector(ConsensusV1.InsufficientActiveValidators.selector, 0, 1));
         consensus.calculateRoundValidators(1);
     }
 

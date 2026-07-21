@@ -79,7 +79,6 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     error ValidatorAlreadyRegistered();
     error ValidatorAlreadyResigned();
     error BellowMinValidators();
-    error NoActiveValidators();
     error InsufficientActiveValidators(uint256 available, uint256 required);
 
     error BlsKeyAlreadyRegistered();
@@ -351,11 +350,6 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         _deleteRoundValidators();
 
         _roundValidatorsHead = address(0);
-        uint8 top = uint8(_clamp(n, 0, _activeValidators.length));
-
-        if (top == 0) {
-            revert NoActiveValidators();
-        }
 
         for (uint256 i = 0; i < _activeValidators.length; i++) {
             address addr = _activeValidators[i];
@@ -372,8 +366,8 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
                 continue;
             }
 
-            if (_roundValidatorsCount < top) {
-                _insertValidator(addr, top);
+            if (_roundValidatorsCount < n) {
+                _insertValidator(addr, n);
                 continue;
             }
 
@@ -382,36 +376,38 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             if (_isGreater(
                     Validator({addr: addr, data: data}), Validator({addr: _roundValidatorsHead, data: headData})
                 )) {
-                _insertValidator(addr, top);
+                _insertValidator(addr, n);
             }
         }
 
-        // A round must consist of exactly `_minValidators` DISTINCT validators. With fewer
-        // eligible active validators, padding the round by repeating a validator across slots
-        // would orphan those slots: a validator only signs consensus messages under a single
-        // validatorIndex, so the duplicated slots never vote and the round cannot reach the
-        // +2/3 threshold. Fail loudly instead.
-        if (_roundValidatorsCount < _minValidators) {
-            revert InsufficientActiveValidators(_roundValidatorsCount, _minValidators);
+        // A round must consist of exactly `n` DISTINCT validators. With fewer eligible active
+        // validators (including none at all), padding the round by repeating a validator across
+        // slots would orphan those slots: a validator only signs consensus messages under a
+        // single validatorIndex, so the duplicated slots never vote and the round cannot reach
+        // the +2/3 threshold. Fail loudly instead.
+        if (_roundValidatorsCount < n) {
+            revert InsufficientActiveValidators(_roundValidatorsCount, n);
         }
 
+        // Materialize the sorted list so the slot order can be shuffled; the shuffled index
+        // becomes each validator's validatorIndex for the round. The count check above
+        // guarantees exactly `n` entries.
         address next = _roundValidatorsHead;
-        address[] memory tmpValidators = new address[](_roundValidatorsCount);
+        address[] memory shuffledValidators = new address[](n);
 
-        for (uint256 i = 0; i < _roundValidatorsCount; i++) {
-            tmpValidators[i] = next;
+        for (uint256 i = 0; i < n; i++) {
+            shuffledValidators[i] = next;
             next = _roundValidatorsMap[next];
         }
-        _shuffleMem(tmpValidators);
+        _shuffleMem(shuffledValidators);
 
-        // Fill round & _roundValidators with `_minValidators` distinct validators (guaranteed
-        // available by the check above) — no slot is ever duplicated.
+        // Fill round & _roundValidators with `n` distinct validators — no slot is ever duplicated.
         RoundValidator[] storage round = _rounds.push();
         delete _roundValidators;
-        _roundValidators = new address[](_minValidators);
+        _roundValidators = new address[](n);
 
-        for (uint256 i = 0; i < _minValidators; i++) {
-            address addr = tmpValidators[i];
+        for (uint256 i = 0; i < n; i++) {
+            address addr = shuffledValidators[i];
             _roundValidators[i] = addr;
             round.push(RoundValidator({addr: addr, voteBalance: _validatorsData[addr].voteBalance}));
         }
