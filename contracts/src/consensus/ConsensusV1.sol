@@ -466,7 +466,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function getVotes(address addr, uint256 count) external view onlyOwner returns (VoteResult[] memory) {
-        VoteResult[] memory voters = new VoteResult[](_clamp(count, 0, _votersCount));
+        VoteResult[] memory voters = new VoteResult[](_min(count, _votersCount));
 
         address next = _votersHead;
 
@@ -713,17 +713,11 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         return validatorA.data.voteBalance > validatorB.data.voteBalance;
     }
 
-    function _clamp(uint256 value, uint256 min, uint256 max) internal pure returns (uint256) {
-        if (min > max) {
-            revert InvalidRange(min, max);
-        }
-
-        if (value < min) {
-            return min;
-        } else if (value > max) {
-            return max;
+	function _min(uint256 valueA, uint256 valueB) internal pure returns (uint256) {
+        if (valueA < valueB) {
+            return valueA;
         } else {
-            return value;
+            return valueB;
         }
     }
 }
