@@ -1,8 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { Events, Identifiers } from "@mainsail/constants";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class TransactionHandler implements Contracts.Transactions.TransactionHandler {
@@ -12,57 +11,8 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
-	@inject(Identifiers.Services.EventDispatcher.Service)
-	private readonly events!: Contracts.Kernel.EventDispatcher;
-
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
-
-	@inject(Identifiers.State.State)
-	private readonly state!: Contracts.State.State;
-
 	public async verify(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
 		return this.verifier.verifyHash(transaction);
-	}
-
-	public async apply(
-		context: Contracts.Transactions.TransactionHandlerContext,
-		transaction: Contracts.Crypto.Transaction,
-	): Promise<Contracts.Evm.TransactionReceipt> {
-		const { commitKey, instance } = context.evm;
-
-		const { receipt } = await instance.process({
-			commitKey,
-			data: Buffer.from(transaction.data.slice(2), "hex"),
-			from: transaction.from,
-			gasLimit: BigInt(transaction.gasLimit),
-			gasPrice: BigInt(transaction.gasPrice),
-			legacyAddress: transaction.senderLegacyAddress,
-			nonce: transaction.nonce,
-			specId: this.configuration.getMilestone().evmSpec,
-			to: transaction.to,
-			txHash: transaction.hash,
-			value: transaction.value,
-		});
-
-		this.#emit(Events.EvmEvent.TransactionReceipt, {
-			receipt,
-			sender: transaction.from,
-			transactionId: transaction.hash,
-		});
-
-		return receipt;
-	}
-
-	#emit<T>(event: string, data?: T): void {
-		if (this.state.isBootstrap()) {
-			return;
-		}
-
-		void this.events.dispatch(event, data).catch((rawError) => {
-			const error = ensureError(rawError);
-			this.logger.error(error.stack ?? error.message);
-		});
 	}
 }
 

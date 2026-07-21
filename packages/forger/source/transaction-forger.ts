@@ -39,9 +39,6 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	@inject(Identifiers.BlockchainUtils.RoundCalculator)
 	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
 
-	@inject(Identifiers.Transaction.Handler)
-	private readonly transactionHandler!: Contracts.Transactions.TransactionHandler;
-
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -212,15 +209,21 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	}
 
 	async #validateTransaction(transaction: Contracts.Crypto.Transaction): Promise<Contracts.Evm.TransactionReceipt> {
-		return await this.transactionHandler.apply(
-			{
-				evm: {
-					commitKey: this.#commitKey,
-					instance: this.evm,
-				},
-			},
-			transaction,
-		);
+		const { receipt } = await this.evm.process({
+			commitKey: this.#commitKey,
+			data: Buffer.from(transaction.data.slice(2), "hex"),
+			from: transaction.from,
+			gasLimit: BigInt(transaction.gasLimit),
+			gasPrice: BigInt(transaction.gasPrice),
+			legacyAddress: transaction.senderLegacyAddress,
+			nonce: transaction.nonce,
+			specId: this.cryptoConfiguration.getMilestone().evmSpec,
+			to: transaction.to,
+			txHash: transaction.hash,
+			value: transaction.value,
+		});
+
+		return receipt;
 	}
 
 	async #handleFailedTransaction(transaction: Contracts.Crypto.Transaction, error: Error): Promise<void> {

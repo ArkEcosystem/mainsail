@@ -1,5 +1,5 @@
 import type { Transaction, TransactionData } from "./crypto/index.js";
-import type { CommitKey, Instance, TransactionReceipt } from "./evm/index.js";
+import type { CommitKey, Instance } from "./evm/index.js";
 
 export type TransactionHandlerConstructor = new () => TransactionHandler;
 
@@ -12,8 +12,6 @@ export type TransactionHandlerContext = {
 
 export interface TransactionHandler {
 	verify(transaction: Transaction): Promise<boolean>;
-
-	apply(context: TransactionHandlerContext, transaction: Transaction): Promise<TransactionReceipt>;
 }
 
 export interface TransactionHandlerRegistry {
