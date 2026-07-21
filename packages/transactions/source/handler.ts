@@ -4,7 +4,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
 @injectable()
-export class TransactionHandler implements Contracts.Transactions.TransactionHandler {
+export class TransactionHandler {
 	@inject(Identifiers.Cryptography.Configuration)
 	protected readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -16,4 +16,3 @@ export class TransactionHandler implements Contracts.Transactions.TransactionHan
 	}
 }
 
-export type TransactionHandlerConstructor = new () => TransactionHandler;
