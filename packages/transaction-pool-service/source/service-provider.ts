@@ -5,7 +5,7 @@ import { injectable } from "@mainsail/container";
 import { Providers, Services } from "@mainsail/kernel";
 import Joi from "joi";
 
-import { ThrowIfCannotBeAppliedAction, VerifyTransactionAction } from "./actions/index.js";
+import { VerifyTransactionAction } from "./actions/index.js";
 import { Mempool } from "./mempool.js";
 import { Processor } from "./processor.js";
 import { Query } from "./query.js";
@@ -68,9 +68,5 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
 			.bind("verifyTransaction", this.app.resolve(VerifyTransactionAction));
-
-		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-			.bind("throwIfCannotBeApplied", this.app.resolve(ThrowIfCannotBeAppliedAction));
 	}
 }

@@ -9,7 +9,7 @@ import {
 	TransactionFailedToVerifyError,
 	TransactionFromWrongNetworkError,
 	UnexpectedNonceError,
-} from "@mainsail/exceptions";
+ TransactionFailedToPreverifyError, UnexpectedLegacySecondSignatureError } from "@mainsail/exceptions";
 import { Services } from "@mainsail/kernel";
 import { Wallets } from "@mainsail/state";
 import { ensureError } from "@mainsail/utils";
@@ -21,7 +21,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool-service")
-	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
@@ -38,6 +38,9 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
+
+	@inject(Identifiers.Cryptography.Transaction.Verifier)
+	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
 	#wallet!: Contracts.State.Wallet;
 
@@ -101,7 +104,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		nonceOffset: bigint = 0n,
 		refund: bigint = 0n,
 	): Promise<void> {
-		const maxTransactionBytes: number = this.configuration.getRequired<number>("maxTransactionBytes");
+		const maxTransactionBytes: number = this.pluginConfiguration.getRequired<number>("maxTransactionBytes");
 		if (transaction.serialized.length > maxTransactionBytes) {
 			throw new TransactionExceedsMaximumByteSizeError(transaction, maxTransactionBytes);
 		}
@@ -126,18 +129,47 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			})
 		) {
 			try {
-				await this.triggers.call("throwIfCannotBeApplied", {
-					evm: this.evm,
-					handler: this.transactionHandler,
-					sender: this.#wallet,
-					transaction,
-				});
+				await this.#throwIfCannotBeApplied(transaction, this.#wallet, this.evm);
 			} catch (rawError) {
 				const error = ensureError(rawError);
 				throw new TransactionFailedToApplyError(transaction, error);
 			}
 		} else {
 			throw new TransactionFailedToVerifyError(transaction);
+		}
+	}
+
+	async #throwIfCannotBeApplied(
+		transaction: Contracts.Crypto.Transaction,
+		sender: Contracts.State.Wallet,
+		evm: Contracts.Evm.Instance,
+	): Promise<void> {
+		if (sender.hasLegacySecondPublicKey()) {
+			await this.verifier.verifyLegacySecondSignature(transaction, sender.legacySecondPublicKey());
+		} else {
+			if (transaction.legacySecondSignature) {
+				throw new UnexpectedLegacySecondSignatureError();
+			}
+		}
+
+		const milestone = this.cryptoConfiguration.getMilestone();
+
+		const preverified = await evm.preverifyTransaction({
+			blockGasLimit: BigInt(milestone.block.maxGasLimit),
+			data: Buffer.from(transaction.data.slice(2), "hex"),
+			from: transaction.from,
+			gasLimit: BigInt(transaction.gasLimit),
+			gasPrice: BigInt(transaction.gasPrice),
+			legacyAddress: transaction.senderLegacyAddress,
+			nonce: transaction.nonce,
+			specId: milestone.evmSpec,
+			to: transaction.to,
+			txHash: transaction.hash,
+			value: transaction.value,
+		});
+
+		if (!preverified.success) {
+			throw new TransactionFailedToPreverifyError(transaction, new Error(preverified.error));
 		}
 	}
 }
