@@ -80,10 +80,6 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	};
 	context.app.bind(Identifiers.Evm.Instance).toConstantValue(evm).whenTagged("instance", "validator");
 
-	context.app.rebind(Identifiers.Transaction.Handler).toConstantValue({
-		apply: async () => ({ gasRefunded: 0n, gasUsed: 0n, logs: [], status: 1 }),
-	});
-
 	context.app.bind(Identifiers.EvmConsensus.GenesisInfo).toConstantValue({});
 
 	context.app.bind(Identifiers.State.Store).toConstantValue({
