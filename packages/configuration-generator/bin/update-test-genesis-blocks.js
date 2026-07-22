@@ -137,7 +137,6 @@ const configurations = [
 		validators: 5,
 		initialBlockNumber: 0,
 		overwriteConfig: true,
-		mockFakeValidatorBlsKeys: true,
 		timeouts: {
 			blockPrepareTime: 100,
 			blockTime: 100,
@@ -268,7 +267,6 @@ const configurations = [
 		initialBlockNumber: 0,
 		validators: 5,
 		overwriteConfig: true,
-		mockFakeValidatorBlsKeys: true,
 		timeouts: {
 			blockPrepareTime: 2000,
 			blockTime: 2000,

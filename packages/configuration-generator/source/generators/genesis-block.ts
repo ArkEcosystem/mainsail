@@ -385,7 +385,6 @@ export class GenesisBlockGenerator {
 				blockNumber: this.snapshotLegacyImporter.genesisBlockNumber,
 				round: 0n,
 			},
-			mockFakeValidatorBlsKeys: options.mockFakeValidatorBlsKeys,
 			timestamp: dayjs(options.epoch).valueOf(),
 		});
 
@@ -397,7 +396,7 @@ export class GenesisBlockGenerator {
 			.set("genesisBlock.block.number", options.initialBlockNumber);
 
 		this.logger.info(
-			`Imported legacy snapshot: ${result.importedValidatorsWithBlsKey} validators with BLS key, ${result.importedValidatorsWithoutBlsKey} without, ${result.importedUsernames} usernames, ${result.importedVoters} voters (initial total supply ${result.initialTotalSupply})`,
+			`Imported legacy snapshot: ${result.importedValidators} dormant validators, ${result.importedUsernames} usernames, ${result.importedVoters} voters (initial total supply ${result.initialTotalSupply})`,
 		);
 	}
 

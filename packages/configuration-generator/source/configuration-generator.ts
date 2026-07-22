@@ -95,7 +95,7 @@ export class ConfigurationGenerator {
 		this.#assertCustomSecrets(internalOptions);
 
 		const genesisWalletMnemonic = internalOptions.genesisMnemonic ?? this.mnemonicGenerator.generate();
-		let validatorsMnemonics =
+		const validatorsMnemonics =
 			internalOptions.validatorMnemonics ?? this.mnemonicGenerator.generateMany(internalOptions.validators);
 
 		const tasks: Task[] = [
@@ -146,6 +146,11 @@ export class ConfigurationGenerator {
 							// @ts-ignore
 							network: {
 								chainId: internalOptions.chainId,
+								client: {
+									explorer: "",
+									symbol: internalOptions.symbol,
+									token: internalOptions.token,
+								},
 								pubKeyHash: internalOptions.pubKeyHash,
 							},
 						},
@@ -157,14 +162,6 @@ export class ConfigurationGenerator {
 							previousGenesisBlockHash: this.importer.previousGenesisBlockHash,
 							snapshotHash: this.importer.snapshotHash,
 						};
-
-						if (
-							this.importer.validators &&
-							options.mockFakeValidatorBlsKeys &&
-							!internalOptions.validatorMnemonics
-						) {
-							validatorsMnemonics = await this.#prepareMockValidatorKeys(internalOptions);
-						}
 					}
 
 					const genesisBlock = await this.genesisBlockGenerator.generate(
@@ -274,10 +271,6 @@ export class ConfigurationGenerator {
 			MAINSAIL_P2P_PORT: options.coreP2PPort,
 		};
 
-		if (options.mockFakeValidatorBlsKeys) {
-			data.MAINSAIL_SNAPSHOT_MOCK_FAKE_VALIDATOR_BLS_KEYS = "1";
-		}
-
 		if (
 			options.coreDBHost &&
 			options.coreDBPort &&
@@ -293,27 +286,5 @@ export class ConfigurationGenerator {
 		}
 
 		return data;
-	}
-
-	async #prepareMockValidatorKeys(internalOptions: Contracts.NetworkGenerator.InternalOptions): Promise<string[]> {
-		// create fake mnemonics for testing
-		const consensusKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(
-			Identifiers.Cryptography.Identity.KeyPair.Factory,
-			"type",
-			"consensus",
-		);
-
-		const importedValidatorMnemonics: string[] = [];
-
-		for (const validator of this.importer.validators) {
-			const validatorMnemonic = this.mnemonicGenerator.generateDeterministic(validator.username);
-			importedValidatorMnemonics.push(validatorMnemonic);
-
-			const consensusKeyPair = await consensusKeyPairFactory.fromMnemonic(validatorMnemonic);
-			validator.blsPublicKey = consensusKeyPair.publicKey;
-		}
-
-		// imported validators are already sorted by descending balance
-		return importedValidatorMnemonics.slice(0, internalOptions.validators);
 	}
 }
