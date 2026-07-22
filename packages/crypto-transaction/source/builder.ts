@@ -83,7 +83,7 @@ export class TransactionBuilder {
 		return this;
 	}
 
-	public value(value: string): TransactionBuilder {
+	public value(value: string | bigint): TransactionBuilder {
 		this.data.value = BigInt(value);
 		return this;
 	}
