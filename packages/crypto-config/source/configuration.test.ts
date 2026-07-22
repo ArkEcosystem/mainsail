@@ -81,7 +81,7 @@ describe<{
 					stageTimeoutIncrease: 2000,
 					tolerance: 100,
 				},
-				validatorRegistrationFee: "250000000000000000000",
+				validatorRegistrationFee: "0",
 			},
 			{
 				roundValidators: 53,

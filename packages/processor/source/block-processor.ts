@@ -299,8 +299,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const { evmSpec, validatorRegistrationFee } = this.configuration.getMilestone(unit.blockNumber + 1);
 		const block = unit.getBlock();
 
-		console.log("updateValidatorRegistrationFee", validatorRegistrationFee);
-
 		await this.evm.updateValidatorRegistrationFee({
 			commitKey: {
 				blockHash: block.hash,

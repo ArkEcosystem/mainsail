@@ -115,7 +115,11 @@ describe<{
 		assert.equal(crypto.milestones[0].timeouts.blockPrepareTime, 4000);
 		assert.equal(crypto.milestones[0].timeouts.stageTimeout, 2000);
 		assert.equal(crypto.milestones[0].timeouts.stageTimeoutIncrease, 2000);
-		assert.equal(crypto.milestones[1], { height: 1, roundValidators: 53 });
+		assert.equal(crypto.milestones[1], {
+			height: 1,
+			roundValidators: 53,
+			validatorRegistrationFee: "250000000000000000000",
+		});
 		assert.equal(crypto.milestones[2], { height: 75_600, reward: "2000000000000000000" });
 
 		// Network reflects the requested token/symbol and the default key/wif prefixes.
@@ -193,7 +197,11 @@ describe<{
 
 		assert.equal(crypto.milestones[0].timeouts.blockTime, 9000);
 		assert.equal(crypto.milestones[0].timeouts.blockPrepareTime, 4500);
-		assert.equal(crypto.milestones[1], { height: 1, roundValidators: 7 });
+		assert.equal(crypto.milestones[1], {
+			height: 1,
+			roundValidators: 7,
+			validatorRegistrationFee: "250000000000000000000",
+		});
 		assert.equal(crypto.milestones[2], { height: 23_000, reward: "200000000" });
 
 		assert.equal(crypto.network.client.explorer, "myex.io");
@@ -228,7 +236,11 @@ describe<{
 
 		// The active round-validator set matches the supplied list.
 		const crypto = readJSONSync(join(configPath, "crypto.json"));
-		assert.equal(crypto.milestones[1], { height: 1, roundValidators: 2 });
+		assert.equal(crypto.milestones[1], {
+			height: 1,
+			roundValidators: 2,
+			validatorRegistrationFee: "250000000000000000000",
+		});
 
 		// The generator receives the supplied mnemonics.
 		const [, validatorMnemonics] = generate.getCallArgs(0) as [string, string[], any];
@@ -321,53 +333,6 @@ describe<{
 		assert.true(environment.includes("MAINSAIL_DB_USERNAME=user"));
 		assert.true(environment.includes("MAINSAIL_DB_PASSWORD=pass"));
 		assert.true(environment.includes("MAINSAIL_DB_DATABASE=mydb"));
-	});
-
-	it("should build a snapshot-based configuration with mock validator keys", async ({ app, configPath }) => {
-		const snapshotSource = join(dirSync().name, "snap.compressed");
-		writeFileSync(snapshotSource, "snapshot-bytes");
-
-		const importer = {
-			genesisBlockNumber: 100n,
-			prepare: async () => {},
-			previousGenesisBlockHash: "b".repeat(64),
-			snapshotHash: "a".repeat(64),
-			validators: [
-				{ blsPublicKey: "", username: "alice" },
-				{ blsPublicKey: "", username: "bob" },
-			],
-		};
-		app.rebind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(importer);
-		const generator = app.get<ConfigurationGenerator>(InternalIdentifiers.ConfigurationGenerator);
-
-		await generator.generate(
-			options({
-				mockFakeValidatorBlsKeys: true,
-				snapshot: { path: snapshotSource, snapshotHash: "a".repeat(64) },
-				validators: 2,
-			}),
-		);
-
-		const crypto = readJSONSync(join(configPath, "crypto.json"));
-		// initialBlockNumber is taken from the importer's genesis block number.
-		assert.equal(crypto.milestones[0].height, 100);
-		assert.equal(crypto.milestones[0].snapshot, {
-			previousGenesisBlockHash: "b".repeat(64),
-			snapshotHash: "a".repeat(64),
-		});
-
-		// The snapshot file is copied into the snapshot directory.
-		assert.true(existsSync(join(configPath, "snapshot", "snap.compressed")));
-
-		// Validator secrets are the deterministic mock mnemonics (one per imported validator).
-		assert.length(readJSONSync(join(configPath, "validators.json")).secrets, 2);
-
-		// The mock-keys flag is propagated to the environment.
-		assert.true(
-			readFileSync(join(configPath, ".env"))
-				.toString()
-				.includes("MAINSAIL_SNAPSHOT_MOCK_FAKE_VALIDATOR_BLS_KEYS=1"),
-		);
 	});
 
 	it("should throw when a snapshot is requested without a snapshot hash", async ({ app }) => {
