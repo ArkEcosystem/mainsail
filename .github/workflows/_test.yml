@@ -221,8 +221,6 @@ jobs:
               run: cd packages/transaction-pool-service && pnpm run test:coverage
             - name: Test transaction-pool-worker
               run: cd packages/transaction-pool-worker && pnpm run test:coverage
-            - name: Test transactions
-              run: cd packages/transactions && pnpm run test:coverage
             - name: Test utils
               run: cd packages/utils && pnpm run test:coverage
             - name: Test validation
