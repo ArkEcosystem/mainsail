@@ -27,7 +27,7 @@
 			"tolerance": 100
 		},
 		"roundValidators": 0,
-		"validatorRegistrationFee": "250000000000000000000"
+		"validatorRegistrationFee": "0"
 	},
 	"core": {
 		"version": "0.0.1"

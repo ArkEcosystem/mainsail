@@ -102,6 +102,15 @@ pub struct JsCalculateRoundValidatorsContext {
 }
 
 #[napi(object)]
+pub struct JsUpdateValidatorRegistrationFeeContext {
+    pub commit_key: JsCommitKey,
+    pub timestamp: BigInt,
+    pub fee: BigInt,
+    pub validator_address: String,
+    pub spec_id: String,
+}
+
+#[napi(object)]
 pub struct JsUpdateRewardsAndVotesContext {
     pub commit_key: JsCommitKey,
     pub timestamp: BigInt,
@@ -249,6 +258,15 @@ pub struct CalculateRoundValidatorsContext {
     pub commit_key: CommitKey,
     pub timestamp: u64,
     pub round_validators: u8,
+    pub validator_address: Address,
+    pub spec_id: SpecId,
+}
+
+#[derive(Debug)]
+pub struct UpdateValidatorRegistrationFeeContext {
+    pub commit_key: CommitKey,
+    pub timestamp: u64,
+    pub fee: u128,
     pub validator_address: Address,
     pub spec_id: SpecId,
 }
@@ -637,6 +655,20 @@ impl TryFrom<JsCalculateRoundValidatorsContext> for CalculateRoundValidatorsCont
                 value.round_validators,
                 "roundValidators",
             )?)?,
+            spec_id: parse_spec_id(value.spec_id)?,
+        })
+    }
+}
+
+impl TryFrom<JsUpdateValidatorRegistrationFeeContext> for UpdateValidatorRegistrationFeeContext {
+    type Error = anyhow::Error;
+
+    fn try_from(value: JsUpdateValidatorRegistrationFeeContext) -> Result<Self, Self::Error> {
+        Ok(UpdateValidatorRegistrationFeeContext {
+            commit_key: value.commit_key.try_into()?,
+            timestamp: utils::convert_bigint_to_u64(value.timestamp, "timestamp")?,
+            validator_address: utils::create_address_from_string(&value.validator_address)?,
+            fee: utils::convert_bigint_to_u128(value.fee, "fee")?,
             spec_id: parse_spec_id(value.spec_id)?,
         })
     }

@@ -5,7 +5,6 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, chunk, ensureError } from "@mainsail/utils";
-import { entropyToMnemonic } from "bip39";
 import { createHash } from "node:crypto";
 import { promisify } from "node:util";
 import { brotliDecompress } from "node:zlib";
@@ -23,20 +22,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Cryptography.Identity.KeyPair.Factory)
-	@tagged("type", "consensus")
-	private readonly consensusKeyPairFactory!: Contracts.Crypto.KeyPairFactory;
-
-	@inject(Identifiers.Cryptography.Identity.PublicKey.Factory)
-	@tagged("type", "consensus")
-	private readonly consensusPublicKeyFactory!: Contracts.Crypto.PublicKeyFactory;
-
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
-
-	@inject(Identifiers.ServiceProvider.Configuration)
-	@tagged("plugin", "snapshot-legacy-importer")
-	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
@@ -242,7 +229,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 				validators.push({
 					arkAddress: wallet.arkAddress,
-					blsPublicKey: wallet.attributes?.["delegate"]["blsPublicKey"],
 					ethAddress,
 					isResigned: wallet.attributes?.["delegate"]["isResigned"] ?? false,
 					publicKey: wallet.publicKey,
@@ -291,13 +277,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	public async import(
 		options: Contracts.Snapshot.LegacyImportOptions,
 	): Promise<Contracts.Snapshot.LegacyImportResult> {
-		options = {
-			...options,
-			mockFakeValidatorBlsKeys:
-				options.mockFakeValidatorBlsKeys ??
-				this.pluginConfiguration.getOptional<boolean>("mockFakeValidatorBlsKeys", false),
-		};
-
 		await this.evm.prepareNextCommit({
 			blockContext: {
 				commitKey: options.commitKey,
@@ -314,7 +293,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const totalSupply = await this.#seedWallets(options);
 
 		// 2) Seed validators
-		const { importedValidatorsWithBlsKey, importedValidatorsWithoutBlsKey } = await this.#seedValidators(options);
+		const importedValidators = await this.#seedValidators(options);
 
 		// 3) Seed voters
 		const importedVoters = await this.#seedVoters(options);
@@ -328,8 +307,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		return {
 			importedUsernames,
-			importedValidatorsWithBlsKey,
-			importedValidatorsWithoutBlsKey,
+			importedValidators,
 			importedVoters,
 			initialTotalSupply: totalSupply,
 		};
@@ -387,54 +365,17 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		return totalSupply;
 	}
 
-	async #seedValidators(options: Contracts.Snapshot.LegacyImportOptions): Promise<{
-		importedValidatorsWithBlsKey: number;
-		importedValidatorsWithoutBlsKey: number;
-	}> {
-		this.logger.info(`seeding ${this.#data.validators.length} validators`);
+	async #seedValidators(options: Contracts.Snapshot.LegacyImportOptions): Promise<number> {
+		let importedValidators = 0;
 
-		const stats = {
-			importedValidatorsWithBlsKey: 0,
-			importedValidatorsWithoutBlsKey: 0,
-		};
+		this.logger.info(`seeding ${this.#data.validators.length} validators`);
 
 		for (const validator of this.#data.validators) {
 			assert.defined(validator.ethAddress);
 
-			if (!validator.blsPublicKey) {
-				if (!options.mockFakeValidatorBlsKeys) {
-					this.logger.debug(
-						`importing legacy delegate ${validator.arkAddress} (${validator.username}) without registered blsPublicKey`,
-					);
-					stats.importedValidatorsWithoutBlsKey++;
-				} else {
-					const entropy = this.hashFactory.sha256(Buffer.from(validator.username, "utf8"));
-					const mnemonic = entropyToMnemonic(entropy);
-
-					const consensusKeyPair = await this.consensusKeyPairFactory.fromMnemonic(mnemonic);
-					validator.blsPublicKey = consensusKeyPair.publicKey;
-				}
-			} else {
-				if (await this.consensusPublicKeyFactory.verify(validator.blsPublicKey)) {
-					this.logger.info(
-						`importing legacy delegate ${validator.arkAddress} (${validator.username}) with valid blsPublicKey '${validator.blsPublicKey}'`,
-					);
-				} else {
-					this.logger.warn(
-						`importing legacy delegate ${validator.arkAddress} (${validator.username}) with invalid blsPublicKey '${validator.blsPublicKey}'`,
-					);
-				}
-
-				stats.importedValidatorsWithBlsKey++;
-			}
-
 			const data = encodeFunctionData({
 				abi: ConsensusAbi.abi,
-				args: [
-					validator.ethAddress,
-					validator.blsPublicKey ? `0x${validator.blsPublicKey}` : `0x`,
-					validator.isResigned,
-				],
+				args: [validator.ethAddress, validator.isResigned],
 				functionName: "addValidator",
 			}).slice(2);
 
@@ -449,9 +390,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			if (!result.receipt.status) {
 				throw new Error("failed to add validator");
 			}
+
+			importedValidators++;
 		}
 
-		return stats;
+		return importedValidators;
 	}
 
 	async #seedVoters(options: Contracts.Snapshot.LegacyImportOptions): Promise<number> {

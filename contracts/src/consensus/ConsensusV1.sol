@@ -91,7 +91,6 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     error AlreadyVoted();
     error MissingVote();
 
-    error InvalidRange(uint256 min, uint256 max);
     error InvalidParameters();
     error ImportIsNotAllowed();
 
@@ -336,7 +335,6 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
         _minValidators = n;
 
-        _shuffle();
         _deleteRoundValidators();
 
         _roundValidatorsHead = address(0);
@@ -467,7 +465,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function getVotes(address addr, uint256 count) external view onlyOwner returns (VoteResult[] memory) {
-        VoteResult[] memory voters = new VoteResult[](_clamp(count, 0, _votersCount));
+        VoteResult[] memory voters = new VoteResult[](_min(count, _votersCount));
 
         address next = _votersHead;
 
@@ -516,48 +514,6 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     // Internal functions
-    function _shuffle() internal {
-        uint256 n = _activeValidators.length;
-        if (n == 0) {
-            return;
-        }
-
-        for (uint256 i = n - 1; i > 0; i--) {
-            // Get a random index between 0 and i (inclusive)
-            uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, i))) % (i + 1);
-
-            if (i == j) {
-                continue; // No need to swap if indices are the same
-            }
-
-            /* Swap example
-            i = 0; j = 2;
-
-            Initial state
-            A B C
-            A:0 B:1 C:2
-
-            Array SWAP
-            C B A
-            A:0 B:1 C:2
-
-            Index SWAP
-            C B A
-            A:2 B:1 C:0
-            */
-
-            // Swap elements at index i and j
-            address addrA = _activeValidators[i];
-            address addrB = _activeValidators[j];
-
-            _activeValidators[i] = _activeValidators[j];
-            _activeValidators[j] = addrA;
-
-            _activeValidatorIndex[addrA] = j;
-            _activeValidatorIndex[addrB] = i;
-        }
-    }
-
     function _shuffleMem(address[] memory array) internal view {
         uint256 n = array.length;
         if (n == 0) {
@@ -756,17 +712,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         return validatorA.data.voteBalance > validatorB.data.voteBalance;
     }
 
-    function _clamp(uint256 value, uint256 min, uint256 max) internal pure returns (uint256) {
-        if (min > max) {
-            revert InvalidRange(min, max);
-        }
-
-        if (value < min) {
-            return min;
-        } else if (value > max) {
-            return max;
-        } else {
-            return value;
-        }
+    function _min(uint256 valueA, uint256 valueB) internal pure returns (uint256) {
+        return valueA < valueB ? valueA : valueB;
     }
 }
