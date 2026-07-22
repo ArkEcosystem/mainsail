@@ -152,20 +152,22 @@ const configurations = [
 		postGenerate: (location) => {
 			// Functional tests run on single node
 			const __dirname = path.dirname(fileURLToPath(import.meta.url));
-			const source = path.join(location, "crypto.json");
-			const target = path.join(
-				__dirname,
-				"..",
-				"..",
-				"..",
-				"tests",
-				"functional",
-				"resync",
-				"paths",
-				"config-snapshot",
-				"crypto.json",
-			);
-			copyFileSync(source, target);
+			for (const file of ["crypto.json", "validators.json"]) {
+				const source = path.join(location, file);
+				const target = path.join(
+					__dirname,
+					"..",
+					"..",
+					"..",
+					"tests",
+					"functional",
+					"resync",
+					"paths",
+					"config-snapshot",
+					file,
+				);
+				copyFileSync(source, target);
+			}
 		},
 	},
 
@@ -285,21 +287,23 @@ const configurations = [
 
 			// Validator Node0 - Node4 (only needs updated crypto.json)
 			for (let i = 0; i < 5; i++) {
-				const source = path.join(location, "crypto.json");
-				const target = path.join(
-					__dirname,
-					"..",
-					"..",
-					"..",
-					"tests",
-					"e2e",
-					"snapshot",
-					"nodes",
-					`node${i}`,
-					"core",
-					"crypto.json",
-				);
-				copyFileSync(source, target);
+				for (const file of ["crypto.json", "validators.json"]) {
+					const source = path.join(location, file);
+					const target = path.join(
+						__dirname,
+						"..",
+						"..",
+						"..",
+						"tests",
+						"e2e",
+						"snapshot",
+						"nodes",
+						`node${i}`,
+						"core",
+						file,
+					);
+					copyFileSync(source, target);
+				}
 			}
 		},
 	},
