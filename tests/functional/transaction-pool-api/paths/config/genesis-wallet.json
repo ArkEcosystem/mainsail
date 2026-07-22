@@ -1,14 +1,14 @@
 {
-    "address": "0x3e90ee799C0325F9B61692A046DF2D39A23e5dFb",
+    "address": "0x2854E2c1346331814D01293433b2813e74C9A83F",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "5d97eb0dd58f5a2439a7308eae8eae3617ce78b3e12619bd9d6663e5986e39a6",
-        "publicKey": "8905b3058353316c195fdda7ba3bede51d00852327dbbe4786a10a34644536f3edd65a3d02a569ff8ebe81b083903d29"
+        "privateKey": "125db971941b98ced414a88533398af7fcdc9b56cd18d173efd19ec554c7e240",
+        "publicKey": "8b0e527d13c4bff04faeef6c7779025854d51783ead631e36f4b8cb133eb43270f1817cebb48269ffca1653726057f4e"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "00bdac289eeb552a8dd5388b5c64b98b544be938522f8aea76ec4ce0fbde042d",
-        "publicKey": "02787122a0c07731447b5bd42a2535a6faffe2bdfde845190409eebf47844489a5"
+        "privateKey": "7a5f4aac2f01356d3fa2a944ed6a4987bdc418f42b6b4c9fd2ff56554ebf0583",
+        "publicKey": "02bb3e2c6fbc0977d4e97a93bb86a2afc919db7bb90361b0d1a379e0ddd4d35574"
     },
-    "passphrase": "furnace tired bargain gorilla leisure plug estate ribbon guard act ceiling siren develop wonder focus pupil galaxy timber piece crater fog tilt fix castle"
+    "passphrase": "weekend deer sudden fantasy equal steel gravity borrow kidney hidden digital doll lyrics extra wrist genre craft parent evil success throw youth evoke room"
 }
