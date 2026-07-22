@@ -1,14 +1,14 @@
 {
-	"address": "0xBDE46e6fa010CC68340A31D4DF539fF779df4474",
+	"address": "0x66Bd2B5729C16F6BfC609f08a29696e13632a755",
 	"consensusKeys": {
 		"compressed": true,
-		"privateKey": "3c832fc0f6f219c68c0c5eaf4e6c9291cf776405b66fcee1ad6a4e780efc186b",
-		"publicKey": "af1cdd86ecb1ca690868af4b55eb6d1f1836f689a6d94c3305c0babb6a3a9cd6685e9c74e77a5eb6b3a6e3c757d4c1ac"
+		"privateKey": "580305f20ff4e8731365053ae59f7ef635281090c0734609228cb0b1a5fb1262",
+		"publicKey": "86a1b7aa495e9e930bd481e24fc2a1283f36823f8448b9be0bebd900384f3b6ab15d829e5e80c035d4dbc324c41e4706"
 	},
 	"keys": {
 		"compressed": true,
-		"privateKey": "9bfff9d0ca04017f5c134c6bfa7d0a1e19e50461cb9c0dac1a0da4f572159176",
-		"publicKey": "03c52c510d53fd1a303ce3f31b177cb7cf8921d7a6955c752aefffd01595757389"
+		"privateKey": "0f925d499057bd14544da53ebec07d19930b6493eef5dcdae9c797c299ceec6d",
+		"publicKey": "03b37192d31037a0390da9bdb5d2bae36a5f44bf00208aa84c2b16ace9c1c44a85"
 	},
-	"passphrase": "spoon grunt burden actress episode broken theme huge retreat tool boil huge learn wrong dinosaur risk ocean coyote smile clarify guess protect same light"
+	"passphrase": "pluck alarm owner nest ribbon mind neither smile turtle slender damage meadow credit ordinary mechanic start grid curious learn extra nuclear measure square decline"
 }
