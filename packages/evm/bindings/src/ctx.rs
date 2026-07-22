@@ -666,9 +666,9 @@ impl TryFrom<JsUpdateValidatorRegistrationFeeContext> for UpdateValidatorRegistr
     fn try_from(value: JsUpdateValidatorRegistrationFeeContext) -> Result<Self, Self::Error> {
         Ok(UpdateValidatorRegistrationFeeContext {
             commit_key: value.commit_key.try_into()?,
-            timestamp: value.timestamp.get_u64().1,
+            timestamp: utils::convert_bigint_to_u64(value.timestamp, "timestamp")?,
             validator_address: utils::create_address_from_string(&value.validator_address)?,
-            fee: value.fee.get_u128().1,
+            fee: utils::convert_bigint_to_u128(value.fee, "fee")?,
             spec_id: parse_spec_id(value.spec_id)?,
         })
     }

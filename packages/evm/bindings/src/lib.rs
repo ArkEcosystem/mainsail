@@ -291,18 +291,14 @@ impl EvmInner {
         &mut self,
         ctx: UpdateValidatorRegistrationFeeContext,
     ) -> std::result::Result<(), EVMError<String>> {
-        assert!(
-            self.pending_commits.contains_key(&ctx.commit_key),
-            "update_validator_registration_fee is missing commit key {:?}",
-            ctx.commit_key
-        );
+        if !self.pending_commits.contains_key(&ctx.commit_key) {
+            return Err(EVMError::Custom(format!(
+                "update_validator_registration_fee is missing commit key {:?}",
+                ctx.commit_key
+            )));
+        }
 
-        let genesis_info = self
-            .persistent_db
-            .genesis_info
-            .as_ref()
-            .expect("genesis info")
-            .clone();
+        let genesis_info = self.genesis_info()?;
 
         let abi = ethers_contract::BaseContract::from(
             ethers_core::abi::parse_abi(&["function setFee(uint128 fee) external"])
@@ -341,10 +337,11 @@ impl EvmInner {
                     ),
                 );
 
-                assert!(
-                    receipt.is_success(),
-                    "update_validator_registration_fee unsuccessful"
-                );
+                if !receipt.is_success() {
+                    return Err(EVMError::Custom(format!(
+                        "update_validator_registration_fee reverted: {receipt:?}"
+                    )));
+                }
                 Ok(())
             }
             Err(err) => Err(EVMError::Database(
