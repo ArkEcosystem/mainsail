@@ -92,7 +92,6 @@ const EXCEPTIONS = {
 			"@mainsail/transaction-pool-client",
 			"@mainsail/transaction-pool-service",
 			"@mainsail/transaction-pool-worker",
-			"@mainsail/transactions",
 			"@mainsail/validation",
 			"@mainsail/validator-set-static",
 			"@mainsail/validator-set-vote-weighted",
