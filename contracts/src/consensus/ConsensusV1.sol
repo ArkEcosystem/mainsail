@@ -91,7 +91,6 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     error AlreadyVoted();
     error MissingVote();
 
-    error InvalidRange(uint256 min, uint256 max);
     error InvalidParameters();
     error ImportIsNotAllowed();
 
