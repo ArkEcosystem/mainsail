@@ -65,35 +65,57 @@ export class GenesisBlockGenerator {
 
 		let transactions: Contracts.Crypto.Transaction[] = [];
 
-		if (options.snapshot) {
-			await this.#buildFromLegacySnapshot(options);
-		} else {
-			const validators = await Promise.all(
-				validatorsMnemonics.map(async (mnemonic) => await this.walletGenerator.generate(mnemonic)),
-			);
+		const proposer = await this.app
+			.getTagged<Contracts.Crypto.AddressFactory>(
+				Identifiers.Cryptography.Identity.Address.Factory,
+				"type",
+				"wallet",
+			)
+			.fromPublicKey(genesisWallet.keys.publicKey);
 
+		const validators = await Promise.all(
+			validatorsMnemonics.map(async (mnemonic) => await this.walletGenerator.generate(mnemonic)),
+		);
+
+		const commitKey = {
+			blockNumber: BigInt(options.initialBlockNumber),
+			round: BigInt(0),
+		};
+
+		const blockContext = {
+			commitKey,
+			gasLimit: BigInt(30_000_000),
+			timestamp: BigInt(dayjs(options.epoch).valueOf()),
+			validatorAddress: proposer,
+		};
+
+		const premine = BigInt(options.premine);
+		if (premine > 0n) {
 			// The premine is always distributed evenly across validators; this also ensures
 			// each validator holds enough balance to pay the (payable) registration fee.
-			transactions = await this.#createTransferTransactions(
-				genesisWallet,
-				validators,
-				options.premine,
-				options.chainId,
+			transactions = transactions.concat(
+				...(await this.#createTransferTransactions(genesisWallet, validators, premine, options.chainId)),
 			);
 
-			const validatorTransactions = [
-				...(await this.#buildValidatorTransactions(
-					validators,
-					options.chainId,
-					options.validatorRegistrationFee,
-				)),
-				...(await this.#buildVoteTransactions(validators, options.chainId)),
-			];
-
-			transactions = [...transactions, ...validatorTransactions];
+			options.premine = transactions.reduce((accumulator, current) => accumulator + current.value, 0n).toString();
 		}
 
-		const genesis = await this.#createGenesisCommit(genesisWallet.keys, validatorsMnemonics, transactions, options);
+		const validatorTransactions = [
+			...(await this.#buildValidatorTransactions(validators, options.chainId, "0")),
+			...(await this.#buildVoteTransactions(validators, options.chainId)),
+		];
+
+		transactions = [...transactions, ...validatorTransactions];
+
+		if (options.snapshot) {
+			await this.#importLegacySnapshotData(options);
+		}
+
+		if (options.createLegacyColdWallets) {
+			await this.#createLegacyColdWallets(blockContext, validatorsMnemonics);
+		}
+
+		const genesis = await this.#createGenesisCommit(blockContext, transactions, options);
 
 		return {
 			block: { ...genesis.block, transactions: genesis.block.transactions.map((tx) => tx.toData()) },
@@ -129,7 +151,7 @@ export class GenesisBlockGenerator {
 	async #createTransferTransaction(
 		sender: Wallet,
 		recipient: Wallet,
-		amount: string,
+		amount: bigint,
 		chainId: number,
 		nonce: number = 0,
 	): Promise<Contracts.Crypto.Transaction> {
@@ -150,10 +172,10 @@ export class GenesisBlockGenerator {
 	async #createTransferTransactions(
 		sender: Wallet,
 		recipients: Wallet[],
-		totalPremine: string,
+		totalPremine: bigint,
 		chainId: number,
 	): Promise<Contracts.Crypto.Transaction[]> {
-		const amount: string = (BigInt(totalPremine) / BigInt(recipients.length)).toString();
+		const amount = totalPremine / BigInt(recipients.length);
 
 		const result: Contracts.Crypto.Transaction[] = [];
 
@@ -223,12 +245,11 @@ export class GenesisBlockGenerator {
 	}
 
 	async #createGenesisCommit(
-		premineKeys: Contracts.Crypto.KeyPair,
-		validatorsMnemonics: string[],
+		blockContext: Contracts.Evm.BlockContext,
 		transactions: Contracts.Crypto.Transaction[],
 		options: Contracts.NetworkGenerator.InternalOptions,
 	): Promise<Contracts.Crypto.Commit> {
-		const genesisBlock = await this.#createGenesisBlock(premineKeys, validatorsMnemonics, transactions, options);
+		const genesisBlock = await this.#createGenesisBlock(blockContext, transactions, options);
 
 		const commit: Contracts.Crypto.CommitSerializable = {
 			block: genesisBlock.block,
@@ -248,8 +269,7 @@ export class GenesisBlockGenerator {
 	}
 
 	async #createGenesisBlock(
-		keys: Contracts.Crypto.KeyPair,
-		validatorsMnemonics: string[],
+		blockContext: Contracts.Evm.BlockContext,
 		transactions: Contracts.Crypto.Transaction[],
 		options: Contracts.NetworkGenerator.InternalOptions,
 	): Promise<{ block: Contracts.Crypto.Block; transactions: Contracts.Crypto.TransactionData[] }> {
@@ -259,42 +279,21 @@ export class GenesisBlockGenerator {
 		};
 
 		const payloadBuffers: Buffer[] = [];
-		const commitKey = {
-			blockNumber: BigInt(options.initialBlockNumber),
-			round: BigInt(0),
-		};
-		const timestamp = BigInt(dayjs(options.epoch).valueOf());
-		const proposer = await this.app
-			.getTagged<Contracts.Crypto.AddressFactory>(
-				Identifiers.Cryptography.Identity.Address.Factory,
-				"type",
-				"wallet",
-			)
-			.fromPublicKey(keys.publicKey);
 
 		// The initial payload length takes the overhead for each serialized transaction into account
 		// which is a uint32 per transaction to store the individual length.
 		let payloadSize = transactions.length * 4;
 
 		await this.evm.prepareNextCommit({
-			blockContext: {
-				commitKey,
-				gasLimit: BigInt(30_000_000),
-				timestamp,
-				validatorAddress: proposer,
-			},
+			blockContext,
 		});
-
-		if (options.createLegacyColdWallets) {
-			await this.#createLegacyColdWallets(validatorsMnemonics);
-		}
 
 		const transactionData: Contracts.Crypto.TransactionData[] = [];
 		for (const transaction of transactions) {
 			assert.string(transaction.hash);
 
 			const { receipt } = await this.evm.process({
-				commitKey,
+				commitKey: blockContext.commitKey,
 				data: Buffer.from(transaction.data.slice(2), "hex"),
 				from: transaction.from,
 				gasLimit: BigInt(transaction.gasLimit),
@@ -322,18 +321,26 @@ export class GenesisBlockGenerator {
 
 		await this.evm.updateRewardsAndVotes({
 			blockReward: 0n,
-			commitKey,
+			commitKey: blockContext.commitKey,
 			specId: Enums.Evm.SpecId.SHANGHAI,
-			timestamp,
-			validatorAddress: proposer,
+			timestamp: blockContext.timestamp,
+			validatorAddress: blockContext.validatorAddress,
+		});
+
+		await this.evm.updateValidatorRegistrationFee({
+			commitKey: blockContext.commitKey,
+			fee: BigInt(options.validatorRegistrationFee),
+			specId: Enums.Evm.SpecId.SHANGHAI,
+			timestamp: blockContext.timestamp,
+			validatorAddress: blockContext.validatorAddress,
 		});
 
 		await this.evm.calculateRoundValidators({
-			commitKey,
+			commitKey: blockContext.commitKey,
 			roundValidators: BigInt(options.validators),
 			specId: Enums.Evm.SpecId.SHANGHAI,
-			timestamp,
-			validatorAddress: proposer,
+			timestamp: blockContext.timestamp,
+			validatorAddress: blockContext.validatorAddress,
 		});
 
 		return {
@@ -341,17 +348,17 @@ export class GenesisBlockGenerator {
 				{
 					fee: totals.fee,
 					gasUsed: totals.gasUsed,
-					logsBloom: await this.evm.logsBloom(commitKey),
-					number: options.initialBlockNumber,
+					logsBloom: await this.evm.logsBloom(blockContext.commitKey),
+					number: options.initialBlockNumber ?? 0,
 					parentHash:
 						options.snapshot?.previousGenesisBlockHash ??
 						"0000000000000000000000000000000000000000000000000000000000000000",
 					payloadSize,
-					proposer,
+					proposer: blockContext.validatorAddress,
 					reward: 0n,
 					round: 0,
 					stateRoot: await this.evm.stateRoot(
-						commitKey,
+						blockContext.commitKey,
 						options.snapshot?.snapshotHash ??
 							"0000000000000000000000000000000000000000000000000000000000000000",
 					),
@@ -376,7 +383,7 @@ export class GenesisBlockGenerator {
 		}
 	}
 
-	async #buildFromLegacySnapshot(options: Contracts.NetworkGenerator.GenesisBlockOptions) {
+	async #importLegacySnapshotData(options: Contracts.NetworkGenerator.GenesisBlockOptions) {
 		assert.defined(options.snapshot);
 
 		// Load snapshot into EVM
@@ -385,7 +392,6 @@ export class GenesisBlockGenerator {
 				blockNumber: this.snapshotLegacyImporter.genesisBlockNumber,
 				round: 0n,
 			},
-			mockFakeValidatorBlsKeys: options.mockFakeValidatorBlsKeys,
 			timestamp: dayjs(options.epoch).valueOf(),
 		});
 
@@ -397,11 +403,15 @@ export class GenesisBlockGenerator {
 			.set("genesisBlock.block.number", options.initialBlockNumber);
 
 		this.logger.info(
-			`Imported legacy snapshot: ${result.importedValidatorsWithBlsKey} validators with BLS key, ${result.importedValidatorsWithoutBlsKey} without, ${result.importedUsernames} usernames, ${result.importedVoters} voters (initial total supply ${result.initialTotalSupply})`,
+			`Imported legacy snapshot: ${result.importedValidators} dormant validators, ${result.importedUsernames} usernames, ${result.importedVoters} voters (initial total supply ${result.initialTotalSupply})`,
 		);
 	}
 
-	async #createLegacyColdWallets(validatorMnemonics: string[]) {
+	async #createLegacyColdWallets(blockContext: Contracts.Evm.BlockContext, validatorMnemonics: string[]) {
+		await this.evm.prepareNextCommit({
+			blockContext,
+		});
+
 		const legacyColdWallets = await this.#getLegacyColdWallets(validatorMnemonics);
 		await this.evm.importLegacyColdWallets(legacyColdWallets.map(({ legacyColdWallet }) => legacyColdWallet));
 	}

@@ -37,11 +37,12 @@ export class MilestonesGenerator {
 					stageTimeoutIncrease: 2000,
 					tolerance: 100,
 				},
-				validatorRegistrationFee: options.validatorRegistrationFee,
+				validatorRegistrationFee: "0",
 			},
 			{
 				height: options.initialBlockNumber + 1,
 				roundValidators: options.validators,
+				validatorRegistrationFee: options.validatorRegistrationFee,
 			},
 		];
 

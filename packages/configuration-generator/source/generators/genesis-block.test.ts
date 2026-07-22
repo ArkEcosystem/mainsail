@@ -20,7 +20,7 @@ describe<{
 			initialBlockNumber: 0,
 			premine: "2000000000",
 			validators: 2,
-			validatorRegistrationFee: "250",
+			validatorRegistrationFee: "0",
 			...overrides,
 		}) as Contracts.NetworkGenerator.InternalOptions;
 
@@ -57,6 +57,9 @@ describe<{
 
 						height: 0,
 						reward: "0",
+					},
+					{
+						height: 1,
 						validatorRegistrationFee: "250",
 					},
 				],
@@ -72,7 +75,7 @@ describe<{
 	});
 
 	it("#generate - should return generated data", async ({ generator, mnemonicGenerator }) => {
-		const validatorsCount = 10;
+		const validatorsCount = 53;
 		assert.object(
 			await generator.generate(
 				mnemonicGenerator.generate(),
@@ -97,8 +100,7 @@ describe<{
 			genesisBlockNumber: 0n,
 			import: async () => ({
 				importedUsernames: 0,
-				importedValidatorsWithBlsKey: 0,
-				importedValidatorsWithoutBlsKey: 0,
+				importedValidators: 0,
 				importedVoters: 0,
 				initialTotalSupply: 0n,
 			}),
@@ -122,7 +124,7 @@ describe<{
 			await generator.generate(
 				mnemonicGenerator.generate(),
 				mnemonicGenerator.generateMany(2),
-				baseOptions({ snapshot: { path: "/snapshot" } }),
+				baseOptions({ snapshot: { path: "/snapshot" }, premine: "0" }),
 			),
 		);
 	});

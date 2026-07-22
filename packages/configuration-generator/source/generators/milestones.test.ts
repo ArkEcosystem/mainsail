@@ -60,11 +60,12 @@ describe<{
 						stageTimeoutIncrease: 2000,
 						tolerance: 100,
 					},
-					validatorRegistrationFee: "250",
+					validatorRegistrationFee: "0",
 				},
 				{
 					roundValidators: 53,
 					height: 1,
+					validatorRegistrationFee: "250",
 				},
 			],
 		);

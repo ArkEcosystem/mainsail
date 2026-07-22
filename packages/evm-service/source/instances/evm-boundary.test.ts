@@ -238,6 +238,18 @@ describe<{
 
 		await assert.rejects(
 			() =>
+				instance.updateValidatorRegistrationFee({
+					commitKey: unknownKey,
+					fee: 0n,
+					specId: Enums.Evm.SpecId.SHANGHAI,
+					timestamp: 0n,
+					validatorAddress: zeroAddress,
+				}),
+			"update_validator_registration_fee is missing commit key",
+		);
+
+		await assert.rejects(
+			() =>
 				instance.importAccountInfos([
 					{ address: wallets[0].address, balance: 0n, legacyAttributes: {}, nonce: 0n },
 				]),
@@ -293,6 +305,22 @@ describe<{
 				}),
 			"out of range",
 		);
+
+		// The fee is a u128 on the wire; negative or wider values fail argument conversion
+		// instead of being silently truncated.
+		for (const fee of [-1n, 2n ** 128n]) {
+			await assert.rejects(
+				() =>
+					instance.updateValidatorRegistrationFee({
+						commitKey: unknownKey,
+						fee,
+						specId: Enums.Evm.SpecId.SHANGHAI,
+						timestamp: 0n,
+						validatorAddress: zeroAddress,
+					}),
+				"fee: expected an unsigned bigint fitting into 128 bits",
+			);
+		}
 	});
 
 	it("imports reject balances that do not fit into u128", async ({ app, instance }) => {
@@ -384,6 +412,18 @@ describe<{
 				}),
 			// A reverted system call surfaces as a rejection carrying the EVM error, not a panic.
 			"calculate_round_validators reverted",
+		);
+
+		await assert.rejects(
+			() =>
+				instance.updateValidatorRegistrationFee({
+					commitKey,
+					fee: 250n,
+					specId: Enums.Evm.SpecId.SHANGHAI,
+					timestamp: 12_345n,
+					validatorAddress: wallets[1].address,
+				}),
+			"update_validator_registration_fee reverted",
 		);
 
 		const reward = 1_000_000n;

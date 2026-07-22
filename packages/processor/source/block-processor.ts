@@ -94,6 +94,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			this.#verifyConsumedAllGas(block, processResult);
 			this.#verifyTotalFee(block, processResult);
 			await this.#updateRewardsAndVotes(unit);
+			await this.#updateValidatorRegistrationFee(unit);
 			await this.#calculateRoundValidators(unit);
 			await this.#verifyStateRoot(block);
 			await this.#verifyLogsBloom(block);
@@ -285,6 +286,27 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 				round: BigInt(block.round),
 			},
 			specId: milestone.evmSpec,
+			timestamp: BigInt(block.timestamp),
+			validatorAddress: block.proposer,
+		});
+	}
+
+	async #updateValidatorRegistrationFee(unit: Contracts.Processor.ProcessableUnit) {
+		if (!this.roundCalculator.isNewRound(unit.blockNumber + 1)) {
+			return;
+		}
+
+		const { evmSpec, validatorRegistrationFee } = this.configuration.getMilestone(unit.blockNumber + 1);
+		const block = unit.getBlock();
+
+		await this.evm.updateValidatorRegistrationFee({
+			commitKey: {
+				blockHash: block.hash,
+				blockNumber: BigInt(block.number),
+				round: BigInt(block.round),
+			},
+			fee: BigInt(validatorRegistrationFee),
+			specId: evmSpec,
 			timestamp: BigInt(block.timestamp),
 			validatorAddress: block.proposer,
 		});

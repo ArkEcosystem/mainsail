@@ -67,7 +67,8 @@ export class Deployer implements Contracts.EvmConsensus.Deployer {
 			abi: ConsensusAbi.abi,
 			addressIdentifier: Identifiers.EvmConsensus.Contracts.Consensus,
 			implementationAddress: consensusAddress,
-			initializerArguments: [this.configuration.getMilestone().validatorRegistrationFee],
+			// Zero registration fee for initial genesis validator set, bumped at start of first round.
+			initializerArguments: ["0"],
 			name: "Consensus",
 			nonce: 1,
 		});

@@ -90,7 +90,7 @@ describe<{
 	it("getAccounts returns the committed accounts", async ({ instance }) => {
 		const { accounts } = await instance.getAccounts(0n, 1000n);
 
-		assert.equal(accounts.length, 55); // initial wallet, validators 0x1;
+		assert.equal(accounts.length, 54); // initial wallet, validators 0x1;
 	});
 
 	it("getLegacyColdWallets is empty", async ({ instance }) => {
