@@ -152,7 +152,6 @@ const setupNode = async (app: Application, dataDirectory: string, configDirector
 		"@mainsail/crypto-transaction",
 		"@mainsail/snapshot-legacy-importer",
 		"@mainsail/state",
-		"@mainsail/transactions",
 		"@mainsail/transaction-pool-service",
 		"@mainsail/crypto-proposal",
 		"@mainsail/crypto-messages",
