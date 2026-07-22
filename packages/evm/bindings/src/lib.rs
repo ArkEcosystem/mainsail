@@ -42,6 +42,8 @@ use revm::{
 };
 use tokio::sync::Semaphore;
 
+use crate::ctx::{JsUpdateValidatorRegistrationFeeContext, UpdateValidatorRegistrationFeeContext};
+
 mod ctx;
 mod logger;
 mod result;
@@ -281,6 +283,72 @@ impl EvmInner {
             }
             Err(err) => Err(EVMError::Database(
                 format!("calculate_round_validators failed: {}", err).into(),
+            )),
+        }
+    }
+
+    pub fn update_validator_registration_fee(
+        &mut self,
+        ctx: UpdateValidatorRegistrationFeeContext,
+    ) -> std::result::Result<(), EVMError<String>> {
+        assert!(
+            self.pending_commits.contains_key(&ctx.commit_key),
+            "update_validator_registration_fee is missing commit key {:?}",
+            ctx.commit_key
+        );
+
+        let genesis_info = self
+            .persistent_db
+            .genesis_info
+            .as_ref()
+            .expect("genesis info")
+            .clone();
+
+        let abi = ethers_contract::BaseContract::from(
+            ethers_core::abi::parse_abi(&["function setFee(uint128 fee) external"])
+                .expect("encode abi"),
+        );
+
+        let calldata = abi.encode("setFee", ctx.fee).expect("encode setFee");
+
+        let nonce = self
+            .get_account_nonce(&ctx.commit_key, genesis_info.deployer_account)
+            .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
+
+        match self.transact_write(ExecutionContext {
+            block_context: Some(BlockContext {
+                commit_key: ctx.commit_key,
+                gas_limit: u64::MAX,
+                timestamp: ctx.timestamp,
+                validator_address: ctx.validator_address,
+            }),
+            from: genesis_info.deployer_account,
+            to: Some(genesis_info.validator_contract),
+            data: Bytes::from(calldata.0),
+            value: U256::ZERO,
+            nonce: Some(nonce),
+            gas_limit: Some(u64::MAX),
+            gas_price: 0,
+            spec_id: ctx.spec_id,
+            tx_hash: None,
+        }) {
+            Ok((receipt, _)) => {
+                self.logger.log(
+                    LogLevel::Debug,
+                    format!(
+                        "update_validator_registration_fee {:?} {:?}",
+                        ctx.commit_key, receipt
+                    ),
+                );
+
+                assert!(
+                    receipt.is_success(),
+                    "update_validator_registration_fee unsuccessful"
+                );
+                Ok(())
+            }
+            Err(err) => Err(EVMError::Database(
+                format!("update_validator_registration_fee failed: {}", err).into(),
             )),
         }
     }
@@ -1489,6 +1557,21 @@ impl JsEvmWrapper {
         self.write(
             env,
             move |evm| evm.calculate_round_validators(ctx),
+            |_, _| Ok(()),
+        )
+    }
+
+    #[napi]
+    pub fn update_validator_registration_fee<'env>(
+        &mut self,
+        env: &'env Env,
+        ctx: JsUpdateValidatorRegistrationFeeContext,
+    ) -> Result<PromiseRaw<'env, ()>> {
+        let ctx = UpdateValidatorRegistrationFeeContext::try_from(ctx)?;
+
+        self.write(
+            env,
+            move |evm| evm.update_validator_registration_fee(ctx),
             |_, _| Ok(()),
         )
     }

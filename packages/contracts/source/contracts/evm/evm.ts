@@ -175,6 +175,15 @@ export interface CalculateRoundValidatorsContext {
 	readonly roundValidators: bigint;
 	readonly specId: SpecId;
 }
+
+export interface UpdateValidatorRegistrationFeeContext {
+	readonly commitKey: CommitKey;
+	readonly timestamp: bigint;
+	readonly validatorAddress: string;
+	readonly fee: bigint;
+	readonly specId: SpecId;
+}
+
 export interface UpdateRewardsAndVotesContext {
 	readonly commitKey: CommitKey;
 	readonly timestamp: bigint;
