@@ -83,7 +83,6 @@
 		{ "path": "packages/transaction-pool-broadcaster" },
 		{ "path": "packages/transaction-pool-service" },
 		{ "path": "packages/transaction-pool-worker" },
-		{ "path": "packages/transactions" },
 		{ "path": "packages/utils" },
 		{ "path": "packages/validation" },
 		{ "path": "packages/validator" },

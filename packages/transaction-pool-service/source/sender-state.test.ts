@@ -52,7 +52,6 @@ describeSkip<{
 
 		context.container = new Container();
 		context.container.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(context.configuration);
-		context.container.bind(Identifiers.Transaction.Handler.Registry).toConstantValue(context.handlerRegistry);
 		context.container.bind(Identifiers.Cryptography.Block.Serializer).toConstantValue(context.blockSerializer);
 		context.container
 			.bind(Identifiers.TransactionPool.ExpirationService)

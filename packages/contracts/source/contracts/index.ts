@@ -18,7 +18,6 @@ export * as Shared from "./shared/index.js";
 export * as Snapshot from "./snapshot.js";
 export * as State from "./state/index.js";
 export * as TransactionPool from "./transaction-pool/index.js";
-export * as Transactions from "./transactions.js";
 export * as Types from "./types/index.js";
 export * as ValidatorSet from "./validator-set.js";
 export * as Validator from "./validator.js";

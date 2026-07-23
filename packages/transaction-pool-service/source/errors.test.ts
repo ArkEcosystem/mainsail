@@ -63,17 +63,6 @@ describe<{
 		);
 	});
 
-	it("TransactionFailedToApplyError", (context) => {
-		const error = new Exceptions.TransactionFailedToApplyError(
-			context.transaction,
-			new Error("Something went horribly wrong"),
-		);
-
-		assert.instance(error, Exceptions.PoolError);
-		assert.equal(error.type, "ERR_APPLY");
-		assert.equal(error.message, `tx ${context.transaction.hash} cannot be applied: Something went horribly wrong`);
-	});
-
 	it("TransactionFailedToVerifyError", (context) => {
 		const error = new Exceptions.TransactionFailedToVerifyError(context.transaction);
 

@@ -290,9 +290,6 @@ export const Identifiers = {
 		State: Symbol("State<State>"),
 		Store: Symbol("State<Store>"),
 	},
-	Transaction: {
-		Handler: Symbol("Transaction<Handler>"),
-	},
 	TransactionPool: {
 		API: {
 			HTTP: Symbol.for("TransactionPool<API.HTTP>"),

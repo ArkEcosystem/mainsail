@@ -1111,9 +1111,6 @@ importers:
       '@mainsail/transaction-pool-worker':
         specifier: workspace:*
         version: link:../transaction-pool-worker
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -1637,9 +1634,6 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1713,9 +1707,6 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -1836,9 +1827,6 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -2020,9 +2008,6 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -2190,9 +2175,6 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -2326,9 +2308,6 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -3149,34 +3128,6 @@ importers:
         specifier: 0.5.6
         version: 0.5.6
 
-  packages/transactions:
-    dependencies:
-      '@mainsail/constants':
-        specifier: workspace:*
-        version: link:../constants
-      '@mainsail/container':
-        specifier: workspace:*
-        version: link:../container
-      '@mainsail/exceptions':
-        specifier: workspace:*
-        version: link:../exceptions
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
-    devDependencies:
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-      '@mainsail/test-runner':
-        specifier: workspace:*
-        version: link:../test-runner
-      uvu:
-        specifier: 0.5.6
-        version: 0.5.6
-
   packages/utils:
     dependencies:
       deepmerge:
@@ -3323,9 +3274,6 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../transactions
       '@mainsail/validation':
         specifier: workspace:*
         version: link:../validation
@@ -3428,7 +3376,7 @@ importers:
         version: 0.5.6
       viem:
         specifier: 2.22.15
-        version: 2.22.15(typescript@7.0.2)
+        version: 2.22.15(typescript@7.0.2)(zod@4.4.3)
 
   tests/e2e/consensus/checks:
     dependencies:
@@ -3440,7 +3388,7 @@ importers:
         version: 14.2.1
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@7.0.2)
+        version: 2.33.1(typescript@7.0.2)(zod@4.4.3)
 
   tests/e2e/consensus/peer-discovery:
     dependencies:
@@ -3473,7 +3421,7 @@ importers:
         version: 14.2.1
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@7.0.2)
+        version: 2.33.1(typescript@7.0.2)(zod@4.4.3)
 
   tests/functional/consensus:
     devDependencies:
@@ -3582,9 +3530,6 @@ importers:
       '@mainsail/transaction-pool-service':
         specifier: workspace:*
         version: link:../../../packages/transaction-pool-service
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../../../packages/transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../../../packages/utils
@@ -3614,7 +3559,7 @@ importers:
         version: 0.5.6
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@7.0.2)
+        version: 2.33.1(typescript@7.0.2)(zod@4.4.3)
 
   tests/functional/resync:
     devDependencies:
@@ -3738,9 +3683,6 @@ importers:
       '@mainsail/transaction-pool-worker':
         specifier: workspace:*
         version: link:../../../packages/transaction-pool-worker
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../../../packages/transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../../../packages/utils
@@ -3761,7 +3703,7 @@ importers:
         version: 0.5.6
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@7.0.2)
+        version: 2.33.1(typescript@7.0.2)(zod@4.4.3)
 
   tests/functional/transaction-pool-api:
     devDependencies:
@@ -3882,9 +3824,6 @@ importers:
       '@mainsail/transaction-pool-worker':
         specifier: workspace:*
         version: link:../../../packages/transaction-pool-worker
-      '@mainsail/transactions':
-        specifier: workspace:*
-        version: link:../../../packages/transactions
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../../../packages/utils
@@ -3905,7 +3844,7 @@ importers:
         version: 0.5.6
       viem:
         specifier: 2.33.1
-        version: 2.33.1(typescript@7.0.2)
+        version: 2.33.1(typescript@7.0.2)(zod@4.4.3)
 
 packages:
 
@@ -17298,7 +17237,7 @@ snapshots:
     transitivePeerDependencies:
       - zod
 
-  ox@0.6.7(typescript@7.0.2):
+  ox@0.6.7(typescript@7.0.2)(zod@4.4.3):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
       '@noble/curves': 1.9.6
@@ -17312,7 +17251,7 @@ snapshots:
     transitivePeerDependencies:
       - zod
 
-  ox@0.8.1(typescript@7.0.2):
+  ox@0.8.1(typescript@7.0.2)(zod@4.4.3):
     dependencies:
       '@adraffy/ens-normalize': 1.11.0
       '@noble/ciphers': 1.3.0
@@ -19074,7 +19013,7 @@ snapshots:
 
   vary@1.1.2: {}
 
-  viem@2.22.15(typescript@7.0.2):
+  viem@2.22.15(typescript@7.0.2)(zod@4.4.3):
     dependencies:
       '@noble/curves': 1.8.1
       '@noble/hashes': 1.7.1
@@ -19082,7 +19021,7 @@ snapshots:
       '@scure/bip39': 1.5.4
       abitype: 1.0.8(typescript@7.0.2)
       isows: 1.0.6(ws@8.18.0)
-      ox: 0.6.7(typescript@7.0.2)
+      ox: 0.6.7(typescript@7.0.2)(zod@4.4.3)
       ws: 8.18.0
     optionalDependencies:
       typescript: 7.0.2
@@ -19091,7 +19030,7 @@ snapshots:
       - utf-8-validate
       - zod
 
-  viem@2.33.1(typescript@7.0.2):
+  viem@2.33.1(typescript@7.0.2)(zod@4.4.3):
     dependencies:
       '@noble/curves': 1.9.2
       '@noble/hashes': 1.8.0
@@ -19099,7 +19038,7 @@ snapshots:
       '@scure/bip39': 1.6.0
       abitype: 1.0.8(typescript@7.0.2)
       isows: 1.0.7(ws@8.18.2)
-      ox: 0.8.1(typescript@7.0.2)
+      ox: 0.8.1(typescript@7.0.2)(zod@4.4.3)
       ws: 8.18.2
     optionalDependencies:
       typescript: 7.0.2

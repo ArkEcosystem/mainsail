@@ -1,9 +1,10 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { formatCurrency } from "@mainsail/blockchain-utils";
-import { Identifiers } from "@mainsail/constants";
+import { Identifiers, Events } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { InvalidSignatureError } from "@mainsail/exceptions";
+import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class TransactionProcessor implements Contracts.Processor.TransactionProcessor {
@@ -20,8 +21,14 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
-	@inject(Identifiers.Transaction.Handler)
-	private readonly transactionHandler!: Contracts.Transactions.TransactionHandler;
+	@inject(Identifiers.State.State)
+	private readonly state!: Contracts.State.State;
+
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
+
+	@inject(Identifiers.Cryptography.Transaction.Verifier)
+	private readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
 	async process(
 		unit: Contracts.Processor.ProcessableUnit,
@@ -29,22 +36,30 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	): Promise<Contracts.Evm.TransactionReceipt> {
 		const block = unit.getBlock();
 
-		const transactionHandlerContext: Contracts.Transactions.TransactionHandlerContext = {
-			evm: {
-				commitKey: {
-					blockHash: block.hash,
-					blockNumber: BigInt(block.number),
-					round: BigInt(block.round),
-				},
-				instance: this.evm,
-			},
-		};
-
-		if (!(await this.transactionHandler.verify(transaction))) {
+		// TODO: Move to verifiers
+		if (!(await this.verifier.verifyHash(transaction))) {
 			throw new InvalidSignatureError();
 		}
 
-		const receipt = await this.transactionHandler.apply(transactionHandlerContext, transaction);
+		const { receipt } = await this.evm.process({
+			commitKey: {
+				blockHash: block.hash,
+				blockNumber: BigInt(block.number),
+				round: BigInt(block.round),
+			},
+			data: Buffer.from(transaction.data.slice(2), "hex"),
+			from: transaction.from,
+			gasLimit: BigInt(transaction.gasLimit),
+			gasPrice: BigInt(transaction.gasPrice),
+			legacyAddress: transaction.senderLegacyAddress,
+			nonce: transaction.nonce,
+			specId: this.configuration.getMilestone().evmSpec,
+			to: transaction.to,
+			txHash: transaction.hash,
+			value: transaction.value,
+		});
+
+		this.#emit(transaction, receipt);
 
 		const feeConsumed = this.feeCalculator.calculateConsumed(transaction.gasPrice, receipt.gasUsed);
 		this.logger.debug(
@@ -53,5 +68,22 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		);
 
 		return receipt;
+	}
+
+	#emit(transaction: Contracts.Crypto.Transaction, receipt: Contracts.Evm.TransactionReceipt): void {
+		if (this.state.isBootstrap()) {
+			return;
+		}
+
+		void this.eventDispatcher
+			.dispatch(Events.EvmEvent.TransactionReceipt, {
+				receipt,
+				sender: transaction.from,
+				transactionId: transaction.hash,
+			})
+			.catch((rawError) => {
+				const error = ensureError(rawError);
+				this.logger.error(error.stack ?? error.message);
+			});
 	}
 }

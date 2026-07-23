@@ -75,7 +75,6 @@
 		"@mainsail/transaction-pool-broadcaster": "workspace:*",
 		"@mainsail/transaction-pool-service": "workspace:*",
 		"@mainsail/transaction-pool-worker": "workspace:*",
-		"@mainsail/transactions": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@mainsail/validator": "workspace:*",

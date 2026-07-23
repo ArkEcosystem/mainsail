@@ -1,7 +1,7 @@
 import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import type { Contracts } from "@mainsail/contracts";
 
-import { Identifiers } from "@mainsail/constants";
+import { Enums , Identifiers } from "@mainsail/constants";
 import { Proposal } from "@mainsail/crypto-proposal";
 import { assert } from "@mainsail/utils";
 import { randomBytes } from "crypto";
@@ -30,7 +30,6 @@ export const makeCustomProposal = async (
 	const cryptoConfiguration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const milestone = cryptoConfiguration.getMilestone();
 
-	const transactionHandler = app.get<Contracts.Transactions.TransactionHandler>(Identifiers.Transaction.Handler);
 	const evm = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "validator");
 
 	// 2)
@@ -64,15 +63,18 @@ export const makeCustomProposal = async (
 		let result = { gasRefunded: 0n, gasUsed: 0n, logs: [] as any, status: 0 };
 
 		try {
-			result = await transactionHandler.apply(
-				{
-					evm: {
-						commitKey,
-						instance: evm,
-					},
-				},
-				transaction,
-			);
+			result = (await evm.process({
+				commitKey: commitKey,
+				data: Buffer.from(transaction.data.slice(2), "hex"),
+				from: transaction.from,
+				gasLimit: BigInt(transaction.gasLimit),
+				gasPrice: BigInt(transaction.gasPrice),
+				nonce: transaction.nonce,
+				specId: Enums.Evm.SpecId.SHANGHAI,
+				to: transaction.to,
+				txHash: transaction.hash,
+				value: transaction.value,
+			})).receipt;
 		} catch {
 			result = { ...result, gasUsed: BigInt(transaction.gasLimit) };
 		}

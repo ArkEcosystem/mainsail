@@ -99,7 +99,6 @@ const setup = async (): Promise<Contracts.Kernel.Application> => {
 		"@mainsail/blockchain-utils",
 		"@mainsail/crypto-transaction",
 		"@mainsail/state",
-		"@mainsail/transactions",
 		"@mainsail/transaction-pool-service",
 		"@mainsail/crypto-proposal",
 		"@mainsail/crypto-messages",

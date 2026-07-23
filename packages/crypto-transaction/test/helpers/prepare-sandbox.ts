@@ -10,7 +10,6 @@ import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-valida
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
-import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
@@ -33,6 +32,5 @@ export const prepareSandbox = async (context: { app: Application }) => {
 	await context.app.resolve(CoreCryptoAddressBase58).register();
 	await context.app.resolve(CoreCryptoAddressKeccak256).register();
 	await context.app.resolve(CoreCryptoWif).register();
-	await context.app.resolve(CoreTransactions).register();
 	await context.app.resolve(CoreCryptoTransaction).register();
 };

@@ -133,9 +133,6 @@
 			"path": "../transaction-pool-worker"
 		},
 		{
-			"path": "../transactions"
-		},
-		{
 			"path": "../utils"
 		},
 		{

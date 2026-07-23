@@ -18,7 +18,6 @@ import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-valida
 import { ServiceProvider as Forger } from "@mainsail/forger";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
-import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
@@ -47,7 +46,6 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({ getRequired: () => 0.75 }); // txCollatorFactor
 
 	await context.app.resolve(CoreCryptoTransaction).register();
-	await context.app.resolve(CoreTransactions).register();
 	await context.app.resolve(CoreCryptoBlock).register();
 	await context.app.resolve(CoreCryptoProposal).register();
 	await context.app.resolve(CoreCryptoMessages).register();
@@ -81,10 +79,6 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 		updateRewardsAndVotes: async () => {},
 	};
 	context.app.bind(Identifiers.Evm.Instance).toConstantValue(evm).whenTagged("instance", "validator");
-
-	context.app.rebind(Identifiers.Transaction.Handler).toConstantValue({
-		apply: async () => ({ gasRefunded: 0n, gasUsed: 0n, logs: [], status: 1 }),
-	});
 
 	context.app.bind(Identifiers.EvmConsensus.GenesisInfo).toConstantValue({});
 
