@@ -28,7 +28,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
+	private readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
 	async process(
 		unit: Contracts.Processor.ProcessableUnit,

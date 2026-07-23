@@ -33,7 +33,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	protected readonly verifier!: Contracts.Crypto.TransactionVerifier;
+	private readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
 	#wallet!: Contracts.State.Wallet;
 
