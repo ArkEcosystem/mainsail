@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import {
 	Contracts as ApiDatabaseContracts,
+	createExtensions,
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 	TypeOrm,
@@ -680,12 +681,7 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		try {
 			await (this.dataSource as TypeOrm.DataSource).synchronize(true);
-			await (this.dataSource as TypeOrm.DataSource)
-				.createQueryRunner()
-				.query("CREATE EXTENSION IF NOT EXISTS citext;");
-			await (this.dataSource as TypeOrm.DataSource)
-				.createQueryRunner()
-				.query("CREATE EXTENSION IF NOT EXISTS pg_trgm;");
+			await createExtensions(this.dataSource as TypeOrm.DataSource);
 		} catch (rawError) {
 			await this.app.terminate("failed to reset database", ensureError(rawError));
 		}
