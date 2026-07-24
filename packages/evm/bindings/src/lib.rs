@@ -1227,7 +1227,7 @@ impl EvmInner {
 
                 block_env.number = U256::from(block_ctx.commit_key.0);
                 block_env.beneficiary = block_ctx.validator_address;
-                block_env.timestamp = U256::from(block_ctx.timestamp);
+                block_env.timestamp = U256::from(block_ctx.timestamp / 1000);
                 block_env.gas_limit = block_ctx.gas_limit;
                 block_env.difficulty = U256::ZERO;
             })
@@ -1346,7 +1346,7 @@ impl EvmInner {
                 };
                 block_env.number = U256::from(block_ctx.commit_key.0);
                 block_env.beneficiary = block_ctx.validator_address;
-                block_env.timestamp = U256::from(block_ctx.timestamp);
+                block_env.timestamp = U256::from(block_ctx.timestamp / 1000);
                 block_env.gas_limit = block_ctx.gas_limit;
                 block_env.difficulty = U256::ZERO;
             })
