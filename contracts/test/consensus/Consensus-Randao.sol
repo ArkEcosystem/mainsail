@@ -8,7 +8,6 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 contract ConsensusRandaoTest is Base {
     event RandaoMixed(uint256 mix);
 
-
     function _reveal(bytes1 seed) internal pure returns (bytes memory reveal) {
         reveal = new bytes(96);
         reveal[0] = seed;
