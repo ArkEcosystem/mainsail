@@ -165,6 +165,10 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return this.#evm.calculateRoundValidators(context);
 	}
 
+	public async mixRandao(context: Contracts.Evm.MixRandaoContext): Promise<void> {
+		return this.#evm.mixRandao(context);
+	}
+
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const { hash, number, round } = unit.getBlock();
 
@@ -305,6 +309,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 				parentHash: block.parentHash,
 				payloadSize: block.payloadSize,
 				proposer: block.proposer,
+				randaoReveal: block.randaoReveal,
 				reward: block.reward,
 				round: block.round,
 				stateRoot: block.stateRoot,

@@ -184,6 +184,14 @@ export interface UpdateValidatorRegistrationFeeContext {
 	readonly specId: SpecId;
 }
 
+export interface MixRandaoContext {
+	readonly commitKey: CommitKey;
+	readonly timestamp: bigint;
+	readonly validatorAddress: string;
+	readonly reveal: Buffer;
+	readonly specId: SpecId;
+}
+
 export interface UpdateRewardsAndVotesContext {
 	readonly commitKey: CommitKey;
 	readonly timestamp: bigint;

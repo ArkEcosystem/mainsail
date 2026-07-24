@@ -3,10 +3,11 @@ use std::{sync::Arc, u64};
 use ctx::{
     CalculateRoundValidatorsContext, EvmOptions, ExecutionContext, GenesisContext,
     JsBlockHeaderData, JsCalculateRoundValidatorsContext, JsCommitData, JsCommitKey, JsEvmOptions,
-    JsGenesisContext, JsPrepareNextCommitContext, JsPreverifyTransactionContext,
-    JsTransactionContext, JsTransactionData, JsTransactionSimulateContext,
-    JsTransactionViewContext, JsUpdateRewardsAndVotesContext, PrepareNextCommitContext,
-    PreverifyTxContext, TxContext, TxSimulateContext, TxViewContext, UpdateRewardsAndVotesContext,
+    JsGenesisContext, JsMixRandaoContext, JsPrepareNextCommitContext,
+    JsPreverifyTransactionContext, JsTransactionContext, JsTransactionData,
+    JsTransactionSimulateContext, JsTransactionViewContext, JsUpdateRewardsAndVotesContext,
+    MixRandaoContext, PrepareNextCommitContext, PreverifyTxContext, TxContext, TxSimulateContext,
+    TxViewContext, UpdateRewardsAndVotesContext,
 };
 use logger::JsLogger;
 use mainsail_evm_core::{
@@ -320,6 +321,32 @@ impl EvmInner {
             ctx.spec_id,
             Bytes::from(calldata.0),
             "update_validator_registration_fee",
+        )
+    }
+
+    pub fn mix_randao(
+        &mut self,
+        ctx: MixRandaoContext,
+    ) -> std::result::Result<(), EVMError<String>> {
+        let abi = ethers_contract::BaseContract::from(
+            ethers_core::abi::parse_abi(&["function mixRandao(bytes calldata reveal) external"])
+                .expect("encode abi"),
+        );
+
+        let calldata = abi
+            .encode(
+                "mixRandao",
+                ethers_core::types::Bytes::from(ctx.reveal.to_vec()),
+            )
+            .expect("encode mixRandao");
+
+        self.consensus_system_call(
+            ctx.commit_key,
+            ctx.timestamp,
+            ctx.validator_address,
+            ctx.spec_id,
+            Bytes::from(calldata.0),
+            "mix_randao",
         )
     }
 
@@ -1544,6 +1571,17 @@ impl JsEvmWrapper {
             move |evm| evm.update_validator_registration_fee(ctx),
             |_, _| Ok(()),
         )
+    }
+
+    #[napi]
+    pub fn mix_randao<'env>(
+        &mut self,
+        env: &'env Env,
+        ctx: JsMixRandaoContext,
+    ) -> Result<PromiseRaw<'env, ()>> {
+        let ctx = MixRandaoContext::try_from(ctx)?;
+
+        self.write(env, move |evm| evm.mix_randao(ctx), |_, _| Ok(()))
     }
 
     #[napi]

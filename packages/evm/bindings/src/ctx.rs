@@ -111,6 +111,15 @@ pub struct JsUpdateValidatorRegistrationFeeContext {
 }
 
 #[napi(object)]
+pub struct JsMixRandaoContext {
+    pub commit_key: JsCommitKey,
+    pub timestamp: BigInt,
+    pub reveal: Buffer,
+    pub validator_address: String,
+    pub spec_id: String,
+}
+
+#[napi(object)]
 pub struct JsUpdateRewardsAndVotesContext {
     pub commit_key: JsCommitKey,
     pub timestamp: BigInt,
@@ -143,6 +152,7 @@ pub struct JsBlockHeaderData {
     pub reward: BigInt,
     pub payload_size: u32,
     pub proposer: String,
+    pub randao_reveal: String,
 }
 
 #[napi(object)]
@@ -267,6 +277,15 @@ pub struct UpdateValidatorRegistrationFeeContext {
     pub commit_key: CommitKey,
     pub timestamp: u64,
     pub fee: u128,
+    pub validator_address: Address,
+    pub spec_id: SpecId,
+}
+
+#[derive(Debug)]
+pub struct MixRandaoContext {
+    pub commit_key: CommitKey,
+    pub timestamp: u64,
+    pub reveal: Bytes,
     pub validator_address: Address,
     pub spec_id: SpecId,
 }
@@ -400,6 +419,7 @@ impl TryFrom<JsBlockHeaderData> for BlockHeaderData {
             fee: utils::convert_bigint_to_u256(value.fee, "fee")?,
             reward: utils::convert_bigint_to_u256(value.reward, "reward")?,
             payload_size: value.payload_size,
+            randao_reveal: utils::convert_string_to_bls_sig(value.randao_reveal)?,
         })
     }
 }
@@ -669,6 +689,20 @@ impl TryFrom<JsUpdateValidatorRegistrationFeeContext> for UpdateValidatorRegistr
             timestamp: utils::convert_bigint_to_u64(value.timestamp, "timestamp")?,
             validator_address: utils::create_address_from_string(&value.validator_address)?,
             fee: utils::convert_bigint_to_u128(value.fee, "fee")?,
+            spec_id: parse_spec_id(value.spec_id)?,
+        })
+    }
+}
+
+impl TryFrom<JsMixRandaoContext> for MixRandaoContext {
+    type Error = anyhow::Error;
+
+    fn try_from(value: JsMixRandaoContext) -> Result<Self, Self::Error> {
+        Ok(MixRandaoContext {
+            commit_key: value.commit_key.try_into()?,
+            timestamp: utils::convert_bigint_to_u64(value.timestamp, "timestamp")?,
+            reveal: utils::convert_js_buffer_to_bytes(value.reveal),
+            validator_address: utils::create_address_from_string(&value.validator_address)?,
             spec_id: parse_spec_id(value.spec_id)?,
         })
     }
