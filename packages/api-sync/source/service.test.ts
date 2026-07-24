@@ -147,7 +147,6 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		};
 
 		context.dataSource = {
-			createQueryRunner: () => ({ query: async () => {} }),
 			query: async (sql: string) =>
 				sql.startsWith("select count(1)") ? context.queryResults.blocksCount : context.queryResults.maxHeight,
 			synchronize: async () => {},
