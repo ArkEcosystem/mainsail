@@ -35,7 +35,7 @@ use revm::{
         BlockEnv, ContextTr, TxEnv,
         result::{EVMError, ExecutionResult, ResultAndState},
     },
-    database::{State, TransitionAccount, WrapDatabaseRef, bal::EvmDatabaseError},
+    database::{State, WrapDatabaseRef, bal::EvmDatabaseError},
     handler::EvmTr,
     primitives::{Address, B256, Bytes, TxKind, U256, hex::ToHexExt, map::HashMap},
     state::AccountInfo,
@@ -749,6 +749,7 @@ impl EvmInner {
             false,
             false,
             0,
+            None,
         );
 
         Ok(match result {
@@ -1276,7 +1277,14 @@ impl EvmInner {
                                 .unwrap_or_default()
                                 .transitions
                                 .into_iter()
-                                .collect::<Vec<(Address, TransitionAccount)>>(),
+                                .map(|(address, account)| {
+                                    (
+                                        address,
+                                        mainsail_evm_core::state_commit::into_evm_transition(
+                                            account,
+                                        ),
+                                    )
+                                }),
                         );
                     }
                 }
