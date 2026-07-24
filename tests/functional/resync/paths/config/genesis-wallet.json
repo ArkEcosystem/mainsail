@@ -1,14 +1,14 @@
 {
-    "address": "0x0e01eEBB3F20FDdC785660aB846Ad4a255d77d3B",
+    "address": "0xF2673da64DE40277e2FBdBC82957A4296eC6C517",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "6457b422115c7efd9efafa02df0129f955141dd4a8f803d14b26e35a1c4dd54f",
-        "publicKey": "8c411c4c60308b6bda65095d9f30640a3133b7d41cd8e9a00e3f7716286c61c285c3b52c80705533fd9451caa43aa71a"
+        "privateKey": "61872ee67ad50ed15b589ae6316a4e3ff3936e25613b110339a3622f409aa3df",
+        "publicKey": "a4e87d71f3ef1831c26d8bc77e732361ffcb0af1d0212a5809377ccc699efc99835abf8bdc68d12f58eb7614002cae19"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "b280f395a19aa7ebb6109f3ac7fe7a1369ecde0cb9d590750e5edd98ad4b487d",
-        "publicKey": "034316e8f4b87bdc5c4fa078fbaff7a90d983cf5b253233b0de61dc5869a5f164d"
+        "privateKey": "7c647161ac19030846b5f2c5e5d6163c6db08dcedce58f11c425a63c5e4632ff",
+        "publicKey": "02bcf1221ccbee077e613dddf75a930402b016b41053d0d11e6b230b2236eda61d"
     },
-    "passphrase": "feed anxiety engage cushion nest pitch sleep near owner where exhaust fashion cabin click save boil machine scrap bright tennis much group talent mushroom"
+    "passphrase": "leopard foot title hollow pupil spell profit park knock sleep rifle armed wisdom relax consider nothing bench report bless say hip hub balcony power"
 }
