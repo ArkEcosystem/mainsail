@@ -355,6 +355,10 @@ export class GenesisBlockGenerator {
 						"0000000000000000000000000000000000000000000000000000000000000000",
 					payloadSize,
 					proposer: blockContext.validatorAddress,
+					// Zeroed at genesis: there is no proposer key to sign with, and neither the
+					// forger, processor, nor this generator mixes at genesis, so `_randaoMix`
+					// stays 0 for the genesis `calculateRoundValidators` call on every node.
+					randaoReveal: "00".repeat(96),
 					reward: 0n,
 					round: 0,
 					stateRoot: await this.evm.stateRoot(

@@ -72,6 +72,7 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 		dispose: async () => {},
 		initializeGenesis: async () => {},
 		logsBloom: async () => "0".repeat(512),
+		mixRandao: async () => {},
 		prepareNextCommit: async () => {},
 		rollback: async () => {},
 		snapshot: async () => {},

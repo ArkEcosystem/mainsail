@@ -244,8 +244,10 @@ export class Snapshot {
 								numberOfContracts += contract.implementations.length;
 							}
 
-							// number of blocks + current round + number of deployed contracts
-							const expectedNonce = numberOfBlocks + round + numberOfContracts;
+							// number of blocks (one vote&reward update each)
+							// + number of post-genesis blocks (one randao mix each; genesis never mixes)
+							// + current round + number of deployed contracts
+							const expectedNonce = numberOfBlocks + (numberOfBlocks - 1) + round + numberOfContracts;
 							// console.log("-- COMPARING DEPLOYER WALLET", expectedNonce, deployerDbWallet, dbWallet);
 							if (BigInt(expectedNonce) === BigInt(deployerDatabaseWallet.nonce)) {
 								nonceMismatch = false;
@@ -449,7 +451,13 @@ export class Snapshot {
 				}
 			}
 
-			// each block increases nonce of internal address due to vote&reward updates
+			// each block increases the nonce of the internal address twice: once for the
+			// vote&reward update and once for the randao mix (both are deployer system calls;
+			// genesis is excluded since this loop starts at block 1 and genesis never mixes)
+			await incrementNonce(
+				block.number,
+				this.app.get<string>(Identifiers.EvmConsensus.DeployerAddress),
+			);
 			await incrementNonce(
 				block.number,
 				this.app.get<string>(Identifiers.EvmConsensus.DeployerAddress),

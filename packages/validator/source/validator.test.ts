@@ -33,12 +33,24 @@ describe<{
 		assert.equal(validator.getConsensusPublicKey(), validatorKeys[0].consensusKeyPair.publicKey);
 	});
 
+	it("#getRandaoReveal - should be deterministic for the same block number", async ({ validator }) => {
+		// The whole RANDAO design rests on the unique-signature property: signing the same
+		// height twice must yield the exact same 96 bytes, and a different height must not.
+		const revealA = await validator.getRandaoReveal(2);
+		const revealB = await validator.getRandaoReveal(2);
+		const revealOther = await validator.getRandaoReveal(3);
+
+		assert.equal(revealA.length, 192);
+		assert.equal(revealA, revealB);
+		assert.true(revealA !== revealOther);
+	});
+
 	it("#propose - should create a signed proposal carrying the given round and validator index", async ({
 		validator,
 		generatorAddress,
 		forger,
 	}) => {
-		const block = await forger.forgeBlock(generatorAddress, 1, 0);
+		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
 		const proposal = await validator.propose(0, 2, undefined, block);
 
 		assert.defined(proposal.signature);
@@ -52,7 +64,7 @@ describe<{
 		generatorAddress,
 		forger,
 	}) => {
-		const block = await forger.forgeBlock(generatorAddress, 1, 0);
+		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
 		const proposal = await validator.propose(0, 3, 1, block);
 
 		assert.equal(proposal.round, 3);
@@ -64,7 +76,7 @@ describe<{
 		generatorAddress,
 		forger,
 	}) => {
-		const block = await forger.forgeBlock(generatorAddress, 1, 0);
+		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
 		const lockProof: Contracts.Crypto.AggregatedSignature = {
 			// 96-byte (192 hex) placeholder signature; validators must match roundValidators (53).
 			signature: "a".repeat(192),
@@ -82,7 +94,7 @@ describe<{
 		generatorAddress,
 		forger,
 	}) => {
-		const block = await forger.forgeBlock(generatorAddress, 1, 0);
+		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
 		const prevote = await validator.prevote(0, 1, 2, block.hash);
 
 		assert.defined(prevote.signature);
@@ -106,7 +118,7 @@ describe<{
 		generatorAddress,
 		forger,
 	}) => {
-		const block = await forger.forgeBlock(generatorAddress, 1, 0);
+		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
 		const precommit = await validator.precommit(0, 1, 2, block.hash);
 
 		assert.defined(precommit.signature);

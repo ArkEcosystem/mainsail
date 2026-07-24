@@ -37,6 +37,7 @@ describe<{
 		context.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue({});
 		context.app.bind(Identifiers.Cryptography.Proposal.Factory).toConstantValue({});
 		context.app.bind(Identifiers.State.Store).toConstantValue({});
+		context.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue({});
 
 		// A stub repository so boot's `configure(validators)` call is observable.
 		context.repository = { configure: () => {} };
