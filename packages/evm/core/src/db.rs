@@ -253,6 +253,7 @@ pub struct BlockHeaderData {
     pub reward: U256,
     pub payload_size: u32,
     pub proposer: Address,
+    pub randao_reveal: BlsSig,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize, PartialEq, Eq)]

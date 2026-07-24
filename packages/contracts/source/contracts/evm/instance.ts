@@ -11,6 +11,7 @@ import type {
 	GetReceiptsResult,
 	ImportLegacyColdWallet,
 	LegacyAttributes,
+	MixRandaoContext,
 	PrepareNextCommitContext,
 	PreverifyTransactionContext,
 	PreverifyTransactionResult,
@@ -44,6 +45,7 @@ export interface Instance extends CommitHandler {
 	getReceiptsByBlockRange(fromBlockNumber: bigint, toBlockNumber: bigint): Promise<GetReceiptsResult>;
 	getReceipt(height: bigint, txHash: string): Promise<GetReceiptResult>;
 	calculateRoundValidators(context: CalculateRoundValidatorsContext): Promise<void>;
+	mixRandao(context: MixRandaoContext): Promise<void>;
 	updateValidatorRegistrationFee(context: UpdateValidatorRegistrationFeeContext): Promise<void>;
 	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;
 	logsBloom(commitKey: CommitKey): Promise<string>;
