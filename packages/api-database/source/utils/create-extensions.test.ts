@@ -26,10 +26,7 @@ describe<{
 	it("should create all default extensions", async ({ queries }) => {
 		await createExtensions(makeDataSource(queries));
 
-		assert.equal(queries, [
-			"CREATE EXTENSION IF NOT EXISTS citext;",
-			"CREATE EXTENSION IF NOT EXISTS pg_trgm;",
-		]);
+		assert.equal(queries, ["CREATE EXTENSION IF NOT EXISTS citext;", "CREATE EXTENSION IF NOT EXISTS pg_trgm;"]);
 	});
 
 	it("should create custom extensions", async ({ queries }) => {
@@ -43,28 +40,19 @@ describe<{
 			makeDataSource(queries, (sql) => (sql.includes("citext") ? makeError({ code: "23505" }) : undefined)),
 		);
 
-		assert.equal(queries, [
-			"CREATE EXTENSION IF NOT EXISTS citext;",
-			"CREATE EXTENSION IF NOT EXISTS pg_trgm;",
-		]);
+		assert.equal(queries, ["CREATE EXTENSION IF NOT EXISTS citext;", "CREATE EXTENSION IF NOT EXISTS pg_trgm;"]);
 	});
 
 	it("should ignore a duplicate object error", async ({ queries }) => {
 		await createExtensions(makeDataSource(queries, () => makeError({ code: "42710" })));
 
-		assert.equal(queries, [
-			"CREATE EXTENSION IF NOT EXISTS citext;",
-			"CREATE EXTENSION IF NOT EXISTS pg_trgm;",
-		]);
+		assert.equal(queries, ["CREATE EXTENSION IF NOT EXISTS citext;", "CREATE EXTENSION IF NOT EXISTS pg_trgm;"]);
 	});
 
 	it("should read the code from the wrapped driver error", async ({ queries }) => {
 		await createExtensions(makeDataSource(queries, () => makeError({ driverError: { code: "23505" } })));
 
-		assert.equal(queries, [
-			"CREATE EXTENSION IF NOT EXISTS citext;",
-			"CREATE EXTENSION IF NOT EXISTS pg_trgm;",
-		]);
+		assert.equal(queries, ["CREATE EXTENSION IF NOT EXISTS citext;", "CREATE EXTENSION IF NOT EXISTS pg_trgm;"]);
 	});
 
 	it("should rethrow any other error", async ({ queries }) => {
