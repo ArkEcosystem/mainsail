@@ -94,6 +94,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			this.#verifyConsumedAllGas(block, processResult);
 			this.#verifyTotalFee(block, processResult);
 			await this.#updateRewardsAndVotes(unit);
+			await this.#mixRandao(unit);
 			await this.#updateValidatorRegistrationFee(unit);
 			await this.#calculateRoundValidators(unit);
 			await this.#verifyStateRoot(block);
@@ -286,6 +287,27 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 				round: BigInt(block.round),
 			},
 			specId: milestone.evmSpec,
+			timestamp: BigInt(block.timestamp),
+			validatorAddress: block.proposer,
+		});
+	}
+
+	async #mixRandao(unit: Contracts.Processor.ProcessableUnit) {
+		if (unit.blockNumber === this.configuration.getGenesisHeight()) {
+			return;
+		}
+
+		const { evmSpec } = this.configuration.getMilestone(unit.blockNumber);
+		const block = unit.getBlock();
+
+		await this.evm.mixRandao({
+			commitKey: {
+				blockHash: block.hash,
+				blockNumber: BigInt(block.number),
+				round: BigInt(block.round),
+			},
+			reveal: Buffer.from(block.randaoReveal, "hex"),
+			specId: evmSpec,
 			timestamp: BigInt(block.timestamp),
 			validatorAddress: block.proposer,
 		});
