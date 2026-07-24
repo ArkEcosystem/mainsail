@@ -1,14 +1,14 @@
 {
-	"address": "0x66Bd2B5729C16F6BfC609f08a29696e13632a755",
-	"consensusKeys": {
-		"compressed": true,
-		"privateKey": "580305f20ff4e8731365053ae59f7ef635281090c0734609228cb0b1a5fb1262",
-		"publicKey": "86a1b7aa495e9e930bd481e24fc2a1283f36823f8448b9be0bebd900384f3b6ab15d829e5e80c035d4dbc324c41e4706"
-	},
-	"keys": {
-		"compressed": true,
-		"privateKey": "0f925d499057bd14544da53ebec07d19930b6493eef5dcdae9c797c299ceec6d",
-		"publicKey": "03b37192d31037a0390da9bdb5d2bae36a5f44bf00208aa84c2b16ace9c1c44a85"
-	},
-	"passphrase": "pluck alarm owner nest ribbon mind neither smile turtle slender damage meadow credit ordinary mechanic start grid curious learn extra nuclear measure square decline"
+    "address": "0x811a04ce9C675bac762B830eB6AD72E67EBf39c8",
+    "consensusKeys": {
+        "compressed": true,
+        "privateKey": "373496ab5c7687c59c0e776e3c063e7fb4e324e3769f328419b3139bd4b9bbd9",
+        "publicKey": "884c4118a8e458adeadc14c9830a6f960745541630ed909e3835565a63de4c741497febe600416259c8d12b985764909"
+    },
+    "keys": {
+        "compressed": true,
+        "privateKey": "3608fa38ee5c003b838e46915996c3bc5e065d0f4c336140ce6863623ff666b7",
+        "publicKey": "028ba4b651e4a17e6e5297e45fde87b5725719895d83ee9837039a63f429073839"
+    },
+    "passphrase": "amount skill assault turn hybrid asthma palace symbol sea tree ghost mammal blood matrix pioneer offer vanish figure zebra capital target loan omit spin"
 }
