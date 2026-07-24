@@ -1,5 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
+import { randaoMessage } from "@mainsail/blockchain-utils";
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
@@ -17,6 +18,9 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.State.Store)
 	private readonly stateStore!: Contracts.State.Store;
 
+	@inject(Identifiers.CryptoWorker.WorkerPool)
+	private readonly workerPool!: Contracts.Crypto.WorkerPool;
+
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
 	public configure(keyPair: Contracts.Validator.ValidatorKeyPair): Contracts.Validator.Validator {
@@ -27,6 +31,19 @@ export class Validator implements Contracts.Validator.Validator {
 
 	public getConsensusPublicKey(): string {
 		return this.#keyPair.publicKey;
+	}
+
+	// The reveal is a deterministic BLS signature: for a given (key, blockNumber) there is exactly
+	// one valid signature, so the proposer cannot choose the value — only withhold the proposal.
+	public async getRandaoReveal(blockNumber: number): Promise<string> {
+		const worker = this.workerPool.getWorker();
+		const { privateKey } = await this.#keyPair.getKeyPair();
+
+		return worker.consensusSignature(
+			"sign",
+			randaoMessage(this.stateStore.getGenesisCommit().block.hash, blockNumber),
+			Buffer.from(privateKey, "hex"),
+		);
 	}
 
 	public async propose(

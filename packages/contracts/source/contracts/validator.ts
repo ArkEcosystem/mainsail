@@ -8,6 +8,7 @@ export interface ValidatorKeyPair {
 export interface Validator {
 	configure(keyPair: ValidatorKeyPair): Validator;
 	getConsensusPublicKey(): string;
+	getRandaoReveal(blockNumber: number): Promise<string>;
 	propose(
 		validatorIndex: number,
 		round: number,

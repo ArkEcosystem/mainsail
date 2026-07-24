@@ -54,6 +54,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	#milestone!: Contracts.Crypto.Milestone;
 	#previousBlock!: Contracts.Crypto.Block;
 	#timeLimit!: number;
+	#randaoReveal!: string;
 
 	#failedSenders: Set<string> = new Set();
 
@@ -61,10 +62,12 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 		generatorAddress: string,
 		timestamp: number,
 		commitKey: Contracts.Evm.CommitKey,
+		randaoReveal: string,
 	): TransactionForger {
 		this.#generatorAddress = generatorAddress;
 		this.#timestamp = timestamp;
 		this.#commitKey = commitKey;
+		this.#randaoReveal = randaoReveal;
 
 		this.#milestone = this.cryptoConfiguration.getMilestone();
 		this.#previousBlock = this.stateStore.getLastBlock();
@@ -99,6 +102,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 			const { fee, gasUsed, transactions } = await this.#processTransactions();
 
 			await this.#updateRewardsAndVotes();
+			await this.#mixRandao();
 			await this.#updateValidatorRegistrationFee();
 			await this.#calculateRoundValidators();
 
@@ -244,14 +248,28 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 		});
 	}
 
+	async #mixRandao(): Promise<void> {
+		const { evmSpec } = this.cryptoConfiguration.getMilestone(this.#previousBlock.number + 1);
+
+		await this.evm.mixRandao({
+			commitKey: this.#commitKey,
+			reveal: Buffer.from(this.#randaoReveal, "hex"),
+			specId: evmSpec,
+			timestamp: BigInt(this.#timestamp),
+			validatorAddress: this.#generatorAddress,
+		});
+	}
+
 	async #updateValidatorRegistrationFee(): Promise<void> {
 		if (this.roundCalculator.isNewRound(this.#previousBlock.number + 2)) {
-			const { validatorRegistrationFee } = this.cryptoConfiguration.getMilestone(this.#previousBlock.number + 2);
+			const { evmSpec, validatorRegistrationFee } = this.cryptoConfiguration.getMilestone(
+				this.#previousBlock.number + 2,
+			);
 
 			await this.evm.updateValidatorRegistrationFee({
 				commitKey: this.#commitKey,
 				fee: BigInt(validatorRegistrationFee),
-				specId: this.#milestone.evmSpec,
+				specId: evmSpec,
 				timestamp: BigInt(this.#timestamp),
 				validatorAddress: this.#generatorAddress,
 			});
@@ -260,12 +278,12 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 
 	async #calculateRoundValidators(): Promise<void> {
 		if (this.roundCalculator.isNewRound(this.#previousBlock.number + 2)) {
-			const { roundValidators } = this.cryptoConfiguration.getMilestone(this.#previousBlock.number + 2);
+			const { evmSpec, roundValidators } = this.cryptoConfiguration.getMilestone(this.#previousBlock.number + 2);
 
 			await this.evm.calculateRoundValidators({
 				commitKey: this.#commitKey,
 				roundValidators: BigInt(roundValidators),
-				specId: this.#milestone.evmSpec,
+				specId: evmSpec,
 				timestamp: BigInt(this.#timestamp),
 				validatorAddress: this.#generatorAddress,
 			});
