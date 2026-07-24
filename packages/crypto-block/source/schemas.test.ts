@@ -161,6 +161,7 @@ describe<{
 		payloadSize: 0,
 		transactionsRoot: "0".repeat(64),
 		proposer: "0x" + "A".repeat(40),
+		randaoReveal: "0".repeat(192),
 	};
 	/* eslint-enable perfectionist/sort-objects */
 
@@ -189,6 +190,7 @@ describe<{
 			"payloadSize",
 			"transactionsRoot",
 			"proposer",
+			"randaoReveal",
 		];
 
 		for (const field of requiredFields) {
