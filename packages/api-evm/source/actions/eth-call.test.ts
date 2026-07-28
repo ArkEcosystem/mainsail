@@ -19,7 +19,7 @@ describe<{
 	beforeEach(async (context) => {
 		context.milestone = {
 			block: { maxGasLimit: 30_000_000 },
-			evmSpec: "shanghai",
+			evmSpec: "Latest",
 			gas: {
 				maximumGasLimit: 2_000_000,
 				maximumGasPrice: 1000,

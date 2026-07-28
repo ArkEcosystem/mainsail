@@ -47,13 +47,13 @@ describe<{
 	const deployConfig = {
 		gasLimit: BigInt(1_000_000),
 		gasPrice: BigInt(0),
-		specId: Enums.Evm.SpecId.PRAGUE,
+		specId: Enums.Evm.SpecId.LATEST,
 	};
 
 	const transferConfig = {
 		gasLimit: BigInt(60_000),
 		gasPrice: BigInt(0),
-		specId: Enums.Evm.SpecId.PRAGUE,
+		specId: Enums.Evm.SpecId.LATEST,
 	};
 
 	const blockContext: Omit<Contracts.Evm.BlockContext, "commitKey"> = {
@@ -758,7 +758,7 @@ describe<{
 					txHash: getRandomTxHash(),
 					gasLimit: 30_000n,
 					gasPrice: 5n,
-					specId: Enums.Evm.SpecId.PRAGUE,
+					specId: Enums.Evm.SpecId.LATEST,
 				}),
 			"transaction validation error: call gas cost (137330) exceeds the gas limit (30000)",
 		);
@@ -988,7 +988,7 @@ describe<{
 			data: Buffer.alloc(0),
 			txHash: getRandomTxHash(),
 			blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(0), round: BigInt(0) } },
-			specId: Enums.Evm.SpecId.PRAGUE,
+			specId: Enums.Evm.SpecId.LATEST,
 		};
 
 		// Succeeds
@@ -1158,7 +1158,7 @@ describe<{
 			gasLimit: 21_000n,
 			gasPrice: 0n,
 			nonce: 0n,
-			specId: Enums.Evm.SpecId.PRAGUE,
+			specId: Enums.Evm.SpecId.LATEST,
 			to: recipient.address,
 			value: parseEther("1"),
 		});
@@ -1205,7 +1205,7 @@ const getBalance = async (
 		from: zeroAddress,
 		data: Buffer.from(toBytes(balanceOf)),
 		to: contractAddress!,
-		specId: Enums.Evm.SpecId.PRAGUE,
+		specId: Enums.Evm.SpecId.LATEST,
 	});
 
 	if (output?.byteLength === 0) {

@@ -159,7 +159,7 @@ describe<{
 			gasLimit: 21_000n,
 			gasPrice: 0n,
 			nonce: 0n,
-			specId: Enums.Evm.SpecId.PRAGUE,
+			specId: Enums.Evm.SpecId.LATEST,
 			to: wallets[1].address,
 			txHash: randomBytes(32).toString("hex"),
 			value: 0n,
@@ -193,7 +193,7 @@ describe<{
 					gasLimit: 21_000n,
 					gasPrice: 0n,
 					nonce: 0n,
-					specId: Enums.Evm.SpecId.PRAGUE,
+					specId: Enums.Evm.SpecId.LATEST,
 					to: wallets[1].address,
 					txHash: randomBytes(32).toString("hex"),
 					value: 0n,
@@ -217,7 +217,7 @@ describe<{
 		const updateContext = {
 			blockReward: 0n,
 			commitKey: unknownKey,
-			specId: Enums.Evm.SpecId.PRAGUE,
+			specId: Enums.Evm.SpecId.LATEST,
 			timestamp: 0n,
 			validatorAddress: zeroAddress,
 		};
@@ -229,7 +229,7 @@ describe<{
 				instance.calculateRoundValidators({
 					commitKey: unknownKey,
 					roundValidators: 1n,
-					specId: Enums.Evm.SpecId.PRAGUE,
+					specId: Enums.Evm.SpecId.LATEST,
 					timestamp: 0n,
 					validatorAddress: zeroAddress,
 				}),
@@ -241,7 +241,7 @@ describe<{
 				instance.updateValidatorRegistrationFee({
 					commitKey: unknownKey,
 					fee: 0n,
-					specId: Enums.Evm.SpecId.PRAGUE,
+					specId: Enums.Evm.SpecId.LATEST,
 					timestamp: 0n,
 					validatorAddress: zeroAddress,
 				}),
@@ -299,7 +299,7 @@ describe<{
 				instance.calculateRoundValidators({
 					commitKey: unknownKey,
 					roundValidators: 300n,
-					specId: Enums.Evm.SpecId.PRAGUE,
+					specId: Enums.Evm.SpecId.LATEST,
 					timestamp: 0n,
 					validatorAddress: zeroAddress,
 				}),
@@ -314,7 +314,7 @@ describe<{
 					instance.updateValidatorRegistrationFee({
 						commitKey: unknownKey,
 						fee,
-						specId: Enums.Evm.SpecId.PRAGUE,
+						specId: Enums.Evm.SpecId.LATEST,
 						timestamp: 0n,
 						validatorAddress: zeroAddress,
 					}),
@@ -356,7 +356,7 @@ describe<{
 					gasLimit: 21_000n,
 					gasPrice: 0n,
 					nonce: 0n,
-					specId: Enums.Evm.SpecId.PRAGUE,
+					specId: Enums.Evm.SpecId.LATEST,
 					to: wallets[1].address,
 					txHash: transaction.hash,
 					value: 0n,
@@ -394,7 +394,7 @@ describe<{
 			gasLimit: 1_000_000n,
 			gasPrice: 0n,
 			nonce: 0n,
-			specId: Enums.Evm.SpecId.PRAGUE,
+			specId: Enums.Evm.SpecId.LATEST,
 			txHash: randomBytes(32).toString("hex"),
 			value: 0n,
 		});
@@ -406,7 +406,7 @@ describe<{
 				instance.calculateRoundValidators({
 					commitKey,
 					roundValidators: 1n,
-					specId: Enums.Evm.SpecId.PRAGUE,
+					specId: Enums.Evm.SpecId.LATEST,
 					timestamp: 12_345n,
 					validatorAddress: wallets[1].address,
 				}),
@@ -419,7 +419,7 @@ describe<{
 				instance.updateValidatorRegistrationFee({
 					commitKey,
 					fee: 250n,
-					specId: Enums.Evm.SpecId.PRAGUE,
+					specId: Enums.Evm.SpecId.LATEST,
 					timestamp: 12_345n,
 					validatorAddress: wallets[1].address,
 				}),
@@ -432,7 +432,7 @@ describe<{
 				instance.updateRewardsAndVotes({
 					blockReward: reward,
 					commitKey,
-					specId: Enums.Evm.SpecId.PRAGUE,
+					specId: Enums.Evm.SpecId.LATEST,
 					timestamp: 12_345n,
 					validatorAddress: wallets[1].address,
 				}),
@@ -455,7 +455,7 @@ describe<{
 					gasLimit: 21_000n,
 					gasPrice: 0n,
 					nonce: 0n,
-					specId: Enums.Evm.SpecId.PRAGUE,
+					specId: Enums.Evm.SpecId.LATEST,
 					to: wallets[0].address,
 					txHash: randomBytes(32).toString("hex"),
 					value: reward,
@@ -560,7 +560,7 @@ describe<{
 				gasPrice: 0n,
 				legacyAddress,
 				nonce: 0n,
-				specId: Enums.Evm.SpecId.PRAGUE,
+				specId: Enums.Evm.SpecId.LATEST,
 				to: recipient,
 				txHash: randomBytes(32).toString("hex"),
 				value: 10n,
@@ -586,7 +586,7 @@ describe<{
 				gasPrice: 0n,
 				legacyAddress,
 				nonce,
-				specId: Enums.Evm.SpecId.PRAGUE,
+				specId: Enums.Evm.SpecId.LATEST,
 				to: recipient,
 				txHash: randomBytes(32).toString("hex"),
 				value: 10n,
@@ -635,7 +635,7 @@ describe<{
 				gasLimit: 2_000_000n,
 				gasPrice: 0n,
 				nonce,
-				specId: Enums.Evm.SpecId.PRAGUE,
+				specId: Enums.Evm.SpecId.LATEST,
 				txHash: randomBytes(32).toString("hex"),
 				value: 0n,
 			});
@@ -690,7 +690,7 @@ describe<{
 			data: Buffer.alloc(0),
 			from: zeroAddress,
 			gasLimit: 1n,
-			specId: Enums.Evm.SpecId.PRAGUE,
+			specId: Enums.Evm.SpecId.LATEST,
 			to: zeroAddress,
 		});
 		assert.false(view.success);
@@ -758,7 +758,7 @@ describe<{
 			gasLimit: 2_000_000n,
 			gasPrice: 0n,
 			nonce: 0n,
-			specId: Enums.Evm.SpecId.PRAGUE,
+			specId: Enums.Evm.SpecId.LATEST,
 			value: 0n,
 		});
 

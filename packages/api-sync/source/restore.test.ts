@@ -336,7 +336,7 @@ describe<Ctx>("Restore", ({ it, beforeEach, assert, spy }) => {
 		};
 
 		context.listeners = { flush: async () => {} };
-		context.milestone = { evmSpec: "shanghai", snapshot: true };
+		context.milestone = { evmSpec: "Latest", snapshot: true };
 
 		context.snapshotImporter = {
 			drain: () => [

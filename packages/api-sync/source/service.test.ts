@@ -168,7 +168,7 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		context.addressFactory = { fromPublicKey: async () => SENDER };
 		context.configuration = {
 			getGenesisHeight: () => 0,
-			getMilestone: () => ({ evmSpec: "shanghai" }),
+			getMilestone: () => ({ evmSpec: "Latest" }),
 			isNewMilestone: () => false,
 		};
 		context.roundCalculator = {
@@ -627,12 +627,12 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		appResolve.restore();
 
 		configuration.isNewMilestone = (number: number) => number === 2;
-		configuration.getMilestone = () => ({ evmSpec: "shanghai", height: 2 });
+		configuration.getMilestone = () => ({ evmSpec: "Latest", height: 2 });
 
 		await sync.onCommit(context.makeUnit());
 		await runQueuedJob(context);
 
-		assert.equal(repos.configuration.qb.calls.set[0][0].activeMilestones, { evmSpec: "shanghai", height: 2 });
+		assert.equal(repos.configuration.qb.calls.set[0][0].activeMilestones, { evmSpec: "Latest", height: 2 });
 	});
 
 	it("onCommit: upserts token entities and removes zeroed holders", async (context) => {

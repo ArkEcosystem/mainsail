@@ -880,7 +880,7 @@ mod tests {
             let mut evm = Context::mainnet()
                 .with_db(state)
                 .modify_cfg_chained(|cfg| {
-                    cfg.spec = SpecId::SHANGHAI;
+                    cfg.spec = SpecId::PRAGUE;
                     cfg.disable_nonce_check = true;
                 })
                 .modify_block_chained(|block: &mut BlockEnv| {
@@ -951,7 +951,7 @@ mod tests {
         let mut evm = Context::mainnet()
             .with_db(state)
             .modify_cfg_chained(|cfg| {
-                cfg.spec = SpecId::SHANGHAI;
+                cfg.spec = SpecId::PRAGUE;
                 cfg.disable_nonce_check = true;
             })
             .modify_block_chained(|block: &mut BlockEnv| {
