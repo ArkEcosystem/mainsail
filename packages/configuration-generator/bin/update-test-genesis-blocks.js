@@ -4,7 +4,7 @@ import { Identifiers as AppIdentifiers } from "@mainsail/constants";
 import { makeApplication } from "../distribution/application-factory.js";
 import { Identifiers } from "../distribution/identifiers.js";
 import { fileURLToPath } from "url";
-import { copyFileSync } from "fs";
+import { copyFileSync, existsSync } from "fs";
 import { readJSONSync, writeJSONSync } from "fs-extra/esm";
 
 const configurations = [
@@ -13,6 +13,7 @@ const configurations = [
 	// tests/functional/transaction-pool-api/paths/config/
 	{
 		network: "devnet",
+		secretsDir: ["tests", "functional", "transaction-pool-api", "paths", "config"],
 		symbol: "TѦ",
 		token: "ARK",
 		premine: "125000000000000000000000000",
@@ -53,6 +54,7 @@ const configurations = [
 	// tests/functional/consensus/config/
 	{
 		network: "devnet",
+		secretsDir: ["tests", "functional", "consensus", "config"],
 		symbol: "TѦ",
 		token: "ARK",
 		premine: "125000000000000000000000000",
@@ -91,6 +93,7 @@ const configurations = [
 	// tests/functional/resync/paths/config/
 	{
 		network: "devnet",
+		secretsDir: ["tests", "functional", "resync", "paths", "config"],
 		symbol: "TѦ",
 		token: "ARK",
 		premine: "125000000000000000000000000",
@@ -130,6 +133,7 @@ const configurations = [
 	// tests/functional/resync/paths/config-snapshot/
 	{
 		network: "devnet",
+		secretsDir: ["tests", "functional", "resync", "paths", "config-snapshot"],
 		symbol: "TѦ",
 		token: "ARK",
 		premine: "125000000000000000000000000",
@@ -175,6 +179,7 @@ const configurations = [
 	// tests/e2e/consensus
 	{
 		network: "devnet",
+		secretsDir: ["tests", "e2e", "clients", "config", "core"],
 		symbol: "TѦ",
 		token: "ARK",
 		premine: "125000000000000000000000000",
@@ -262,6 +267,7 @@ const configurations = [
 	// tests/e2e/snapshot
 	{
 		network: "devnet",
+		secretsDir: ["tests", "e2e", "snapshot", "nodes", "node0", "core"],
 		symbol: "TѦ",
 		token: "ARK",
 		premine: "125000000000000000000000000",
@@ -319,9 +325,21 @@ async function run() {
 	}
 }
 
-const generateConfiguration = async (path, configuration) => {
-	const app = await makeApplication(path, {});
+const generateConfiguration = async (configCorePath, configuration) => {
+	const app = await makeApplication(configCorePath, {});
 	const generator = app.get(Identifiers.ConfigurationGenerator);
+
+	// Reuse the committed secrets so validator identities stay stable across regenerations.
+	const __dirname = path.dirname(fileURLToPath(import.meta.url));
+	if (configuration.secretsDir) {
+		const secretsDir = path.join(__dirname, "..", "..", "..", ...configuration.secretsDir);
+		configuration.validatorMnemonics = readJSONSync(path.join(secretsDir, "validators.json")).secrets;
+
+		const genesisWalletPath = path.join(secretsDir, "genesis-wallet.json");
+		if (existsSync(genesisWalletPath)) {
+			configuration.genesisMnemonic = readJSONSync(genesisWalletPath).passphrase;
+		}
+	}
 
 	await generator.generate(configuration);
 
