@@ -99,7 +99,7 @@ export const makeApplication = async (
 			},
 			milestones: [
 				{
-					evmSpec: Enums.Evm.SpecId.SHANGHAI,
+					evmSpec: Enums.Evm.SpecId.OSAKA,
 					height: 0,
 					timeouts: {
 						blockPrepareTime: 4000,

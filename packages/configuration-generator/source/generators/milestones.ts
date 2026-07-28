@@ -16,7 +16,7 @@ export class MilestonesGenerator {
 					version: 1,
 				},
 				epoch: options.epoch.toISOString().slice(0, 11) + "00:00:00.000Z",
-				evmSpec: Enums.Evm.SpecId.SHANGHAI,
+				evmSpec: Enums.Evm.SpecId.OSAKA,
 				gas: {
 					maximumGasLimit: 5_000_000,
 					maximumGasPrice: 10_000 * 1e9,
