@@ -46,7 +46,7 @@ describe<{
 				milestones: [
 					{
 						block: { maxGasLimit: 30_000_000, maxPayload: 2_097_152, version: 1 },
-						evmSpec: Enums.Evm.SpecId.SHANGHAI,
+						evmSpec: Enums.Evm.SpecId.PRAGUE,
 						// @ts-ignore
 						gas: {
 							maximumGasLimit: 2_000_000,

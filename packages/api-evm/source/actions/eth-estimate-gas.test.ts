@@ -25,7 +25,7 @@ describe<{
 
 	const milestone = {
 		block: { maxGasLimit: 30_000_000 },
-		evmSpec: Enums.Evm.SpecId.SHANGHAI,
+		evmSpec: Enums.Evm.SpecId.PRAGUE,
 		gas: { minimumGasPrice: 5 },
 	};
 

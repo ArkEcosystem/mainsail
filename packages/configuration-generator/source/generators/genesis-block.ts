@@ -299,7 +299,7 @@ export class GenesisBlockGenerator {
 				gasLimit: BigInt(transaction.gasLimit),
 				gasPrice: BigInt(transaction.gasPrice),
 				nonce: transaction.nonce,
-				specId: Enums.Evm.SpecId.SHANGHAI,
+				specId: Enums.Evm.SpecId.PRAGUE,
 				to: transaction.to,
 				txHash: transaction.hash,
 				value: transaction.value,
@@ -322,7 +322,7 @@ export class GenesisBlockGenerator {
 		await this.evm.updateRewardsAndVotes({
 			blockReward: 0n,
 			commitKey: blockContext.commitKey,
-			specId: Enums.Evm.SpecId.SHANGHAI,
+			specId: Enums.Evm.SpecId.PRAGUE,
 			timestamp: blockContext.timestamp,
 			validatorAddress: blockContext.validatorAddress,
 		});
@@ -330,7 +330,7 @@ export class GenesisBlockGenerator {
 		await this.evm.updateValidatorRegistrationFee({
 			commitKey: blockContext.commitKey,
 			fee: BigInt(options.validatorRegistrationFee),
-			specId: Enums.Evm.SpecId.SHANGHAI,
+			specId: Enums.Evm.SpecId.PRAGUE,
 			timestamp: blockContext.timestamp,
 			validatorAddress: blockContext.validatorAddress,
 		});
@@ -338,7 +338,7 @@ export class GenesisBlockGenerator {
 		await this.evm.calculateRoundValidators({
 			commitKey: blockContext.commitKey,
 			roundValidators: BigInt(options.validators),
-			specId: Enums.Evm.SpecId.SHANGHAI,
+			specId: Enums.Evm.SpecId.PRAGUE,
 			timestamp: blockContext.timestamp,
 			validatorAddress: blockContext.validatorAddress,
 		});

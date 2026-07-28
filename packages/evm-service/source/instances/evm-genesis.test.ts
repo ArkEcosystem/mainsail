@@ -160,7 +160,7 @@ describe<{
 			await instance.updateRewardsAndVotes({
 				blockReward: reward,
 				commitKey,
-				specId: Enums.Evm.SpecId.SHANGHAI,
+				specId: Enums.Evm.SpecId.PRAGUE,
 				timestamp: 12_345n,
 				validatorAddress: proposer,
 			});
@@ -209,7 +209,7 @@ describe<{
 			await instance.updateRewardsAndVotes({
 				blockReward: 0n,
 				commitKey,
-				specId: Enums.Evm.SpecId.SHANGHAI,
+				specId: Enums.Evm.SpecId.PRAGUE,
 				timestamp: 12_345n,
 				validatorAddress: proposer,
 			});
@@ -218,7 +218,7 @@ describe<{
 				instance.calculateRoundValidators({
 					commitKey,
 					roundValidators: 0n,
-					specId: Enums.Evm.SpecId.SHANGHAI,
+					specId: Enums.Evm.SpecId.PRAGUE,
 					timestamp: 12_345n,
 					validatorAddress: proposer,
 				}),

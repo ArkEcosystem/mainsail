@@ -692,13 +692,13 @@ fn parse_spec_id(spec_id: String) -> Result<SpecId, anyhow::Error> {
     // By default "Latest" also includes unreleased specs, hence pin it to a specific spec which we
     // can change manually as needed.
     if spec_id == "Latest" {
-        return Ok(SpecId::SHANGHAI);
+        return Ok(SpecId::PRAGUE);
     }
 
     // Any supported spec is listed in the first match arm
     match SpecId::from_str(spec_id.as_str()) {
         Ok(spec_id) => match spec_id {
-            SpecId::SHANGHAI => Ok(spec_id),
+            SpecId::PRAGUE => Ok(spec_id),
             _ => Err(anyhow::anyhow!("unsupported spec_id")),
         },
         _ => Err(anyhow::anyhow!("invalid spec_id")),
