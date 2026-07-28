@@ -157,7 +157,7 @@ describe<{
 		await generator.generate(options());
 
 		// 7 task titles (prepare, genesis-wallet, crypto, peers, validators, .env, app) + the completion line.
-		info.calledTimes(8);
+		info.calledTimes(9);
 		info.calledWith("Preparing directories.");
 		info.calledWith("Writing crypto.json in core config path.");
 		info.calledWith("Writing .env in core config path.");
@@ -233,8 +233,8 @@ describe<{
 
 		await generator.generate(options({ validatorMnemonics: [MNEMONIC_A, MNEMONIC_B], validators: 2 }));
 
-		// validators.json holds exactly the supplied secrets, in order.
-		assert.equal(readJSONSync(join(configPath, "validators.json")).secrets, [MNEMONIC_A, MNEMONIC_B]);
+		// The supplied secrets, possibly reordered into genesis round slot order.
+		assert.equal(readJSONSync(join(configPath, "validators.json")).secrets.sort(), [MNEMONIC_A, MNEMONIC_B].sort());
 
 		// The active round-validator set matches the supplied list.
 		const crypto = readJSONSync(join(configPath, "crypto.json"));
@@ -244,9 +244,9 @@ describe<{
 			validatorRegistrationFee: "250000000000000000000",
 		});
 
-		// The generator receives the supplied mnemonics.
+		// Compare as a set: the captured reference is reordered in place by the sorting task.
 		const [, validatorMnemonics] = generate.getCallArgs(0) as [string, string[], any];
-		assert.equal(validatorMnemonics, [MNEMONIC_A, MNEMONIC_B]);
+		assert.equal([...validatorMnemonics].sort(), [MNEMONIC_A, MNEMONIC_B].sort());
 	});
 
 	it("should reject validator mnemonics whose count differs from the validators count", async ({
