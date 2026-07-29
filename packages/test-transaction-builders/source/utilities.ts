@@ -1,7 +1,8 @@
 import type { Contracts } from "@mainsail/contracts";
+import type { TransactionBuilder } from "@mainsail/crypto-transaction";
 
 import { Identifiers } from "@mainsail/constants";
-import { TransactionBuilder, TransactionFactory, Verifier } from "@mainsail/crypto-transaction";
+import { TransactionFactory, Verifier } from "@mainsail/crypto-transaction";
 import { sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
