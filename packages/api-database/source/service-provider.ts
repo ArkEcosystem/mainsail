@@ -66,6 +66,7 @@ import {
 	makeWalletRepository,
 } from "./repositories/index.js";
 import { makeMultiPaymentRepository } from "./repositories/multi-payment-repository.js";
+import { createExtensions } from "./utils/create-extensions.js";
 import { SnakeNamingStrategy } from "./utils/snake-naming-strategy.js";
 
 @injectable()
@@ -127,8 +128,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			// Note: this only initializes the connection pool, etc. but does not run migrations.
 			// Migrations are handled during bootstrap elsewhere in the main process (see sync.ts)
 			await dataSource.initialize();
-			await dataSource.createQueryRunner().query("CREATE EXTENSION IF NOT EXISTS citext;");
-			await dataSource.createQueryRunner().query("CREATE EXTENSION IF NOT EXISTS pg_trgm;");
+			await createExtensions(dataSource);
 
 			this.app.bind(Identifiers.DataSource).toConstantValue(dataSource);
 			this.app.bind(Identifiers.Migrations).to(Migrations).inSingletonScope();
