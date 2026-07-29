@@ -5,8 +5,14 @@ import { inject, injectable } from "@mainsail/container";
 
 @injectable()
 export class PoolWorker implements Contracts.TransactionPool.Worker {
-	@inject(Identifiers.TransactionPool.Query)
-	private readonly poolQuery!: Contracts.TransactionPool.Query;
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
+	@inject(Identifiers.TransactionPool.Selector)
+	private readonly selector!: Contracts.TransactionPool.Selector;
+
+	@inject(Identifiers.TransactionPool.Service)
+	private readonly transactionPoolService!: Contracts.TransactionPool.Service;
 
 	@inject(Identifiers.TransactionPool.Mempool)
 	private readonly transactionPoolMempool!: Contracts.TransactionPool.Mempool;
@@ -22,29 +28,45 @@ export class PoolWorker implements Contracts.TransactionPool.Worker {
 	}
 
 	public async dispose(): Promise<void> {}
+
 	public getQueueSize(): number {
 		return 0;
 	}
 
-	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {}
+	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
+		const block = unit.getBlock();
 
-	public async getTransactions(options: Contracts.TransactionPool.GetBatchOptions): Promise<Contracts.TransactionPool.GetBatchResult> {
-		const result =  {
-			remaining: 0,
-			transactions: (await this.poolQuery.getFromHighestPriority().all()).map((transaction) => transaction.toData()),
+		const sendersAddresses = new Set<string>();
+		for (const transaction of block.transactions) {
+			sendersAddresses.add(transaction.from);
 		}
 
-		this.transactionPoolMempool.flush();
-		return result;
+		const { blockTime } = this.configuration.getMilestone().timeouts;
+		const isSyncing = block.timestamp < Date.now() - blockTime * 3;
+
+		// Discard the batch snapshot so the next round re-reads the pool.
+		this.selector.clear();
+
+		if (this.configuration.isNewMilestone()) {
+			await this.transactionPoolService.reAddTransactions();
+		} else {
+			await this.transactionPoolService.commit([...sendersAddresses], block.gasUsed, isSyncing);
+		}
+	}
+
+	public async getTransactions(
+		options: Contracts.TransactionPool.GetBatchOptions,
+	): Promise<Contracts.TransactionPool.GetBatchResult> {
+		return this.selector.getBatch(options);
 	}
 
 	public async removeTransaction(address: string, hash: string): Promise<void> {
 		await this.transactionPoolMempool.removeTransaction(address, hash);
 	}
 
-	registerEventHandler(event: string, callback: Contracts.Kernel.IPC.EventCallback<any>): void {}
+	public registerEventHandler<T>(event: string, callback: Contracts.Kernel.IPC.EventCallback<T>): void {}
 
-	async setPeer(ip: string): Promise<void> {}
-	async forgetPeer(ip: string): Promise<void> {}
-	async reloadWebhooks(): Promise<void> {}
+	public async setPeer(ip: string): Promise<void> {}
+	public async forgetPeer(ip: string): Promise<void> {}
+	public async reloadWebhooks(): Promise<void> {}
 }
