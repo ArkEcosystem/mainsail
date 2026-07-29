@@ -1,7 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
 import { assert } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
@@ -9,33 +8,6 @@ export const getAddressByPublicKey = async (app: Contracts.Kernel.Application, p
 	return app
 		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
 		.fromPublicKey(publicKey);
-};
-
-export const getRandomFundedWallet = async (
-	context: { app: Contracts.Kernel.Application; wallets: Contracts.Crypto.KeyPair[] },
-	funder: Contracts.Crypto.KeyPair,
-	amount?: bigint,
-): Promise<Contracts.Crypto.KeyPair> => {
-	const { app } = context;
-
-	const seed = Date.now().toString();
-
-	const randomKeyPair = await app
-		.getTagged<Contracts.Crypto.KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory, "type", "wallet")
-		.fromMnemonic(seed);
-
-	const recipient = await app
-		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-		.fromPublicKey(randomKeyPair.publicKey);
-
-	amount = amount ?? 1000000000000000000n;
-
-	const fundTx = await EvmCalls.makeEvmCall(context, { recipient, sender: funder, value: amount });
-
-	await addTransactionsToPool(context, [fundTx]);
-	await Utils.waitBlock(context);
-
-	return randomKeyPair;
 };
 
 export const getRandomSignature = async (app: Contracts.Kernel.Application): Promise<string> => {

@@ -180,42 +180,6 @@ export const waitBlock = async ({ app }: { app: Contracts.Kernel.Application }, 
 	}
 };
 
-export const getRandomFundedWallet = async (context: Context, amount?: bigint): Promise<Contracts.Crypto.KeyPair> => {
-	if (context.fundedWalletProvider) {
-		return context.fundedWalletProvider(context, amount);
-	}
-
-	const { app, wallets } = context;
-
-	//const seed = randomBytes(32).toString("hex");
-
-	const randomKeyPair = await app
-		.getTagged<Contracts.Crypto.KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory, "type", "wallet")
-		.fromMnemonic("ladder pet busy silver convince lens either observe gap program debate film");
-
-	const recipient = await app
-		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-		.fromPublicKey(randomKeyPair.publicKey);
-	amount = amount ?? BigInt("1000000000000000000");
-
-	const nonce = await getNonceByPublicKey(app, wallets[0].publicKey);
-
-	const fundTx = await (
-		await app
-			.resolve(TransactionBuilder)
-			.gasPrice(5)
-			.recipientAddress(recipient)
-			.value(amount.toString())
-			.nonce((nonce + 1n).toString())
-			.signWithKeyPair(wallets[0])
-	).build();
-
-	await addTransactionsToPool(context, [fundTx]);
-	await waitBlock({ app }, 2); // Await 2 blocks to ensure the transaction is confirmed
-
-	return randomKeyPair;
-};
-
 export const getRandomConsensusKeyPair = async ({ app }: Context): Promise<Contracts.Crypto.KeyPair> => {
 	const seed = Array.from({ length: 12 }).fill(Date.now().toString()).join(" ");
 
