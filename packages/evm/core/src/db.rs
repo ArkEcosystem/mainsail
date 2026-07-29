@@ -27,7 +27,7 @@ use crate::{
     logger::{LogLevel, Logger},
     receipt::{TxReceipt, map_execution_result},
     state_changes,
-    state_commit::StateCommit,
+    state_commit::{StateCommit, into_evm_transition},
 };
 
 #[derive(Debug)]
@@ -1536,9 +1536,8 @@ impl PendingCommit {
             .increment_balance(balance)
             .unwrap_or_else(|| TransitionAccount::new_empty_eip161(Default::default()));
 
-        let transitions = vec![(address, transition_account)];
-
-        self.transitions.add_transitions(transitions);
+        self.transitions
+            .add_transitions([(address, into_evm_transition(transition_account))]);
 
         self.cache = std::mem::take(&mut state.cache);
 

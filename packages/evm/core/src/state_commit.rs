@@ -1,4 +1,4 @@
-use std::collections::BTreeMap;
+use std::{borrow::Cow, collections::BTreeMap};
 
 use alloy_sol_types::SolEvent;
 use rayon::{
@@ -7,8 +7,9 @@ use rayon::{
 };
 use revm::{
     context::result::ExecutionResult,
-    database::{DatabaseCommitExt, WrapDatabaseRef},
+    database::{DatabaseCommitExt, TransitionAccount, WrapDatabaseRef},
     primitives::{Address, B256, map::HashMap},
+    state::{EvmStorage, EvmStorageSlot, TransactionId},
 };
 
 use crate::{
@@ -75,9 +76,12 @@ pub fn apply_rewards(
     // return the prestate cache so a recoverable failure never leaves `pending` empty.
     if result.is_ok() {
         if let Some(transition_state) = state.transition_state.take() {
-            pending
-                .transitions
-                .add_transitions(transition_state.transitions.into_iter());
+            pending.transitions.add_transitions(
+                transition_state
+                    .transitions
+                    .into_iter()
+                    .map(|(address, account)| (address, into_evm_transition(account))),
+            );
         }
     }
 
@@ -85,6 +89,30 @@ pub fn apply_rewards(
     // println!("cache {:#?}", pending.cache.accounts);
 
     result
+}
+
+/// `TransitionState::add_transitions` expects the EVM-side storage representation;
+/// convert an already-flattened transition back into it.
+pub fn into_evm_transition(
+    account: TransitionAccount,
+) -> TransitionAccount<Option<Cow<'static, EvmStorage>>> {
+    account.map_storage(|storage| {
+        Some(Cow::Owned(
+            storage
+                .into_iter()
+                .map(|(key, slot)| {
+                    (
+                        key,
+                        EvmStorageSlot::new_changed(
+                            slot.previous_or_original_value,
+                            slot.present_value,
+                            TransactionId::default(),
+                        ),
+                    )
+                })
+                .collect(),
+        ))
+    })
 }
 
 pub fn commit_to_db(
