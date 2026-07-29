@@ -21,7 +21,9 @@ export const getRandomConsensusKeyPair = async ({
 }: {
 	app: Contracts.Kernel.Application;
 }): Promise<Contracts.Crypto.KeyPair> => {
-	const seed = Array.from({ length: 12 }).fill(Date.now().toString()).join(" ");
+	// Must not be time-derived: back-to-back calls would otherwise yield the same consensus
+	// key, so a test expecting two distinct validator keys would silently register the same one.
+	const seed = Array.from({ length: 12 }, () => randomBytes(4).toString("hex")).join(" ");
 
 	return app
 		.getTagged<Contracts.Crypto.KeyPairFactory>(
