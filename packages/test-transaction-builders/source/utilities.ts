@@ -1,7 +1,8 @@
 import type { Contracts } from "@mainsail/contracts";
+import type { TransactionBuilder } from "@mainsail/crypto-transaction";
 
 import { Identifiers } from "@mainsail/constants";
-import { TransactionBuilder, TransactionFactory, Verifier } from "@mainsail/crypto-transaction";
+import { TransactionFactory, Verifier } from "@mainsail/crypto-transaction";
 import { sleep } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
@@ -178,42 +179,6 @@ export const waitBlock = async ({ app }: { app: Contracts.Kernel.Application }, 
 	if (app.isBound(Identifiers.ApiSync.Service)) {
 		await app.get<Contracts.ApiSync.Service>(Identifiers.ApiSync.Service).flush();
 	}
-};
-
-export const getRandomFundedWallet = async (context: Context, amount?: bigint): Promise<Contracts.Crypto.KeyPair> => {
-	if (context.fundedWalletProvider) {
-		return context.fundedWalletProvider(context, amount);
-	}
-
-	const { app, wallets } = context;
-
-	//const seed = randomBytes(32).toString("hex");
-
-	const randomKeyPair = await app
-		.getTagged<Contracts.Crypto.KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory, "type", "wallet")
-		.fromMnemonic("ladder pet busy silver convince lens either observe gap program debate film");
-
-	const recipient = await app
-		.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-		.fromPublicKey(randomKeyPair.publicKey);
-	amount = amount ?? BigInt("1000000000000000000");
-
-	const nonce = await getNonceByPublicKey(app, wallets[0].publicKey);
-
-	const fundTx = await (
-		await app
-			.resolve(TransactionBuilder)
-			.gasPrice(5)
-			.recipientAddress(recipient)
-			.value(amount.toString())
-			.nonce((nonce + 1n).toString())
-			.signWithKeyPair(wallets[0])
-	).build();
-
-	await addTransactionsToPool(context, [fundTx]);
-	await waitBlock({ app }, 2); // Await 2 blocks to ensure the transaction is confirmed
-
-	return randomKeyPair;
 };
 
 export const getRandomConsensusKeyPair = async ({ app }: Context): Promise<Contracts.Crypto.KeyPair> => {
