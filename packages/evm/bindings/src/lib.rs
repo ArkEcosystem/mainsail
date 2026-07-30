@@ -1216,6 +1216,9 @@ impl EvmInner {
             .modify_cfg_chained(|cfg| {
                 cfg.spec = ctx.spec_id;
                 cfg.disable_nonce_check = ctx.nonce.is_none();
+                // Mainsail enforces its own gas policy based on milestone which is
+                // passed via `block_ctx.gas_limit`.
+                cfg.tx_gas_limit_cap = Some(u64::MAX);
             })
             .modify_block_chained(|block_env: &mut BlockEnv| {
                 let Some(block_ctx) = ctx.block_context.as_ref() else {
@@ -1333,6 +1336,9 @@ impl EvmInner {
             .modify_cfg_chained(|cfg| {
                 cfg.spec = ctx.spec_id;
                 cfg.disable_nonce_check = ctx.nonce.is_none();
+                // Mainsail enforces its own gas policy based on milestone which is
+                // passed via `block_ctx.gas_limit`.
+                cfg.tx_gas_limit_cap = Some(u64::MAX);
             })
             .modify_block_chained(|block_env: &mut BlockEnv| {
                 let Some(block_ctx) = ctx.block_context.as_ref() else {
