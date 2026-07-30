@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
-pragma solidity ^0.8.27;
+pragma solidity ^0.8.36;
 
 library BLSPoP {
     address internal constant POP_VERIFY = 0x0000000000000000000000000000000001181200;
