@@ -47,7 +47,7 @@ describe<{
 			}),
 			getMilestone: () => ({
 				block: { maxGasLimit: 30_000_000 },
-				evmSpec: "shanghai",
+				evmSpec: "Osaka",
 				validatorRegistrationFee: 100n,
 			}),
 		};

@@ -8,7 +8,7 @@ import { ConsensusContractCaller } from "./consensus-contract-caller.js";
 
 const DEPLOYER = "0x0000000000000000000000000000000000000001";
 const CONSENSUS = "0x00000000000000000000000000000000000000aa";
-const EVM_SPEC = "shanghai";
+const EVM_SPEC = "Osaka";
 
 const encodeOutput = (functionName: string, result: unknown): Buffer =>
 	Buffer.from(toBytes(encodeFunctionResult({ abi: ConsensusAbi.abi, functionName, result })));

@@ -365,7 +365,7 @@ export const callViewFunction = async (
 	viewContext: Omit<Contracts.Evm.TransactionViewContext, "specId">,
 ): Promise<Contracts.Evm.ViewResult> => {
 	const instance = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
-	return instance.view({ ...viewContext, specId: Enums.Evm.SpecId.LATEST });
+	return instance.view({ ...viewContext, specId: Enums.Evm.SpecId.OSAKA });
 };
 
 export * as ContractAbis from "@mainsail/evm-contracts";
