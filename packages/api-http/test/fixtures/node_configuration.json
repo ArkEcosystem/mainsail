@@ -6,7 +6,7 @@
 			"maxGasLimit": 10000000
 		},
 		"epoch": "2024-05-31T00:00:00.000Z",
-		"evmSpec": "Shanghai",
+		"evmSpec": "Osaka",
 		"gas": {
 			"minimumGasPrice": 5000000000,
 			"maximumGasPrice": 10000000000000,
