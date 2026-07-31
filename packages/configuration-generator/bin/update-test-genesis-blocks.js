@@ -9,6 +9,42 @@ import { readJSONSync, writeJSONSync } from "fs-extra/esm";
 
 const configurations = [
 	//
+	// Shipped devnet config
+	// packages/core/bin/config/devnet/core/
+	{
+		network: "devnet",
+		secretsDir: ["packages", "core", "bin", "config", "devnet", "core"],
+		symbol: "TѦ",
+		token: "ARK",
+		premine: "125000000000000000000000000",
+		chainId: 10000,
+		validators: 53,
+		initialBlockNumber: 0,
+		overwriteConfig: true,
+		postGenerate: (location) => {
+			const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+			for (const file of ["crypto.json", "validators.json", "genesis-wallet.json"]) {
+				const source = path.join(location, file);
+				const target = path.join(
+					__dirname,
+					"..",
+					"..",
+					"..",
+					"packages",
+					"core",
+					"bin",
+					"config",
+					"devnet",
+					"core",
+					file,
+				);
+				copyFileSync(source, target);
+			}
+		},
+	},
+
+	//
 	// Functional Tests
 	// tests/functional/transaction-pool-api/paths/config/
 	{
