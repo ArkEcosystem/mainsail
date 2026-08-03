@@ -136,6 +136,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 		try {
 			const bytesForProcess = [...job.blocks];
+			number = this.#skipAppliedBlocks(bytesForProcess, number);
 
 			while (bytesForProcess.length > 0) {
 				const roundInfo = this.roundCalculator.calculateRound(number);
@@ -198,6 +199,23 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 		this.#downloadJobs.shift();
 		this.#processNextJob();
+	}
+
+	// Drops leading blocks that are already applied (e.g. committed by live consensus while
+	// the job was in flight) and returns the first block number left to process. Verifying
+	// them against the store's last block would use the wrong predecessor hash and ban an
+	// honest peer.
+	#skipAppliedBlocks(bytesForProcess: Buffer[], fromBlockNumber: number): number {
+		const storedBlockNumber = this.stateStore.getBlockNumber();
+
+		if (fromBlockNumber > storedBlockNumber) {
+			return fromBlockNumber;
+		}
+
+		const skipCount = Math.min(bytesForProcess.length, storedBlockNumber - fromBlockNumber + 1);
+		bytesForProcess.splice(0, skipCount);
+
+		return fromBlockNumber + skipCount;
 	}
 
 	#processNextJob(): void {
