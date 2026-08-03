@@ -1,12 +1,18 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Enums, Identifiers as AppIdentifiers } from "@mainsail/constants";
+import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
+import { TransactionBuilder } from "@mainsail/crypto-transaction";
+import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { Application } from "@mainsail/kernel";
+import { bytesToHex, encodeFunctionData } from "viem";
 
 import { describe } from "@mainsail/test-runner";
 import { makeApplication } from "../application-factory";
+import { Wallet } from "../contracts";
 import { Identifiers } from "../identifiers";
 import { GenesisBlockGenerator } from "./genesis-block";
 import { MnemonicGenerator } from "./mnemonic";
+import { WalletGenerator } from "./wallet";
 
 describe<{
 	app: Application;
@@ -126,6 +132,116 @@ describe<{
 				mnemonicGenerator.generateMany(2),
 				baseOptions({ snapshot: { path: "/snapshot" }, premine: "0" }),
 			),
+		);
+	});
+
+	// Presigns the registration transaction for a wallet exactly as external validator tooling
+	// would, so the generator itself never needs the validator secrets.
+	const presignRegistration = async (app: Application, wallet: Wallet): Promise<string> => {
+		const consensusContract = app.get<string>(AppIdentifiers.EvmConsensus.Contracts.Consensus);
+		const { pop } = buildProofOfPossession(Buffer.from(wallet.consensusKeys.privateKey, "hex"));
+
+		const registration = await (
+			await app
+				.resolve(TransactionBuilder)
+				.network(123)
+				.recipientAddress(consensusContract)
+				.nonce("0")
+				.payload(
+					encodeFunctionData({
+						abi: ConsensusAbi.abi,
+						args: [`0x${wallet.consensusKeys.publicKey}`, bytesToHex(pop)],
+						functionName: "registerValidator",
+					}),
+				)
+				.value("0")
+				.gasPrice(0)
+				.gasLimit(500_000)
+				.sign(wallet.passphrase)
+		).build();
+
+		return registration.serialized.toString("hex");
+	};
+
+	it("#generate - should build a genesis block from presigned validator transactions", async ({
+		app,
+		generator,
+		mnemonicGenerator,
+	}) => {
+		const walletGenerator = app.get<WalletGenerator>(Identifiers.Generator.Wallet);
+		const wallets = await Promise.all(
+			mnemonicGenerator.generateMany(2).map(async (mnemonic) => await walletGenerator.generate(mnemonic)),
+		);
+
+		const validatorTransactions = await Promise.all(
+			wallets.map(async (wallet) => await presignRegistration(app, wallet)),
+		);
+
+		const data = await generator.generate(
+			mnemonicGenerator.generate(),
+			[],
+			baseOptions({ validators: 2, validatorTransactions }),
+		);
+
+		assert.object(data);
+
+		// 2 premine transfers (one per recovered sender) + 2 registrations; no votes exist
+		// at genesis in presigned mode.
+		assert.length(data.block.transactions, 4);
+
+		// The genesis wallet distributes the premine evenly to the presigned senders.
+		assert.equal(data.block.transactions[0].to, wallets[0].address);
+		assert.equal(data.block.transactions[1].to, wallets[1].address);
+		assert.equal(data.block.transactions[0].value, BigInt(2_000_000_000 / 2));
+		assert.equal(data.block.transactions[1].value, BigInt(2_000_000_000 / 2));
+	});
+
+	it("#generate - should reject a presigned validator transaction that is not valid", async ({
+		generator,
+		mnemonicGenerator,
+	}) => {
+		await assert.rejects(
+			() =>
+				generator.generate(
+					mnemonicGenerator.generate(),
+					[],
+					baseOptions({ validators: 1, validatorTransactions: ["deadbeef"] }),
+				),
+			"validatorTransactions[0] is invalid",
+		);
+	});
+
+	it("#generate - should reject a presigned transaction that is not a registerValidator call", async ({
+		app,
+		generator,
+		mnemonicGenerator,
+	}) => {
+		const walletGenerator = app.get<WalletGenerator>(Identifiers.Generator.Wallet);
+		const wallet = await walletGenerator.generate(mnemonicGenerator.generate());
+
+		const vote = await (
+			await app
+				.resolve(TransactionBuilder)
+				.network(123)
+				.recipientAddress(app.get<string>(AppIdentifiers.EvmConsensus.Contracts.Consensus))
+				.nonce("0")
+				.payload(encodeFunctionData({ abi: ConsensusAbi.abi, args: [wallet.address], functionName: "vote" }))
+				.gasPrice(0)
+				.gasLimit(200_000)
+				.sign(wallet.passphrase)
+		).build();
+
+		await assert.rejects(
+			() =>
+				generator.generate(
+					mnemonicGenerator.generate(),
+					[],
+					baseOptions({
+						validators: 1,
+						validatorTransactions: [vote.serialized.toString("hex")],
+					}),
+				),
+			"validatorTransactions[0] is not a registerValidator call to the consensus contract.",
 		);
 	});
 

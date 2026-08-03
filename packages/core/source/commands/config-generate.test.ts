@@ -1,3 +1,9 @@
+import { Identifiers as GeneratorIdentifiers, makeApplication } from "@mainsail/configuration-generator";
+import { Enums, Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
+import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
+import { TransactionBuilder } from "@mainsail/crypto-transaction";
+import { FunctionSigs } from "@mainsail/evm-contracts";
 import { existsSync, readFileSync } from "fs";
 import { ensureDirSync, readJSONSync, writeJSONSync } from "fs-extra/esm";
 import { join } from "path";
@@ -117,6 +123,121 @@ describe<{
 					.withFlags(generateFlags(configPath, { force: true, secretsFile, validators: undefined }))
 					.execute(Command),
 			"validatorMnemonics[0] is not a valid BIP39 mnemonic.",
+		);
+	});
+
+	// Presigns one registerValidator transaction per freshly generated wallet, exactly as
+	// external validator tooling would — the command under test never sees the secrets. The
+	// registerValidator(bytes,bytes) calldata is hand-encoded to avoid pulling an ABI encoder
+	// into this package.
+	const makePresignedValidatorTransactions = async (validators: number): Promise<string[]> => {
+		const app = await makeApplication(dirSync().name, {});
+
+		app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(
+			{
+				genesisBlock: {
+					// @ts-ignore
+					block: {
+						number: 0,
+						timestamp: 0,
+					},
+				},
+				milestones: [
+					{
+						block: { maxGasLimit: 30_000_000, maxPayload: 2_097_152, version: 1 },
+						evmSpec: Enums.Evm.SpecId.OSAKA,
+						// @ts-ignore
+						gas: {
+							maximumGasLimit: 2_000_000,
+							maximumGasPrice: 10_000 * 1e9,
+							minimumGasLimit: 21_000,
+							minimumGasPrice: 5 * 1e9,
+						},
+						height: 0,
+						reward: "0",
+					},
+				],
+				// @ts-ignore
+				network: {
+					chainId: 10_000,
+				},
+			},
+			false,
+		);
+
+		const walletGenerator = app.get<{ generate: () => Promise<any> }>(GeneratorIdentifiers.Generator.Wallet);
+		const consensusContract = app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus);
+
+		const abiEncodeBytes = (hex: string): string =>
+			(hex.length / 2).toString(16).padStart(64, "0") + hex.padEnd(Math.ceil(hex.length / 64) * 64, "0");
+
+		const transactions: string[] = [];
+
+		for (let index = 0; index < validators; index++) {
+			const wallet = await walletGenerator.generate();
+			const { pop } = buildProofOfPossession(Buffer.from(wallet.consensusKeys.privateKey, "hex"));
+
+			// registerValidator(bytes blsPublicKey, bytes proofOfPossession)
+			const registrationData =
+				FunctionSigs.ConsensusV1.RegisterValidator +
+				(0x40).toString(16).padStart(64, "0") +
+				(0xa0).toString(16).padStart(64, "0") +
+				abiEncodeBytes(wallet.consensusKeys.publicKey) +
+				abiEncodeBytes(Buffer.from(pop).toString("hex"));
+
+			const registration = await (
+				await app
+					.resolve(TransactionBuilder)
+					.network(10_000)
+					.recipientAddress(consensusContract)
+					.nonce("0")
+					.payload(registrationData)
+					.gasPrice(0)
+					.gasLimit(500_000)
+					.sign(wallet.passphrase)
+			).build();
+
+			transactions.push(registration.serialized.toString("hex"));
+		}
+
+		for (const tag of ["evm", "validator", "transaction-pool", "rpc"]) {
+			await app.getTagged<{ dispose(): Promise<void> }>(Identifiers.Evm.Instance, "instance", tag).dispose();
+		}
+
+		return transactions;
+	};
+
+	it("should generate genesis from presigned validator transactions", async ({ cli, configPath }) => {
+		const validatorTransactions = await makePresignedValidatorTransactions(2);
+
+		const secretsFile = join(dirSync().name, "presigned.json");
+		writeJSONSync(secretsFile, { validatorTransactions });
+
+		// --validators is omitted, so the count is derived from the presigned registrations (2).
+		await cli
+			.withFlags(generateFlags(configPath, { force: true, secretsFile, validators: undefined }))
+			.execute(Command);
+
+		// No validator secrets exist anywhere in the generated configuration.
+		assert.equal(readJSONSync(join(configPath, "devnet", "validators.json")).secrets, []);
+
+		const crypto = readJSONSync(join(configPath, "devnet", "crypto.json"));
+		assert.equal(crypto.milestones[1].roundValidators, 2);
+
+		// 2 premine transfers + 2 registrations; no votes exist at genesis in presigned mode.
+		assert.equal(crypto.genesisBlock.block.transactionsCount, 4);
+	});
+
+	it("should reject a secrets file whose validatorTransactions is not an array", async ({ cli, configPath }) => {
+		const secretsFile = join(dirSync().name, "bad-presigned.json");
+		writeJSONSync(secretsFile, { validatorTransactions: "not-an-array" });
+
+		await assert.rejects(
+			() =>
+				cli
+					.withFlags(generateFlags(configPath, { force: true, secretsFile, validators: undefined }))
+					.execute(Command),
+			'"validatorTransactions" must be an array of hex-encoded transactions.',
 		);
 	});
 
