@@ -4,9 +4,9 @@ import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
-import { ConsensusAbi } from "@mainsail/evm-contracts";
+import { ConsensusAbi, FunctionSigs } from "@mainsail/evm-contracts";
 import { Application } from "@mainsail/kernel";
-import { assert } from "@mainsail/utils";
+import { assert, ensureError } from "@mainsail/utils";
 import dayjs from "dayjs";
 import { bytesToHex, encodeFunctionData } from "viem";
 
@@ -24,6 +24,9 @@ export class GenesisBlockGenerator {
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly transactionVerifier!: Contracts.Crypto.TransactionVerifier;
+
+	@inject(Identifiers.Cryptography.Transaction.Factory)
+	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
 	@inject(Identifiers.Snapshot.Legacy.Importer)
 	private readonly snapshotLegacyImporter!: Contracts.Snapshot.LegacyImporter;
@@ -61,7 +64,19 @@ export class GenesisBlockGenerator {
 	): Promise<Contracts.Crypto.CommitData> {
 		const genesisWallet = await this.walletGenerator.generate(genesisMnemonic);
 
-		await this.#prepareEvm(genesisWallet.address, validatorsMnemonics.length, options);
+		const presignedRegistrations = options.validatorRegistrations
+			? await this.#parsePresignedRegistrations(options.validatorRegistrations)
+			: undefined;
+
+		const validators = await Promise.all(
+			validatorsMnemonics.map(async (mnemonic) => await this.walletGenerator.generate(mnemonic)),
+		);
+
+		const premineRecipients = presignedRegistrations
+			? [...new Set(presignedRegistrations.map(({ from }) => from))]
+			: validators.map(({ address }) => address);
+
+		await this.#prepareEvm(genesisWallet.address, premineRecipients.length, options);
 
 		let transactions: Contracts.Crypto.Transaction[] = [];
 
@@ -72,10 +87,6 @@ export class GenesisBlockGenerator {
 				"wallet",
 			)
 			.fromPublicKey(genesisWallet.keys.publicKey);
-
-		const validators = await Promise.all(
-			validatorsMnemonics.map(async (mnemonic) => await this.walletGenerator.generate(mnemonic)),
-		);
 
 		const commitKey = {
 			blockNumber: BigInt(options.initialBlockNumber),
@@ -94,13 +105,13 @@ export class GenesisBlockGenerator {
 			// The premine is always distributed evenly across validators; this also ensures
 			// each validator holds enough balance to pay the (payable) registration fee.
 			transactions = transactions.concat(
-				...(await this.#createTransferTransactions(genesisWallet, validators, premine, options.chainId)),
+				...(await this.#createTransferTransactions(genesisWallet, premineRecipients, premine, options.chainId)),
 			);
 
 			options.premine = transactions.reduce((accumulator, current) => accumulator + current.value, 0n).toString();
 		}
 
-		const validatorTransactions = [
+		const validatorTransactions = presignedRegistrations ?? [
 			...(await this.#buildValidatorTransactions(validators, options.chainId, "0")),
 			...(await this.#buildVoteTransactions(validators, options.chainId)),
 		];
@@ -126,7 +137,7 @@ export class GenesisBlockGenerator {
 
 	async #prepareEvm(
 		genesisWalletAddress: string,
-		validatorsCount: number,
+		premineRecipientsCount: number,
 		options: Contracts.NetworkGenerator.InternalOptions,
 	) {
 		const genesisInfo: Contracts.Evm.GenesisInfo = {
@@ -137,7 +148,7 @@ export class GenesisBlockGenerator {
 			// In snapshot mode premine is "0", so this mints nothing and the snapshot importer supplies the state.
 			initialSupply: options.snapshot
 				? 0n
-				: (BigInt(options.premine) / BigInt(validatorsCount)) * BigInt(validatorsCount),
+				: (BigInt(options.premine) / BigInt(premineRecipientsCount)) * BigInt(premineRecipientsCount),
 
 			usernameContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Usernames), // PROXY Uses nonce 3
 			validatorContract: this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus), // PROXY Uses nonce 1
@@ -150,7 +161,7 @@ export class GenesisBlockGenerator {
 
 	async #createTransferTransaction(
 		sender: Wallet,
-		recipient: Wallet,
+		recipientAddress: string,
 		amount: bigint,
 		chainId: number,
 		nonce: number = 0,
@@ -159,7 +170,7 @@ export class GenesisBlockGenerator {
 			await this.app
 				.resolve(TransactionBuilder)
 				.network(chainId)
-				.recipientAddress(recipient.address)
+				.recipientAddress(recipientAddress)
 				.nonce(nonce.toFixed(0))
 				.value(amount)
 				.payload("")
@@ -171,19 +182,47 @@ export class GenesisBlockGenerator {
 
 	async #createTransferTransactions(
 		sender: Wallet,
-		recipients: Wallet[],
+		recipientAddresses: string[],
 		totalPremine: bigint,
 		chainId: number,
 	): Promise<Contracts.Crypto.Transaction[]> {
-		const amount = totalPremine / BigInt(recipients.length);
+		const amount = totalPremine / BigInt(recipientAddresses.length);
 
 		const result: Contracts.Crypto.Transaction[] = [];
 
-		for (const [index, recipient] of recipients.entries()) {
-			result.push(await this.#createTransferTransaction(sender, recipient, amount, chainId, index));
+		for (const [index, recipientAddress] of recipientAddresses.entries()) {
+			result.push(await this.#createTransferTransaction(sender, recipientAddress, amount, chainId, index));
 		}
 
 		return result;
+	}
+
+	async #parsePresignedRegistrations(serialized: string[]): Promise<Contracts.Crypto.Transaction[]> {
+		const consensusContractAddress = this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus);
+
+		const transactions: Contracts.Crypto.Transaction[] = [];
+
+		for (const [index, serializedTransaction] of serialized.entries()) {
+			let transaction: Contracts.Crypto.Transaction;
+			try {
+				transaction = await this.transactionFactory.fromHex(serializedTransaction);
+			} catch (error) {
+				throw new Error(`validatorRegistrations[${index}] is invalid: ${ensureError(error).message}`);
+			}
+
+			if (
+				transaction.to !== consensusContractAddress ||
+				!transaction.data.startsWith(FunctionSigs.ConsensusV1.RegisterValidator)
+			) {
+				throw new Error(
+					`validatorRegistrations[${index}] is not a registerValidator call to the consensus contract.`,
+				);
+			}
+
+			transactions.push(transaction);
+		}
+
+		return transactions;
 	}
 
 	async #buildValidatorTransactions(
