@@ -226,6 +226,36 @@ describe<{
 		assert.false(downloader.isDownloading());
 	});
 
+	it("#tryToDownload - should download from an eligible peer", ({ downloader }) => {
+		const getBlocks = stub(communicator, "getBlocks").returnValue(new Promise(() => {}));
+		stub(repository, "getPeers").returnValue([makePeer(3)]);
+
+		downloader.tryToDownload();
+
+		getBlocks.calledOnce();
+		assert.true(downloader.isDownloading());
+	});
+
+	it("#tryToDownload - should not spin when a peer is exactly one block ahead", ({ downloader }) => {
+		const getBlocks = stub(communicator, "getBlocks");
+		// The peer's stored block (blockNumber - 1) equals ours: nothing to download.
+		stub(repository, "getPeers").returnValue([makePeer(1)]);
+
+		downloader.tryToDownload();
+
+		getBlocks.neverCalled();
+		assert.false(downloader.isDownloading());
+	});
+
+	it("#tryToDownload - should stop when the job cap is reached", ({ downloader }) => {
+		const getBlocks = stub(communicator, "getBlocks").returnValue(new Promise(() => {}));
+		stub(repository, "getPeers").returnValue([makePeer(100_000)]);
+
+		downloader.tryToDownload();
+
+		getBlocks.calledTimes(10);
+	});
+
 	it("#download - should not ban when the short reply was near the payload limit", async ({ downloader }) => {
 		// 3 MiB of block data: adding another maxPayload (2 MiB) block could exceed the 5 MiB
 		// response limit, so the short reply is legitimate.

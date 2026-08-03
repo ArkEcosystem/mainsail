@@ -60,10 +60,17 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		let peers = this.repository.getPeers();
 
 		while (
-			(peers = peers.filter((peer) => peer.header.blockNumber > this.#getLastRequestedBlockNumber())) &&
+			(peers = peers.filter((peer) => peer.header.blockNumber - 1 > this.#getLastRequestedBlockNumber())) &&
 			peers.length > 0
 		) {
+			const jobCount = this.#downloadJobs.length;
+
 			this.download(getRandomPeer(peers));
+
+			// download() can decline (e.g. the job cap is reached); stop instead of spinning.
+			if (this.#downloadJobs.length === jobCount) {
+				return;
+			}
 		}
 	}
 
