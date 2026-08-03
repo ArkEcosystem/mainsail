@@ -337,7 +337,7 @@ describe<{
 			{ r: `0x${"1".padStart(64, "0")}`, s: `0x${"1".padStart(64, "0")}`, v: 27n },
 		).slice(2);
 
-	const makeValidatorTransactions = (app: Application, validators: number): string[] => {
+	const makeValidatorRegistrations = (app: Application, validators: number): string[] => {
 		const consensusContract = app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus);
 
 		const transactions: string[] = [];
@@ -354,16 +354,16 @@ describe<{
 		return transactions;
 	};
 
-	it("should derive the validator count from presigned validator transactions", async ({
+	it("should derive the validator count from presigned validator registrations", async ({
 		app,
 		generator,
 		configPath,
 		genesis,
 	}) => {
 		const generate = spy(genesis, "generate");
-		const validatorTransactions = makeValidatorTransactions(app, 2);
+		const validatorRegistrations = makeValidatorRegistrations(app, 2);
 
-		await generator.generate(options({ validatorTransactions }));
+		await generator.generate(options({ validatorRegistrations }));
 
 		// No validator secrets exist; validators.json is written empty.
 		assert.equal(readJSONSync(join(configPath, "validators.json")).secrets, []);
@@ -381,7 +381,7 @@ describe<{
 		const [, validatorMnemonics, internalOptions] = generate.getCallArgs(0) as [string, string[], any];
 		assert.equal(validatorMnemonics, []);
 		assert.equal(internalOptions.validators, 2);
-		assert.equal(internalOptions.validatorTransactions, validatorTransactions);
+		assert.equal(internalOptions.validatorRegistrations, validatorRegistrations);
 	});
 
 	it("should accept an explicit validators count matching the presigned registrations", async ({
@@ -389,7 +389,9 @@ describe<{
 		generator,
 		configPath,
 	}) => {
-		await generator.generate(options({ validators: 2, validatorTransactions: makeValidatorTransactions(app, 2) }));
+		await generator.generate(
+			options({ validators: 2, validatorRegistrations: makeValidatorRegistrations(app, 2) }),
+		);
 
 		assert.equal(readJSONSync(join(configPath, "crypto.json")).milestones[1].roundValidators, 2);
 	});
@@ -402,28 +404,28 @@ describe<{
 		await assert.rejects(
 			() =>
 				generator.generate(
-					options({ validators: 3, validatorTransactions: makeValidatorTransactions(app, 2) }),
+					options({ validators: 3, validatorRegistrations: makeValidatorRegistrations(app, 2) }),
 				),
-			"validatorTransactions registration count (2) does not match the validators count (3).",
+			"validatorRegistrations length (2) does not match the validators count (3).",
 		);
 
 		// Rejected up front, before any config file is written.
 		assert.false(existsSync(join(configPath, "crypto.json")));
 	});
 
-	it("should use an externally supplied genesis mnemonic alongside presigned validator transactions", async ({
+	it("should use an externally supplied genesis mnemonic alongside presigned validator registrations", async ({
 		app,
 		generator,
 		configPath,
 	}) => {
 		await generator.generate(
-			options({ genesisMnemonic: MNEMONIC_C, validatorTransactions: makeValidatorTransactions(app, 2) }),
+			options({ genesisMnemonic: MNEMONIC_C, validatorRegistrations: makeValidatorRegistrations(app, 2) }),
 		);
 
 		assert.equal(readJSONSync(join(configPath, "genesis-wallet.json")).passphrase, MNEMONIC_C);
 	});
 
-	it("should reject validator mnemonics combined with presigned validator transactions", async ({
+	it("should reject validator mnemonics combined with presigned validator registrations", async ({
 		app,
 		generator,
 	}) => {
@@ -433,40 +435,40 @@ describe<{
 					options({
 						validatorMnemonics: [MNEMONIC_A],
 						validators: 1,
-						validatorTransactions: makeValidatorTransactions(app, 1),
+						validatorRegistrations: makeValidatorRegistrations(app, 1),
 					}),
 				),
-			"validatorMnemonics and validatorTransactions are mutually exclusive.",
+			"validatorMnemonics and validatorRegistrations are mutually exclusive.",
 		);
 	});
 
-	it("should reject an empty presigned validator transactions list", async ({ generator }) => {
+	it("should reject an empty presigned validator registrations list", async ({ generator }) => {
 		await assert.rejects(
-			() => generator.generate(options({ validatorTransactions: [] })),
-			"validatorTransactions must be a non-empty array.",
+			() => generator.generate(options({ validatorRegistrations: [] })),
+			"validatorRegistrations must be a non-empty array.",
 		);
 	});
 
 	it("should reject a non-string presigned validator transaction", async ({ generator }) => {
 		await assert.rejects(
-			() => generator.generate(options({ validatorTransactions: [123] })),
-			"validatorTransactions[0] must be a hex-encoded serialized transaction.",
+			() => generator.generate(options({ validatorRegistrations: [123] })),
+			"validatorRegistrations[0] must be a hex-encoded serialized transaction.",
 		);
 	});
 
-	it("should reject duplicate presigned validator transactions", async ({ app, generator }) => {
-		const [registration] = makeValidatorTransactions(app, 1);
+	it("should reject duplicate presigned validator registrations", async ({ app, generator }) => {
+		const [registration] = makeValidatorRegistrations(app, 1);
 
 		await assert.rejects(
-			() => generator.generate(options({ validatorTransactions: [registration, registration] })),
-			"validatorTransactions contains duplicate entries.",
+			() => generator.generate(options({ validatorRegistrations: [registration, registration] })),
+			"validatorRegistrations contains duplicate entries.",
 		);
 	});
 
-	it("should reject a presigned validator transaction that cannot be deserialized", async ({ generator }) => {
+	it("should reject a presigned validator registration that cannot be deserialized", async ({ generator }) => {
 		await assert.rejects(
-			() => generator.generate(options({ validatorTransactions: ["deadbeef"] })),
-			"validatorTransactions[0] cannot be deserialized",
+			() => generator.generate(options({ validatorRegistrations: ["deadbeef"] })),
+			"validatorRegistrations[0] cannot be deserialized",
 		);
 	});
 
@@ -475,13 +477,13 @@ describe<{
 		const vote = makePresignedTransaction(consensusContract, 1, `${FunctionSigs.ConsensusV1.Vote}01`);
 
 		await assert.rejects(
-			() => generator.generate(options({ validatorTransactions: [vote] })),
-			"validatorTransactions[0] is not a registerValidator call to the consensus contract.",
+			() => generator.generate(options({ validatorRegistrations: [vote] })),
+			"validatorRegistrations[0] is not a registerValidator call to the consensus contract.",
 		);
 	});
 
 	it("should reject a presigned registerValidator call to another contract", async ({ app, generator }) => {
-		const [registration] = makeValidatorTransactions(app, 1);
+		const [registration] = makeValidatorRegistrations(app, 1);
 		const elsewhere = makePresignedTransaction(
 			`0x${"1".repeat(40)}`,
 			0,
@@ -489,8 +491,8 @@ describe<{
 		);
 
 		await assert.rejects(
-			() => generator.generate(options({ validatorTransactions: [registration, elsewhere] })),
-			"validatorTransactions[1] is not a registerValidator call to the consensus contract.",
+			() => generator.generate(options({ validatorRegistrations: [registration, elsewhere] })),
+			"validatorRegistrations[1] is not a registerValidator call to the consensus contract.",
 		);
 	});
 

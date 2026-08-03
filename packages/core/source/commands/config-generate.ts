@@ -23,7 +23,7 @@ type Flag = {
 type Flags = Omit<AppContracts.NetworkGenerator.Options, "peers" | "rewardAmount"> & {
 	peers: string;
 	rewardAmount: number | string;
-	secretsFile?: string;
+	validatorsFile?: string;
 };
 
 @injectable()
@@ -153,11 +153,11 @@ export class Command extends Commands.Command {
 			default: "127.0.0.1",
 		},
 
-		// Externally supplied secrets
+		// Externally supplied validators
 		{
-			name: "secretsFile",
+			name: "validatorsFile",
 			description:
-				'Path to a JSON file with externally-generated secrets: { "genesisMnemonic"?: string, "validatorMnemonics": string[] }. A validators.json-style { "secrets": [...] } is also accepted. Alternatively "validatorTransactions": string[] supplies hex-encoded presigned transactions (one registerValidator call per validator; anything else is rejected) so no validator secrets are needed at all. When provided, the validator count follows the supplied list.',
+				'Path to a JSON file supplying the genesis validators: { "genesisMnemonic"?: string, "validatorMnemonics": string[] }. A validators.json-style { "secrets": [...] } is also accepted. Alternatively "validatorRegistrations": string[] supplies hex-encoded presigned transactions (one registerValidator call per validator; anything else is rejected) so no validator secrets are needed at all. When provided, the validator count follows the supplied list.',
 			schema: Joi.string(),
 		},
 
@@ -279,25 +279,25 @@ export class Command extends Commands.Command {
 	}
 
 	#convertFlags(options: Flags, validatorsExplicit: boolean): AppContracts.NetworkGenerator.Options {
-		const secrets = this.#readSecrets(options);
+		const external = this.#readValidatorsFile(options);
 
-		// When validator secrets come from a file and no explicit --validators was given, the
+		// When the validators come from a file and no explicit --validators was given, the
 		// count follows the file. An explicit, conflicting --validators is left intact so the
 		// generator rejects the mismatch rather than silently overriding it. For presigned
-		// transactions the count is derived by the generator itself (it requires deserializing
+		// registrations the count is derived by the generator itself (it requires deserializing
 		// them), so pass undefined instead of the flag default.
 		let validators: number | undefined = options.validators;
 		if (!validatorsExplicit) {
-			if (secrets.validatorMnemonics) {
-				validators = secrets.validatorMnemonics.length;
-			} else if (secrets.validatorTransactions) {
+			if (external.validatorMnemonics) {
+				validators = external.validatorMnemonics.length;
+			} else if (external.validatorRegistrations) {
 				validators = undefined;
 			}
 		}
 
 		return {
 			...options,
-			...secrets,
+			...external,
 			// Trim each entry and drop empty ones: --peers="" means no peers, and
 			// "a, b, c" must not keep leading spaces past the first entry.
 			peers: options.peers
@@ -309,42 +309,42 @@ export class Command extends Commands.Command {
 		};
 	}
 
-	#readSecrets(options: Flags): {
+	#readValidatorsFile(options: Flags): {
 		genesisMnemonic?: string;
 		validatorMnemonics?: string[];
-		validatorTransactions?: string[];
+		validatorRegistrations?: string[];
 	} {
-		if (!options.secretsFile) {
+		if (!options.validatorsFile) {
 			return {};
 		}
 
-		const resolved = path.resolve(options.secretsFile);
+		const resolved = path.resolve(options.validatorsFile);
 		if (!existsSync(resolved)) {
-			throw new Error(`Secrets file not found: ${resolved}`);
+			throw new Error(`Validators file not found: ${resolved}`);
 		}
 
 		const contents = readJSONSync(resolved);
 		const validatorMnemonics = contents.validatorMnemonics ?? contents.secrets;
-		const validatorTransactions = contents.validatorTransactions;
+		const validatorRegistrations = contents.validatorRegistrations;
 		const genesisMnemonic = contents.genesisMnemonic ?? contents.genesis;
 
 		// Shape checks only; per-mnemonic BIP39 validation and the deserialization of
-		// presigned transactions happen in the generator.
+		// presigned registrations happen in the generator.
 		if (validatorMnemonics !== undefined && !Array.isArray(validatorMnemonics)) {
-			throw new Error(`Secrets file ${resolved}: "validatorMnemonics" must be an array of mnemonics.`);
+			throw new Error(`Validators file ${resolved}: "validatorMnemonics" must be an array of mnemonics.`);
 		}
 
-		if (validatorTransactions !== undefined && !Array.isArray(validatorTransactions)) {
+		if (validatorRegistrations !== undefined && !Array.isArray(validatorRegistrations)) {
 			throw new Error(
-				`Secrets file ${resolved}: "validatorTransactions" must be an array of hex-encoded transactions.`,
+				`Validators file ${resolved}: "validatorRegistrations" must be an array of hex-encoded transactions.`,
 			);
 		}
 
 		if (genesisMnemonic !== undefined && typeof genesisMnemonic !== "string") {
-			throw new Error(`Secrets file ${resolved}: "genesisMnemonic" must be a string.`);
+			throw new Error(`Validators file ${resolved}: "genesisMnemonic" must be a string.`);
 		}
 
-		return { genesisMnemonic, validatorMnemonics, validatorTransactions };
+		return { genesisMnemonic, validatorMnemonics, validatorRegistrations };
 	}
 
 	#getConfigurationPath(options: Flags, applicationName?: string): string {

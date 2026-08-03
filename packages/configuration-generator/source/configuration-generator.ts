@@ -99,16 +99,16 @@ export class ConfigurationGenerator {
 
 		this.#assertCustomSecrets(internalOptions);
 
-		if (internalOptions.validatorTransactions) {
+		if (internalOptions.validatorRegistrations) {
 			internalOptions.validators = await this.#deriveValidatorCount(
-				internalOptions.validatorTransactions,
+				internalOptions.validatorRegistrations,
 				options.validators,
 			);
 		}
 
 		const genesisWalletMnemonic = internalOptions.genesisMnemonic ?? this.mnemonicGenerator.generate();
 		// In presigned mode no validator secrets exist; validators.json is written empty.
-		const validatorsMnemonics = internalOptions.validatorTransactions
+		const validatorsMnemonics = internalOptions.validatorRegistrations
 			? []
 			: (internalOptions.validatorMnemonics ?? this.mnemonicGenerator.generateMany(internalOptions.validators));
 
@@ -254,7 +254,7 @@ export class ConfigurationGenerator {
 			assertMnemonic(options.genesisMnemonic, "genesisMnemonic");
 		}
 
-		this.#assertValidatorTransactions(options);
+		this.#assertValidatorRegistrations(options);
 
 		if (options.validatorMnemonics !== undefined) {
 			if (!Array.isArray(options.validatorMnemonics) || options.validatorMnemonics.length === 0) {
@@ -282,40 +282,40 @@ export class ConfigurationGenerator {
 		}
 	}
 
-	#assertValidatorTransactions(options: Contracts.NetworkGenerator.InternalOptions): void {
-		if (options.validatorTransactions === undefined) {
+	#assertValidatorRegistrations(options: Contracts.NetworkGenerator.InternalOptions): void {
+		if (options.validatorRegistrations === undefined) {
 			return;
 		}
 
 		if (options.validatorMnemonics !== undefined) {
-			throw new Error("validatorMnemonics and validatorTransactions are mutually exclusive.");
+			throw new Error("validatorMnemonics and validatorRegistrations are mutually exclusive.");
 		}
 
-		if (!Array.isArray(options.validatorTransactions) || options.validatorTransactions.length === 0) {
-			throw new Error("validatorTransactions must be a non-empty array.");
+		if (!Array.isArray(options.validatorRegistrations) || options.validatorRegistrations.length === 0) {
+			throw new Error("validatorRegistrations must be a non-empty array.");
 		}
 
-		for (const [index, transaction] of options.validatorTransactions.entries()) {
+		for (const [index, transaction] of options.validatorRegistrations.entries()) {
 			if (typeof transaction !== "string" || transaction.length === 0) {
-				throw new Error(`validatorTransactions[${index}] must be a hex-encoded serialized transaction.`);
+				throw new Error(`validatorRegistrations[${index}] must be a hex-encoded serialized transaction.`);
 			}
 		}
 
-		if (new Set(options.validatorTransactions).size !== options.validatorTransactions.length) {
-			throw new Error("validatorTransactions contains duplicate entries.");
+		if (new Set(options.validatorRegistrations).size !== options.validatorRegistrations.length) {
+			throw new Error("validatorRegistrations contains duplicate entries.");
 		}
 	}
 
-	async #deriveValidatorCount(validatorTransactions: string[], explicitValidators?: number): Promise<number> {
+	async #deriveValidatorCount(validatorRegistrations: string[], explicitValidators?: number): Promise<number> {
 		const consensusContractAddress = this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus);
 
-		for (const [index, transaction] of validatorTransactions.entries()) {
+		for (const [index, transaction] of validatorRegistrations.entries()) {
 			let data: Contracts.Crypto.TransactionSerializable;
 			try {
 				({ data } = await this.transactionDeserializer.deserialize(Buffer.from(transaction, "hex")));
 			} catch (error) {
 				throw new Error(
-					`validatorTransactions[${index}] cannot be deserialized: ${ensureError(error).message}`,
+					`validatorRegistrations[${index}] cannot be deserialized: ${ensureError(error).message}`,
 				);
 			}
 
@@ -324,16 +324,16 @@ export class ConfigurationGenerator {
 				!data.data.startsWith(FunctionSigs.ConsensusV1.RegisterValidator)
 			) {
 				throw new Error(
-					`validatorTransactions[${index}] is not a registerValidator call to the consensus contract.`,
+					`validatorRegistrations[${index}] is not a registerValidator call to the consensus contract.`,
 				);
 			}
 		}
 
-		const registrations = validatorTransactions.length;
+		const registrations = validatorRegistrations.length;
 
 		if (explicitValidators !== undefined && explicitValidators !== registrations) {
 			throw new Error(
-				`validatorTransactions registration count (${registrations}) does not match the validators count (${explicitValidators}).`,
+				`validatorRegistrations length (${registrations}) does not match the validators count (${explicitValidators}).`,
 			);
 		}
 

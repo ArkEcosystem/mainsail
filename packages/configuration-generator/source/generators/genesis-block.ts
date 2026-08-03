@@ -64,16 +64,16 @@ export class GenesisBlockGenerator {
 	): Promise<Contracts.Crypto.CommitData> {
 		const genesisWallet = await this.walletGenerator.generate(genesisMnemonic);
 
-		const presignedTransactions = options.validatorTransactions
-			? await this.#parsePresignedTransactions(options.validatorTransactions)
+		const presignedRegistrations = options.validatorRegistrations
+			? await this.#parsePresignedRegistrations(options.validatorRegistrations)
 			: undefined;
 
 		const validators = await Promise.all(
 			validatorsMnemonics.map(async (mnemonic) => await this.walletGenerator.generate(mnemonic)),
 		);
 
-		const premineRecipients = presignedTransactions
-			? [...new Set(presignedTransactions.map(({ from }) => from))]
+		const premineRecipients = presignedRegistrations
+			? [...new Set(presignedRegistrations.map(({ from }) => from))]
 			: validators.map(({ address }) => address);
 
 		await this.#prepareEvm(genesisWallet.address, premineRecipients.length, options);
@@ -111,7 +111,7 @@ export class GenesisBlockGenerator {
 			options.premine = transactions.reduce((accumulator, current) => accumulator + current.value, 0n).toString();
 		}
 
-		const validatorTransactions = presignedTransactions ?? [
+		const validatorTransactions = presignedRegistrations ?? [
 			...(await this.#buildValidatorTransactions(validators, options.chainId, "0")),
 			...(await this.#buildVoteTransactions(validators, options.chainId)),
 		];
@@ -197,7 +197,7 @@ export class GenesisBlockGenerator {
 		return result;
 	}
 
-	async #parsePresignedTransactions(serialized: string[]): Promise<Contracts.Crypto.Transaction[]> {
+	async #parsePresignedRegistrations(serialized: string[]): Promise<Contracts.Crypto.Transaction[]> {
 		const consensusContractAddress = this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus);
 
 		const transactions: Contracts.Crypto.Transaction[] = [];
@@ -207,7 +207,7 @@ export class GenesisBlockGenerator {
 			try {
 				transaction = await this.transactionFactory.fromHex(serializedTransaction);
 			} catch (error) {
-				throw new Error(`validatorTransactions[${index}] is invalid: ${ensureError(error).message}`);
+				throw new Error(`validatorRegistrations[${index}] is invalid: ${ensureError(error).message}`);
 			}
 
 			if (
@@ -215,7 +215,7 @@ export class GenesisBlockGenerator {
 				!transaction.data.startsWith(FunctionSigs.ConsensusV1.RegisterValidator)
 			) {
 				throw new Error(
-					`validatorTransactions[${index}] is not a registerValidator call to the consensus contract.`,
+					`validatorRegistrations[${index}] is not a registerValidator call to the consensus contract.`,
 				);
 			}
 

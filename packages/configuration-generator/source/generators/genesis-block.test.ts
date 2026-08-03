@@ -163,7 +163,7 @@ describe<{
 		return registration.serialized.toString("hex");
 	};
 
-	it("#generate - should build a genesis block from presigned validator transactions", async ({
+	it("#generate - should build a genesis block from presigned validator registrations", async ({
 		app,
 		generator,
 		mnemonicGenerator,
@@ -173,14 +173,14 @@ describe<{
 			mnemonicGenerator.generateMany(2).map(async (mnemonic) => await walletGenerator.generate(mnemonic)),
 		);
 
-		const validatorTransactions = await Promise.all(
+		const validatorRegistrations = await Promise.all(
 			wallets.map(async (wallet) => await presignRegistration(app, wallet)),
 		);
 
 		const data = await generator.generate(
 			mnemonicGenerator.generate(),
 			[],
-			baseOptions({ validators: 2, validatorTransactions }),
+			baseOptions({ validators: 2, validatorRegistrations }),
 		);
 
 		assert.object(data);
@@ -196,7 +196,7 @@ describe<{
 		assert.equal(data.block.transactions[1].value, BigInt(2_000_000_000 / 2));
 	});
 
-	it("#generate - should reject a presigned validator transaction that is not valid", async ({
+	it("#generate - should reject a presigned validator registration that is not valid", async ({
 		generator,
 		mnemonicGenerator,
 	}) => {
@@ -205,9 +205,9 @@ describe<{
 				generator.generate(
 					mnemonicGenerator.generate(),
 					[],
-					baseOptions({ validators: 1, validatorTransactions: ["deadbeef"] }),
+					baseOptions({ validators: 1, validatorRegistrations: ["deadbeef"] }),
 				),
-			"validatorTransactions[0] is invalid",
+			"validatorRegistrations[0] is invalid",
 		);
 	});
 
@@ -238,10 +238,10 @@ describe<{
 					[],
 					baseOptions({
 						validators: 1,
-						validatorTransactions: [vote.serialized.toString("hex")],
+						validatorRegistrations: [vote.serialized.toString("hex")],
 					}),
 				),
-			"validatorTransactions[0] is not a registerValidator call to the consensus contract.",
+			"validatorRegistrations[0] is not a registerValidator call to the consensus contract.",
 		);
 	});
 

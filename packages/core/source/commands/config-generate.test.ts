@@ -69,19 +69,19 @@ describe<{
 		assert.length(readJSONSync(join(configPath, "devnet", "validators.json")).secrets, 3);
 	});
 
-	it("should generate genesis from an external secrets file", async ({ cli, configPath }) => {
+	it("should generate genesis from an external validators file", async ({ cli, configPath }) => {
 		const validatorMnemonics = [
 			"abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
 			"legal winner thank year wave sausage worth useful legal winner thank yellow",
 			"letter advice cage absurd amount doctor acoustic avoid letter advice cage above",
 		];
 		const genesisMnemonic = "zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo zoo wrong";
-		const secretsFile = join(dirSync().name, "secrets.json");
-		writeJSONSync(secretsFile, { genesisMnemonic, validatorMnemonics });
+		const validatorsFile = join(dirSync().name, "validators.json");
+		writeJSONSync(validatorsFile, { genesisMnemonic, validatorMnemonics });
 
 		// --validators is omitted, so the count is derived from the supplied list (3).
 		await cli
-			.withFlags(generateFlags(configPath, { force: true, secretsFile, validators: undefined }))
+			.withFlags(generateFlags(configPath, { force: true, validatorsFile, validators: undefined }))
 			.execute(Command);
 
 		// validators.json holds exactly the supplied secrets, and the genesis wallet uses the supplied mnemonic.
@@ -92,9 +92,12 @@ describe<{
 		assert.equal(readJSONSync(join(configPath, "devnet", "crypto.json")).milestones[1].roundValidators, 3);
 	});
 
-	it("should reject an explicit --validators that conflicts with the secrets file", async ({ cli, configPath }) => {
-		const secretsFile = join(dirSync().name, "secrets.json");
-		writeJSONSync(secretsFile, {
+	it("should reject an explicit --validators that conflicts with the validators file", async ({
+		cli,
+		configPath,
+	}) => {
+		const validatorsFile = join(dirSync().name, "validators.json");
+		writeJSONSync(validatorsFile, {
 			validatorMnemonics: [
 				"abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
 				"legal winner thank year wave sausage worth useful legal winner thank yellow",
@@ -106,21 +109,21 @@ describe<{
 		await assert.rejects(
 			() =>
 				cli
-					.withFlags(generateFlags(configPath, { force: true, secretsFile, validators: "9" }))
+					.withFlags(generateFlags(configPath, { force: true, validatorsFile, validators: "9" }))
 					.execute(Command),
 			"validatorMnemonics length (3) does not match the validators count (9).",
 		);
 	});
 
-	it("should reject an external secrets file with an invalid mnemonic", async ({ cli, configPath }) => {
-		const secretsFile = join(dirSync().name, "bad-secrets.json");
-		writeJSONSync(secretsFile, { validatorMnemonics: ["not a valid mnemonic"] });
+	it("should reject an external validators file with an invalid mnemonic", async ({ cli, configPath }) => {
+		const validatorsFile = join(dirSync().name, "bad-validators.json");
+		writeJSONSync(validatorsFile, { validatorMnemonics: ["not a valid mnemonic"] });
 
 		// --validators omitted so the count matches (1), letting the BIP39 check be the one to fire.
 		await assert.rejects(
 			() =>
 				cli
-					.withFlags(generateFlags(configPath, { force: true, secretsFile, validators: undefined }))
+					.withFlags(generateFlags(configPath, { force: true, validatorsFile, validators: undefined }))
 					.execute(Command),
 			"validatorMnemonics[0] is not a valid BIP39 mnemonic.",
 		);
@@ -130,7 +133,7 @@ describe<{
 	// external validator tooling would — the command under test never sees the secrets. The
 	// registerValidator(bytes,bytes) calldata is hand-encoded to avoid pulling an ABI encoder
 	// into this package.
-	const makePresignedValidatorTransactions = async (validators: number): Promise<string[]> => {
+	const makePresignedValidatorRegistrations = async (validators: number): Promise<string[]> => {
 		const app = await makeApplication(dirSync().name, {});
 
 		app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setConfig(
@@ -208,14 +211,14 @@ describe<{
 	};
 
 	it("should generate genesis from presigned validator transactions", async ({ cli, configPath }) => {
-		const validatorTransactions = await makePresignedValidatorTransactions(2);
+		const validatorRegistrations = await makePresignedValidatorRegistrations(2);
 
-		const secretsFile = join(dirSync().name, "presigned.json");
-		writeJSONSync(secretsFile, { validatorTransactions });
+		const validatorsFile = join(dirSync().name, "presigned.json");
+		writeJSONSync(validatorsFile, { validatorRegistrations });
 
 		// --validators is omitted, so the count is derived from the presigned registrations (2).
 		await cli
-			.withFlags(generateFlags(configPath, { force: true, secretsFile, validators: undefined }))
+			.withFlags(generateFlags(configPath, { force: true, validatorsFile, validators: undefined }))
 			.execute(Command);
 
 		// No validator secrets exist anywhere in the generated configuration.
@@ -228,16 +231,16 @@ describe<{
 		assert.equal(crypto.genesisBlock.block.transactionsCount, 4);
 	});
 
-	it("should reject a secrets file whose validatorTransactions is not an array", async ({ cli, configPath }) => {
-		const secretsFile = join(dirSync().name, "bad-presigned.json");
-		writeJSONSync(secretsFile, { validatorTransactions: "not-an-array" });
+	it("should reject a validators file whose validatorRegistrations is not an array", async ({ cli, configPath }) => {
+		const validatorsFile = join(dirSync().name, "bad-presigned.json");
+		writeJSONSync(validatorsFile, { validatorRegistrations: "not-an-array" });
 
 		await assert.rejects(
 			() =>
 				cli
-					.withFlags(generateFlags(configPath, { force: true, secretsFile, validators: undefined }))
+					.withFlags(generateFlags(configPath, { force: true, validatorsFile, validators: undefined }))
 					.execute(Command),
-			'"validatorTransactions" must be an array of hex-encoded transactions.',
+			'"validatorRegistrations" must be an array of hex-encoded transactions.',
 		);
 	});
 
