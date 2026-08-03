@@ -73,6 +73,13 @@ export type InternalOptions = EnvironmentOptions &
 		genesisMnemonic?: string;
 		validatorMnemonics?: string[];
 
+		// Hex-encoded presigned validator transactions (one registerValidator call per
+		// validator; anything else is rejected), used instead of validator mnemonics so a
+		// genesis block can be generated without holding any validator secrets. Mutually
+		// exclusive with validatorMnemonics. The genesis wallet distributes the premine to
+		// the sender addresses recovered from these transactions.
+		validatorTransactions?: string[];
+
 		// Testing
 		createLegacyColdWallets?: boolean;
 	};

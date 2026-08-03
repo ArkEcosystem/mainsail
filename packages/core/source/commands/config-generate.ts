@@ -157,7 +157,7 @@ export class Command extends Commands.Command {
 		{
 			name: "secretsFile",
 			description:
-				'Path to a JSON file with externally-generated secrets: { "genesisMnemonic"?: string, "validatorMnemonics": string[] }. A validators.json-style { "secrets": [...] } is also accepted. When provided, the validator count follows the supplied list.',
+				'Path to a JSON file with externally-generated secrets: { "genesisMnemonic"?: string, "validatorMnemonics": string[] }. A validators.json-style { "secrets": [...] } is also accepted. Alternatively "validatorTransactions": string[] supplies hex-encoded presigned transactions (one registerValidator call per validator; anything else is rejected) so no validator secrets are needed at all. When provided, the validator count follows the supplied list.',
 			schema: Joi.string(),
 		},
 
@@ -283,9 +283,17 @@ export class Command extends Commands.Command {
 
 		// When validator secrets come from a file and no explicit --validators was given, the
 		// count follows the file. An explicit, conflicting --validators is left intact so the
-		// generator rejects the mismatch rather than silently overriding it.
-		const validators =
-			secrets.validatorMnemonics && !validatorsExplicit ? secrets.validatorMnemonics.length : options.validators;
+		// generator rejects the mismatch rather than silently overriding it. For presigned
+		// transactions the count is derived by the generator itself (it requires deserializing
+		// them), so pass undefined instead of the flag default.
+		let validators: number | undefined = options.validators;
+		if (!validatorsExplicit) {
+			if (secrets.validatorMnemonics) {
+				validators = secrets.validatorMnemonics.length;
+			} else if (secrets.validatorTransactions) {
+				validators = undefined;
+			}
+		}
 
 		return {
 			...options,
@@ -301,7 +309,11 @@ export class Command extends Commands.Command {
 		};
 	}
 
-	#readSecrets(options: Flags): { genesisMnemonic?: string; validatorMnemonics?: string[] } {
+	#readSecrets(options: Flags): {
+		genesisMnemonic?: string;
+		validatorMnemonics?: string[];
+		validatorTransactions?: string[];
+	} {
 		if (!options.secretsFile) {
 			return {};
 		}
@@ -313,18 +325,26 @@ export class Command extends Commands.Command {
 
 		const contents = readJSONSync(resolved);
 		const validatorMnemonics = contents.validatorMnemonics ?? contents.secrets;
+		const validatorTransactions = contents.validatorTransactions;
 		const genesisMnemonic = contents.genesisMnemonic ?? contents.genesis;
 
-		// Shape checks only; per-mnemonic BIP39 validation happens in the generator.
+		// Shape checks only; per-mnemonic BIP39 validation and the deserialization of
+		// presigned transactions happen in the generator.
 		if (validatorMnemonics !== undefined && !Array.isArray(validatorMnemonics)) {
 			throw new Error(`Secrets file ${resolved}: "validatorMnemonics" must be an array of mnemonics.`);
+		}
+
+		if (validatorTransactions !== undefined && !Array.isArray(validatorTransactions)) {
+			throw new Error(
+				`Secrets file ${resolved}: "validatorTransactions" must be an array of hex-encoded transactions.`,
+			);
 		}
 
 		if (genesisMnemonic !== undefined && typeof genesisMnemonic !== "string") {
 			throw new Error(`Secrets file ${resolved}: "genesisMnemonic" must be a string.`);
 		}
 
-		return { genesisMnemonic, validatorMnemonics };
+		return { genesisMnemonic, validatorMnemonics, validatorTransactions };
 	}
 
 	#getConfigurationPath(options: Flags, applicationName?: string): string {
