@@ -101,7 +101,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		const round = this.#getHighestRoundToDownload(ourHeader, peer.header);
 		if (ourHeader.round === round) {
-			const downloads = this.#getDownloadsByRound(peer.header.blockNumber, peer.header.round);
+			const downloads = this.#getDownloadsByRound(peer.header.blockNumber, round);
 
 			const job: DownloadJob = {
 				blockNumber: ourHeader.blockNumber,
@@ -145,7 +145,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		const round = this.#getHighestRoundToDownload(ourHeader, peerHeader);
 		if (ourHeader.round === round) {
-			const downloads = this.#getDownloadsByRound(peerHeader.blockNumber, peerHeader.round);
+			const downloads = this.#peekDownloadsByRound(peerHeader.blockNumber, round);
 
 			const prevoteIndexes = this.#getPrevoteIndexesToDownload(ourHeader, peerHeader, downloads.prevotes);
 			const precommitIndexes = this.#getPrecommitIndexesToDownload(ourHeader, peerHeader, downloads.precommits);
@@ -204,17 +204,23 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const roundsByBlockNumber = this.#downloadsByBlockNumber.get(blockNumber)!;
 
 		if (!roundsByBlockNumber.has(round)) {
-			roundsByBlockNumber.set(round, {
-				precommits: Array.from<boolean>({
-					length: this.cryptoConfiguration.getMilestone(blockNumber).roundValidators,
-				}).fill(false),
-				prevotes: Array.from<boolean>({
-					length: this.cryptoConfiguration.getMilestone(blockNumber).roundValidators,
-				}).fill(false),
-			});
+			roundsByBlockNumber.set(round, this.#makeDownloadsByRound(blockNumber));
 		}
 
 		return roundsByBlockNumber.get(round)!;
+	}
+
+	#peekDownloadsByRound(blockNumber: number, round: number): DownloadsByRound {
+		return this.#downloadsByBlockNumber.get(blockNumber)?.get(round) ?? this.#makeDownloadsByRound(blockNumber);
+	}
+
+	#makeDownloadsByRound(blockNumber: number): DownloadsByRound {
+		const { roundValidators } = this.cryptoConfiguration.getMilestone(blockNumber);
+
+		return {
+			precommits: Array.from<boolean>({ length: roundValidators }).fill(false),
+			prevotes: Array.from<boolean>({ length: roundValidators }).fill(false),
+		};
 	}
 
 	#checkMessage(message: Contracts.Crypto.Message, firstMessage: Contracts.Crypto.Message, job: DownloadJob): void {
