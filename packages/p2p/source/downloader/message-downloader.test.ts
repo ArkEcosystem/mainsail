@@ -194,10 +194,46 @@ describe<{
 		process.calledOnce();
 	});
 
-	it("#download - should not request the same messages from two peers on different rounds", async ({
+	it("#download - should ban the peer when a message we asked for is missing", async ({ downloader, peer }) => {
+		// Peer is on our round, so its header does describe what it holds: both prevotes were
+		// promised and only one came back.
+		stub(communicator, "getMessages").resolvedValue({ precommits: [], prevotes: [Buffer.alloc(1)] });
+		stub(factory, "makeMessageFromBytes").resolvedValue({ blockNumber: 2, round: 0, validatorIndex: 0 });
+		const banPeer = stub(peerDisposer, "banPeer");
+
+		downloader.download(peer);
+		await sleep(10);
+
+		banPeer.calledOnce();
+	});
+
+	it("#download - should not ban a peer a round ahead for messages its header never described", async ({
 		downloader,
 		peer,
 	}) => {
+		// The peer's header only describes the round it is on, so what we picked out of it says
+		// nothing about the earlier round it actually answers with. Holding it to that pick
+		// would ban a peer that returned perfectly good messages.
+		stub(cryptoConfiguration, "getMilestone").returnValue({ roundValidators: 5 });
+		peer.header.round = 1;
+		peer.header.validatorsSignedPrevote = [true, false];
+		peer.header.validatorsSignedPrecommit = [false, false];
+
+		stub(communicator, "getMessages").resolvedValue({ precommits: [], prevotes: [Buffer.alloc(1)] });
+		// It answers for round 0 with a different validator than its round 1 header advertised.
+		stub(factory, "makeMessageFromBytes").resolvedValue({ blockNumber: 2, round: 0, validatorIndex: 1 });
+		const process = stub(messageProcessor, "process").resolvedValue(Enums.Consensus.ProcessorResult.Accepted);
+		const banPeer = stub(peerDisposer, "banPeer");
+
+		downloader.download(peer);
+		await sleep(10);
+
+		banPeer.neverCalled();
+		process.calledOnce();
+		assert.false(downloader.isDownloading());
+	});
+
+	it("#download - should not request the same messages from two peers on different rounds", ({ downloader }) => {
 		// Both peers resolve to the same round to download, so the second one has nothing left
 		// to add once the first is in flight.
 		stub(cryptoConfiguration, "getMilestone").returnValue({ roundValidators: 5 });
@@ -221,7 +257,6 @@ describe<{
 		downloader.download(aRoundAhead as any);
 
 		getMessages.calledOnce();
-		void peer;
 	});
 
 	it("#download - should download a full round when the peer is ahead", async ({ downloader, peer }) => {

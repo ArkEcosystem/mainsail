@@ -261,9 +261,14 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		if (job.ourHeader.round < receivedRound) {
 			this.#checkFullRoundResponse(prevotesMap, precommitsMap, job);
-		} else {
+		} else if (job.peerHeader.round === job.round) {
 			this.#checkPartialRoundResponse(prevotesMap, precommitsMap, job);
 		}
+
+		// Anything left over is a peer whose header was not describing the round the job is
+		// for, so it never advertised what it holds here and there is nothing further to hold
+		// it to. The messages have still been checked individually and accepted by the
+		// processor.
 	}
 
 	#checkFullRoundResponse(
