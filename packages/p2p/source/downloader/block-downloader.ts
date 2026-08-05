@@ -136,7 +136,11 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 		try {
 			const bytesForProcess = [...job.blocks];
-			number = this.#skipAppliedBlocks(bytesForProcess, number);
+
+			const storedBlockNumber = this.stateStore.getBlockNumber();
+			let previousBlockHash = this.stateStore.getLastBlock().hash;
+
+			number = this.#skipAppliedBlocks(bytesForProcess, number, storedBlockNumber);
 
 			while (bytesForProcess.length > 0) {
 				const roundInfo = this.roundCalculator.calculateRound(number);
@@ -161,13 +165,15 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 				}
 
 				// Each commit's precommit signature covers the previous block hash, so verify
-				// against the actual predecessor in the chain instead of the store's last block
-				// (which is stale for every commit but the first until the batch is processed).
+				// against the actual predecessor in the chain never the store's last block,
+				// which moves whenever consensus applies a block.
 				const hasValidSignatures = await Promise.all(
-					commits.map(async (commit, index) =>
-						index === 0
-							? await this.commitProcessor.hasValidSignature(commit, this.stateStore.getLastBlock().hash)
-							: await this.commitProcessor.hasValidSignature(commit, commits[index - 1].block.hash),
+					commits.map(
+						async (commit, index) =>
+							await this.commitProcessor.hasValidSignature(
+								commit,
+								index === 0 ? previousBlockHash : commits[index - 1].block.hash,
+							),
 					),
 				);
 
@@ -182,6 +188,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 					}
 
 					number++;
+					previousBlockHash = commit.block.hash;
 				}
 			}
 
@@ -203,9 +210,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 	// Drops leading blocks that are already applied (e.g. committed by live consensus while the job was in flight)
 	// and returns the first block number left to process.
-	#skipAppliedBlocks(bytesForProcess: Buffer[], fromBlockNumber: number): number {
-		const storedBlockNumber = this.stateStore.getBlockNumber();
-
+	#skipAppliedBlocks(bytesForProcess: Buffer[], fromBlockNumber: number, storedBlockNumber: number): number {
 		if (fromBlockNumber > storedBlockNumber) {
 			return fromBlockNumber;
 		}

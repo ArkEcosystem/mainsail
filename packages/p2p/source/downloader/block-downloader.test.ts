@@ -226,6 +226,52 @@ describe<{
 		assert.false(downloader.isDownloading());
 	});
 
+	it("#download - should not ban the peer when a block is applied while the batch deserialises", async ({
+		downloader,
+	}) => {
+		const hasValidSignature = stub(commitProcessor, "hasValidSignature").callsFake(
+			async (commit: any, previousBlockHash: string) => previousBlockHash === `hash${commit.block.number - 1}`,
+		);
+		let storedBlockNumber = 0;
+		stub(stateStore, "getBlockNumber").callsFake(() => storedBlockNumber);
+		stub(stateStore, "getLastBlock").callsFake(() => ({ hash: `hash${storedBlockNumber}` }));
+		// Realistic processor: a commit that consensus already applied is skipped, not accepted.
+		const process = stub(commitProcessor, "process").callsFake(async (commit: any) =>
+			commit.block.number <= storedBlockNumber
+				? Enums.Consensus.ProcessorResult.Skipped
+				: Enums.Consensus.ProcessorResult.Accepted,
+		);
+		const banPeer = stub(peerDisposer, "banPeer");
+
+		// Consensus commits block 1 inside the very await that deserialises the batch —
+		// after the applied-blocks skip has already run.
+		stub(commitFactory, "fromBytes").callsFake(async (buffer: Buffer) => {
+			storedBlockNumber = 1;
+			return { block: { hash: `hash${buffer[0]}`, number: buffer[0] } };
+		});
+
+		let resolveBlocks: any;
+		stub(communicator, "getBlocks").returnValue(new Promise((resolve) => (resolveBlocks = resolve)));
+
+		// Job for blocks 1-3 while our stored block is 0.
+		downloader.download(makePeer(4));
+
+		resolveBlocks({ blocks: [makeBlock(1), makeBlock(2), makeBlock(3)] });
+		await sleep(10);
+
+		// Every commit is verified against its true predecessor: block 1 against the hash
+		// captured before the deserialise, later ones against the previous commit.
+		banPeer.neverCalled();
+		hasValidSignature.calledTimes(3);
+		assert.equal(
+			[0, 1, 2].map((n) => hasValidSignature.getCallArgs(n)[1]),
+			["hash0", "hash1", "hash2"],
+		);
+		// Block 1 is skipped by the processor (already applied), 2 and 3 are accepted.
+		process.calledTimes(3);
+		assert.false(downloader.isDownloading());
+	});
+
 	it("#download - should not ban when the short reply was near the payload limit", async ({ downloader }) => {
 		// 3 MiB of block data: adding another maxPayload (2 MiB) block could exceed the 5 MiB
 		// response limit, so the short reply is legitimate.
