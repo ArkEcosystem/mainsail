@@ -146,6 +146,86 @@ describe<{
 		assert.false(downloader.isDownloading());
 	});
 
+	it("#download - should skip already applied blocks instead of banning the peer", async ({ downloader }) => {
+		// Realistic signature check: a commit's proof signs over its predecessor's hash.
+		const hasValidSignature = stub(commitProcessor, "hasValidSignature").callsFake(
+			async (commit: any, previousBlockHash: string) => previousBlockHash === `hash${commit.block.number - 1}`,
+		);
+		const process = stub(commitProcessor, "process").resolvedValue(Enums.Consensus.ProcessorResult.Accepted);
+		const banPeer = stub(peerDisposer, "banPeer");
+
+		let resolveBlocks: any;
+		stub(communicator, "getBlocks").returnValue(new Promise((resolve) => (resolveBlocks = resolve)));
+
+		// Job for blocks 1-3 while our stored block is 0.
+		downloader.download(makePeer(4));
+
+		// Consensus commits blocks 1 and 2 via live gossip while the download is in flight.
+		stub(stateStore, "getBlockNumber").returnValue(2);
+		stub(stateStore, "getLastBlock").returnValue({ hash: "hash2" });
+
+		resolveBlocks({ blocks: [makeBlock(1), makeBlock(2), makeBlock(3)] });
+		await sleep(10);
+
+		// Only block 3 is verified (against the store's block 2) and processed; no ban.
+		banPeer.neverCalled();
+		hasValidSignature.calledOnce();
+		process.calledOnce();
+		assert.false(downloader.isDownloading());
+	});
+
+	it("#download - should skip exactly the applied block when the store advanced by one", async ({ downloader }) => {
+		const hasValidSignature = stub(commitProcessor, "hasValidSignature").callsFake(
+			async (commit: any, previousBlockHash: string) => previousBlockHash === `hash${commit.block.number - 1}`,
+		);
+		const process = stub(commitProcessor, "process").resolvedValue(Enums.Consensus.ProcessorResult.Accepted);
+		const banPeer = stub(peerDisposer, "banPeer");
+
+		let resolveBlocks: any;
+		stub(communicator, "getBlocks").returnValue(new Promise((resolve) => (resolveBlocks = resolve)));
+
+		// Job for blocks 1-2 while our stored block is 0.
+		downloader.download(makePeer(3));
+
+		// The boundary case: exactly the first block of the job gets applied meanwhile.
+		stub(stateStore, "getBlockNumber").returnValue(1);
+		stub(stateStore, "getLastBlock").returnValue({ hash: "hash1" });
+
+		resolveBlocks({ blocks: [makeBlock(1), makeBlock(2)] });
+		await sleep(10);
+
+		// Block 1 is dropped, block 2 is verified against block 1 and processed; no ban.
+		banPeer.neverCalled();
+		hasValidSignature.calledOnce();
+		process.calledOnce();
+		assert.false(downloader.isDownloading());
+	});
+
+	it("#download - should complete a job whose blocks were all applied meanwhile", async ({ downloader }) => {
+		const hasValidSignature = stub(commitProcessor, "hasValidSignature").callsFake(
+			async (commit: any, previousBlockHash: string) => previousBlockHash === `hash${commit.block.number - 1}`,
+		);
+		const process = stub(commitProcessor, "process");
+		const banPeer = stub(peerDisposer, "banPeer");
+
+		let resolveBlocks: any;
+		stub(communicator, "getBlocks").returnValue(new Promise((resolve) => (resolveBlocks = resolve)));
+
+		// Job for blocks 1-2 while our stored block is 0.
+		downloader.download(makePeer(3));
+
+		stub(stateStore, "getBlockNumber").returnValue(2);
+		stub(stateStore, "getLastBlock").returnValue({ hash: "hash2" });
+
+		resolveBlocks({ blocks: [makeBlock(1), makeBlock(2)] });
+		await sleep(10);
+
+		banPeer.neverCalled();
+		hasValidSignature.neverCalled();
+		process.neverCalled();
+		assert.false(downloader.isDownloading());
+	});
+
 	it("#download - should not ban when the short reply was near the payload limit", async ({ downloader }) => {
 		// 3 MiB of block data: adding another maxPayload (2 MiB) block could exceed the 5 MiB
 		// response limit, so the short reply is legitimate.
