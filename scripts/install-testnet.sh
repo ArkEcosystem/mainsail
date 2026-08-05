@@ -126,7 +126,7 @@ heading "Installing pnpm..."
     export PNPM_HOME=~/.pnpm
     export PATH=$PATH:$PNPM_HOME/bin
     pnpm config set --global enable-global-virtual-store false
-    info "Global Virtual Store: disabled"
+    info "(pnpm) Global Virtual Store: disabled"
 
 success "Installed pnpm!"
 
