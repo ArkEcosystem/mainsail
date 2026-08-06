@@ -65,7 +65,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 		const downloadJob: DownloadJob = {
 			blockNumberFrom: this.#getLastRequestedBlockNumber() + 1,
-			blockNumberTo: this.#calculateBlockNumberTo(peer),
+			blockNumberTo: this.#calculateBlockNumberTo(peer, this.#getLastRequestedBlockNumber()),
 			blocks: [],
 			peer,
 			status: JobStatus.Downloading,
@@ -257,11 +257,14 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		}
 
 		const isFirstJob = index === 0;
+		const isSoleJob = this.#downloadJobs.length === 1;
 		const blockNumberFrom = isFirstJob ? this.stateStore.getBlockNumber() + 1 : job.blockNumberFrom;
 
-		const peers = this.repository
-			.getPeers()
-			.filter((peer) => peer.header.blockNumber > Math.max(blockNumberFrom, job.blockNumberTo));
+		// A sole job may shrink to whatever the new peer can serve; a job with successors must
+		// keep its exact range so the requested ranges stay contiguous.
+		const requiredBlockNumber = isSoleJob ? blockNumberFrom : Math.max(blockNumberFrom, job.blockNumberTo);
+
+		const peers = this.repository.getPeers().filter((peer) => peer.header.blockNumber > requiredBlockNumber);
 
 		if (peers.length === 0) {
 			// Remove higher jobs, because peer is no longer available
@@ -271,7 +274,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 		const peer = getRandomPeer(peers);
 
-		const blockNumberTo = this.#downloadJobs.length === 1 ? this.#calculateBlockNumberTo(peer) : job.blockNumberTo;
+		const blockNumberTo = isSoleJob ? this.#calculateBlockNumberTo(peer, blockNumberFrom - 1) : job.blockNumberTo;
 
 		// Skip if blockNumberFrom is higher than blockNumberTo
 		if (isFirstJob && blockNumberFrom > blockNumberTo) {
@@ -292,10 +295,10 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		void this.#downloadBlocksFromPeer(newJob);
 	}
 
-	#calculateBlockNumberTo(peer: Contracts.P2P.Peer): number {
+	#calculateBlockNumberTo(peer: Contracts.P2P.Peer, lastRequestedBlockNumber: number): number {
 		// Check that we don't exceed maxDownloadBlocks
-		return peer.header.blockNumber - this.#getLastRequestedBlockNumber() > constants.MAX_DOWNLOAD_BLOCKS
-			? this.#getLastRequestedBlockNumber() + constants.MAX_DOWNLOAD_BLOCKS
+		return peer.header.blockNumber - lastRequestedBlockNumber > constants.MAX_DOWNLOAD_BLOCKS
+			? lastRequestedBlockNumber + constants.MAX_DOWNLOAD_BLOCKS
 			: peer.header.blockNumber - 1; // Stored block number is always 1 less than the consensus block number
 	}
 }
