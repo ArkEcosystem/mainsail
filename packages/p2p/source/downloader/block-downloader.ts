@@ -15,7 +15,6 @@ enum JobStatus {
 
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;
-	peerBlockNumber: number;
 	blockNumberFrom: number;
 	blockNumberTo: number;
 	blocks: Buffer[];
@@ -80,7 +79,6 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			blockNumberTo: this.#calculateBlockNumberTo(peer),
 			blocks: [],
 			peer,
-			peerBlockNumber: peer.header.blockNumber - 1,
 			status: JobStatus.Downloading,
 		};
 
@@ -297,7 +295,6 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			blockNumberTo,
 			blocks: [],
 			peer,
-			peerBlockNumber: peer.header.blockNumber - 1,
 			status: JobStatus.Downloading,
 		};
 
