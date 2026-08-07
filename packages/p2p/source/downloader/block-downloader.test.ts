@@ -272,6 +272,65 @@ describe<{
 		assert.false(downloader.isDownloading());
 	});
 
+	it("#download - should cap the replay of the only queued job at the maximum batch size", async ({ downloader }) => {
+		const rejecters: any[] = [];
+		const getBlocks = stub(communicator, "getBlocks").callsFake(
+			() => new Promise((_, reject) => rejecters.push(reject)),
+		);
+		const replayPeer = makePeer(100_000, "2.2.2.2");
+		stub(repository, "getPeers").returnValue([replayPeer]);
+
+		// Job for blocks 1-400 (a full batch) fails; the replacement range must be measured
+		// from the job's start, not from the end of the failed job (which allowed 800).
+		downloader.download(makePeer(500));
+		rejecters[0](new Error("boom"));
+		await sleep(10);
+
+		getBlocks.calledTimes(2);
+		getBlocks.calledWith(replayPeer, { fromBlockNumber: 1, limit: 400 });
+	});
+
+	it("#download - should accept a replay peer that can serve the shrunken range", async ({ downloader }) => {
+		const rejecters: any[] = [];
+		const getBlocks = stub(communicator, "getBlocks").callsFake(
+			() => new Promise((_, reject) => rejecters.push(reject)),
+		);
+
+		// Job for blocks 1-400 fails after blocks up to 390 were applied meanwhile; a peer
+		// holding blocks up to 394 (short of the original range's end) can serve the rest.
+		downloader.download(makePeer(500));
+		stub(stateStore, "getBlockNumber").returnValue(390);
+		const replayPeer = makePeer(395, "3.3.3.3");
+		stub(repository, "getPeers").returnValue([replayPeer]);
+
+		rejecters[0](new Error("boom"));
+		await sleep(10);
+
+		getBlocks.calledTimes(2);
+		getBlocks.calledWith(replayPeer, { fromBlockNumber: 391, limit: 4 });
+		assert.true(downloader.isDownloading());
+	});
+
+	it("#download - should keep the exact range when replaying a job with successors", async ({ downloader }) => {
+		const rejecters: any[] = [];
+		const getBlocks = stub(communicator, "getBlocks").callsFake(
+			() => new Promise((_, reject) => rejecters.push(reject)),
+		);
+		const replayPeer = makePeer(100_000, "2.2.2.2");
+		stub(repository, "getPeers").returnValue([replayPeer]);
+
+		// Jobs for blocks 1-400 and 401-800; the second fails and must be replayed unchanged
+		// so the requested ranges stay contiguous.
+		downloader.download(makePeer(500));
+		downloader.download(makePeer(900));
+		rejecters[1](new Error("boom"));
+		await sleep(10);
+
+		getBlocks.calledTimes(3);
+		getBlocks.calledWith(replayPeer, { fromBlockNumber: 401, limit: 400 });
+		assert.true(downloader.isDownloading());
+	});
+
 	it("#download - should not ban when the short reply was near the payload limit", async ({ downloader }) => {
 		// 3 MiB of block data: adding another maxPayload (2 MiB) block could exceed the 5 MiB
 		// response limit, so the short reply is legitimate.
