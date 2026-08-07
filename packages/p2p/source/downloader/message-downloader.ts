@@ -303,8 +303,12 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			const result = await this.communicator.getMessages(job.peer, {
 				blockNumber: job.blockNumber,
 				round: job.round,
-				validatorsSignedPrecommit: job.isFullDownload ? nothingSigned : job.ourHeader.validatorsSignedPrecommit,
-				validatorsSignedPrevote: job.isFullDownload ? nothingSigned : job.ourHeader.validatorsSignedPrevote,
+				validatorsSignedPrecommit: job.isFullDownload
+					? nothingSigned
+					: [...job.ourHeader.validatorsSignedPrecommit],
+				validatorsSignedPrevote: job.isFullDownload
+					? nothingSigned
+					: [...job.ourHeader.validatorsSignedPrevote],
 			});
 
 			const prevotes: Map<number, Contracts.Crypto.Message> = new Map();

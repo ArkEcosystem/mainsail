@@ -30,8 +30,6 @@ describe<{
 		// prevotes and precommits (indexes 0 and 1) that we are missing.
 		context.ourHeader = {
 			blockNumber: 2,
-			getValidatorsSignedPrecommitCount: () => 0,
-			getValidatorsSignedPrevoteCount: () => 0,
 			round: 0,
 			validatorsSignedPrecommit: [false, false],
 			validatorsSignedPrevote: [false, false],
@@ -77,6 +75,27 @@ describe<{
 		const getMessages = stub(communicator, "getMessages").returnValue(new Promise(() => {}));
 
 		downloader.download(peer);
+
+		getMessages.calledWith(peer, {
+			blockNumber: 2,
+			round: 0,
+			validatorsSignedPrecommit: [false, false],
+			validatorsSignedPrevote: [false, false],
+		});
+	});
+
+	it("#download - should keep the queried bitmaps as they were when the job was created", ({
+		downloader,
+		peer,
+		ourHeader,
+	}) => {
+		const getMessages = stub(communicator, "getMessages").returnValue(new Promise(() => {}));
+
+		downloader.download(peer);
+
+		// A message arrives while the request is in flight; the live header flips, but the
+		// query was pinned at job creation and must not change under the request.
+		ourHeader.validatorsSignedPrevote[0] = true;
 
 		getMessages.calledWith(peer, {
 			blockNumber: 2,
