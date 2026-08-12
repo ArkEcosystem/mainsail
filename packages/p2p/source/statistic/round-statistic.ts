@@ -192,7 +192,11 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	}
 
 	peerRemoved(ip: string): void {
-		if (!this.#peersBanned.has(ip) && this.#peersRemoved.size < MAX_TRACKED_PEERS) {
+		if (
+			!this.#peersBanned.has(ip) &&
+			this.#peersBanned.size < MAX_TRACKED_PEERS &&
+			this.#peersRemoved.size < MAX_TRACKED_PEERS
+		) {
 			this.#peersRemoved.add(ip);
 		}
 	}

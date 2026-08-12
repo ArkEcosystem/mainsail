@@ -1,4 +1,3 @@
-import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 
@@ -155,5 +154,18 @@ describe<{
 
 		assert.equal(peers.removed, []);
 		assert.equal(peers.banned, ["1.2.3.4"]);
+	});
+
+	it("should not report a banned peer as removed once the banned set is saturated", ({ statistic }) => {
+		for (let index = 0; index < MAX_TRACKED_PEERS; index++) {
+			statistic.peerBanned(`10.0.${Math.floor(index / 256)}.${index % 256}`);
+		}
+
+		statistic.peerBanned("1.2.3.4");
+		statistic.peerRemoved("1.2.3.4");
+
+		const { peers } = statistic.getGeneralStatistic();
+
+		assert.equal(peers.removed, []);
 	});
 });
