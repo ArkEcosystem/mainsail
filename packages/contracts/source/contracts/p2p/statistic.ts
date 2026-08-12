@@ -51,6 +51,7 @@ export type GeneralStatistic = {
 		emitsFailed: number;
 		pingsSuccess: number;
 		pingsFailed: number;
+		recordsDropped: number;
 	};
 	response: {
 		average: number;
