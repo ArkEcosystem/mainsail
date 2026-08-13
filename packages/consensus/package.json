@@ -23,6 +23,7 @@
 		"@mainsail/blockchain-utils": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
+		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"dayjs": "1.11.20"
