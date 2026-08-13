@@ -167,16 +167,14 @@ const setupNode = async (app: Application, dataDirectory: string, configDirector
 		await loadPlugin(app, packageId, options);
 	}
 
-	// The durable double-sign guard fsyncs every signature, which is too slow for the block times
-	// these scenarios expect when all validators sign on a single node.
-	app.rebind(Identifiers.Validator.DoubleSignGuard).toConstantValue({ guard: async () => { } });
+	app.rebind(Identifiers.Validator.DoubleSignGuard).toConstantValue({ guard: async () => {} });
 
 	for (const packageId of packages) {
 		await bootPlugin(app, packageId);
 	}
 
 	await bootstrap(app);
-}
+};
 
 const loadPlugin = async (app: Application, packageId: string, options: PluginOptions) => {
 	const serviceProviderRepository = app.get<Providers.ServiceProviderRepository>(
