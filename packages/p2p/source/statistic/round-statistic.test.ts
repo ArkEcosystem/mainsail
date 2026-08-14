@@ -70,14 +70,14 @@ describe<{
 		}
 
 		assert.equal(statistic.getPeerStatistics().length, MAX_TRACKED_PEERS);
-		assert.equal(statistic.getGeneralStatistic().count.recordsDropped, 500);
+		assert.equal(statistic.getGeneralStatistic().count.recordsUnattributed, 500);
 	});
 
-	it("should not report dropped records while under the caps", ({ statistic }) => {
+	it("should not report unattributed records while under the caps", ({ statistic }) => {
 		statistic.addPing("1.2.3.4", "getStatus", ping(10));
 		statistic.addEmit("1.2.3.4", "getBlocks", emit(10));
 
-		assert.equal(statistic.getGeneralStatistic().count.recordsDropped, 0);
+		assert.equal(statistic.getGeneralStatistic().count.recordsUnattributed, 0);
 	});
 
 	it("should retain a bounded number of samples per peer endpoint", ({ statistic }) => {

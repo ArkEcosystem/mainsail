@@ -7,7 +7,7 @@ import { performance } from "perf_hooks";
 /* Each key holds running totals plus a fixed number of samples, so it costs the same whether it saw
  * one request or a million, and the number of ip keys is capped. The counts reported by
  * getGeneralStatistic stay exact regardless: a request from a peer past the cap still lands in the
- * round totals, and is counted in `recordsDropped` so the cap is visible. The added, removed and
+ * round totals, and is counted in `recordsUnattributed` so the cap is visible. The added, removed and
  * banned lists are capped the same way, and what they leave out is counted in `peersDropped`.
  */
 const MIN_MAX_SLICE = 3; // fastest / slowest response times reported per key
@@ -111,7 +111,7 @@ class PeerAccumulator {
 }
 
 class SectionAccumulator {
-	public dropped = 0;
+	public unattributed = 0;
 
 	public readonly byEndpoint = new Map<string, EndpointAccumulator>();
 	public readonly byPeer = new Map<string, PeerAccumulator>();
@@ -131,7 +131,7 @@ class SectionAccumulator {
 		let peerAccumulator = this.byPeer.get(ip);
 		if (peerAccumulator === undefined) {
 			if (this.byPeer.size >= MAX_TRACKED_PEERS) {
-				this.dropped++;
+				this.unattributed++;
 				return;
 			}
 
@@ -228,7 +228,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 			peersTotal: this.#totalPeers,
 			pingsFailed: this.#pings.totals.count - this.#pings.totals.success,
 			pingsSuccess: this.#pings.totals.success,
-			recordsDropped: this.#emits.dropped + this.#pings.dropped,
+			recordsUnattributed: this.#emits.unattributed + this.#pings.unattributed,
 		};
 
 		const response = {
