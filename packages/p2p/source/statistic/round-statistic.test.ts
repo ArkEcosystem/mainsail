@@ -146,6 +146,24 @@ describe<{
 		assert.equal(peers.banned.length, MAX_TRACKED_PEERS);
 	});
 
+	it("should report the peers left out once the lists are full", ({ statistic }) => {
+		for (let index = 0; index < MAX_TRACKED_PEERS + 100; index++) {
+			statistic.peerAdded(`10.0.${Math.floor(index / 256)}.${index % 256}`);
+		}
+
+		const { count, peers } = statistic.getGeneralStatistic();
+
+		assert.equal(peers.added.length, MAX_TRACKED_PEERS);
+		assert.equal(count.peersDropped, 100);
+	});
+
+	it("should not report dropped peers while under the cap", ({ statistic }) => {
+		statistic.peerAdded("1.2.3.4");
+		statistic.peerBanned("5.6.7.8");
+
+		assert.equal(statistic.getGeneralStatistic().count.peersDropped, 0);
+	});
+
 	it("should not report a banned peer as removed", ({ statistic }) => {
 		statistic.peerRemoved("1.2.3.4");
 		statistic.peerBanned("1.2.3.4");

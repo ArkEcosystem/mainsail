@@ -60,6 +60,10 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 			log += ` dropped=${generalStatistic.count.recordsDropped}`;
 		}
 
+		if (generalStatistic.count.peersDropped > 0) {
+			log += ` peersDropped=${generalStatistic.count.peersDropped}`;
+		}
+
 		this.logger.info(log, "p2p");
 	}
 
