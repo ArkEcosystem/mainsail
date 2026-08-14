@@ -1,18 +1,17 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { performance } from "perf_hooks";
 
 /* Each key holds running totals plus a fixed number of samples, so it costs the same whether it saw
- * one request or a million, and the number of ip keys is capped. The counts reported by
+ * one request or a million, and the number of ip keys is capped by `statistic.maxTrackedPeers`. The counts reported by
  * getGeneralStatistic stay exact regardless: a request from a peer past the cap still lands in the
  * round totals, and is counted in `recordsUnattributed` so the cap is visible. The added, removed and
  * banned lists are capped the same way, and what they leave out is counted in `peersDropped`.
  */
 const MIN_MAX_SLICE = 3; // fastest / slowest response times reported per key
 const MAX_ENDPOINT_SAMPLES = 32; // most recent response times kept per peer and endpoint
-const MAX_TRACKED_PEERS = 250; // ip keys per round
 
 const keepSlice = (slice: number[], responseTime: number, compare: (a: number, b: number) => number): void => {
 	slice.push(responseTime);
@@ -58,10 +57,12 @@ class EndpointAccumulator {
 
 	readonly #peers = new Set<string>();
 
+	public constructor(private readonly maxTrackedPeers: number) {}
+
 	public add(ip: string, responseTime: number, success: boolean): void {
 		this.responses.add(responseTime, success);
 
-		if (this.#peers.size < MAX_TRACKED_PEERS) {
+		if (this.#peers.size < this.maxTrackedPeers) {
 			this.#peers.add(ip);
 		}
 	}
@@ -117,12 +118,14 @@ class SectionAccumulator {
 	public readonly byPeer = new Map<string, PeerAccumulator>();
 	public readonly totals = new ResponseAccumulator();
 
+	public constructor(private readonly maxTrackedPeers: number) {}
+
 	public record(ip: string, endpoint: string, responseTime: number, success: boolean): void {
 		this.totals.add(responseTime, success);
 
 		let endpointAccumulator = this.byEndpoint.get(endpoint);
 		if (endpointAccumulator === undefined) {
-			endpointAccumulator = new EndpointAccumulator();
+			endpointAccumulator = new EndpointAccumulator(this.maxTrackedPeers);
 			this.byEndpoint.set(endpoint, endpointAccumulator);
 		}
 
@@ -130,7 +133,7 @@ class SectionAccumulator {
 
 		let peerAccumulator = this.byPeer.get(ip);
 		if (peerAccumulator === undefined) {
-			if (this.byPeer.size >= MAX_TRACKED_PEERS) {
+			if (this.byPeer.size >= this.maxTrackedPeers) {
 				this.unattributed++;
 				return;
 			}
@@ -148,6 +151,10 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "p2p")
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
+
 	public height: number = 0;
 	public round: number = 0;
 
@@ -155,14 +162,23 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	#endTime!: number;
 	#totalPeers!: number;
 	#totalPeersBanned = 0;
+	#maxTrackedPeers!: number;
 
-	readonly #emits = new SectionAccumulator();
-	readonly #pings = new SectionAccumulator();
+	#emits!: SectionAccumulator;
+	#pings!: SectionAccumulator;
 
 	#peersAdded = new Set<string>();
 	#peersRemoved = new Set<string>();
 	#peersBanned = new Set<string>();
 	#peersDropped = 0;
+
+	@postConstruct()
+	public init(): void {
+		this.#maxTrackedPeers = this.configuration.getRequired<number>("statistic.maxTrackedPeers");
+
+		this.#emits = new SectionAccumulator(this.#maxTrackedPeers);
+		this.#pings = new SectionAccumulator(this.#maxTrackedPeers);
+	}
 
 	public start(): void {
 		this.#startTime = performance.now();
@@ -194,7 +210,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	peerRemoved(ip: string): void {
 		// A saturated banned list can no longer tell a removal from a ban, so it is left out
 		// entirely; the ban that caused it already counts in `peersDropped`.
-		if (this.#peersBanned.has(ip) || this.#peersBanned.size >= MAX_TRACKED_PEERS) {
+		if (this.#peersBanned.has(ip) || this.#peersBanned.size >= this.#maxTrackedPeers) {
 			return;
 		}
 
@@ -208,7 +224,7 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	}
 
 	#trackPeer(peers: Set<string>, ip: string): void {
-		if (peers.size >= MAX_TRACKED_PEERS) {
+		if (peers.size >= this.#maxTrackedPeers) {
 			this.#peersDropped++;
 			return;
 		}

@@ -1,13 +1,14 @@
-import { Application } from "@mainsail/kernel";
+import { Identifiers } from "@mainsail/constants";
+import { Application, Providers } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 
+import { defaults } from "../defaults";
 import { RoundStatistic } from "./round-statistic";
 
-const MAX_TRACKED_PEERS = 250;
+const MAX_TRACKED_PEERS = defaults.statistic.maxTrackedPeers;
 const MAX_ENDPOINT_SAMPLES = 32;
 
 describe<{
-	app: Application;
 	statistic: RoundStatistic;
 }>("RoundStatistic", ({ it, assert, beforeEach }) => {
 	const ping = (responseTime: number, success = true) => ({ responseTime, success });
@@ -18,9 +19,17 @@ describe<{
 		throttleTime: 0,
 	});
 
+	const resolveStatistic = (configuration = defaults) => {
+		const app = new Application();
+		app.bind(Identifiers.ServiceProvider.Configuration)
+			.toConstantValue(new Providers.PluginConfiguration().from("", configuration))
+			.whenTagged("plugin", "p2p");
+
+		return app.resolve(RoundStatistic);
+	};
+
 	beforeEach((context) => {
-		context.app = new Application();
-		context.statistic = context.app.resolve(RoundStatistic);
+		context.statistic = resolveStatistic();
 	});
 
 	it("should report the fastest and slowest response times and the average", ({ statistic }) => {
@@ -162,6 +171,24 @@ describe<{
 		statistic.peerBanned("5.6.7.8");
 
 		assert.equal(statistic.getGeneralStatistic().count.peersDropped, 0);
+	});
+
+	it("should track the number of peers configured by statistic.maxTrackedPeers", () => {
+		const statistic = resolveStatistic({ ...defaults, statistic: { ...defaults.statistic, maxTrackedPeers: 2 } });
+
+		for (const ip of ["1.1.1.1", "2.2.2.2", "3.3.3.3"]) {
+			statistic.addPing(ip, "getStatus", ping(10));
+			statistic.peerAdded(ip);
+		}
+
+		const { count, peers } = statistic.getGeneralStatistic();
+
+		// The totals stay exact; only the per-peer views follow the cap.
+		assert.equal(statistic.getPingStatistics()[0].count.emits, 3);
+		assert.equal(statistic.getPeerStatistics().length, 2);
+		assert.equal(peers.added.length, 2);
+		assert.equal(count.recordsUnattributed, 1);
+		assert.equal(count.peersDropped, 1);
 	});
 
 	it("should not report a banned peer as removed", ({ statistic }) => {
