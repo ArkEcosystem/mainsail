@@ -10,8 +10,8 @@ import { DoubleSignGuard } from "./double-sign-guard";
 
 const { Propose, Prevote, Precommit } = Enums.Consensus.Step;
 
-const KEY = "97a8...bls";
-const OTHER_KEY = "b12c...bls";
+const KEY = "97f1d3a73197d7942695638c4fa9ac0fc3688c4f9774b905a14e3a3f171bac586c55e83ff97a1aeffb3af00adb22c6bb";
+const OTHER_KEY = "a7e75af9dd4d868a41ad2f5a5b021d653e31084261724fb40ae2f1b1c31c778d3b9464502d599cf6720723ec5c68b59d";
 const A = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const B = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
 
