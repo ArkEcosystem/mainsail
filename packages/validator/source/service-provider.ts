@@ -6,6 +6,7 @@ import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 
+import { DoubleSignGuard } from "./double-sign-guard.js";
 import { BIP38, BIP39 } from "./keys/index.js";
 import { ValidatorRepository } from "./validator-repository.js";
 import { Validator } from "./validator.js";
@@ -13,6 +14,7 @@ import { Validator } from "./validator.js";
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
+		this.app.bind(Identifiers.Validator.DoubleSignGuard).to(DoubleSignGuard).inSingletonScope();
 		this.app.bind(Identifiers.Validator.Repository).to(ValidatorRepository).inSingletonScope();
 	}
 

@@ -114,6 +114,8 @@ const setup = async (): Promise<Contracts.Kernel.Application> => {
 		await loadPlugin(app, packageId, options);
 	}
 
+	app.rebind(Identifiers.Validator.DoubleSignGuard).toConstantValue({ guard: async () => {} });
+
 	for (const packageId of packages) {
 		await bootPlugin(app, packageId);
 	}

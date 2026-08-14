@@ -100,4 +100,6 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue({
 		getValidatorIndexByWalletPublicKey: () => 0,
 	});
+
+	context.app.bind(Identifiers.Validator.DoubleSignGuard).toConstantValue({ guard: () => {} });
 };

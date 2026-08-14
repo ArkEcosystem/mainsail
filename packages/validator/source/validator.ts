@@ -17,6 +17,9 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.State.Store)
 	private readonly stateStore!: Contracts.State.Store;
 
+	@inject(Identifiers.Validator.DoubleSignGuard)
+	private readonly doubleSignGuard!: Contracts.Validator.DoubleSignGuard;
+
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
 	public configure(keyPair: Contracts.Validator.ValidatorKeyPair): Contracts.Validator.Validator {
@@ -36,6 +39,13 @@ export class Validator implements Contracts.Validator.Validator {
 		block: Contracts.Crypto.Block,
 		lockProof?: Contracts.Crypto.AggregatedSignature,
 	): Promise<Contracts.Crypto.Proposal> {
+		await this.doubleSignGuard.guard(this.#keyPair.publicKey, {
+			blockNumber: block.number,
+			round,
+			step: Enums.Consensus.Step.Propose,
+			value: block.hash,
+		});
+
 		const serializedProposedData = await this.proposalSerializer.serializePayload({ block, lockProof });
 		return this.proposalFactory.makeProposal(
 			{
@@ -54,6 +64,13 @@ export class Validator implements Contracts.Validator.Validator {
 		round: number,
 		blockHash: string | undefined,
 	): Promise<Contracts.Crypto.Message> {
+		await this.doubleSignGuard.guard(this.#keyPair.publicKey, {
+			blockNumber,
+			round,
+			step: Enums.Consensus.Step.Prevote,
+			value: blockHash,
+		});
+
 		return this.messageFactory.makeMessage(
 			{
 				blockHash,
@@ -73,6 +90,13 @@ export class Validator implements Contracts.Validator.Validator {
 		round: number,
 		blockHash: string | undefined,
 	): Promise<Contracts.Crypto.Message> {
+		await this.doubleSignGuard.guard(this.#keyPair.publicKey, {
+			blockNumber,
+			round,
+			step: Enums.Consensus.Step.Precommit,
+			value: blockHash,
+		});
+
 		return this.messageFactory.makeMessage(
 			{
 				blockHash,

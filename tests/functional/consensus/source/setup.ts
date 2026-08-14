@@ -14,41 +14,43 @@ import { Worker } from "./worker.js";
 
 type PluginOptions = Record<string, any>;
 
-const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validators: ValidatorsJson): Promise<Contracts.Kernel.Application> => {
+const setup = async (
+	id: number,
+	p2pRegistry: P2PRegistry,
+	crypto: any,
+	validators: ValidatorsJson,
+): Promise<Contracts.Kernel.Application> => {
 	const app = new Application();
 
 	// Basic binds and mocks
 	app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
 	app.bind(Identifiers.Config.Flags).toConstantValue({});
 	app.bind(Identifiers.Config.Plugins).toConstantValue({});
-	app
-		.bind(Identifiers.Services.EventDispatcher.Service)
-		.to(Services.Events.MemoryEventDispatcher)
-		.inSingletonScope();
+	app.bind(Identifiers.Services.EventDispatcher.Service).to(Services.Events.MemoryEventDispatcher).inSingletonScope();
 
 	p2pRegistry.registerNode(id, app);
 	app.bind(Identifiers.P2P.Broadcaster).toConstantValue(p2pRegistry.makeBroadcaster(id));
-	app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => { } });
+	app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => {} });
 
 	app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
 		getMessages: async () => [],
 		getProposals: async () => [],
-		getState: async () => { },
-		persist: async () => { },
+		getState: async () => {},
+		persist: async () => {},
 	});
 
 	app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
 		getTransactions: async () => ({ remaining: 0, transactions: [] }),
-		onCommit: async () => { },
+		onCommit: async () => {},
 	});
 	app.bind(Identifiers.Evm.Worker).toConstantValue({
-		onCommit: async () => { },
+		onCommit: async () => {},
 	});
 
 	app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
-	app
-		.bind(Identifiers.CryptoWorker.WorkerPool)
-		.toConstantValue({ getWorker: () => app.get<Worker>(Identifiers.CryptoWorker.Worker.Instance) });
+	app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue({
+		getWorker: () => app.get<Worker>(Identifiers.CryptoWorker.Worker.Instance),
+	});
 
 	// Bootstrap
 	await app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
@@ -69,9 +71,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	configRepository.set("crypto", crypto);
 
 	// Set logger
-	const logManager: Services.Log.LogManager = app.get<Services.Log.LogManager>(
-		Identifiers.Services.Log.Manager,
-	);
+	const logManager: Services.Log.LogManager = app.get<Services.Log.LogManager>(Identifiers.Services.Log.Manager);
 	await logManager.extend("test", async () => app.resolve<TestLogger>(TestLogger).make({ id }));
 	logManager.setDefaultDriver("test");
 
@@ -119,6 +119,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 
 	// Rebinds
 	app.rebind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
+	app.rebind(Identifiers.Validator.DoubleSignGuard).toConstantValue({ guard: async () => {} });
 
 	return app;
 };
@@ -155,7 +156,7 @@ const getPluginConfiguration = async (
 			.resolve(Providers.PluginConfiguration)
 			.from(packageId, defaults)
 			.merge(options[packageId] || {});
-	} catch { }
+	} catch {}
 	return undefined;
 };
 
@@ -187,9 +188,9 @@ const bootstrap = async (app: Contracts.Kernel.Application) => {
 	// const validatorSet = app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
 	// await validatorSet.restore();
 
-	const commitState = app.get<Contracts.Consensus.CommitStateFactory>(
-		Identifiers.Consensus.CommitState.Factory,
-	)(genesisCommit);
+	const commitState = app.get<Contracts.Consensus.CommitStateFactory>(Identifiers.Consensus.CommitState.Factory)(
+		genesisCommit,
+	);
 
 	const blockProcessor = app.get<Contracts.Processor.BlockProcessor>(Identifiers.Processor.BlockProcessor);
 

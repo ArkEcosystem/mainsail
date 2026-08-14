@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { DoubleSignError } from "@mainsail/exceptions";
 import { assert, ensureError, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -75,7 +76,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	#pendingJobs = new Set<Contracts.Consensus.RoundState>();
 
 	#proposedBlock?: Contracts.Crypto.Block;
-	#proposalPromise?: Promise<Contracts.Crypto.Proposal>;
+	#proposalPromise?: Promise<Contracts.Crypto.Proposal | undefined>;
 	#roundStartTime = 0;
 
 	// Handler lock is different than commit lock. It is used to prevent parallel processing and it is similar to queue.
@@ -244,11 +245,19 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		if (this.#proposalPromise) {
 			const proposal = await this.#proposalPromise;
+			this.#proposalPromise = undefined;
+
+			if (proposal === undefined) {
+				// The double-sign guard refused to sign; the propose timeout scheduled above lets the
+				// round time out and the machinery continue to later rounds, where signing is allowed
+				// again once the round passes the recorded watermark.
+				return;
+			}
+
 			assert.defined(this.#proposedBlock);
 
 			this.logger.info(`Proposing block ${this.#getBlockString(this.#proposedBlock)}`, "consensus");
 
-			this.#proposalPromise = undefined;
 			this.#proposedBlock = undefined;
 			await this.proposalProcessor.process(proposal);
 		}
@@ -510,6 +519,22 @@ export class Consensus implements Contracts.Consensus.Service {
 	async #makeProposal(
 		roundState: Contracts.Consensus.RoundState,
 		registeredProposer: Contracts.Validator.Validator,
+	): Promise<Contracts.Crypto.Proposal | undefined> {
+		try {
+			return await this.#signProposal(roundState, registeredProposer);
+		} catch (error) {
+			if (error instanceof DoubleSignError) {
+				this.logger.warn(`Skipped proposal for ${this.#getHeightRoundString()}: ${error.message}`, "consensus");
+				return undefined;
+			}
+
+			throw error;
+		}
+	}
+
+	async #signProposal(
+		roundState: Contracts.Consensus.RoundState,
+		registeredProposer: Contracts.Validator.Validator,
 	): Promise<Contracts.Crypto.Proposal> {
 		if (this.#validValue) {
 			this.#proposedBlock = this.#validValue.getBlock();
@@ -559,7 +584,20 @@ export class Consensus implements Contracts.Consensus.Service {
 				continue;
 			}
 
-			const prevote = await localValidator.prevote(validatorIndex, this.#blockNumber, this.#round, value);
+			let prevote: Contracts.Crypto.Message;
+			try {
+				prevote = await localValidator.prevote(validatorIndex, this.#blockNumber, this.#round, value);
+			} catch (error) {
+				if (error instanceof DoubleSignError) {
+					this.logger.warn(
+						`Skipped prevote for ${this.#getHeightRoundString()}: ${error.message}`,
+						"consensus",
+					);
+					continue;
+				}
+
+				throw error;
+			}
 
 			void this.messageProcessor.process(prevote);
 		}
@@ -578,7 +616,20 @@ export class Consensus implements Contracts.Consensus.Service {
 				continue;
 			}
 
-			const precommit = await localValidator.precommit(validatorIndex, this.#blockNumber, this.#round, value);
+			let precommit: Contracts.Crypto.Message;
+			try {
+				precommit = await localValidator.precommit(validatorIndex, this.#blockNumber, this.#round, value);
+			} catch (error) {
+				if (error instanceof DoubleSignError) {
+					this.logger.warn(
+						`Skipped precommit for ${this.#getHeightRoundString()}: ${error.message}`,
+						"consensus",
+					);
+					continue;
+				}
+
+				throw error;
+			}
 
 			void this.messageProcessor.process(precommit);
 		}
