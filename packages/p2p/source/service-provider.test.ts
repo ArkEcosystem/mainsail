@@ -306,6 +306,22 @@ describe<{
 		assert.equal(result.value.developmentMode.enabled, true);
 	});
 
+	it("should parse process.env.MAINSAIL_P2P_STATISTIC_MAX_TRACKED_PEERS", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_STATISTIC_MAX_TRACKED_PEERS = "1000";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.statistic.maxTrackedPeers, 1000);
+	});
+
+	it("should default statistic.maxTrackedPeers when the environment does not set it", async ({ serviceProvider }) => {
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.statistic.maxTrackedPeers, 250);
+	});
+
 	it("should parse process.env.MAINSAIL_P2P_API_NODES_MAX_CONTENT_LENGTH", async ({ serviceProvider }) => {
 		process.env.MAINSAIL_P2P_API_NODES_MAX_CONTENT_LENGTH = "25000";
 

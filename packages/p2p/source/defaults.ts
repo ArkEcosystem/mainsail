@@ -24,6 +24,7 @@ export const defaults = {
 	},
 	skipPeerStateVerification: Environment.isTrue(EnvironmentVariables.MAINSAIL_SKIP_PEER_STATE_VERIFICATION),
 	statistic: {
+		maxTrackedPeers: Environment.get(EnvironmentVariables.MAINSAIL_P2P_STATISTIC_MAX_TRACKED_PEERS, 250),
 		verbosity: Environment.get(EnvironmentVariables.MAINSAIL_P2P_STATISTIC_VERBOSITY, 0),
 	},
 	txPoolPort: Environment.get(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_PORT, 4007),

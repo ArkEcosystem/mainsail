@@ -23,13 +23,16 @@ export class StatisticPlugin {
 
 		server.ext({
 			method: async (request, h) => {
+				const endpoint = request.route.settings.id;
+				if (endpoint === undefined) {
+					return h.continue;
+				}
+
 				const duration = Math.round(performance.now() - request.start);
-				this.statisticService
-					.getCurrentRoundStatistic()
-					.addPing(request.info.remoteAddress, request.path.slice(1), {
-						responseTime: duration,
-						success: !request.response.isBoom,
-					});
+				this.statisticService.getCurrentRoundStatistic().addPing(request.info.remoteAddress, endpoint, {
+					responseTime: duration,
+					success: !request.response.isBoom,
+				});
 
 				return h.continue;
 			},
