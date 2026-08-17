@@ -543,6 +543,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				return undefined;
 			}
 
+			// TODO: rethrowing rejects the unawaited #proposalPromise, killing the node without dispose.
 			throw error;
 		}
 	}
@@ -554,7 +555,11 @@ export class Consensus implements Contracts.Consensus.Service {
 		if (this.#validValue) {
 			// A valid value restored from consensus storage still holds a serialized payload, so the
 			// block has to be deserialized before it can be re-proposed. Deserializing is idempotent.
-			await this.#validValue.getProposal()?.deserializePayload();
+			const validProposal = this.#validValue.getProposal();
+			// TODO: reject a proposal-less valid value at restore (bootstrapper.ts), so corrupt
+			// consensus state terminates on boot instead of here, mid-round.
+			assert.defined(validProposal);
+			await validProposal.deserializePayload();
 
 			this.#proposedBlock = this.#validValue.getBlock();
 			const lockProof = await this.#validValue.aggregatePrevotes();
@@ -661,6 +666,8 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		if (state) {
 			if (state.blockNumber === this.#blockNumber) {
+				// TODO: run() calls startRound() next, which overwrites this with Propose. Decide
+				// whether the restored step should survive, or stop persisting it.
 				this.#step = state.step;
 				this.#round = state.round;
 				this.#lockedValue = state.lockedValue;
