@@ -546,6 +546,10 @@ export class Consensus implements Contracts.Consensus.Service {
 		registeredProposer: Contracts.Validator.Validator,
 	): Promise<Contracts.Crypto.Proposal> {
 		if (this.#validValue) {
+			// A valid value restored from consensus storage still holds a serialized payload, so the
+			// block has to be deserialized before it can be re-proposed. Deserializing is idempotent.
+			await this.#validValue.getProposal()?.deserializePayload();
+
 			this.#proposedBlock = this.#validValue.getBlock();
 			const lockProof = await this.#validValue.aggregatePrevotes();
 
