@@ -1186,7 +1186,171 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
 	});
 
-	it("#onProposalLocked - broadcast prevote null, if block is valid and lockedRound is higher than validRound", async () => {});
+	it("#onProposalLocked - broadcast prevote block hash, if locked on the proposed block and lockedRound is higher than validRound", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		messageProcessor,
+		roundState,
+		block,
+		proposal,
+		proposer,
+	}) => {
+		stub(roundState, "getProcessorResult").returnValue({ success: true });
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+
+		// Lock on the block at round 2 (the validator repository still returns undefined here, so
+		// no precommit is signed while locking).
+		consensus.setRound(2);
+		consensus.setStep(Enums.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevote({ ...roundState, round: 2 });
+		assert.equal(consensus.getLockedRound(), 2);
+
+		// The same block is re-proposed at round 3, proven by prevotes from round 1 - older than
+		// the round this validator locked in.
+		proposal.lockProof = { signature: "1234", validators: [] };
+		proposal.validRound = 1;
+
+		const prevote = {
+			blockNumber: 1,
+			round: 3,
+		};
+
+		const validator = {
+			prevote: () => {},
+		};
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
+
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		const spyMessageProcess = spy(messageProcessor, "process");
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		consensus.setRound(3);
+		consensus.setStep(Enums.Consensus.Step.Propose);
+		await consensus.onProposalLocked({ ...roundState, round: 3 });
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 3, block.hash); // locked on the proposed block: prevote it
+
+		spyMessageProcess.calledOnce();
+		spyMessageProcess.calledWith(prevote);
+	});
+
+	it("#onProposalLocked - broadcast prevote null, if locked on another block and lockedRound is higher than validRound", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		messageProcessor,
+		roundState,
+		proposer,
+	}) => {
+		stub(roundState, "getProcessorResult").returnValue({ success: true });
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+
+		// Lock on the round-0 block at round 2.
+		consensus.setRound(2);
+		consensus.setStep(Enums.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevote({ ...roundState, round: 2 });
+		assert.equal(consensus.getLockedRound(), 2);
+
+		// A different block is proposed at round 3, proven by prevotes from round 1.
+		const anotherBlock = {
+			hash: "anotherBlockHash",
+			number: 1,
+			round: 3,
+		};
+		const anotherProposal = {
+			blockHeader: anotherBlock,
+			getData: () => ({ block: anotherBlock }),
+			lockProof: { signature: "1234", validators: [] },
+			round: 3,
+			validRound: 1,
+		};
+		const anotherRoundState = {
+			blockNumber: 1,
+			getProcessorResult: () => ({ success: true }),
+			getProposal: () => anotherProposal,
+			round: 3,
+		} as unknown as Contracts.Consensus.RoundState;
+
+		const prevote = {
+			blockNumber: 1,
+			round: 3,
+		};
+
+		const validator = {
+			prevote: () => {},
+		};
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
+
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		const spyMessageProcess = spy(messageProcessor, "process");
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		consensus.setRound(3);
+		consensus.setStep(Enums.Consensus.Step.Propose);
+		await consensus.onProposalLocked(anotherRoundState);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 3, undefined); // locked on another block: nil prevote
+
+		spyMessageProcess.calledOnce();
+		spyMessageProcess.calledWith(prevote);
+	});
+
+	it("#onProposalLocked - broadcast prevote null, if locked on the proposed block but the block is invalid", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		messageProcessor,
+		roundState,
+		proposal,
+		proposer,
+	}) => {
+		stub(roundState, "getProcessorResult").returnValue({ success: true });
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+
+		// Lock on the block at round 2.
+		consensus.setRound(2);
+		consensus.setStep(Enums.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevote({ ...roundState, round: 2 });
+		assert.equal(consensus.getLockedRound(), 2);
+
+		// The same block is re-proposed at round 3, but this time it fails processing.
+		proposal.lockProof = { signature: "1234", validators: [] };
+		proposal.validRound = 1;
+
+		const invalidRoundState = {
+			blockNumber: 1,
+			getProcessorResult: () => ({ success: false }),
+			getProposal: () => proposal,
+			round: 3,
+		} as unknown as Contracts.Consensus.RoundState;
+
+		const prevote = {
+			blockNumber: 1,
+			round: 3,
+		};
+
+		const validator = {
+			prevote: () => {},
+		};
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
+
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		const spyMessageProcess = spy(messageProcessor, "process");
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		consensus.setRound(3);
+		consensus.setStep(Enums.Consensus.Step.Propose);
+		await consensus.onProposalLocked(invalidRoundState);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 3, undefined); // the lock never overrides an invalid block
+
+		spyMessageProcess.calledOnce();
+		spyMessageProcess.calledWith(prevote);
+	});
 
 	it("#onProposalLocked - should return if step === prevote", async ({ consensus, roundState, proposal }) => {
 		proposal.validRound = 0;
