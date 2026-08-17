@@ -280,7 +280,16 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.logger.info(`Received proposal ${this.#getBlockString(proposal.blockHeader)}`, "consensus");
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
-		await this.prevote(roundState.getProcessorResult().success ? proposal.blockHeader.hash : undefined);
+		// A validator locked on a block must not prevote a different one
+		const isNotLockedOnAnotherBlock =
+			this.#lockedValue === undefined ||
+			this.#lockedValue.getProposal()?.blockHeader.hash === proposal.blockHeader.hash;
+
+		await this.prevote(
+			roundState.getProcessorResult().success && isNotLockedOnAnotherBlock
+				? proposal.blockHeader.hash
+				: undefined,
+		);
 	}
 
 	protected async onProposalLocked(roundState: Contracts.Consensus.RoundState): Promise<void> {
