@@ -105,6 +105,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		context.proposal = {
+			deserializePayload: () => {},
 			getData: () => ({
 				block: context.block,
 			}),
@@ -366,6 +367,69 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			validRound: 0,
 		});
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
+	});
+
+	it("#startRound - local validator should propose validRound restored from storage", async ({
+		consensus,
+		validatorsRepository,
+		roundStateRepository,
+		proposalProcessor,
+		block,
+		proposal,
+		proposer,
+		roundState,
+		validatorSet,
+		forger,
+	}) => {
+		const validator = {
+			propose: () => {},
+		};
+
+		const spyForgerForgeBlock = stub(forger, "forgeBlock").resolvedValue(block);
+		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
+		const spyProposalProcess = spy(proposalProcessor, "process");
+
+		stub(roundStateRepository, "getRoundState").returnValue({
+			hasProposal: () => false,
+			proposer,
+		});
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		const lockProof = {
+			signature: "signature",
+			validators: [],
+		};
+
+		// A valid value as restored from consensus storage: the proposal payload is still
+		// serialized, so the block only becomes available once it is deserialized.
+		let isDataDeserialized = false;
+		const spyProposalDeserializePayload = stub(proposal, "deserializePayload").callsFake(() => {
+			isDataDeserialized = true;
+		});
+		const spyRoundStateAggregatePrevotes = stub(roundState, "aggregatePrevotes").returnValue(lockProof);
+		const spyRoundStateGetBlock = stub(roundState, "getBlock").callsFake(() => {
+			if (!isDataDeserialized) {
+				throw new Error("Block is not available, because proposal is not set or deserialized");
+			}
+
+			return block;
+		});
+
+		consensus.setValidRound(roundState);
+		await consensus.startRound(1);
+		await consensus.onTimeoutStartRound();
+
+		spyProposalDeserializePayload.calledOnce();
+		spyRoundStateGetBlock.calledOnce();
+		spyRoundStateAggregatePrevotes.calledOnce();
+		spyForgerForgeBlock.neverCalled();
+
+		spyValidatorPropose.calledOnce();
+		spyValidatorPropose.calledWith(1, 1, 0, block, lockProof); // validator index, round, validRound, block, lockProof
+
+		spyProposalProcess.calledOnce();
+		spyProposalProcess.calledWith(proposal);
 	});
 
 	it("#onTimeoutStartRound - should propose if proposal is ready", async ({
