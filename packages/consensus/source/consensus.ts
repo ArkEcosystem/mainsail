@@ -280,10 +280,9 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.logger.info(`Received proposal ${this.#getBlockString(proposal.blockHeader)}`, "consensus");
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
-		// A validator locked on a block must not prevote a different one
+		// A validator locked on a block must not prevote a different one.
 		const isNotLockedOnAnotherBlock =
-			this.#lockedValue === undefined ||
-			this.#lockedValue.getProposal()?.blockHeader.hash === proposal.blockHeader.hash;
+			this.#lockedValue === undefined || this.#isLockedOnBlock(proposal.blockHeader.hash);
 
 		await this.prevote(
 			roundState.getProcessorResult().success && isNotLockedOnAnotherBlock
@@ -313,7 +312,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		const lockedRound = this.getLockedRound();
 
-		if ((!lockedRound || lockedRound <= proposal.validRound) && roundState.getProcessorResult().success) {
+		if (
+			(!lockedRound || lockedRound <= proposal.validRound || this.#isLockedOnBlock(proposal.blockHeader.hash)) &&
+			roundState.getProcessorResult().success
+		) {
 			await this.prevote(proposal.blockHeader.hash);
 		} else {
 			await this.prevote();
@@ -495,6 +497,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 			await this.startRound(this.#round + 1);
 		});
+	}
+
+	#isLockedOnBlock(hash: string): boolean {
+		return this.#lockedValue?.getProposal()?.blockHeader.hash === hash;
 	}
 
 	#isInvalidRoundState(roundState: Contracts.Processor.ProcessableUnit): boolean {
