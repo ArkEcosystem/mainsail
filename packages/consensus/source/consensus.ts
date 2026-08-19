@@ -522,13 +522,19 @@ export class Consensus implements Contracts.Consensus.Service {
 	): Promise<Contracts.Crypto.Proposal | undefined> {
 		try {
 			return await this.#signProposal(roundState, registeredProposer);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
+
 			if (error instanceof DoubleSignError) {
 				this.logger.warn(`Skipped proposal for ${this.#getHeightRoundString()}: ${error.message}`, "consensus");
-				return undefined;
+			} else {
+				this.logger.error(
+					`Failed to create proposal for ${this.#getHeightRoundString()}: ${error.stack ?? error.message}`,
+					"consensus",
+				);
 			}
 
-			throw error;
+			return undefined;
 		}
 	}
 

@@ -90,6 +90,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		};
 
 		context.logger = {
+			error: () => {},
 			info: () => {},
 			warn: () => {},
 		};
@@ -152,7 +153,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.app.bind(Identifiers.Consensus.Bootstrapper).toConstantValue(context.bootstrapper);
 		context.app.bind(Identifiers.Consensus.Scheduler).toConstantValue(context.scheduler);
 		context.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(new Lock());
-		+context.app.bind(Identifiers.Validator.Repository).toConstantValue(context.validatorsRepository);
+		context.app.bind(Identifiers.Validator.Repository).toConstantValue(context.validatorsRepository);
 		context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
 		context.app.bind(Identifiers.BlockchainUtils.ProposerCalculator).toConstantValue(context.proposerCalculator);
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
@@ -436,6 +437,47 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await consensus.onTimeoutStartRound();
 
 		spyLoggerWarn.calledOnce();
+		spyProposalProcess.neverCalled();
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
+	});
+
+	it("#propose - should catch a forging failure instead of leaving an unhandled rejection", async ({
+		consensus,
+		validatorsRepository,
+		roundStateRepository,
+		validatorSet,
+		proposalProcessor,
+		proposer,
+		logger,
+		forger,
+	}) => {
+		stub(forger, "forgeBlock").rejectedValue(new Error("evm is gone"));
+		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
+		stub(validatorsRepository, "getValidator").returnValue({ propose: () => {} });
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		const spyProposalProcess = spy(proposalProcessor, "process");
+		const spyLoggerError = spy(logger, "error");
+
+		const unhandled: unknown[] = [];
+		const onUnhandledRejection = (reason: unknown) => unhandled.push(reason);
+		process.on("unhandledRejection", onUnhandledRejection);
+
+		try {
+			await consensus.startRound(0);
+			await new Promise((resolve) => setImmediate(resolve));
+			await new Promise((resolve) => setImmediate(resolve));
+
+			assert.equal(unhandled, []);
+		} finally {
+			process.off("unhandledRejection", onUnhandledRejection);
+		}
+
+		spyLoggerError.calledOnce();
+
+		// Nothing is proposed and the step is untouched, so the propose timeout moves the round on.
+		await consensus.onTimeoutStartRound();
+
 		spyProposalProcess.neverCalled();
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
 	});
