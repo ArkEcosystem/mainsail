@@ -248,9 +248,9 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#proposalPromise = undefined;
 
 			if (proposal === undefined) {
-				// The double-sign guard refused to sign; the propose timeout scheduled above lets the
-				// round time out and the machinery continue to later rounds, where signing is allowed
-				// again once the round passes the recorded watermark.
+				// Nothing to propose: either the double-sign guard refused this position, or building the
+				// proposal failed. #makeProposal reported which. The propose timeout scheduled above lets
+				// the round time out so consensus moves on.
 				return;
 			}
 
@@ -526,6 +526,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			const error = ensureError(rawError);
 
 			if (error instanceof DoubleSignError) {
+				// Signing is allowed again once a later round passes the recorded watermark.
 				this.logger.warn(`Skipped proposal for ${this.#getHeightRoundString()}: ${error.message}`, "consensus");
 			} else {
 				this.logger.error(
