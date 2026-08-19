@@ -35,9 +35,6 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@inject(Identifiers.P2P.Broadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
-
 	async process(
 		proposal: Contracts.Crypto.Proposal,
 		broadcast: boolean = true,
@@ -72,7 +69,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 
 			// Add some time to allow the proposal to be broadcasted to other nodes before processing it.
 			setTimeout(() => {
-				void this.getConsensus().handle(roundState);
+				this.handleRoundState(roundState);
 			}, 0);
 
 			return Enums.Consensus.ProcessorResult.Accepted;

@@ -34,6 +34,7 @@ describe<{
 		context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue({});
 		context.app.bind(Identifiers.State.Store).toConstantValue({});
 		context.app.bind(Identifiers.BlockchainUtils.TimestampCalculator).toConstantValue({});
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue({ error: () => {} });
 
 		context.processor = context.app.resolve(CommitProcessor);
 	});
