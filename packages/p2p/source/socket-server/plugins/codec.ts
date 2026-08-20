@@ -32,7 +32,7 @@ export class CodecPlugin extends BasePlugin {
 		);
 
 		server.ext({
-			async method(request, h) {
+			method: async (request, h) => {
 				try {
 					request.payload = allRoutesConfigByPath[request.path].codec.request.deserialize(request.payload);
 				} catch (rawError) {
