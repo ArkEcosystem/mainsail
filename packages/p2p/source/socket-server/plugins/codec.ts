@@ -37,7 +37,7 @@ export class CodecPlugin extends BasePlugin {
 					request.payload = allRoutesConfigByPath[request.path].codec.request.deserialize(request.payload);
 				} catch (rawError) {
 					const error = ensureError(rawError);
-					return this.disposeAndReturnBadRequest(request, h, `Payload deserializing failed: ${error}`);
+					return this.disposeAndReturnBadRequest(request, `Payload deserializing failed: ${error}`);
 				}
 				return h.continue;
 			},
