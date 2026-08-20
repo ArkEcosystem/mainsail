@@ -14,6 +14,7 @@ type Context = {
 	bootstrapper: any;
 	cryptoConfiguration: any;
 	state: any;
+	fakeTimers: any;
 	messageProcessor: any;
 	proposalProcessor: any;
 	scheduler: any;
@@ -92,6 +93,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.logger = {
 			error: () => {},
 			info: () => {},
+			notice: () => {},
 			warn: () => {},
 		};
 
@@ -103,6 +105,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			number: 1,
 			round: 0,
 			hash: "blockHash",
+			proposer: "proposerAddress",
 		};
 
 		context.proposal = {
@@ -376,14 +379,16 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		logger,
 	}) => {
 		const spyProposalProcess = spy(proposalProcessor, "process");
-		const spyLoggerInfo = spy(logger, "info");
+		const spyLoggerNotice = spy(logger, "notice");
 
 		consensus.setProposal(proposal, proposal.getData().block);
 		await consensus.onTimeoutStartRound();
 
 		spyProposalProcess.calledOnce();
 		spyProposalProcess.calledWith(proposal);
-		spyLoggerInfo.calledWith(`Proposing block ${1}/${0}/${proposal.getData().block.hash}`);
+		spyLoggerNotice.calledWith(
+			`📦 Proposing block ${1}/${0}/${proposal.getData().block.hash} as ${proposal.getData().block.proposer}`,
+		);
 
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
 	});
@@ -1692,6 +1697,270 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	// 	spyBlockProcessorCommit.neverCalled();
 	// 	spyConsensusStartRound.neverCalled();
 	// });
+
+	// Our own slot reporting. False reports are the thing to guard against here: a node runner who sees
+	// a missed slot that did not happen has no way to tell it apart from a real one.
+	const OURS = "ourValidatorAddress";
+	const THEIRS = "otherValidatorAddress";
+
+	const beOurProposer = (context: any, address: string = OURS) => {
+		stub(context.forger, "forgeBlock").resolvedValue(context.block);
+		stub(context.roundStateRepository, "getRoundState").returnValue({
+			hasProposal: () => false,
+			proposer: { address, blsPublicKey: "ourBlsPublicKey" },
+		});
+		stub(context.validatorsRepository, "getValidator").callsFake((blsPublicKey: string) =>
+			blsPublicKey === "ourBlsPublicKey" ? { propose: () => ({}) } : undefined,
+		);
+		stub(context.validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+	};
+
+	const beOurProposerEachRound = (context: any, addressByRound: Record<number, string>) => {
+		stub(context.forger, "forgeBlock").resolvedValue(context.block);
+		stub(context.roundStateRepository, "getRoundState").callsFake((blockNumber: number, round: number) => ({
+			hasProposal: () => false,
+			proposer: { address: addressByRound[round] ?? THEIRS, blsPublicKey: "ourBlsPublicKey" },
+		}));
+		stub(context.validatorsRepository, "getValidator").callsFake((blsPublicKey: string) =>
+			blsPublicKey === "ourBlsPublicKey" ? { propose: () => ({}) } : undefined,
+		);
+		stub(context.validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+	};
+
+	const commitBlock = async (context: any, block: any, unit: any = context.roundState, isRoundState = true) => {
+		context.fakeTimers ??= clock();
+
+		unit.getBlock = () => block;
+		unit.hasProcessorResult = () => true;
+		unit.getProcessorResult = () => ({ success: true });
+
+		void context.consensus.onMajorityPrecommit(unit, isRoundState);
+		await context.fakeTimers.nextAsync();
+	};
+
+	it("#onTimeoutStartRound - should report the proposal this node submits", async ({
+		consensus,
+		logger,
+		proposal,
+	}) => {
+		const spyLoggerNotice = spy(logger, "notice");
+
+		consensus.setProposal(proposal, proposal.getData().block);
+		await consensus.onTimeoutStartRound();
+
+		spyLoggerNotice.calledOnce();
+		spyLoggerNotice.calledWith(
+			`📦 Proposing block ${1}/${0}/${proposal.getData().block.hash} as ${proposal.getData().block.proposer}`,
+		);
+	});
+
+	it("#onTimeoutStartRound - should report nothing when there is no proposal to submit", async ({
+		consensus,
+		logger,
+	}) => {
+		const spyLoggerNotice = spy(logger, "notice");
+
+		await consensus.onTimeoutStartRound();
+
+		spyLoggerNotice.neverCalled();
+	});
+
+	it("#onMajorityPrecommit - should report our own block being committed", async (context) => {
+		const { consensus, block, logger } = context;
+		beOurProposer(context);
+
+		const spyLoggerNotice = spy(logger, "notice");
+
+		await consensus.startRound(0);
+		await commitBlock(context, { ...block, proposer: OURS });
+
+		spyLoggerNotice.calledOnce();
+		spyLoggerNotice.calledWith(`✅ Committed our block ${1}/${0} as ${OURS}`);
+	});
+
+	it("#onMajorityPrecommit - should still count our block as ours when a later round re-proposed it", async (context) => {
+		// Another validator re-proposes the value this node is locked on; the block is still ours.
+		const { consensus, block, logger } = context;
+		beOurProposer(context);
+
+		const spyLoggerNotice = spy(logger, "notice");
+
+		await consensus.startRound(0);
+		await commitBlock(context, { ...block, proposer: OURS, round: 1 });
+
+		spyLoggerNotice.calledOnce();
+		spyLoggerNotice.calledWith(`✅ Committed our block ${1}/${1} as ${OURS}`);
+	});
+
+	it("#onMajorityPrecommit - should report a slot we lost to another validator", async (context) => {
+		const { consensus, block, logger } = context;
+		beOurProposer(context);
+
+		const spyLoggerNotice = spy(logger, "notice");
+
+		await consensus.startRound(0);
+		await commitBlock(context, { ...block, proposer: THEIRS });
+
+		spyLoggerNotice.calledOnce();
+		spyLoggerNotice.calledWith(`❌ Missed our slot ${1}/${0} as ${OURS}, committed by ${THEIRS}`);
+	});
+
+	it("#propose - should report nothing while a round of ours is still in play", async (context) => {
+		// A commit is accepted on block number alone, so the round we moved on from can still be the one
+		// that commits. Reporting a lost slot here would be a guess.
+		const { consensus, logger } = context;
+		beOurProposerEachRound(context, { 0: OURS, 1: "ourSecondValidator" });
+
+		const spyLoggerNotice = spy(logger, "notice");
+
+		await consensus.startRound(0);
+		await consensus.startRound(1);
+
+		spyLoggerNotice.neverCalled();
+	});
+
+	it("#onMajorityPrecommit - should credit the round of ours that committed, not the latest one", async (context) => {
+		// Two of this node's validators hold consecutive rounds; the earlier round is the one that wins.
+		const { consensus, block, logger } = context;
+		beOurProposerEachRound(context, { 0: OURS, 1: "ourSecondValidator" });
+
+		const spyLoggerNotice = spy(logger, "notice");
+
+		await consensus.startRound(0);
+		await consensus.startRound(1);
+		await commitBlock(context, { ...block, proposer: OURS, round: 0 });
+
+		spyLoggerNotice.calledOnce();
+		spyLoggerNotice.calledWith(`✅ Committed our block ${1}/${0} as ${OURS}`);
+	});
+
+	it("#onMajorityPrecommit - should report every slot of ours when another validator wins the height", async (context) => {
+		const { consensus, block, logger } = context;
+		beOurProposerEachRound(context, { 0: OURS, 1: "ourSecondValidator" });
+
+		const spyLoggerNotice = spy(logger, "notice");
+
+		await consensus.startRound(0);
+		await consensus.startRound(1);
+		await commitBlock(context, { ...block, proposer: THEIRS });
+
+		spyLoggerNotice.calledTimes(2);
+		spyLoggerNotice.calledWith(`❌ Missed our slot ${1}/${0} as ${OURS}, committed by ${THEIRS}`);
+		spyLoggerNotice.calledWith(`❌ Missed our slot ${1}/${1} as ourSecondValidator, committed by ${THEIRS}`);
+	});
+
+	it("#onTimeoutStartRound - should name the validator proposing, not the forger of a re-proposed block", async (context) => {
+		// A locked value is re-proposed as it stands, so its proposer can be another validator entirely.
+		const { consensus, block, logger, proposal } = context;
+		beOurProposer(context);
+
+		const spyLoggerNotice = spy(logger, "notice");
+
+		await consensus.startRound(0);
+		consensus.setProposal(proposal, { ...block, proposer: THEIRS });
+		await consensus.onTimeoutStartRound();
+
+		spyLoggerNotice.calledWith(`📦 Proposing block ${1}/${0}/${block.hash} as ${OURS}`);
+	});
+
+	it("#onMajorityPrecommit - should report nothing when this node runs no validators", async (context) => {
+		const { consensus, block, logger, proposer, roundStateRepository, validatorsRepository } = context;
+		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
+		stub(validatorsRepository, "getValidator").returnValue();
+
+		const spyLoggerNotice = spy(logger, "notice");
+
+		await consensus.startRound(0);
+		await commitBlock(context, { ...block, proposer: THEIRS });
+
+		spyLoggerNotice.neverCalled();
+	});
+
+	it("#onMajorityPrecommit - should report nothing when the proposer belongs to another node", async (context) => {
+		// This node has validators, but none of them is the proposer for this round.
+		const { consensus, block, logger } = context;
+		beOurProposer(context, THEIRS);
+		context.roundStateRepository.getRoundState = () => ({
+			hasProposal: () => false,
+			proposer: { address: THEIRS, blsPublicKey: "theirBlsPublicKey" },
+		});
+
+		const spyLoggerNotice = spy(logger, "notice");
+
+		await consensus.startRound(0);
+		await commitBlock(context, { ...block, proposer: THEIRS });
+
+		spyLoggerNotice.neverCalled();
+	});
+
+	it("#onMajorityPrecommit - should report nothing when the round already had a proposal", async (context) => {
+		// Restored mid-round: propose() returns before it can claim the slot, so nothing is reported.
+		const { consensus, block, logger } = context;
+		beOurProposer(context);
+		context.roundStateRepository.getRoundState = () => ({
+			hasProposal: () => true,
+			proposer: { address: OURS, blsPublicKey: "ourBlsPublicKey" },
+		});
+
+		const spyLoggerNotice = spy(logger, "notice");
+
+		await consensus.startRound(0);
+		await commitBlock(context, { ...block, proposer: THEIRS });
+
+		spyLoggerNotice.neverCalled();
+	});
+
+	it("#onMajorityPrecommit - should report nothing when the block is invalid", async (context) => {
+		const { consensus, roundState, block, logger } = context;
+		beOurProposer(context);
+
+		const spyLoggerNotice = spy(logger, "notice");
+
+		await consensus.startRound(0);
+
+		roundState.getBlock = () => ({ ...block, proposer: THEIRS });
+		roundState.hasProcessorResult = () => true;
+		roundState.getProcessorResult = () => ({ success: false });
+		await consensus.onMajorityPrecommit(roundState);
+
+		spyLoggerNotice.neverCalled();
+	});
+
+	it("#onMajorityPrecommit - should report a slot only once", async (context) => {
+		const { consensus, block, logger } = context;
+		beOurProposer(context);
+		stub(consensus, "startRound").callsFake(async () => {});
+
+		const spyLoggerNotice = spy(logger, "notice");
+
+		consensus.setRound(0);
+		await consensus.propose(context.roundStateRepository.getRoundState());
+		await commitBlock(context, { ...block, proposer: THEIRS });
+
+		// The next height arriving from a peer must not produce a second report for the same slot.
+		await commitBlock(
+			context,
+			{ ...block, number: 2, proposer: THEIRS },
+			{ ...context.roundState, blockNumber: 2 },
+			false,
+		);
+
+		spyLoggerNotice.calledOnce();
+	});
+
+	it("#onMajorityPrecommit - should not resolve our slot with a block from another height", async (context) => {
+		const { consensus, block, logger } = context;
+		beOurProposer(context);
+		stub(consensus, "startRound").callsFake(async () => {});
+
+		const spyLoggerNotice = spy(logger, "notice");
+
+		consensus.setRound(0);
+		await consensus.propose(context.roundStateRepository.getRoundState());
+		await commitBlock(context, { ...block, number: 2, proposer: THEIRS });
+
+		spyLoggerNotice.neverCalled();
+	});
 
 	it("#onMinorityWithHigherRound - should start new round", async ({ consensus, roundState }) => {
 		const fakeTimers = clock();
