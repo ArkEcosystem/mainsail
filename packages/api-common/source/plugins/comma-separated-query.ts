@@ -4,7 +4,7 @@ import { set } from "@mainsail/utils";
 
 export const commaArrayQuery = {
 	name: "comma-array-query",
-	onRequest(request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue {
+	onRequest: (request: Hapi.Request, h: Hapi.ResponseToolkit): Hapi.Lifecycle.ReturnValue => {
 		const query = {};
 		const separator = ",";
 
@@ -24,7 +24,7 @@ export const commaArrayQuery = {
 	},
 
 	register(server: Hapi.Server): void {
-		server.ext("onRequest", this.onRequest);
+		server.ext("onRequest", commaArrayQuery.onRequest);
 	},
 
 	version: "1.0.0",

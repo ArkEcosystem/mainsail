@@ -12,7 +12,7 @@ export const rpcResponseHandler = {
 	name: "rcpResponseHandler",
 	register: (server: HapiServer): void => {
 		server.ext({
-			method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+			method: (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
 				const response = request.response;
 
 				if (

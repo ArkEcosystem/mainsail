@@ -41,7 +41,7 @@ export class Server {
 		this.#server.app.database = this.database;
 
 		this.#server.ext({
-			async method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+			method: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
 				request.headers["content-type"] = "application/json";
 
 				return h.continue;

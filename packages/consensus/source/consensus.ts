@@ -6,6 +6,8 @@ import { DoubleSignError } from "@mainsail/exceptions";
 import { assert, ensureError, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 
+type OwnSlot = { address: string; blockNumber: number; round: number };
+
 const FAILED_PROCESSOR_RESULT: Contracts.Processor.BlockProcessorResult = {
 	feeUsed: 0n,
 	gasUsed: 0,
@@ -75,6 +77,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	#isDisposed = false;
 	#pendingJobs = new Set<Contracts.Consensus.RoundState>();
 
+	#ownSlots: OwnSlot[] = [];
 	#proposedBlock?: Contracts.Crypto.Block;
 	#proposalPromise?: Promise<Contracts.Crypto.Proposal | undefined>;
 	#roundStartTime = 0;
@@ -248,15 +251,24 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#proposalPromise = undefined;
 
 			if (proposal === undefined) {
-				// The double-sign guard refused to sign; the propose timeout scheduled above lets the
-				// round time out and the machinery continue to later rounds, where signing is allowed
-				// again once the round passes the recorded watermark.
+				// Nothing to propose: either the double-sign guard refused this position, or building the
+				// proposal failed. #makeProposal reported which. The propose timeout scheduled above lets
+				// the round time out so consensus moves on.
 				return;
 			}
 
 			assert.defined(this.#proposedBlock);
 
-			this.logger.info(`Proposing block ${this.#getBlockString(this.#proposedBlock)}`, "consensus");
+			const ownSlot = this.#ownSlots.find(
+				(slot) => slot.blockNumber === this.#blockNumber && slot.round === this.#round,
+			);
+
+			this.logger.notice(
+				`📦 Proposing block ${this.#getBlockString(this.#proposedBlock)} as ${
+					ownSlot?.address ?? this.#proposedBlock.proposer
+				}`,
+				"consensus",
+			);
 
 			this.#proposedBlock = undefined;
 			await this.proposalProcessor.process(proposal);
@@ -432,6 +444,8 @@ export class Consensus implements Contracts.Consensus.Service {
 				await this.app.terminate("Failed to commit block", error);
 			}
 
+			this.#reportOwnSlotOutcome(block);
+
 			this.roundStateRepository.clear();
 
 			this.#blockNumber++;
@@ -528,6 +542,8 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		this.logger.info(`Found registered proposer: ${roundState.proposer.address}`, "consensus");
 
+		this.#trackOwnSlot(roundState.proposer.address);
+
 		this.#proposalPromise = this.#makeProposal(roundState, registeredProposer);
 	}
 
@@ -537,14 +553,20 @@ export class Consensus implements Contracts.Consensus.Service {
 	): Promise<Contracts.Crypto.Proposal | undefined> {
 		try {
 			return await this.#signProposal(roundState, registeredProposer);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
+
 			if (error instanceof DoubleSignError) {
+				// Signing is allowed again once a later round passes the recorded watermark.
 				this.logger.warn(`Skipped proposal for ${this.#getHeightRoundString()}: ${error.message}`, "consensus");
-				return undefined;
+			} else {
+				this.logger.error(
+					`Failed to create proposal for ${this.#getHeightRoundString()}: ${error.stack ?? error.message}`,
+					"consensus",
+				);
 			}
 
-			// TODO: rethrowing rejects the unawaited #proposalPromise, killing the node without dispose.
-			throw error;
+			return undefined;
 		}
 	}
 
@@ -752,5 +774,40 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		return `${number}/${consensusRound}/${block.hash}`;
+	}
+
+	#trackOwnSlot(address: string): void {
+		if (this.#ownSlots.length > 0 && this.#ownSlots[0].blockNumber !== this.#blockNumber) {
+			this.#ownSlots = [];
+		}
+
+		this.#ownSlots.push({ address, blockNumber: this.#blockNumber, round: this.#round });
+	}
+
+	#reportOwnSlotOutcome(block: Contracts.Crypto.BlockHeader): void {
+		const ownSlots = this.#ownSlots.filter((slot) => slot.blockNumber === block.number);
+
+		if (ownSlots.length === 0) {
+			return;
+		}
+
+		this.#ownSlots = [];
+
+		// Whichever of our rounds it came from, and whoever ended up proposing it: the block is ours.
+		if (ownSlots.some((slot) => slot.address === block.proposer)) {
+			const position = `${block.number.toLocaleString(Locale)}/${block.round.toLocaleString(Locale)}`;
+
+			this.logger.notice(`✅ Committed our block ${position} as ${block.proposer}`, "consensus");
+			return;
+		}
+
+		for (const slot of ownSlots) {
+			const position = `${slot.blockNumber.toLocaleString(Locale)}/${slot.round.toLocaleString(Locale)}`;
+
+			this.logger.notice(
+				`❌ Missed our slot ${position} as ${slot.address}, committed by ${block.proposer}`,
+				"consensus",
+			);
+		}
 	}
 }

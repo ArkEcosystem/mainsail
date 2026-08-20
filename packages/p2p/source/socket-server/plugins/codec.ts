@@ -32,12 +32,12 @@ export class CodecPlugin extends BasePlugin {
 		);
 
 		server.ext({
-			async method(request, h) {
+			method: async (request, h) => {
 				try {
 					request.payload = allRoutesConfigByPath[request.path].codec.request.deserialize(request.payload);
 				} catch (rawError) {
 					const error = ensureError(rawError);
-					return this.disposeAndReturnBadRequest(request, h, `Payload deserializing failed: ${error}`);
+					return this.disposeAndReturnBadRequest(request, `Payload deserializing failed: ${error}`);
 				}
 				return h.continue;
 			},

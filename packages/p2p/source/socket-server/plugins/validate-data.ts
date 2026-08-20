@@ -38,14 +38,13 @@ export class ValidateDataPlugin extends BasePlugin {
 				if (version && !isValidVersion(this.app, version)) {
 					return this.disposeAndReturnBadRequest(
 						request,
-						h,
 						`[${request.path}] Validation failed (invalid version)`,
 					);
 				}
 
 				const result = allRoutesConfigByPath[request.path]?.validation?.validate(request.payload);
 				if (result && result.error) {
-					return this.banAndReturnBadRequest(request, h, `[${request.path}] Validation failed (bad payload)`);
+					return this.banAndReturnBadRequest(request, `[${request.path}] Validation failed (bad payload)`);
 				}
 				return h.continue;
 			},

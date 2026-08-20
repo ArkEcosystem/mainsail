@@ -14,12 +14,15 @@ const { Scheduler: SchedulerProxy } = await esmock("./scheduler", {
 describe<{
 	app: Application;
 	scheduler: Scheduler;
+	logger: any;
 }>("Scheduler", ({ beforeEach, it, assert, spy, clock, stub }) => {
 	currentTimestamp = 0;
 
 	const delays = [1000, 3000, 5000];
 
 	const consensus = {
+		getBlockNumber: () => 1,
+		getRound: () => 0,
 		onTimeoutPrecommit: () => {},
 		onTimeoutPrevote: () => {},
 		onTimeoutPropose: () => {},
@@ -42,11 +45,16 @@ describe<{
 	};
 
 	beforeEach((context) => {
+		context.logger = {
+			error: () => {},
+		};
+
 		context.app = new Application();
 
 		context.app.bind(Identifiers.Consensus.Service).toConstantValue(consensus);
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
 		context.app.bind(Identifiers.State.Store).toConstantValue(store);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
 		context.scheduler = context.app.resolve(SchedulerProxy);
 	});
@@ -229,6 +237,41 @@ describe<{
 
 		assert.equal(timerValues, delays);
 	});
+
+	const failingHandlers: [string, string, (scheduler: Scheduler) => boolean][] = [
+		["onTimeoutStartRound", "blockPrepare 1/0", (scheduler) => scheduler.scheduleTimeoutBlockPrepare(8000)],
+		["onTimeoutPropose", "propose 1/2", (scheduler) => scheduler.scheduleTimeoutPropose(1, 2)],
+		["onTimeoutPrevote", "prevote 1/2", (scheduler) => scheduler.scheduleTimeoutPrevote(1, 2)],
+		["onTimeoutPrecommit", "precommit 1/2", (scheduler) => scheduler.scheduleTimeoutPrecommit(1, 2)],
+	];
+
+	for (const [handler, label, schedule] of failingHandlers) {
+		it(`#${handler} - should report a failing handler and keep the node running`, async ({
+			app,
+			scheduler,
+			logger,
+		}) => {
+			// Nothing awaits a timeout handler, so the scheduler has to catch and log a failure itself.
+			const fakeTimers = clock();
+			const spyTerminate = stub(app, "terminate").callsFake(() => new Promise(() => {}));
+			const spyLoggerError = spy(logger, "error");
+			const error = new Error("handler failed");
+			stub(consensus, handler).rejectedValue(error);
+
+			assert.true(schedule(scheduler));
+			await fakeTimers.nextAsync();
+
+			spyTerminate.neverCalled();
+			spyLoggerError.calledOnce();
+			// The message says which timeout failed, which the error on its own does not, and it carries
+			// the stack, which is all an unexpected failure gives you to work from.
+			assert.match(spyLoggerError.getCallArgs(0)[0], `Timeout handler ${label} failed:`);
+			assert.match(spyLoggerError.getCallArgs(0)[0], error.stack);
+
+			// The timeout no longer counts as pending, so the same one can be scheduled again.
+			assert.true(schedule(scheduler));
+		});
+	}
 
 	it("#clear - should clear timeoutPropose", async ({ scheduler }) => {
 		const fakeTimers = clock();
