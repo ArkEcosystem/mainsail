@@ -111,7 +111,14 @@ export default [
 				{
 					message:
 						"Write this handler as an arrow function (`method: async (request, h) => {...}`). In a plain `method() {}`, hapi replaces `this` with whatever was last passed to server.bind() — usually a route controller — so `this.x` silently reads from the wrong object.",
-					selector: "CallExpression[callee.property.name='ext'] > ObjectExpression > Property[method=true]",
+					selector:
+						"CallExpression[callee.property.name='ext'] > ObjectExpression > Property[method=true], CallExpression[callee.property.name='ext'] > ArrayExpression > ObjectExpression > Property[method=true]",
+				},
+				{
+					message:
+						"Write this handler as an arrow function. A plain `function` handler gets `this` rebound by hapi exactly like a shorthand method — to whatever was last passed to server.bind().",
+					selector:
+						"CallExpression[callee.property.name='ext'] > FunctionExpression, CallExpression[callee.property.name='ext'] > ObjectExpression > Property[method=false][key.name='method'] > FunctionExpression, CallExpression[callee.property.name='ext'] > ArrayExpression > ObjectExpression > Property[method=false][key.name='method'] > FunctionExpression, CallExpression[callee.property.name='ext'] > ObjectExpression > Property[method=false][key.name='method'] > ArrayExpression > FunctionExpression, CallExpression[callee.property.name='ext'] > ArrayExpression > ObjectExpression > Property[method=false][key.name='method'] > ArrayExpression > FunctionExpression",
 				},
 				{
 					message:
