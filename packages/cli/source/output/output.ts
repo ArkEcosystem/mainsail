@@ -11,7 +11,7 @@ enum OutputVerbosity {
 export class Output {
 	#verbosity: number = OutputVerbosity.Normal;
 
-	#realStdout: (message: string) => boolean = process.stdout.write;
+	#realStdout: (message: string) => boolean = process.stdout.write.bind(process.stdout);
 
 	public mute(): void {
 		process.stdout.write = (message: string) => true;
