@@ -29,9 +29,6 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 	@inject(Identifiers.CryptoWorker.WorkerPool)
 	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
-	@inject(Identifiers.Services.Log.Service)
-	protected readonly logger!: Contracts.Kernel.Logger;
-
 	#pendingMessages: Map<string, ((value: SignatureCheckResult) => void)[]> = new Map();
 
 	async process(
@@ -74,7 +71,7 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 				void this.broadcaster.broadcastMessage(message);
 			}
 
-			void this.getConsensus().handle(roundState);
+			this.handleRoundState(roundState);
 
 			return Enums.Consensus.ProcessorResult.Accepted;
 		});
