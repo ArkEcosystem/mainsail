@@ -27,11 +27,11 @@ export class ValidateIpPlugin extends BasePlugin {
 				const ip = getPeerIp(peerRequest);
 
 				if (this.peerDisposer.isBanned(ip)) {
-					return this.banAndReturnBadRequest(peerRequest, h, "Validation failed (peer is bannned)");
+					return this.banAndReturnBadRequest(peerRequest, "Validation failed (peer is bannned)");
 				}
 
 				if (!this.peerProcessor.validatePeerIp(ip)) {
-					return this.disposeAndReturnBadRequest(peerRequest, h, "Validation failed (bad ip)");
+					return this.disposeAndReturnBadRequest(peerRequest, "Validation failed (bad ip)");
 				}
 
 				return h.continue;

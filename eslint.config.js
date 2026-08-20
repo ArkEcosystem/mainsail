@@ -71,7 +71,7 @@ export default [
 			"@typescript-eslint/require-await": "off",
 			"@typescript-eslint/restrict-plus-operands": "off",
 			"@typescript-eslint/restrict-template-expressions": "off",
-			"@typescript-eslint/unbound-method": "warn",
+			"@typescript-eslint/unbound-method": "error",
 			"@typescript-eslint/typedef": [
 				"error",
 				{
@@ -106,6 +106,27 @@ export default [
 			"no-empty": ["error", { allowEmptyCatch: true }],
 			"no-nested-ternary": "warn",
 			"no-prototype-builtins": "off",
+			"no-restricted-syntax": [
+				"error",
+				{
+					message:
+						"Write this handler as an arrow function (`method: async (request, h) => {...}`). In a plain `method() {}`, hapi replaces `this` with whatever was last passed to server.bind() — usually a route controller — so `this.x` silently reads from the wrong object.",
+					selector:
+						"CallExpression[callee.property.name='ext'] > ObjectExpression > Property[method=true], CallExpression[callee.property.name='ext'] > ArrayExpression > ObjectExpression > Property[method=true]",
+				},
+				{
+					message:
+						"Write this handler as an arrow function. A plain `function` handler gets `this` rebound by hapi exactly like a shorthand method — to whatever was last passed to server.bind().",
+					selector:
+						"CallExpression[callee.property.name='ext'] > FunctionExpression, CallExpression[callee.property.name='ext'] > ObjectExpression > Property[method=false][key.name='method'] > FunctionExpression, CallExpression[callee.property.name='ext'] > ArrayExpression > ObjectExpression > Property[method=false][key.name='method'] > FunctionExpression, CallExpression[callee.property.name='ext'] > ObjectExpression > Property[method=false][key.name='method'] > ArrayExpression > FunctionExpression, CallExpression[callee.property.name='ext'] > ArrayExpression > ObjectExpression > Property[method=false][key.name='method'] > ArrayExpression > FunctionExpression",
+				},
+				{
+					message:
+						"Do not pass `this.<handler>` to server.ext: when hapi calls the handler later, `this` is no longer your plugin. Reference it through the plugin object's name instead (e.g. myPlugin.onRequest).",
+					selector:
+						"CallExpression[callee.property.name='ext'] > MemberExpression[object.type='ThisExpression']:not([property.name='ext'])",
+				},
+			],
 			"no-unneeded-ternary": "warn",
 			"no-unused-expressions": "off",
 			"no-unused-vars": "off",
