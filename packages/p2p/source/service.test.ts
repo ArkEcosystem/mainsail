@@ -1,699 +1,563 @@
-import { Identifiers, Events } from "@mainsail/constants";
-import { Providers } from "@mainsail/kernel";
-import importFresh from "import-fresh";
-
+import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
-import { describeSkip } from "@mainsail/test-runner";
-import { Peer } from "./peer";
+import { describe } from "@mainsail/test-runner";
+import dayjs from "dayjs";
+
+import { constants } from "./constants";
 import { Service } from "./service";
 
-describeSkip<{
-	app: Application;
-	networkMonitor: Service;
-	configuration: Providers.PluginConfiguration;
-}>("NetworkMonitor", ({ it, assert, beforeEach, stub, spy, match, each }) => {
-	const logger = { debug: () => {}, error: () => {}, info: () => {}, notice: () => {}, warn: () => {} };
+const makePeer = (ip: string, extra: Record<string, unknown> = {}): any => ({
+	header: {},
+	ip,
+	port: 4002,
+	version: "0.0.1",
+	...extra,
+});
 
-	const emitter = { dispatch: () => {} };
-	const communicator = {
-		getPeerBlocks: () => {},
-		getPeers: () => {},
-		ping: () => {},
-		pingPorts: () => {},
-		postBlock: () => {},
-	};
-	const repository = { forgetPeer: () => {}, getPeers: () => [] };
-
-	const triggerService = { call: () => {} }; // validateAndAcceptPeer
-	const store = { getLastBlock: () => {} };
-	const blockchain = { getBlockPing: () => {}, getLastBlock: () => {} };
-	const slots = { getSlotNumber: () => 0 };
-
+describe<{
+	service: Service;
+	repository: any;
+	peerVerifier: any;
+	state: any;
+	logger: any;
+	peerDiscoverer: any;
+	apiNodeDiscoverer: any;
+	configuration: any;
+}>("Service", ({ it, beforeEach, assert, clock, spy, stub }) => {
 	beforeEach((context) => {
-		context.app = new Application();
+		context.logger = { debug: () => {}, error: () => {}, info: () => {}, warn: () => {} };
+		context.repository = { getPeers: () => [], hasMinimumPeers: () => true };
+		context.peerVerifier = { verify: async () => true };
+		context.state = { getLastMessageTime: () => dayjs() };
+		context.peerDiscoverer = { discoverPeers: async () => {}, populateSeedPeers: async () => {} };
+		context.apiNodeDiscoverer = {
+			discoverNewApiNodes: async () => {},
+			populateApiNodesFromConfiguration: async () => {},
+			refreshApiNodes: async () => {},
+		};
+		context.configuration = { getRequired: (key: string) => ({ verifyTimeout: 60_000 })[key] };
 
-		context.app
-			.bind(Identifiers.ServiceProvider.Configuration)
-			.toConstantValue(new Providers.PluginConfiguration().from("", importFresh("./defaults").defaults))
-			.whenTargetTagged("plugin", "p2p");
-		context.app.bind(Identifiers.Application.Version).toConstantValue("0.0.1");
-		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
-		context.app.bind(Identifiers.PeerNetworkMonitor).to(Service);
-		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(emitter);
-		context.app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(communicator);
-		context.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(repository);
-		context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
-		context.app.bind(Identifiers.store).toConstantValue(store);
+		const app = new Application();
+		app.bind(Identifiers.ServiceProvider.Configuration)
+			.toConstantValue(context.configuration)
+			.whenTagged("plugin", "p2p");
+		app.bind(Identifiers.P2P.State).toConstantValue(context.state);
+		app.bind(Identifiers.P2P.Peer.Discoverer).toConstantValue(context.peerDiscoverer);
+		app.bind(Identifiers.P2P.ApiNode.Discoverer).toConstantValue(context.apiNodeDiscoverer);
+		app.bind(Identifiers.P2P.Peer.Verifier).toConstantValue(context.peerVerifier);
+		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
+		app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
-		context.configuration = context.app.getTagged(Identifiers.ServiceProvider.Configuration, "plugin", "p2p");
-		context.networkMonitor = context.app.resolve(Service);
+		context.service = app.resolve(Service);
 	});
 
-	// it("#boot - should populate peers from seed peers config by calling validateAndAcceptPeer, when peer discovery is disabled", async ({
-	// 	networkMonitor,
-	// 	app,
-	// 	configuration,
-	// }) => {
-	// 	configuration.set("skipDiscovery", true);
+	it("#cleansePeers - should do nothing when there are no peers", async ({ service, peerVerifier, logger }) => {
+		const verify = spy(peerVerifier, "verify");
+		const info = spy(logger, "info");
 
-	// 	const peers = {
-	// 		list: [
-	// 			{ ip: "187.177.54.44", port: 4000 },
-	// 			{ ip: "188.177.54.44", port: 4000 },
-	// 			{ ip: "189.177.54.44", port: 4000 },
-	// 		],
-	// 	};
+		await service.cleansePeers({ fast: true, peerCount: 5 });
 
-	// 	stub(app, "config").returnValue(peers);
-	// 	const spyTriggerServiceCall = spy(triggerService, "call");
+		verify.neverCalled();
+		info.neverCalled();
+	});
 
-	// 	await networkMonitor.boot();
+	it("#cleansePeers - should verify every peer when the repository holds fewer than peerCount", async ({
+		service,
+		repository,
+		peerVerifier,
+		logger,
+	}) => {
+		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2"), makePeer("3.3.3.3")];
+		const verify = spy(peerVerifier, "verify");
+		const info = spy(logger, "info");
 
-	// 	spyTriggerServiceCall.calledTimes(peers.list.length);
-	// 	for (let index = 0; index < peers.list.length; index++) {
-	// 		spyTriggerServiceCall.calledNthWith(index++, "validateAndAcceptPeer", {
-	// 			options: { lessVerbose: true, seed: true },
-	// 			peer: match.instanceOf(Peer),
-	// 		});
-	// 	}
-	// });
+		await service.cleansePeers({ fast: true, peerCount: 5 });
 
-	// it("#boot - should populate peers from URL config by calling validateAndAcceptPeer, when peer discovery is disabled", async ({
-	// 	app,
-	// 	networkMonitor,
-	// 	configuration,
-	// }) => {
-	// 	configuration.set("skipDiscovery", true);
+		verify.calledTimes(3);
+		info.calledWith("Checking 3 peers", "p2p");
+	});
 
-	// 	const peers = [
-	// 		{ ip: "187.177.54.44", port: 4000 },
-	// 		{ ip: "188.177.54.44", port: 4000 },
-	// 		{ ip: "189.177.54.44", port: 4000 },
-	// 		{ ip: "190.177.54.44", port: 4000 },
-	// 		{ ip: "191.177.54.44", port: 4000 },
-	// 	];
+	it("#cleansePeers - should verify at most peerCount peers", async ({ service, repository, peerVerifier }) => {
+		repository.getPeers = () => [
+			makePeer("1.1.1.1"),
+			makePeer("2.2.2.2"),
+			makePeer("3.3.3.3"),
+			makePeer("4.4.4.4"),
+			makePeer("5.5.5.5"),
+		];
+		const verify = spy(peerVerifier, "verify");
 
-	// 	stub(app, "config").returnValue({
-	// 		list: [],
-	// 		sources: ["http://peers.someurl.com"],
-	// 	});
-	// 	const spyTriggerServiceCall = spy(triggerService, "call");
-	// 	stub(Utils.http, "get").resolvedValue({ data: peers });
+		await service.cleansePeers({ fast: true, peerCount: 2 });
 
-	// 	await networkMonitor.boot();
+		verify.calledTimes(2);
+	});
 
-	// 	spyTriggerServiceCall.calledTimes(peers.length);
-	// 	for (let index = 0; index < peers.length; index++) {
-	// 		spyTriggerServiceCall.calledNthWith(index++, "validateAndAcceptPeer", {
-	// 			options: { lessVerbose: true, seed: true },
-	// 			peer: match.instanceOf(Peer),
-	// 		});
-	// 	}
-	// });
+	it("#cleansePeers - should log the number of unresponsive peers", async ({
+		service,
+		repository,
+		peerVerifier,
+		logger,
+	}) => {
+		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2"), makePeer("3.3.3.3")];
+		peerVerifier.verify = async (peer) => peer.ip === "2.2.2.2";
+		const debug = spy(logger, "debug");
 
-	// it("#boot - should populate peers from URL config by calling validateAndAcceptPeer, when body is string, when peer discovery is disabled", async ({
-	// 	app,
-	// 	networkMonitor,
-	// 	configuration,
-	// }) => {
-	// 	configuration.set("skipDiscovery", true);
+		await service.cleansePeers({ fast: true, peerCount: 5 });
 
-	// 	const peers = [
-	// 		{ ip: "187.177.54.44", port: 4000 },
-	// 		{ ip: "188.177.54.44", port: 4000 },
-	// 		{ ip: "189.177.54.44", port: 4000 },
-	// 		{ ip: "190.177.54.44", port: 4000 },
-	// 		{ ip: "191.177.54.44", port: 4000 },
-	// 	];
+		debug.calledWith("Removed 2 peers", "p2p");
+	});
 
-	// 	stub(app, "config").returnValue({
-	// 		list: [],
-	// 		sources: ["http://peers.someurl.com"],
-	// 	});
-	// 	const spyTriggerServiceCall = spy(triggerService, "call");
-	// 	stub(Utils.http, "get").resolvedValue({ data: JSON.stringify(peers) });
+	it("#cleansePeers - should not log removals when every peer is responsive", async ({
+		service,
+		repository,
+		logger,
+	}) => {
+		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		const debug = spy(logger, "debug");
 
-	// 	await networkMonitor.boot();
+		await service.cleansePeers({ fast: true, peerCount: 5 });
 
-	// 	spyTriggerServiceCall.calledTimes(peers.length);
-	// 	for (let index = 0; index < peers.length; index++) {
-	// 		spyTriggerServiceCall.calledNthWith(index++, "validateAndAcceptPeer", {
-	// 			options: { lessVerbose: true, seed: true },
-	// 			peer: match.instanceOf(Peer),
-	// 		});
-	// 	}
-	// });
+		debug.neverCalled();
+	});
 
-	// it("#boot -  should handle as empty array if appConfigPeers.sources is undefined, when peer discovery is disabled", async ({
-	// 	app,
-	// 	networkMonitor,
-	// 	configuration,
-	// }) => {
-	// 	configuration.set("skipDiscovery", true);
+	it("#cleansePeers - should resolve once all verifications finish and clear the cutoff timer", async ({
+		service,
+		repository,
+	}) => {
+		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
+		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
 
-	// 	stub(app, "config").returnValue({
-	// 		list: [],
-	// 	});
-	// 	const spyTriggerServiceCall = spy(triggerService, "call");
+		let resolved = false;
+		const promise = service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (resolved = true));
 
-	// 	await networkMonitor.boot();
+		await fakeTimers.tickAsync(0);
+		assert.true(resolved);
+		assert.equal(fakeTimers.countTimers(), 0);
 
-	// 	spyTriggerServiceCall.calledTimes(0);
-	// });
+		await promise;
+	});
 
-	// it("#boot - should populate peers from file by calling validateAndAcceptPeer, when peer discovery is disabled", async ({
-	// 	app,
-	// 	networkMonitor,
-	// 	configuration,
-	// }) => {
-	// 	configuration.set("skipDiscovery", true);
+	it("#cleansePeers - fast mode should cut loose after the fast timeout when a verification hangs", async ({
+		service,
+		repository,
+		peerVerifier,
+	}) => {
+		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
+		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		peerVerifier.verify = (peer) => (peer.ip === "1.1.1.1" ? Promise.resolve(true) : new Promise(() => {}));
 
-	// 	stub(app, "config").returnValue({
-	// 		list: [],
-	// 		sources: [path.resolve(__dirname, "../test/fixtures/", "peers.json")],
-	// 	});
-	// 	const spyTriggerServiceCall = spy(triggerService, "call");
+		let resolved = false;
+		const promise = service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (resolved = true));
 
-	// 	await networkMonitor.boot();
+		await fakeTimers.tickAsync(constants.FAST_VERIFY_TIMEOUT - 1);
+		assert.false(resolved);
 
-	// 	spyTriggerServiceCall.calledTimes(peerFixtures.length);
-	// 	for (let index = 0; index < peerFixtures.length; index++) {
-	// 		spyTriggerServiceCall.calledNthWith(index++, "validateAndAcceptPeer", {
-	// 			options: { lessVerbose: true, seed: true },
-	// 			peer: match.instanceOf(Peer),
-	// 		});
-	// 	}
-	// });
+		await fakeTimers.tickAsync(1);
+		assert.true(resolved);
+		assert.equal(fakeTimers.countTimers(), 0);
 
-	// // TODO: Stop test
-	// it.skip("#boot - should discover peers from seed peers (calling updateNetworkStatus) and log the peers discovered by version, when peer discovery is enabled", async ({
-	// 	networkMonitor,
-	// 	app,
-	// 	configuration,
-	// }) => {
-	// 	const peers = [
-	// 		{ ip: "187.177.54.44", port: 4000, version: "3.0.0" },
-	// 		{ ip: "188.177.54.44", port: 4000, version: "3.0.0" },
-	// 		{ ip: "189.177.54.44", port: 4000, version: "3.0.1" },
-	// 		{ ip: "190.177.54.44", port: 4000, version: "3.0.2" },
-	// 		{ ip: "191.177.54.44", port: 4000, version: "3.0.2" },
-	// 	];
-	// 	stub(repository, "getPeers").returnValue(peers);
-	// 	stub(app, "config").returnValue({
-	// 		list: [],
-	// 	});
-	// 	const spyUpdateNetworkStatus = spy(networkMonitor, "updateNetworkStatus");
-	// 	const spyLoggerInfo = spy(logger, "info");
+		await promise;
+	});
 
-	// 	await networkMonitor.boot();
-
-	// 	spyUpdateNetworkStatus.calledOnce();
-	// 	spyUpdateNetworkStatus.calledWith(true);
-
-	// 	spyLoggerInfo.called();
-	// 	spyLoggerInfo.calledWith("Discovered 2 peers with v3.0.0.");
-	// 	spyLoggerInfo.calledWith("Discovered 1 peer with v3.0.1.");
-	// 	spyLoggerInfo.calledWith("Discovered 2 peers with v3.0.2.");
-	// });
-
-	// it("#updateNetworkStatus - should not do anything, when process.env.NODE_ENV === 'test'", async ({
-	// 	networkMonitor,
-	// }) => {
-	// 	process.env.MAINSAIL_ENV = "test";
-
-	// 	const spyDiscoverPeers = spy(networkMonitor, "discoverPeers");
-
-	// 	await networkMonitor.updateNetworkStatus();
-
-	// 	spyDiscoverPeers.neverCalled();
-
-	// 	delete process.env.MAINSAIL_ENV;
-	// });
-
-	it("#updateNetworkStatus - should log a warning message and not discover peers, when in 'disable discovery' mode", async ({
-		networkMonitor,
+	it("#cleansePeers - should cut loose after the configured verifyTimeout when not in fast mode", async ({
+		service,
+		repository,
+		peerVerifier,
 		configuration,
 	}) => {
-		configuration.set("disableDiscovery", true);
+		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
+		repository.getPeers = () => [makePeer("1.1.1.1")];
+		peerVerifier.verify = () => new Promise(() => {});
+		const getRequired = spy(configuration, "getRequired");
 
-		const spyDiscoverPeers = spy(networkMonitor, "discoverPeers");
-		const spyLoggerWarn = spy(logger, "warn");
+		let resolved = false;
+		const promise = service.cleansePeers({ fast: false, peerCount: 5 }).then(() => (resolved = true));
 
-		await networkMonitor.updateNetworkStatus();
+		getRequired.calledWith("verifyTimeout");
 
-		spyLoggerWarn.calledWith("Skipped peer discovery because the relay is in non-discovery mode.");
-		spyDiscoverPeers.neverCalled();
+		await fakeTimers.tickAsync(59_999);
+		assert.false(resolved);
+
+		await fakeTimers.tickAsync(1);
+		assert.true(resolved);
+
+		await promise;
 	});
 
-	it.skip("#updateNetworkStatus - should discover new peers from existing", async ({ networkMonitor, app }) => {
-		stub(app, "config").returnValue({
-			list: [],
-		});
-
-		const spyDiscoverPeers = spy(networkMonitor, "discoverPeers");
-
-		await networkMonitor.updateNetworkStatus();
-
-		spyDiscoverPeers.calledOnce();
-	});
-
-	it.skip("#updateNetworkStatus - should log an error when discovering new peers fails", async ({
-		networkMonitor,
-		app,
+	it("#cleansePeers - should let slow verifications finish in the background after the cutoff", async ({
+		service,
+		repository,
+		peerVerifier,
+		logger,
 	}) => {
-		stub(app, "config").returnValue({
-			list: [],
-		});
+		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
+		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		peerVerifier.verify = (peer) =>
+			peer.ip === "1.1.1.1"
+				? Promise.resolve(true)
+				: new Promise((resolve) => setTimeout(() => resolve(false), 5000));
+		const debug = spy(logger, "debug");
 
-		const errorMessage = "failed discovering peers";
-		const spyDiscoverPeers = stub(networkMonitor, "discoverPeers").rejectedValue(new Error(errorMessage));
-		const spyLoggerErrror = stub(logger, "error");
+		let resolved = false;
+		const promise = service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (resolved = true));
 
-		await networkMonitor.updateNetworkStatus();
+		await fakeTimers.tickAsync(constants.FAST_VERIFY_TIMEOUT);
+		assert.true(resolved);
 
-		spyDiscoverPeers.calledOnce();
-		spyLoggerErrror.calledOnce();
-		spyLoggerErrror.calledWith(`Network Status: ${errorMessage}`);
+		// The slow peer had not failed by the cutoff, so nothing was logged as removed.
+		debug.neverCalled();
+
+		// The slow verification settles in the background without surfacing errors
+		// and without being logged retroactively.
+		await fakeTimers.tickAsync(5000);
+		debug.neverCalled();
+		assert.equal(fakeTimers.countTimers(), 0);
+
+		await promise;
 	});
 
-	it.skip("#updateNetworkStatus - should fall back to seed peers when after discovering we are below minimum peers", async ({
-		networkMonitor,
-		app,
+	it("#cleansePeers - should log a verification that rejects in the background after the cutoff", async ({
+		service,
+		repository,
+		peerVerifier,
+		logger,
 	}) => {
-		stub(app, "config").returnValue({
-			list: [],
-		});
+		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
+		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		peerVerifier.verify = (peer) =>
+			peer.ip === "1.1.1.1"
+				? Promise.resolve(true)
+				: new Promise((_, reject) => setTimeout(() => reject(new Error("late boom")), 5000));
+		const error = spy(logger, "error");
 
-		const spyLoggerInfo = stub(logger, "info");
+		let resolved = false;
+		const promise = service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (resolved = true));
 
-		await networkMonitor.updateNetworkStatus();
+		await fakeTimers.tickAsync(constants.FAST_VERIFY_TIMEOUT);
+		assert.true(resolved);
+		error.neverCalled();
 
-		spyLoggerInfo.calledWith("Couldn't find enough peers. Falling back to seed peers.");
+		// The late rejection is caught and logged instead of surfacing as unhandled.
+		await fakeTimers.tickAsync(5000);
+		error.calledWith("Peer verification failed: late boom", "p2p");
+		assert.equal(fakeTimers.countTimers(), 0);
+
+		await promise;
 	});
 
-	it.skip("#updateNetworkStatus - should not fall back to seed peers when config.ignoreMinimumNetworkReach, when we are below minimum peers", async ({
-		configuration,
-		networkMonitor,
-		app,
+	it("#cleansePeers - should skip peers whose verification is still in flight and retry them once it settles", async ({
+		service,
+		repository,
+		peerVerifier,
 	}) => {
-		configuration.set("ignoreMinimumNetworkReach", true);
-		const spyLoggerInfo = stub(logger, "info");
+		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
+		repository.getPeers = () => [makePeer("1.1.1.1")];
 
-		await networkMonitor.updateNetworkStatus();
-
-		spyLoggerInfo.notCalledWith("Couldn't find enough peers. Falling back to seed peers.");
-	});
-
-	// TODO: Restore test
-	// it.only("#updateNetworkStatus - should schedule the next updateNetworkStatus only once", async ({
-	// 	networkMonitor,
-	// 	app,
-	// }) => {
-	// 	stub(app, "config").returnValue({
-	// 		list: [],
-	// 	});
-
-	// 	const sleeping = true;
-	// 	const mockSleep = async () => {
-	// 		while (sleeping) {
-	// 			await delay(10);
-	// 		}
-	// 	};
-
-	// 	const spySleep = stub(Utils, "sleep").callsFake(async () => {
-	// 		console.log("TEST");
-	// 	});
-
-	// 	// repository.getPeers.mockReturnValue([]);
-
-	// 	// let sleeping = true;
-	// 	// const mockSleep = async () => {
-	// 	// 	while (sleeping) {
-	// 	// 		await delay(10);
-	// 	// 	}
-	// 	// };
-	// 	// const spySleep = jest.spyOn(Utils, "sleep").mockImplementationOnce(mockSleep);
-	// 	// await networkMonitor.updateNetworkStatus();
-
-	// 	// expect(spySleep).toBeCalledTimes(1);
-
-	// 	// await networkMonitor.updateNetworkStatus();
-	// 	// expect(spySleep).toBeCalledTimes(1);
-
-	// 	// sleeping = false;
-	// 	// await delay(20); // give time to mockSleep to end and scheduleUpdateNetworkStatus to finish
-
-	// 	// await networkMonitor.updateNetworkStatus();
-
-	// 	// expect(spySleep).toBeCalledTimes(2); // because no more pending nextUpdateNetworkStatusScheduled
-	// });
-
-	it.skip("#cleansePeers - should ping every peer when the peers length is <= <peerCount>", async ({
-		networkMonitor,
-		configuration,
-	}) => {
-		const peers = [
-			new Peer("187.177.54.44", 4000),
-			new Peer("188.177.54.44", 4000),
-			new Peer("189.177.54.44", 4000),
-			new Peer("190.177.54.44", 4000),
-			new Peer("191.177.54.44", 4000),
-		];
-		stub(repository, "getPeers").returnValue(peers);
-
-		const spyCommunicatorPing = spy(communicator, "ping");
-
-		await networkMonitor.cleansePeers({ peerCount: 5 });
-
-		spyCommunicatorPing.calledTimes(peers.length);
-		for (const peer of peers) {
-			spyCommunicatorPing.calledWith(peer, configuration.getRequired("verifyTimeout"));
-		}
-	});
-
-	it.skip("#cleansePeers - should ping a max of <peerCount> peers when the peers length is above <peerCount>", async ({
-		networkMonitor,
-	}) => {
-		const peers = [
-			new Peer("187.177.54.44", 4000),
-			new Peer("188.177.54.44", 4000),
-			new Peer("189.177.54.44", 4000),
-			new Peer("190.177.54.44", 4000),
-			new Peer("191.177.54.44", 4000),
-		];
-		stub(repository, "getPeers").returnValue(peers);
-
-		const spyCommunicatorPing = spy(communicator, "ping");
-
-		await networkMonitor.cleansePeers({ peerCount: 2 });
-
-		spyCommunicatorPing.calledTimes(2);
-	});
-
-	it.skip("#cleansePeers - should dispatch 'p2p.internal.disconnectPeer', PeerEvent.Removed, and log the error when ping fails for a peer", async ({
-		networkMonitor,
-	}) => {
-		const peers = [
-			new Peer("187.177.54.44", 4000),
-			new Peer("188.177.54.44", 4000),
-			new Peer("189.177.54.44", 4000),
-			new Peer("190.177.54.44", 4000),
-			new Peer("191.177.54.44", 4000),
-		];
-		stub(repository, "getPeers").returnValue(peers);
-
-		const spyCommunicatorPing = stub(communicator, "ping").rejectedValueNth(0, new Error("Timeout"));
-		const spyEmitterDispatch = spy(emitter, "dispatch");
-
-		await networkMonitor.cleansePeers({ peerCount: 5 });
-
-		spyCommunicatorPing.calledTimes(peers.length);
-		spyEmitterDispatch.calledTimes(2);
-		spyEmitterDispatch.calledWith(Events.PeerEvent.Disconnect, { peer: match.instanceOf(Peer) }); // TODO: Check consistency
-		spyEmitterDispatch.calledWith(Events.PeerEvent.Removed, match.instanceOf(Peer)); // TODO: Check consistency
-	});
-
-	it.skip("#cleansePeers - should log the responsive peers count and the median network height when initializing", async ({
-		networkMonitor,
-	}) => {
-		const peers = [
-			new Peer("187.177.54.44", 4000),
-			new Peer("188.177.54.44", 4000),
-			new Peer("189.177.54.44", 4000),
-			new Peer("190.177.54.44", 4000),
-			new Peer("191.177.54.44", 4000),
-		];
-		stub(repository, "getPeers").returnValue(peers);
-
-		const spyCommunicatorPing = stub(communicator, "ping").rejectedValueNth(0, new Error("Timeout"));
-		const spyLoggerInfo = spy(logger, "info");
-
-		await networkMonitor.cleansePeers({ peerCount: 5 });
-
-		spyCommunicatorPing.calledTimes(peers.length);
-		spyLoggerInfo.calledWith("4 of 5 peers on the network are responsive");
-		spyLoggerInfo.calledWith("Median Network Height: 0");
-	});
-
-	it("#discoverPeers - should get peers from 8 of our peers, and add them to our peers", async ({
-		networkMonitor,
-	}) => {
-		const peers = [
-			new Peer("180.177.54.4", 4000),
-			new Peer("181.177.54.4", 4000),
-			new Peer("182.177.54.4", 4000),
-			new Peer("183.177.54.4", 4000),
-			new Peer("184.177.54.4", 4000),
-			new Peer("185.177.54.4", 4000),
-			new Peer("186.177.54.4", 4000),
-			new Peer("187.177.54.4", 4000),
-			new Peer("188.177.54.4", 4000),
-			new Peer("189.177.54.4", 4000),
-		];
-		stub(repository, "getPeers").returnValue(peers);
-
-		const spyTriggerServiceCall = spy(triggerService, "call");
-		const spyCommunicatorGetPeers = stub(communicator, "getPeers").rejectedValueNth(0, new Error("Timeout"));
-
-		// mocking a timeout for the first peer, should be fine
-		// mocking different getPeers return for the other peers in storage
-		for (let index = 1, peer = peers[1]; index < peers.length; index++, peer = peers[index]) {
-			spyCommunicatorGetPeers.resolvedValueNth(index, [
-				{ ip: `${peer.ip}1${index}`, port: peer.port },
-				{ ip: `${peer.ip}2${index}`, port: peer.port },
-				{ ip: `${peer.ip}3${index}`, port: peer.port },
-				{ ip: `${peer.ip}4${index}`, port: peer.port },
-			]);
-		}
-
-		await networkMonitor.discoverPeers();
-
-		spyCommunicatorGetPeers.calledTimes(8);
-		spyTriggerServiceCall.calledTimes(7 * 4); // validateAndAcceptPeer for each peer fetched from the 7 peers
-	});
-
-	it("#discoverPeers - should not add the peers fetched, when not in pingAll mode + we have more than minimum peers + we have more than 75% of the peers fetched", async ({
-		networkMonitor,
-		configuration,
-	}) => {
-		configuration.set("minimumNetworkReach", 5);
-
-		const peers = [
-			new Peer("180.177.54.4", 4000),
-			new Peer("181.177.54.4", 4000),
-			new Peer("182.177.54.4", 4000),
-			new Peer("183.177.54.4", 4000),
-			new Peer("184.177.54.4", 4000),
-			new Peer("185.177.54.4", 4000),
-			new Peer("186.177.54.4", 4000),
-			new Peer("187.177.54.4", 4000),
-			new Peer("188.177.54.4", 4000),
-			new Peer("189.177.54.4", 4000),
-		];
-		stub(repository, "getPeers").returnValue(peers);
-
-		const spyTriggerServiceCall = spy(triggerService, "call");
-		const spyCommunicatorGetPeers = stub(communicator, "getPeers");
-		// mocking different getPeers return for each peer in storage
-		for (let index = 0, peer = peers[0]; index < peers.length; index++, peer = peers[index]) {
-			spyCommunicatorGetPeers.rejectedValueNth(1, [{ ip: `${peer.ip}1${index}`, port: peer.port }]);
-		}
-
-		await networkMonitor.discoverPeers();
-
-		spyCommunicatorGetPeers.calledTimes(8);
-		spyTriggerServiceCall.neverCalled();
-	});
-
-	it("#getNetworkState - should call cleansePeers with {fast, forcePing} and return network state from NetworkState.analyze", async ({
-		networkMonitor,
-	}) => {
-		process.env.MAINSAIL_ENV = "test"; // for NetworkState analyze
-
-		const block = {
-			data: {
-				blockSignature:
-					"3045022100e7385c6ea42bd950f7f6ab8c8619cf2f66a41d8f8f185b0bc99af032cb25f30d02200b6210176a6cedfdcbe483167fd91c21d740e0e4011d24d679c601fdd46b0de9",
-				generatorAddress: "026c598170201caf0357f202ff14f365a3b09322071e347873869f58d776bfc565",
-				height: 2,
-				id: "17882607875259085966",
-				numberOfTransactions: 0,
-				payloadHash: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-				payloadLength: 0,
-				previousBlock: "17184958558311101492",
-				reward: 0n,
-				timestamp: 46_583_330,
-				totalAmount: 0n,
-				totalFee: 0n,
-				version: 0,
-			},
-			transactions: [],
+		let verifyCalls = 0;
+		let release!: (result: boolean) => void;
+		peerVerifier.verify = () => {
+			verifyCalls++;
+			return new Promise<boolean>((resolve) => (release = resolve));
 		};
 
-		stub(blockchain, "getLastBlock").returnValueOnce(block);
-		const spyCleansePeers = spy(networkMonitor, "cleansePeers");
+		// The first cleanse hangs on the verification and is cut loose.
+		let firstResolved = false;
+		const first = service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (firstResolved = true));
+		await fakeTimers.tickAsync(constants.FAST_VERIFY_TIMEOUT);
+		assert.true(firstResolved);
+		assert.equal(verifyCalls, 1);
 
-		const networkState = await networkMonitor.getNetworkState();
+		// A second cleanse finds no eligible peer and returns immediately.
+		let secondResolved = false;
+		void service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (secondResolved = true));
+		await fakeTimers.tickAsync(0);
+		assert.true(secondResolved);
+		assert.equal(verifyCalls, 1);
 
-		assert.instance(networkState, NetworkState);
-		spyCleansePeers.calledOnce();
-		spyCleansePeers.calledWith({ fast: true, forcePing: true });
+		// Once the hung verification settles, the peer becomes eligible again.
+		release(true);
+		await fakeTimers.tickAsync(0);
+		await first;
 
+		let thirdResolved = false;
+		void service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (thirdResolved = true));
+		assert.equal(verifyCalls, 2);
+		release(true);
+		await fakeTimers.tickAsync(0);
+		assert.true(thirdResolved);
+	});
+
+	it("#cleansePeers - should resolve and log instead of hanging when a verification rejects", async ({
+		service,
+		repository,
+		peerVerifier,
+		logger,
+	}) => {
+		repository.getPeers = () => [makePeer("1.1.1.1")];
+		peerVerifier.verify = async () => {
+			throw new Error("boom");
+		};
+		const error = spy(logger, "error");
+
+		await service.cleansePeers({ fast: true, peerCount: 5 });
+
+		error.calledWith("Peer verification failed: boom", "p2p");
+	});
+
+	it("#mainLoop - should re-arm every 2 seconds until disposed", async ({ service, state }) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const getLastMessageTime = spy(state, "getLastMessageTime");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+		getLastMessageTime.calledTimes(1);
+
+		await fakeTimers.tickAsync(2000);
+		getLastMessageTime.calledTimes(2);
+
+		await fakeTimers.tickAsync(2000);
+		getLastMessageTime.calledTimes(3);
+
+		assert.equal(fakeTimers.countTimers(), 1);
+		await service.dispose();
+		assert.equal(fakeTimers.countTimers(), 0);
+
+		await fakeTimers.tickAsync(10_000);
+		getLastMessageTime.calledTimes(3);
+	});
+
+	it("#mainLoop - should not re-arm when disposed during an in-flight iteration", async ({
+		service,
+		state,
+		repository,
+		peerVerifier,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		state.getLastMessageTime = () => dayjs().subtract(9, "second");
+		repository.getPeers = () => [makePeer("1.1.1.1")];
+
+		let release!: (result: boolean) => void;
+		peerVerifier.verify = () => new Promise<boolean>((resolve) => (release = resolve));
+
+		// The iteration is now in flight, blocked on the verification.
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+
+		await service.dispose();
+
+		release(true);
+		await fakeTimers.tickAsync(0);
+
+		// The finished iteration must not have armed a new loop timer.
+		assert.equal(fakeTimers.countTimers(), 0);
+	});
+
+	it("#mainLoop - should fall back to seed peers when below the minimum, at most once per minute", async ({
+		service,
+		repository,
+		peerDiscoverer,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		repository.hasMinimumPeers = () => false;
+		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		const populateSeedPeers = spy(peerDiscoverer, "populateSeedPeers");
+		const discoverPeers = spy(peerDiscoverer, "discoverPeers");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+
+		// Throttled: the last check timestamp was set at construction.
+		populateSeedPeers.neverCalled();
+
+		await fakeTimers.tickAsync(61_000);
+		populateSeedPeers.calledOnce();
+		discoverPeers.calledTimes(2);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should fast-cleanse at least 5 peers when no messages arrived within 8 seconds", async ({
+		service,
+		state,
+		repository,
+		peerVerifier,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		state.getLastMessageTime = () => dayjs().subtract(9, "second");
+		repository.getPeers = () => Array.from({ length: 10 }, (_, index) => makePeer(`1.1.1.${index}`));
+		const verify = stub(peerVerifier, "verify").resolvedValue(true);
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+
+		// max(ceil(10 * 0.2), 5) = 5
+		verify.calledTimes(5);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should fast-cleanse 20% of peers (rounded up) when that exceeds the minimum of 5", async ({
+		service,
+		state,
+		repository,
+		peerVerifier,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		state.getLastMessageTime = () => dayjs().subtract(9, "second");
+		repository.getPeers = () => Array.from({ length: 26 }, (_, index) => makePeer(`1.1.1.${index}`));
+		const verify = stub(peerVerifier, "verify").resolvedValue(true);
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+
+		// ceil(26 * 0.2) = 6
+		verify.calledTimes(6);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should log and re-arm when a check throws", async ({ service, state, logger }) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const error = spy(logger, "error");
+
+		let calls = 0;
+		state.getLastMessageTime = () => {
+			calls++;
+			if (calls === 1) {
+				throw new Error("boom");
+			}
+
+			return dayjs();
+		};
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+
+		error.calledWith("P2P main loop failed: boom", "p2p");
+		assert.equal(calls, 1);
+
+		// The loop survived the failure and ticked again.
+		await fakeTimers.tickAsync(2000);
+		assert.equal(calls, 2);
+
+		await service.dispose();
+	});
+
+	it("#boot - should skip booting in the test environment", async ({ service, apiNodeDiscoverer }) => {
+		const previous = process.env.MAINSAIL_ENV;
+		process.env.MAINSAIL_ENV = "test";
+
+		try {
+			const populate = spy(apiNodeDiscoverer, "populateApiNodesFromConfiguration");
+
+			await service.boot();
+
+			populate.neverCalled();
+		} finally {
+			if (previous === undefined) {
+				delete process.env.MAINSAIL_ENV;
+			} else {
+				process.env.MAINSAIL_ENV = previous;
+			}
+		}
+	});
+
+	it("#boot - should populate api nodes and seed peers, log discovered versions and start the loops", async ({
+		service,
+		apiNodeDiscoverer,
+		peerDiscoverer,
+		repository,
+		logger,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const previous = process.env.MAINSAIL_ENV;
 		delete process.env.MAINSAIL_ENV;
+
+		try {
+			repository.getPeers = () => [
+				makePeer("1.1.1.1"),
+				makePeer("2.2.2.2"),
+				makePeer("3.3.3.3", { version: "0.0.2" }),
+			];
+			const populateApiNodes = spy(apiNodeDiscoverer, "populateApiNodesFromConfiguration");
+			const discoverNewApiNodes = spy(apiNodeDiscoverer, "discoverNewApiNodes");
+			const populateSeedPeers = spy(peerDiscoverer, "populateSeedPeers");
+			const info = spy(logger, "info");
+
+			await service.boot();
+			await fakeTimers.tickAsync(0);
+
+			populateApiNodes.calledOnce();
+			populateSeedPeers.calledOnce();
+			discoverNewApiNodes.calledOnce();
+			info.calledWith("Discovered 2 peers with v0.0.1.", "p2p");
+			info.calledWith("Discovered 1 peer with v0.0.2.", "p2p");
+
+			// Both loop timers are pending; dispose cancels them all.
+			assert.equal(fakeTimers.countTimers(), 2);
+			await service.dispose();
+			assert.equal(fakeTimers.countTimers(), 0);
+		} finally {
+			await service.dispose();
+
+			if (previous === undefined) {
+				delete process.env.MAINSAIL_ENV;
+			} else {
+				process.env.MAINSAIL_ENV = previous;
+			}
+		}
 	});
 
-	it.skip("#refreshPeersAfterFork - should call cleansePeers with {forcePing}", async ({ networkMonitor }) => {
-		const spyCleansePeers = spy(networkMonitor, "cleansePeers");
-
-		await networkMonitor.refreshPeersAfterFork();
-
-		spyCleansePeers.calledOnce();
-		spyCleansePeers.calledWith({ forcePing: true });
-	});
-
-	it.skip("#checkNetworkHealth - should not rollback when there are no verified peers", async ({
-		networkMonitor,
+	it("#boot - should log and re-arm the api node check when it throws", async ({
+		service,
+		apiNodeDiscoverer,
+		logger,
 	}) => {
-		const peers = [
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-		];
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const previous = process.env.MAINSAIL_ENV;
+		delete process.env.MAINSAIL_ENV;
 
-		stub(repository, "getPeers").returnValue(peers);
+		try {
+			let calls = 0;
+			apiNodeDiscoverer.discoverNewApiNodes = async () => {
+				calls++;
+				if (calls === 1) {
+					throw new Error("boom");
+				}
+			};
+			const error = spy(logger, "error");
 
-		const networkStatus = await networkMonitor.checkNetworkHealth();
+			await service.boot();
+			await fakeTimers.tickAsync(0);
 
-		assert.equal(networkStatus, { forked: false });
+			error.calledWith("API node check failed: boom", "p2p");
+			assert.equal(calls, 1);
+
+			// The check re-armed despite the failure (10-20 min random delay).
+			await fakeTimers.tickAsync(20 * 60 * 1000);
+			assert.equal(calls, 2);
+		} finally {
+			await service.dispose();
+
+			if (previous === undefined) {
+				delete process.env.MAINSAIL_ENV;
+			} else {
+				process.env.MAINSAIL_ENV = previous;
+			}
+		}
 	});
 
-	it.skip("#checkNetworkHealth - should rollback ignoring peers who are below common height", async ({
-		networkMonitor,
+	it("#getNetworkBlockNumberPercentile - should compute the percentile over peers reporting a block number", ({
+		service,
+		repository,
 	}) => {
-		//                      105 (4 peers)
-		//                     /
-		// 90 (3 peers) ... 100 ... 103 (2 peers and us)
-
-		const lastBlock = { data: { height: 103 } };
-
-		const peers = [
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
+		repository.getPeers = () => [
+			makePeer("1.1.1.1", { header: { blockNumber: 9 } }),
+			makePeer("2.2.2.2", { header: { blockNumber: 3 } }),
+			makePeer("3.3.3.3", { header: { blockNumber: 5 } }),
+			makePeer("4.4.4.4", { header: {} }),
 		];
 
-		stub(repository, "getPeers").returnValue(peers);
-		stub(store, "getLastBlock").returnValue(lastBlock);
-
-		peers[0].verificationResult = new PeerVerificationResult(103, 90, 90);
-		peers[1].verificationResult = new PeerVerificationResult(103, 90, 90);
-		peers[2].verificationResult = new PeerVerificationResult(103, 90, 90);
-
-		peers[3].verificationResult = new PeerVerificationResult(103, 105, 100);
-		peers[4].verificationResult = new PeerVerificationResult(103, 105, 100);
-		peers[5].verificationResult = new PeerVerificationResult(103, 105, 100);
-		peers[6].verificationResult = new PeerVerificationResult(103, 105, 100);
-
-		peers[7].verificationResult = new PeerVerificationResult(103, 103, 103);
-		peers[8].verificationResult = new PeerVerificationResult(103, 103, 103);
-
-		const networkStatus = await networkMonitor.checkNetworkHealth();
-
-		assert.equal(networkStatus, { blocksToRollback: 3, forked: true });
-	});
-
-	it.skip("#checkNetworkHealth - should rollback ignoring peers who are at common height", async ({
-		networkMonitor,
-	}) => {
-		//     105 (4 peers)
-		//    /
-		// 100 (3 peers) ... 103 (2 peers and us)
-
-		const lastBlock = { data: { height: 103 } };
-
-		const peers = [
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-		];
-
-		stub(repository, "getPeers").returnValue(peers);
-		stub(store, "getLastBlock").returnValue(lastBlock);
-
-		peers[0].verificationResult = new PeerVerificationResult(103, 100, 100);
-		peers[1].verificationResult = new PeerVerificationResult(103, 100, 100);
-		peers[2].verificationResult = new PeerVerificationResult(103, 100, 100);
-
-		peers[3].verificationResult = new PeerVerificationResult(103, 105, 100);
-		peers[4].verificationResult = new PeerVerificationResult(103, 105, 100);
-		peers[5].verificationResult = new PeerVerificationResult(103, 105, 100);
-		peers[6].verificationResult = new PeerVerificationResult(103, 105, 100);
-
-		peers[7].verificationResult = new PeerVerificationResult(103, 103, 103);
-		peers[8].verificationResult = new PeerVerificationResult(103, 103, 103);
-
-		const networkStatus = await networkMonitor.checkNetworkHealth();
-
-		assert.equal(networkStatus, { blocksToRollback: 3, forked: true });
-	});
-
-	it.skip("#checkNetworkHealth - should not rollback although most peers are forked", async ({ networkMonitor }) => {
-		//    47 (1 peer)    47 (3 peers)   47 (3 peers)
-		//   /              /              /
-		// 12 ........... 31 ........... 35 ... 43 (3 peers and us)
-
-		const lastBlock = { data: { height: 103 } };
-
-		const peers = [
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-			new Peer("180.177.54.4", 4000),
-		];
-
-		stub(repository, "getPeers").returnValue(peers);
-		stub(store, "getLastBlock").returnValue(lastBlock);
-
-		peers[0].verificationResult = new PeerVerificationResult(43, 47, 12);
-
-		peers[1].verificationResult = new PeerVerificationResult(43, 47, 31);
-		peers[2].verificationResult = new PeerVerificationResult(43, 47, 31);
-		peers[3].verificationResult = new PeerVerificationResult(43, 47, 31);
-
-		peers[4].verificationResult = new PeerVerificationResult(43, 47, 35);
-		peers[5].verificationResult = new PeerVerificationResult(43, 47, 35);
-		peers[6].verificationResult = new PeerVerificationResult(43, 47, 35);
-
-		peers[7].verificationResult = new PeerVerificationResult(43, 47, 43);
-		peers[8].verificationResult = new PeerVerificationResult(43, 47, 43);
-		peers[9].verificationResult = new PeerVerificationResult(43, 47, 43);
-
-		const networkStatus = await networkMonitor.checkNetworkHealth();
-
-		assert.equal(networkStatus, { forked: false });
+		assert.equal(service.getNetworkBlockNumberPercentile(50), 5);
 	});
 });

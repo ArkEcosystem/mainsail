@@ -3,6 +3,9 @@ import { Units } from "@mainsail/constants";
 export const constants = {
 	CHECK_HEADER_DELAY: 2000,
 
+	// cut-loose timeout for a fast peer cleanse. slow verifications continue in the background
+	FAST_VERIFY_TIMEOUT: 1500,
+
 	MAX_DOWNLOAD_BLOCKS: 400, // maximum number of blocks we can download at once
 	MAX_DOWNLOAD_BLOCKS_JOBS: 10, // maximum number of blocks jobs
 
