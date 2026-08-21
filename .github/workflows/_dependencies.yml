@@ -10,14 +10,14 @@ jobs:
     source:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v6.0.2
+            - uses: actions/checkout@v7.0.1
               with:
                   ref: ${{ github.head_ref }}
-            - uses: actions/setup-node@v6.3.0
+            - uses: actions/setup-node@v7.0.0
               with:
                   node-version: ${{ matrix.node-version }}
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4.3.0
+              uses: pnpm/action-setup@v6.0.10
               with:
                   run_install: false
                   version: latest
@@ -26,13 +26,13 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache@v5.0.3
+              uses: actions/cache@v6.1.0
               with:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
                   restore-keys: ${{ runner.os }}-pnpm-
             - name: Cache lerna
-              uses: actions/cache@v5.0.3
+              uses: actions/cache@v6.1.0
               with:
                   key: ${{ runner.os }}-lerna
                   path: ./.nx
