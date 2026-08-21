@@ -31,12 +31,6 @@ jobs:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
                   restore-keys: ${{ runner.os }}-pnpm-
-            - name: Cache lerna
-              uses: actions/cache@v6.1.0
-              with:
-                  key: ${{ runner.os }}-lerna
-                  path: ./.nx
-                  restore-keys: ${{ runner.os }}-lerna-
             - name: Install dependencies
               run: pnpm install
             - name: Check dependencies

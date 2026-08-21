@@ -55,10 +55,17 @@ jobs:
             - name: Install dependencies
               run: pnpm install
 
+            - name: Restore lerna cache
+              uses: actions/cache/restore@v6.1.0
+              with:
+                  key: lerna-${{ github.sha }}
+                  path: ./.nx
+                  restore-keys: lerna-
+
             - name: Build
               run: pnpm run build
 
-            - name: Cache lerna
+            - name: Save lerna cache
               uses: actions/cache/save@v6.1.0
               with:
                   key: lerna-${{ github.sha }}
@@ -97,11 +104,12 @@ jobs:
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-            - name: Cache lerna
+            - name: Restore lerna cache
               uses: actions/cache/restore@v6.1.0
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.nx
+                  restore-keys: lerna-
             - uses: dtolnay/rust-toolchain@stable
               with:
                   components: llvm-tools-preview
@@ -182,11 +190,12 @@ jobs:
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-            - name: Cache lerna
+            - name: Restore lerna cache
               uses: actions/cache/restore@v6.1.0
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.nx
+                  restore-keys: lerna-
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -233,11 +242,12 @@ jobs:
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-            - name: Cache lerna
+            - name: Restore lerna cache
               uses: actions/cache/restore@v6.1.0
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.nx
+                  restore-keys: lerna-
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -318,11 +328,12 @@ jobs:
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-            - name: Cache lerna
+            - name: Restore lerna cache
               uses: actions/cache/restore@v6.1.0
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.nx
+                  restore-keys: lerna-
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -376,11 +387,12 @@ jobs:
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-            - name: Cache lerna
+            - name: Restore lerna cache
               uses: actions/cache/restore@v6.1.0
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.nx
+                  restore-keys: lerna-
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -455,11 +467,12 @@ jobs:
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-            - name: Cache lerna
+            - name: Restore lerna cache
               uses: actions/cache/restore@v6.1.0
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.nx
+                  restore-keys: lerna-
             - name: Install dependencies
               run: pnpm install
             - name: Build
@@ -540,11 +553,12 @@ jobs:
               with:
                   key: pnpm-${{ hashFiles('pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
-            - name: Cache lerna
+            - name: Restore lerna cache
               uses: actions/cache/restore@v6.1.0
               with:
                   key: lerna-${{ github.sha }}
                   path: ./.nx
+                  restore-keys: lerna-
             - name: Install dependencies
               run: pnpm install
             - name: Build
