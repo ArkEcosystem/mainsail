@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { percentile } from "@mainsail/blockchain-utils";
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { groupBy, pluralize, randomNumber, shuffle } from "@mainsail/utils";
+import { ensureError, groupBy, pluralize, randomNumber, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 import delay from "delay";
 
@@ -61,13 +61,17 @@ export class Service implements Contracts.P2P.Service {
 	}
 
 	public async mainLoop(): Promise<void> {
-		await this.#checkMinPeers();
-		await this.#checkReceivedMessages();
-
-		if (!this.#disposed) {
-			this.#mainLoopTimeout = setTimeout(() => {
-				void this.mainLoop();
-			}, 2000);
+		try {
+			await this.#checkMinPeers();
+			await this.#checkReceivedMessages();
+		} catch (rawError) {
+			this.logger.error(`P2P main loop failed: ${ensureError(rawError).message}`, "p2p");
+		} finally {
+			if (!this.#disposed) {
+				this.#mainLoopTimeout = setTimeout(() => {
+					void this.mainLoop();
+				}, 2000);
+			}
 		}
 	}
 
@@ -106,14 +110,18 @@ export class Service implements Contracts.P2P.Service {
 	}
 
 	async #checkApiNodes(): Promise<void> {
-		await this.ApiNodeDiscoverer.discoverNewApiNodes();
-		await this.ApiNodeDiscoverer.refreshApiNodes();
-
-		if (!this.#disposed) {
-			const nextTimeout = randomNumber(10, 20) * 60 * 1000;
-			this.#apiNodeCheckLoopTimeout = setTimeout(() => {
-				void this.#checkApiNodes();
-			}, nextTimeout);
+		try {
+			await this.ApiNodeDiscoverer.discoverNewApiNodes();
+			await this.ApiNodeDiscoverer.refreshApiNodes();
+		} catch (rawError) {
+			this.logger.error(`API node check failed: ${ensureError(rawError).message}`, "p2p");
+		} finally {
+			if (!this.#disposed) {
+				const nextTimeout = randomNumber(10, 20) * 60 * 1000;
+				this.#apiNodeCheckLoopTimeout = setTimeout(() => {
+					void this.#checkApiNodes();
+				}, nextTimeout);
+			}
 		}
 	}
 
