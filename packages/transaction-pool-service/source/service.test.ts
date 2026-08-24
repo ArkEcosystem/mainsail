@@ -26,7 +26,8 @@ describe<{
 	poolQuery: any;
 	stateStore: any;
 	storage: any;
-}>("Service", ({ it, beforeEach, stub, spy }) => {
+	transactionFactory: any;
+}>("Service", ({ it, beforeEach, assert, stub, spy }) => {
 	beforeEach((context) => {
 		context.blockNumber = 100;
 		context.poolTransactions = [];
@@ -101,11 +102,12 @@ describe<{
 			info: () => {},
 			warn: () => {},
 		});
-		context.app.bind(Identifiers.Cryptography.Transaction.Factory).toConstantValue({
+		context.transactionFactory = {
 			fromBytes: async () => {
 				throw new Error("not implemented");
 			},
-		});
+		};
+		context.app.bind(Identifiers.Cryptography.Transaction.Factory).toConstantValue(context.transactionFactory);
 
 		context.service = context.app.resolve(Service);
 	});
@@ -223,6 +225,38 @@ describe<{
 		await context.service.commit([], 0, false);
 
 		broadcastTransactions.calledWith([context.poolTransactions[0], context.poolTransactions[1]]);
+	});
+
+	it("addTransaction - should dispatch AddedToPool with the transaction data", async (context) => {
+		const transaction = makeTransaction(0);
+		const dispatch = spy(context.events, "dispatch");
+
+		await context.service.addTransaction(transaction);
+
+		dispatch.calledWith(Events.TransactionEvent.AddedToPool, transaction.toData());
+	});
+
+	it("addTransaction - should dispatch RejectedByPool with the transaction data when the pool rejects", async (context) => {
+		const transaction = makeTransaction(0);
+		stub(context.mempool, "addTransaction").rejectedValue(new Error("rejected"));
+		const dispatch = spy(context.events, "dispatch");
+
+		await assert.rejects(() => context.service.addTransaction(transaction));
+
+		dispatch.calledWith(Events.TransactionEvent.RejectedByPool, transaction.toData());
+	});
+
+	it("reAddTransactions - should dispatch AddedToPool with the transaction data for re-added transactions", async (context) => {
+		const transaction = makeTransaction(0);
+		stub(context.storage, "getAllTransactions").returnValue([
+			{ blockNumber: 99, hash: transaction.hash, serialized: transaction.serialized },
+		]);
+		stub(context.transactionFactory, "fromBytes").resolvedValue(transaction);
+		const dispatch = spy(context.events, "dispatch");
+
+		await context.service.reAddTransactions();
+
+		dispatch.calledWith(Events.TransactionEvent.AddedToPool, transaction.toData());
 	});
 
 	it("addTransaction - should hold back rebroadcast of a just-added transaction until the next block", async (context) => {
