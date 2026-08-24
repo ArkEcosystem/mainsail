@@ -123,13 +123,13 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.logger.debug(`tx ${transaction.hash} added to pool`);
 				this.#txRebroadcastCooldowns.set(transaction.hash, this.stateStore.getBlockNumber());
 
-				void this.events.dispatch(Events.TransactionEvent.AddedToPool, transaction);
+				void this.events.dispatch(Events.TransactionEvent.AddedToPool, transaction.toData());
 			} catch (rawError) {
 				const error = ensureError(rawError);
 				this.storage.removeTransaction(transaction.hash);
 				this.logger.warn(`tx ${transaction.hash} failed to enter pool: ${error.message}`);
 
-				void this.events.dispatch(Events.TransactionEvent.RejectedByPool, transaction);
+				void this.events.dispatch(Events.TransactionEvent.RejectedByPool, transaction.toData());
 
 				throw error instanceof PoolError ? error : new PoolError(error.message, "ERR_OTHER");
 			}
@@ -160,7 +160,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 						void this.events.dispatch(
 							Events.TransactionEvent.AddedToPool,
-							previouslyStoredTransaction.data,
+							previouslyStoredTransaction.toData(),
 						);
 
 						previouslyStoredSuccesses++;
