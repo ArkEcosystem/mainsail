@@ -104,7 +104,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		for (const removed of removedTransactions) {
 			this.storage.removeTransaction(removed.hash);
 			this.logger.debug(`Removed overwritten tx ${removed.hash}`);
-			void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, removed.data);
+			void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, removed.toData());
 		}
 	}
 
