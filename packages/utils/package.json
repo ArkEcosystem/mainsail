@@ -27,16 +27,16 @@
 	},
 	"dependencies": {
 		"deepmerge": "4.3.1",
-		"fast-copy": "4.0.3",
+		"fast-copy": "4.0.4",
 		"fast-sort": "3.4.1",
-		"ipaddr.js": "2.4.0",
+		"ipaddr.js": "2.5.0",
 		"micromatch": "4.0.8",
-		"type-fest": "5.6.0",
-		"viem": "2.48.11"
+		"type-fest": "5.8.0",
+		"viem": "2.55.19"
 	},
 	"devDependencies": {
 		"@hapi/boom": "10.0.1",
-		"@hapi/hapi": "21.4.9",
+		"@hapi/hapi": "21.4.10",
 		"@mainsail/test-runner": "workspace:*",
 		"@types/micromatch": "4.0.10",
 		"uvu": "0.5.6"
