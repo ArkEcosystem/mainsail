@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-for dir in `find packages -mindepth 1 -maxdepth 1 -type d | sort -nr`; do
-    cd $dir
-    echo $PWD
-    npx ncu -u
-    cd ../..
-done
+cd "$(dirname "$0")/../.."
+
+pnpm --recursive update --latest '!typescript' '!better-sqlite3' "$@"
+pnpm dedupe
