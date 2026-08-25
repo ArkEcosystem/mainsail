@@ -2,11 +2,14 @@ import type { Block, Transaction } from "./crypto/index.js";
 import type { CommitKey } from "./evm/index.js";
 
 export interface TransactionForger {
-	getTransactions(
+	initialize(
 		generatorAddress: string,
 		timestamp: number,
 		commitKey: CommitKey,
-	): Promise<{
+		randaoReveal: string,
+	): TransactionForger;
+
+	getTransactions(): Promise<{
 		logsBloom: string;
 		stateRoot: string;
 		transactions: Transaction[];
@@ -16,5 +19,5 @@ export interface TransactionForger {
 }
 
 export interface BlockForger {
-	forgeBlock(generatorAddress: string, round: number, timestamp: number): Promise<Block>;
+	forgeBlock(generatorAddress: string, round: number, timestamp: number, randaoReveal: string): Promise<Block>;
 }
