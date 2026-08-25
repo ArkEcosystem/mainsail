@@ -1571,10 +1571,10 @@ mod tests {
         account::StoredAccountInfo,
         compression::CompactBincode,
         db::{
-            AddressWrapper, BlockHeaderData, CommitData, CommitKey, CommitReceipts, HashWrapper,
-            LegacyAddressWrapper, MAP_SIZE_UNIT, PendingCommit, PersistentDB, PersistentDBOptions,
-            ProofData, StaticStringWrapper, StorageEntryWrapper, TransactionData, TransactionKey,
-            TxnDatabaseReader, next_map_size,
+            AddressWrapper, BlockHeaderData, CommitData, CommitKey, CommitReceipts, GenesisInfo,
+            HashWrapper, LegacyAddressWrapper, MAP_SIZE_UNIT, PendingCommit, PersistentDB,
+            PersistentDBOptions, ProofData, RANDAO_MIX_STORAGE_SLOT, StaticStringWrapper,
+            StorageEntryWrapper, TransactionData, TransactionKey, TxnDatabaseReader, next_map_size,
         },
         historical::HistoricalAccountData,
         legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
@@ -1799,6 +1799,73 @@ mod tests {
             let account_storage = db.storage(address, U256::from(index)).expect("storage");
             assert_eq!(account_storage, U256::from(index));
         }
+    }
+
+    #[test]
+    fn test_randao_mix_reads_pinned_slot() {
+        let mut db = create_temp_database();
+
+        // Zero before the genesis contracts are known.
+        assert_eq!(db.randao_mix().expect("randao mix"), B256::ZERO);
+
+        let validator_contract = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+        db.set_genesis_info(GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            deployer_account: address!("0000000000000000000000000000000000000002"),
+            validator_contract,
+            username_contract: address!("0000000000000000000000000000000000000003"),
+            initial_block_number: 0,
+            initial_supply: U256::ZERO,
+        })
+        .expect("genesis info");
+
+        // Still zero: the contract's storage is empty.
+        assert_eq!(db.randao_mix().expect("randao mix"), B256::ZERO);
+
+        // Commit a mix into the pinned slot, plus a decoy in the neighboring slot to
+        // catch an off-by-one in the slot constant.
+        let mix = U256::from_be_bytes([0xab; 32]);
+
+        let mut account = revm::state::Account::new_not_existing(revm::state::TransactionId::ZERO);
+        account.status = revm::state::AccountStatus::Touched;
+
+        let mut storage = HashMap::default();
+        storage.insert(
+            RANDAO_MIX_STORAGE_SLOT,
+            revm::database::states::StorageSlot::new_changed(U256::ZERO, mix),
+        );
+        storage.insert(
+            RANDAO_MIX_STORAGE_SLOT - U256::from(1),
+            revm::database::states::StorageSlot::new_changed(U256::ZERO, U256::from(0xdead)),
+        );
+
+        let mut state = HashMap::default();
+        state.insert(
+            validator_contract,
+            revm::database::TransitionAccount {
+                status: revm::database::AccountStatus::InMemoryChange,
+                info: Some(account.info.clone()),
+                previous_status: revm::database::AccountStatus::Loaded,
+                previous_info: None,
+                storage,
+                storage_was_destroyed: false,
+            },
+        );
+
+        crate::state_commit::commit_to_db(
+            &mut db,
+            PendingCommit {
+                key: CommitKey::default(),
+                transitions: TransitionState { transitions: state },
+                ..Default::default()
+            },
+            Default::default(),
+        )
+        .expect("commit");
+
+        assert_eq!(db.randao_mix().expect("randao mix"), B256::from(mix));
+
+        assert_eq!(RANDAO_MIX_STORAGE_SLOT, U256::from(18));
     }
 
     #[test]

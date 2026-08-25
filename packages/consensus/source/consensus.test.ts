@@ -426,6 +426,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	}) => {
 		const position = { blockNumber: 1, round: 0, step: Enums.Consensus.Step.Propose, value: "blockHash" };
 		const validator = {
+			getRandaoReveal: async () => "aa".repeat(96),
 			propose: () => {},
 		};
 
@@ -460,7 +461,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	}) => {
 		stub(forger, "forgeBlock").rejectedValue(new Error("evm is gone"));
 		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
-		stub(validatorsRepository, "getValidator").returnValue({ propose: () => {} });
+		stub(validatorsRepository, "getValidator").returnValue({
+			getRandaoReveal: async () => "aa".repeat(96),
+			propose: () => {},
+		});
 		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
 
 		const spyProposalProcess = spy(proposalProcessor, "process");

@@ -117,6 +117,14 @@ contract ConsensusRandaoTest is Base {
         consensus.mixRandao(new bytes(97));
     }
 
+    function test_randao_mix_lives_in_pinned_storage_slot() public {
+        consensus.mixRandao(_reveal(0x42));
+
+        uint256 mix = consensus.randaoMix();
+        assertNotEq(mix, 0);
+        assertEq(uint256(vm.load(address(consensus), bytes32(uint256(18)))), mix);
+    }
+
     function test_shuffle_is_pure_function_of_mix() public {
         _registerValidators(10);
 

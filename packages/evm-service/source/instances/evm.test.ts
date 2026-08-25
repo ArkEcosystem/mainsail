@@ -196,6 +196,120 @@ describe<{
 		assert.equal(data.txOrigin, sender.address);
 	});
 
+	it("#process - should expose the parent block randao mix as block.prevrandao", async ({ instance }) => {
+		const [sender] = wallets;
+		// Unfunded placeholder accounts; `initializeGenesis` only records their addresses.
+		const genesisAccount = "0x0000000000000000000000000000000000000101";
+		const deployerAccount = "0x0000000000000000000000000000000000000102";
+
+		// Wraps a runtime in the minimal init code that copies it into place, so a plain
+		// CREATE transaction deploys the raw bytecode:
+		// PUSH1 <len> DUP1 PUSH1 0x0b PUSH1 0x00 CODECOPY PUSH1 0x00 RETURN <runtime>
+		const deployable = (runtime: string): Buffer =>
+			Buffer.from(`60${(runtime.length / 2).toString(16).padStart(2, "0")}80600b6000396000f3${runtime}`, "hex");
+
+		// The stand-in for ConsensusV1.mixRandao:
+		// PUSH1 0xff PUSH1 0x12 SSTORE STOP — stores 0xff in its own slot 0x12 (= 18).
+		const mixWriterRuntime = "60ff60125500";
+		// The probe:
+		// PREVRANDAO PUSH1 0x00 MSTORE PUSH1 0x20 PUSH1 0x00 RETURN — returns the 32-byte
+		// `block.prevrandao` this transaction executed under.
+		const prevrandaoEchoRuntime = "4460005260206000f3";
+
+		const commit = async (blockNumber: bigint) =>
+			instance.onCommit({
+				blockNumber,
+				round: 0n,
+				getBlock: () => ({ number: blockNumber, round: 0n }),
+				setAccountUpdates: () => {},
+			} as any);
+
+		// Block 0: deploy the mix writer and the echo contract.
+		let commitKey = { blockNumber: 0n, round: 0n };
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+
+		const { receipt: writerDeploy } = await instance.process({
+			from: sender.address,
+			value: 0n,
+			nonce: 0n,
+			data: deployable(mixWriterRuntime),
+			commitKey,
+			txHash: getRandomTxHash(),
+			...deployConfig,
+		});
+		const { receipt: echoDeploy } = await instance.process({
+			from: sender.address,
+			value: 0n,
+			nonce: 1n,
+			data: deployable(prevrandaoEchoRuntime),
+			commitKey,
+			txHash: getRandomTxHash(),
+			...deployConfig,
+		});
+		assert.equal(writerDeploy.status, 1);
+		assert.equal(echoDeploy.status, 1);
+		await commit(0n);
+
+		// Register the mix writer as "the consensus contract": from here on the node
+		// snapshots ITS slot 18 as prevrandao at every prepareNextCommit.
+		await instance.initializeGenesis({
+			account: genesisAccount,
+			deployerAccount: deployerAccount,
+			validatorContract: writerDeploy.contractAddress!,
+			usernameContract: zeroAddress,
+			initialBlockNumber: 0n,
+			initialSupply: 0n,
+		});
+
+		// Block 1: the mix is written mid-block, but prevrandao is snapshotted at
+		// prepareNextCommit — every transaction in the block must still see the
+		// parent (zero) value, even after the write.
+		commitKey = { blockNumber: 1n, round: 0n };
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+
+		const { receipt: mixWrite } = await instance.process({
+			from: sender.address,
+			value: 0n,
+			nonce: 2n,
+			data: Buffer.alloc(0),
+			to: writerDeploy.contractAddress,
+			commitKey,
+			txHash: getRandomTxHash(),
+			...transferConfig,
+		});
+		const { receipt: echoDuring } = await instance.process({
+			from: sender.address,
+			value: 0n,
+			nonce: 3n,
+			data: Buffer.alloc(0),
+			to: echoDeploy.contractAddress,
+			commitKey,
+			txHash: getRandomTxHash(),
+			...transferConfig,
+		});
+		assert.equal(mixWrite.status, 1);
+		assert.equal(echoDuring.status, 1);
+		assert.equal(Buffer.from(echoDuring.output!).toString("hex"), "00".repeat(32));
+		await commit(1n);
+
+		// Block 2: the committed mix is now the parent value and must surface as prevrandao.
+		commitKey = { blockNumber: 2n, round: 0n };
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+
+		const { receipt: echoAfter } = await instance.process({
+			from: sender.address,
+			value: 0n,
+			nonce: 4n,
+			data: Buffer.alloc(0),
+			to: echoDeploy.contractAddress,
+			commitKey,
+			txHash: getRandomTxHash(),
+			...transferConfig,
+		});
+		assert.equal(echoAfter.status, 1);
+		assert.equal(Buffer.from(echoAfter.output!).toString("hex"), "00".repeat(31) + "ff");
+	});
+
 	it("should deploy, transfer and and update balance correctly", async ({ instance }) => {
 		const [sender, recipient] = wallets;
 
