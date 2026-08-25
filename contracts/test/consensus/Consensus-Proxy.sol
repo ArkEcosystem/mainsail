@@ -59,7 +59,13 @@ contract ConsensusTest is Base {
         consensus.vote(address(1));
 
         vm.stopPrank();
+        bytes memory reveal = new bytes(96);
+        reveal[0] = 0x01;
+        consensus.mixRandao(reveal);
         consensus.calculateRoundValidators(2);
+
+        uint256 randaoMixBefore = consensus.randaoMix();
+        assertTrue(randaoMixBefore != 0);
 
         assertEq(consensus.version(), 1);
         assertEq(consensus.validatorsCount(), 3);
@@ -81,6 +87,7 @@ contract ConsensusTest is Base {
         assertEq(consensusNew.resignedValidatorsCount(), 1);
         assertEq(consensusNew.roundValidatorsCount(), 2);
         assertEq(consensusNew.getVotesCount(), 1);
+        assertEq(consensusNew.randaoMix(), randaoMixBefore);
         assertEq(consensus.getRoundValidators().length, 2);
         ConsensusV1.Validator[] memory validatorsAfter = consensusNew.getAllValidators();
         assertEq(validatorsAfter.length, 3);

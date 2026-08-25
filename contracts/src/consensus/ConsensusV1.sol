@@ -66,6 +66,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     event FeeUpdated(uint256 fee);
+    event RandaoMixed(uint256 mix);
     event ValidatorRegistered(address addr, bytes blsPublicKey);
     event ValidatorUpdated(address addr, bytes blsPublicKey);
     event ValidatorResigned(address addr);
@@ -93,6 +94,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     error InvalidParameters();
     error ImportIsNotAllowed();
+    error InvalidRevealLength();
 
     mapping(address => ValidatorData) private _validatorsData;
     mapping(address => bool) private _hasValidator;
@@ -116,6 +118,8 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     RoundValidator[][] private _rounds;
 
+    uint256 private _randaoMix;
+
     // Initializers
     function initialize(uint128 registrationFee) public initializer {
         __Ownable_init(msg.sender);
@@ -134,6 +138,15 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
         _fee = registrationFee;
         emit FeeUpdated(registrationFee);
+    }
+
+    function mixRandao(bytes calldata reveal) external onlyOwner {
+        if (reveal.length != 96) {
+            revert InvalidRevealLength();
+        }
+
+        _randaoMix = uint256(keccak256(abi.encodePacked(_randaoMix, reveal)));
+        emit RandaoMixed(_randaoMix);
     }
 
     function addValidator(address addr, bool isResigned) external onlyOwner {
@@ -410,6 +423,10 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         return _fee;
     }
 
+    function randaoMix() external view returns (uint256) {
+        return _randaoMix;
+    }
+
     function validatorsCount() external view returns (uint256) {
         return _validators.length;
     }
@@ -522,7 +539,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
         for (uint256 i = n - 1; i > 0; i--) {
             // Get a random index between 0 and i (inclusive)
-            uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, i))) % (i + 1);
+            uint256 j = uint256(keccak256(abi.encodePacked(_randaoMix, i))) % (i + 1);
 
             // Swap elements at index i and j
             address temp = array[i];

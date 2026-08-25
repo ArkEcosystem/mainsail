@@ -197,7 +197,7 @@ contract ConsensusTest is Base {
         ConsensusV1.Validator[] memory validators = consensus.getRoundValidators();
         assertEq(validators.length, activeValidators);
 
-        assertEq(validators[activeValidators - 1].addr, address(0x1B)); // Shuffled address
+        assertEq(validators[activeValidators - 1].addr, address(0x1F)); // Shuffled address (seeded from _randaoMix = 0)
         validators = sortValidators(validators);
         assertEq(validators[0].addr, highest);
         assertEq(validators[activeValidators - 1].addr, address(53));
@@ -206,7 +206,7 @@ contract ConsensusTest is Base {
         consensus.calculateRoundValidators(uint8(activeValidators));
 
         validators = consensus.getRoundValidators();
-        assertEq(validators[activeValidators - 1].addr, address(0x1B)); // Shuffled address
+        assertEq(validators[activeValidators - 1].addr, address(0x1F)); // Shuffled address (seeded from _randaoMix = 0)
         validators = sortValidators(validators);
         assertEq(validators.length, activeValidators);
         assertEq(validators[0].addr, highest);
