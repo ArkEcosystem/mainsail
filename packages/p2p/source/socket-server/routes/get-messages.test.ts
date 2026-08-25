@@ -19,11 +19,9 @@ describe<{
 		context.route = context.app.resolve(GetMessagesRoute);
 	});
 
-	it("should scale the payload limit with the maximum validator count", ({ route }) => {
+	it("should use a flat payload limit", ({ route }) => {
 		const { maxBytes } = route.getRoutesConfigByPath()["/getMessages"];
 
-		// The request carries four validator bitmaps (two in the headers, two in the query),
-		// each one byte per validator on the wire.
-		assert.equal(maxBytes, 1024 + 4 * 200);
+		assert.equal(maxBytes, 1024);
 	});
 });
