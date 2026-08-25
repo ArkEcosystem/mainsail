@@ -4,8 +4,16 @@ import "shared.proto";
 
 package getMessages;
 
+message GetMessagesQuery {
+    uint32 blockNumber = 1;
+    uint32 round = 2;
+    repeated bool validatorsSignedPrevote = 3;
+    repeated bool validatorsSignedPrecommit = 4;
+}
+
 message GetMessagesRequest {
     shared.Headers headers = 1;
+    GetMessagesQuery query = 2;
 }
 
 message GetMessagesResponse {

@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { isMajority, isMinority } from "@mainsail/blockchain-utils";
+import { isMinority } from "@mainsail/blockchain-utils";
 import { Enums, Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
@@ -11,6 +11,8 @@ type DownloadsByRound = {
 	precommits: boolean[];
 	prevotes: boolean[];
 };
+
+class IncompleteResponseError extends Error {}
 
 type DownloadJob = {
 	isFullDownload: boolean;
@@ -60,6 +62,9 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.P2P.State)
 	private readonly state!: Contracts.P2P.State;
 
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	#fullDownloadsByBlockNumber: Map<number, Set<number>> = new Map();
 	#downloadsByBlockNumber: Map<number, Map<number, DownloadsByRound>> = new Map();
 
@@ -83,7 +88,6 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const header = this.headerFactory();
 		let peers = this.repository.getPeers();
 
-		// Create download jobs as long as we can download
 		while ((peers = peers.filter((peer) => this.#canDownload(header, peer.header))) && peers.length > 0) {
 			this.download(getRandomPeer(peers));
 		}
@@ -101,7 +105,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		const round = this.#getHighestRoundToDownload(ourHeader, peer.header);
 		if (ourHeader.round === round) {
-			const downloads = this.#getDownloadsByRound(peer.header.blockNumber, peer.header.round);
+			const downloads = this.#getDownloadsByRound(peer.header.blockNumber, round);
 
 			const job: DownloadJob = {
 				blockNumber: ourHeader.blockNumber,
@@ -145,7 +149,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		const round = this.#getHighestRoundToDownload(ourHeader, peerHeader);
 		if (ourHeader.round === round) {
-			const downloads = this.#getDownloadsByRound(peerHeader.blockNumber, peerHeader.round);
+			const downloads = this.#peekDownloadsByRound(peerHeader.blockNumber, round);
 
 			const prevoteIndexes = this.#getPrevoteIndexesToDownload(ourHeader, peerHeader, downloads.prevotes);
 			const precommitIndexes = this.#getPrecommitIndexesToDownload(ourHeader, peerHeader, downloads.precommits);
@@ -167,7 +171,10 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		const { roundValidators } = this.cryptoConfiguration.getMilestone(ourHeader.blockNumber);
 
-		if (isMinority(peerHeader.validatorsSignedPrevote.filter(Boolean).length, roundValidators)) {
+		if (
+			isMinority(peerHeader.validatorsSignedPrevote.filter(Boolean).length, roundValidators) ||
+			isMinority(peerHeader.validatorsSignedPrecommit.filter(Boolean).length, roundValidators)
+		) {
 			return peerHeader.round;
 		}
 
@@ -204,34 +211,30 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const roundsByBlockNumber = this.#downloadsByBlockNumber.get(blockNumber)!;
 
 		if (!roundsByBlockNumber.has(round)) {
-			roundsByBlockNumber.set(round, {
-				precommits: Array.from<boolean>({
-					length: this.cryptoConfiguration.getMilestone(blockNumber).roundValidators,
-				}).fill(false),
-				prevotes: Array.from<boolean>({
-					length: this.cryptoConfiguration.getMilestone(blockNumber).roundValidators,
-				}).fill(false),
-			});
+			roundsByBlockNumber.set(round, this.#makeDownloadsByRound(blockNumber));
 		}
 
 		return roundsByBlockNumber.get(round)!;
 	}
 
-	#checkMessage(message: Contracts.Crypto.Message, firstMessage: Contracts.Crypto.Message, job: DownloadJob): void {
-		if (message.blockNumber !== firstMessage.blockNumber || message.round !== firstMessage.round) {
-			throw new Error(
-				`Received message blockNumber ${message.blockNumber} and round ${message.round} does not match expected blockNumber ${firstMessage.blockNumber} and round ${firstMessage.round}`,
-			);
-		}
+	#peekDownloadsByRound(blockNumber: number, round: number): DownloadsByRound {
+		return this.#downloadsByBlockNumber.get(blockNumber)?.get(round) ?? this.#makeDownloadsByRound(blockNumber);
+	}
 
-		if (message.blockNumber !== job.blockNumber) {
-			throw new Error(
-				`Received message blockNumber ${message.blockNumber} does not match expected blockNumber ${job.blockNumber}`,
-			);
-		}
+	#makeDownloadsByRound(blockNumber: number): DownloadsByRound {
+		const { roundValidators } = this.cryptoConfiguration.getMilestone(blockNumber);
 
-		if (message.round < job.round) {
-			throw new Error(`Received message round ${message.round} is lower than requested round ${job.round}`);
+		return {
+			precommits: Array.from<boolean>({ length: roundValidators }).fill(false),
+			prevotes: Array.from<boolean>({ length: roundValidators }).fill(false),
+		};
+	}
+
+	#checkMessage(message: Contracts.Crypto.Message, job: DownloadJob): void {
+		if (message.blockNumber !== job.blockNumber || message.round !== job.round) {
+			throw new Error(
+				`Received message blockNumber ${message.blockNumber} and round ${message.round} does not match requested blockNumber ${job.blockNumber} and round ${job.round}`,
+			);
 		}
 	}
 
@@ -243,17 +246,17 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const prevotes = [...prevotesMap.values()];
 		const precommits = [...precommitsMap.values()];
 
-		// Allow response to be empty
 		if (prevotes.length === 0 && precommits.length === 0) {
 			return;
 		}
 
 		this.state.resetLastMessageTime();
 
-		// Check actual received round, because we might have received a full response even if we marked request as a partial
-		const receivedRound = prevotes.length > 0 ? prevotes[0].round : precommits[0].round;
+		if (job.peerHeader.round !== job.round) {
+			return;
+		}
 
-		if (job.ourHeader.round < receivedRound) {
+		if (job.isFullDownload) {
 			this.#checkFullRoundResponse(prevotesMap, precommitsMap, job);
 		} else {
 			this.#checkPartialRoundResponse(prevotesMap, precommitsMap, job);
@@ -267,12 +270,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	) {
 		const { roundValidators } = this.cryptoConfiguration.getMilestone(job.blockNumber);
 
-		if (!isMajority(prevotes.size + job.ourHeader.getValidatorsSignedPrevoteCount(), roundValidators)) {
-			throw new Error(`Peer didn't return enough prevotes for +2/3 majority`);
-		}
-
-		if (!isMajority(precommits.size + job.ourHeader.getValidatorsSignedPrecommitCount(), roundValidators)) {
-			throw new Error(`Peer didn't return enough precommits for +2/3 majority`);
+		if (!isMinority(prevotes.size, roundValidators) && !isMinority(precommits.size, roundValidators)) {
+			throw new IncompleteResponseError(`Peer didn't return a blocking minority of prevotes or precommits`);
 		}
 	}
 
@@ -281,16 +280,15 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		precommits: Map<number, Contracts.Crypto.Message>,
 		job: DownloadJob,
 	) {
-		// Check if received all the requested data
 		for (const index of job.prevoteIndexes) {
 			if (!prevotes.has(index)) {
-				throw new Error(`Missing prevote for validator ${index}`);
+				throw new IncompleteResponseError(`Missing prevote for validator ${index}`);
 			}
 		}
 
 		for (const index of job.precommitIndexes) {
 			if (!precommits.has(index)) {
-				throw new Error(`Missing precommit for validator ${index}`);
+				throw new IncompleteResponseError(`Missing precommit for validator ${index}`);
 			}
 		}
 	}
@@ -299,18 +297,22 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		let error: Error | undefined;
 
 		try {
-			const result = await this.communicator.getMessages(job.peer);
+			const { roundValidators } = this.cryptoConfiguration.getMilestone(job.blockNumber);
+			const nothingSigned = Array.from<boolean>({ length: roundValidators }).fill(false);
 
-			let firstPrevote: Contracts.Crypto.Message | undefined;
+			const result = await this.communicator.getMessages(job.peer, {
+				blockNumber: job.blockNumber,
+				round: job.round,
+				validatorsSignedPrecommit: job.isFullDownload ? nothingSigned : job.ourHeader.validatorsSignedPrecommit,
+				validatorsSignedPrevote: job.isFullDownload ? nothingSigned : job.ourHeader.validatorsSignedPrevote,
+			});
+
 			const prevotes: Map<number, Contracts.Crypto.Message> = new Map();
 			for (const buffer of result.prevotes) {
 				const prevote = await this.factory.makeMessageFromBytes(buffer);
 				prevotes.set(prevote.validatorIndex, prevote);
 
-				if (firstPrevote === undefined) {
-					firstPrevote = prevote;
-				}
-				this.#checkMessage(prevote, firstPrevote, job);
+				this.#checkMessage(prevote, job);
 
 				const response = await this.messageProcessor.process(prevote, false);
 
@@ -319,16 +321,12 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 				}
 			}
 
-			let firstPrecommit: Contracts.Crypto.Message | undefined;
 			const precommits: Map<number, Contracts.Crypto.Message> = new Map();
 			for (const buffer of result.precommits) {
 				const precommit = await this.factory.makeMessageFromBytes(buffer);
 				precommits.set(precommit.validatorIndex, precommit);
 
-				if (firstPrecommit === undefined) {
-					firstPrecommit = precommit;
-				}
-				this.#checkMessage(precommit, firstPrecommit, job);
+				this.#checkMessage(precommit, job);
 
 				const response = await this.messageProcessor.process(precommit, false);
 
@@ -345,7 +343,12 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		this.#removeDownloadJob(job);
 
 		if (error) {
-			this.peerDisposer.banPeer(job.peer.ip, error);
+			if (error instanceof IncompleteResponseError) {
+				this.logger.debug(`Incomplete response from ${job.peer.ip}: ${error.message}`, "p2p");
+			} else {
+				this.peerDisposer.banPeer(job.peer.ip, error);
+			}
+
 			this.tryToDownload();
 		}
 	}
@@ -371,14 +374,12 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	#removeFullDownloadJob(job: DownloadJob) {
 		this.#fullDownloadsByBlockNumber.get(job.blockNumber)?.delete(job.round);
 
-		// Cleanup
 		if (this.#fullDownloadsByBlockNumber.get(job.blockNumber)?.size === 0) {
 			this.#fullDownloadsByBlockNumber.delete(job.blockNumber);
 		}
 	}
 
 	#removePartialDownloadJob(job: DownloadJob) {
-		// Return if the blockNumber was already removed, because the block was applied.
 		const roundsByBlockNumber = this.#downloadsByBlockNumber.get(job.blockNumber);
 		if (!roundsByBlockNumber) {
 			return;
@@ -397,7 +398,6 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			downloadsByRound.precommits[index] = false;
 		}
 
-		// Cleanup
 		if (
 			downloadsByRound.prevotes.every((value) => !value) &&
 			downloadsByRound.precommits.every((value) => !value)
@@ -441,7 +441,6 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	): number[] {
 		const indexes: number[] = [];
 
-		// Request missing messages
 		for (const [index, precommit] of messages.entries()) {
 			if (!precommit && peerValidatorsSignedMessage[index] && !ourValidatorsSignedMessage[index]) {
 				indexes.push(index);

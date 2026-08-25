@@ -15,7 +15,7 @@ export class GetMessagesRoute extends Route {
 			"/getMessages": {
 				codec: Codecs.getMessages,
 				id: Routes.GetMessages,
-				maxBytes: 1024,
+				maxBytes: 1024 + 4 * this.cryptoConfiguration.getMaxRoundValidators(),
 				validation: Schemas.getMessages(this.cryptoConfiguration),
 			},
 		};
