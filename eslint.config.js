@@ -178,7 +178,7 @@ export default [
 			],
 			"unicorn/no-abusive-eslint-disable": "warn",
 			"unicorn/no-array-callback-reference": "warn",
-			"unicorn/no-array-for-each": "warn",
+			"unicorn/no-for-each": "warn",
 			"unicorn/no-array-method-this-argument": "warn",
 			"unicorn/no-array-reduce": "warn",
 			"unicorn/no-await-expression-member": "warn",

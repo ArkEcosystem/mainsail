@@ -26,14 +26,14 @@
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"dayjs": "1.11.20",
-		"pg": "8.22.0",
-		"typeorm": "1.0.0"
+		"dayjs": "1.11.23",
+		"pg": "8.23.0",
+		"typeorm": "1.1.0"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
-		"@types/pg": "8.20.0",
+		"@types/pg": "8.23.1",
 		"uvu": "0.5.6"
 	},
 	"engines": {

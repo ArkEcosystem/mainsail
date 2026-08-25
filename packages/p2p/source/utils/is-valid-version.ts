@@ -32,6 +32,8 @@ export const isValidVersion = (app: Contracts.Kernel.Application, version: strin
 	}
 
 	const includePrerelease: boolean = cryptoConfiguration.getNetwork().name !== "mainnet";
+	// TODO: semver is pinned to 7.8.0 (see scripts/deps/update.sh); since 7.8.3 "^0.0.x" no longer matches
+	// prerelease builds under includePrerelease, which breaks the default minimumVersions.
 	return minimumVersions.some((minimumVersion: string) =>
 		semver.satisfies(version, minimumVersion, { includePrerelease }),
 	);

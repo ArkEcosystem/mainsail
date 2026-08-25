@@ -24,13 +24,13 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"lmdb": "3.5.4"
+		"lmdb": "3.5.6"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@types/tmp": "0.2.6",
-		"tmp": "0.2.5",
+		"tmp": "0.2.7",
 		"uvu": "0.5.6"
 	},
 	"engines": {

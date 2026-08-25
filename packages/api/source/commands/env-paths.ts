@@ -1,4 +1,3 @@
-// eslint-disable-next-line unicorn/prevent-abbreviations
 import type { Contracts } from "@mainsail/contracts";
 
 import { Commands } from "@mainsail/cli";

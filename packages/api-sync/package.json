@@ -27,9 +27,9 @@
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"joi": "18.2.1",
-		"lru-cache": "11.3.6",
-		"viem": "2.48.11"
+		"joi": "18.2.5",
+		"lru-cache": "11.5.2",
+		"viem": "2.55.19"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
