@@ -46,6 +46,14 @@ describe<{
 		context.downloader = context.app.resolve(ProposalDownloader);
 	});
 
+	it("#download - should request exactly the job's block and round", ({ downloader, peer }) => {
+		const getProposal = stub(communicator, "getProposal").returnValue(new Promise(() => {}));
+
+		downloader.download(peer);
+
+		getProposal.calledWith(peer, { blockNumber: 2, round: 0 });
+	});
+
 	it("#download - should release the slot on an empty reply and allow the round to be re-pulled", async ({
 		downloader,
 		peer,
