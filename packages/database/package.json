@@ -47,7 +47,7 @@
 		"@mainsail/test-runner": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"@types/tmp": "0.2.6",
-		"tmp": "0.2.5",
+		"tmp": "0.2.7",
 		"uvu": "0.5.6"
 	},
 	"engines": {
