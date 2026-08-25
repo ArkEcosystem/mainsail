@@ -318,8 +318,8 @@ importers:
         specifier: 9.3.0
         version: 9.3.0
       semver:
-        specifier: 7.8.5
-        version: 7.8.5
+        specifier: 7.8.0
+        version: 7.8.0
     devDependencies:
       '@mainsail/contracts':
         specifier: workspace:*
@@ -664,8 +664,8 @@ importers:
         specifier: 1.10.0
         version: 1.10.0
       semver:
-        specifier: 7.8.5
-        version: 7.8.5
+        specifier: 7.8.0
+        version: 7.8.0
       tar:
         specifier: 7.5.22
         version: 7.5.22
@@ -2357,8 +2357,8 @@ importers:
         specifier: 4.0.8
         version: 4.0.8
       semver:
-        specifier: 7.8.5
-        version: 7.8.5
+        specifier: 7.8.0
+        version: 7.8.0
       split2:
         specifier: 4.2.0
         version: 4.2.0
@@ -2591,8 +2591,8 @@ importers:
         specifier: 11.2.0
         version: 11.2.0
       semver:
-        specifier: 7.8.5
-        version: 7.8.5
+        specifier: 7.8.0
+        version: 7.8.0
       ws:
         specifier: 8.21.3
         version: 8.21.3
@@ -9597,6 +9597,11 @@ packages:
 
   semver@7.7.2:
     resolution: {integrity: sha512-RF0Fw+rO5AMf9MAyaRXI4AV0Ulj5lMHqVxxdSgiVbixSCXoEmmX/jk0CuJw4+3SqroYO9VoUh+HcuJivvtJemA==}
+    engines: {node: '>=10'}
+    hasBin: true
+
+  semver@7.8.0:
+    resolution: {integrity: sha512-AcM7dV/5ul4EekoQ29Agm5vri8JNqRyj39o0qpX6vDF2GZrtutZl5RwgD1XnZjiTAfncsJhMI48QQH3sN87YNA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -16772,6 +16777,8 @@ snapshots:
   semver@6.3.1: {}
 
   semver@7.7.2: {}
+
+  semver@7.8.0: {}
 
   semver@7.8.4: {}
 

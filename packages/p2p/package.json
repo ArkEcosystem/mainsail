@@ -44,7 +44,7 @@
 		"long": "5.3.2",
 		"protobufjs": "8.7.2",
 		"rate-limiter-flexible": "11.2.0",
-		"semver": "7.8.5",
+		"semver": "7.8.0",
 		"ws": "8.21.3"
 	},
 	"devDependencies": {

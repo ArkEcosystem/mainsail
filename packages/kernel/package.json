@@ -40,7 +40,7 @@
 		"joi": "18.2.5",
 		"log-process-errors": "12.0.1",
 		"micromatch": "4.0.8",
-		"semver": "7.8.5",
+		"semver": "7.8.0",
 		"split2": "4.2.0"
 	},
 	"devDependencies": {
