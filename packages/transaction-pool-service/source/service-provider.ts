@@ -21,9 +21,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.TransactionPool.Processor).to(Processor);
 		this.app.bind(Identifiers.TransactionPool.Query).to(Query);
 		this.app
-			.bind<
-				(address: string, legacyAddress?: string) => Promise<SenderMempool>
-			>(Identifiers.TransactionPool.SenderMempool.Factory)
+			.bind<(address: string, legacyAddress?: string) => Promise<SenderMempool>>(
+				Identifiers.TransactionPool.SenderMempool.Factory,
+			)
 			.toFactory(
 				(context: Contracts.Kernel.Container.ResolutionContext) =>
 					async (address: string, legacyAddress?: string) =>
