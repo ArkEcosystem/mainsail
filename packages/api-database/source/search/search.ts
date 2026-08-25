@@ -16,7 +16,7 @@ export const optimizeExpression = <TEntity>(expression: Expression<TEntity>): Ex
 			const optimized = expression.expressions.map(optimizeExpression);
 			let flattened = [] as Expression<TEntity>[];
 
-			for (const [index, e] of optimized.entries()) {
+			for (const e of optimized) {
 				flattened = e.op === "and" ? [...flattened, ...e.expressions] : [...flattened, e];
 			}
 
@@ -35,7 +35,7 @@ export const optimizeExpression = <TEntity>(expression: Expression<TEntity>): Ex
 			const optimized = expression.expressions.map(optimizeExpression);
 			let flattened = [] as Expression<TEntity>[];
 
-			for (const [index, e] of optimized.entries()) {
+			for (const e of optimized) {
 				flattened = e.op === "or" ? [...flattened, ...e.expressions] : [...flattened, e];
 			}
 

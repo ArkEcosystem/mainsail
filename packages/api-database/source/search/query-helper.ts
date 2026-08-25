@@ -129,7 +129,7 @@ export class QueryHelper<TEntity> {
 				const query = `(${built.map((b) => b.query).join(" AND ")})`;
 				let parameters = {};
 
-				for (const [index, b] of built.entries()) {
+				for (const b of built) {
 					parameters = Object.assign({}, parameters, b.parameters);
 				}
 				return { parameters, query };
@@ -139,7 +139,7 @@ export class QueryHelper<TEntity> {
 				const query = `(${built.map((b) => b.query).join(" OR ")})`;
 				let parameters = {};
 
-				for (const [index, b] of built.entries()) {
+				for (const b of built) {
 					parameters = Object.assign({}, parameters, b.parameters);
 				}
 				return { parameters, query };
