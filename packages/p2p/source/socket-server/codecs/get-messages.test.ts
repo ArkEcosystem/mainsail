@@ -23,9 +23,7 @@ describe("getMessages codec", ({ it, assert }) => {
 	};
 
 	it("should round-trip the header and query bitmaps as booleans", () => {
-		const result: any = getMessages.request.deserialize(
-			getMessages.request.serialize({ headers, query } as any),
-		);
+		const result: any = getMessages.request.deserialize(getMessages.request.serialize({ headers, query } as any));
 
 		assert.equal(result.headers.validatorsSignedPrevote, headers.validatorsSignedPrevote);
 		assert.equal(result.headers.validatorsSignedPrecommit, headers.validatorsSignedPrecommit);
