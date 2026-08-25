@@ -61,9 +61,15 @@ export interface GetStatusResponse extends Response {
 	config: PeerConfig;
 }
 
+export interface GetProposalQuery {
+	blockNumber: number;
+	round: number;
+}
+
 export interface GetProposalRequest extends Request {
 	payload: {
 		headers: HeaderData;
+		query: GetProposalQuery;
 	};
 }
 
