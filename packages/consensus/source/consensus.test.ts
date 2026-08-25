@@ -255,6 +255,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		forger,
 	}) => {
 		const validator = {
+			getRandaoReveal: async () => "aa".repeat(96),
 			propose: () => {},
 		};
 
@@ -314,6 +315,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		forger,
 	}) => {
 		const validator = {
+			getRandaoReveal: async () => "aa".repeat(96),
 			propose: () => {},
 		};
 
