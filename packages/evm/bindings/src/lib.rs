@@ -107,9 +107,15 @@ impl EvmInner {
             );
         }
 
+        let prevrandao = self
+            .persistent_db
+            .randao_mix()
+            .map_err(|err| napi::Error::from_reason(format!("read randao mix: {err}")))?;
+
         let pending_commit = PendingCommit {
             key: ctx.block_context.commit_key,
             block_context: ctx.block_context,
+            prevrandao,
             ..Default::default()
         };
 
@@ -1195,6 +1201,12 @@ impl EvmInner {
         (ExecutionResult, u64),
         EVMError<EvmDatabaseError<mainsail_evm_core::db::Error>>,
     > {
+        let prevrandao = ctx
+            .block_context
+            .as_ref()
+            .and_then(|b| self.pending_commits.get(&b.commit_key))
+            .map_or(B256::ZERO, |pending| pending.prevrandao);
+
         let mut state_builder = State::builder().with_bundle_update();
 
         if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key) {
@@ -1230,6 +1242,7 @@ impl EvmInner {
                 block_env.timestamp = U256::from(block_ctx.timestamp / 1000);
                 block_env.gas_limit = block_ctx.gas_limit;
                 block_env.difficulty = U256::ZERO;
+                block_env.prevrandao = Some(prevrandao);
             })
             .modify_tx_chained(|tx_env: &mut TxEnv| {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or(u64::MAX);
@@ -1323,6 +1336,14 @@ impl EvmInner {
         (ExecutionResult, u64),
         EVMError<EvmDatabaseError<mainsail_evm_core::db::Error>>,
     > {
+        let prevrandao = if ctx.block_context.is_some() {
+            self.persistent_db
+                .randao_mix()
+                .map_err(|err| EVMError::Database(EvmDatabaseError::Database(err)))?
+        } else {
+            B256::ZERO
+        };
+
         let db_reader = TxnDatabaseReader::new(&self.persistent_db)
             .map_err(|err| EVMError::Database(EvmDatabaseError::Database(err)))?;
 
@@ -1349,6 +1370,7 @@ impl EvmInner {
                 block_env.timestamp = U256::from(block_ctx.timestamp / 1000);
                 block_env.gas_limit = block_ctx.gas_limit;
                 block_env.difficulty = U256::ZERO;
+                block_env.prevrandao = Some(prevrandao);
             })
             .modify_tx_chained(|tx_env: &mut TxEnv| {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or(u64::MAX);

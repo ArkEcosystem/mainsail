@@ -295,6 +295,7 @@ pub struct BlockContext {
 pub struct PendingCommit {
     pub key: CommitKey,
     pub block_context: BlockContext,
+    pub prevrandao: B256,
     pub cache: CacheState,
     pub results: BTreeMap<B256, (ExecutionResult, u64)>,
     pub transitions: TransitionState,
@@ -316,6 +317,8 @@ pub struct PendingCommit {
     // Optimization to avoid unnecessary (deep) clones of commit data.
     pub built_commit: Option<StateCommit>,
 }
+
+pub const RANDAO_MIX_STORAGE_SLOT: U256 = U256::from_limbs([18, 0, 0, 0]);
 
 #[derive(Clone, Debug, Default, Serialize, PartialEq, Eq)]
 pub struct GenesisInfo {
@@ -565,6 +568,17 @@ impl PersistentDB {
 
         self.genesis_info.replace(genesis_info);
         Ok(())
+    }
+
+    pub fn randao_mix(&self) -> Result<B256, Error> {
+        let Some(genesis_info) = self.genesis_info.as_ref() else {
+            return Ok(B256::ZERO);
+        };
+
+        Ok(B256::from(self.storage_ref(
+            genesis_info.validator_contract,
+            RANDAO_MIX_STORAGE_SLOT,
+        )?))
     }
 
     pub fn get_accounts(
@@ -1507,6 +1521,7 @@ impl PendingCommit {
         Self {
             key,
             block_context: Default::default(),
+            prevrandao: Default::default(),
             cache: Default::default(),
             cumulative_gas_used: Default::default(),
             results: Default::default(),
