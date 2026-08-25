@@ -3950,12 +3950,303 @@ export const getProposal = $root.getProposal = (() => {
      */
     const getProposal = {};
 
+    getProposal.GetProposalQuery = (function() {
+
+        /**
+         * Properties of a GetProposalQuery.
+         * @typedef {Object} getProposal.GetProposalQuery.$Properties
+         * @property {number|null} [blockNumber] GetProposalQuery blockNumber
+         * @property {number|null} [round] GetProposalQuery round
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
+         */
+
+        /**
+         * Properties of a GetProposalQuery.
+         * @memberof getProposal
+         * @interface IGetProposalQuery
+         * @augments getProposal.GetProposalQuery.$Properties
+         * @deprecated Use getProposal.GetProposalQuery.$Properties instead.
+         */
+
+        /**
+         * Shape of a GetProposalQuery.
+         * @typedef {getProposal.GetProposalQuery.$Properties} getProposal.GetProposalQuery.$Shape
+         */
+
+        /**
+         * Constructs a new GetProposalQuery.
+         * @memberof getProposal
+         * @classdesc Represents a GetProposalQuery.
+         * @constructor
+         * @param {getProposal.GetProposalQuery.$Properties=} [properties] Properties to set
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
+         */
+        const GetProposalQuery = function (properties) {
+            if (properties)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null && keys[i] !== "__proto__")
+                        this[keys[i]] = properties[keys[i]];
+        };
+
+        /**
+         * GetProposalQuery blockNumber.
+         * @member {number} blockNumber
+         * @memberof getProposal.GetProposalQuery
+         * @instance
+         */
+        GetProposalQuery.prototype.blockNumber = 0;
+
+        /**
+         * GetProposalQuery round.
+         * @member {number} round
+         * @memberof getProposal.GetProposalQuery
+         * @instance
+         */
+        GetProposalQuery.prototype.round = 0;
+
+        /**
+         * Creates a new GetProposalQuery instance using the specified properties.
+         * @function create
+         * @memberof getProposal.GetProposalQuery
+         * @static
+         * @param {getProposal.GetProposalQuery.$Properties=} [properties] Properties to set
+         * @returns {getProposal.GetProposalQuery} GetProposalQuery instance
+         * @type {{
+         *   (properties: getProposal.GetProposalQuery.$Shape): getProposal.GetProposalQuery & getProposal.GetProposalQuery.$Shape;
+         *   (properties?: getProposal.GetProposalQuery.$Properties): getProposal.GetProposalQuery;
+         * }}
+         */
+        GetProposalQuery.create = function(properties) {
+            return new GetProposalQuery(properties);
+        };
+
+        /**
+         * Encodes the specified GetProposalQuery message. Does not implicitly {@link getProposal.GetProposalQuery.verify|verify} messages.
+         * @function encode
+         * @memberof getProposal.GetProposalQuery
+         * @static
+         * @param {getProposal.GetProposalQuery.$Properties} message GetProposalQuery message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetProposalQuery.encode = function (message, writer, _depth) {
+            if (!writer)
+                writer = $Writer.create();
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
+                writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.blockNumber);
+            if (message.round != null && $Object.hasOwnProperty.call(message, "round"))
+                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.round);
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
+                    writer.raw(message.$unknowns[i]);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GetProposalQuery message, length delimited. Does not implicitly {@link getProposal.GetProposalQuery.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof getProposal.GetProposalQuery
+         * @static
+         * @param {getProposal.GetProposalQuery.$Properties} message GetProposalQuery message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetProposalQuery.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
+        };
+
+        /**
+         * Decodes a GetProposalQuery message from the specified reader or buffer.
+         * @function decode
+         * @memberof getProposal.GetProposalQuery
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {getProposal.GetProposalQuery & getProposal.GetProposalQuery.$Shape} GetProposalQuery
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetProposalQuery.decode = function (reader, length, _end, _depth, _target) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $Reader.recursionLimit)
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getProposal.GetProposalQuery(), value;
+            while (reader.pos < end) {
+                let start = reader.pos;
+                let tag = reader.tag();
+                if (tag === _end) {
+                    _end = $undefined;
+                    break;
+                }
+                let wireType = tag & 7;
+                switch (tag >>>= 3) {
+                case 1: {
+                        if (wireType !== 0)
+                            break;
+                        if (value = reader.uint32())
+                            message.blockNumber = value;
+                        else
+                            delete message.blockNumber;
+                        continue;
+                    }
+                case 2: {
+                        if (wireType !== 0)
+                            break;
+                        if (value = reader.uint32())
+                            message.round = value;
+                        else
+                            delete message.round;
+                        continue;
+                    }
+                }
+                reader.skipType(wireType, _depth, tag);
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
+            }
+            if (_end !== $undefined)
+                throw $Error("missing end group");
+            return message;
+        };
+
+        /**
+         * Decodes a GetProposalQuery message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof getProposal.GetProposalQuery
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {getProposal.GetProposalQuery & getProposal.GetProposalQuery.$Shape} GetProposalQuery
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetProposalQuery.decodeDelimited = function(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GetProposalQuery message.
+         * @function verify
+         * @memberof getProposal.GetProposalQuery
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GetProposalQuery.verify = function (message, _depth) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                return "max depth exceeded";
+            if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
+                if (!$util.isInteger(message.blockNumber))
+                    return "blockNumber: integer expected";
+            if (message.round != null && $Object.hasOwnProperty.call(message, "round"))
+                if (!$util.isInteger(message.round))
+                    return "round: integer expected";
+            return null;
+        };
+
+        /**
+         * Creates a GetProposalQuery message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof getProposal.GetProposalQuery
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {getProposal.GetProposalQuery} GetProposalQuery
+         */
+        GetProposalQuery.fromObject = function (object, _depth) {
+            if (object instanceof $root.getProposal.GetProposalQuery)
+                return object;
+            if (!$util.isObject(object))
+                throw $TypeError(".getProposal.GetProposalQuery: object expected");
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let message = new $root.getProposal.GetProposalQuery();
+            if (object.blockNumber != null)
+                if ($Number(object.blockNumber) !== 0)
+                    message.blockNumber = object.blockNumber >>> 0;
+            if (object.round != null)
+                if ($Number(object.round) !== 0)
+                    message.round = object.round >>> 0;
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GetProposalQuery message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof getProposal.GetProposalQuery
+         * @static
+         * @param {getProposal.GetProposalQuery} message GetProposalQuery
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GetProposalQuery.toObject = function (message, options, _depth) {
+            if (!options)
+                options = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
+            if (options.defaults) {
+                object.blockNumber = 0;
+                object.round = 0;
+            }
+            if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
+                object.blockNumber = message.blockNumber;
+            if (message.round != null && $Object.hasOwnProperty.call(message, "round"))
+                object.round = message.round;
+            return object;
+        };
+
+        /**
+         * Converts this GetProposalQuery to JSON.
+         * @function toJSON
+         * @memberof getProposal.GetProposalQuery
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GetProposalQuery.prototype.toJSON = function() {
+            return GetProposalQuery.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the type url for GetProposalQuery
+         * @function getTypeUrl
+         * @memberof getProposal.GetProposalQuery
+         * @static
+         * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns {string} The type url
+         */
+        GetProposalQuery.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
+                prefix = "type.googleapis.com";
+            return prefix + "/getProposal.GetProposalQuery";
+        };
+
+        return GetProposalQuery;
+    })();
+
     getProposal.GetProposalRequest = (function() {
 
         /**
          * Properties of a GetProposalRequest.
          * @typedef {Object} getProposal.GetProposalRequest.$Properties
          * @property {shared.Headers.$Properties|null} [headers] GetProposalRequest headers
+         * @property {getProposal.GetProposalQuery.$Properties|null} [query] GetProposalRequest query
          * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
@@ -3996,6 +4287,14 @@ export const getProposal = $root.getProposal = (() => {
         GetProposalRequest.prototype.headers = null;
 
         /**
+         * GetProposalRequest query.
+         * @member {getProposal.GetProposalQuery.$Properties|null|undefined} query
+         * @memberof getProposal.GetProposalRequest
+         * @instance
+         */
+        GetProposalRequest.prototype.query = null;
+
+        /**
          * Creates a new GetProposalRequest instance using the specified properties.
          * @function create
          * @memberof getProposal.GetProposalRequest
@@ -4029,6 +4328,8 @@ export const getProposal = $root.getProposal = (() => {
                 throw $Error("max depth exceeded");
             if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
                 $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
+            if (message.query != null && $Object.hasOwnProperty.call(message, "query"))
+                $root.getProposal.GetProposalQuery.encode(message.query, writer.uint32(/* id 2, wireType 2 =*/18).fork(), _depth + 1).ldelim();
             if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
                 for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
@@ -4082,6 +4383,12 @@ export const getProposal = $root.getProposal = (() => {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
+                case 2: {
+                        if (wireType !== 2)
+                            break;
+                        message.query = $root.getProposal.GetProposalQuery.decode(reader, reader.uint32(), $undefined, _depth + 1, message.query);
+                        continue;
+                    }
                 }
                 reader.skipType(wireType, _depth, tag);
                 if (!reader.discardUnknown) {
@@ -4130,6 +4437,11 @@ export const getProposal = $root.getProposal = (() => {
                 if (error)
                     return "headers." + error;
             }
+            if (message.query != null && $Object.hasOwnProperty.call(message, "query")) {
+                let error = $root.getProposal.GetProposalQuery.verify(message.query, _depth + 1);
+                if (error)
+                    return "query." + error;
+            }
             return null;
         };
 
@@ -4156,6 +4468,11 @@ export const getProposal = $root.getProposal = (() => {
                     throw $TypeError(".getProposal.GetProposalRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
+            if (object.query != null) {
+                if (!$util.isObject(object.query))
+                    throw $TypeError(".getProposal.GetProposalRequest.query: object expected");
+                message.query = $root.getProposal.GetProposalQuery.fromObject(object.query, _depth + 1);
+            }
             return message;
         };
 
@@ -4176,10 +4493,14 @@ export const getProposal = $root.getProposal = (() => {
             if (_depth > $util.recursionLimit)
                 throw $Error("max depth exceeded");
             let object = {};
-            if (options.defaults)
+            if (options.defaults) {
                 object.headers = null;
+                object.query = null;
+            }
             if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
                 object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
+            if (message.query != null && $Object.hasOwnProperty.call(message, "query"))
+                object.query = $root.getProposal.GetProposalQuery.toObject(message.query, options, _depth + 1);
             return object;
         };
 

@@ -1543,6 +1543,129 @@ export namespace getPeers {
 export namespace getProposal {
 
     /**
+     * Properties of a GetProposalQuery.
+     * @deprecated Use getProposal.GetProposalQuery.$Properties instead.
+     */
+    interface IGetProposalQuery extends getProposal.GetProposalQuery.$Properties {
+    }
+
+    /** Represents a GetProposalQuery. */
+    class GetProposalQuery {
+
+        /**
+         * Constructs a new GetProposalQuery.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: getProposal.GetProposalQuery.$Properties);
+
+        /** Unknown fields preserved while decoding when enabled */
+        $unknowns?: Uint8Array[];
+
+        /** GetProposalQuery blockNumber. */
+        blockNumber: number;
+
+        /** GetProposalQuery round. */
+        round: number;
+
+        /**
+         * Creates a new GetProposalQuery instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns GetProposalQuery instance
+         */
+        static create(properties: getProposal.GetProposalQuery.$Shape): getProposal.GetProposalQuery & getProposal.GetProposalQuery.$Shape;
+        static create(properties?: getProposal.GetProposalQuery.$Properties): getProposal.GetProposalQuery;
+
+        /**
+         * Encodes the specified GetProposalQuery message. Does not implicitly {@link getProposal.GetProposalQuery.verify|verify} messages.
+         * @param message GetProposalQuery message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        static encode(message: getProposal.GetProposalQuery.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified GetProposalQuery message, length delimited. Does not implicitly {@link getProposal.GetProposalQuery.verify|verify} messages.
+         * @param message GetProposalQuery message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        static encodeDelimited(message: getProposal.GetProposalQuery.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a GetProposalQuery message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns {getProposal.GetProposalQuery & getProposal.GetProposalQuery.$Shape} GetProposalQuery
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getProposal.GetProposalQuery & getProposal.GetProposalQuery.$Shape;
+
+        /**
+         * Decodes a GetProposalQuery message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns {getProposal.GetProposalQuery & getProposal.GetProposalQuery.$Shape} GetProposalQuery
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getProposal.GetProposalQuery & getProposal.GetProposalQuery.$Shape;
+
+        /**
+         * Verifies a GetProposalQuery message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a GetProposalQuery message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns GetProposalQuery
+         */
+        static fromObject(object: { [k: string]: any }): getProposal.GetProposalQuery;
+
+        /**
+         * Creates a plain object from a GetProposalQuery message. Also converts values to other types if specified.
+         * @param message GetProposalQuery
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        static toObject(message: getProposal.GetProposalQuery, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this GetProposalQuery to JSON.
+         * @returns JSON object
+         */
+        toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the type url for GetProposalQuery
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
+         */
+        static getTypeUrl(prefix?: string): string;
+    }
+
+    namespace GetProposalQuery {
+
+        /** Properties of a GetProposalQuery. */
+        interface $Properties {
+
+            /** GetProposalQuery blockNumber */
+            blockNumber?: (number|null);
+
+            /** GetProposalQuery round */
+            round?: (number|null);
+
+            /** Unknown fields preserved while decoding when enabled */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a GetProposalQuery. */
+        type $Shape = getProposal.GetProposalQuery.$Properties;
+    }
+
+    /**
      * Properties of a GetProposalRequest.
      * @deprecated Use getProposal.GetProposalRequest.$Properties instead.
      */
@@ -1563,6 +1686,9 @@ export namespace getProposal {
 
         /** GetProposalRequest headers. */
         headers?: (shared.Headers.$Properties|null);
+
+        /** GetProposalRequest query. */
+        query?: (getProposal.GetProposalQuery.$Properties|null);
 
         /**
          * Creates a new GetProposalRequest instance using the specified properties.
@@ -1650,6 +1776,9 @@ export namespace getProposal {
 
             /** GetProposalRequest headers */
             headers?: (shared.Headers.$Properties|null);
+
+            /** GetProposalRequest query */
+            query?: (getProposal.GetProposalQuery.$Properties|null);
 
             /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
