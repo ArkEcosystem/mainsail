@@ -33,9 +33,17 @@ export interface GetBlocksResponse extends Response {
 	blocks: Buffer[];
 }
 
+export interface GetMessagesQuery {
+	blockNumber: number;
+	round: number;
+	validatorsSignedPrevote: readonly boolean[];
+	validatorsSignedPrecommit: readonly boolean[];
+}
+
 export interface GetMessagesRequest extends Request {
 	payload: {
 		headers: HeaderData;
+		query: GetMessagesQuery;
 	};
 }
 

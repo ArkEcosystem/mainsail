@@ -2318,12 +2318,409 @@ export const getMessages = $root.getMessages = (() => {
      */
     const getMessages = {};
 
+    getMessages.GetMessagesQuery = (function() {
+
+        /**
+         * Properties of a GetMessagesQuery.
+         * @typedef {Object} getMessages.GetMessagesQuery.$Properties
+         * @property {number|null} [blockNumber] GetMessagesQuery blockNumber
+         * @property {number|null} [round] GetMessagesQuery round
+         * @property {Array.<boolean>|null} [validatorsSignedPrevote] GetMessagesQuery validatorsSignedPrevote
+         * @property {Array.<boolean>|null} [validatorsSignedPrecommit] GetMessagesQuery validatorsSignedPrecommit
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
+         */
+
+        /**
+         * Properties of a GetMessagesQuery.
+         * @memberof getMessages
+         * @interface IGetMessagesQuery
+         * @augments getMessages.GetMessagesQuery.$Properties
+         * @deprecated Use getMessages.GetMessagesQuery.$Properties instead.
+         */
+
+        /**
+         * Shape of a GetMessagesQuery.
+         * @typedef {getMessages.GetMessagesQuery.$Properties} getMessages.GetMessagesQuery.$Shape
+         */
+
+        /**
+         * Constructs a new GetMessagesQuery.
+         * @memberof getMessages
+         * @classdesc Represents a GetMessagesQuery.
+         * @constructor
+         * @param {getMessages.GetMessagesQuery.$Properties=} [properties] Properties to set
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
+         */
+        const GetMessagesQuery = function (properties) {
+            this.validatorsSignedPrevote = [];
+            this.validatorsSignedPrecommit = [];
+            if (properties)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null && keys[i] !== "__proto__")
+                        this[keys[i]] = properties[keys[i]];
+        };
+
+        /**
+         * GetMessagesQuery blockNumber.
+         * @member {number} blockNumber
+         * @memberof getMessages.GetMessagesQuery
+         * @instance
+         */
+        GetMessagesQuery.prototype.blockNumber = 0;
+
+        /**
+         * GetMessagesQuery round.
+         * @member {number} round
+         * @memberof getMessages.GetMessagesQuery
+         * @instance
+         */
+        GetMessagesQuery.prototype.round = 0;
+
+        /**
+         * GetMessagesQuery validatorsSignedPrevote.
+         * @member {Array.<boolean>} validatorsSignedPrevote
+         * @memberof getMessages.GetMessagesQuery
+         * @instance
+         */
+        GetMessagesQuery.prototype.validatorsSignedPrevote = $util.emptyArray;
+
+        /**
+         * GetMessagesQuery validatorsSignedPrecommit.
+         * @member {Array.<boolean>} validatorsSignedPrecommit
+         * @memberof getMessages.GetMessagesQuery
+         * @instance
+         */
+        GetMessagesQuery.prototype.validatorsSignedPrecommit = $util.emptyArray;
+
+        /**
+         * Creates a new GetMessagesQuery instance using the specified properties.
+         * @function create
+         * @memberof getMessages.GetMessagesQuery
+         * @static
+         * @param {getMessages.GetMessagesQuery.$Properties=} [properties] Properties to set
+         * @returns {getMessages.GetMessagesQuery} GetMessagesQuery instance
+         * @type {{
+         *   (properties: getMessages.GetMessagesQuery.$Shape): getMessages.GetMessagesQuery & getMessages.GetMessagesQuery.$Shape;
+         *   (properties?: getMessages.GetMessagesQuery.$Properties): getMessages.GetMessagesQuery;
+         * }}
+         */
+        GetMessagesQuery.create = function(properties) {
+            return new GetMessagesQuery(properties);
+        };
+
+        /**
+         * Encodes the specified GetMessagesQuery message. Does not implicitly {@link getMessages.GetMessagesQuery.verify|verify} messages.
+         * @function encode
+         * @memberof getMessages.GetMessagesQuery
+         * @static
+         * @param {getMessages.GetMessagesQuery.$Properties} message GetMessagesQuery message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetMessagesQuery.encode = function (message, writer, _depth) {
+            if (!writer)
+                writer = $Writer.create();
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
+                writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.blockNumber);
+            if (message.round != null && $Object.hasOwnProperty.call(message, "round"))
+                writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.round);
+            if (message.validatorsSignedPrevote != null && message.validatorsSignedPrevote.length) {
+                writer.uint32(/* id 3, wireType 2 =*/26).fork();
+                for (let i = 0; i < message.validatorsSignedPrevote.length; ++i)
+                    writer.bool(message.validatorsSignedPrevote[i]);
+                writer.ldelim();
+            }
+            if (message.validatorsSignedPrecommit != null && message.validatorsSignedPrecommit.length) {
+                writer.uint32(/* id 4, wireType 2 =*/34).fork();
+                for (let i = 0; i < message.validatorsSignedPrecommit.length; ++i)
+                    writer.bool(message.validatorsSignedPrecommit[i]);
+                writer.ldelim();
+            }
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
+                    writer.raw(message.$unknowns[i]);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified GetMessagesQuery message, length delimited. Does not implicitly {@link getMessages.GetMessagesQuery.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof getMessages.GetMessagesQuery
+         * @static
+         * @param {getMessages.GetMessagesQuery.$Properties} message GetMessagesQuery message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        GetMessagesQuery.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
+        };
+
+        /**
+         * Decodes a GetMessagesQuery message from the specified reader or buffer.
+         * @function decode
+         * @memberof getMessages.GetMessagesQuery
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {getMessages.GetMessagesQuery & getMessages.GetMessagesQuery.$Shape} GetMessagesQuery
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetMessagesQuery.decode = function (reader, length, _end, _depth, _target) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $Reader.recursionLimit)
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getMessages.GetMessagesQuery(), value;
+            while (reader.pos < end) {
+                let start = reader.pos;
+                let tag = reader.tag();
+                if (tag === _end) {
+                    _end = $undefined;
+                    break;
+                }
+                let wireType = tag & 7;
+                switch (tag >>>= 3) {
+                case 1: {
+                        if (wireType !== 0)
+                            break;
+                        if (value = reader.uint32())
+                            message.blockNumber = value;
+                        else
+                            delete message.blockNumber;
+                        continue;
+                    }
+                case 2: {
+                        if (wireType !== 0)
+                            break;
+                        if (value = reader.uint32())
+                            message.round = value;
+                        else
+                            delete message.round;
+                        continue;
+                    }
+                case 3: {
+                        if (wireType === 2) {
+                            if (!(message.validatorsSignedPrevote && message.validatorsSignedPrevote.length))
+                                message.validatorsSignedPrevote = [];
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.validatorsSignedPrevote.push(reader.bool());
+                            continue;
+                        }
+                        if (wireType !== 0)
+                            break;
+                        if (!(message.validatorsSignedPrevote && message.validatorsSignedPrevote.length))
+                            message.validatorsSignedPrevote = [];
+                        message.validatorsSignedPrevote.push(reader.bool());
+                        continue;
+                    }
+                case 4: {
+                        if (wireType === 2) {
+                            if (!(message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length))
+                                message.validatorsSignedPrecommit = [];
+                            let end2 = reader.uint32() + reader.pos;
+                            while (reader.pos < end2)
+                                message.validatorsSignedPrecommit.push(reader.bool());
+                            continue;
+                        }
+                        if (wireType !== 0)
+                            break;
+                        if (!(message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length))
+                            message.validatorsSignedPrecommit = [];
+                        message.validatorsSignedPrecommit.push(reader.bool());
+                        continue;
+                    }
+                }
+                reader.skipType(wireType, _depth, tag);
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
+            }
+            if (_end !== $undefined)
+                throw $Error("missing end group");
+            return message;
+        };
+
+        /**
+         * Decodes a GetMessagesQuery message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof getMessages.GetMessagesQuery
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {getMessages.GetMessagesQuery & getMessages.GetMessagesQuery.$Shape} GetMessagesQuery
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        GetMessagesQuery.decodeDelimited = function(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a GetMessagesQuery message.
+         * @function verify
+         * @memberof getMessages.GetMessagesQuery
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        GetMessagesQuery.verify = function (message, _depth) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                return "max depth exceeded";
+            if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
+                if (!$util.isInteger(message.blockNumber))
+                    return "blockNumber: integer expected";
+            if (message.round != null && $Object.hasOwnProperty.call(message, "round"))
+                if (!$util.isInteger(message.round))
+                    return "round: integer expected";
+            if (message.validatorsSignedPrevote != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrevote")) {
+                if (!$Array.isArray(message.validatorsSignedPrevote))
+                    return "validatorsSignedPrevote: array expected";
+                for (let i = 0; i < message.validatorsSignedPrevote.length; ++i)
+                    if (typeof message.validatorsSignedPrevote[i] !== "boolean")
+                        return "validatorsSignedPrevote: boolean[] expected";
+            }
+            if (message.validatorsSignedPrecommit != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrecommit")) {
+                if (!$Array.isArray(message.validatorsSignedPrecommit))
+                    return "validatorsSignedPrecommit: array expected";
+                for (let i = 0; i < message.validatorsSignedPrecommit.length; ++i)
+                    if (typeof message.validatorsSignedPrecommit[i] !== "boolean")
+                        return "validatorsSignedPrecommit: boolean[] expected";
+            }
+            return null;
+        };
+
+        /**
+         * Creates a GetMessagesQuery message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof getMessages.GetMessagesQuery
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {getMessages.GetMessagesQuery} GetMessagesQuery
+         */
+        GetMessagesQuery.fromObject = function (object, _depth) {
+            if (object instanceof $root.getMessages.GetMessagesQuery)
+                return object;
+            if (!$util.isObject(object))
+                throw $TypeError(".getMessages.GetMessagesQuery: object expected");
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let message = new $root.getMessages.GetMessagesQuery();
+            if (object.blockNumber != null)
+                if ($Number(object.blockNumber) !== 0)
+                    message.blockNumber = object.blockNumber >>> 0;
+            if (object.round != null)
+                if ($Number(object.round) !== 0)
+                    message.round = object.round >>> 0;
+            if (object.validatorsSignedPrevote) {
+                if (!$Array.isArray(object.validatorsSignedPrevote))
+                    throw $TypeError(".getMessages.GetMessagesQuery.validatorsSignedPrevote: array expected");
+                message.validatorsSignedPrevote = $Array(object.validatorsSignedPrevote.length);
+                for (let i = 0; i < object.validatorsSignedPrevote.length; ++i)
+                    message.validatorsSignedPrevote[i] = $Boolean(object.validatorsSignedPrevote[i]);
+            }
+            if (object.validatorsSignedPrecommit) {
+                if (!$Array.isArray(object.validatorsSignedPrecommit))
+                    throw $TypeError(".getMessages.GetMessagesQuery.validatorsSignedPrecommit: array expected");
+                message.validatorsSignedPrecommit = $Array(object.validatorsSignedPrecommit.length);
+                for (let i = 0; i < object.validatorsSignedPrecommit.length; ++i)
+                    message.validatorsSignedPrecommit[i] = $Boolean(object.validatorsSignedPrecommit[i]);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a GetMessagesQuery message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof getMessages.GetMessagesQuery
+         * @static
+         * @param {getMessages.GetMessagesQuery} message GetMessagesQuery
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        GetMessagesQuery.toObject = function (message, options, _depth) {
+            if (!options)
+                options = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
+            if (options.arrays || options.defaults) {
+                object.validatorsSignedPrevote = [];
+                object.validatorsSignedPrecommit = [];
+            }
+            if (options.defaults) {
+                object.blockNumber = 0;
+                object.round = 0;
+            }
+            if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
+                object.blockNumber = message.blockNumber;
+            if (message.round != null && $Object.hasOwnProperty.call(message, "round"))
+                object.round = message.round;
+            if (message.validatorsSignedPrevote && message.validatorsSignedPrevote.length) {
+                object.validatorsSignedPrevote = $Array(message.validatorsSignedPrevote.length);
+                for (let j = 0; j < message.validatorsSignedPrevote.length; ++j)
+                    object.validatorsSignedPrevote[j] = message.validatorsSignedPrevote[j];
+            }
+            if (message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length) {
+                object.validatorsSignedPrecommit = $Array(message.validatorsSignedPrecommit.length);
+                for (let j = 0; j < message.validatorsSignedPrecommit.length; ++j)
+                    object.validatorsSignedPrecommit[j] = message.validatorsSignedPrecommit[j];
+            }
+            return object;
+        };
+
+        /**
+         * Converts this GetMessagesQuery to JSON.
+         * @function toJSON
+         * @memberof getMessages.GetMessagesQuery
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        GetMessagesQuery.prototype.toJSON = function() {
+            return GetMessagesQuery.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the type url for GetMessagesQuery
+         * @function getTypeUrl
+         * @memberof getMessages.GetMessagesQuery
+         * @static
+         * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns {string} The type url
+         */
+        GetMessagesQuery.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
+                prefix = "type.googleapis.com";
+            return prefix + "/getMessages.GetMessagesQuery";
+        };
+
+        return GetMessagesQuery;
+    })();
+
     getMessages.GetMessagesRequest = (function() {
 
         /**
          * Properties of a GetMessagesRequest.
          * @typedef {Object} getMessages.GetMessagesRequest.$Properties
          * @property {shared.Headers.$Properties|null} [headers] GetMessagesRequest headers
+         * @property {getMessages.GetMessagesQuery.$Properties|null} [query] GetMessagesRequest query
          * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
@@ -2364,6 +2761,14 @@ export const getMessages = $root.getMessages = (() => {
         GetMessagesRequest.prototype.headers = null;
 
         /**
+         * GetMessagesRequest query.
+         * @member {getMessages.GetMessagesQuery.$Properties|null|undefined} query
+         * @memberof getMessages.GetMessagesRequest
+         * @instance
+         */
+        GetMessagesRequest.prototype.query = null;
+
+        /**
          * Creates a new GetMessagesRequest instance using the specified properties.
          * @function create
          * @memberof getMessages.GetMessagesRequest
@@ -2397,6 +2802,8 @@ export const getMessages = $root.getMessages = (() => {
                 throw $Error("max depth exceeded");
             if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
                 $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
+            if (message.query != null && $Object.hasOwnProperty.call(message, "query"))
+                $root.getMessages.GetMessagesQuery.encode(message.query, writer.uint32(/* id 2, wireType 2 =*/18).fork(), _depth + 1).ldelim();
             if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
                 for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
@@ -2450,6 +2857,12 @@ export const getMessages = $root.getMessages = (() => {
                         message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
+                case 2: {
+                        if (wireType !== 2)
+                            break;
+                        message.query = $root.getMessages.GetMessagesQuery.decode(reader, reader.uint32(), $undefined, _depth + 1, message.query);
+                        continue;
+                    }
                 }
                 reader.skipType(wireType, _depth, tag);
                 if (!reader.discardUnknown) {
@@ -2498,6 +2911,11 @@ export const getMessages = $root.getMessages = (() => {
                 if (error)
                     return "headers." + error;
             }
+            if (message.query != null && $Object.hasOwnProperty.call(message, "query")) {
+                let error = $root.getMessages.GetMessagesQuery.verify(message.query, _depth + 1);
+                if (error)
+                    return "query." + error;
+            }
             return null;
         };
 
@@ -2524,6 +2942,11 @@ export const getMessages = $root.getMessages = (() => {
                     throw $TypeError(".getMessages.GetMessagesRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
+            if (object.query != null) {
+                if (!$util.isObject(object.query))
+                    throw $TypeError(".getMessages.GetMessagesRequest.query: object expected");
+                message.query = $root.getMessages.GetMessagesQuery.fromObject(object.query, _depth + 1);
+            }
             return message;
         };
 
@@ -2544,10 +2967,14 @@ export const getMessages = $root.getMessages = (() => {
             if (_depth > $util.recursionLimit)
                 throw $Error("max depth exceeded");
             let object = {};
-            if (options.defaults)
+            if (options.defaults) {
                 object.headers = null;
+                object.query = null;
+            }
             if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
                 object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
+            if (message.query != null && $Object.hasOwnProperty.call(message, "query"))
+                object.query = $root.getMessages.GetMessagesQuery.toObject(message.query, options, _depth + 1);
             return object;
         };
 
