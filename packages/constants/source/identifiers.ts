@@ -303,7 +303,6 @@ export const Identifiers = {
 			Repository: Symbol("TransactionPoolBroadcaster<Peer.Repository>"),
 		},
 		Processor: Symbol("TransactionPool<Processor>"),
-		ProcessorExtension: Symbol("TransactionPool<ProcessorExtension>"),
 		Query: Symbol("TransactionPool<Query>"),
 		Selector: Symbol("TransactionPool<Selector>"),
 		SenderMempool: {
