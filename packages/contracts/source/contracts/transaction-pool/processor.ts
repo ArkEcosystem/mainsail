@@ -1,5 +1,3 @@
-
-
 export type ProcessorError = {
 	type: string;
 	message: string;
