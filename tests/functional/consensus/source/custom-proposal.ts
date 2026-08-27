@@ -1,7 +1,8 @@
 import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import type { Contracts } from "@mainsail/contracts";
 
-import { Enums , Identifiers } from "@mainsail/constants";
+import { randaoMessage } from "@mainsail/blockchain-utils";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { Proposal } from "@mainsail/crypto-proposal";
 import { assert } from "@mainsail/utils";
 import { randomBytes } from "crypto";
@@ -63,18 +64,20 @@ export const makeCustomProposal = async (
 		let result = { gasRefunded: 0n, gasUsed: 0n, logs: [] as any, status: 0 };
 
 		try {
-			result = (await evm.process({
-				commitKey: commitKey,
-				data: Buffer.from(transaction.data.slice(2), "hex"),
-				from: transaction.from,
-				gasLimit: BigInt(transaction.gasLimit),
-				gasPrice: BigInt(transaction.gasPrice),
-				nonce: transaction.nonce,
-				specId: Enums.Evm.SpecId.OSAKA,
-				to: transaction.to,
-				txHash: transaction.hash,
-				value: transaction.value,
-			})).receipt;
+			result = (
+				await evm.process({
+					commitKey: commitKey,
+					data: Buffer.from(transaction.data.slice(2), "hex"),
+					from: transaction.from,
+					gasLimit: BigInt(transaction.gasLimit),
+					gasPrice: BigInt(transaction.gasPrice),
+					nonce: transaction.nonce,
+					specId: Enums.Evm.SpecId.OSAKA,
+					to: transaction.to,
+					txHash: transaction.hash,
+					value: transaction.value,
+				})
+			).receipt;
 		} catch {
 			result = { ...result, gasUsed: BigInt(transaction.gasLimit) };
 		}
@@ -100,6 +103,17 @@ export const makeCustomProposal = async (
 
 	const hashFactory = app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
 	const blockFactory = app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
+
+	const randaoReveal = await app
+		.getTagged<Contracts.Crypto.SignatureBls>(Identifiers.Cryptography.Signature.Instance, "type", "consensus")
+		.sign(
+			randaoMessage(
+				app.get<Contracts.State.Store>(Identifiers.State.Store).getGenesisCommit().block.hash,
+				Number(commitKey.blockNumber),
+			),
+			Buffer.from(validators[0].consensusPrivateKey, "hex"),
+		);
+
 	const block = await blockFactory.make(
 		{
 			fee: totals.fee,
@@ -109,6 +123,7 @@ export const makeCustomProposal = async (
 			parentHash: previousBlock.hash,
 			payloadSize,
 			proposer: validators[0].address,
+			randaoReveal,
 			reward: BigInt(milestone.reward),
 			round,
 			stateRoot: "0".repeat(64),

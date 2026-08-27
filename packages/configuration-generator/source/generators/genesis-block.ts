@@ -395,6 +395,7 @@ export class GenesisBlockGenerator {
 						"0000000000000000000000000000000000000000000000000000000000000000",
 					payloadSize,
 					proposer: blockContext.validatorAddress,
+					randaoReveal: "00".repeat(96),
 					reward: 0n,
 					round: 0,
 					stateRoot: await this.evm.stateRoot(

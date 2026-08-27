@@ -60,6 +60,7 @@ describe<{
 		gasLimit: BigInt(10_000_000),
 		timestamp: BigInt(12345),
 		validatorAddress: zeroAddress,
+		prevrandao: Buffer.alloc(32),
 	};
 
 	it("#process - should deploy contract successfully", async ({ instance }) => {
