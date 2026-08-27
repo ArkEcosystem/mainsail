@@ -193,20 +193,36 @@ contract ConsensusTest is Base {
 
         uint160 activeValidators = 53;
 
+        vm.prevrandao(uint256(1));
+
         consensus.calculateRoundValidators(uint8(activeValidators));
         ConsensusV1.Validator[] memory validators = consensus.getRoundValidators();
         assertEq(validators.length, activeValidators);
 
+        assertEq(validators[0].addr, address(0x28)); // Shuffled address
         assertEq(validators[activeValidators - 1].addr, address(0x1B)); // Shuffled address
         validators = sortValidators(validators);
         assertEq(validators[0].addr, highest);
         assertEq(validators[activeValidators - 1].addr, address(53));
 
-        // Second attempt should return the same result
+        // Second attempt with the same seed should return the same result
         consensus.calculateRoundValidators(uint8(activeValidators));
 
         validators = consensus.getRoundValidators();
+        assertEq(validators[0].addr, address(0x28)); // Shuffled address
         assertEq(validators[activeValidators - 1].addr, address(0x1B)); // Shuffled address
+        validators = sortValidators(validators);
+        assertEq(validators.length, activeValidators);
+        assertEq(validators[0].addr, highest);
+        assertEq(validators[activeValidators - 1].addr, address(53));
+
+        // A different seed reorders the slots but selects the same validators
+        vm.prevrandao(uint256(2));
+        consensus.calculateRoundValidators(uint8(activeValidators));
+
+        validators = consensus.getRoundValidators();
+        assertEq(validators[0].addr, address(0x2F)); // Shuffled address
+        assertEq(validators[activeValidators - 1].addr, address(0x2A)); // Shuffled address
         validators = sortValidators(validators);
         assertEq(validators.length, activeValidators);
         assertEq(validators[0].addr, highest);
