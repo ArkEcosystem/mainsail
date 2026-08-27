@@ -31,7 +31,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				32 + // reward
 				4 + // payloadLength
 				hashByteLength + // payloadHash
-				generatorAddressByteLength
+				generatorAddressByteLength +
+				96 // randaoReveal (consensusSignature)
 			);
 		});
 
