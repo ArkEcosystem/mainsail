@@ -283,6 +283,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				gasLimit: BigInt(250_000_000),
 				timestamp: BigInt(options.timestamp),
 				validatorAddress: this.deployerAddress,
+				prevrandao: Buffer.alloc(32),
 			},
 		});
 

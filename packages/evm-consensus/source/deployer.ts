@@ -57,6 +57,7 @@ export class Deployer implements Contracts.EvmConsensus.Deployer {
 				gasLimit: BigInt(milestone.block.maxGasLimit),
 				timestamp: BigInt(genesisBlock.timestamp),
 				validatorAddress: this.deployerAddress,
+				prevrandao: Buffer.alloc(32),
 			},
 		});
 

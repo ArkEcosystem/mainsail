@@ -30,6 +30,9 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	@tagged("instance", "validator")
 	private readonly evm!: Contracts.Evm.Instance;
 
+	@inject(Identifiers.Cryptography.Hash.Factory)
+	private readonly hashFactory!: Contracts.Crypto.HashFactory;
+
 	@inject(Identifiers.State.Store)
 	protected readonly stateStore!: Contracts.State.Store;
 
@@ -93,6 +96,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 					gasLimit: BigInt(this.#milestone.block.maxGasLimit),
 					timestamp: BigInt(this.#timestamp),
 					validatorAddress: this.#generatorAddress,
+					prevrandao: this.#getPrevrandao(),
 				},
 			});
 
@@ -272,5 +276,9 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 				validatorAddress: this.#generatorAddress,
 			});
 		}
+	}
+
+	#getPrevrandao(): Buffer {
+		return this.hashFactory.keccak256(Buffer.from(this.#previousBlock.randaoReveal, "hex"));
 	}
 }

@@ -232,18 +232,18 @@ impl EvmInner {
         calldata: Bytes,
         label: &str,
     ) -> std::result::Result<(), EVMError<String>> {
-        if !self.pending_commits.contains_key(&commit_key) {
-            return Err(EVMError::Custom(format!(
-                "{label} is missing commit key {:?}",
-                commit_key
-            )));
-        }
-
         let genesis_info = self.genesis_info()?;
 
         let nonce = self
             .get_account_nonce(&commit_key, genesis_info.deployer_account)
             .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
+
+        let Some(pending_commit) = self.pending_commits.get(&commit_key) else {
+            return Err(EVMError::Custom(format!(
+                "{label} is missing commit key {:?}",
+                commit_key
+            )));
+        };
 
         match self.transact_write(ExecutionContext {
             block_context: Some(BlockContext {
@@ -251,6 +251,7 @@ impl EvmInner {
                 gas_limit: u64::MAX,
                 timestamp,
                 validator_address,
+                prevrandao: pending_commit.block_context.prevrandao,
             }),
             from: genesis_info.deployer_account,
             to: Some(genesis_info.validator_contract),
@@ -364,12 +365,15 @@ impl EvmInner {
                     .encode("updateVoters", voters.clone())
                     .expect("encode updateVoters");
 
+                let prev_randao = pending_commit.block_context.prevrandao;
+
                 match self.transact_write(ExecutionContext {
                     block_context: Some(BlockContext {
                         commit_key: ctx.commit_key,
                         gas_limit: u64::MAX,
                         timestamp: ctx.timestamp,
                         validator_address: ctx.validator_address,
+                        prevrandao: prev_randao,
                     }),
                     from: genesis_info.deployer_account,
                     to: Some(genesis_info.validator_contract),
@@ -1203,6 +1207,7 @@ impl EvmInner {
                 block_env.timestamp = U256::from(block_ctx.timestamp);
                 block_env.gas_limit = block_ctx.gas_limit;
                 block_env.difficulty = U256::ZERO;
+                block_env.prevrandao = Some(block_ctx.prevrandao);
             })
             .modify_tx_chained(|tx_env: &mut TxEnv| {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or(u64::MAX);
@@ -1322,6 +1327,7 @@ impl EvmInner {
                 block_env.timestamp = U256::from(block_ctx.timestamp);
                 block_env.gas_limit = block_ctx.gas_limit;
                 block_env.difficulty = U256::ZERO;
+                block_env.prevrandao = Some(block_ctx.prevrandao);
             })
             .modify_tx_chained(|tx_env: &mut TxEnv| {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or(u64::MAX);

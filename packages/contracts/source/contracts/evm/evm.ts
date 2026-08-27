@@ -166,6 +166,7 @@ export interface BlockContext {
 	readonly gasLimit: bigint;
 	readonly timestamp: bigint;
 	readonly validatorAddress: string;
+	readonly prevrandao: Buffer;
 }
 
 export interface CalculateRoundValidatorsContext {

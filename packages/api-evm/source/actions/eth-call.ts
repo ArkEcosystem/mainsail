@@ -151,6 +151,7 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 			gasLimit: BigInt(milestone.block.maxGasLimit),
 			timestamp: BigInt(dayjs().valueOf()),
 			validatorAddress: "0x0000000000000000000000000000000000000001",
+			prevrandao: Buffer.alloc(32),
 		};
 	}
 }
