@@ -15,6 +15,7 @@ describe<{
 }>("RandaoVerifier", ({ it, beforeEach, assert, spy }) => {
 	const genesisHash = "27184b900e6f6a44eb0e1f0923b8214b351eee6b3736e8c07f75e5019bee2a92";
 	const blsPublicKey = "a".repeat(96);
+	const parentReveal = "p".repeat(192);
 	const randaoReveal = "b".repeat(192);
 
 	const makeUnit = (blockNumber: number) => ({
@@ -30,7 +31,10 @@ describe<{
 	beforeEach((context) => {
 		context.configuration = { getGenesisHeight: () => 0 };
 		context.consensusSignature = { verify: async () => true };
-		context.stateStore = { getGenesisCommit: () => ({ block: { hash: genesisHash } }) };
+		context.stateStore = {
+			getGenesisCommit: () => ({ block: { hash: genesisHash } }),
+			getLastBlock: () => ({ randaoReveal: parentReveal }),
+		};
 		context.validatorSet = {
 			getValidator: () => ({ blsPublicKey }),
 			getValidatorIndexByWalletAddress: () => 0,
@@ -85,7 +89,12 @@ describe<{
 		expectedBlockNumber.writeUInt32BE(2, 0);
 		assert.equal(
 			captured.message,
-			Buffer.concat([Buffer.from("MAINSAIL_RANDAO"), Buffer.from(genesisHash, "hex"), expectedBlockNumber]),
+			Buffer.concat([
+				Buffer.from("MAINSAIL_RANDAO"),
+				Buffer.from(genesisHash, "hex"),
+				Buffer.from(parentReveal, "hex"),
+				expectedBlockNumber,
+			]),
 		);
 	});
 

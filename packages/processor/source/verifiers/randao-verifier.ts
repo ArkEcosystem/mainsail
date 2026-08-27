@@ -33,7 +33,11 @@ export class RandaoVerifier implements Contracts.Processor.Handler {
 
 		const valid = await this.consensusSignature.verify(
 			Buffer.from(block.randaoReveal, "hex"),
-			randaoMessage(this.stateStore.getGenesisCommit().block.hash, block.number),
+			randaoMessage(
+				this.stateStore.getGenesisCommit().block.hash,
+				this.stateStore.getLastBlock().randaoReveal,
+				block.number,
+			),
 			Buffer.from(proposer.blsPublicKey, "hex"),
 		);
 

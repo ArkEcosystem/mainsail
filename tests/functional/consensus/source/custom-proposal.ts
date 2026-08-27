@@ -104,11 +104,13 @@ export const makeCustomProposal = async (
 	const hashFactory = app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
 	const blockFactory = app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
 
+	const stateStore = app.get<Contracts.State.Store>(Identifiers.State.Store);
 	const randaoReveal = await app
 		.getTagged<Contracts.Crypto.SignatureBls>(Identifiers.Cryptography.Signature.Instance, "type", "consensus")
 		.sign(
 			randaoMessage(
-				app.get<Contracts.State.Store>(Identifiers.State.Store).getGenesisCommit().block.hash,
+				stateStore.getGenesisCommit().block.hash,
+				stateStore.getLastBlock().randaoReveal,
 				Number(commitKey.blockNumber),
 			),
 			Buffer.from(validators[0].consensusPrivateKey, "hex"),

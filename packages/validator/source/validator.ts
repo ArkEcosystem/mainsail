@@ -42,7 +42,11 @@ export class Validator implements Contracts.Validator.Validator {
 
 		return worker.consensusSignature(
 			"sign",
-			randaoMessage(this.stateStore.getGenesisCommit().block.hash, blockNumber),
+			randaoMessage(
+				this.stateStore.getGenesisCommit().block.hash,
+				this.stateStore.getLastBlock().randaoReveal,
+				blockNumber,
+			),
 			Buffer.from(privateKey, "hex"),
 		);
 	}
