@@ -281,9 +281,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			blockContext: {
 				commitKey: options.commitKey,
 				gasLimit: BigInt(250_000_000),
+				prevrandao: Buffer.alloc(32),
 				timestamp: BigInt(options.timestamp),
 				validatorAddress: this.deployerAddress,
-				prevrandao: Buffer.alloc(32),
 			},
 		});
 

@@ -149,9 +149,9 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 		return {
 			commitKey: { blockNumber: BigInt(this.configuration.getHeight()), round: BigInt(0) },
 			gasLimit: BigInt(milestone.block.maxGasLimit),
+			prevrandao: Buffer.alloc(32),
 			timestamp: BigInt(dayjs().valueOf()),
 			validatorAddress: "0x0000000000000000000000000000000000000001",
-			prevrandao: Buffer.alloc(32),
 		};
 	}
 }

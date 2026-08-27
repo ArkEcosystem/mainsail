@@ -86,9 +86,9 @@ export class EthEstimateGasAction implements Contracts.Api.RPC.Action<[TxData]> 
 			blockContext: {
 				commitKey,
 				gasLimit: BigInt(block.maxGasLimit),
+				prevrandao: Buffer.alloc(32),
 				timestamp: BigInt(dayjs().valueOf()),
 				validatorAddress: "0x0000000000000000000000000000000000000001",
-				prevrandao: Buffer.alloc(32),
 			},
 			data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
 			from: data.from,

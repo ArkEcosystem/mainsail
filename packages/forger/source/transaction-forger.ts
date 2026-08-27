@@ -94,9 +94,9 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 				blockContext: {
 					commitKey: this.#commitKey,
 					gasLimit: BigInt(this.#milestone.block.maxGasLimit),
+					prevrandao: this.#getPrevrandao(),
 					timestamp: BigInt(this.#timestamp),
 					validatorAddress: this.#generatorAddress,
-					prevrandao: this.#getPrevrandao(),
 				},
 			});
 
