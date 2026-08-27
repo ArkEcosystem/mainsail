@@ -581,6 +581,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			roundState.proposer.address,
 			this.#round,
 			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
+			await registeredProposer.getRandaoReveal(this.#blockNumber),
 		);
 		this.logger.info(`Created proposal with new block ${this.#getBlockString(this.#proposedBlock)}`, "consensus");
 

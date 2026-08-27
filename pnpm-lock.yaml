@@ -3198,6 +3198,9 @@ importers:
       '@chainsafe/bls-keystore':
         specifier: 3.1.0
         version: 3.1.0
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/constants':
         specifier: workspace:*
         version: link:../constants
@@ -3214,9 +3217,6 @@ importers:
         specifier: workspace:*
         version: link:../utils
     devDependencies:
-      '@mainsail/blockchain-utils':
-        specifier: workspace:*
-        version: link:../blockchain-utils
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
