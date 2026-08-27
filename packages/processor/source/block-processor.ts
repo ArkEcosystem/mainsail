@@ -1,5 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
+import { getPrevrandao } from "@mainsail/blockchain-utils";
 import { Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { assert, ensureError, sleep } from "@mainsail/utils";
@@ -233,7 +234,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			return Buffer.alloc(32);
 		}
 
-		return this.hashFactory.keccak256(Buffer.from(this.stateStore.getLastBlock().randaoReveal, "hex"));
+		return getPrevrandao(this.hashFactory, this.stateStore.getLastBlock());
 	}
 
 	async #verifyStateRoot(block: Contracts.Crypto.Block): Promise<void> {

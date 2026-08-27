@@ -1,5 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
+import { getPrevrandao } from "@mainsail/blockchain-utils";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
@@ -94,7 +95,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 				blockContext: {
 					commitKey: this.#commitKey,
 					gasLimit: BigInt(this.#milestone.block.maxGasLimit),
-					prevrandao: this.#getPrevrandao(),
+					prevrandao: getPrevrandao(this.hashFactory, this.#previousBlock),
 					timestamp: BigInt(this.#timestamp),
 					validatorAddress: this.#generatorAddress,
 				},
@@ -276,9 +277,5 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 				validatorAddress: this.#generatorAddress,
 			});
 		}
-	}
-
-	#getPrevrandao(): Buffer {
-		return this.hashFactory.keccak256(Buffer.from(this.#previousBlock.randaoReveal, "hex"));
 	}
 }

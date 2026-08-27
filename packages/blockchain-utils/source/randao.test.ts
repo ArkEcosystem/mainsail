@@ -1,8 +1,8 @@
 import { describe } from "@mainsail/test-runner";
 
-import { randaoMessage } from "./randao";
+import { getPrevrandao, randaoMessage } from "./randao";
 
-describe("randaoMessage", ({ assert, it }) => {
+describe("randaoMessage", ({ assert, it, spy }) => {
 	const genesisBlockHash = "27184b900e6f6a44eb0e1f0923b8214b351eee6b3736e8c07f75e5019bee2a92";
 	const parentRandaoReveal = "ab".repeat(96);
 
@@ -67,5 +67,18 @@ describe("randaoMessage", ({ assert, it }) => {
 
 		// Beyond uint32 the message would be ambiguous — writeUInt32BE must reject, not wrap.
 		assert.throws(() => randaoMessage(genesisBlockHash, parentRandaoReveal, 0xff_ff_ff_ff + 1));
+	});
+
+	it("should keccak256 the previous block randaoReveal bytes", () => {
+		const hashed = Buffer.alloc(32, 1);
+		const hashFactory = { keccak256: () => hashed };
+		const keccak256 = spy(hashFactory, "keccak256");
+		const randaoReveal = "ab".repeat(96);
+
+		const result = getPrevrandao(hashFactory as any, { randaoReveal } as any);
+
+		assert.equal(result, hashed);
+		keccak256.calledOnce();
+		keccak256.calledWith(Buffer.from(randaoReveal, "hex"));
 	});
 });

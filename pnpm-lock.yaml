@@ -2235,6 +2235,9 @@ importers:
 
   packages/forger:
     dependencies:
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/constants':
         specifier: workspace:*
         version: link:../constants
@@ -2251,9 +2254,6 @@ importers:
         specifier: 18.2.5
         version: 18.2.5
     devDependencies:
-      '@mainsail/blockchain-utils':
-        specifier: workspace:*
-        version: link:../blockchain-utils
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
@@ -12462,7 +12462,7 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.67.0
       debug: 4.4.3(supports-color@7.2.0)
       minimatch: 10.2.6
-      semver: 7.8.5
+      semver: 7.8.0
       tinyglobby: 0.2.17
       ts-api-utils: 2.5.0(typescript@5.9.3)
       typescript: 5.9.3
@@ -12477,7 +12477,7 @@ snapshots:
       '@typescript-eslint/visitor-keys': 8.67.0
       debug: 4.4.3(supports-color@7.2.0)
       minimatch: 10.2.6
-      semver: 7.8.5
+      semver: 7.8.0
       tinyglobby: 0.2.17
       ts-api-utils: 2.5.0(typescript@6.0.3)
       typescript: 6.0.3
@@ -15598,7 +15598,7 @@ snapshots:
 
   node-abi@3.94.0:
     dependencies:
-      semver: 7.8.5
+      semver: 7.8.0
 
   node-addon-api@6.1.0: {}
 
