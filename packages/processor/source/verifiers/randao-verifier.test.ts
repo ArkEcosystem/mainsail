@@ -15,7 +15,7 @@ describe<{
 }>("RandaoVerifier", ({ it, beforeEach, assert, spy }) => {
 	const genesisHash = "27184b900e6f6a44eb0e1f0923b8214b351eee6b3736e8c07f75e5019bee2a92";
 	const blsPublicKey = "a".repeat(96);
-	const parentReveal = "p".repeat(192);
+	const parentReveal = "ab".repeat(96);
 	const randaoReveal = "b".repeat(192);
 
 	const makeUnit = (blockNumber: number) => ({
