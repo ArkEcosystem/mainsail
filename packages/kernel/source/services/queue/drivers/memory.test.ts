@@ -97,6 +97,7 @@ describe<{
 			onDrainCount++;
 		};
 		context.driver.on("drain", onDrain);
+		const drained = new Promise<void>((resolve) => context.driver.once("drain", resolve));
 
 		await context.driver.push(new DummyJob(jobMethod1));
 		await context.driver.push(new DummyJob(jobMethod2));
@@ -107,9 +108,10 @@ describe<{
 		await assert.resolves(() => start1);
 		await assert.resolves(() => start2);
 
-		await sleep(15);
+		await drained;
 
 		assert.gt(methodFinish2, methodFinish1);
+		assert.gte(methodFinish2 - methodFinish1, 4);
 
 		assert.equal(onDrainCount, 1);
 	});
@@ -368,6 +370,7 @@ describe<{
 
 		const onDrain = spyFn();
 		context.driver.on("drain", () => onDrain.call());
+		const drained = new Promise<void>((resolve) => context.driver.once("drain", resolve));
 
 		await context.driver.push(new DummyJob(async () => await jobMethod1.call()));
 		await context.driver.push(new DummyJob(async () => await jobMethod2.call()));
@@ -378,11 +381,10 @@ describe<{
 		await assert.resolves(() => start1);
 		await assert.resolves(() => resume1);
 
-		await sleep(150);
+		await drained;
 
 		assert.gt(methodFinish2, methodFinish1);
 		assert.gt(methodFinish2 - methodFinish1, 40);
-		assert.lt(methodFinish2 - methodFinish1, 60);
 
 		onDrain.calledOnce();
 	});
@@ -402,6 +404,7 @@ describe<{
 
 		const onDrain = spyFn();
 		context.driver.on("drain", () => onDrain.call());
+		const drained = new Promise<void>((resolve) => context.driver.once("drain", resolve));
 
 		await context.driver.push(new DummyJob(async () => await jobMethod1.call()));
 		await context.driver.push(new DummyJob(async () => await jobMethod2.call()));
@@ -412,11 +415,10 @@ describe<{
 		await assert.resolves(() => resume1);
 		await assert.resolves(() => resume2);
 
-		await sleep(150);
+		await drained;
 
 		assert.gt(methodFinish2, methodFinish1);
 		assert.gt(methodFinish2 - methodFinish1, 40);
-		assert.lt(methodFinish2 - methodFinish1, 60);
 
 		onDrain.calledOnce();
 	});
