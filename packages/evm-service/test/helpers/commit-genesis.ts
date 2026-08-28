@@ -42,6 +42,7 @@ export const processGenesis = async (
 			gasLimit: BigInt(10_000_000),
 			timestamp: BigInt(block.timestamp),
 			validatorAddress: block.proposer,
+			prevrandao: Buffer.alloc(32),
 		},
 	});
 

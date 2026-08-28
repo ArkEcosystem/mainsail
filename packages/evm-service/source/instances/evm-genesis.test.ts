@@ -2,7 +2,7 @@ import { Enums } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 import { setGracefulCleanup } from "tmp";
-import { zeroHash } from "viem";
+import { zeroAddress, zeroHash } from "viem";
 
 import { describe } from "@mainsail/test-runner";
 import { commitGenesis, processGenesis } from "../../test/helpers/commit-genesis";
@@ -27,6 +27,13 @@ describe<{
 		await context.instance.dispose();
 		setGracefulCleanup();
 	});
+
+	const blockContext: Omit<Contracts.Evm.BlockContext, "commitKey"> = {
+		gasLimit: 10_000_000n,
+		timestamp: 12_345n,
+		prevrandao: Buffer.alloc(32),
+		validatorAddress: zeroAddress,
+	};
 
 	it("isEmpty is false", async ({ instance }) => {
 		assert.false(await instance.isEmpty());
@@ -151,10 +158,9 @@ describe<{
 
 			await instance.prepareNextCommit({
 				blockContext: {
-					commitKey,
-					gasLimit: BigInt(10_000_000),
-					timestamp: BigInt(12345),
+					...blockContext,
 					validatorAddress: proposer,
+					commitKey,
 				},
 			});
 			await instance.updateRewardsAndVotes({
@@ -199,8 +205,7 @@ describe<{
 
 			await instance.prepareNextCommit({
 				blockContext: {
-					gasLimit: BigInt(10_000_000),
-					timestamp: BigInt(12345),
+					...blockContext,
 					validatorAddress: proposer,
 					commitKey,
 				},

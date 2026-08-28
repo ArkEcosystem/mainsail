@@ -2,6 +2,7 @@ export * from "./chained-verifier.js";
 export * from "./gas-limit-verifier.js";
 export * from "./generator-verifier.js";
 export * from "./legacy-attribute-verifier.js";
+export * from "./randao-verifier.js";
 export * from "./reward-verifier.js";
 export * from "./size-verifier.js";
 export * from "./timestamp-verifier.js";

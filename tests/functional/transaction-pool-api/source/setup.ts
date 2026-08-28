@@ -195,6 +195,7 @@ const bootstrap = async (app: Application) => {
 				round: BigInt(commitState.round),
 			},
 			gasLimit: BigInt(Number.MAX_SAFE_INTEGER),
+			prevrandao: Buffer.alloc(32),
 			timestamp: BigInt(genesisCommit.block.timestamp),
 			validatorAddress: genesisCommit.block.proposer,
 		},

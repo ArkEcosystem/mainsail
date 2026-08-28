@@ -35,6 +35,7 @@ describe<{
 			gasLimit: BigInt(milestone.block.maxGasLimit),
 			timestamp: BigInt(Date.now()),
 			validatorAddress: zero,
+			prevrandao: Buffer.alloc(32),
 		},
 		data: Buffer.alloc(0),
 		from: sender,

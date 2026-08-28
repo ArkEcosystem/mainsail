@@ -96,6 +96,7 @@ export class GenesisBlockGenerator {
 		const blockContext = {
 			commitKey,
 			gasLimit: BigInt(30_000_000),
+			prevrandao: Buffer.alloc(32),
 			timestamp: BigInt(dayjs(options.epoch).valueOf()),
 			validatorAddress: proposer,
 		};
@@ -394,6 +395,7 @@ export class GenesisBlockGenerator {
 						"0000000000000000000000000000000000000000000000000000000000000000",
 					payloadSize,
 					proposer: blockContext.validatorAddress,
+					randaoReveal: "00".repeat(96),
 					reward: 0n,
 					round: 0,
 					stateRoot: await this.evm.stateRoot(

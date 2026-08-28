@@ -94,6 +94,7 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 			number: 1,
 			parentHash: "0000000000000000000000000000000000000000000000000000000000000000",
 			stateRoot: "0000000000000000000000000000000000000000000000000000000000000000",
+			randaoReveal: "0".repeat(192),
 		}),
 	});
 

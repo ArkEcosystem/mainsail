@@ -55,6 +55,7 @@ export class Deployer implements Contracts.EvmConsensus.Deployer {
 			blockContext: {
 				commitKey: this.#getCommitKey(),
 				gasLimit: BigInt(milestone.block.maxGasLimit),
+				prevrandao: Buffer.alloc(32),
 				timestamp: BigInt(genesisBlock.timestamp),
 				validatorAddress: this.deployerAddress,
 			},

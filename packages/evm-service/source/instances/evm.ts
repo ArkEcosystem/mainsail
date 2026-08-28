@@ -305,6 +305,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 				parentHash: block.parentHash,
 				payloadSize: block.payloadSize,
 				proposer: block.proposer,
+				randaoReveal: block.randaoReveal,
 				reward: block.reward,
 				round: block.round,
 				stateRoot: block.stateRoot,

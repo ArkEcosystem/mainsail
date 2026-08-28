@@ -1,5 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
+import { randaoMessage } from "@mainsail/blockchain-utils";
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
@@ -20,6 +21,9 @@ export class Validator implements Contracts.Validator.Validator {
 	@inject(Identifiers.Validator.DoubleSignGuard)
 	private readonly doubleSignGuard!: Contracts.Validator.DoubleSignGuard;
 
+	@inject(Identifiers.CryptoWorker.WorkerPool)
+	private readonly workerPool!: Contracts.Crypto.WorkerPool;
+
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
 	public configure(keyPair: Contracts.Validator.ValidatorKeyPair): Contracts.Validator.Validator {
@@ -30,6 +34,21 @@ export class Validator implements Contracts.Validator.Validator {
 
 	public getConsensusPublicKey(): string {
 		return this.#keyPair.publicKey;
+	}
+
+	public async getRandaoReveal(blockNumber: number): Promise<string> {
+		const worker = this.workerPool.getWorker();
+		const { privateKey } = await this.#keyPair.getKeyPair();
+
+		return worker.consensusSignature(
+			"sign",
+			randaoMessage(
+				this.stateStore.getGenesisCommit().block.hash,
+				this.stateStore.getLastBlock().randaoReveal,
+				blockNumber,
+			),
+			Buffer.from(privateKey, "hex"),
+		);
 	}
 
 	public async propose(

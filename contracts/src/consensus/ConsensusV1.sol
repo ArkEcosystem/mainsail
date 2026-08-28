@@ -522,7 +522,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
         for (uint256 i = n - 1; i > 0; i--) {
             // Get a random index between 0 and i (inclusive)
-            uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, i))) % (i + 1);
+            uint256 j = uint256(keccak256(abi.encodePacked(block.prevrandao, i))) % (i + 1);
 
             // Swap elements at index i and j
             address temp = array[i];

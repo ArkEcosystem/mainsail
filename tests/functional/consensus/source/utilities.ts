@@ -68,7 +68,12 @@ export const makeProposal = async (
 
 	await sleep(1); // Sleep to avoid same timestamp
 
-	const block = await forger.forgeBlock(validator.address, round, timestamp);
+	const block = await forger.forgeBlock(
+		validator.address,
+		round,
+		timestamp,
+		await proposer.getRandaoReveal(blockNumber),
+	);
 	const proposal = await proposer.propose(0, round, undefined, block);
 
 	await proposal.deserializePayload();

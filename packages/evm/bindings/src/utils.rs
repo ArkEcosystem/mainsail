@@ -16,6 +16,18 @@ pub(crate) fn convert_js_buffer_to_bytes(buffer: Buffer) -> Bytes {
     Bytes::from_iter(buffer.as_ref())
 }
 
+pub(crate) fn convert_js_buffer_to_b256(buffer: Buffer, field: &str) -> anyhow::Result<B256> {
+    let bytes = buffer.as_ref();
+    if bytes.len() != B256::len_bytes() {
+        anyhow::bail!(
+            "{field}: expected exactly {} bytes, got {}",
+            B256::len_bytes(),
+            bytes.len()
+        );
+    }
+    Ok(B256::from_slice(bytes))
+}
+
 pub(crate) fn convert_string_to_b256(str: String) -> anyhow::Result<B256> {
     Ok(B256::try_from(
         &Bytes::from_str(str.as_str())?.as_ref()[..],

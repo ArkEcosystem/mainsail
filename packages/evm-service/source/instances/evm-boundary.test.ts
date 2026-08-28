@@ -29,6 +29,13 @@ describe<{
 		context.instance = context.app.resolve(EvmInstance);
 	});
 
+	const blockContext: Omit<Contracts.Evm.BlockContext, "commitKey"> = {
+		gasLimit: 10_000_000n,
+		timestamp: 12_345n,
+		prevrandao: Buffer.alloc(32),
+		validatorAddress: zeroAddress,
+	};
+
 	const makeUnit = (genesisCommit: Contracts.Crypto.Commit): Contracts.Processor.ProcessableUnit =>
 		({
 			blockNumber: genesisCommit.block.number,
@@ -149,7 +156,7 @@ describe<{
 	it("process rejects negative or oversized BigInt fields instead of truncating", async ({ instance }) => {
 		const commitKey = { blockNumber: 0n, round: 0n };
 		await instance.prepareNextCommit({
-			blockContext: { commitKey, gasLimit: 10_000_000n, timestamp: 12_345n, validatorAddress: zeroAddress },
+			blockContext: { ...blockContext, commitKey },
 		});
 
 		const base = {
@@ -233,7 +240,7 @@ describe<{
 					timestamp: 0n,
 					validatorAddress: zeroAddress,
 				}),
-			"calculate_round_validators is missing commit key",
+			"genesis not initialized",
 		);
 
 		await assert.rejects(
@@ -245,7 +252,7 @@ describe<{
 					timestamp: 0n,
 					validatorAddress: zeroAddress,
 				}),
-			"update_validator_registration_fee is missing commit key",
+			"genesis not initialized",
 		);
 
 		await assert.rejects(
@@ -267,6 +274,30 @@ describe<{
 		await assert.rejects(
 			() => instance.updateRewardsAndVotes(updateContext),
 			"update_rewards_and_votes is missing commit key",
+		);
+
+		await assert.rejects(
+			() =>
+				instance.calculateRoundValidators({
+					commitKey: unknownKey,
+					roundValidators: 1n,
+					specId: Enums.Evm.SpecId.OSAKA,
+					timestamp: 0n,
+					validatorAddress: zeroAddress,
+				}),
+			"calculate_round_validators is missing commit key",
+		);
+
+		await assert.rejects(
+			() =>
+				instance.updateValidatorRegistrationFee({
+					commitKey: unknownKey,
+					fee: 0n,
+					specId: Enums.Evm.SpecId.OSAKA,
+					timestamp: 0n,
+					validatorAddress: zeroAddress,
+				}),
+			"update_validator_registration_fee is missing commit key",
 		);
 
 		await assert.rejects(() => instance.stateRoot(unknownKey, zeroHash), "state_root is missing commit key");
@@ -384,7 +415,7 @@ describe<{
 		// an existing pending commit (bootstrap guard), which would defeat the rebuild below.
 		const commitKey = { blockNumber: 1n, round: 0n };
 		await instance.prepareNextCommit({
-			blockContext: { commitKey, gasLimit: 10_000_000n, timestamp: 12_345n, validatorAddress: zeroAddress },
+			blockContext: { ...blockContext, commitKey },
 		});
 
 		const { receipt } = await instance.process({
@@ -443,7 +474,7 @@ describe<{
 		// which replaces the dirty pending commit with a fresh one. The applied-then-
 		// abandoned reward must not survive that — spending it fails.
 		await instance.prepareNextCommit({
-			blockContext: { commitKey, gasLimit: 10_000_000n, timestamp: 12_345n, validatorAddress: zeroAddress },
+			blockContext: { ...blockContext, commitKey },
 		});
 
 		await assert.rejects(
@@ -510,8 +541,8 @@ describe<{
 		// replacing it like every other re-prepare (the deliberate genesis exception).
 		await instance.prepareNextCommit({
 			blockContext: {
+				...blockContext,
 				commitKey,
-				gasLimit: 10_000_000n,
 				timestamp: BigInt(genesisCommit.block.timestamp),
 				validatorAddress: genesisCommit.block.proposer,
 			},
@@ -574,7 +605,7 @@ describe<{
 
 		const commitKey = { blockNumber: 1n, round: 0n };
 		await instance.prepareNextCommit({
-			blockContext: { commitKey, gasLimit: 10_000_000n, timestamp: 12_345n, validatorAddress: zeroAddress },
+			blockContext: { ...blockContext, commitKey },
 		});
 
 		const transfer = (nonce: bigint, from: string, legacyAddress: string) =>
@@ -624,7 +655,7 @@ describe<{
 
 		const commitKey = { blockNumber: 1n, round: 0n };
 		await instance.prepareNextCommit({
-			blockContext: { commitKey, gasLimit: 10_000_000n, timestamp: 12_345n, validatorAddress: zeroAddress },
+			blockContext: { ...blockContext, commitKey },
 		});
 
 		const deploy = (nonce: bigint) =>
@@ -747,12 +778,7 @@ describe<{
 		});
 
 		const { receipt } = await instance.simulate({
-			blockContext: {
-				commitKey: { blockNumber: 0n, round: 0n },
-				gasLimit: 10_000_000n,
-				timestamp: 12_345n,
-				validatorAddress: zeroAddress,
-			},
+			blockContext: { ...blockContext, commitKey: { blockNumber: 0n, round: 0n } },
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			from: wallets[0].address,
 			gasLimit: 2_000_000n,

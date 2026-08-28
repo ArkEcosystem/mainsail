@@ -1,5 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
+import { getPrevrandao } from "@mainsail/blockchain-utils";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
@@ -29,6 +30,9 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "validator")
 	private readonly evm!: Contracts.Evm.Instance;
+
+	@inject(Identifiers.Cryptography.Hash.Factory)
+	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	@inject(Identifiers.State.Store)
 	protected readonly stateStore!: Contracts.State.Store;
@@ -91,6 +95,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 				blockContext: {
 					commitKey: this.#commitKey,
 					gasLimit: BigInt(this.#milestone.block.maxGasLimit),
+					prevrandao: getPrevrandao(this.hashFactory, this.#previousBlock),
 					timestamp: BigInt(this.#timestamp),
 					validatorAddress: this.#generatorAddress,
 				},
@@ -246,12 +251,14 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 
 	async #updateValidatorRegistrationFee(): Promise<void> {
 		if (this.roundCalculator.isNewRound(this.#previousBlock.number + 2)) {
-			const { validatorRegistrationFee } = this.cryptoConfiguration.getMilestone(this.#previousBlock.number + 2);
+			const { evmSpec, validatorRegistrationFee } = this.cryptoConfiguration.getMilestone(
+				this.#previousBlock.number + 2,
+			);
 
 			await this.evm.updateValidatorRegistrationFee({
 				commitKey: this.#commitKey,
 				fee: BigInt(validatorRegistrationFee),
-				specId: this.#milestone.evmSpec,
+				specId: evmSpec,
 				timestamp: BigInt(this.#timestamp),
 				validatorAddress: this.#generatorAddress,
 			});
@@ -260,12 +267,12 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 
 	async #calculateRoundValidators(): Promise<void> {
 		if (this.roundCalculator.isNewRound(this.#previousBlock.number + 2)) {
-			const { roundValidators } = this.cryptoConfiguration.getMilestone(this.#previousBlock.number + 2);
+			const { evmSpec, roundValidators } = this.cryptoConfiguration.getMilestone(this.#previousBlock.number + 2);
 
 			await this.evm.calculateRoundValidators({
 				commitKey: this.#commitKey,
 				roundValidators: BigInt(roundValidators),
-				specId: this.#milestone.evmSpec,
+				specId: evmSpec,
 				timestamp: BigInt(this.#timestamp),
 				validatorAddress: this.#generatorAddress,
 			});

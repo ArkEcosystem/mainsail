@@ -27,6 +27,7 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 		generatorAddress: string,
 		round: number,
 		timestamp: number,
+		randaoReveal: string,
 	): Promise<Contracts.Crypto.Block> {
 		const previousBlock = this.stateStore.getLastBlock();
 		const blockNumber = previousBlock.number + 1;
@@ -37,7 +38,17 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 		});
 
 		const { fee, gasUsed, logsBloom, stateRoot, transactions } = await transactionForger.getTransactions();
-		return this.#makeBlock(round, generatorAddress, logsBloom, stateRoot, transactions, timestamp, gasUsed, fee);
+		return this.#makeBlock(
+			round,
+			generatorAddress,
+			logsBloom,
+			stateRoot,
+			transactions,
+			timestamp,
+			gasUsed,
+			fee,
+			randaoReveal,
+		);
 	}
 
 	async #makeBlock(
@@ -49,6 +60,7 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 		timestamp: number,
 		gasUsed: number,
 		fee: bigint,
+		randaoReveal: string,
 	): Promise<Contracts.Crypto.Block> {
 		const previousBlock = this.stateStore.getLastBlock();
 		const number = previousBlock.number + 1;
@@ -78,6 +90,7 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 				parentHash: previousBlock.hash,
 				payloadSize,
 				proposer,
+				randaoReveal,
 				reward: BigInt(milestone.reward),
 				round,
 				stateRoot,
