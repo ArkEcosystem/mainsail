@@ -1,57 +1,85 @@
+import { Enums } from "@mainsail/constants";
+import { injectable } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
+import { sleep } from "@mainsail/utils";
 import { setGracefulCleanup } from "tmp";
+import { zeroAddress } from "viem";
 
 import { describe } from "@mainsail/test-runner";
 import { prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { EvmInstance } from "./evm";
 import { LimitedEvmInstance } from "./limited-evm";
 
+@injectable()
+class SerialEvmInstance extends LimitedEvmInstance {
+	protected override readonly concurrency = 1;
+}
+
 describe<{
 	app: Application;
-	unlimitedInstance: Contracts.Evm.Instance & Contracts.Evm.Storage;
-	limitedInstance: Contracts.Evm.Instance & Contracts.Evm.Storage;
+	unlimitedInstance: Contracts.Evm.Instance;
+	serialInstance: Contracts.Evm.Instance;
 }>("LimitedEvmInstance", ({ assert, afterAll, afterEach, beforeEach, it }) => {
 	afterAll(() => setGracefulCleanup());
 
-	afterEach(async ({ unlimitedInstance, limitedInstance }) => {
-		await unlimitedInstance.dispose();
-		await limitedInstance.dispose();
-	});
-
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
-
 		context.unlimitedInstance = context.app.resolve(EvmInstance);
-		context.limitedInstance = context.app.resolve(LimitedEvmInstance);
+		context.serialInstance = context.app.resolve(SerialEvmInstance);
 	});
 
-	const address = "0x0000000000000000000000000000000000000001";
+	afterEach(async ({ unlimitedInstance, serialInstance }) => {
+		await unlimitedInstance.dispose();
+		await serialInstance.dispose();
+	});
 
-	// Fire `n` gated reads at once and return how long they took to all settle.
-	const hammer = async (evm: Contracts.Evm.Instance, n: number): Promise<number> => {
-		await evm.getAccountInfo(address); // warm up (one-time init cost out of the measurement)
-		const start = performance.now();
-		await Promise.all(Array.from({ length: n }, () => evm.getAccountInfo(address)));
-		return performance.now() - start;
+	const GAS = 500_000_000n;
+	const burn = async (evm: Contracts.Evm.Instance): Promise<void> => {
+		const { receipt } = await evm.simulate({
+			blockContext: {
+				commitKey: { blockNumber: 0n, round: 0n },
+				gasLimit: GAS,
+				timestamp: 0n,
+				validatorAddress: zeroAddress,
+			},
+			// Deploys 'JUMPDEST PUSH1 0 JUMP', a loop until the tx runs out of gas.
+			// At 12 gas per iteration 500M gas is ~42M iterations - roughly 200 ms on a current core, even longer
+			// on a slow or busy one. it only has to dwarf a `getAccountInfo` (~1 ms) so that a read issued while
+			// the burn is running lands well inside it.
+			data: Buffer.from("5b600056", "hex"),
+			from: zeroAddress,
+			gasLimit: GAS,
+			gasPrice: 0n,
+			nonce: 0n,
+			specId: Enums.Evm.SpecId.OSAKA,
+			value: 0n,
+		});
+		assert.equal(receipt.gasUsed, GAS);
 	};
 
-	it("serializes gated calls under a small limit and parallelizes without one", async ({
-		unlimitedInstance,
-		limitedInstance,
-	}) => {
-		const N = 500;
+	const settleOrder = async (evm: Contracts.Evm.Instance): Promise<string[]> => {
+		// warm up cache
+		await evm.getAccountInfo(zeroAddress);
 
-		// limited → the semaphore admits less than N reads at the same time, so N reads take longer.
-		const limited = await hammer(limitedInstance, N);
-		// unlimited → N reads fan out across the blocking pool (512 threads) and overlap, so N reads take less.
-		const unlimited = await hammer(unlimitedInstance, N);
+		const order: string[] = [];
+		const burning = burn(evm).then(() => order.push("burn"));
 
-		console.log({ limited, unlimited });
-		// { limited: 9.473764999999958, unlimited: 2.2855690000000095 }
+		// The burn's tokio task acquires its permit within microseconds of being spawned. 50 ms is a wide
+		// margin for that while leaving most of the burn ahead of the read.
+		await sleep(50);
 
-		// The limited batch takes longer than the unbounded one. That gap is the proof
-		// the semaphore is actually enforcing the cap
-		assert.true(limited > unlimited * 1.05);
+		const reading = evm.getAccountInfo(zeroAddress).then(() => order.push("read"));
+		await Promise.all([burning, reading]);
+
+		return order;
+	};
+
+	it("should queue a call behind the one in flight once the limit is reached", async ({ serialInstance }) => {
+		assert.equal(await settleOrder(serialInstance), ["burn", "read"]);
+	});
+
+	it("should run calls concurrently when no limit is set", async ({ unlimitedInstance }) => {
+		assert.equal(await settleOrder(unlimitedInstance), ["read", "burn"]);
 	});
 });
