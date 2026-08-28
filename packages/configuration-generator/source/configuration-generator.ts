@@ -9,6 +9,7 @@ import { validateMnemonic } from "bip39";
 import dayjs from "dayjs";
 import { ensureDirSync, pathExistsSync } from "fs-extra/esm";
 import { join } from "path";
+import { bytesToBigInt, encodePacked, keccak256 } from "viem";
 
 import { ConfigurationWriter } from "./configuration-writer.js";
 import { EnvironmentData, Task } from "./contracts.js";
@@ -215,6 +216,38 @@ export class ConfigurationGenerator {
 					);
 				},
 				title: "Writing peers.json in core config path.",
+			},
+			{
+				task: async () => {
+					if (options.snapshot) {
+						return;
+					}
+
+					const wallets = await Promise.all(
+						validatorsMnemonics.map(async (mnemonic) => {
+							const { address } = await this.walletGenerator.generate(mnemonic);
+							return { address: BigInt(address), mnemonic };
+						}),
+					);
+
+					wallets.sort((a, b) => (a.address > b.address ? -1 : 1));
+
+					const genesisPrevrandao = bytesToBigInt(Buffer.alloc(32));
+					for (let index = wallets.length - 1; index > 0; index--) {
+						const hash = BigInt(
+							keccak256(encodePacked(["uint256", "uint256"], [genesisPrevrandao, BigInt(index)])),
+						);
+						const target = Number(hash % BigInt(index + 1));
+						[wallets[index], wallets[target]] = [wallets[target], wallets[index]];
+					}
+
+					validatorsMnemonics.splice(
+						0,
+						validatorsMnemonics.length,
+						...wallets.map(({ mnemonic }) => mnemonic),
+					);
+				},
+				title: "Sorting validators.json into genesis round slot order.",
 			},
 			{
 				task: async () => {
