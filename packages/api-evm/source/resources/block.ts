@@ -35,7 +35,7 @@ export class BlockResource {
 			size: `0x${block.payloadSize.toString(16)}`, // TODO: Add block header size
 			gasLimit: `0x${milestone.block.maxGasLimit.toString(16)}`,
 			gasUsed: `0x${block.gasUsed.toString(16)}`,
-			timestamp: `0x${block.timestamp.toString(16)}`,
+			timestamp: `0x${Math.floor(block.timestamp / 1000).toString(16)}`,
 			transactions: transactionObject
 				? await this.#transformTransactions(block)
 				: block.transactions.map((transaction) => `0x${transaction.hash}`),

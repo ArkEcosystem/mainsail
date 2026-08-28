@@ -189,7 +189,7 @@ describe<{
 		// }
 
 		assert.equal(data.blockHeight, 1245n);
-		assert.equal(data.blockTimestamp, 123_456_789n);
+		assert.equal(data.blockTimestamp, 123_456n);
 		assert.equal(data.blockGasLimit, 12_000_000n);
 		assert.equal(data.blockCoinbase, validator.address);
 		assert.equal(data.blockDifficulty, 0n); // difficulty always 0
