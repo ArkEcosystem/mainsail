@@ -22,5 +22,5 @@ export class LimitedEvmInstance extends EvmInstance {
 	//
 	// TODO: move these limits (and `max_blocking_threads`) into config so operators can tune per
 	//       deployment (high-RPC node vs. pure validator) without a code change; keep 192 as default
-	protected override readonly concurrency = 192;
+	protected override readonly concurrency: number = 192;
 }
