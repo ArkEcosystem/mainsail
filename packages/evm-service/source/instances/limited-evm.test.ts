@@ -42,6 +42,7 @@ describe<{
 				gasLimit: GAS,
 				timestamp: 0n,
 				validatorAddress: zeroAddress,
+				prevrandao: Buffer.alloc(32),
 			},
 			// Deploys 'JUMPDEST PUSH1 0 JUMP', a loop until the tx runs out of gas.
 			// At 12 gas per iteration 500M gas is ~42M iterations - roughly 200 ms on a current core, even longer
