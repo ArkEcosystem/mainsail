@@ -157,7 +157,7 @@ describe<{
 		await generator.generate(options());
 
 		// 7 task titles (prepare, genesis-wallet, crypto, peers, validators, .env, app) + the completion line.
-		info.calledTimes(8);
+		info.calledTimes(9);
 		info.calledWith("Preparing directories.");
 		info.calledWith("Writing crypto.json in core config path.");
 		info.calledWith("Writing .env in core config path.");
