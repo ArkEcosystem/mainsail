@@ -106,7 +106,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new TransactionFromWrongNetworkError(transaction, chainId);
 		}
 
-
 		if (this.#wallet.getNonce() + nonceOffset !== transaction.nonce) {
 			throw new UnexpectedNonceError(transaction.nonce, this.#wallet);
 		}
