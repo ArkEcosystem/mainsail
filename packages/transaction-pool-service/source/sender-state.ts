@@ -148,7 +148,10 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		});
 
 		if (!preverified.success) {
-			throw new TransactionFailedToPreverifyError(transaction, preverified.error ?? 'Preverify failed for unknown reason');
+			throw new TransactionFailedToPreverifyError(
+				transaction,
+				preverified.error ?? "Preverify failed for unknown reason",
+			);
 		}
 	}
 }
