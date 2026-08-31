@@ -1,7 +1,6 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import { Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
-import { sleep } from "@mainsail/utils";
 
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
@@ -16,6 +15,7 @@ import {
 	makeProposal,
 	prepareNodeValidators,
 	snoozeForBlock,
+	snoozeUntil,
 } from "./utilities.js";
 import type { Contracts } from "@mainsail/contracts";
 
@@ -87,7 +87,7 @@ describe<{
 		});
 
 		await runMany(nodes);
-		await sleep(500);
+		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === 3);
 
 		assert.equal(p2p.precommits.getMessages(1, 0).length, 3);
 	});
