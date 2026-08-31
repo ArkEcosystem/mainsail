@@ -14,12 +14,13 @@ export const prepareNodeValidators = (validators: ValidatorsJson, nodeIndex: num
 	};
 };
 
-export const getValidators = async (app: Contracts.Kernel.Application, validators: ValidatorsJson): Promise<Validator[]> => {
+export const getValidators = async (
+	app: Contracts.Kernel.Application,
+	validators: ValidatorsJson,
+): Promise<Validator[]> => {
 	const result: Validator[] = [];
 
-	const addressFactory = app.get<Contracts.Crypto.AddressFactory>(
-		Identifiers.Cryptography.Identity.Address.Factory,
-	);
+	const addressFactory = app.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory);
 	const keyPairFactory = app.getTagged<Contracts.Crypto.KeyPairFactory>(
 		Identifiers.Cryptography.Identity.KeyPair.Factory,
 		"type",
@@ -56,8 +57,7 @@ export const makeProposal = async (
 	round: number,
 	timestamp: number,
 ): Promise<Contracts.Crypto.Proposal> => {
-	const forger = app
-		.get<Contracts.Forger.BlockForger>(Identifiers.Forger.Block);
+	const forger = app.get<Contracts.Forger.BlockForger>(Identifiers.Forger.Block);
 	const proposer = app
 		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
 		.getValidator(validator.consensusPublicKey);
@@ -68,7 +68,12 @@ export const makeProposal = async (
 
 	await sleep(1); // Sleep to avoid same timestamp
 
-	const block = await forger.forgeBlock(validator.address, round, timestamp);
+	const block = await forger.forgeBlock(
+		validator.address,
+		round,
+		timestamp,
+		await proposer.getRandaoReveal(blockNumber),
+	);
 	const proposal = await proposer.propose(0, round, undefined, block);
 
 	await proposal.deserializePayload();
@@ -125,25 +130,56 @@ export const makePrecommit = async (
 	);
 };
 
-export const snoozeForBlock = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], blockNumber?: number): Promise<void> => {
-	const function_ = async (app: Contracts.Kernel.Application): Promise<void> =>
-		new Promise((resolve) => {
-			const event = Events.BlockEvent.Applied;
-			const eventDispatcher = app.get<Contracts.Kernel.EventDispatcher<Contracts.Crypto.BlockData>>(
-				Identifiers.Services.EventDispatcher.Service,
-			);
+export const snoozeUntil = async (predicate: () => boolean, timeout = 10_000, interval = 10): Promise<void> => {
+	const deadline = Date.now() + timeout;
 
-			const listener = {
+	while (!predicate() && Date.now() < deadline) {
+		await sleep(interval);
+	}
+};
+
+export const getLastBlockNumber = async (app: Contracts.Kernel.Application): Promise<number> => {
+	try {
+		const commit = await app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service).getLastCommit();
+		return commit.block.number;
+	} catch {
+		return -1;
+	}
+};
+
+export const snoozeForBlock = async (
+	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
+	blockNumber?: number,
+): Promise<void> => {
+	const function_ = async (app: Contracts.Kernel.Application): Promise<void> => {
+		const eventDispatcher = app.get<Contracts.Kernel.EventDispatcher<Contracts.Crypto.BlockData>>(
+			Identifiers.Services.EventDispatcher.Service,
+		);
+
+		let stopListening: (() => void) | undefined;
+		const applied = new Promise<void>((resolve) => {
+			stopListening = eventDispatcher.listen(Events.BlockEvent.Applied, {
 				handle: async ({ data }: { data: Contracts.Crypto.BlockData }): Promise<void> => {
 					if (!blockNumber || data.number >= blockNumber) {
-						eventDispatcher.forget(event, listener);
 						resolve();
 					}
 				},
-			};
-
-			eventDispatcher.listen(event, listener);
+			});
 		});
+
+		try {
+			// The target block may already have been applied before the listener existed (its Applied event
+			// fired while the caller was still asserting on the previous block); without this check the wait
+			// would only resolve at the NEXT applied block.
+			if (blockNumber && (await getLastBlockNumber(app)) >= blockNumber) {
+				return;
+			}
+
+			await applied;
+		} finally {
+			stopListening?.();
+		}
+	};
 
 	if (Array.isArray(app)) {
 		await Promise.all(app.map((s) => function_(s)));
@@ -152,7 +188,10 @@ export const snoozeForBlock = async (app: Contracts.Kernel.Application | Contrac
 	}
 };
 
-export const snoozeForRound = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], round?: number): Promise<void> => {
+export const snoozeForRound = async (
+	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
+	round?: number,
+): Promise<void> => {
 	const function_ = async (app: Contracts.Kernel.Application): Promise<void> =>
 		new Promise((resolve) => {
 			const event = Events.ConsensusEvent.RoundStarted;
@@ -183,8 +222,14 @@ export interface InvalidBlock {
 	block: Contracts.Crypto.BlockData;
 	error: Error;
 }
-export async function snoozeForInvalidBlock(app: Contracts.Kernel.Application, blockNumber?: number): Promise<InvalidBlock>;
-export async function snoozeForInvalidBlock(app: Contracts.Kernel.Application[], blockNumber?: number): Promise<InvalidBlock[]>;
+export async function snoozeForInvalidBlock(
+	app: Contracts.Kernel.Application,
+	blockNumber?: number,
+): Promise<InvalidBlock>;
+export async function snoozeForInvalidBlock(
+	app: Contracts.Kernel.Application[],
+	blockNumber?: number,
+): Promise<InvalidBlock[]>;
 export async function snoozeForInvalidBlock(
 	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
 	blockNumber?: number,
@@ -222,9 +267,8 @@ export const getLastCommit = async (app: Contracts.Kernel.Application): Promise<
 	const [serialized] = await databaseService.findCommitBuffers(
 		lasCommit.block.number,
 		lasCommit.block.number,
+		Number.MAX_SAFE_INTEGER,
 	);
 
-	return app
-		.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory)
-		.fromBytes(serialized);
+	return app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory).fromBytes(serialized);
 };

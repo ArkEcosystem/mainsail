@@ -7,7 +7,7 @@ import {
 	EnvironmentConfigurationCannotBeLoaded,
 	FileException,
 } from "@mainsail/exceptions";
-import { assert, dotenv, get, set } from "@mainsail/utils";
+import { assert, dotenv, ensureError, get } from "@mainsail/utils";
 import { existsSync, readFileSync } from "fs";
 import Joi from "joi";
 import { extname } from "path";
@@ -34,10 +34,11 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 
 			for (const [key, value] of Object.entries(config)) {
 				if (process.env[key] === undefined) {
-					set(process.env, key, value);
+					process.env[key] = String(value);
 				}
 			}
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			throw new EnvironmentConfigurationCannotBeLoaded(error.message);
 		}
 	}
@@ -51,7 +52,8 @@ export class LocalConfigLoader implements Contracts.Kernel.ConfigLoader {
 			this.#loadValidators();
 
 			this.#loadCryptography();
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			throw new ApplicationConfigurationCannotBeLoaded(error.message);
 		}
 	}

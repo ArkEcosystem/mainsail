@@ -15,8 +15,9 @@ RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 py3-setuptools
     && echo "servers time.google.com" >> /etc/ntpd.conf \
     && npm install -g npm@latest \
     && su node -c "npm install --prefix=/home/node/.pnpm -g pnpm" \
+    && su node -c "pnpm config set --global enable-global-virtual-store false" \
     && su node -c "pnpm add -g @mainsail/api@${mainsail_channel} --allow-build=nsfw" \
-    && su node -c "export PNPM_HOME=/home/node/.pnpm/bin" \
+    && su node -c "export PNPM_HOME=/home/node/.pnpm" \
     && su node -c "pnpm store prune" \
     && su node -c "rm -rf ~/.cache/node-gyp" \
     && apk del .build-deps \

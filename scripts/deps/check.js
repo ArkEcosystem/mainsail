@@ -34,7 +34,6 @@ const EXCEPTIONS = {
 	"@mainsail/configuration-generator": {
 		dependencies: [
 			"@mainsail/crypto-key-pair-ecdsa",
-			"@mainsail/snapshot-legacy-exporter",
 		],
 		devDependencies: [],
 	},
@@ -83,7 +82,6 @@ const EXCEPTIONS = {
 			"@mainsail/fees",
 			"@mainsail/forger",
 			"@mainsail/logger-pino",
-			"@mainsail/networking-dns",
 			"@mainsail/networking-ntp",
 			"@mainsail/p2p",
 			"@mainsail/processor",
@@ -94,7 +92,6 @@ const EXCEPTIONS = {
 			"@mainsail/transaction-pool-client",
 			"@mainsail/transaction-pool-service",
 			"@mainsail/transaction-pool-worker",
-			"@mainsail/transactions",
 			"@mainsail/validation",
 			"@mainsail/validator-set-static",
 			"@mainsail/validator-set-vote-weighted",
@@ -235,6 +232,7 @@ const main = async () => {
 
 	const pkgs = readdirSync(source)
 		.filter((name) => lstatSync(`${source}/${name}`).isDirectory())
+		.filter((name) => name !== "evm")
 		.sort();
 
 	let pass = true;

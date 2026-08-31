@@ -39,7 +39,7 @@ describe<{
 		const serviceProvider: StubServiceProvider = new StubServiceProvider();
 		context.serviceProviderRepository.set("stub", serviceProvider);
 
-		assert.equal(context.serviceProviderRepository.all(), [["stub", serviceProvider]]);
+		assert.equal(context.serviceProviderRepository.all(), [serviceProvider]);
 	});
 
 	it(".allLoadedProviders", (context) => {
@@ -103,6 +103,28 @@ describe<{
 
 		fired.calledOnce();
 		spyRegister.calledOnce();
+	});
+
+	it(".register tags the configuration binding with the unscoped name for scoped providers", async (context) => {
+		const config = { sentinel: "scoped" } as unknown as Contracts.Kernel.PluginConfiguration;
+		const serviceProvider: StubServiceProvider = new StubServiceProvider();
+		serviceProvider.setConfig(config);
+		context.serviceProviderRepository.set("@mainsail/stub", serviceProvider);
+
+		await context.serviceProviderRepository.register("@mainsail/stub");
+
+		assert.equal(context.app.getTagged(Identifiers.ServiceProvider.Configuration, "plugin", "stub"), config);
+	});
+
+	it(".register tags the configuration binding with the full name for unscoped providers", async (context) => {
+		const config = { sentinel: "unscoped" } as unknown as Contracts.Kernel.PluginConfiguration;
+		const serviceProvider: StubServiceProvider = new StubServiceProvider();
+		serviceProvider.setConfig(config);
+		context.serviceProviderRepository.set("stub", serviceProvider);
+
+		await context.serviceProviderRepository.register("stub");
+
+		assert.equal(context.app.getTagged(Identifiers.ServiceProvider.Configuration, "plugin", "stub"), config);
 	});
 
 	it(".boot", async (context) => {

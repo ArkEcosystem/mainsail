@@ -1,3 +1,4 @@
+import type { Step } from "./consensus/enums.js";
 import type { AggregatedSignature, Block, KeyPair, Message, Proposal } from "./crypto/index.js";
 
 export interface ValidatorKeyPair {
@@ -8,6 +9,7 @@ export interface ValidatorKeyPair {
 export interface Validator {
 	configure(keyPair: ValidatorKeyPair): Validator;
 	getConsensusPublicKey(): string;
+	getRandaoReveal(blockNumber: number): Promise<string>;
 	propose(
 		validatorIndex: number,
 		round: number,
@@ -17,13 +19,13 @@ export interface Validator {
 	): Promise<Proposal>;
 	prevote(
 		validatorIndex: number,
-		blockHeight: number,
+		blockNumber: number,
 		round: number,
 		blockHash: string | undefined,
 	): Promise<Message>;
 	precommit(
 		validatorIndex: number,
-		blockHeight: number,
+		blockNumber: number,
 		round: number,
 		blockHash: string | undefined,
 	): Promise<Message>;
@@ -32,4 +34,15 @@ export interface Validator {
 export interface ValidatorRepository {
 	getValidator(publicKey: string): Validator | undefined;
 	printLoadedValidators(): void;
+}
+
+export interface SigningPosition {
+	readonly blockNumber: number;
+	readonly round: number;
+	readonly step: Step;
+	readonly value?: string; // block hash being signed; undefined for a nil vote
+}
+
+export interface DoubleSignGuard {
+	guard(publicKey: string, position: SigningPosition): Promise<void>;
 }

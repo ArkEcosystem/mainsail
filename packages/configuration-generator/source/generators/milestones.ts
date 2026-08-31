@@ -16,7 +16,7 @@ export class MilestonesGenerator {
 					version: 1,
 				},
 				epoch: options.epoch.toISOString().slice(0, 11) + "00:00:00.000Z",
-				evmSpec: Enums.Evm.SpecId.SHANGHAI,
+				evmSpec: Enums.Evm.SpecId.OSAKA,
 				gas: {
 					maximumGasLimit: 5_000_000,
 					maximumGasPrice: 10_000 * 1e9,
@@ -37,11 +37,12 @@ export class MilestonesGenerator {
 					stageTimeoutIncrease: 2000,
 					tolerance: 100,
 				},
-				validatorRegistrationFee: options.validatorRegistrationFee,
+				validatorRegistrationFee: "0",
 			},
 			{
 				height: options.initialBlockNumber + 1,
 				roundValidators: options.validators,
+				validatorRegistrationFee: options.validatorRegistrationFee,
 			},
 		];
 

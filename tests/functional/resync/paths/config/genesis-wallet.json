@@ -1,14 +1,14 @@
 {
-    "address": "0xFaF2A197233DE670fEA2850C465F6Cf32aA0847F",
+    "address": "0xD4A6DafeCCD6d0A28dA7290Af61A523cce0Bf3f7",
     "consensusKeys": {
         "compressed": true,
-        "privateKey": "2541b58a5f2c4eb39b6d47db7c93ba0582766352fa3a9a47c4e16b6c893345c3",
-        "publicKey": "8d036e6ce18f3c97db3a23a1480e4df456ab5f0fa570f4df90536a67b5257b859398376f8c44d6d22736ce95acab06ef"
+        "privateKey": "24b5e1b605510abf04bb0988e8efcacb20167f8450a287b6134cf5d586f93ac0",
+        "publicKey": "ab41323623743b1f4f54ceadc1878c279b3957259dad04a04e162cbe472d5104a11403ff8e040d8d2d510ab3048a2c0f"
     },
     "keys": {
         "compressed": true,
-        "privateKey": "d3ee16da2ef9f40ce2c30f0c78416baffc64dacff8a05c3dbcc3058c0575e618",
-        "publicKey": "02fea45ee10450bc012a8ffbade94317c24ed19b863509a67038fb2e2e2b8f3dc8"
+        "privateKey": "55c1eeb7fa993d7dcfc89be3256b374dba9b732c44575f969c872248bc9c7422",
+        "publicKey": "02c9554f8ac2607abfb63e9a864c4d0caafb060a1c920b5e49376f1f450f860623"
     },
-    "passphrase": "stem food dirt cave use what code uniform bike route fence few decline easily indicate erosion slender able ancient ritual meadow cart blur expose"
+    "passphrase": "bronze success spawn over avocado update moon pitch pledge sleep remain estate coast people tank rigid arena fame assume nephew energy pottery sugar method"
 }

@@ -3,7 +3,7 @@ import { describe } from "@mainsail/test-runner";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
 import { setupSyncNode } from "./setup.js";
 import { verifyNodeIntegrity } from "./integrity.js";
-import { forgeTransactions, getRandomConsensusKeyPair, getWallets, waitBlock } from "./utilities.js";
+import { forgeTransactions, getRandomConsensusKeyPair, getWallets } from "./utilities.js";
 import { dirSync } from "tmp";
 import { getCreateAddress, Hex, parseEther } from "viem";
 
@@ -23,7 +23,7 @@ describe<{
 	});
 
 	it("should be ok", async ({ syncNode }) => {
-		await waitBlock(syncNode, 5);
+		await Utils.waitBlock({ app: syncNode }, 54);
 	});
 
 	it("should be ok with votes", async ({ syncNode }) => {

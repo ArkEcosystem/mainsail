@@ -6,9 +6,6 @@ import { InvalidTransactionsRoot } from "@mainsail/exceptions";
 
 @injectable()
 export class TransactionsRootVerifier implements Contracts.Processor.Handler {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 

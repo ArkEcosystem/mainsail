@@ -87,7 +87,7 @@ export interface AccountUpdateContext {
 }
 
 export interface PrepareNextCommitContext {
-	readonly commitKey: CommitKey;
+	readonly blockContext: BlockContext;
 }
 
 export interface PreverifyTransactionContext {
@@ -115,7 +115,7 @@ export interface TransactionContext {
 	readonly gasPrice: bigint;
 	readonly nonce: bigint;
 	readonly data: Buffer;
-	readonly blockContext: BlockContext;
+	readonly commitKey: CommitKey;
 	readonly txHash: string;
 	readonly specId: SpecId;
 }
@@ -165,6 +165,7 @@ export interface BlockContext {
 	readonly gasLimit: bigint;
 	readonly timestamp: bigint;
 	readonly validatorAddress: string;
+	readonly prevrandao: Buffer;
 }
 
 export interface CalculateRoundValidatorsContext {
@@ -174,6 +175,15 @@ export interface CalculateRoundValidatorsContext {
 	readonly roundValidators: bigint;
 	readonly specId: SpecId;
 }
+
+export interface UpdateValidatorRegistrationFeeContext {
+	readonly commitKey: CommitKey;
+	readonly timestamp: bigint;
+	readonly validatorAddress: string;
+	readonly fee: bigint;
+	readonly specId: SpecId;
+}
+
 export interface UpdateRewardsAndVotesContext {
 	readonly commitKey: CommitKey;
 	readonly timestamp: bigint;

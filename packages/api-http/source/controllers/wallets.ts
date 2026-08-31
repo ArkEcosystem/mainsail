@@ -286,7 +286,7 @@ export class WalletsController extends Controller {
 		const addresses = Array.isArray(request.query.addresses) ? request.query.addresses : [request.query.addresses];
 
 		if (addresses.length === 0) {
-			return [];
+			return this.getEmptyPage();
 		}
 
 		// Transactions

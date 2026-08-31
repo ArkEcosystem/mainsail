@@ -1,5 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 import { Application } from "../application.js";
 import { Spinner } from "../components/index.js";
@@ -19,8 +20,10 @@ export class RestartProcess {
 			spinner = this.app.get<Spinner>(Identifiers.Cli.Component.Spinner).render(`Restarting ${processName}`);
 
 			this.processManager.restart(processName);
-		} catch (error) {
-			throw new Error(error.stderr ? `${error.message}: ${error.stderr}` : error.message);
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			const stderr = (rawError as { stderr?: string }).stderr;
+			throw new Error(stderr ? `${error.message}: ${stderr}` : error.message);
 		} finally {
 			spinner.stop();
 		}

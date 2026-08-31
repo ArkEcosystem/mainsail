@@ -78,4 +78,10 @@ describe("NullQueue", ({ assert, it }) => {
 		const result = await driver.isRunning();
 		assert.is(result, false);
 	});
+
+	it("should return undefined", async () => {
+		const driver = new NullQueue();
+		const result = await driver.drain();
+		assert.undefined(result);
+	});
 });

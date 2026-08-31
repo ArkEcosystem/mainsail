@@ -69,10 +69,6 @@ describe<{
 		spyPeerDispose.calledOnce();
 	});
 
-	it("#required - should return true", async ({ serviceProvider }) => {
-		assert.true(await serviceProvider.required());
-	});
-
 	it("#peerFactory - should create a peer with integer port number, when using string config", async ({
 		app,
 		serviceProvider,
@@ -193,8 +189,8 @@ describe<{
 		assert.equal(result.error?.message, '"server.port" must be a number');
 	});
 
-	it("should return logLevel = 1 if process.env.MAINSAIL_NETWORK_NAME is devnet", async ({ serviceProvider }) => {
-		process.env.MAINSAIL_NETWORK_NAME = "devnet";
+	it("should read server.logLevel from process.env.MAINSAIL_P2P_LOG_LEVEL", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_LOG_LEVEL = "1";
 
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
@@ -202,9 +198,9 @@ describe<{
 		assert.equal(result.value.server.logLevel, 1);
 	});
 
-	it("should return logLevel = 0 if process.env.MAINSAIL_NETWORK_NAME is not devnet", async ({ serviceProvider }) => {
-		process.env.MAINSAIL_NETWORK_NAME = "testnet";
-
+	it("should default server.logLevel to 0 when process.env.MAINSAIL_P2P_LOG_LEVEL is not set", async ({
+		serviceProvider,
+	}) => {
 		const result = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(result.error);
@@ -308,6 +304,22 @@ describe<{
 
 		assert.undefined(result.error);
 		assert.equal(result.value.developmentMode.enabled, true);
+	});
+
+	it("should parse process.env.MAINSAIL_P2P_STATISTIC_MAX_TRACKED_PEERS", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_STATISTIC_MAX_TRACKED_PEERS = "1000";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.statistic.maxTrackedPeers, 1000);
+	});
+
+	it("should default statistic.maxTrackedPeers when the environment does not set it", async ({ serviceProvider }) => {
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.statistic.maxTrackedPeers, 250);
 	});
 
 	it("should parse process.env.MAINSAIL_P2P_API_NODES_MAX_CONTENT_LENGTH", async ({ serviceProvider }) => {

@@ -1,16 +1,20 @@
-use std::collections::BTreeMap;
+use std::{borrow::Cow, collections::BTreeMap};
 
 use alloy_sol_types::SolEvent;
+use rayon::{
+    iter::{IntoParallelRefMutIterator, ParallelIterator},
+    slice::ParallelSliceMut,
+};
 use revm::{
     context::result::ExecutionResult,
-    database::{DatabaseCommitExt, WrapDatabaseRef},
+    database::{DatabaseCommitExt, TransitionAccount, WrapDatabaseRef},
     primitives::{Address, B256, map::HashMap},
+    state::{EvmStorage, EvmStorageSlot, TransactionId},
 };
 
 use crate::{
     db::{CommitData, CommitKey, Error, GenesisInfo, PendingCommit, PersistentDB},
     state_changes::{self, AccountMergeInfo, AccountUpdate},
-    state_root::calculate_commit_hashes,
 };
 
 #[derive(Clone, Debug, Default)]
@@ -41,15 +45,19 @@ pub fn build_commit(pending_commit: &mut PendingCommit) -> Result<StateCommit, c
             .filter_map(|(key, legacy)| legacy.map(|v| (key, v)))
             .collect();
 
-    Ok(StateCommit {
+    let mut state_commit = StateCommit {
         key: pending_commit.key,
         change_set,
         results: std::mem::take(&mut pending_commit.results),
-    })
+    };
+
+    finalize(&mut state_commit);
+
+    Ok(state_commit)
 }
 
 pub fn apply_rewards(
-    db: &mut PersistentDB,
+    db: &PersistentDB,
     pending: &mut PendingCommit,
     rewards: HashMap<Address, u128>,
 ) -> Result<(), crate::db::Error> {
@@ -59,21 +67,52 @@ pub fn apply_rewards(
         .with_database(WrapDatabaseRef(&db))
         .build();
 
-    state
+    let result = state
         .increment_balances(rewards)
-        .map_err(|err| crate::db::Error::State(format!("increment balances err={}", err)))?;
+        .map_err(|err| crate::db::Error::State(format!("increment balances err={}", err)));
 
-    if let Some(transition_state) = state.transition_state.take() {
-        // println!("transition state {:#?}", transition_state);
-        pending
-            .transitions
-            .add_transitions(transition_state.transitions.into_iter());
+    // `increment_balances` short-circuits before committing any transition, so on error
+    // the state carries no reward changes. Only fold transitions in on success; always
+    // return the prestate cache so a recoverable failure never leaves `pending` empty.
+    if result.is_ok() {
+        if let Some(transition_state) = state.transition_state.take() {
+            pending.transitions.add_transitions(
+                transition_state
+                    .transitions
+                    .into_iter()
+                    .map(|(address, account)| (address, into_evm_transition(account))),
+            );
+        }
     }
 
     pending.cache = std::mem::take(&mut state.cache);
     // println!("cache {:#?}", pending.cache.accounts);
 
-    Ok(())
+    result
+}
+
+/// `TransitionState::add_transitions` expects the EVM-side storage representation;
+/// convert an already-flattened transition back into it.
+pub fn into_evm_transition(
+    account: TransitionAccount,
+) -> TransitionAccount<Option<Cow<'static, EvmStorage>>> {
+    account.map_storage(|storage| {
+        Some(Cow::Owned(
+            storage
+                .into_iter()
+                .map(|(key, slot)| {
+                    (
+                        key,
+                        EvmStorageSlot::new_changed(
+                            slot.previous_or_original_value,
+                            slot.present_value,
+                            TransactionId::default(),
+                        ),
+                    )
+                })
+                .collect(),
+        ))
+    })
 }
 
 pub fn commit_to_db(
@@ -87,24 +126,42 @@ pub fn commit_to_db(
         None => build_commit(&mut pending_commit)?,
     };
 
-    let commit_hashes = match pending_commit.commit_hashes {
-        Some(commit_hashes) => commit_hashes,
-        None => calculate_commit_hashes(&mut commit)?,
-    };
+    commit_with_resize_retry(|| db.commit(&mut commit, &commit_data), || db.resize())?;
 
-    match db.commit(&mut commit, &commit_data, &commit_hashes) {
-        Ok(_) => Ok(collect_dirty_accounts(commit, &genesis_info)),
-        Err(err) => match &err {
-            Error::DbFull => {
-                // try to resize the db and attempt another commit on success
-                db.resize().and_then(|_| {
-                    db.commit(&mut commit, &commit_data, &commit_hashes)
-                        .and_then(|_| Ok(collect_dirty_accounts(commit, &genesis_info)))
-                })
-            }
-            _ => Err(err),
-        },
+    Ok(collect_dirty_accounts(commit, &genesis_info))
+}
+
+/// Maximum number of resize-and-retry attempts after an initial `DbFull` on commit.
+const MAX_RESIZE_RETRIES: usize = 3;
+
+fn commit_with_resize_retry(
+    mut try_commit: impl FnMut() -> Result<(), Error>,
+    mut resize: impl FnMut() -> Result<(), Error>,
+) -> Result<(), Error> {
+    for _ in 0..=MAX_RESIZE_RETRIES {
+        match try_commit() {
+            Ok(()) => return Ok(()),
+            Err(Error::DbFull) => resize()?,
+            Err(err) => return Err(err),
+        }
     }
+    Err(Error::DbFull)
+}
+
+fn finalize(state: &mut StateCommit) {
+    state.change_set.accounts.par_sort_unstable_by_key(|a| a.0);
+    state.change_set.contracts.par_sort_unstable_by_key(|a| a.0);
+
+    state
+        .change_set
+        .storage
+        .par_iter_mut()
+        .for_each(|s| s.storage.par_sort_unstable_by_key(|slot| slot.0));
+
+    state
+        .change_set
+        .storage
+        .par_sort_unstable_by_key(|a| a.address);
 }
 
 fn collect_dirty_accounts(
@@ -114,32 +171,44 @@ fn collect_dirty_accounts(
     let mut dirty_accounts = HashMap::with_capacity(commit.change_set.accounts.len());
 
     for (address, account) in commit.change_set.accounts {
-        if let Some(account) = account {
-            dirty_accounts.insert(
+        // A destroyed (selfdestructed) account comes through as `None`; surface it as a
+        // zeroed update so consumers drop the stale balance — mirroring the history
+        // table, which records deletions as a default account.
+        let account = account.unwrap_or_default();
+
+        dirty_accounts.insert(
+            address,
+            AccountUpdate {
                 address,
-                AccountUpdate {
-                    address,
-                    balance: account.balance,
-                    nonce: account.nonce,
-                    vote: None,
-                    unvote: None,
-                    username: None,
-                    username_resigned: false,
-                    merge_info: commit
-                        .change_set
-                        .merged_legacy_cold_wallets
-                        .get(&address)
-                        .map(|value| AccountMergeInfo {
-                            legacy_address: value.1,
-                            transaction_hash: value.0,
-                        }),
-                },
-            );
-        }
+                balance: account.balance,
+                nonce: account.nonce,
+                vote: None,
+                unvote: None,
+                username: None,
+                username_resigned: false,
+                merge_info: commit
+                    .change_set
+                    .merged_legacy_cold_wallets
+                    .get(&address)
+                    .map(|value| AccountMergeInfo {
+                        legacy_address: value.1,
+                        transaction_hash: value.0,
+                    }),
+            },
+        );
     }
 
     if let Some(info) = genesis_info {
-        for (receipt, _) in commit.results.values() {
+        // `results` is keyed by tx hash, but the "last event wins" folds below must see
+        // events in execution order. Cumulative gas is strictly increasing per executed
+        // transaction, so it recovers that order: every executed transaction consumes at
+        // least the 21000-gas intrinsic cost, so each entry's cumulative total is strictly
+        // greater than the previous one's — the key is guaranteed unique and monotonic,
+        // never tied.
+        let mut results: Vec<&(ExecutionResult, u64)> = commit.results.values().collect();
+        results.sort_by_key(|(_, cumulative_gas_used)| *cumulative_gas_used);
+
+        for (receipt, _) in results {
             match receipt {
                 ExecutionResult::Success { logs, .. } => {
                     for log in logs {
@@ -219,11 +288,12 @@ fn collect_dirty_accounts(
 mod tests {
     use std::collections::BTreeMap;
 
+    use super::commit_with_resize_retry;
     use crate::{
-        db::{GenesisInfo, PendingCommit, PersistentDB},
+        db::{Error, GenesisInfo, PendingCommit, PersistentDB},
         events,
         state_changes::{AccountMergeInfo, AccountUpdate, StateChangeset},
-        state_commit::{StateCommit, apply_rewards, collect_dirty_accounts},
+        state_commit::{StateCommit, apply_rewards, build_commit, collect_dirty_accounts},
     };
     use crate::{
         legacy::{LegacyAccountAttributes, LegacyAddress},
@@ -427,6 +497,149 @@ mod tests {
     }
 
     #[test]
+    fn test_collect_dirty_accounts_includes_destroyed_accounts() {
+        let destroyed = address!("0000000000000000000000000000000000000001");
+        let alive = address!("0000000000000000000000000000000000000002");
+
+        let mut change_set = StateChangeset::default();
+        change_set.accounts.push((destroyed, None));
+        change_set
+            .accounts
+            .push((alive, Some(AccountInfo::from_balance(U256::from(7)))));
+
+        let state = StateCommit {
+            change_set,
+            ..Default::default()
+        };
+
+        let mut account_updates = collect_dirty_accounts(state, &None);
+        account_updates.sort_by_key(|u| u.address);
+
+        // A selfdestructed account must surface as a zeroed update — consumers (api-sync
+        // wallet table) would otherwise keep the stale pre-destruction balance forever.
+        assert_eq!(
+            account_updates,
+            vec![
+                AccountUpdate {
+                    address: destroyed,
+                    balance: U256::ZERO,
+                    nonce: 0,
+                    ..Default::default()
+                },
+                AccountUpdate {
+                    address: alive,
+                    balance: U256::from(7),
+                    nonce: 0,
+                    ..Default::default()
+                }
+            ]
+        );
+    }
+
+    #[test]
+    fn test_collect_dirty_accounts_folds_events_in_execution_order() {
+        let voter = address!("0000000000000000000000000000000000000001");
+        let validator = address!("0000000000000000000000000000000000000002");
+
+        let genesis_info = GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            deployer_account: address!("0000000000000000000000000000000000000002"),
+            validator_contract: address!("0000000000000000000000000000000000000003"),
+            username_contract: address!("0000000000000000000000000000000000000004"),
+            initial_block_number: 0,
+            initial_supply: U256::from(1_000_000),
+        };
+
+        let mut change_set = StateChangeset::default();
+        change_set
+            .accounts
+            .push((voter, Some(AccountInfo::from_balance(U256::ONE))));
+
+        let success = |log: Log| ExecutionResult::Success {
+            reason: SuccessReason::Stop,
+            gas: ResultGas::new_with_state_gas(30000, 30000, 0, 0),
+            logs: vec![log],
+            output: Output::Call(alloy_primitives::Bytes(Bytes::new())),
+        };
+
+        // Execution order (= cumulative gas order): vote, unvote, register, resign.
+        // The tx hashes sort in exactly the reverse order, so a fold iterating the
+        // hash-keyed BTreeMap directly would end up with vote + username instead.
+        let mut results = BTreeMap::<B256, (ExecutionResult, u64)>::new();
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000004"),
+            (
+                success(Log {
+                    address: genesis_info.validator_contract,
+                    data: events::Voted { validator, voter }.encode_log_data(),
+                }),
+                21000,
+            ),
+        );
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000003"),
+            (
+                success(Log {
+                    address: genesis_info.validator_contract,
+                    data: events::Unvoted { validator, voter }.encode_log_data(),
+                }),
+                42000,
+            ),
+        );
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000002"),
+            (
+                success(Log {
+                    address: genesis_info.username_contract,
+                    data: events::UsernameRegistered {
+                        addr: voter,
+                        username: "test".into(),
+                        previousUsername: "".into(),
+                    }
+                    .encode_log_data(),
+                }),
+                63000,
+            ),
+        );
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+            (
+                success(Log {
+                    address: genesis_info.username_contract,
+                    data: events::UsernameResigned {
+                        addr: voter,
+                        username: "test".into(),
+                    }
+                    .encode_log_data(),
+                }),
+                84000,
+            ),
+        );
+
+        let state = StateCommit {
+            change_set,
+            results,
+            ..Default::default()
+        };
+
+        let account_updates = collect_dirty_accounts(state, &Some(genesis_info));
+
+        assert_eq!(
+            account_updates,
+            vec![AccountUpdate {
+                address: voter,
+                balance: U256::ONE,
+                nonce: 0,
+                vote: None,
+                unvote: Some(validator),
+                username: None,
+                username_resigned: true,
+                merge_info: None
+            }]
+        );
+    }
+
+    #[test]
     fn test_apply_rewards() {
         let path = tempfile::Builder::new()
             .prefix("evm.mdb")
@@ -477,5 +690,313 @@ mod tests {
 
         let transition_account2 = pending.transitions.transitions.get(&account2);
         assert_eq!(transition_account2, None);
+    }
+
+    #[test]
+    fn commit_succeeds_without_resizing() {
+        let mut commits = 0;
+        let mut resizes = 0;
+
+        let result = commit_with_resize_retry(
+            || {
+                commits += 1;
+                Ok(())
+            },
+            || {
+                resizes += 1;
+                Ok(())
+            },
+        );
+
+        assert!(result.is_ok());
+        assert_eq!(commits, 1); // committed on the first attempt
+        assert_eq!(resizes, 0); // never had to grow the map
+    }
+
+    #[test]
+    fn commit_recovers_after_one_resize() {
+        let mut commits = 0;
+        let mut resizes = 0;
+
+        let result = commit_with_resize_retry(
+            || {
+                commits += 1;
+                if commits == 1 {
+                    Err(Error::DbFull)
+                } else {
+                    Ok(())
+                }
+            },
+            || {
+                resizes += 1;
+                Ok(())
+            },
+        );
+
+        assert!(result.is_ok());
+        assert_eq!(commits, 2); // one DbFull, then success
+        assert_eq!(resizes, 1);
+    }
+
+    #[test]
+    fn commit_recovers_after_two_resizes() {
+        let mut commits = 0;
+        let mut resizes = 0;
+
+        let result = commit_with_resize_retry(
+            || {
+                commits += 1;
+                if commits <= 2 {
+                    Err(Error::DbFull)
+                } else {
+                    Ok(())
+                }
+            },
+            || {
+                resizes += 1;
+                Ok(())
+            },
+        );
+
+        assert!(result.is_ok());
+        assert_eq!(commits, 3); // two DbFull, then success
+        assert_eq!(resizes, 2);
+    }
+
+    #[test]
+    fn commit_gives_up_after_max_retries() {
+        let mut commits = 0;
+        let mut resizes = 0;
+
+        let result = commit_with_resize_retry(
+            || {
+                commits += 1;
+                Err(Error::DbFull) // never fits, no matter how often we grow
+            },
+            || {
+                resizes += 1;
+                Ok(())
+            },
+        );
+
+        assert!(matches!(result, Err(Error::DbFull)));
+        assert_eq!(commits, 4); // initial attempt + MAX_RESIZE_RETRIES (3)
+        assert_eq!(resizes, 4); // a resize follows every DbFull
+    }
+
+    #[test]
+    fn commit_propagates_non_dbfull_error_without_resizing() {
+        let mut resizes = 0;
+
+        let result = commit_with_resize_retry(
+            || Err(Error::Lock),
+            || {
+                resizes += 1;
+                Ok(())
+            },
+        );
+
+        assert!(matches!(result, Err(Error::Lock)));
+        assert_eq!(resizes, 0); // non-DbFull errors return immediately
+    }
+
+    /// `build_commit` derives the committed change set from a pending commit's `transitions`,
+    /// not from its account `cache`. Emptying the cache before building must therefore produce
+    /// an identical change set.
+    #[test]
+    fn build_commit_is_independent_of_a_drained_cache() {
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+        let db = PersistentDB::new(crate::db::PersistentDBOptions::new(
+            path.path().to_path_buf(),
+        ))
+        .expect("database");
+
+        let account = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let mut rewards = HashMap::<Address, u128>::default();
+        rewards.insert(account, 1234);
+
+        let mut pending = PendingCommit::default();
+        apply_rewards(&db, &mut pending, rewards).expect("apply rewards");
+        assert!(pending.cache.accounts.contains_key(&account));
+        assert!(pending.transitions.transitions.contains_key(&account));
+
+        // Baseline: build with the cache intact.
+        let mut intact = pending.clone();
+        let intact_commit = build_commit(&mut intact).expect("build intact");
+
+        // Build again with the cache emptied but the transitions kept.
+        let mut drained = pending.clone();
+        drained.cache = Default::default();
+        assert!(drained.cache.accounts.is_empty());
+        assert!(drained.transitions.transitions.contains_key(&account));
+        let drained_commit = build_commit(&mut drained).expect("build drained");
+
+        assert_eq!(
+            format!("{:?}", intact_commit.change_set),
+            format!("{:?}", drained_commit.change_set),
+            "draining the cache must not change the committed change set"
+        );
+    }
+
+    /// A transaction executes against the pending commit's account cache as its prestate. An
+    /// account credited only in the cache (not yet committed to the database) is visible to a
+    /// transfer from it: the transfer succeeds against the populated cache, and fails with
+    /// insufficient funds against an empty cache.
+    #[test]
+    fn drained_cache_diverges_a_dependent_transaction() {
+        use revm::{
+            Context, ExecuteEvm, MainBuilder, MainContext,
+            context::{BlockEnv, TxEnv},
+            database::{CacheState, State, WrapDatabaseRef},
+            primitives::{TxKind, hardfork::SpecId},
+        };
+
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+        let db = PersistentDB::new(crate::db::PersistentDBOptions::new(
+            path.path().to_path_buf(),
+        ))
+        .expect("database");
+
+        let account = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let recipient = address!("ad6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let mut pending = PendingCommit::default();
+        let mut rewards = HashMap::<Address, u128>::default();
+        rewards.insert(account, 1_000_000);
+        apply_rewards(&db, &mut pending, rewards).expect("apply rewards");
+
+        let run_transfer = |prestate: CacheState| -> bool {
+            let state = State::builder()
+                .with_bundle_update()
+                .with_cached_prestate(prestate)
+                .with_database(WrapDatabaseRef(&db))
+                .build();
+
+            let mut evm = Context::mainnet()
+                .with_db(state)
+                .modify_cfg_chained(|cfg| {
+                    cfg.spec = SpecId::OSAKA;
+                    cfg.disable_nonce_check = true;
+                })
+                .modify_block_chained(|block: &mut BlockEnv| {
+                    block.gas_limit = 30_000_000;
+                })
+                .modify_tx_chained(|tx: &mut TxEnv| {
+                    tx.caller = account;
+                    tx.kind = TxKind::Call(recipient);
+                    tx.value = U256::from(1);
+                    tx.gas_limit = 21_000;
+                    tx.gas_price = 0;
+                    tx.gas_priority_fee = None;
+                    tx.nonce = 0;
+                })
+                .build_mainnet();
+
+            matches!(evm.replay(), Ok(result) if result.result.is_success())
+        };
+
+        assert!(
+            run_transfer(pending.cache.clone()),
+            "transfer should succeed against the populated cache"
+        );
+        assert!(
+            !run_transfer(CacheState::default()),
+            "transfer must NOT succeed against the empty cache"
+        );
+    }
+
+    /// A transaction that fails validation (here, spending more than its balance) leaves the
+    /// cached account state untouched: the sender's balance is unchanged and the recipient is
+    /// not credited.
+    #[test]
+    fn failed_replay_does_not_mutate_state_cache() {
+        use revm::{
+            Context, ExecuteEvm, MainBuilder, MainContext,
+            context::{BlockEnv, ContextTr, TxEnv},
+            database::{State, WrapDatabaseRef},
+            handler::EvmTr,
+            primitives::{TxKind, hardfork::SpecId},
+        };
+
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+        let db = PersistentDB::new(crate::db::PersistentDBOptions::new(
+            path.path().to_path_buf(),
+        ))
+        .expect("database");
+
+        // Prestate: `from` holds exactly `balance`.
+        let from = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let recipient = address!("ad6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let balance: u128 = 1_000;
+        let mut pending = PendingCommit::default();
+        let mut rewards = HashMap::<Address, u128>::default();
+        rewards.insert(from, balance);
+        apply_rewards(&db, &mut pending, rewards).expect("seed prestate");
+
+        let state = State::builder()
+            .with_bundle_update()
+            .with_cached_prestate(pending.cache.clone())
+            .with_database(WrapDatabaseRef(&db))
+            .build();
+
+        // A transfer that fails validation (spends more than `balance`).
+        let mut evm = Context::mainnet()
+            .with_db(state)
+            .modify_cfg_chained(|cfg| {
+                cfg.spec = SpecId::OSAKA;
+                cfg.disable_nonce_check = true;
+            })
+            .modify_block_chained(|block: &mut BlockEnv| {
+                block.gas_limit = 30_000_000;
+            })
+            .modify_tx_chained(|tx: &mut TxEnv| {
+                tx.caller = from;
+                tx.kind = TxKind::Call(recipient);
+                tx.value = U256::from(balance + 1);
+                tx.gas_limit = 21_000;
+                tx.gas_price = 0;
+                tx.gas_priority_fee = None;
+                tx.nonce = 0;
+            })
+            .build_mainnet();
+
+        assert!(
+            evm.replay().is_err(),
+            "transfer must fail (insufficient funds)"
+        );
+
+        // The failed replay must not have mutated the cached prestate.
+        let ctx = evm.ctx_mut();
+        let cache = &ctx.db().cache;
+        let from_balance = cache
+            .accounts
+            .get(&from)
+            .and_then(|a| a.account.as_ref())
+            .map(|a| a.info.balance)
+            .expect("from cached");
+        assert_eq!(
+            from_balance,
+            U256::from(balance),
+            "from balance must be unchanged after a failed tx"
+        );
+        let recipient_balance = cache
+            .accounts
+            .get(&recipient)
+            .and_then(|a| a.account.as_ref())
+            .map(|a| a.info.balance)
+            .unwrap_or(U256::ZERO);
+        assert_eq!(
+            recipient_balance,
+            U256::ZERO,
+            "recipient must not be credited by a failed tx"
+        );
     }
 }

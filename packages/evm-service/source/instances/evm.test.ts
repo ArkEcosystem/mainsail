@@ -1,7 +1,6 @@
 import { randomBytes } from "node:crypto";
 import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
-import { Container } from "@mainsail/container";
 import { Enums } from "@mainsail/constants";
 import { Evm } from "@mainsail/evm";
 import {
@@ -31,7 +30,7 @@ import { setGracefulCleanup } from "tmp";
 
 describe<{
 	app: Application;
-	instance: Contracts.Evm.Instance;
+	instance: Contracts.Evm.Instance & Contracts.Evm.Storage;
 }>("Instance", ({ it, assert, afterAll, afterEach, beforeEach }) => {
 	afterAll(() => setGracefulCleanup());
 
@@ -42,37 +41,40 @@ describe<{
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.instance = context.app.resolve<Contracts.Evm.Instance>(EvmInstance);
+		context.instance = context.app.resolve(EvmInstance);
 	});
 
 	const deployConfig = {
 		gasLimit: BigInt(1_000_000),
 		gasPrice: BigInt(0),
-		specId: Enums.Evm.SpecId.SHANGHAI,
+		specId: Enums.Evm.SpecId.OSAKA,
 	};
 
 	const transferConfig = {
 		gasLimit: BigInt(60_000),
 		gasPrice: BigInt(0),
-		specId: Enums.Evm.SpecId.SHANGHAI,
+		specId: Enums.Evm.SpecId.OSAKA,
 	};
 
 	const blockContext: Omit<Contracts.Evm.BlockContext, "commitKey"> = {
 		gasLimit: BigInt(10_000_000),
 		timestamp: BigInt(12345),
 		validatorAddress: zeroAddress,
+		prevrandao: Buffer.alloc(32),
 	};
 
-	it("should deploy contract successfully", async ({ instance }) => {
+	it("#process - should deploy contract successfully", async ({ instance }) => {
 		const [sender] = wallets;
 
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+
 		const { receipt } = await instance.process({
 			from: sender.address,
 			value: 0n,
 			nonce: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			txHash: getRandomTxHash(),
 			...deployConfig,
 		});
@@ -82,7 +84,7 @@ describe<{
 		assert.equal(receipt.contractAddress, "0x0c2485e7d05894BC4f4413c52B080b6D1eca122a");
 	});
 
-	it("should call log hook", async ({ app, instance }) => {
+	it("#initialize - should call log hook", async ({ app, instance }) => {
 		let hookCalled = 0;
 
 		const evm = new Evm({
@@ -95,12 +97,13 @@ describe<{
 
 		assert.equal(hookCalled, 0);
 
-		const commitKey = { commitKey: { blockNumber: 1n, round: 1n } };
-		await evm.prepareNextCommit(commitKey);
+		const commitKey = { blockNumber: 1n, round: 1n };
+
+		await evm.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 		assert.equal(hookCalled, 0);
 
 		for (let i = 0; i < 100; i++) {
-			await evm.prepareNextCommit(commitKey);
+			await evm.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 		}
 
 		await new Promise((resolve) => setTimeout(resolve, 1000)).then(() => evm.dispose());
@@ -113,15 +116,15 @@ describe<{
 	it("should correctly set global variables", async ({ instance }) => {
 		const [validator, sender] = wallets;
 
-		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
-		await instance.prepareNextCommit({ commitKey });
+		let commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		let { receipt } = await instance.process({
 			from: sender.address,
 			value: 0n,
 			nonce: 0n,
 			data: Buffer.from(MainsailGlobals.bytecode.slice(2), "hex"),
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			txHash: getRandomTxHash(),
 			...deployConfig,
 		});
@@ -144,6 +147,17 @@ describe<{
 			args: undefined,
 		});
 
+		commitKey = { blockNumber: BigInt(1245), round: BigInt(0) };
+		await instance.prepareNextCommit({
+			blockContext: {
+				...blockContext,
+				commitKey,
+				timestamp: BigInt(123_456_789),
+				gasLimit: BigInt(12_000_000),
+				validatorAddress: validator.address,
+			},
+		});
+
 		({ receipt } = await instance.process({
 			from: sender.address,
 			value: 0n,
@@ -151,12 +165,7 @@ describe<{
 			data: Buffer.from(toBytes(encodedCall)),
 			to: "0x69230f08D82f095aCB9BE4B21043B502b712D3C1",
 			txHash: getRandomTxHash(),
-			blockContext: {
-				commitKey: { blockNumber: BigInt(1245), round: BigInt(0) },
-				gasLimit: BigInt(12_000_000),
-				timestamp: BigInt(123_456_789),
-				validatorAddress: validator.address,
-			},
+			commitKey,
 			...transferConfig,
 		}));
 
@@ -180,7 +189,7 @@ describe<{
 		// }
 
 		assert.equal(data.blockHeight, 1245n);
-		assert.equal(data.blockTimestamp, 123_456_789n);
+		assert.equal(data.blockTimestamp, 123_456n);
 		assert.equal(data.blockGasLimit, 12_000_000n);
 		assert.equal(data.blockCoinbase, validator.address);
 		assert.equal(data.blockDifficulty, 0n); // difficulty always 0
@@ -193,7 +202,7 @@ describe<{
 
 		let commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
 
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		let { receipt } = await instance.process({
 			from: sender.address,
@@ -201,7 +210,7 @@ describe<{
 			nonce: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			...deployConfig,
 		});
 
@@ -229,7 +238,7 @@ describe<{
 
 		commitKey = { blockNumber: BigInt(1), round: BigInt(0) };
 
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		const transferEncodedCall = encodeFunctionData({
 			abi: MainsailERC20.abi,
@@ -244,7 +253,7 @@ describe<{
 			data: Buffer.from(toBytes(transferEncodedCall)),
 			to: contractAddress,
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			...transferConfig,
 		}));
 
@@ -287,7 +296,7 @@ describe<{
 		assert.equal(extendedInfo.balance, 0n);
 
 		// Import legacy cold wallet with 10n balance
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 		await instance.importLegacyColdWallets([
 			{
 				address: legacyAddress,
@@ -310,7 +319,7 @@ describe<{
 
 		// Perform tx from sender, to initiate a cold wallet merge
 		commitKey = { blockNumber: BigInt(1), round: BigInt(0) };
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		const txHash = getRandomTxHash();
 
@@ -322,7 +331,7 @@ describe<{
 			data: Buffer.alloc(0),
 			to: recipient.address,
 			txHash,
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			...transferConfig,
 		});
 		assert.equal(receipt.receipt.status, 1);
@@ -344,7 +353,7 @@ describe<{
 
 		// Move all funds to different wallet
 		commitKey = { blockNumber: BigInt(2), round: BigInt(0) };
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 		receipt = await instance.process({
 			from: sender.address,
 			value: 10n,
@@ -352,7 +361,7 @@ describe<{
 			data: Buffer.alloc(0),
 			to: recipient.address,
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			...transferConfig,
 		});
 		assert.equal(receipt.receipt.status, 1);
@@ -395,7 +404,7 @@ describe<{
 				setAccountUpdates: () => {},
 			} as any);
 
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 		await instance.importLegacyColdWallets([
 			{
 				address: legacyAddress,
@@ -423,7 +432,7 @@ describe<{
 		const [sender] = wallets;
 
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		let { receipt } = await instance.process({
 			from: sender.address,
@@ -431,7 +440,7 @@ describe<{
 			nonce: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			...deployConfig,
 		});
 
@@ -445,7 +454,7 @@ describe<{
 			data: Buffer.from("0xdead", "hex"),
 			to: contractAddress,
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			...transferConfig,
 		}));
 
@@ -458,10 +467,10 @@ describe<{
 
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
 
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		let { receipt } = await instance.process({
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			from: sender.address,
 			value: 0n,
 			nonce: 0n,
@@ -489,9 +498,9 @@ describe<{
 
 		// Transfer 1 ARK (1,0)
 		await assert.resolves(async () => {
-			await instance.prepareNextCommit({ commitKey: commitKey1 });
+			await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey: commitKey1 } });
 			await instance.process({
-				blockContext: { ...blockContext, commitKey: commitKey1 },
+				commitKey: commitKey1,
 				value: 0n,
 				nonce: 1n,
 				from: sender.address,
@@ -512,9 +521,9 @@ describe<{
 
 		// Transfer 2 ARK (1,1)
 		await assert.resolves(async () => {
-			await instance.prepareNextCommit({ commitKey: commitKey2 });
+			await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey: commitKey2 } });
 			await instance.process({
-				blockContext: { ...blockContext, commitKey: commitKey2 },
+				commitKey: commitKey2,
 				value: 0n,
 				nonce: 1n,
 				from: sender.address,
@@ -555,7 +564,7 @@ describe<{
 				}),
 				setAccountUpdates: () => {},
 			} as any);
-		}, "assertion failed: self.pending_commits.contains_key(&commit_key)");
+		}, "commit is missing commit key");
 
 		// Balance updated correctly
 		const balance = await getBalance(instance, contractAddress!, recipient.address);
@@ -564,7 +573,7 @@ describe<{
 
 	it("should not throw when commit is empty", async ({ instance }) => {
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		await assert.resolves(
 			async () =>
@@ -588,7 +597,7 @@ describe<{
 					value: 0n,
 					nonce: 0n,
 					data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
-					blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(0), round: BigInt(0) } },
+					commitKey: { blockNumber: BigInt(0), round: BigInt(0) },
 					txHash: getRandomTxHash(),
 					...deployConfig,
 				}),
@@ -601,14 +610,14 @@ describe<{
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
 		const txHash = getRandomTxHash();
 
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		await instance.process({
 			from: sender.address,
 			value: 0n,
 			nonce: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			txHash,
 			...deployConfig,
 		});
@@ -630,25 +639,25 @@ describe<{
 				value: 0n,
 				nonce: 0n,
 				data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
-				blockContext: { ...blockContext, commitKey },
+				commitKey,
 				txHash: randomTxHash,
 				...deployConfig,
 			});
-		}, "assertion failed: !committed");
+		}, `cannot process transaction 0x${randomTxHash}: block 0 was already committed`);
 	});
 
 	it("should deploy, transfer multipe times and update balance correctly", async ({ instance }) => {
 		const [sender, recipient] = wallets;
 
 		let commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		let { receipt } = await instance.process({
 			from: sender.address,
 			value: 0n,
 			nonce: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			txHash: getRandomTxHash(),
 			...deployConfig,
 		});
@@ -673,7 +682,7 @@ describe<{
 		const amount = parseEther("1999");
 
 		commitKey = { blockNumber: BigInt(1), round: BigInt(0) };
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		const transferEncodedCall = encodeFunctionData({
 			abi: MainsailERC20.abi,
@@ -687,7 +696,7 @@ describe<{
 			nonce: 1n,
 			data: Buffer.from(toBytes(transferEncodedCall)),
 			to: contractAddress,
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			txHash: getRandomTxHash(),
 			...transferConfig,
 		}));
@@ -698,7 +707,7 @@ describe<{
 			nonce: 2n,
 			data: Buffer.from(toBytes(transferEncodedCall)),
 			to: contractAddress,
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			txHash: getRandomTxHash(),
 			...transferConfig,
 		}));
@@ -709,7 +718,7 @@ describe<{
 			nonce: 3n,
 			data: Buffer.from(toBytes(transferEncodedCall)),
 			to: contractAddress,
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			txHash: getRandomTxHash(),
 			...transferConfig,
 		}));
@@ -736,6 +745,9 @@ describe<{
 	it("should revert transaction if it exceeds gas limit", async ({ instance }) => {
 		const [sender] = wallets;
 
+		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+
 		await assert.rejects(
 			async () =>
 				instance.process({
@@ -743,11 +755,11 @@ describe<{
 					value: 0n,
 					nonce: 0n,
 					data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
-					blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(0), round: BigInt(0) } },
+					commitKey,
 					txHash: getRandomTxHash(),
 					gasLimit: 30_000n,
 					gasPrice: 5n,
-					specId: Enums.Evm.SpecId.SHANGHAI,
+					specId: Enums.Evm.SpecId.OSAKA,
 				}),
 			"transaction validation error: call gas cost (137330) exceeds the gas limit (30000)",
 		);
@@ -763,7 +775,7 @@ describe<{
 					value: 0n,
 					nonce: 0n,
 					data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
-					blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(0), round: BigInt(0) } },
+					commitKey: { blockNumber: BigInt(0), round: BigInt(0) },
 					txHash: getRandomTxHash(),
 					gasLimit: 30_000n,
 					gasPrice: 5n,
@@ -774,19 +786,31 @@ describe<{
 	});
 
 	it("should return state hash", async ({ instance }) => {
+		const [sender] = wallets;
+		const initialSupply = parseEther("100");
+
+		await instance.initializeGenesis({
+			account: sender.address,
+			initialSupply,
+			initialBlockNumber: 0n,
+			deployerAccount: zeroAddress,
+			usernameContract: zeroAddress,
+			validatorContract: zeroAddress,
+		});
+
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		const hash = await instance.stateRoot(
 			commitKey,
 			"0000000000000000000000000000000000000000000000000000000000000000",
 		);
-		assert.equal(hash, "0722d8002560934d7004b8b849101024bf7ec2aaa2c3396f7292d4ac8cdae5ab");
+		assert.equal(hash, "a09fc67efe3184d31dc3f1351381ca57861c5a568c122ab3e9c9c06395c52516");
 	});
 
 	it("should return logs bloom", async ({ instance }) => {
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		const logsBloom = await instance.logsBloom(commitKey);
 		assert.equal(logsBloom, "0".repeat(512));
@@ -804,7 +828,7 @@ describe<{
 		assert.equal(code, "0x");
 
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		// deployed code
 		const { receipt } = await instance.process({
@@ -813,7 +837,7 @@ describe<{
 			nonce: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			...deployConfig,
 		});
 
@@ -834,6 +858,9 @@ describe<{
 	it("should panic when transferring value without funds", async ({ instance }) => {
 		const [sender] = wallets;
 
+		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+
 		await assert.rejects(
 			async () =>
 				await instance.process({
@@ -842,7 +869,7 @@ describe<{
 					nonce: 0n,
 					data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 					txHash: getRandomTxHash(),
-					blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(0), round: BigInt(0) } },
+					commitKey,
 					...deployConfig,
 				}),
 			"transaction validation error: lack of funds (0) for max fee (2)",
@@ -853,7 +880,7 @@ describe<{
 		const [sender] = wallets;
 
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		await assert.resolves(
 			async () =>
@@ -863,7 +890,7 @@ describe<{
 					nonce: 0n,
 					data: Buffer.from("00", "hex"),
 					txHash: getRandomTxHash(),
-					blockContext: { ...blockContext, commitKey },
+					commitKey,
 					...deployConfig,
 				}),
 		);
@@ -878,6 +905,9 @@ describe<{
 			setAccountUpdates: () => {},
 		} as any);
 
+		const nextCommitKey = { blockNumber: BigInt(1), round: BigInt(0) };
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey: nextCommitKey } });
+
 		await assert.rejects(
 			async () =>
 				await instance.process({
@@ -886,7 +916,7 @@ describe<{
 					nonce: 2n, // should be 1
 					data: Buffer.from("00", "hex"),
 					txHash: getRandomTxHash(),
-					blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(1), round: BigInt(0) } },
+					commitKey: nextCommitKey,
 					...deployConfig,
 				}),
 			"transaction validation error: nonce 2 too high, expected 1",
@@ -902,7 +932,7 @@ describe<{
 
 		// deploy erc20
 		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		const { receipt } = await instance.process({
 			from: sender.address,
@@ -910,7 +940,7 @@ describe<{
 			nonce: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			...deployConfig,
 		});
 
@@ -959,7 +989,7 @@ describe<{
 			data: Buffer.alloc(0),
 			txHash: getRandomTxHash(),
 			blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(0), round: BigInt(0) } },
-			specId: Enums.Evm.SpecId.SHANGHAI,
+			specId: Enums.Evm.SpecId.OSAKA,
 		};
 
 		// Succeeds
@@ -1001,7 +1031,7 @@ describe<{
 
 		let commitKey = { blockNumber: BigInt(1), round: BigInt(0) };
 
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		await instance.snapshot(commitKey);
 
@@ -1011,7 +1041,7 @@ describe<{
 			nonce: 0n,
 			data: Buffer.from(MainsailERC20.bytecode.slice(2), "hex"),
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			...deployConfig,
 		});
 
@@ -1056,7 +1086,7 @@ describe<{
 		const recipientAccountBefore = await instance.getAccountInfo(recipient.address);
 		const zeroAccountBefore = await instance.getAccountInfo(zeroAddress);
 
-		await instance.prepareNextCommit({ commitKey });
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
 
 		// TX 1: Send funds to `recipient`
 		// - snapshot -
@@ -1070,7 +1100,7 @@ describe<{
 			nonce: 0n,
 			data: Buffer.alloc(0),
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			...deployConfig,
 		});
 		await instance.snapshot(commitKey);
@@ -1082,7 +1112,7 @@ describe<{
 			nonce: 0n,
 			data: Buffer.alloc(0),
 			txHash: getRandomTxHash(),
-			blockContext: { ...blockContext, commitKey },
+			commitKey,
 			...deployConfig,
 		});
 
@@ -1109,6 +1139,54 @@ describe<{
 		assert.equal(recipientAccountAfter.balance, recipientAccountBefore.balance + 100n);
 		assert.equal(zeroAccountBefore.balance, zeroAccountAfter.balance);
 	});
+
+	it("should simulate a transaction without persisting state", async ({ instance }) => {
+		const [sender, recipient] = wallets;
+
+		await instance.initializeGenesis({
+			account: sender.address,
+			deployerAccount: zeroAddress,
+			initialBlockNumber: 0n,
+			initialSupply: parseEther("100"),
+			usernameContract: zeroAddress,
+			validatorContract: zeroAddress,
+		});
+
+		const { receipt } = await instance.simulate({
+			blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(0), round: BigInt(0) } },
+			data: Buffer.alloc(0),
+			from: sender.address,
+			gasLimit: 21_000n,
+			gasPrice: 0n,
+			nonce: 0n,
+			specId: Enums.Evm.SpecId.OSAKA,
+			to: recipient.address,
+			value: parseEther("1"),
+		});
+
+		assert.equal(receipt.status, 1);
+		// The simulated transfer must not have moved any funds.
+		assert.equal((await instance.getAccountInfo(recipient.address)).balance, 0n);
+	});
+
+	it("should import account balances", async ({ instance }) => {
+		const [sender] = wallets;
+		const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
+
+		// importAccountInfos must run inside a prepared commit (see snapshot-legacy-importer).
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+		await instance.importAccountInfos([
+			{ address: sender.address, balance: 1234n, legacyAttributes: {}, nonce: 0n },
+		]);
+		await instance.onCommit({
+			blockNumber: BigInt(0),
+			getBlock: () => ({ number: BigInt(0), round: BigInt(0) }),
+			round: BigInt(0),
+			setAccountUpdates: () => {},
+		} as any);
+
+		assert.equal((await instance.getAccountInfo(sender.address)).balance, 1234n);
+	});
 });
 
 const getRandomTxHash = () => Buffer.from(randomBytes(32)).toString("hex");
@@ -1128,7 +1206,7 @@ const getBalance = async (
 		from: zeroAddress,
 		data: Buffer.from(toBytes(balanceOf)),
 		to: contractAddress!,
-		specId: Enums.Evm.SpecId.SHANGHAI,
+		specId: Enums.Evm.SpecId.OSAKA,
 	});
 
 	if (output?.byteLength === 0) {

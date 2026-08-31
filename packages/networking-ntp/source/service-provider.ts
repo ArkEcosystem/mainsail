@@ -11,13 +11,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
-		await this.app.resolve(Checker).execute();
+		// Advisory clock-skew/connectivity check; nothing consumes its result, so don't
+		// block boot on it (up to hosts x timeout ms when UDP/123 is firewalled).
+		void this.app.resolve(Checker).execute();
 	}
 
 	public configSchema(): object {
 		return Joi.object({
 			hosts: Joi.array().items(Joi.string()).required(),
-			timeout: Joi.number(),
+			timeout: Joi.number().integer().min(1).required(),
 		}).unknown(true);
 	}
 }

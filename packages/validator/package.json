@@ -15,20 +15,20 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
-		"test:coverage": "c8 -r=text -r=lcov --all pnpm run test",
-		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:coverage": "c8 --experimental-monocart -r=text -r=lcov --all pnpm run test",
 		"test:file": "pnpm run uvu source",
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
 		"@chainsafe/bls-keystore": "3.1.0",
+		"@mainsail/blockchain-utils": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
+		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*"
 	},
 	"devDependencies": {
-		"@mainsail/blockchain-utils": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-address-base58": "workspace:*",
 		"@mainsail/crypto-address-keccak256": "workspace:*",
@@ -43,12 +43,9 @@
 		"@mainsail/crypto-signature-ecdsa": "workspace:*",
 		"@mainsail/crypto-transaction": "workspace:*",
 		"@mainsail/crypto-validation": "workspace:*",
-		"@mainsail/crypto-wif": "workspace:*",
-		"@mainsail/evm-consensus": "workspace:*",
 		"@mainsail/forger": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
-		"@mainsail/transactions": "workspace:*",
 		"@mainsail/validation": "workspace:*",
 		"uvu": "0.5.6"
 	},

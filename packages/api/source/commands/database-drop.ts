@@ -1,14 +1,11 @@
 import { Pg } from "@mainsail/api-database";
 import { Commands } from "@mainsail/cli";
+import { EnvironmentVariables } from "@mainsail/constants";
 import { injectable, postConstruct } from "@mainsail/container";
-import { parse } from "envfile";
-import { existsSync, readFileSync } from "fs";
+import { ensureError } from "@mainsail/utils";
 import Joi from "joi";
 
-// Recreate database
-// source ~/.config/mainsail/api/.env
-// sudo -i -u postgres psql -c "DROP DATABASE $MAINSAIL_DB_DATABASE;"
-// sudo -i -u postgres psql -c "CREATE DATABASE $MAINSAIL_DB_DATABASE WITH OWNER $MAINSAIL_DB_USERNAME;"
+import { loadEnvironmentFile, requireEnvironmentVariable, terminateActiveSessions } from "../helpers.js";
 
 @injectable()
 export class Command extends Commands.Command {
@@ -18,31 +15,27 @@ export class Command extends Commands.Command {
 
 	@postConstruct()
 	public configure(): void {
-		this.definition.setFlag("force", "Force drop of database without confirmation.", Joi.boolean());
-		this.definition.setFlag("init", "Initialize empty database after drop.", Joi.boolean());
+		this.definition.setFlag("force", "Force drop of database without confirmation.", Joi.boolean().default(false));
+		this.definition.setFlag("init", "Initialize empty database after drop.", Joi.boolean().default(false));
 	}
 
 	public async execute(): Promise<void> {
-		const environmentFile: string = this.app.getCorePath("config", ".env");
+		const environment = loadEnvironmentFile(this.app, this.components);
 
-		if (!existsSync(environmentFile)) {
-			this.components.fatal(`No environment file found at ${environmentFile}.`);
-		}
+		const fromEnvironment = (key: string): string => requireEnvironmentVariable(this.components, environment, key);
 
-		const environment: object = parse(readFileSync(environmentFile).toString("utf8"));
-
-		const databaseName = this.#fromEnv(environment, "MAINSAIL_DB_DATABASE");
-		const user = this.#fromEnv(environment, "MAINSAIL_DB_USERNAME");
+		const databaseName = fromEnvironment(EnvironmentVariables.MAINSAIL_DB_DATABASE);
+		const user = fromEnvironment(EnvironmentVariables.MAINSAIL_DB_USERNAME);
 
 		const config = {
 			database: "postgres",
-			host: this.#fromEnv(environment, "MAINSAIL_DB_HOST"),
-			password: this.#fromEnv(environment, "MAINSAIL_DB_PASSWORD"),
-			port: Number.parseInt(this.#fromEnv(environment, "MAINSAIL_DB_PORT")),
+			host: fromEnvironment(EnvironmentVariables.MAINSAIL_DB_HOST),
+			password: fromEnvironment(EnvironmentVariables.MAINSAIL_DB_PASSWORD),
+			port: Number.parseInt(fromEnvironment(EnvironmentVariables.MAINSAIL_DB_PORT)),
 			user,
 		};
 
-		if (!this.hasFlag("force")) {
+		if (!this.getFlag<boolean>("force")) {
 			if (
 				!(await this.components.confirm(
 					`⚠️  You are about to DROP the database "${databaseName}". All data will be LOST. Continue?`,
@@ -67,14 +60,7 @@ export class Command extends Commands.Command {
 			await this.components.taskList([
 				{
 					task: async () => {
-						await client.query(
-							`
-    SELECT pg_terminate_backend(pid)
-    FROM pg_stat_activity
-    WHERE datname = $1 AND pid <> pg_backend_pid();
-  `,
-							[databaseName],
-						);
+						await terminateActiveSessions(client, databaseName);
 					},
 					title: "Terminate active sessions",
 				},
@@ -85,25 +71,18 @@ export class Command extends Commands.Command {
 					title: `Drop database "${databaseName}"`,
 				},
 				{
-					skip: () => !this.hasFlag("init"),
+					skip: () => !this.getFlag<boolean>("init"),
 					task: async () => {
 						await client.query(`CREATE DATABASE "${databaseName}" WITH OWNER "${user}"`);
 					},
 					title: `Create empty database "${databaseName}" with owner "${user}"`,
 				},
 			]);
-		} catch (ex) {
-			this.components.fatal(ex.message);
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			this.components.fatal(error.message);
 		} finally {
 			await client.end();
 		}
-	}
-
-	#fromEnv(environment: object, key: string): string {
-		if (!environment[key]) {
-			this.components.fatal(`The "${key}" doesn't exist.`);
-		}
-
-		return environment[key];
 	}
 }

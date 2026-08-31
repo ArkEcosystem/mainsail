@@ -3,8 +3,14 @@ import type { Contracts } from "@mainsail/contracts";
 import { injectable } from "@mainsail/container";
 import { isEmpty, prettyTime } from "@mainsail/utils";
 import chalk, { ChalkInstance } from "chalk";
-import { differenceInMilliseconds, format } from "date-fns";
 import { inspect } from "util";
+
+const pad = (value: number, length = 2): string => value.toString().padStart(length, "0");
+
+// Local-time "yyyy-MM-dd HH:mm:ss.SSS" timestamp for log lines.
+const formatTimestamp = (date: Date): string =>
+	`${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ` +
+	`${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}.${pad(date.getMilliseconds(), 3)}`;
 
 @injectable()
 export class MemoryLogger implements Contracts.Kernel.Logger {
@@ -70,7 +76,7 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 
 		level = level ? this.levelStyles[level](`[${level.toUpperCase()}] `) : "";
 
-		const timestamp: string = format(new Date(), "yyyy-MM-dd HH:MM:ss.SSS");
+		const timestamp: string = formatTimestamp(new Date());
 		const timestampDiff: string = this.getTimestampDiff();
 
 		process.stdout.write(`[${timestamp}] ${level}${message}${timestampDiff}\n`);
@@ -79,7 +85,7 @@ export class MemoryLogger implements Contracts.Kernel.Logger {
 	protected getTimestampDiff(): string {
 		const now = new Date();
 
-		const diff: number = differenceInMilliseconds(now, this.#lastTimestamp);
+		const diff: number = now.getTime() - this.#lastTimestamp.getTime();
 
 		this.#lastTimestamp = new Date();
 

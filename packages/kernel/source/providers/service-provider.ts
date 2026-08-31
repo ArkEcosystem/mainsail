@@ -30,20 +30,12 @@ export class ServiceProvider {
 		this.#packageManifest = manifest;
 	}
 
-	public name(): string | undefined {
-		if (this.#packageManifest) {
-			return this.#packageManifest.get("name");
-		}
-
-		return undefined;
+	public name(): string {
+		return this.#packageManifest.getRequired<string>("name");
 	}
 
-	public version(): string | undefined {
-		if (this.#packageManifest) {
-			return this.#packageManifest.get("version");
-		}
-
-		return undefined;
+	public version(): string {
+		return this.#packageManifest.getRequired<string>("version");
 	}
 
 	public config(): Contracts.Kernel.PluginConfiguration {
@@ -63,10 +55,6 @@ export class ServiceProvider {
 	}
 
 	public dependencies(): Contracts.Kernel.PluginDependency[] {
-		if (this.#packageManifest) {
-			return this.#packageManifest.get("arkecosystem.core.dependencies", []);
-		}
-
 		return [];
 	}
 
@@ -75,14 +63,6 @@ export class ServiceProvider {
 	}
 
 	public async disposeWhen(serviceProvider?: string): Promise<boolean> {
-		return false;
-	}
-
-	public async required(): Promise<boolean> {
-		if (this.#packageManifest) {
-			return this.#packageManifest.get("arkecosystem.core.required", false);
-		}
-
 		return false;
 	}
 

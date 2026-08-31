@@ -6,7 +6,7 @@ use revm::{
     state::AccountInfo,
 };
 
-use crate::{compression::CompressedBincode, db::Error};
+use crate::{compression::CompactBincode, db::Error};
 
 #[derive(Clone, Debug, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
 pub struct HistoricalAccountData {
@@ -39,12 +39,16 @@ impl AccountHistory {
         txn: &mut RwTxn,
         database: &heed::Database<
             heed::types::U64<heed::byteorder::BigEndian>,
-            CompressedBincode<BTreeMap<Address, HistoricalAccountData>>,
+            CompactBincode<BTreeMap<Address, HistoricalAccountData>>,
         >,
         block_number: u64,
         accounts: Vec<(Address, AccountInfo)>,
     ) -> Result<(), Error> {
-        assert!(database.get(txn, &block_number)?.is_none());
+        if database.get(txn, &block_number)?.is_some() {
+            return Err(Error::State(format!(
+                "history for block {block_number} already recorded"
+            )));
+        }
 
         let count = database.len(txn)?;
         if count >= self.capacity {
@@ -58,7 +62,7 @@ impl AccountHistory {
             .map(|a| (a.0, HistoricalAccountData::from(a.1)))
             .collect::<BTreeMap<Address, HistoricalAccountData>>();
 
-        database.put(txn, &block_number, &CompressedBincode(&data))?;
+        database.put(txn, &block_number, &CompactBincode(&data))?;
 
         Ok(())
     }
@@ -68,7 +72,7 @@ impl AccountHistory {
         txn: &RoTxn,
         database: &heed::Database<
             heed::types::U64<heed::byteorder::BigEndian>,
-            CompressedBincode<BTreeMap<Address, HistoricalAccountData>>,
+            CompactBincode<BTreeMap<Address, HistoricalAccountData>>,
         >,
         block_number: u64,
         address: &Address,
@@ -104,7 +108,7 @@ fn test_account_history() {
     let history = AccountHistory::new(10);
     let mut txn = db.env.write_txn().unwrap();
 
-    let history_db = &db.inner.borrow().accounts_history.unwrap();
+    let history_db = &db.inner.accounts_history.unwrap();
 
     // Block 1
     history
@@ -415,7 +419,7 @@ fn test_accounts_history_capacity() {
     let history = AccountHistory::new(3);
     let mut txn = db.env.write_txn().unwrap();
 
-    let history_db = &db.inner.borrow().accounts_history.unwrap();
+    let history_db = &db.inner.accounts_history.unwrap();
 
     for i in 0..5 {
         println!("writing i... {}", i);

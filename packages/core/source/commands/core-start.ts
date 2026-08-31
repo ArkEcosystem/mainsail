@@ -18,9 +18,13 @@ export class Command extends Commands.Command {
 	public configure(): void {
 		this.definition
 			.setFlag("env", "", Joi.string().default("production"))
-			.setFlag("disableDiscovery", "Permanently disable all peer discovery.", Joi.boolean())
-			.setFlag("skipDiscovery", "Skip the initial peer discovery.", Joi.boolean())
-			.setFlag("ignoreMinimumNetworkReach", "Ignore the minimum network reach on start.", Joi.boolean())
+			.setFlag("disableDiscovery", "Permanently disable all peer discovery.", Joi.boolean().default(false))
+			.setFlag("skipDiscovery", "Skip the initial peer discovery.", Joi.boolean().default(false))
+			.setFlag(
+				"ignoreMinimumNetworkReach",
+				"Ignore the minimum network reach on start.",
+				Joi.boolean().default(false),
+			)
 			.setFlag("launchMode", "The mode the relay will be launched in (seed only at the moment).", Joi.string())
 			.setFlag("password", "A custom password that encrypts the BIP39. Referred to as BIP38.", Joi.string())
 			.setFlag("daemon", "Start the Core process as a daemon.", Joi.boolean().default(true))

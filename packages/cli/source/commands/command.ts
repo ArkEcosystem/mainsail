@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 import { ActionFactory } from "../action-factory.js";
 import { ComponentFactory } from "../component-factory.js";
@@ -9,16 +10,13 @@ import { Box } from "../components/index.js";
 import { InputDefinition } from "../input/definition.js";
 import { Input } from "../input/index.js";
 import { Output } from "../output/index.js";
-import { Config, Environment } from "../services/index.js";
+import { Config } from "../services/index.js";
 import { CommandHelp } from "./command-help.js";
 
 @injectable()
 export abstract class Command implements Contracts.Cli.Command {
 	@inject(Identifiers.Cli.Application.Instance)
 	protected readonly app!: Contracts.Cli.Application;
-
-	@inject(Identifiers.Cli.Service.Environment)
-	protected readonly env!: Environment;
 
 	@inject(Identifiers.Cli.Output.Instance)
 	protected readonly output!: Output;
@@ -57,7 +55,8 @@ export abstract class Command implements Contracts.Cli.Command {
 			} else {
 				this.output.setVerbosity(this.input.getFlag("v") || 1);
 			}
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.components.fatal(error.message);
 		}
 	}
@@ -79,7 +78,8 @@ export abstract class Command implements Contracts.Cli.Command {
 			}
 
 			await this.execute();
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.components.fatal(error.message);
 		}
 	}

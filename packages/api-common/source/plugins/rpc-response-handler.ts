@@ -12,10 +12,14 @@ export const rpcResponseHandler = {
 	name: "rcpResponseHandler",
 	register: (server: HapiServer): void => {
 		server.ext({
-			method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+			method: (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
 				const response = request.response;
 
-				if (responseIsBoom(response) && request.method === "post" && request.path === "") {
+				if (
+					responseIsBoom(response) &&
+					request.method === "post" &&
+					(request.path === "/" || request.path === "")
+				) {
 					return h.response(
 						Utilities.prepareRcpError(
 							Utilities.getRcpId(request),

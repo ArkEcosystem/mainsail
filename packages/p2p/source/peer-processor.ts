@@ -55,7 +55,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			handle: async (): Promise<void> => this.#disconnectInvalidPeers(),
 		});
 
-		this.transactionPoolWorker.registerEventHandler("peer.removed", (ip: string) => {
+		this.transactionPoolWorker.registerEventHandler(Events.PeerEvent.Removed, (ip: string) => {
 			this.peerDisposer.disposePeer(ip);
 		});
 	}
@@ -118,16 +118,21 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		const txPoolNode = this.txPoolNodeFactory(ip);
 
 		if ((await this.peerVerifier.verify(peer)) && (await this.txPoolNodeVerifier.verify(txPoolNode))) {
-			this.repository.setPeer(peer);
-			this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
+			// Re-check after the awaits: the peer may have been banned while its
+			// acceptance was being verified, and a banned peer must never enter the
+			// repository - nothing would remove it before the ban expires.
+			if (!this.peerDisposer.isBanned(peer.ip)) {
+				this.repository.setPeer(peer);
+				this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
 
-			void this.events.dispatch(Events.PeerEvent.Added, peer);
+				void this.events.dispatch(Events.PeerEvent.Added, peer);
 
-			await this.transactionPoolWorker.setPeer(peer.ip);
+				await this.transactionPoolWorker.setPeer(peer.ip);
 
-			await this.peerCommunicator.pingPorts(peer);
-			await this.peerDiscoverer.discoverPeers(peer);
-			await this.ApiNodeDiscoverer.discoverApiNodes(peer);
+				await this.peerCommunicator.pingPorts(peer);
+				await this.peerDiscoverer.discoverPeers(peer);
+				await this.ApiNodeDiscoverer.discoverApiNodes(peer);
+			}
 		}
 
 		this.repository.forgetPendingPeer(peer);

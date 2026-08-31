@@ -2,15 +2,15 @@ import type { Contracts } from "@mainsail/contracts";
 
 import {
 	Contracts as ApiDatabaseContracts,
+	createExtensions,
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 	TypeOrm,
 } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { parseTransactionError } from "@mainsail/evm-contracts";
-import { assert, chunk, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
+import { assert, chunk, ensureError, formatEcdsaSignature, sleep, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { Listeners, TokenParser } from "./contracts.js";
@@ -94,6 +94,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
+	@inject(Identifiers.EvmConsensus.Contracts.MultiPayment)
+	private readonly multiPaymentContractAddress!: string;
+
 	@inject(Identifiers.State.State)
 	private readonly state!: Contracts.State.State;
 
@@ -168,10 +171,6 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		const receipts = unit.getProcessorResult().receipts;
 
-		const multiPaymentContractAddress = this.app.get<string>(
-			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
-		);
-
 		for (const transaction of blockTransactions) {
 			const { senderPublicKey } = transaction;
 			if (!publicKeyToAddress[senderPublicKey]) {
@@ -183,7 +182,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			const receipt = receipts?.get(transaction.hash);
 			assert.defined(receipt);
 
-			const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
+			const parsedMultiPayments = parseMultiPayments(this.multiPaymentContractAddress, transaction, receipt);
 			const {
 				tokenActions: parsedTokenActions,
 				tokenHolders: parsedTokenHolders,
@@ -450,11 +449,16 @@ export class Sync implements Contracts.ApiSync.Service {
 					try {
 						await this.#syncToDatabase(deferredSync);
 						success = true;
-					} catch (error) {
-						const nextAttemptDelay = Math.min(baseDelay + attempts * 500, maxDelay);
+					} catch (rawError) {
 						attempts++;
+
+						const error = ensureError(rawError);
+						const nextAttemptDelay = Math.min(baseDelay + attempts * 500, maxDelay);
+						const { query } = error as { query?: string };
+						const querySuffix = query ? ` (query: ${query})` : "";
+
 						this.logger.warn(
-							`sync encountered exception: ${error.message} (query: ${error.query}). retry #${attempts} in ... ${nextAttemptDelay}ms`,
+							`sync encountered exception: ${error.message}${querySuffix}. retry #${attempts} in ${nextAttemptDelay}ms`,
 						);
 						await sleep(nextAttemptDelay);
 					}
@@ -677,14 +681,9 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		try {
 			await (this.dataSource as TypeOrm.DataSource).synchronize(true);
-			await (this.dataSource as TypeOrm.DataSource)
-				.createQueryRunner()
-				.query("CREATE EXTENSION IF NOT EXISTS citext;");
-			await (this.dataSource as TypeOrm.DataSource)
-				.createQueryRunner()
-				.query("CREATE EXTENSION IF NOT EXISTS pg_trgm;");
-		} catch (error) {
-			await this.app.terminate("failed to reset database", error);
+			await createExtensions(this.dataSource as TypeOrm.DataSource);
+		} catch (rawError) {
+			await this.app.terminate("failed to reset database", ensureError(rawError));
 		}
 	}
 }

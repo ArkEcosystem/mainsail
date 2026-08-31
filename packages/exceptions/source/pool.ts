@@ -71,12 +71,9 @@ export class TransactionFailedToPreverifyError extends PoolError {
 	}
 }
 
-export class TransactionFailedToApplyError extends PoolError {
-	public readonly error: Error;
-
-	public constructor(transaction: Contracts.Crypto.Transaction, error: Error) {
-		super(`tx ${transaction.hash} cannot be applied: ${error.message}`, "ERR_APPLY");
-		this.error = error;
+export class TransactionFailedToVerifyError extends PoolError {
+	public constructor(transaction: Contracts.Crypto.Transaction) {
+		super(`tx ${transaction.hash} didn't pass verification`, "ERR_BAD_DATA");
 	}
 }
 

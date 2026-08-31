@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject, tagged } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 import { BasePlugin } from "./base-plugin.js";
 
@@ -10,9 +11,6 @@ import { BasePlugin } from "./base-plugin.js";
 
 @injectable()
 export class CodecPlugin extends BasePlugin {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -34,11 +32,12 @@ export class CodecPlugin extends BasePlugin {
 		);
 
 		server.ext({
-			async method(request, h) {
+			method: async (request, h) => {
 				try {
 					request.payload = allRoutesConfigByPath[request.path].codec.request.deserialize(request.payload);
-				} catch (error) {
-					return this.disposeAndReturnBadRequest(request, h, `Payload deserializing failed: ${error}`);
+				} catch (rawError) {
+					const error = ensureError(rawError);
+					return this.disposeAndReturnBadRequest(request, `Payload deserializing failed: ${error}`);
 				}
 				return h.continue;
 			},
@@ -61,7 +60,8 @@ export class CodecPlugin extends BasePlugin {
 							"Error";
 						request.response.output.payload = Buffer.from(errorMessage, "utf8");
 					}
-				} catch (error) {
+				} catch (rawError) {
+					const error = ensureError(rawError);
 					request.response.statusCode = 500; // Internal server error (serializing failed)
 					request.response.output = {
 						headers: {},

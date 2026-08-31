@@ -75,10 +75,7 @@ export interface Application {
 
 export interface PluginDependency {
 	name: string;
-
 	version?: string;
-
-	required?: boolean | (() => Promise<boolean>);
 }
 
 export interface Bootstrapper {

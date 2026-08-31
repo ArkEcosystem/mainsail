@@ -4,7 +4,8 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { TransactionSchemaError } from "@mainsail/exceptions";
 
-import { Serialized, Transactions, Storage, Json } from "../test/fixtures/index.js";
+import { Serialized, Transactions, Storage, Json, wallet } from "../test/fixtures/index.js";
+import { signUntilLeadingZeroRS } from "../test/helpers/canonical-transaction";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
 describe<{
@@ -86,6 +87,33 @@ describe<{
 		}
 	});
 
+	it("fromHex - should accept an externally-signed transaction with stripped (minimal-RLP) r/s", async ({
+		app,
+		factory,
+		serializer,
+	}) => {
+		// Sign until a signature has a leading zero byte in r or s (~1 in 128), so the standard
+		// minimal-RLP encoding a canonical Ethereum wallet emits is shorter than 32 bytes.
+		const canonical = await signUntilLeadingZeroRS(app);
+
+		// The serialized wire form is now minimal-RLP — byte-identical to a canonical Ethereum
+		// wallet's, so at least one of r/s is under 32 bytes on the wire.
+		const wireHex = (await serializer.serialize(canonical)).toString("hex");
+
+		// Before the deserializer left-pad, this rejected: the 63-byte r||s buffer made recovery
+		// throw and the sub-64-hex r/s failed the schema.
+		const transaction = await factory.fromHex(wireHex);
+
+		// The stripped wire r/s are normalized back to 32 bytes, the correct sender is recovered,
+		// and the hash equals the one computed at signing time (the standard Ethereum hash).
+		assert.equal(transaction.r, canonical.r);
+		assert.equal(transaction.s, canonical.s);
+		assert.equal(transaction.r.length, 64);
+		assert.equal(transaction.s.length, 64);
+		assert.equal(transaction.from, wallet.address);
+		assert.equal(transaction.hash, canonical.hash);
+	});
+
 	it("fromHex - should reject transaction with schema errors", async ({ factory, serializer }) => {
 		const serialized = await serializer.serialize({
 			...Transactions.transactionTransfer,
@@ -103,6 +131,26 @@ describe<{
 			Serialized.transactionDeploy,
 		]) {
 			await assert.resolves(async () => factory.fromBytes(Buffer.from(serialized, "hex")));
+		}
+	});
+
+	it("fromPoolData - should deserialize well-formed transaction", async ({ factory }) => {
+		for (const transaction of [
+			Transactions.transactionTransfer,
+			Transactions.transactionContractCall,
+			Transactions.transactionContractCallWithSecondSignature,
+			Transactions.transactionDeploy,
+		]) {
+			const original = await factory.fromBytes(transaction.serialized);
+			const fromPool = await factory.fromPoolData(original.toData());
+
+			assert.equal(fromPool.hash, original.hash);
+			assert.equal(fromPool.from, original.from);
+			assert.equal(fromPool.to, original.to);
+			assert.equal(fromPool.senderPublicKey, original.senderPublicKey);
+			assert.equal(fromPool.senderLegacyAddress, original.senderLegacyAddress);
+			assert.true(fromPool.serialized.equals(original.serialized));
+			assert.equal(fromPool.toData(), original.toData());
 		}
 	});
 

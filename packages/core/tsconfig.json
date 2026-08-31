@@ -109,9 +109,6 @@
 			"path": "../logger-pino"
 		},
 		{
-			"path": "../networking-dns"
-		},
-		{
 			"path": "../networking-ntp"
 		},
 		{
@@ -134,9 +131,6 @@
 		},
 		{
 			"path": "../transaction-pool-worker"
-		},
-		{
-			"path": "../transactions"
 		},
 		{
 			"path": "../utils"

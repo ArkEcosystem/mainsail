@@ -7,7 +7,7 @@ import { assert } from "@mainsail/utils";
 @injectable()
 export class PeerRepository implements Contracts.TransactionPool.PeerRepository {
 	@inject(Identifiers.TransactionPool.Peer.Factory)
-	private readonly peerFactor!: Contracts.TransactionPool.PeerFactory;
+	private readonly peerFactory!: Contracts.TransactionPool.PeerFactory;
 
 	readonly #peers: Map<string, Contracts.TransactionPool.Peer> = new Map();
 
@@ -24,7 +24,7 @@ export class PeerRepository implements Contracts.TransactionPool.PeerRepository 
 	}
 
 	public setPeer(ip: string): void {
-		this.#peers.set(ip, this.peerFactor(ip));
+		this.#peers.set(ip, this.peerFactory(ip));
 	}
 
 	public forgetPeer(ip: string): void {

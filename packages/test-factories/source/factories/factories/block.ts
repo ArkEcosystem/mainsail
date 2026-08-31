@@ -100,6 +100,7 @@ export const registerBlockFactory = async (
 							"wallet",
 						)
 						.fromMnemonic(passphrase),
+					randaoReveal: "00".repeat(96),
 					reward: BigInt(options.reward || reward),
 					round: 0,
 					stateRoot: "0".repeat(64),

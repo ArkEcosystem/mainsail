@@ -5,7 +5,7 @@ import Boom, { badData } from "@hapi/boom";
 import { Request as HapiRequest, Server as HapiServer, ServerInjectOptions, ServerInjectResponse } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { cloneDeep } from "@mainsail/utils";
+import { cloneDeep, ensureError } from "@mainsail/utils";
 import { randomBytes } from "crypto";
 
 import { defaults } from "../defaults.js";
@@ -41,7 +41,7 @@ export class Server {
 		this.#server.app.database = this.database;
 
 		this.#server.ext({
-			async method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+			method: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
 				request.headers["content-type"] = "application/json";
 
 				return h.continue;
@@ -59,7 +59,8 @@ export class Server {
 			await this.#server.start();
 
 			this.logger.info(`Webhook Server started at ${this.#server.info.uri}`);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			await this.app.terminate(`Failed to start Webhook Server!`, error);
 		}
 	}
@@ -69,7 +70,8 @@ export class Server {
 			await this.#server.stop();
 
 			this.logger.info(`Webhook Server stopped at ${this.#server.info.uri}`);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			await this.app.terminate(`Failed to stop Webhook Server!`, error);
 		}
 	}

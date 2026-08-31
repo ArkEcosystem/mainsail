@@ -3,18 +3,18 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Application, Providers } from "@mainsail/kernel";
-import { assert } from "@mainsail/utils";
+import { assert, ensureError } from "@mainsail/utils";
 import { createHash } from "node:crypto";
 import { writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import { brotliCompress } from "node:zlib";
 import { DataSource, EntityManager } from "typeorm";
-import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
+import { PostgresDataSourceOptions } from "typeorm/driver/postgres/PostgresDataSourceOptions.js";
 
 import { Identifiers as InternalIdentifiers } from "../identifiers.js";
 import { LegacyChainTip, LegacySnapshot, LegacyWallet } from "../interfaces.js";
 
-interface DatabaseOptions extends PostgresConnectionOptions {
+interface DatabaseOptions extends PostgresDataSourceOptions {
 	readonly v3: {
 		readonly host: string;
 		readonly port: number;
@@ -143,8 +143,9 @@ export class Generator {
 
 				await callback(entityManager);
 			});
-		} catch (ex) {
-			this.logger.error(ex);
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			this.logger.error(error.message);
 		} finally {
 			await dataSource.destroy();
 		}

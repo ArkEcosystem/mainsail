@@ -2,6 +2,7 @@ import { TypeOrm } from "@mainsail/api-database";
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { Application, Bootstrap, Providers, Services } from "@mainsail/kernel";
+import { ensureError } from "@mainsail/utils";
 import { resolve } from "path";
 
 import { PoolWorker } from "./pool-worker.js";
@@ -119,6 +120,11 @@ const setupNode = async (app: Application, dataDirectory: string, configDirector
 		},
 		"@mainsail/api-sync": {
 			maxSyncAttempts: 1,
+			restore: {
+				blocks: {
+					batchSize: 5,
+				},
+			},
 			syncInterval: 250,
 			truncateDatabase: "1",
 		},
@@ -146,7 +152,6 @@ const setupNode = async (app: Application, dataDirectory: string, configDirector
 		"@mainsail/crypto-transaction",
 		"@mainsail/snapshot-legacy-importer",
 		"@mainsail/state",
-		"@mainsail/transactions",
 		"@mainsail/transaction-pool-service",
 		"@mainsail/crypto-proposal",
 		"@mainsail/crypto-messages",
@@ -162,12 +167,14 @@ const setupNode = async (app: Application, dataDirectory: string, configDirector
 		await loadPlugin(app, packageId, options);
 	}
 
+	app.rebind(Identifiers.Validator.DoubleSignGuard).toConstantValue({ guard: async () => {} });
+
 	for (const packageId of packages) {
 		await bootPlugin(app, packageId);
 	}
 
 	await bootstrap(app);
-}
+};
 
 const loadPlugin = async (app: Application, packageId: string, options: PluginOptions) => {
 	const serviceProviderRepository = app.get<Providers.ServiceProviderRepository>(
@@ -307,8 +314,9 @@ const runDatabaseQuery = async <T>(databaseName: string, callback: (dataSource: 
 		const result = await callback(nodeDatabase);
 		return result;
 	} catch (ex) {
-		console.log("runDatabaseQuery", ex.message);
-		throw ex;
+		const error = ensureError(ex);
+		console.log("runDatabaseQuery", error.message);
+		throw error;
 	} finally {
 		await nodeDatabase.destroy();
 	}

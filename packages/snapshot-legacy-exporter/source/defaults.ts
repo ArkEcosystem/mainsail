@@ -4,9 +4,7 @@ import { Environment } from "@mainsail/kernel";
 export const defaults = {
 	database: {
 		applicationName: "mainsail/snapshot-legacy",
-		database:
-			Environment.get(EnvironmentVariables.MAINSAIL_DB_DATABASE) ??
-			`${Environment.get(EnvironmentVariables.MAINSAIL_TOKEN)}_${Environment.get(EnvironmentVariables.MAINSAIL_NETWORK_NAME)}`,
+		database: Environment.get(EnvironmentVariables.MAINSAIL_DB_DATABASE),
 		entityPrefix: "public.",
 
 		extra: {
@@ -24,10 +22,7 @@ export const defaults = {
 		port: Environment.get(EnvironmentVariables.MAINSAIL_DB_PORT, 5432),
 
 		type: "postgres",
-		username:
-			Environment.get(EnvironmentVariables.MAINSAIL_DB_USERNAME) ??
-			Environment.get(EnvironmentVariables.MAINSAIL_TOKEN),
-
+		username: Environment.get(EnvironmentVariables.MAINSAIL_DB_USERNAME),
 		v3: {
 			database: "ark_devnet",
 			// when using podman

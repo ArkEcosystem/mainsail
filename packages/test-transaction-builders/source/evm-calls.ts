@@ -3,7 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 import { Enums, Identifiers } from "@mainsail/constants";
 import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
-import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ConsensusAbi, MultiPaymentAbi, UsernamesAbi } from "@mainsail/evm-contracts";
 import { bytesToHex, decodeFunctionResult, encodeFunctionData, parseEther, toBytes, toHex, zeroAddress } from "viem";
 
@@ -90,7 +89,7 @@ export const makeValidatorRegistration = async (
 	}
 
 	if (!recipient) {
-		recipient = app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
+		recipient = app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus);
 	}
 
 	if (recipient === undefined) {
@@ -127,7 +126,7 @@ export const makeValidatorResignation = async (
 	}
 
 	if (!recipient) {
-		recipient = app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
+		recipient = app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus);
 	}
 
 	if (recipient === undefined) {
@@ -158,7 +157,7 @@ export const makeValidatorVote = async (
 	}
 
 	if (!recipient) {
-		recipient = app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
+		recipient = app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus);
 	}
 
 	if (recipient === undefined) {
@@ -189,7 +188,7 @@ export const makeValidatorUnvote = async (
 	}
 
 	if (!recipient) {
-		recipient = app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Consensus);
+		recipient = app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus);
 	}
 
 	if (recipient === undefined) {
@@ -220,7 +219,7 @@ export const makeUsernameRegistration = async (
 	}
 
 	if (!recipient) {
-		recipient = app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Usernames);
+		recipient = app.get<string>(Identifiers.EvmConsensus.Contracts.Usernames);
 	}
 
 	if (recipient === undefined) {
@@ -251,7 +250,7 @@ export const makeUsernameResignation = async (
 	}
 
 	if (!recipient) {
-		recipient = app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Usernames);
+		recipient = app.get<string>(Identifiers.EvmConsensus.Contracts.Usernames);
 	}
 
 	if (recipient === undefined) {
@@ -366,7 +365,7 @@ export const callViewFunction = async (
 	viewContext: Omit<Contracts.Evm.TransactionViewContext, "specId">,
 ): Promise<Contracts.Evm.ViewResult> => {
 	const instance = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
-	return instance.view({ ...viewContext, specId: Enums.Evm.SpecId.LATEST });
+	return instance.view({ ...viewContext, specId: Enums.Evm.SpecId.OSAKA });
 };
 
 export * as ContractAbis from "@mainsail/evm-contracts";

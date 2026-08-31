@@ -31,7 +31,7 @@ describe<{
 		assert.equal(action.name, "eth_getStorageAt");
 	});
 
-	it("schema should be ok", ({ action, validator }) => {
+	it("schema should validate address, slot and blockTag", ({ action, validator }) => {
 		validator.addSchema(keccak256Schemas.address);
 		validator.addSchema(schemas.blockTag);
 		validator.addSchema(action.schema);
@@ -55,7 +55,7 @@ describe<{
 		);
 	});
 
-	it("should return code", async ({ action, evm }) => {
+	it("should return the storage value at the given slot", async ({ action, evm }) => {
 		const spyStorageAt = spy(evm, "storageAt");
 
 		assert.equal(await action.handle(["0x0000000000", "0x0", "latest"]), "0x0");

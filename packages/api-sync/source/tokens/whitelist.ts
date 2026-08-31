@@ -7,7 +7,7 @@ import {
 } from "@mainsail/api-database";
 import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { http } from "@mainsail/utils";
+import { ensureError, http } from "@mainsail/utils";
 
 import { isValidPgTimestamptz, sanitizeComment } from "./sanitizers.js";
 
@@ -42,8 +42,9 @@ export class TokenWhitelist {
 		const run = async () => {
 			try {
 				await this.#syncWhitelist();
-			} catch (ex) {
-				this.logger.error(`#syncWhitelist failed: ${ex}`);
+			} catch (rawError) {
+				const error = ensureError(rawError);
+				this.logger.error(`#syncWhitelist failed: ${error}`);
 			} finally {
 				this.#syncTimeout = setTimeout(() => {
 					void run();
@@ -83,12 +84,15 @@ export class TokenWhitelist {
 		}
 
 		try {
-			const { data } = await http.get<string>(this.#getTokenWhitelistRemoteUrl(), {
+			const { data } = await http.get<string | WhitelistedToken[]>(this.#getTokenWhitelistRemoteUrl(), {
 				maxContentLength: 16 * Units.KILOBYTE,
 				timeout: 2500,
 			});
-			return JSON.parse(data) as WhitelistedToken[];
-		} catch (error) {
+			// http.get already JSON-parses responses served as application/json, so only
+			// parse when the body came back as a raw string (e.g. text/plain).
+			return (typeof data === "string" ? JSON.parse(data) : data) as WhitelistedToken[];
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.logger.error(`fetchWhitelist failed: ${error}`);
 		}
 
@@ -127,7 +131,8 @@ export class TokenWhitelist {
 			if (token.comment) {
 				token.comment = sanitizeComment(token.comment);
 			}
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.logger.debugExtra(
 				`ignoring token ${token.address} for whitelist because of exception: ${error.message}`,
 			);

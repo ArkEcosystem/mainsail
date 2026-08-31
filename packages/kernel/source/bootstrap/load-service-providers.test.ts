@@ -2,7 +2,7 @@ import { Identifiers } from "@mainsail/constants";
 import { readJSONSync } from "fs-extra/esm";
 import { resolve } from "path";
 
-import { describeSkip } from "@mainsail/test-runner";
+import { describe } from "@mainsail/test-runner";
 import { Application } from "../application";
 import { ServiceProvider, ServiceProviderRepository } from "../providers";
 import { ConfigRepository } from "../services/config";
@@ -11,13 +11,14 @@ import { LoadServiceProviders } from "./load-service-providers";
 
 class StubServiceProvider extends ServiceProvider {}
 
-describeSkip<{
+describe<{
 	app: Application;
 	configRepository: ConfigRepository;
 	serviceProviderRepository: ServiceProviderRepository;
 }>("LoadServiceProviders", ({ assert, beforeEach, it, stub }) => {
 	beforeEach((context) => {
 		context.app = new Application();
+		context.app.bind(Identifiers.Application.Thread).toConstantValue("plugins");
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
 		context.app
 			.bind(Identifiers.Services.Filesystem.Service)
@@ -57,12 +58,40 @@ describeSkip<{
 		stub(context.app, "dataPath").returnValue(resolve(new URL(".", import.meta.url).pathname, "../../test/stubs"));
 
 		context.configRepository.merge({
-			app: { plugins: [{ package: "non-existing-plugin" }] },
+			app: { plugins: [{ package: "@mainsail/non-existing-plugin" }] },
 		});
 
 		await assert.rejects(
 			() => context.app.resolve<LoadServiceProviders>(LoadServiceProviders).bootstrap(),
 			"non-existing-plugin",
+		);
+	});
+
+	it("should throw a module-not-found error (not a TypeError) for an unscoped, missing package", async (context) => {
+		stub(context.app, "dataPath").returnValue(resolve(new URL(".", import.meta.url).pathname, "../../test/stubs"));
+
+		context.configRepository.merge({
+			app: { plugins: [{ package: "non-existing-plugin" }] },
+		});
+
+		// Without the `?? packageId` fallback, `"non-existing-plugin".split("/")[1]` is undefined and
+		// path.resolve throws "Path must be a string", an error that does not mention the package name.
+		await assert.rejects(
+			() => context.app.resolve<LoadServiceProviders>(LoadServiceProviders).bootstrap(),
+			"non-existing-plugin",
+		);
+	});
+
+	it("should throw if the plugin package exports no ServiceProvider", async (context) => {
+		stub(context.app, "dataPath").returnValue(resolve(new URL(".", import.meta.url).pathname, "../../test/stubs"));
+
+		context.configRepository.merge({
+			app: { plugins: [{ package: "stub-plugin-no-export" }] },
+		});
+
+		await assert.rejects(
+			() => context.app.resolve<LoadServiceProviders>(LoadServiceProviders).bootstrap(),
+			"stub-plugin-no-export",
 		);
 	});
 

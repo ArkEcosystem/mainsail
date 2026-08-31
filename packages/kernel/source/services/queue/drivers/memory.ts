@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 import { EventEmitter } from "events";
 import { performance } from "perf_hooks";
 
@@ -19,6 +20,8 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 	#started = false;
 
 	#onProcessedCallbacks: (() => void)[] = [];
+
+	readonly #timers: Set<ReturnType<typeof setTimeout>> = new Set();
 
 	public constructor() {
 		super();
@@ -56,19 +59,24 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 	}
 
 	public async clear(): Promise<void> {
+		for (const timer of this.#timers) {
+			clearTimeout(timer);
+		}
+		this.#timers.clear();
+
 		this.#jobs = [];
 	}
 
 	public async drain(): Promise<void> {
 		while (this.#running || this.#jobs.length > 0) {
-			if (!this.#started) {
+			if (this.#started) {
+				void this.#processJobs();
+			} else {
 				await this.start();
 			}
 
 			await this.#waitUntilProcessed();
 		}
-
-		this.#started = false;
 	}
 
 	public async push(job: Contracts.Kernel.QueueJob): Promise<void> {
@@ -78,13 +86,21 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 	}
 
 	public async later(delay: number, job: Contracts.Kernel.QueueJob): Promise<void> {
-		setTimeout(() => void this.push(job), delay);
+		const timer = setTimeout(() => {
+			this.#timers.delete(timer);
+
+			void this.push(job);
+		}, delay);
+
+		this.#timers.add(timer);
 	}
 
 	public async bulk(jobs: Contracts.Kernel.QueueJob[]): Promise<void> {
 		for (const job of jobs) {
 			this.#jobs.push(job);
 		}
+
+		void this.#processJobs();
 	}
 
 	public size(): number {
@@ -127,45 +143,50 @@ export class MemoryQueue extends EventEmitter implements Contracts.Kernel.Queue 
 			return;
 		}
 
-		while (this.#jobs.length > 0) {
-			if (!this.#started) {
-				break;
+		this.#running = true;
+
+		try {
+			while (this.#jobs.length > 0) {
+				if (!this.#started) {
+					break;
+				}
+
+				const job = this.#jobs.shift()!;
+
+				const start = performance.now();
+				try {
+					const data = await job.handle();
+
+					await this.events.dispatch(Events.QueueEvent.Finished, {
+						data: data,
+						driver: "memory",
+						executionTime: performance.now() - start,
+					});
+
+					this.emit("jobDone", job, data);
+				} catch (rawError) {
+					const error = ensureError(rawError);
+					await this.events.dispatch(Events.QueueEvent.Failed, {
+						driver: "memory",
+						error: error,
+						executionTime: performance.now() - start,
+					});
+
+					this.logger.warn(`Queue error occurred while handling job: ${error.message}`);
+
+					this.emit("jobError", job, error);
+				}
 			}
+		} catch (rawError) {
+			this.logger.warn(`Queue error occurred while processing jobs: ${ensureError(rawError).message}`);
+		} finally {
+			this.#running = false;
 
-			this.#running = true;
+			this.#resolveOnProcessed();
 
-			const job = this.#jobs.shift()!;
-
-			const start = performance.now();
-			try {
-				const data = await job.handle();
-
-				await this.events.dispatch(Events.QueueEvent.Finished, {
-					data: data,
-					driver: "memory",
-					executionTime: performance.now() - start,
-				});
-
-				this.emit("jobDone", job, data);
-			} catch (error) {
-				await this.events.dispatch(Events.QueueEvent.Failed, {
-					driver: "memory",
-					error: error,
-					executionTime: performance.now() - start,
-				});
-
-				this.logger.warn(`Queue error occured while handling job: ${error.message}`);
-
-				this.emit("jobError", job, error);
+			if (this.#jobs.length === 0) {
+				this.emit("drain");
 			}
-		}
-
-		this.#running = false;
-
-		this.#resolveOnProcessed();
-
-		if (this.#jobs.length === 0) {
-			this.emit("drain");
 		}
 	}
 }

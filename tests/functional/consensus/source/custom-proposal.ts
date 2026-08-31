@@ -1,7 +1,8 @@
 import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import type { Contracts } from "@mainsail/contracts";
 
-import { Identifiers } from "@mainsail/constants";
+import { randaoMessage } from "@mainsail/blockchain-utils";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { Proposal } from "@mainsail/crypto-proposal";
 import { assert } from "@mainsail/utils";
 import { randomBytes } from "crypto";
@@ -30,7 +31,6 @@ export const makeCustomProposal = async (
 	const cryptoConfiguration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const milestone = cryptoConfiguration.getMilestone();
 
-	const transactionHandler = app.get<Contracts.Transactions.TransactionHandler>(Identifiers.Transaction.Handler);
 	const evm = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "validator");
 
 	// 2)
@@ -64,20 +64,20 @@ export const makeCustomProposal = async (
 		let result = { gasRefunded: 0n, gasUsed: 0n, logs: [] as any, status: 0 };
 
 		try {
-			result = await transactionHandler.apply(
-				{
-					evm: {
-						blockContext: {
-							commitKey,
-							gasLimit: BigInt(milestone.block.maxGasLimit),
-							timestamp: BigInt(dayjs().valueOf()),
-							validatorAddress: validators[0].publicKey,
-						},
-						instance: evm,
-					},
-				},
-				transaction,
-			);
+			result = (
+				await evm.process({
+					commitKey: commitKey,
+					data: Buffer.from(transaction.data.slice(2), "hex"),
+					from: transaction.from,
+					gasLimit: BigInt(transaction.gasLimit),
+					gasPrice: BigInt(transaction.gasPrice),
+					nonce: transaction.nonce,
+					specId: Enums.Evm.SpecId.OSAKA,
+					to: transaction.to,
+					txHash: transaction.hash,
+					value: transaction.value,
+				})
+			).receipt;
 		} catch {
 			result = { ...result, gasUsed: BigInt(transaction.gasLimit) };
 		}
@@ -103,6 +103,19 @@ export const makeCustomProposal = async (
 
 	const hashFactory = app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
 	const blockFactory = app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
+
+	const stateStore = app.get<Contracts.State.Store>(Identifiers.State.Store);
+	const randaoReveal = await app
+		.getTagged<Contracts.Crypto.SignatureBls>(Identifiers.Cryptography.Signature.Instance, "type", "consensus")
+		.sign(
+			randaoMessage(
+				stateStore.getGenesisCommit().block.hash,
+				stateStore.getLastBlock().randaoReveal,
+				Number(commitKey.blockNumber),
+			),
+			Buffer.from(validators[0].consensusPrivateKey, "hex"),
+		);
+
 	const block = await blockFactory.make(
 		{
 			fee: totals.fee,
@@ -112,6 +125,7 @@ export const makeCustomProposal = async (
 			parentHash: previousBlock.hash,
 			payloadSize,
 			proposer: validators[0].address,
+			randaoReveal,
 			reward: BigInt(milestone.reward),
 			round,
 			stateRoot: "0".repeat(64),

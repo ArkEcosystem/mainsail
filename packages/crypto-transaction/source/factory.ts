@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged, optional } from "@mainsail/container";
 import { InvalidTransactionBytesError, TransactionSchemaError } from "@mainsail/exceptions";
-import { assert } from "@mainsail/utils";
+import { assert, ensureError } from "@mainsail/utils";
 
 import { BlockTransaction } from "./block-transaction.js";
 import { Transaction } from "./transaction.js";
@@ -55,6 +55,11 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		};
 
 		return this.fromData(transactionData);
+	}
+
+	public async fromPoolData(data: Contracts.Crypto.TransactionData): Promise<Contracts.Crypto.Transaction> {
+		const serialized = await this.serializer.serialize(data);
+		return new Transaction(data, serialized);
 	}
 
 	public async fromStorage(
@@ -126,7 +131,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		try {
 			const { data: transaction } = await this.deserializer.deserialize(serialized);
 
-			const worker = this.workerPool ? await this.workerPool.getWorker() : undefined;
+			const worker = this.workerPool ? this.workerPool.getWorker() : undefined;
 			const cryptoData = worker
 				? await worker.transactionFactory("computeCryptoData", transaction)
 				: await this.computeCryptoData(transaction);
@@ -139,7 +144,8 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			}
 
 			return new Transaction(tx, serialized);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			if (error instanceof TransactionSchemaError) {
 				throw error;
 			}

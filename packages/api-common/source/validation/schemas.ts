@@ -60,5 +60,5 @@ export const jsonRpcResponseSchema: SchemaObject = {
 
 export const jsonRpcPayloadSchema: SchemaObject = {
 	$id: "jsonRpcPayload",
-	oneOf: [jsonRpcRequest, { items: jsonRpcRequest, type: "array" }],
+	oneOf: [jsonRpcRequest, { items: jsonRpcRequest, maxItems: 100, minItems: 1, type: "array" }],
 };

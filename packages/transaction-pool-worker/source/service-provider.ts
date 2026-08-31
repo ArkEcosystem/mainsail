@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { Ipc, Providers } from "@mainsail/kernel";
-import Joi from "joi";
+import { fileURLToPath } from "url";
 import { Worker } from "worker_threads";
 
 import { Worker as WorkerInstance } from "./worker.js";
@@ -17,11 +17,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app
 			.bind<() => Ipc.Subprocess>(Identifiers.TransactionPool.WorkerSubprocess.Factory)
 			.toFactory(() => () => {
-				const subprocess = new Worker(`${new URL(".", import.meta.url).pathname}/worker-script.js`, {
+				const subprocess = new Worker(fileURLToPath(new URL("worker-script.js", import.meta.url)), {
 					stderr: true,
 					stdout: true,
 				});
-				return new Ipc.Subprocess(this.app, "tx-pool", subprocess);
+				return new Ipc.Subprocess(this.app, "transaction-pool", "tx-pool", subprocess);
 			});
 
 		this.app.bind(Identifiers.TransactionPool.Worker).toConstantValue(this.app.resolve(WorkerInstance));
@@ -35,14 +35,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<Contracts.TransactionPool.Worker>(Identifiers.TransactionPool.Worker).kill();
-	}
-
-	public async required(): Promise<boolean> {
-		return true;
-	}
-
-	public configSchema(): Joi.AnySchema {
-		return Joi.object({}).required().unknown(true);
+		await this.app.get<Contracts.TransactionPool.Worker>(Identifiers.TransactionPool.Worker).dispose();
 	}
 }

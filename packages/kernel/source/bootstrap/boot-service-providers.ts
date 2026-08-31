@@ -3,12 +3,10 @@ import type { Contracts } from "@mainsail/contracts";
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ServiceProviderCannotBeBooted } from "@mainsail/exceptions";
-import { assert } from "@mainsail/utils";
+import { ensureError } from "@mainsail/utils";
 
 import { ServiceProviderRepository } from "../providers/index.js";
 import { ChangeServiceProviderState } from "./listeners.js";
-
-// @TODO review the implementation
 
 @injectable()
 export class BootServiceProviders implements Contracts.Kernel.Bootstrapper {
@@ -25,24 +23,17 @@ export class BootServiceProviders implements Contracts.Kernel.Bootstrapper {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public async bootstrap(): Promise<void> {
-		for (const [name, serviceProvider] of this.serviceProviders.all()) {
-			const serviceProviderName: string | undefined = serviceProvider.name();
-
-			assert.string(serviceProviderName);
+		for (const serviceProvider of this.serviceProviders.all()) {
+			const name = serviceProvider.name();
 
 			if (await serviceProvider.bootWhen()) {
 				try {
 					await this.serviceProviders.boot(name);
-				} catch (error) {
-					const isRequired: boolean = await serviceProvider.required();
+				} catch (rawError) {
+					const error = ensureError(rawError);
+					this.logger.error(`${name}: ${error.stack}`);
 
-					if (isRequired) {
-						throw new ServiceProviderCannotBeBooted(serviceProviderName, error.message);
-					} else {
-						this.logger.warn(`${name}: ${error.stack}`);
-					}
-
-					this.serviceProviders.fail(serviceProviderName);
+					throw new ServiceProviderCannotBeBooted(name, error.message);
 				}
 			} else {
 				this.serviceProviders.defer(name);
@@ -50,12 +41,9 @@ export class BootServiceProviders implements Contracts.Kernel.Bootstrapper {
 
 			const eventListener: Contracts.Kernel.EventListener = this.app
 				.resolve(ChangeServiceProviderState)
-				.initialize(serviceProviderName, serviceProvider);
+				.initialize(name, serviceProvider);
 
-			// Register the "enable/disposeWhen" listeners to be triggered on every block. Use with care!
 			this.events.listen(Events.BlockEvent.Applied, eventListener);
-
-			// We only want to trigger this if another service provider has been booted to avoid an infinite loop.
 			this.events.listen(Events.KernelEvent.ServiceProviderBooted, eventListener);
 		}
 	}

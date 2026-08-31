@@ -22,9 +22,6 @@ export class CommandHelp {
 	@inject(Identifiers.Cli.Application.Instance)
 	protected readonly app!: Contracts.Cli.Application;
 
-	@inject(Identifiers.Cli.Package)
-	protected readonly pkg!: Contracts.Types.PackageJson;
-
 	public render(command: CommandInterface): string {
 		let helpMessage = `${this.app.get<AppHeader>(Identifiers.Cli.Component.AppHeader).render()}
 
@@ -51,7 +48,7 @@ ${flags}`;
 	#buildArguments(command: CommandInterface): string {
 		const arguments_ = command.definition.getArguments();
 
-		if (Object.keys(arguments_).length <= 0) {
+		if (Object.keys(arguments_).length === 0) {
 			return "";
 		}
 
@@ -68,7 +65,7 @@ ${flags}`;
 	#buildFlags(command: CommandInterface): string {
 		const flags = command.definition.getFlags();
 
-		if (Object.keys(flags).length <= 0) {
+		if (Object.keys(flags).length === 0) {
 			return "";
 		}
 

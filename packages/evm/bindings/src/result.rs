@@ -131,7 +131,7 @@ impl JsTransactionReceipt {
             logs: receipt
                 .logs
                 .map(|l| serde_json::to_value(l).unwrap())
-                .unwrap_or_else(|| serde_json::Value::Null), // TODO: check if null is correct
+                .unwrap_or_else(|| serde_json::json!([])),
             output: receipt.output.map(|o| utils::convert_bytes_to_js_buffer(o)),
             block_number: None,
             tx_hash: None,
@@ -184,6 +184,7 @@ impl JsBlockHeaderData {
             reward: utils::convert_u256_to_bigint(header.reward),
             payload_size: header.payload_size,
             proposer: header.proposer.to_string(),
+            randao_reveal: header.randao_reveal.encode_hex(),
         }
     }
 }
@@ -231,8 +232,8 @@ impl TryInto<AccountInfo> for JsAccountInfo {
 
     fn try_into(self) -> Result<AccountInfo, Self::Error> {
         Ok(AccountInfo {
-            balance: utils::convert_bigint_to_u256(self.balance)?,
-            nonce: self.nonce.get_u64().1,
+            balance: utils::convert_bigint_to_u256(self.balance, "balance")?,
+            nonce: utils::convert_bigint_to_u64(self.nonce, "nonce")?,
             ..Default::default()
         })
     }
@@ -350,8 +351,8 @@ impl TryInto<AccountInfoExtended> for JsAccountInfoExtended {
         Ok(AccountInfoExtended {
             address: utils::create_address_from_string(&self.address)?,
             info: AccountInfo {
-                balance: utils::convert_bigint_to_u256(self.balance)?,
-                nonce: self.nonce.get_u64().1,
+                balance: utils::convert_bigint_to_u256(self.balance, "balance")?,
+                nonce: utils::convert_bigint_to_u64(self.nonce, "nonce")?,
                 ..Default::default()
             },
             legacy_attributes: self.legacy_attributes.try_into()?,
@@ -374,7 +375,7 @@ impl TryInto<LegacyColdWallet> for JsLegacyColdWallet {
 
         Ok(LegacyColdWallet {
             address: utils::create_legacy_address_from_string(&self.address)?,
-            balance: utils::convert_bigint_to_u256(self.balance)?,
+            balance: utils::convert_bigint_to_u256(self.balance, "balance")?,
             legacy_attributes: self.legacy_attributes.try_into()?,
             merge_info,
         })
@@ -400,13 +401,18 @@ impl JsLegacyAttributes {
     }
 }
 
-impl Into<LegacyAccountAttributes> for JsLegacyAttributes {
-    fn into(self) -> LegacyAccountAttributes {
-        LegacyAccountAttributes {
-            legacy_nonce: self.legacy_nonce.map(|nonce| nonce.get_u64().1),
+impl TryInto<LegacyAccountAttributes> for JsLegacyAttributes {
+    type Error = crate::Error;
+
+    fn try_into(self) -> Result<LegacyAccountAttributes, Self::Error> {
+        Ok(LegacyAccountAttributes {
+            legacy_nonce: self
+                .legacy_nonce
+                .map(|nonce| utils::convert_bigint_to_u64(nonce, "legacyNonce"))
+                .transpose()?,
             second_public_key: self.second_public_key,
             multi_signature: self.multi_signature.map(Into::into),
-        }
+        })
     }
 }
 

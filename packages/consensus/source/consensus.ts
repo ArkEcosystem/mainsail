@@ -2,8 +2,11 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { assert, Lock } from "@mainsail/utils";
+import { DoubleSignError } from "@mainsail/exceptions";
+import { assert, ensureError, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
+
+type OwnSlot = { address: string; blockNumber: number; round: number };
 
 const FAILED_PROCESSOR_RESULT: Contracts.Processor.BlockProcessorResult = {
 	feeUsed: 0n,
@@ -74,8 +77,9 @@ export class Consensus implements Contracts.Consensus.Service {
 	#isDisposed = false;
 	#pendingJobs = new Set<Contracts.Consensus.RoundState>();
 
+	#ownSlots: OwnSlot[] = [];
 	#proposedBlock?: Contracts.Crypto.Block;
-	#proposalPromise?: Promise<Contracts.Crypto.Proposal>;
+	#proposalPromise?: Promise<Contracts.Crypto.Proposal | undefined>;
 	#roundStartTime = 0;
 
 	// Handler lock is different than commit lock. It is used to prevent parallel processing and it is similar to queue.
@@ -143,7 +147,8 @@ export class Consensus implements Contracts.Consensus.Service {
 			for (let index = 0; index < this.#round; index++) {
 				await this.handle(this.roundStateRepository.getRoundState(this.#blockNumber, index));
 			}
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			await this.app.terminate("Consensus bootstrap error", error);
 		}
 	}
@@ -243,11 +248,28 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		if (this.#proposalPromise) {
 			const proposal = await this.#proposalPromise;
+			this.#proposalPromise = undefined;
+
+			if (proposal === undefined) {
+				// Nothing to propose: either the double-sign guard refused this position, or building the
+				// proposal failed. #makeProposal reported which. The propose timeout scheduled above lets
+				// the round time out so consensus moves on.
+				return;
+			}
+
 			assert.defined(this.#proposedBlock);
 
-			this.logger.info(`Proposing block ${this.#getBlockString(this.#proposedBlock)}`, "consensus");
+			const ownSlot = this.#ownSlots.find(
+				(slot) => slot.blockNumber === this.#blockNumber && slot.round === this.#round,
+			);
 
-			this.#proposalPromise = undefined;
+			this.logger.notice(
+				`📦 Proposing block ${this.#getBlockString(this.#proposedBlock)} as ${
+					ownSlot?.address ?? this.#proposedBlock.proposer
+				}`,
+				"consensus",
+			);
+
 			this.#proposedBlock = undefined;
 			await this.proposalProcessor.process(proposal);
 		}
@@ -270,7 +292,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.logger.info(`Received proposal ${this.#getBlockString(proposal.blockHeader)}`, "consensus");
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
-		await this.prevote(roundState.getProcessorResult() ? proposal.blockHeader.hash : undefined);
+		await this.prevote(roundState.getProcessorResult().success ? proposal.blockHeader.hash : undefined);
 	}
 
 	protected async onProposalLocked(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -294,7 +316,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		const lockedRound = this.getLockedRound();
 
-		if ((!lockedRound || lockedRound <= proposal.validRound) && roundState.getProcessorResult()) {
+		if ((!lockedRound || lockedRound <= proposal.validRound) && roundState.getProcessorResult().success) {
 			await this.prevote(proposal.blockHeader.hash);
 		} else {
 			await this.prevote();
@@ -406,9 +428,12 @@ export class Consensus implements Contracts.Consensus.Service {
 		await this.commitLock.runExclusive(async () => {
 			try {
 				await this.processor.commit(processState);
-			} catch (error) {
+			} catch (rawError) {
+				const error = ensureError(rawError);
 				await this.app.terminate("Failed to commit block", error);
 			}
+
+			this.#reportOwnSlotOutcome(block);
 
 			this.roundStateRepository.clear();
 
@@ -502,10 +527,35 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		this.logger.info(`Found registered proposer: ${roundState.proposer.address}`, "consensus");
 
+		this.#trackOwnSlot(roundState.proposer.address);
+
 		this.#proposalPromise = this.#makeProposal(roundState, registeredProposer);
 	}
 
 	async #makeProposal(
+		roundState: Contracts.Consensus.RoundState,
+		registeredProposer: Contracts.Validator.Validator,
+	): Promise<Contracts.Crypto.Proposal | undefined> {
+		try {
+			return await this.#signProposal(roundState, registeredProposer);
+		} catch (rawError) {
+			const error = ensureError(rawError);
+
+			if (error instanceof DoubleSignError) {
+				// Signing is allowed again once a later round passes the recorded watermark.
+				this.logger.warn(`Skipped proposal for ${this.#getHeightRoundString()}: ${error.message}`, "consensus");
+			} else {
+				this.logger.error(
+					`Failed to create proposal for ${this.#getHeightRoundString()}: ${error.stack ?? error.message}`,
+					"consensus",
+				);
+			}
+
+			return undefined;
+		}
+	}
+
+	async #signProposal(
 		roundState: Contracts.Consensus.RoundState,
 		registeredProposer: Contracts.Validator.Validator,
 	): Promise<Contracts.Crypto.Proposal> {
@@ -531,6 +581,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			roundState.proposer.address,
 			this.#round,
 			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
+			await registeredProposer.getRandaoReveal(this.#blockNumber),
 		);
 		this.logger.info(`Created proposal with new block ${this.#getBlockString(this.#proposedBlock)}`, "consensus");
 
@@ -557,7 +608,20 @@ export class Consensus implements Contracts.Consensus.Service {
 				continue;
 			}
 
-			const prevote = await localValidator.prevote(validatorIndex, this.#blockNumber, this.#round, value);
+			let prevote: Contracts.Crypto.Message;
+			try {
+				prevote = await localValidator.prevote(validatorIndex, this.#blockNumber, this.#round, value);
+			} catch (error) {
+				if (error instanceof DoubleSignError) {
+					this.logger.warn(
+						`Skipped prevote for ${this.#getHeightRoundString()}: ${error.message}`,
+						"consensus",
+					);
+					continue;
+				}
+
+				throw error;
+			}
 
 			void this.messageProcessor.process(prevote);
 		}
@@ -576,7 +640,20 @@ export class Consensus implements Contracts.Consensus.Service {
 				continue;
 			}
 
-			const precommit = await localValidator.precommit(validatorIndex, this.#blockNumber, this.#round, value);
+			let precommit: Contracts.Crypto.Message;
+			try {
+				precommit = await localValidator.precommit(validatorIndex, this.#blockNumber, this.#round, value);
+			} catch (error) {
+				if (error instanceof DoubleSignError) {
+					this.logger.warn(
+						`Skipped precommit for ${this.#getHeightRoundString()}: ${error.message}`,
+						"consensus",
+					);
+					continue;
+				}
+
+				throw error;
+			}
 
 			void this.messageProcessor.process(precommit);
 		}
@@ -634,7 +711,8 @@ export class Consensus implements Contracts.Consensus.Service {
 				}
 
 				roundState.setProcessorResult(await this.processor.process(roundState));
-			} catch (error) {
+			} catch (rawError) {
+				const error = ensureError(rawError);
 				this.logger.error(
 					`Failed to process proposal ${this.#getHeightRoundString()}: ${error.message}`,
 					"consensus",
@@ -672,5 +750,40 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		return `${number}/${consensusRound}/${block.hash}`;
+	}
+
+	#trackOwnSlot(address: string): void {
+		if (this.#ownSlots.length > 0 && this.#ownSlots[0].blockNumber !== this.#blockNumber) {
+			this.#ownSlots = [];
+		}
+
+		this.#ownSlots.push({ address, blockNumber: this.#blockNumber, round: this.#round });
+	}
+
+	#reportOwnSlotOutcome(block: Contracts.Crypto.BlockHeader): void {
+		const ownSlots = this.#ownSlots.filter((slot) => slot.blockNumber === block.number);
+
+		if (ownSlots.length === 0) {
+			return;
+		}
+
+		this.#ownSlots = [];
+
+		// Whichever of our rounds it came from, and whoever ended up proposing it: the block is ours.
+		if (ownSlots.some((slot) => slot.address === block.proposer)) {
+			const position = `${block.number.toLocaleString(Locale)}/${block.round.toLocaleString(Locale)}`;
+
+			this.logger.notice(`✅ Committed our block ${position} as ${block.proposer}`, "consensus");
+			return;
+		}
+
+		for (const slot of ownSlots) {
+			const position = `${slot.blockNumber.toLocaleString(Locale)}/${slot.round.toLocaleString(Locale)}`;
+
+			this.logger.notice(
+				`❌ Missed our slot ${position} as ${slot.address}, committed by ${block.proposer}`,
+				"consensus",
+			);
+		}
 	}
 }

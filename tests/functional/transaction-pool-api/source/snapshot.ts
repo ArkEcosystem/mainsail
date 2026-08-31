@@ -7,7 +7,6 @@ import {
 	Identifiers as ApiDatabaseIdentifiers
 } from "@mainsail/api-database";
 import { Events, Identifiers } from "@mainsail/constants";
-import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { assert } from "@mainsail/test-runner";
 import { parseAbi, parseEventLogs } from "viem";
 
@@ -324,7 +323,7 @@ export class Snapshot {
 			return { accountDeltas, lastHeight: 0 };
 		}
 
-		const blocks = await database.findBlocks(1, (await database.getLastCommit()).block.number);
+		const blocks = await database.findBlocks(1, Math.max(1, (await database.getLastCommit()).block.number));
 		const updateBalanceDelta = async (addressOrPublicKey: string, delta: bigint): Promise<void> => {
 			const account = await getAccountByAddressOrPublicKey({ app: this.app }, addressOrPublicKey);
 
@@ -397,7 +396,7 @@ export class Snapshot {
 					}
 
 					const consensusContract = this.app.get<string>(
-						EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
+						Identifiers.EvmConsensus.Contracts.Consensus,
 					);
 
 					// Refund Validator Fee
@@ -407,7 +406,7 @@ export class Snapshot {
 						const resignations = parseEventLogs({
 							abi: consensusAbi,
 							eventName: "ValidatorResigned",
-							logs: receipt.receipt.logs ?? [],
+							logs: receipt.receipt.logs,
 						});
 
 						for (const resignation of resignations) {
@@ -424,7 +423,7 @@ export class Snapshot {
 
 					// multipayment forwards value to recipients
 					const multiPaymentContract = this.app.get<string>(
-						EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
+						Identifiers.EvmConsensus.Contracts.MultiPayment,
 					);
 					if (transaction.to === multiPaymentContract) {
 						const paymentAbi = parseAbi([
@@ -434,7 +433,7 @@ export class Snapshot {
 						const payments = parseEventLogs({
 							abi: paymentAbi,
 							eventName: "Payment",
-							logs: receipt.receipt.logs ?? [],
+							logs: receipt.receipt.logs,
 						});
 
 						for (const payment of payments) {
@@ -453,7 +452,7 @@ export class Snapshot {
 			// each block increases nonce of internal address due to vote&reward updates
 			await incrementNonce(
 				block.number,
-				this.app.get<string>(EvmConsensusIdentifiers.Internal.Addresses.Deployer),
+				this.app.get<string>(Identifiers.EvmConsensus.DeployerAddress),
 			);
 
 			// Validator balance

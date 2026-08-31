@@ -3,6 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { RpcError } from "@mainsail/exceptions";
+import { ensureError } from "@mainsail/utils";
 import dayjs from "dayjs";
 import { zeroAddress } from "viem";
 
@@ -70,16 +71,17 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 			});
 
 			if (receipt.status === 1) {
-				return `0x${receipt.output?.toString("hex")}`;
+				return receipt.output ? `0x${receipt.output.toString("hex")}` : "0x";
 			} else {
 				const data = receipt.output ? `0x${receipt.output.toString("hex")}` : undefined;
 				throw new RpcError("execution reverted", data);
 			}
-		} catch (ex) {
-			if (ex instanceof RpcError) {
-				throw ex;
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			if (error instanceof RpcError) {
+				throw error;
 			}
-			throw new RpcError(`execution reverted: ${ex.message}`);
+			throw new RpcError(`execution reverted: ${error.message}`);
 		}
 	}
 
@@ -147,6 +149,7 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 		return {
 			commitKey: { blockNumber: BigInt(this.configuration.getHeight()), round: BigInt(0) },
 			gasLimit: BigInt(milestone.block.maxGasLimit),
+			prevrandao: Buffer.alloc(32),
 			timestamp: BigInt(dayjs().valueOf()),
 			validatorAddress: "0x0000000000000000000000000000000000000001",
 		};

@@ -6,7 +6,7 @@
 			"maxGasLimit": 10000000
 		},
 		"epoch": "2024-05-31T00:00:00.000Z",
-		"evmSpec": "Shanghai",
+		"evmSpec": "Osaka",
 		"gas": {
 			"minimumGasPrice": 5000000000,
 			"maximumGasPrice": 10000000000000,
@@ -27,14 +27,16 @@
 			"tolerance": 100
 		},
 		"roundValidators": 0,
-		"validatorRegistrationFee": "250000000000000000000"
+		"validatorRegistrationFee": "0"
 	},
 	"core": {
 		"version": "0.0.1"
 	},
 	"explorer": "",
 	"nethash": "5f919d94bacac4bf509c65eedd7cd8899da08f7ad97a074bdfc4a2f31d87ac4f",
-	"ports": {},
+	"ports": {
+		"@mainsail/api-http": 4003
+	},
 	"symbol": "TѦ",
 	"token": "ARK",
 	"version": 30,

@@ -5,12 +5,6 @@ import type { Transaction } from "../crypto/index.js";
 
 export type PeerProtocol = Enums.Api.Protocol;
 
-export interface PeerBroadcast {
-	ip: string;
-	port: number;
-	protocol: PeerProtocol;
-}
-
 export interface Peer {
 	readonly url: string;
 	readonly port: number;
@@ -18,14 +12,8 @@ export interface Peer {
 
 	readonly ip: string;
 
-	version: string | undefined;
-	latency: number | undefined;
-
 	lastPinged: Dayjs | undefined;
 	errorCount: number;
-
-	recentlyPinged(): boolean;
-	toBroadcast(): PeerBroadcast;
 }
 
 export type PeerFactory = (ip: string) => Peer;

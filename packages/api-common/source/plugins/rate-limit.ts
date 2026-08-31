@@ -12,11 +12,10 @@ type RateLimitPluginData = {
 	reset: number;
 };
 
-const isListed = (ip: string, patterns: string[]): boolean => {
-	if (!Array.isArray(patterns)) {
-		return true;
-	}
+const isRateLimiterResponse = (value: unknown): value is RateLimiterRes =>
+	typeof value === "object" && value !== null && "remainingPoints" in value && "msBeforeNext" in value;
 
+const isListed = (ip: string, patterns: string[]): boolean => {
 	for (const pattern of patterns) {
 		if (mm.isMatch(ip, pattern)) {
 			return true;
@@ -46,15 +45,15 @@ export const rateLimit = {
 
 		const rateLimiter = new RLWrapperBlackAndWhite({
 			blackList: options.blacklist || [],
-			isBlackListed: (ip: string) => isListed(ip, options.blacklist),
-			isWhiteListed: (ip: string) => isListed(ip, options.whitelist),
+			isBlackListed: (ip: string) => isListed(ip, options.blacklist || []),
+			isWhiteListed: (ip: string) => isListed(ip, options.whitelist || ["*"]),
 			limiter: new RateLimiterMemory({ duration: options.duration, points: options.points }),
 			runActionAnyway: false,
 			whiteList: options.whitelist || ["*"],
 		});
 
 		server.ext({
-			async method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+			method: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
 				try {
 					const rateLimitRes: RateLimiterRes = await rateLimiter.consume(
 						getIp(request, options.trustProxy),
@@ -66,14 +65,18 @@ export const rateLimit = {
 						reset: Date.now() + rateLimitRes.msBeforeNext,
 					} as RateLimitPluginData;
 				} catch (error) {
+					// rate-limiter-flexible rejects with a RateLimiterRes (not an Error) when
+					// the limit is hit; a real Error only occurs on an internal failure.
 					if (error instanceof Error) {
 						return Boom.internal(error.message);
 					}
 
-					request.plugins["rate-limit"] = {
-						remaining: error.remainingPoints,
-						reset: Date.now() + error.msBeforeNext,
-					} as RateLimitPluginData;
+					if (isRateLimiterResponse(error)) {
+						request.plugins["rate-limit"] = {
+							remaining: error.remainingPoints,
+							reset: Date.now() + error.msBeforeNext,
+						};
+					}
 
 					return Boom.tooManyRequests();
 				}
@@ -84,7 +87,7 @@ export const rateLimit = {
 		});
 
 		server.ext({
-			async method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+			method: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
 				if (request.plugins["rate-limit"]) {
 					const data = request.plugins["rate-limit"] as RateLimitPluginData;
 

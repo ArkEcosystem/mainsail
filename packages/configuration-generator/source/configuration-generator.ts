@@ -2,12 +2,16 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { FunctionSigs } from "@mainsail/evm-contracts";
 import { Application } from "@mainsail/kernel";
+import { ensureError } from "@mainsail/utils";
+import { validateMnemonic } from "bip39";
+import dayjs from "dayjs";
 import { ensureDirSync, pathExistsSync } from "fs-extra/esm";
 import { join } from "path";
 
 import { ConfigurationWriter } from "./configuration-writer.js";
-import { EnvironmentData } from "./contracts.js";
+import { EnvironmentData, Task } from "./contracts.js";
 import {
 	AppGenerator,
 	EnvironmentGenerator,
@@ -20,9 +24,10 @@ import {
 } from "./generators/index.js";
 import { Identifiers as InternalIdentifiers } from "./identifiers.js";
 
-type Task = {
-	task: () => Promise<void>;
-	title: string;
+const assertMnemonic = (mnemonic: unknown, label: string): void => {
+	if (typeof mnemonic !== "string" || !validateMnemonic(mnemonic)) {
+		throw new Error(`${label} is not a valid BIP39 mnemonic.`);
+	}
 };
 
 @injectable()
@@ -60,24 +65,26 @@ export class ConfigurationGenerator {
 	@inject(InternalIdentifiers.Generator.Wallet)
 	private walletGenerator!: WalletGenerator;
 
-	public async generate(
-		options: Contracts.NetworkGenerator.Options,
-		writeOptions?: Contracts.NetworkGenerator.WriteOptions,
-	): Promise<void> {
+	@inject(Identifiers.Services.Log.Service)
+	private logger!: Contracts.Kernel.Logger;
+
+	@inject(Identifiers.Snapshot.Legacy.Importer)
+	private importer!: Contracts.Snapshot.LegacyImporter;
+
+	@inject(Identifiers.Cryptography.Transaction.Deserializer)
+	private transactionDeserializer!: Contracts.Crypto.TransactionDeserializer;
+
+	public async generate(options: Contracts.NetworkGenerator.Options): Promise<void> {
 		const internalOptions: Contracts.NetworkGenerator.InternalOptions = {
 			blockTime: 8000,
 			coreDBHost: "localhost",
 			coreDBPort: 5432,
 			coreP2PPort: 4000,
-			coreWebhooksPort: 4004,
-			distribute: false,
 			epoch: new Date(),
 			explorer: "",
-			force: false,
 			initialBlockNumber: 0,
 			maxBlockGasLimit: 10_000_000,
 			maxBlockPayload: 2_097_152,
-			maxTxPerBlock: 150,
 			overwriteConfig: false,
 			peers: ["127.0.0.1"],
 			premine: "125000000000000000000000000",
@@ -90,19 +97,20 @@ export class ConfigurationGenerator {
 			...options,
 		};
 
-		writeOptions = {
-			writeApp: true,
-			writeCrypto: true,
-			writeEnvironment: true,
-			writeGenesisBlock: true,
-			writePeers: true,
-			writeSnapshot: !!options.snapshot,
-			writeValidators: true,
-			...writeOptions,
-		};
+		this.#assertCustomSecrets(internalOptions);
 
-		const genesisWalletMnemonic = this.mnemonicGenerator.generate();
-		let validatorsMnemonics = this.mnemonicGenerator.generateMany(internalOptions.validators);
+		if (internalOptions.validatorRegistrations) {
+			internalOptions.validators = await this.#deriveValidatorCount(
+				internalOptions.validatorRegistrations,
+				options.validators,
+			);
+		}
+
+		const genesisWalletMnemonic = internalOptions.genesisMnemonic ?? this.mnemonicGenerator.generate();
+		// In presigned mode no validator secrets exist; validators.json is written empty.
+		const validatorsMnemonics = internalOptions.validatorRegistrations
+			? []
+			: (internalOptions.validatorMnemonics ?? this.mnemonicGenerator.generateMany(internalOptions.validators));
 
 		const tasks: Task[] = [
 			{
@@ -115,28 +123,20 @@ export class ConfigurationGenerator {
 				},
 				title: `Preparing directories.`,
 			},
-		];
-
-		if (writeOptions.writeGenesisBlock) {
-			tasks.push({
+			{
 				task: async () => {
 					this.configurationWriter.writeGenesisWallet(
 						await this.walletGenerator.generate(genesisWalletMnemonic),
 					);
 				},
 				title: "Writing genesis-wallet.json in core config path.",
-			});
-		}
-
-		if (writeOptions.writeCrypto) {
-			tasks.push({
+			},
+			{
 				task: async () => {
 					if (options.snapshot) {
-						const importer = this.app.get<Contracts.Snapshot.LegacyImporter>(
-							Identifiers.Snapshot.Legacy.Importer,
-						);
-						await importer.prepare(options.snapshot.path);
-						internalOptions.initialBlockNumber = Number(importer.genesisBlockNumber);
+						await this.importer.prepare(options.snapshot.path);
+						internalOptions.initialBlockNumber = Number(this.importer.genesisBlockNumber);
+						internalOptions.premine = "0";
 					}
 
 					const milestones = this.milestonesGenerator
@@ -153,49 +153,29 @@ export class ConfigurationGenerator {
 								// @ts-ignore
 								block: {
 									number: internalOptions.initialBlockNumber,
+									timestamp: dayjs(internalOptions.epoch).valueOf(),
 								},
 							},
 							milestones,
 							// @ts-ignore
 							network: {
-								chainId: options.chainId,
-								pubKeyHash: options.pubKeyHash || 30,
+								chainId: internalOptions.chainId,
+								client: {
+									explorer: "",
+									symbol: internalOptions.symbol,
+									token: internalOptions.token,
+								},
+								pubKeyHash: internalOptions.pubKeyHash,
 							},
 						},
 						false,
 					);
 
 					if (options.snapshot) {
-						const importer = this.app.get<Contracts.Snapshot.LegacyImporter>(
-							Identifiers.Snapshot.Legacy.Importer,
-						);
 						milestones[0].snapshot = {
-							previousGenesisBlockHash: importer.previousGenesisBlockHash,
-							snapshotHash: importer.snapshotHash,
+							previousGenesisBlockHash: this.importer.previousGenesisBlockHash,
+							snapshotHash: this.importer.snapshotHash,
 						};
-
-						if (importer.validators && options.mockFakeValidatorBlsKeys) {
-							const importedValidatorMnemonics: string[] = [];
-							// create fake mnemonics for testing
-							const consensusKeyPairFactory = this.app.getTagged<Contracts.Crypto.KeyPairFactory>(
-								Identifiers.Cryptography.Identity.KeyPair.Factory,
-								"type",
-								"consensus",
-							);
-
-							for (const validator of importer.validators) {
-								const validatorMnemonic = this.mnemonicGenerator.generateDeterministic(
-									validator.username,
-								);
-								importedValidatorMnemonics.push(validatorMnemonic);
-
-								const consensusKeyPair = await consensusKeyPairFactory.fromMnemonic(validatorMnemonic);
-								validator.blsPublicKey = consensusKeyPair.publicKey;
-							}
-
-							// imported validators are already sorted by descending balance
-							validatorsMnemonics = importedValidatorMnemonics.slice(0, internalOptions.validators);
-						}
 					}
 
 					const genesisBlock = await this.genesisBlockGenerator.generate(
@@ -209,10 +189,11 @@ export class ConfigurationGenerator {
 					this.configurationWriter.writeCrypto(genesisBlock, milestones, network);
 				},
 				title: "Writing crypto.json in core config path.",
-			});
-		}
+			},
+		];
 
-		if (writeOptions.writeSnapshot) {
+		// Only write the snapshot when a snapshot source was provided.
+		if (options.snapshot) {
 			tasks.push({
 				task: async () => {
 					if (!options.snapshot || !options.snapshot.snapshotHash) {
@@ -226,93 +207,157 @@ export class ConfigurationGenerator {
 			});
 		}
 
-		if (writeOptions.writePeers) {
-			tasks.push({
+		tasks.push(
+			{
 				task: async () => {
 					this.configurationWriter.writePeers(
 						this.peersGenerator.generate(internalOptions.coreP2PPort, internalOptions.peers),
 					);
 				},
 				title: "Writing peers.json in core config path.",
-			});
-		}
-
-		if (writeOptions.writeValidators) {
-			tasks.push(
-				{
-					task: async () => {
-						this.configurationWriter.writeValidators(validatorsMnemonics);
-					},
-					title: "Writing validators.json in core config path.",
+			},
+			{
+				task: async () => {
+					this.configurationWriter.writeValidators(validatorsMnemonics);
 				},
-				{
-					task: async () => {
-						this.configurationWriter.writeEnvironment(
-							this.environmentGenerator
-								.addInitialRecords()
-								.addRecords(this.#preparteEnvironmentOptions(internalOptions))
-								.generate(),
-						);
-					},
-					title: "Writing .env in core config path.",
+				title: "Writing validators.json in core config path.",
+			},
+			{
+				task: async () => {
+					this.configurationWriter.writeEnvironment(
+						this.environmentGenerator
+							.addInitialRecords()
+							.addRecords(this.#prepareEnvironmentOptions(internalOptions))
+							.generate(),
+					);
 				},
-			);
-		}
-
-		if (writeOptions.writeApp) {
-			tasks.push({
+				title: "Writing .env in core config path.",
+			},
+			{
 				task: async () => {
 					this.configurationWriter.writeApp(this.appGenerator.generate(internalOptions));
 				},
 				title: "Writing app.json in core config path.",
-			});
-		}
-
-		let logger: Contracts.Kernel.Logger | undefined;
-		if (this.app.isBound(Identifiers.Services.Log.Service)) {
-			logger = this.app.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service);
-		}
+			},
+		);
 
 		for (const task of tasks) {
-			logger?.info(task.title);
+			this.logger.info(task.title);
 			await task.task();
 		}
 
-		logger?.info(`Configuration generated on location: ${this.configurationPath}`);
+		this.logger.info(`Configuration generated on location: ${this.configurationPath}`);
 	}
 
-	#preparteEnvironmentOptions(options: Contracts.NetworkGenerator.InternalOptions): EnvironmentData {
-		const data: EnvironmentData = {
-			MAINSAIL_API_EVM_HOST: "127.0.0.1",
-
-			MAINSAIL_API_EVM_PORT: 4008,
-
-			MAINSAIL_API_TRANSACTION_POOL_HOST: "127.0.0.1",
-
-			MAINSAIL_API_TRANSACTION_POOL_PORT: 4007,
-
-			MAINSAIL_CRYPTO_WORKER_COUNT: 2,
-			// MAINSAIL_DB_HOST: options.coreDBHost,
-			// MAINSAIL_DB_PORT: options.coreDBPort,
-			MAINSAIL_P2P_PORT: options.coreP2PPort,
-			MAINSAIL_WEBHOOKS_PORT: options.coreWebhooksPort,
-		};
-
-		if (options.mockFakeValidatorBlsKeys) {
-			data.MAINSAIL_SNAPSHOT_MOCK_FAKE_VALIDATOR_BLS_KEYS = "1";
+	#assertCustomSecrets(options: Contracts.NetworkGenerator.InternalOptions): void {
+		if (options.genesisMnemonic !== undefined) {
+			assertMnemonic(options.genesisMnemonic, "genesisMnemonic");
 		}
 
-		// if (options.coreDBDatabase) {
-		// 	data.MAINSAIL_DB_DATABASE = options.coreDBDatabase;
-		// }
+		this.#assertValidatorRegistrations(options);
 
-		// if (options.coreDBUsername) {
-		// 	data.MAINSAIL_DB_USERNAME = options.coreDBUsername;
-		// }
+		if (options.validatorMnemonics !== undefined) {
+			if (!Array.isArray(options.validatorMnemonics) || options.validatorMnemonics.length === 0) {
+				throw new Error("validatorMnemonics must be a non-empty array.");
+			}
 
-		// if (options.coreDBPassword) {
-		// 	data.MAINSAIL_DB_PASSWORD = options.coreDBDatabase;
-		// }
+			if (options.validatorMnemonics.length !== options.validators) {
+				throw new Error(
+					`validatorMnemonics length (${options.validatorMnemonics.length}) does not match the validators count (${options.validators}).`,
+				);
+			}
+
+			for (const [index, mnemonic] of options.validatorMnemonics.entries()) {
+				assertMnemonic(mnemonic, `validatorMnemonics[${index}]`);
+			}
+
+			const unique = new Set(options.validatorMnemonics);
+			if (unique.size !== options.validatorMnemonics.length) {
+				throw new Error("validatorMnemonics contains duplicate entries.");
+			}
+
+			if (options.genesisMnemonic !== undefined && unique.has(options.genesisMnemonic)) {
+				throw new Error("genesisMnemonic must not also be a validator mnemonic.");
+			}
+		}
+	}
+
+	#assertValidatorRegistrations(options: Contracts.NetworkGenerator.InternalOptions): void {
+		if (options.validatorRegistrations === undefined) {
+			return;
+		}
+
+		if (options.validatorMnemonics !== undefined) {
+			throw new Error("validatorMnemonics and validatorRegistrations are mutually exclusive.");
+		}
+
+		if (!Array.isArray(options.validatorRegistrations) || options.validatorRegistrations.length === 0) {
+			throw new Error("validatorRegistrations must be a non-empty array.");
+		}
+
+		for (const [index, transaction] of options.validatorRegistrations.entries()) {
+			if (typeof transaction !== "string" || transaction.length === 0) {
+				throw new Error(`validatorRegistrations[${index}] must be a hex-encoded serialized transaction.`);
+			}
+		}
+
+		if (new Set(options.validatorRegistrations).size !== options.validatorRegistrations.length) {
+			throw new Error("validatorRegistrations contains duplicate entries.");
+		}
+	}
+
+	async #deriveValidatorCount(validatorRegistrations: string[], explicitValidators?: number): Promise<number> {
+		const consensusContractAddress = this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus);
+
+		for (const [index, transaction] of validatorRegistrations.entries()) {
+			let data: Contracts.Crypto.TransactionSerializable;
+			try {
+				({ data } = await this.transactionDeserializer.deserialize(Buffer.from(transaction, "hex")));
+			} catch (error) {
+				throw new Error(
+					`validatorRegistrations[${index}] cannot be deserialized: ${ensureError(error).message}`,
+				);
+			}
+
+			if (
+				data.to !== consensusContractAddress ||
+				!data.data.startsWith(FunctionSigs.ConsensusV1.RegisterValidator)
+			) {
+				throw new Error(
+					`validatorRegistrations[${index}] is not a registerValidator call to the consensus contract.`,
+				);
+			}
+		}
+
+		const registrations = validatorRegistrations.length;
+
+		if (explicitValidators !== undefined && explicitValidators !== registrations) {
+			throw new Error(
+				`validatorRegistrations length (${registrations}) does not match the validators count (${explicitValidators}).`,
+			);
+		}
+
+		return registrations;
+	}
+
+	#prepareEnvironmentOptions(options: Contracts.NetworkGenerator.InternalOptions): EnvironmentData {
+		const data: EnvironmentData = {
+			MAINSAIL_P2P_PORT: options.coreP2PPort,
+		};
+
+		if (
+			options.coreDBHost &&
+			options.coreDBPort &&
+			options.coreDBUsername &&
+			options.coreDBPassword &&
+			options.coreDBDatabase
+		) {
+			data.MAINSAIL_DB_HOST = options.coreDBHost;
+			data.MAINSAIL_DB_PORT = options.coreDBPort;
+			data.MAINSAIL_DB_USERNAME = options.coreDBUsername;
+			data.MAINSAIL_DB_PASSWORD = options.coreDBPassword;
+			data.MAINSAIL_DB_DATABASE = options.coreDBDatabase;
+		}
 
 		return data;
 	}

@@ -18,6 +18,9 @@ jobs:
     circular:
         uses: ./.github/workflows/_circular.yml
 
+    dead-injects:
+        uses: ./.github/workflows/_dead-injects.yml
+
     check-commit-count:
         uses: ./.github/workflows/_check-commit-count.yml
         permissions:
@@ -49,6 +52,7 @@ jobs:
             - circular
             - check-commit-count
             - contracts
+            - dead-injects
             - lint-internal
             - lint-external
         if: ${{ !cancelled() }}
@@ -63,6 +67,7 @@ jobs:
                   LINT_INTERNAL_DID_COMMIT: ${{ needs.lint-internal.outputs.did_commit }}
                   LINT_EXTERNAL_RESULT: ${{ needs.lint-external.result }}
                   DEPENDENCIES_RESULT: ${{ needs.dependencies.result }}
+                  DEAD_INJECTS_RESULT: ${{ needs.dead-injects.result }}
                   CIRCULAR_RESULT: ${{ needs.circular.result }}
                   COMMIT_COUNT_RESULT: ${{ needs.check-commit-count.result }}
                   CONTRACTS_RESULT: ${{ needs.contracts.result }}
@@ -78,7 +83,7 @@ jobs:
                   fi
 
                   other_checks_ok=true
-                  for result in "$DEPENDENCIES_RESULT" "$CIRCULAR_RESULT" "$COMMIT_COUNT_RESULT" "$CONTRACTS_RESULT"; do
+                  for result in "$DEPENDENCIES_RESULT" "$DEAD_INJECTS_RESULT" "$CIRCULAR_RESULT" "$COMMIT_COUNT_RESULT" "$CONTRACTS_RESULT"; do
                     if [[ "$result" != "success" ]]; then
                       other_checks_ok=false
                     fi

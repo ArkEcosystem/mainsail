@@ -20,6 +20,7 @@ export interface BlockHeaderStorageData {
 	readonly payloadSize: number;
 	readonly transactionsRoot: string;
 	readonly proposer: string;
+	readonly randaoReveal: string;
 }
 
 export interface TransactionStorageData {
@@ -52,10 +53,15 @@ export interface CommitStorageData {
 
 export interface Storage {
 	getState(): Promise<{ blockNumber: number; totalRound: number }>;
-	getBlockHeaderData(blockNumber: number): Promise<BlockHeaderStorageData | undefined | null>;
-	getBlockNumberByHash(blockHash: string): Promise<number | undefined | null>;
-	getCommitData(blockNumber: number): Promise<CommitStorageData | undefined | null>;
-	getTransactionData(key: string): Promise<TransactionStorageData | undefined | null>;
-	getTransactionKeyByHash(txHash: string): Promise<string | undefined | null>;
+	getBlockHeaderData(blockNumber: number): Promise<BlockHeaderStorageData | undefined>;
+	getBlockNumberByHash(blockHash: string): Promise<number | undefined>;
+	getCommitData(blockNumber: number): Promise<CommitStorageData | undefined>;
+	getCommitsByBlockRange(
+		fromBlockNumber: number,
+		toBlockNumber: number,
+		maxBytes: number,
+	): Promise<CommitStorageData[]>;
+	getTransactionData(key: string): Promise<TransactionStorageData | undefined>;
+	getTransactionKeyByHash(txHash: string): Promise<string | undefined>;
 	isEmpty(): Promise<boolean>;
 }

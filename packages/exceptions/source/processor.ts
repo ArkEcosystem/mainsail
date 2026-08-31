@@ -74,6 +74,12 @@ export class FutureBlock extends ValidatorException {
 	}
 }
 
+export class InvalidRandaoReveal extends ValidatorException {
+	public constructor(block: Contracts.Crypto.Block) {
+		super(`Block ${block.hash} has an invalid randao reveal for proposer ${block.proposer}.`);
+	}
+}
+
 export class InvalidGenerator extends ValidatorException {
 	public constructor(block: Contracts.Crypto.Block, expectedValidator: string) {
 		super(`Block ${block.hash} has invalid generator. Proposer is ${block.proposer} instead ${expectedValidator}.`);

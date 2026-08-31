@@ -1,3 +1,4 @@
+import { InvalidCriteria } from "@mainsail/exceptions";
 import { isObject } from "@mainsail/utils";
 
 import type { Wallet } from "../../models/index.js";
@@ -33,7 +34,7 @@ export class WalletFilter {
 				case "balance": {
 					return handleOrCriteria(criteria.balance, async (c) =>
 						// @ts-ignore
-						handleComparisonCriteria("nonce", c),
+						handleComparisonCriteria("balance", c),
 					);
 				}
 				case "nonce": {
@@ -71,6 +72,13 @@ export class WalletFilter {
 		};
 	}
 
+	// jsonb attribute keys are interpolated into the SQL path expression, so restrict them to a
+	// safe identifier-path charset. This rejects quotes/operators an attacker could use for
+	// injection before the key reaches the query builder (defense-in-depth alongside the
+	// literal-escaping in QueryHelper.getColumnName). Real attributes are dotted identifier paths
+	// (e.g. "validatorLastBlock.number"), so this does not constrain legitimate queries.
+	private static readonly attributeKeyRegex = /^[A-Za-z0-9_]+(\.[A-Za-z0-9_]+)*$/;
+
 	public static async handleAttributesCriteria(
 		criteria: Record<string, NumericCriteria<string>>,
 	): Promise<OrExpression<Wallet>> {
@@ -83,6 +91,10 @@ export class WalletFilter {
 						const nestedAttribute = Object.keys(v)[0];
 						k = `${k}.${nestedAttribute}`;
 						v = v[nestedAttribute];
+					}
+
+					if (!this.attributeKeyRegex.test(k)) {
+						throw new InvalidCriteria(`Invalid attribute key '${k}'`);
 					}
 
 					return handleComparisonCriteria<Wallet, "attributes">("attributes", v, {

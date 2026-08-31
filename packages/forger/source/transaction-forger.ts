@@ -1,8 +1,9 @@
 import type { Contracts } from "@mainsail/contracts";
 
+import { getPrevrandao } from "@mainsail/blockchain-utils";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
+import { ensureError } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { TransactionIterable } from "./transaction-iterable.js";
@@ -30,17 +31,17 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	@tagged("instance", "validator")
 	private readonly evm!: Contracts.Evm.Instance;
 
+	@inject(Identifiers.Cryptography.Hash.Factory)
+	private readonly hashFactory!: Contracts.Crypto.HashFactory;
+
 	@inject(Identifiers.State.Store)
 	protected readonly stateStore!: Contracts.State.Store;
 
-	@inject(EvmConsensusIdentifiers.Internal.GenesisInfo)
+	@inject(Identifiers.EvmConsensus.GenesisInfo)
 	private readonly genesisInfo!: Contracts.Evm.GenesisInfo;
 
 	@inject(Identifiers.BlockchainUtils.RoundCalculator)
 	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
-
-	@inject(Identifiers.Transaction.Handler)
-	private readonly transactionHandler!: Contracts.Transactions.TransactionHandler;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
@@ -90,11 +91,20 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	}> {
 		try {
 			await this.evm.initializeGenesis(this.genesisInfo);
-			await this.evm.prepareNextCommit({ commitKey: this.#commitKey });
+			await this.evm.prepareNextCommit({
+				blockContext: {
+					commitKey: this.#commitKey,
+					gasLimit: BigInt(this.#milestone.block.maxGasLimit),
+					prevrandao: getPrevrandao(this.hashFactory, this.#previousBlock),
+					timestamp: BigInt(this.#timestamp),
+					validatorAddress: this.#generatorAddress,
+				},
+			});
 
 			const { fee, gasUsed, transactions } = await this.#processTransactions();
 
 			await this.#updateRewardsAndVotes();
+			await this.#updateValidatorRegistrationFee();
 			await this.#calculateRoundValidators();
 
 			return {
@@ -144,8 +154,10 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 		transaction: Contracts.Crypto.Transaction,
 		result: ProcessTransactionResult,
 	): Promise<void> {
+		const optimisticExecution = result.gasLeft - transaction.gasLimit < 0;
+		let snapshotTaken = false;
+
 		try {
-			const optimisticExecution = result.gasLeft - transaction.gasLimit < 0;
 			if (optimisticExecution) {
 				// Optimistically execute transaction even if the gas limit exceeds the remaining
 				// block space since there's possibly still space to fit the actual gas consumed.
@@ -157,6 +169,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 				);
 
 				await this.evm.snapshot(this.#commitKey);
+				snapshotTaken = true;
 			}
 
 			const validation = await this.#validateTransaction(transaction);
@@ -169,7 +182,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 					`Skipping tx ${transaction.hash} due to insufficient block space (tx.gasUsed=${gasUsed} gasLeft=${transaction.gasLimit} optimistic=${optimisticExecution})`,
 				);
 
-				if (optimisticExecution) {
+				if (snapshotTaken) {
 					await this.evm.rollback(this.#commitKey);
 					return;
 				} else {
@@ -183,26 +196,40 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 			result.gasUsed += gasUsed;
 			result.fee += this.gasFeeCalculator.calculateConsumed(transaction.gasPrice, validation.gasUsed);
 			result.transactions.push(transaction);
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
+
+			// Ensure unexpected errors keep the evm in a consistent state.
+			if (snapshotTaken) {
+				try {
+					await this.evm.rollback(this.#commitKey);
+				} catch (innerError) {
+					this.logger.warn(
+						`rollback failed after failed tx ${transaction.hash}: ${ensureError(innerError).message}`,
+					);
+				}
+			}
+
 			await this.#handleFailedTransaction(transaction, error as Error);
 		}
 	}
 
 	async #validateTransaction(transaction: Contracts.Crypto.Transaction): Promise<Contracts.Evm.TransactionReceipt> {
-		return await this.transactionHandler.apply(
-			{
-				evm: {
-					blockContext: {
-						commitKey: this.#commitKey,
-						gasLimit: BigInt(this.#milestone.block.maxGasLimit),
-						timestamp: BigInt(this.#timestamp),
-						validatorAddress: this.#generatorAddress,
-					},
-					instance: this.evm,
-				},
-			},
-			transaction,
-		);
+		const { receipt } = await this.evm.process({
+			commitKey: this.#commitKey,
+			data: Buffer.from(transaction.data.slice(2), "hex"),
+			from: transaction.from,
+			gasLimit: BigInt(transaction.gasLimit),
+			gasPrice: BigInt(transaction.gasPrice),
+			legacyAddress: transaction.senderLegacyAddress,
+			nonce: transaction.nonce,
+			specId: this.cryptoConfiguration.getMilestone().evmSpec,
+			to: transaction.to,
+			txHash: transaction.hash,
+			value: transaction.value,
+		});
+
+		return receipt;
 	}
 
 	async #handleFailedTransaction(transaction: Contracts.Crypto.Transaction, error: Error): Promise<void> {
@@ -222,14 +249,30 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 		});
 	}
 
+	async #updateValidatorRegistrationFee(): Promise<void> {
+		if (this.roundCalculator.isNewRound(this.#previousBlock.number + 2)) {
+			const { evmSpec, validatorRegistrationFee } = this.cryptoConfiguration.getMilestone(
+				this.#previousBlock.number + 2,
+			);
+
+			await this.evm.updateValidatorRegistrationFee({
+				commitKey: this.#commitKey,
+				fee: BigInt(validatorRegistrationFee),
+				specId: evmSpec,
+				timestamp: BigInt(this.#timestamp),
+				validatorAddress: this.#generatorAddress,
+			});
+		}
+	}
+
 	async #calculateRoundValidators(): Promise<void> {
 		if (this.roundCalculator.isNewRound(this.#previousBlock.number + 2)) {
-			const { roundValidators } = this.cryptoConfiguration.getMilestone(this.#previousBlock.number + 2);
+			const { evmSpec, roundValidators } = this.cryptoConfiguration.getMilestone(this.#previousBlock.number + 2);
 
 			await this.evm.calculateRoundValidators({
 				commitKey: this.#commitKey,
 				roundValidators: BigInt(roundValidators),
-				specId: this.#milestone.evmSpec,
+				specId: evmSpec,
 				timestamp: BigInt(this.#timestamp),
 				validatorAddress: this.#generatorAddress,
 			});

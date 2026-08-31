@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
-pragma solidity ^0.8.27;
+pragma solidity ^0.8.36;
 
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
@@ -79,7 +79,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     error ValidatorAlreadyRegistered();
     error ValidatorAlreadyResigned();
     error BellowMinValidators();
-    error NoActiveValidators();
+    error InsufficientActiveValidators(uint256 available, uint256 required);
 
     error BlsKeyAlreadyRegistered();
     error BlsKeyIsInvalid();
@@ -91,7 +91,6 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     error AlreadyVoted();
     error MissingVote();
 
-    error InvalidRange(uint256 min, uint256 max);
     error InvalidParameters();
     error ImportIsNotAllowed();
 
@@ -129,12 +128,15 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     // External functions
     function setFee(uint128 registrationFee) external onlyOwner {
+        if (_fee == registrationFee) {
+            return;
+        }
+
         _fee = registrationFee;
         emit FeeUpdated(registrationFee);
     }
 
-    // TODO: import validator without bls public key
-    function addValidator(address addr, bytes calldata blsPublicKey, bool isResigned) external onlyOwner {
+    function addValidator(address addr, bool isResigned) external onlyOwner {
         if (_rounds.length > 0) {
             revert ImportIsNotAllowed();
         }
@@ -143,17 +145,8 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             revert ValidatorAlreadyRegistered();
         }
 
-        if (_blsPublicKeys[keccak256(blsPublicKey)]) {
-            revert BlsKeyAlreadyRegistered();
-        }
-
-        // Allow empty blsPublicKey for imports
-        if (blsPublicKey.length != 0) {
-            _verifyAndRegisterBlsPublicKey(blsPublicKey);
-        }
-
         ValidatorData memory validator =
-            ValidatorData({votersCount: 0, voteBalance: 0, fee: 0, isResigned: isResigned, blsPublicKey: blsPublicKey});
+            ValidatorData({votersCount: 0, voteBalance: 0, fee: 0, isResigned: isResigned, blsPublicKey: ""});
 
         _hasValidator[addr] = true;
         _validatorsData[addr] = validator;
@@ -163,11 +156,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             _resignedValidatorsCount++;
         }
 
-        if (_canBecomeActiveValidator(addr)) {
-            _addActiveValidator(addr);
-        }
-
-        emit ValidatorRegistered(addr, blsPublicKey);
+        emit ValidatorRegistered(addr, "");
     }
 
     function addVotes(address[] calldata voters, address[] calldata validators) external onlyOwner {
@@ -346,15 +335,9 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
         _minValidators = n;
 
-        _shuffle();
         _deleteRoundValidators();
 
         _roundValidatorsHead = address(0);
-        uint8 top = uint8(_clamp(n, 0, _activeValidators.length));
-
-        if (top == 0) {
-            revert NoActiveValidators();
-        }
 
         for (uint256 i = 0; i < _activeValidators.length; i++) {
             address addr = _activeValidators[i];
@@ -371,8 +354,8 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
                 continue;
             }
 
-            if (_roundValidatorsCount < top) {
-                _insertValidator(addr, top);
+            if (_roundValidatorsCount < n) {
+                _insertValidator(addr, n);
                 continue;
             }
 
@@ -381,31 +364,38 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             if (_isGreater(
                     Validator({addr: addr, data: data}), Validator({addr: _roundValidatorsHead, data: headData})
                 )) {
-                _insertValidator(addr, top);
+                _insertValidator(addr, n);
             }
         }
 
-        if (_roundValidatorsCount == 0) {
-            revert NoActiveValidators();
+        // A round must consist of exactly `n` DISTINCT validators. With fewer eligible active
+        // validators (including none at all), padding the round by repeating a validator across
+        // slots would orphan those slots: a validator only signs consensus messages under a
+        // single validatorIndex, so the duplicated slots never vote and the round cannot reach
+        // the +2/3 threshold. Fail loudly instead.
+        if (_roundValidatorsCount < n) {
+            revert InsufficientActiveValidators(_roundValidatorsCount, n);
         }
 
-        // Prepare temp array. Used when _roundValidatorsCount < _minValidators
+        // Materialize the sorted list so the slot order can be shuffled; the shuffled index
+        // becomes each validator's validatorIndex for the round. The count check above
+        // guarantees exactly `n` entries.
         address next = _roundValidatorsHead;
-        address[] memory tmpValidators = new address[](_roundValidatorsCount);
+        address[] memory shuffledValidators = new address[](n);
 
-        for (uint256 i = 0; i < _roundValidatorsCount; i++) {
-            tmpValidators[i] = next;
+        for (uint256 i = 0; i < n; i++) {
+            shuffledValidators[i] = next;
             next = _roundValidatorsMap[next];
         }
-        _shuffleMem(tmpValidators);
+        _shuffleMem(shuffledValidators);
 
-        // Fill round & _roundValidators
+        // Fill round & _roundValidators with `n` distinct validators — no slot is ever duplicated.
         RoundValidator[] storage round = _rounds.push();
         delete _roundValidators;
-        _roundValidators = new address[](_minValidators);
+        _roundValidators = new address[](n);
 
-        for (uint256 i = 0; i < _minValidators; i++) {
-            address addr = tmpValidators[i % _roundValidatorsCount];
+        for (uint256 i = 0; i < n; i++) {
+            address addr = shuffledValidators[i];
             _roundValidators[i] = addr;
             round.push(RoundValidator({addr: addr, voteBalance: _validatorsData[addr].voteBalance}));
         }
@@ -475,7 +465,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function getVotes(address addr, uint256 count) external view onlyOwner returns (VoteResult[] memory) {
-        VoteResult[] memory voters = new VoteResult[](_clamp(count, 0, _votersCount));
+        VoteResult[] memory voters = new VoteResult[](_min(count, _votersCount));
 
         address next = _votersHead;
 
@@ -524,48 +514,6 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     // Internal functions
-    function _shuffle() internal {
-        uint256 n = _activeValidators.length;
-        if (n == 0) {
-            return;
-        }
-
-        for (uint256 i = n - 1; i > 0; i--) {
-            // Get a random index between 0 and i (inclusive)
-            uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, i))) % (i + 1);
-
-            if (i == j) {
-                continue; // No need to swap if indices are the same
-            }
-
-            /* Swap example
-            i = 0; j = 2;
-
-            Initial state
-            A B C
-            A:0 B:1 C:2
-
-            Array SWAP
-            C B A
-            A:0 B:1 C:2
-
-            Index SWAP
-            C B A
-            A:2 B:1 C:0
-            */
-
-            // Swap elements at index i and j
-            address addrA = _activeValidators[i];
-            address addrB = _activeValidators[j];
-
-            _activeValidators[i] = _activeValidators[j];
-            _activeValidators[j] = addrA;
-
-            _activeValidatorIndex[addrA] = j;
-            _activeValidatorIndex[addrB] = i;
-        }
-    }
-
     function _shuffleMem(address[] memory array) internal view {
         uint256 n = array.length;
         if (n == 0) {
@@ -574,7 +522,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
         for (uint256 i = n - 1; i > 0; i--) {
             // Get a random index between 0 and i (inclusive)
-            uint256 j = uint256(keccak256(abi.encodePacked(block.timestamp, i))) % (i + 1);
+            uint256 j = uint256(keccak256(abi.encodePacked(block.prevrandao, i))) % (i + 1);
 
             // Swap elements at index i and j
             address temp = array[i];
@@ -698,8 +646,8 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             _voters[voter.prev].next = address(0);
             _votersTail = voter.prev;
         } else if (_votersHead == msg.sender) {
-            _voters[_votersTail].prev = address(0);
-            _votersHead = _voters[_votersHead].next;
+            _voters[voter.next].prev = address(0);
+            _votersHead = voter.next;
         } else {
             _voters[voter.prev].next = voter.next;
             _voters[voter.next].prev = voter.prev;
@@ -764,17 +712,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         return validatorA.data.voteBalance > validatorB.data.voteBalance;
     }
 
-    function _clamp(uint256 value, uint256 min, uint256 max) internal pure returns (uint256) {
-        if (min > max) {
-            revert InvalidRange(min, max);
-        }
-
-        if (value < min) {
-            return min;
-        } else if (value > max) {
-            return max;
-        } else {
-            return value;
-        }
+    function _min(uint256 valueA, uint256 valueB) internal pure returns (uint256) {
+        return valueA < valueB ? valueA : valueB;
     }
 }

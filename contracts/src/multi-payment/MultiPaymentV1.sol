@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GNU GENERAL PUBLIC LICENSE
-pragma solidity ^0.8.27;
+pragma solidity ^0.8.36;
 
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";

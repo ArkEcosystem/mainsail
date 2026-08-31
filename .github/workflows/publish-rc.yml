@@ -26,34 +26,23 @@ jobs:
                       docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
                       build: rustup update stable && npm i -g pnpm --force && cd ./packages/evm && pnpm run build-napi --target x86_64-unknown-linux-gnu
                     - host: ubuntu-latest
-                      target: x86_64-unknown-linux-musl
-                      docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-                      build: rustup update stable && cd ./packages/evm && pnpm run build-napi --target x86_64-unknown-linux-musl
-                    - host: ubuntu-latest
                       target: aarch64-unknown-linux-gnu
                       docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
                       build: rustup update stable && npm i -g pnpm --force && cd ./packages/evm && pnpm run build-napi --target aarch64-unknown-linux-gnu
-                    - host: ubuntu-latest
-                      target: aarch64-unknown-linux-musl
-                      docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-alpine
-                      build: |-
-                          set -e &&
-                          rustup target add aarch64-unknown-linux-musl &&
-                          rustup update stable && cd ./packages/evm && pnpm run build-napi --target aarch64-unknown-linux-musl
 
         name: stable - ${{ matrix.settings.target }} - node@20
         runs-on: ${{ matrix.settings.host }}
 
         steps:
-            - uses: actions/checkout@v6.0.2
+            - uses: actions/checkout@v7.0.1
 
             - name: Setup node
-              uses: actions/setup-node@v6.3.0
+              uses: actions/setup-node@v7.0.0
               with:
                   node-version: "24.x"
 
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4.3.0
+              uses: pnpm/action-setup@v6.0.10
               with:
                   run_install: false
                   version: latest
@@ -63,7 +52,7 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache@v5.0.3
+              uses: actions/cache@v6.1.0
               with:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -81,7 +70,7 @@ jobs:
                   run: ${{ matrix.settings.build }}
 
             - name: Upload artifact
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v7.0.1
               with:
                   name: bindings-${{ matrix.settings.target }}
                   path: ./packages/evm/${{ env.APP_NAME }}.*.node
@@ -94,16 +83,16 @@ jobs:
         needs:
             - build
         steps:
-            - uses: actions/checkout@v6.0.2
+            - uses: actions/checkout@v7.0.1
 
             - name: Setup node
-              uses: actions/setup-node@v6.3.0
+              uses: actions/setup-node@v7.0.0
               with:
                   node-version: "24.x"
                   registry-url: https://registry.npmjs.org/
 
             - name: Setup pnpm
-              uses: pnpm/action-setup@v4.3.0
+              uses: pnpm/action-setup@v6.0.10
               with:
                   run_install: false
                   version: latest
@@ -113,7 +102,7 @@ jobs:
               run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
               shell: bash
             - name: Cache pnpm modules
-              uses: actions/cache@v5.0.3
+              uses: actions/cache@v6.1.0
               with:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
@@ -130,7 +119,7 @@ jobs:
               run: pnpm run build
 
             - name: Download all artifacts
-              uses: actions/download-artifact@v4
+              uses: actions/download-artifact@v8.0.1
               with:
                   path: ./packages/evm/artifacts
 
@@ -142,6 +131,11 @@ jobs:
               working-directory: ./packages/evm
               run: ls -R ./npm
               shell: bash
+
+            - name: Publish native to NPM
+              run: pnpm run release:native -- --publish-branch=develop --tag=rc --no-git-checks
+              env:
+                  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
             - name: Publish to NPM
               run: |

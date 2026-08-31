@@ -13,16 +13,6 @@ export class StubServiceProvider extends ServiceProvider {
 	}
 }
 
-export class RequiredServiceProvider extends ServiceProvider {
-	public name(): string {
-		return "stub";
-	}
-
-	public async required(): Promise<boolean> {
-		return true;
-	}
-}
-
 export class InvalidConfigurationServiceProvider extends ServiceProvider {
 	public name(): string {
 		return "stub";
@@ -32,22 +22,6 @@ export class InvalidConfigurationServiceProvider extends ServiceProvider {
 		return Joi.object({
 			username: Joi.string().required(),
 		});
-	}
-}
-
-export class RequiredInvalidConfigurationServiceProvider extends ServiceProvider {
-	public name(): string {
-		return "stub";
-	}
-
-	public configSchema(): object {
-		return Joi.object({
-			username: Joi.string().required(),
-		});
-	}
-
-	public async required(): Promise<boolean> {
-		return true;
 	}
 }
 
@@ -73,7 +47,7 @@ export class RequiredDependencyCanBeFoundServiceProvider extends ServiceProvider
 	}
 
 	public dependencies(): PluginDependency[] {
-		return [{ name: "dep", required: true }];
+		return [{ name: "dep" }];
 	}
 }
 
@@ -83,27 +57,7 @@ export class RequiredDependencyCannotBeFoundServiceProvider extends ServiceProvi
 	}
 
 	public dependencies(): PluginDependency[] {
-		return [{ name: "deps-required", required: true }];
-	}
-}
-
-export class RequiredDependencyCannotBeFoundAsyncServiceProvider extends ServiceProvider {
-	public name(): string {
-		return "stub";
-	}
-
-	public dependencies(): PluginDependency[] {
-		return [{ name: "deps-required", required: async () => true }];
-	}
-}
-
-export class OptionalDependencyCannotBeFoundServiceProvider extends ServiceProvider {
-	public name(): string {
-		return "stub";
-	}
-
-	public dependencies(): PluginDependency[] {
-		return [{ name: "deps-optional" }];
+		return [{ name: "deps-required" }];
 	}
 }
 
@@ -113,21 +67,11 @@ export class RequiredDependencyVersionCanBeSatisfiedServiceProvider extends Serv
 	}
 
 	public dependencies(): PluginDependency[] {
-		return [{ name: "dep", required: true, version: "<=2.0.0" }];
+		return [{ name: "dep", version: "<=2.0.0" }];
 	}
 }
 
 export class RequiredDependencyVersionCannotBeSatisfiedServiceProvider extends ServiceProvider {
-	public name(): string {
-		return "stub";
-	}
-
-	public dependencies(): PluginDependency[] {
-		return [{ name: "dep", required: true, version: ">=2.0.0" }];
-	}
-}
-
-export class OptionalDependencyVersionCannotBeSatisfiedServiceProvider extends ServiceProvider {
 	public name(): string {
 		return "stub";
 	}
@@ -148,20 +92,6 @@ export class FaultyBootServiceProvider extends ServiceProvider {
 
 	public version(): string {
 		return "version";
-	}
-}
-
-export class RequiredFaultyBootServiceProvider extends ServiceProvider {
-	public async boot(): Promise<void> {
-		throw new Error("Boot Error");
-	}
-
-	public name(): string {
-		return "stub";
-	}
-
-	public async required(): Promise<boolean> {
-		return true;
 	}
 }
 

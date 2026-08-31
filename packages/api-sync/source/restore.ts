@@ -7,7 +7,6 @@ import {
 } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import { Deployer, Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { parseTransactionError } from "@mainsail/evm-contracts";
 import { assert, chunk, formatEcdsaSignature, validatorSetPack } from "@mainsail/utils";
 import { performance } from "perf_hooks";
@@ -149,6 +148,12 @@ export class Restore {
 	@inject(Identifiers.Evm.ContractService.Consensus)
 	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
 
+	@inject(Identifiers.EvmConsensus.Contracts.MultiPayment)
+	private readonly multiPaymentContractAddress!: string;
+
+	@inject(Identifiers.EvmConsensus.Contracts.Usernames)
+	private readonly usernameContractAddress!: string;
+
 	@inject(Identifiers.ApiSync.TokenParser)
 	private readonly tokenParser!: TokenParser;
 
@@ -158,6 +163,10 @@ export class Restore {
 	@inject(Identifiers.Snapshot.Legacy.Importer)
 	@optional()
 	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
+
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "api-sync")
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	public async restore(): Promise<void> {
 		const isEmpty = await this.databaseService.isEmpty();
@@ -240,10 +249,7 @@ export class Restore {
 			// 7) Write `state` table
 			await this.#ingestState(context);
 
-			// 8) Write `contracts` table
-			await this.#ingestContracts(context);
-
-			// 9) Write captured data from plugins, configuration, etc.
+			// 8) Write captured data from plugins, configuration, etc.
 			await this.listeners.flush(entityManager);
 
 			restoredHeight = context.lastBlockNumber;
@@ -299,8 +305,8 @@ export class Restore {
 			validatorRounds,
 		} = context;
 
-		const BATCH_SIZE = 1000;
-		const CHUNK_SIZE = 1000;
+		const BATCH_SIZE = this.pluginConfiguration.getRequired<number>("restore.blocks.batchSize");
+		const CHUNK_SIZE = BATCH_SIZE;
 		const t0 = performance.now();
 
 		const genesisBlockNumber = this.configuration.getGenesisHeight();
@@ -308,18 +314,34 @@ export class Restore {
 
 		let ingestedBlocks = 0;
 		let ingestedTransactions = 0;
-
-		const multiPaymentContractAddress = this.app.get<string>(
-			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
-		);
-
-		const usernameContractAddress = this.app.get<string>(EvmConsensusIdentifiers.Contracts.Addresses.Usernames);
+		let totalRound = 0;
 
 		do {
 			const fromBlockNumber = Math.min(currentBlockNumber, mostRecentCommit.block.number);
 			const toBlockNumber = Math.min(currentBlockNumber + BATCH_SIZE - 1, mostRecentCommit.block.number);
 
-			const commits = this.databaseService.readCommits(fromBlockNumber, toBlockNumber);
+			const commits = this.databaseService.readCommits(fromBlockNumber, toBlockNumber, Number.MAX_SAFE_INTEGER);
+
+			// Prefetch every receipt for the batch in a single read
+			const { receipts: batchReceipts } = await this.evm.getReceiptsByBlockRange(
+				BigInt(fromBlockNumber),
+				BigInt(toBlockNumber),
+			);
+
+			const receiptsByBlock = new Map<number, Record<string, Contracts.Evm.TransactionReceipt>>();
+			for (const receipt of batchReceipts) {
+				assert.defined(receipt.blockNumber);
+				assert.defined(receipt.txHash);
+
+				const blockNumber = Number(receipt.blockNumber);
+				let blockReceipts = receiptsByBlock.get(blockNumber);
+				if (!blockReceipts) {
+					blockReceipts = {};
+					receiptsByBlock.set(blockNumber, blockReceipts);
+				}
+
+				blockReceipts[receipt.txHash] = receipt;
+			}
 
 			const blocks: Models.Block[] = [];
 			const transactions: Models.Transaction[] = [];
@@ -383,7 +405,6 @@ export class Restore {
 				}
 			};
 
-			let totalRound = 0;
 			for await (const { block, proof } of commits) {
 				blocks.push({
 					commitRound: proof.round,
@@ -429,15 +450,19 @@ export class Restore {
 				}
 
 				// Handle transactions
-				const receipts = await this.evm.getReceiptsByBlockNumber(BigInt(block.number));
+				const receipts = receiptsByBlock.get(block.number) ?? {};
 
 				for (const transaction of block.transactions) {
 					const receipt = receipts[transaction.hash];
 					assert.defined(receipt);
 
 					const { senderPublicKey } = transaction;
-					const parsedMultiPayments = parseMultiPayments(multiPaymentContractAddress, transaction, receipt);
-					const parsedUsernames = parseUsernames(usernameContractAddress, transaction, receipt);
+					const parsedMultiPayments = parseMultiPayments(
+						this.multiPaymentContractAddress,
+						transaction,
+						receipt,
+					);
+					const parsedUsernames = parseUsernames(this.usernameContractAddress, transaction, receipt);
 					const {
 						tokenActions: parsedTokenActions,
 						tokenHolders: parsedTokenHolders,
@@ -904,27 +929,6 @@ export class Restore {
 			.execute();
 	}
 
-	async #ingestContracts(context: RestoreContext): Promise<void> {
-		const deploymentEvents = this.app
-			.get<Deployer>(EvmConsensusIdentifiers.Internal.Deployer)
-			.getDeploymentEvents();
-
-		await context.contractRepository
-			.createQueryBuilder()
-			.insert()
-			.orIgnore()
-			.values(
-				deploymentEvents.map((event) => ({
-					activeImplementation: event.activeImplementation ?? event.address,
-					address: event.address,
-					implementations: event.implementations,
-					name: event.name,
-					proxy: event.proxy,
-				})) as unknown as { address: string; abi: Record<string, unknown> }[],
-			)
-			.execute();
-	}
-
 	async #updateValidatorRanks(context: RepositoryContext): Promise<void> {
 		await context.entityManager.query("SELECT update_validator_ranks();", []);
 	}
@@ -940,26 +944,28 @@ export class Restore {
 		legacyColdWalletRepository,
 		multiPaymentRepository,
 		stateRepository,
+		tokenActionRepository,
 		tokenHolderRepository,
 		tokenRepository,
 		transactionRepository,
 		validatorRoundRepository,
 		walletRepository,
 	}: RepositoryContext): Promise<void> {
-		await Promise.all(
-			[
-				blockRepository,
-				contractRepository,
-				stateRepository,
-				transactionRepository,
-				validatorRoundRepository,
-				walletRepository,
-				legacyColdWalletRepository,
-				multiPaymentRepository,
-				tokenRepository,
-				tokenHolderRepository,
-				configurationRepository,
-			].map((repo) => repo.query(`ANALYZE ${repo.metadata.tableName}`)),
-		);
+		for (const repository of [
+			blockRepository,
+			contractRepository,
+			stateRepository,
+			transactionRepository,
+			validatorRoundRepository,
+			walletRepository,
+			legacyColdWalletRepository,
+			multiPaymentRepository,
+			tokenRepository,
+			tokenActionRepository,
+			tokenHolderRepository,
+			configurationRepository,
+		]) {
+			await repository.query(`ANALYZE ${repository.metadata.tableName}`);
+		}
 	}
 }

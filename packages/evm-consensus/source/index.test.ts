@@ -6,7 +6,7 @@ describe("Index", ({ assert, it }) => {
 		assert.defined(index.ServiceProvider);
 	});
 
-	it("should export Identifiers", () => {
-		assert.defined(index.Identifiers);
+	it("should export Deployer", () => {
+		assert.defined(index.Deployer);
 	});
 });

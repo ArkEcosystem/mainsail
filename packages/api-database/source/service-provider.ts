@@ -1,6 +1,6 @@
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
-import { assert } from "@mainsail/utils";
+import { assert, ensureError } from "@mainsail/utils";
 import { DataSource } from "typeorm";
 import { URL } from "url";
 
@@ -13,7 +13,7 @@ import {
 	MultiPaymentRepository,
 	PeerRepository,
 	PluginRepository,
-	PostgresConnectionOptions,
+	PostgresConnectionCredentialsOptions,
 	RepositoryDataSource,
 	StateRepository,
 	SystemRepository,
@@ -66,6 +66,7 @@ import {
 	makeWalletRepository,
 } from "./repositories/index.js";
 import { makeMultiPaymentRepository } from "./repositories/multi-payment-repository.js";
+import { createExtensions } from "./utils/create-extensions.js";
 import { SnakeNamingStrategy } from "./utils/snake-naming-strategy.js";
 
 @injectable()
@@ -91,7 +92,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			return;
 		}
 
-		const options = this.config().getRequired<PostgresConnectionOptions>("database");
+		const options = this.config().getRequired<PostgresConnectionCredentialsOptions>("database");
 		assert.defined(options);
 
 		try {
@@ -121,13 +122,13 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				migrationsRun: false,
 				namingStrategy: new SnakeNamingStrategy(),
 				synchronize: false,
+				type: "postgres",
 			});
 
 			// Note: this only initializes the connection pool, etc. but does not run migrations.
 			// Migrations are handled during bootstrap elsewhere in the main process (see sync.ts)
 			await dataSource.initialize();
-			await dataSource.createQueryRunner().query("CREATE EXTENSION IF NOT EXISTS citext;");
-			await dataSource.createQueryRunner().query("CREATE EXTENSION IF NOT EXISTS pg_trgm;");
+			await createExtensions(dataSource);
 
 			this.app.bind(Identifiers.DataSource).toConstantValue(dataSource);
 			this.app.bind(Identifiers.Migrations).to(Migrations).inSingletonScope();
@@ -251,8 +252,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					() => (customDataSource?: RepositoryDataSource) =>
 						makeLegacyColdWalletRepository(customDataSource ?? dataSource),
 				);
-		} catch (error) {
-			await this.app.terminate("Failed to configure database!", error);
+		} catch (rawError) {
+			await this.app.terminate("Failed to configure database!", ensureError(rawError));
 		}
 	}
 

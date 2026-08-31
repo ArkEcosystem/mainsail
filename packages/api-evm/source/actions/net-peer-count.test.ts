@@ -40,7 +40,7 @@ describe<{
 		assert.defined(validator.validate("jsonRpc_net_peerCount", {}).errors);
 	});
 
-	it("should return true", async ({ action, state }) => {
+	it("should return the peer count as hex", async ({ action, state }) => {
 		assert.equal(await action.handle([]), "0x0");
 
 		state.peerCount = 1;

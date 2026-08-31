@@ -75,10 +75,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		await this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).disposePeers();
 	}
 
-	public async required(): Promise<boolean> {
-		return true;
-	}
-
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
 			apiNodes: Joi.array().items(Joi.string()).default([]),
@@ -109,6 +105,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			skipDiscovery: Joi.bool(),
 			skipPeerStateVerification: Joi.bool(),
 			statistic: Joi.object({
+				maxTrackedPeers: Joi.number().integer().min(1).required(),
 				verbosity: Joi.number().integer().min(0).max(3).required(),
 			}).required(),
 			txPoolPort: Joi.number().integer().min(0).required(),

@@ -1,132 +1,128 @@
-import { Container } from "@mainsail/container";
 import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
-
+import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+
 import { Processor } from "./processor";
 
+const nextTick = async () => new Promise((resolve) => setImmediate(resolve));
+
 describe<{
-	container: Container;
+	app: Application;
+	processor: Processor;
 	pool: any;
-	extensions: any[];
 	broadcaster: any;
+	factory: any;
+	logger: any;
 	transaction1: any;
 	transaction2: any;
-	factory: any;
-}>("Processor", ({ it, assert, beforeAll, stub, spy }) => {
-	beforeAll((context) => {
+}>("Processor", ({ it, assert, beforeEach, stub, spy }) => {
+	beforeEach((context) => {
+		context.transaction1 = { hash: "dummy-tx-hash", serialized: Buffer.from("dummy") };
+		context.transaction2 = { hash: "dummy-tx-hash-2", serialized: Buffer.from("dummy-2") };
+
 		context.pool = {
-			addTransaction: () => {},
+			addTransaction: async () => {},
 		};
 
-		context.extensions = [{ throwIfCannotBroadcast: () => {} }, { throwIfCannotBroadcast: () => {} }];
-
 		context.factory = {
-			fromBytes: (bytes) => ({}),
-			fromJson: (tx) => tx,
+			fromBytes: async () => context.transaction1,
 		};
 
 		context.broadcaster = {
 			broadcastTransactions: async () => {},
 		};
 
-		context.container = new Container();
-
-		context.container.bind(Identifiers.TransactionPool.ProcessorExtension).toConstantValue(context.extensions[0]);
-		context.container.bind(Identifiers.TransactionPool.ProcessorExtension).toConstantValue(context.extensions[1]);
-		context.container.bind(Identifiers.TransactionPool.Service).toConstantValue(context.pool);
-		context.container.bind(Identifiers.Cryptography.Transaction.Factory).toConstantValue(context.factory);
-		context.container.bind(Identifiers.TransactionPool.Broadcaster).toConstantValue(context.broadcaster);
-		context.container.bind(Identifiers.Services.Log.Service).toConstantValue({
+		context.logger = {
 			error: () => {},
-		});
-
-		context.transaction1 = {
-			data: {
-				amount: 100n,
-				id: "dummy-tx-id",
-				nonce: 1n,
-				senderPublicKey: "dummy-sender-key",
-				type: 0,
-				version: 2,
-			},
-			id: "dummy-tx-id",
-			key: "some-key",
-			serialized: Buffer.from("dummy"),
-			type: 0,
 		};
 
-		context.transaction2 = {
-			data: {
-				amount: 100n,
-				id: "dummy-tx-id-2",
-				nonce: 1n,
-				senderPublicKey: "dummy-sender-key",
-				type: 0,
-				typeGroup: undefined,
-				version: 2,
-			},
-			id: "dummy-tx-id-2",
-			key: "some-key",
-			serialized: Buffer.from("dummy-2"),
-			type: 0,
-		};
+		context.app = new Application();
+		context.app.bind(Identifiers.TransactionPool.Service).toConstantValue(context.pool);
+		context.app.bind(Identifiers.Cryptography.Transaction.Factory).toConstantValue(context.factory);
+		context.app.bind(Identifiers.TransactionPool.Broadcaster).toConstantValue(context.broadcaster);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
+
+		context.processor = context.app.resolve(Processor);
 	});
 
-	it("should parse transactions through factory pool", async (context) => {
-		const poolSpy = spy(context.pool, "addTransaction");
-		const factoryStub = stub(context.factory, "fromJson");
-		const spiedBroadcaster = spy(context.broadcaster, "broadcastTransactions");
+	it("should accept and broadcast all valid transactions", async ({
+		processor,
+		pool,
+		factory,
+		broadcaster,
+		transaction1,
+		transaction2,
+	}) => {
+		const spiedPool = spy(pool, "addTransaction");
+		const spiedBroadcaster = spy(broadcaster, "broadcastTransactions");
 
-		factoryStub.resolvedValueNth(0, context.transaction1).resolvedValueNth(1, context.transaction2);
+		stub(factory, "fromBytes").resolvedValueNth(0, transaction1).resolvedValueNth(1, transaction2);
 
-		const spiedExtension0 = stub(context.extensions[0], "throwIfCannotBroadcast");
+		const result = await processor.process([transaction1.serialized, transaction2.serialized]);
 
-		spiedExtension0
-			.callsFakeNth(0, async (transaction) => {
-				throw new Exceptions.TransactionFeeTooLowError(transaction);
-			})
-			.callsFakeNth(1, async (transaction) => {
-				throw new Exceptions.TransactionFeeTooLowError(transaction);
-			});
+		spiedPool.calledTimes(2);
+		spiedPool.calledNthWith(0, transaction1);
+		spiedPool.calledNthWith(1, transaction2);
 
-		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
-
-		const processor = context.container.get(Processor, { autobind: true });
-		const result = await processor.process([context.transaction1.data, context.transaction2.data]);
-
-		poolSpy.calledTimes(2);
-		spiedExtension0.calledTimes(2);
-		spiedExtension1.calledTimes(2);
-		spiedBroadcaster.neverCalled();
+		spiedBroadcaster.calledOnce();
+		spiedBroadcaster.calledWith([transaction1, transaction2]);
 
 		assert.equal(result.accept, [0, 1]);
-		assert.equal(result.broadcast, []);
+		assert.equal(result.broadcast, [0, 1]);
 		assert.equal(result.invalid, []);
 		assert.equal(result.excess, []);
 		assert.undefined(result.errors);
 	});
 
-	it("should add transactions to pool", async (context) => {
-		const poolStub = stub(context.pool, "addTransaction");
+	it("should mark transactions with invalid data as invalid", async ({
+		processor,
+		pool,
+		factory,
+		broadcaster,
+		transaction1,
+		transaction2,
+	}) => {
+		const spiedPool = spy(pool, "addTransaction");
+		const spiedBroadcaster = spy(broadcaster, "broadcastTransactions");
 
-		poolStub
-			.callsFakeNth(0, async (transaction) => {})
-			.callsFakeNth(1, async (transaction) => {
-				throw new Exceptions.TransactionFeeTooLowError(transaction);
-			});
+		stub(factory, "fromBytes").resolvedValueNth(0, transaction1).rejectedValueNth(1, new Error("malformed buffer"));
 
-		const spiedExtension0 = spy(context.extensions[0], "throwIfCannotBroadcast");
-		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
-		// const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
+		const result = await processor.process([transaction1.serialized, transaction2.serialized]);
 
-		const processor = context.container.get(Processor, { autobind: true });
-		const result = await processor.process([context.transaction1.data, context.transaction2.data]);
+		spiedPool.calledOnce();
+		spiedBroadcaster.calledOnce();
+		spiedBroadcaster.calledWith([transaction1]);
+
+		assert.equal(result.accept, [0]);
+		assert.equal(result.broadcast, [0]);
+		assert.equal(result.invalid, [1]);
+		assert.equal(result.excess, []);
+		assert.equal(result.errors["1"].type, "ERR_BAD_DATA");
+		assert.equal(result.errors["1"].message, "Invalid transaction data: malformed buffer");
+	});
+
+	it("should mark transactions rejected by the pool as invalid", async ({
+		processor,
+		pool,
+		factory,
+		broadcaster,
+		transaction1,
+		transaction2,
+	}) => {
+		stub(factory, "fromBytes").resolvedValueNth(0, transaction1).resolvedValueNth(1, transaction2);
+
+		const poolStub = stub(pool, "addTransaction")
+			.resolvedValueNth(0, undefined)
+			.rejectedValueNth(1, new Exceptions.TransactionFeeTooLowError(transaction2));
+
+		const spiedBroadcaster = spy(broadcaster, "broadcastTransactions");
+
+		const result = await processor.process([transaction1.serialized, transaction2.serialized]);
 
 		poolStub.calledTimes(2);
-		spiedExtension0.calledOnce();
-		spiedExtension1.calledOnce();
-		// spiedBroadcaster.calledOnce();
+		spiedBroadcaster.calledOnce();
+		spiedBroadcaster.calledWith([transaction1]);
 
 		assert.equal(result.accept, [0]);
 		assert.equal(result.broadcast, [0]);
@@ -136,69 +132,19 @@ describe<{
 		assert.equal(result.errors["1"].type, "ERR_LOW_FEE");
 	});
 
-	it("should add broadcast eligible transaction", async (context) => {
-		const poolSpy = spy(context.pool, "addTransaction");
+	it("should track excess transactions", async ({ processor, pool, factory, broadcaster, transaction1 }) => {
+		stub(factory, "fromBytes").resolvedValue(transaction1);
 
-		const spiedExtension0 = stub(context.extensions[0], "throwIfCannotBroadcast");
-		// const spiedBroadcaster = spy(context.transactionBroadcaster, "broadcastTransactions");
+		const poolStub = stub(pool, "addTransaction").rejectedValueNth(
+			0,
+			new Exceptions.SenderExceededMaximumTransactionCountError(transaction1, 1),
+		);
 
-		spiedExtension0
-			.callsFakeNth(0, async (transaction) => {})
-			.callsFakeNth(1, async (transaction) => {
-				throw new Exceptions.TransactionFeeTooLowError(transaction);
-			});
+		const spiedBroadcaster = spy(broadcaster, "broadcastTransactions");
 
-		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
-
-		const processor = context.container.get(Processor, { autobind: true });
-		const result = await processor.process([context.transaction1.data, context.transaction2.data]);
-
-		poolSpy.calledTimes(2);
-		spiedExtension0.calledTimes(2);
-		spiedExtension1.calledTimes(2);
-		// spiedBroadcaster.called();
-
-		assert.equal(result.accept, [0, 1]);
-		assert.equal(result.broadcast, [0]);
-		assert.equal(result.invalid, []);
-		assert.equal(result.excess, []);
-		assert.undefined(result.errors);
-	});
-
-	it("should rethrow unexpected error", async (context) => {
-		const poolStub = stub(context.pool, "addTransaction").rejectedValueNth(0, new Error("Unexpected error"));
-
-		const spiedExtension0 = spy(context.extensions[0], "throwIfCannotBroadcast");
-		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
-		const spiedBroadcaster = spy(context.broadcaster, "broadcastTransactions");
-
-		const processor = context.container.get(Processor, { autobind: true });
-		const promise = processor.process([context.transaction1.data, context.transaction2.data]);
-
-		await assert.rejects(() => promise);
+		const result = await processor.process([transaction1.serialized]);
 
 		poolStub.calledOnce();
-		spiedExtension0.neverCalled();
-		spiedExtension1.neverCalled();
-		spiedBroadcaster.neverCalled();
-	});
-
-	it("should track excess transactions", async (context) => {
-		const exceedsError = new Exceptions.SenderExceededMaximumTransactionCountError(context.transaction1, 1);
-
-		const poolStub = stub(context.pool, "addTransaction").rejectedValueNth(0, exceedsError);
-		stub(context.factory, "fromJson").returnValue(context.transaction1);
-
-		const spiedExtension0 = spy(context.extensions[0], "throwIfCannotBroadcast");
-		const spiedExtension1 = spy(context.extensions[1], "throwIfCannotBroadcast");
-		const spiedBroadcaster = spy(context.broadcaster, "broadcastTransactions");
-
-		const processor = context.container.get(Processor, { autobind: true });
-		const result = await processor.process([context.transaction1.data]);
-
-		poolStub.calledOnce();
-		spiedExtension0.neverCalled();
-		spiedExtension1.neverCalled();
 		spiedBroadcaster.neverCalled();
 
 		assert.equal(result.accept, []);
@@ -207,5 +153,65 @@ describe<{
 		assert.equal(result.excess, [0]);
 		assert.truthy(result.errors["0"]);
 		assert.equal(result.errors["0"].type, "ERR_EXCEEDS_MAX_COUNT");
+	});
+
+	it("should rethrow unexpected error", async ({ processor, pool, factory, broadcaster, transaction1 }) => {
+		stub(factory, "fromBytes").resolvedValue(transaction1);
+
+		const poolStub = stub(pool, "addTransaction").rejectedValueNth(0, new Error("Unexpected error"));
+		const spiedBroadcaster = spy(broadcaster, "broadcastTransactions");
+
+		await assert.rejects(
+			() => processor.process([transaction1.serialized, transaction1.serialized]),
+			"Unexpected error",
+		);
+
+		poolStub.calledOnce();
+		spiedBroadcaster.neverCalled();
+	});
+
+	it("should broadcast already accepted transactions when an unexpected error is rethrown", async ({
+		processor,
+		pool,
+		factory,
+		broadcaster,
+		transaction1,
+		transaction2,
+	}) => {
+		stub(factory, "fromBytes").resolvedValueNth(0, transaction1).resolvedValueNth(1, transaction2);
+
+		stub(pool, "addTransaction").resolvedValueNth(0, undefined).rejectedValueNth(1, new Error("Unexpected error"));
+
+		const spiedBroadcaster = spy(broadcaster, "broadcastTransactions");
+
+		await assert.rejects(
+			() => processor.process([transaction1.serialized, transaction2.serialized]),
+			"Unexpected error",
+		);
+
+		spiedBroadcaster.calledOnce();
+		spiedBroadcaster.calledWith([transaction1]);
+	});
+
+	it("should log an error when broadcasting fails", async ({
+		processor,
+		factory,
+		broadcaster,
+		logger,
+		transaction1,
+	}) => {
+		stub(factory, "fromBytes").resolvedValue(transaction1);
+		stub(broadcaster, "broadcastTransactions").rejectedValue(new Error("Broadcast failed"));
+
+		const spiedLogger = spy(logger, "error");
+
+		const result = await processor.process([transaction1.serialized]);
+
+		assert.equal(result.accept, [0]);
+		assert.equal(result.broadcast, [0]);
+
+		await nextTick();
+
+		spiedLogger.calledOnce();
 	});
 });

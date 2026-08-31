@@ -1,5 +1,3 @@
-use std::boxed::Box;
-
 use blst::BLST_ERROR;
 use blst::min_pk::{PublicKey, Signature};
 
@@ -9,19 +7,30 @@ use revm::handler::{EthPrecompiles, PrecompileProvider, precompile_output_to_int
 use revm::interpreter::{CallInputs, InterpreterResult};
 use revm::precompile::{PrecompileHalt, PrecompileOutput, PrecompileResult};
 use revm::primitives::hardfork::SpecId;
-use revm::primitives::{Address, Bytes, address};
+use revm::primitives::{Address, AddressSet, Bytes, address};
 
 pub const BLS_POP_VERIFY_ADDR: Address = address!("0000000000000000000000000000000001181200");
 
 pub struct MainsailPrecompiles {
     eth: EthPrecompiles,
+    warm_addresses: AddressSet,
 }
 
 impl MainsailPrecompiles {
     pub fn new(spec: SpecId) -> Self {
+        let eth = EthPrecompiles::new(spec);
+        let warm_addresses = Self::warm_addresses_for(&eth);
+
         Self {
-            eth: EthPrecompiles::new(spec),
+            eth,
+            warm_addresses,
         }
+    }
+
+    fn warm_addresses_for(eth: &EthPrecompiles) -> AddressSet {
+        let mut warm_addresses = eth.warm_addresses().clone();
+        warm_addresses.insert(BLS_POP_VERIFY_ADDR);
+        warm_addresses
     }
 }
 
@@ -29,7 +38,12 @@ impl<CTX: ContextTr> PrecompileProvider<CTX> for MainsailPrecompiles {
     type Output = InterpreterResult;
 
     fn set_spec(&mut self, spec: <CTX::Cfg as Cfg>::Spec) -> bool {
-        PrecompileProvider::<CTX>::set_spec(&mut self.eth, spec)
+        let changed = PrecompileProvider::<CTX>::set_spec(&mut self.eth, spec);
+        if changed {
+            // `eth` swapped to the new spec's precompile set and needs a rebuild.
+            self.warm_addresses = Self::warm_addresses_for(&self.eth);
+        }
+        changed
     }
 
     fn run(
@@ -49,10 +63,8 @@ impl<CTX: ContextTr> PrecompileProvider<CTX> for MainsailPrecompiles {
         PrecompileProvider::<CTX>::run(&mut self.eth, context, inputs)
     }
 
-    fn warm_addresses(&self) -> Box<impl Iterator<Item = Address>> {
-        let mut addrs: Vec<Address> = self.eth.warm_addresses().collect();
-        addrs.push(BLS_POP_VERIFY_ADDR);
-        Box::new(addrs.into_iter())
+    fn warm_addresses(&self) -> &AddressSet {
+        &self.warm_addresses
     }
 
     fn contains(&self, address: &Address) -> bool {
@@ -138,6 +150,51 @@ mod tests {
     use revm::precompile::{PrecompileHalt, PrecompileOutput, PrecompileStatus};
 
     use crate::precompiles::{POP_DST, POP_VERIFY_GAS, bls_pop_verify};
+
+    #[test]
+    fn test_set_spec_rebuilds_warm_addresses() {
+        use revm::MainContext;
+        use revm::context::Cfg;
+        use revm::context_interface::ContextTr;
+        use revm::handler::{EthPrecompiles, PrecompileProvider};
+        use revm::primitives::AddressSet;
+        use revm::primitives::hardfork::SpecId;
+
+        use crate::precompiles::{BLS_POP_VERIFY_ADDR, MainsailPrecompiles};
+
+        fn set_spec<CTX: ContextTr>(_ctx: &CTX, p: &mut MainsailPrecompiles, spec: SpecId) -> bool
+        where
+            CTX::Cfg: Cfg<Spec = SpecId>,
+        {
+            PrecompileProvider::<CTX>::set_spec(p, spec)
+        }
+
+        fn warm<CTX: ContextTr>(_ctx: &CTX, p: &MainsailPrecompiles) -> AddressSet {
+            PrecompileProvider::<CTX>::warm_addresses(p).clone()
+        }
+
+        let expected = |spec: SpecId| -> AddressSet {
+            let mut set = EthPrecompiles::new(spec).warm_addresses().clone();
+            set.insert(BLS_POP_VERIFY_ADDR);
+            set
+        };
+
+        // Prague activates EIP-2537; the specs must differ for this test to be meaningful.
+        assert_ne!(expected(SpecId::SHANGHAI), expected(SpecId::PRAGUE));
+
+        let ctx = revm::Context::mainnet();
+        let mut precompiles = MainsailPrecompiles::new(SpecId::SHANGHAI);
+        assert_eq!(warm(&ctx, &precompiles), expected(SpecId::SHANGHAI));
+
+        // Same spec: no change reported, snapshot untouched.
+        assert!(!set_spec(&ctx, &mut precompiles, SpecId::SHANGHAI));
+        assert_eq!(warm(&ctx, &precompiles), expected(SpecId::SHANGHAI));
+
+        // Spec bump: the snapshot must follow the new precompile set — otherwise newly
+        // activated precompiles are charged cold access (EIP-2929), a consensus divergence.
+        assert!(set_spec(&ctx, &mut precompiles, SpecId::PRAGUE));
+        assert_eq!(warm(&ctx, &precompiles), expected(SpecId::PRAGUE));
+    }
 
     // ── Helpers ─────────────────────────────────────────────────────────────
 

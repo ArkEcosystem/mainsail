@@ -1,5 +1,7 @@
 import type { EntityTarget, ObjectLiteral, SelectQueryBuilder } from "typeorm";
 
+import { ensureError } from "@mainsail/utils";
+
 import type {
 	ExtendedRepository,
 	RepositoryDataSource,
@@ -106,7 +108,8 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 				await queryRunner.commitTransaction();
 
 				return { meta: { totalCountIsEstimate: true }, results, totalCount };
-			} catch (error) {
+			} catch (rawError) {
+				const error = ensureError(rawError);
 				await queryRunner.rollbackTransaction();
 				throw error;
 			}

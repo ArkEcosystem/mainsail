@@ -3,6 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Plugin, Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 import { constants } from "../constants.js";
 import { plugin as hapiNesPlugin } from "../hapi-nes/index.js";
@@ -74,7 +75,8 @@ export class Server implements Contracts.P2P.Server {
 		try {
 			await this.server.start();
 			this.logger.info(`${this.name} started at ${this.server.info.uri}`, "p2p");
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			await this.app.terminate(`Failed to start ${this.name} Server!`, error);
 		}
 	}
@@ -83,7 +85,8 @@ export class Server implements Contracts.P2P.Server {
 		try {
 			await this.server.stop();
 			this.logger.info(`${this.name} stopped at ${this.server.info.uri}`, "p2p");
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			await this.app.terminate(`Failed to stop ${this.name} Server!`, error);
 		}
 	}

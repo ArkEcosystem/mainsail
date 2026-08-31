@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Commands } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { http } from "@mainsail/utils";
+import { ensureError, http } from "@mainsail/utils";
 import { createWriteStream, existsSync, readFileSync, writeFileSync } from "fs";
 import { ensureDirSync, removeSync } from "fs-extra/esm";
 import got from "got";
@@ -56,10 +56,18 @@ export class Command extends Commands.Command {
 		this.definition
 			.setFlag("app", "The link to the app.json file.", Joi.string().uri(URI_OPTIONS))
 			.setFlag("peers", "The link to the peers.json file.", Joi.string().uri(URI_OPTIONS))
-			.setFlag("crypto", "The link to the app.json file.", Joi.string().uri(URI_OPTIONS))
+			.setFlag("crypto", "The link to the crypto.json file.", Joi.string().uri(URI_OPTIONS))
 			.setFlag("snapshot", "The link to the <snapshot>.compressed file.", Joi.string().uri())
-			.setFlag("reset", "Using the --reset flag will remove existing configuration.", Joi.boolean())
-			.setFlag("overwrite", "Using the --overwrite will overwrite existing configuration.", Joi.boolean());
+			.setFlag(
+				"reset",
+				"Using the --reset flag will remove existing configuration.",
+				Joi.boolean().default(false),
+			)
+			.setFlag(
+				"overwrite",
+				"Using the --overwrite will overwrite existing configuration.",
+				Joi.boolean().default(false),
+			);
 	}
 
 	public async execute(): Promise<void> {
@@ -202,12 +210,11 @@ export class Command extends Commands.Command {
 
 			const { data } = await http.get<string>(url);
 			return data;
-		} catch (error) {
-			console.error(`Error fetching file from ${url}:`, error);
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			this.components.error(`Error fetching file from ${url}: ${error.message}`);
 
-			throw new Error(
-				`Failed to fetch file from ${url}: ${error instanceof Error ? error.message : String(error)}`,
-			);
+			throw new Error(`Failed to fetch file from ${url}: ${error.message}`);
 		}
 	}
 

@@ -115,21 +115,22 @@ heading "Installing node.js & npm..."
 
 success "Installed node.js & npm!"
 
-heading "Installing Pnpm..."
+heading "Installing pnpm..."
 
     sudo npm install -g npm@latest
     npm install --prefix=~/.pnpm -g pnpm
     if ! $(grep -Eq "(PNPM_HOME)" "$HOME/.bashrc"); then
-        echo 'export PNPM_HOME=~/.pnpm/bin' >> ~/.bashrc
-        echo 'export PATH=$PATH:$PNPM_HOME' >> ~/.bashrc
+        echo 'export PNPM_HOME=~/.pnpm' >> ~/.bashrc
+        echo 'export PATH=$PATH:$PNPM_HOME/bin' >> ~/.bashrc
     fi
-    export PNPM_HOME=~/.pnpm/bin
-    export PATH=$PATH:$PNPM_HOME
+    export PNPM_HOME=~/.pnpm
+    export PATH=$PATH:$PNPM_HOME/bin
+    pnpm config set --global enable-global-virtual-store false
+    info "(pnpm) Global Virtual Store: disabled"
 
+success "Installed pnpm!"
 
-success "Installed Pnpm!"
-
-heading "Installing PM2..."
+heading "Installing pm2..."
 
     pnpm i -g pm2
     pm2 install pm2-logrotate
@@ -137,7 +138,7 @@ heading "Installing PM2..."
     pm2 set pm2-logrotate:compress true
     pm2 set pm2-logrotate:retain 7
 
-success "Installed PM2!"
+success "Installed pm2!"
 
 heading "Installing program dependencies..."
 

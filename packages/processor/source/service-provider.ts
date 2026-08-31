@@ -10,6 +10,7 @@ import {
 	GasLimitVerifier,
 	GeneratorVerifier,
 	LegacyAttributeVerifier,
+	RandaoVerifier,
 	RewardVerifier,
 	SizeVerifier,
 	TimestampVerifier,
@@ -36,15 +37,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			TransactionsRootVerifier,
 			GasLimitVerifier,
 			LegacyAttributeVerifier,
+			RandaoVerifier,
 		]) {
 			this.app.bind(Identifiers.Processor.BlockVerifierHandlers).to(handler);
 		}
 
 		this.app.bind(Identifiers.Processor.BlockProcessor).to(BlockProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Processor.TransactionProcessor).to(TransactionProcessor).inSingletonScope();
-	}
-
-	public async required(): Promise<boolean> {
-		return true;
 	}
 }

@@ -1,23 +1,10 @@
 import type { ByteBuffer } from "@mainsail/utils";
 
 export type MandatoryPropertyType =
-	| "hash"
-	| "publicKey"
-	| "hex"
-	| "transactions"
-	| "consensusSignature"
-	| "validatorSet";
+	"hash" | "publicKey" | "hex" | "transactions" | "consensusSignature" | "validatorSet";
 
 export type OptionalPropertyType =
-	| "uint8"
-	| "uint16"
-	| "uint32"
-	| "uint48"
-	| "uint64"
-	| "uint256"
-	| "address"
-	| "bigint"
-	| "blockHash";
+	"uint8" | "uint16" | "uint32" | "uint48" | "uint64" | "uint256" | "address" | "bigint" | "blockHash";
 
 export type SerializationSchema = { type: MandatoryPropertyType } | { type: OptionalPropertyType; optional?: true };
 
@@ -28,8 +15,7 @@ export interface SerializationConfiguration {
 }
 
 export type DeserializationSchema =
-	| { type: MandatoryPropertyType; size?: number }
-	| { type: OptionalPropertyType; optional?: true };
+	{ type: MandatoryPropertyType; size?: number } | { type: OptionalPropertyType; optional?: true };
 
 export interface DeserializationConfiguration {
 	schema: Record<string, DeserializationSchema>;

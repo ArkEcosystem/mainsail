@@ -6,6 +6,7 @@ import { clone } from "@hapi/hoek";
 import Teamwork from "@hapi/teamwork";
 
 import { parseNesMessage, protocol, stringifyNesMessage } from "./utilities.js";
+import { ensureError } from "@mainsail/utils";
 
 const internals = {
 	version: "2",
@@ -45,7 +46,6 @@ export class Socket {
 		this.info = {
 			remoteAddress: request.socket.remoteAddress,
 			remotePort: request.socket.remotePort,
-			"x-forwarded-for": request.headers["x-forwarded-for"],
 		};
 
 		this._ws.on("message", (message) => this._onMessage(message));
@@ -89,7 +89,8 @@ export class Socket {
 					string = string.replace(`"${token}"`, options.replace[token]);
 				}
 			}
-		} catch (error) {
+		} catch (rawError) {
+			const error = ensureError(rawError);
 			this.server.log(["nes", "serialization", "error"], message.type);
 
 			if (message.id) {
@@ -146,8 +147,8 @@ export class Socket {
 			this._ws.send(message, (error_) => team.attend(error_));
 			try {
 				await team.work;
-			} catch (error_) {
-				error = error_;
+			} catch (rawError) {
+				error = ensureError(rawError);
 				break;
 			}
 
@@ -203,8 +204,9 @@ export class Socket {
 			const lifecycleResponse = await this._lifecycle(request);
 			response = lifecycleResponse.response;
 			options = lifecycleResponse.options;
-		} catch (error_) {
-			Bounce.rethrow(error_, "system");
+		} catch (rawError) {
+			const error_ = ensureError(rawError);
+			Bounce.rethrow(rawError, "system");
 			error = error_;
 		}
 
@@ -214,7 +216,8 @@ export class Socket {
 			} else if (response) {
 				await this._send(response, options);
 			}
-		} catch (error_) {
+		} catch (rawError) {
+			const error_ = ensureError(rawError);
 			Bounce.rethrow(error_, "system");
 			this.terminate();
 		}

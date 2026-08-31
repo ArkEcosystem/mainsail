@@ -12,15 +12,20 @@
 		"build-napi:debug": "napi build --platform --output-dir ./ --manifest-path bindings/Cargo.toml",
 		"build-rs": "pnpm run clean && pnpm run build-napi",
 		"clean": "rm -f index.js && rm -f index.d.ts && rm -f evm.*.node && rm -rf target",
-		"prepublishOnly": "napi prepublish -t pnpm",
+		"postinstall": "node scripts/postinstall.mjs",
 		"release": "pnpm publish --access public",
+		"release:prepare": "napi prepublish -t pnpm --skip-optional-publish --no-gh-release",
 		"test": "cargo test --release",
-		"test:coverage": "mkdir -p coverage && cargo llvm-cov --lcov --output-path coverage/lcov.info --remap-path-prefix",
+		"test:coverage": "bash ./scripts/coverage.sh",
 		"test:coverage:html": "mkdir -p coverage && cargo llvm-cov --html --output-dir coverage/ --remap-path-prefix",
 		"version": "napi version"
 	},
-	"devDependencies": {
-		"@napi-rs/cli": "3.6.2"
+	"dependencies": {
+		"@napi-rs/cli": "3.8.6"
+	},
+	"optionalDependencies": {
+		"@mainsail/evm-linux-arm64-gnu": "workspace:*",
+		"@mainsail/evm-linux-x64-gnu": "workspace:*"
 	},
 	"engines": {
 		"node": ">=24"
@@ -29,9 +34,7 @@
 		"binaryName": "evm",
 		"targets": [
 			"aarch64-unknown-linux-gnu",
-			"aarch64-unknown-linux-musl",
-			"x86_64-unknown-linux-gnu",
-			"x86_64-unknown-linux-musl"
+			"x86_64-unknown-linux-gnu"
 		]
 	}
 }

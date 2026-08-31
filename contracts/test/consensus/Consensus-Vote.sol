@@ -190,7 +190,7 @@ contract ConsensusTest is Base {
 
     function test_vote_prevent_for_validator_without_bls_key() public {
         address addr = address(1);
-        consensus.addValidator(addr, new bytes(0), false);
+        consensus.addValidator(addr, false);
 
         vm.startPrank(addr);
         vm.expectRevert(ConsensusV1.VoteValidatorWithoutBlsPublicKey.selector);
@@ -411,6 +411,60 @@ contract ConsensusTest is Base {
         assertEq(consensus.getVotesCount(), 0);
         allVoters = consensus.getVotes(address(0), 10);
         assertEq(allVoters.length, 0);
+    }
+
+    function test_unvote_head_with_multiple_remaining() public {
+        // removing the voter-list HEAD while >=2 voters remain must keep the list consistent.
+        registerValidator(address(1));
+        registerValidator(address(2));
+        registerValidator(address(3));
+
+        address voterA = address(11); // head
+        address voterB = address(12);
+        address voterC = address(13); // tail
+        vm.deal(voterA, 100 ether);
+        vm.deal(voterB, 100 ether);
+        vm.deal(voterC, 100 ether);
+
+        vm.prank(voterA);
+        consensus.vote(address(1));
+        vm.prank(voterB);
+        consensus.vote(address(2));
+        vm.prank(voterC);
+        consensus.vote(address(3));
+
+        assertEq(consensus.getVotesCount(), 3);
+
+        // Unvote the HEAD while B and C remain.
+        vm.prank(voterA);
+        consensus.unvote();
+
+        assertEq(consensus.getVotesCount(), 2);
+        ConsensusV1.VoteResult[] memory voters = consensus.getVotes(address(0), 10);
+        assertEq(voters.length, 2);
+        assertEq(voters[0].voter, voterB);
+        assertEq(voters[1].voter, voterC);
+
+        // Unvote the TAIL next.
+        vm.prank(voterC);
+        consensus.unvote();
+
+        assertEq(consensus.getVotesCount(), 1);
+        voters = consensus.getVotes(address(0), 10);
+        assertEq(voters.length, 1);
+        assertEq(voters[0].voter, voterB);
+
+        // A subsequent vote must remain reachable from the head.
+        address voterD = address(14);
+        vm.deal(voterD, 100 ether);
+        vm.prank(voterD);
+        consensus.vote(address(1));
+
+        assertEq(consensus.getVotesCount(), 2);
+        voters = consensus.getVotes(address(0), 10);
+        assertEq(voters.length, 2);
+        assertEq(voters[0].voter, voterB);
+        assertEq(voters[1].voter, voterD);
     }
 
     function test_multiple_voted_different_validators() public {

@@ -1,6 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
-import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { describe } from "@mainsail/test-runner";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
 import { setup, shutdown } from "./setup.js";
@@ -11,7 +10,6 @@ import {
 	getTransactionReceipt,
 	getWallets,
 	isTransactionCommitted,
-	waitBlock,
 } from "./utilities.js";
 import { getCreateAddress, Hex, parseEther, parseGwei } from "viem";
 
@@ -46,7 +44,7 @@ describe<{
 		const { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 	});
 
@@ -60,13 +58,12 @@ describe<{
 		assert.equal(invalid, [0]);
 		assert.equal(errors, {
 			"0": {
-				message:
-					'Invalid transaction data: data/gasPrice must pass "transactionGasPrice" keyword validation',
+				message: 'Invalid transaction data: data/gasPrice must pass "transactionGasPrice" keyword validation',
 				type: "ERR_BAD_DATA",
 			},
 		});
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.false(await isTransactionCommitted(context, tx));
 	});
 
@@ -76,7 +73,7 @@ describe<{
 		let { accept } = await addTransactionsToPool(context, [deployTx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, deployTx));
 
 		const erc20Address = getCreateAddress({
@@ -98,7 +95,7 @@ describe<{
 		({ accept } = await addTransactionsToPool(context, [transferTx]));
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, transferTx));
 
 		// Check final balance
@@ -131,11 +128,11 @@ describe<{
 		const { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 
 		const legacyAfter = await evm.getAccountInfo(legacyColdWallet.mainsailAddress);
-		assert.equal(legacyAfter.balance, legacyBefore.balance - 108160000000000n - 5n);
+		assert.equal(legacyAfter.balance, legacyBefore.balance - 112900000000000n - 5n);
 
 		const recipientAfter = await evm.getAccountInfo(randomWallet.address);
 		assert.equal(recipientAfter.balance, 5n);
@@ -157,7 +154,7 @@ describe<{
 		const recipientBefore = await evm.getAccountInfo(randomWallet.address);
 		assert.equal(recipientBefore.balance, 0n);
 
-		const gasSpentPerTx = 108160000000000n;
+		const gasSpentPerTx = 112900000000000n;
 		const valuePerTx = 5n;
 		const N = 10n;
 
@@ -171,7 +168,7 @@ describe<{
 			const { accept } = await addTransactionsToPool(context, [tx]);
 			assert.equal(accept, [0]);
 
-			await waitBlock(context);
+			await Utils.waitBlock(context);
 			await isTransactionCommitted(context, tx);
 		}
 
@@ -203,7 +200,7 @@ describe<{
 		let { accept } = await addTransactionsToPool(context, [fundTx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, fundTx));
 
 		const legacyAfter = await evm.getAccountInfoExtended(
@@ -226,7 +223,7 @@ describe<{
 		({ accept } = await addTransactionsToPool(context, [spentTx]));
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, spentTx));
 
 		const receipt = await getTransactionReceipt(context, spentTx);
@@ -294,7 +291,7 @@ describe<{
 		({ accept } = await addTransactionsToPool(context, [tx2]));
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 
 		assert.false(await isTransactionCommitted(context, tx1));
 		assert.true(await isTransactionCommitted(context, tx2));
@@ -329,7 +326,7 @@ describe<{
 		assert.equal(accept, [0]);
 		assert.undefined(errors);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 
 		for (let i = 0; i < 10; i++) {
 			if (txs[i].nonce === replacementTx.nonce) {
@@ -369,7 +366,7 @@ describe<{
 		assert.equal(accept, []);
 		assert.equal(invalid, [0, 1]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 
 		assert.true(await isTransactionCommitted(context, tx1));
 		assert.false(await isTransactionCommitted(context, tx2));
@@ -387,7 +384,7 @@ describe<{
 			value: parseEther("1001"),
 		});
 		await addTransactionsToPool(context, [fundTx]);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, fundTx));
 
 		// Send 10 txs each 100 ARK
@@ -422,8 +419,8 @@ describe<{
 		assert.equal(accept, [0]);
 		assert.undefined(errors);
 
-		await waitBlock(context);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
+		await Utils.waitBlock(context);
 
 		for (let i = 0; i < 10; i++) {
 			if (txs[i].nonce < replacementTx.nonce) {
@@ -459,7 +456,7 @@ describe<{
 		assert.equal(accept, []);
 		assert.equal(invalid, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 
 		assert.true(await isTransactionCommitted(context, tx1));
 		assert.false(await isTransactionCommitted(context, tx2));
@@ -469,9 +466,7 @@ describe<{
 		const randomWallet1 = await Utils.getRandomColdWallet(context);
 		const randomWallet2 = await Utils.getRandomColdWallet(context);
 
-		const multiPaymentContract = context.app.get<string>(
-			EvmConsensusIdentifiers.Contracts.Addresses.MultiPayment,
-		);
+		const multiPaymentContract = context.app.get<string>(Identifiers.EvmConsensus.Contracts.MultiPayment);
 
 		const recipients = [randomWallet1.address, randomWallet2.address];
 
@@ -487,7 +482,7 @@ describe<{
 		const { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 	});
 
@@ -501,7 +496,7 @@ describe<{
 			value: parseEther("350"),
 		});
 		await addTransactionsToPool(context, [fundTx]);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, fundTx));
 
 		const txFromAToB = await EvmCalls.makeEvmCall(context, {
@@ -510,7 +505,7 @@ describe<{
 			value: parseEther("300"),
 		});
 		let { accept, invalid, errors } = await addTransactionsToPool(context, [txFromAToB]);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.equal(accept, [0]);
 		assert.equal(invalid, []);
 		assert.true(await isTransactionCommitted(context, txFromAToB));
@@ -523,7 +518,7 @@ describe<{
 		({ accept, invalid } = await addTransactionsToPool(context, [txFromBToA]));
 		assert.equal(accept, [0]);
 		assert.equal(invalid, []);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, txFromBToA));
 
 		const txFromAToBAgain = await EvmCalls.makeEvmCall(context, {
@@ -535,7 +530,7 @@ describe<{
 		console.log(accept, invalid, errors);
 		assert.equal(accept, [0]);
 		assert.equal(invalid, []);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 
 		assert.true(await isTransactionCommitted(context, txFromAToBAgain));
 	});

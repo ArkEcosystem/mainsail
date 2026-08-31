@@ -1,5 +1,3 @@
-const {
-    ServiceProvider
-} = require('./service-provider')
+import { ServiceProvider } from './service-provider'
 
-exports.ServiceProvider = ServiceProvider;
+export { ServiceProvider }
