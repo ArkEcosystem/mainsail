@@ -152,9 +152,6 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 		app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 		app.useLogPath(dirSync().name);
 
-		const ms = new Date().getMilliseconds();
-		await sleep(1000 - ms + 400);
-
 		const logger = await app.resolve(PinoLogger).make({
 			fileRotator: {
 				interval: "1s",
@@ -165,11 +162,22 @@ describe("Logger", ({ assert, afterAll, afterEach, beforeAll, beforeEach, it }) 
 			},
 		});
 
-		for (let index = 0; index < 3; index++) {
-			logger.info(`Test ${index + 1}`);
+		const gzCount = () => readdirSync(app.logPath()).filter((file) => file.endsWith(".log.gz")).length;
 
-			await sleep(900);
+		for (let index = 1; index <= 3; index++) {
+			logger.info(`Test ${index}`);
+
+			const deadline = Date.now() + 5000;
+			while (gzCount() < index) {
+				if (Date.now() > deadline) {
+					throw new Error(`timed out waiting for log rotation ${index}`);
+				}
+
+				await sleep(20);
+			}
 		}
+
+		await logger.dispose();
 
 		const files = readdirSync(app.logPath());
 		assert.length(
