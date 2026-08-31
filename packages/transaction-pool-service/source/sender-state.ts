@@ -5,7 +5,6 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import {
 	InsufficientBalanceError,
 	TransactionExceedsMaximumByteSizeError,
-	TransactionFailedToVerifyError,
 	TransactionFromWrongNetworkError,
 	UnexpectedNonceError,
 	TransactionFailedToPreverifyError,
@@ -107,16 +106,13 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new TransactionFromWrongNetworkError(transaction, chainId);
 		}
 
+
 		if (this.#wallet.getNonce() + nonceOffset !== transaction.nonce) {
 			throw new UnexpectedNonceError(transaction.nonce, this.#wallet);
 		}
 
 		if (this.#wallet.getBalance() + refund - transaction.value - this.feeCalculator.calculate(transaction) < 0n) {
 			throw new InsufficientBalanceError();
-		}
-
-		if (!(await this.verifier.verifyHash(transaction))) {
-			throw new TransactionFailedToVerifyError(transaction);
 		}
 
 		if (this.#wallet.hasLegacySecondPublicKey()) {

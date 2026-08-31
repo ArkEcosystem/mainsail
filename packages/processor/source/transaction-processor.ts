@@ -26,20 +26,11 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	private readonly verifier!: Contracts.Crypto.TransactionVerifier;
-
 	async process(
 		unit: Contracts.Processor.ProcessableUnit,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Evm.TransactionReceipt> {
 		const block = unit.getBlock();
-
-		// TODO: Move to verifiers
-		if (!(await this.verifier.verifyHash(transaction))) {
-			throw new Error(`Transaction hash is invalid for transaction ${transaction.hash}`);
-		}
-
 		const { receipt } = await this.evm.process({
 			commitKey: {
 				blockHash: block.hash,
