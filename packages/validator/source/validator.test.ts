@@ -160,7 +160,7 @@ describe<{
 		forger,
 		doubleSignGuard,
 	}) => {
-		const block = await forger.forgeBlock(generatorAddress, 1, 0);
+		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
 		const guard = spy(doubleSignGuard, "guard");
 
 		await validator.propose(0, 2, undefined, block);
@@ -180,7 +180,7 @@ describe<{
 		forger,
 		doubleSignGuard,
 	}) => {
-		const block = await forger.forgeBlock(generatorAddress, 1, 0);
+		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
 		doubleSignGuard.guard = async () => {
 			throw new Error("double sign");
 		};
@@ -194,7 +194,7 @@ describe<{
 		forger,
 		doubleSignGuard,
 	}) => {
-		const block = await forger.forgeBlock(generatorAddress, 1, 0);
+		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
 		const guard = spy(doubleSignGuard, "guard");
 
 		await validator.prevote(0, 1, 2, block.hash);
@@ -235,7 +235,7 @@ describe<{
 		forger,
 		doubleSignGuard,
 	}) => {
-		const block = await forger.forgeBlock(generatorAddress, 1, 0);
+		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
 		const guard = spy(doubleSignGuard, "guard");
 
 		await validator.precommit(0, 1, 2, block.hash);
