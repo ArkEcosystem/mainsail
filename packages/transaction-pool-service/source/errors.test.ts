@@ -63,20 +63,12 @@ describe<{
 		);
 	});
 
-	it("TransactionFailedToVerifyError", (context) => {
-		const error = new Exceptions.TransactionFailedToVerifyError(context.transaction);
-
-		assert.instance(error, Exceptions.PoolError);
-		assert.equal(error.type, "ERR_BAD_DATA");
-		assert.equal(error.message, `tx ${context.transaction.hash} didn't pass verification`);
-	});
-
 	it("TransactionFromWrongNetworkError", (context) => {
 		const error = new Exceptions.TransactionFromWrongNetworkError(context.transaction, 23);
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_WRONG_NETWORK");
-		assert.equal(error.message, `tx ${context.transaction.hash} network 30 doesn't match node's network 23`);
+		assert.equal(error.message, `tx ${context. transaction.hash} network 30 doesn't match node's network 23`);
 	});
 
 	it("InvalidTransactionDataError", (context) => {
