@@ -168,12 +168,6 @@ export class EvmCallMissingRecipientError extends Exception {
 	}
 }
 
-export class EvmCallFailedError extends Exception {
-	public constructor(transaction: Contracts.Crypto.Transaction, error: Error) {
-		super(`invalid EVM call for tx ${transaction.hash}: ${error.message}`);
-	}
-}
-
 export class InvalidMilestoneConfigurationError extends Exception {
 	public constructor(message: string) {
 		super(message);
