@@ -9,7 +9,13 @@ import { assertBlockHash, assertBlockNumber, assertBlockRound } from "./asserts.
 import { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { boot, bootMany, bootstrap, bootstrapMany, runMany, setup, stop, stopMany } from "./setup.js";
-import { getNodeForValidator, getValidatorsInSlotOrder, prepareNodeValidators, snoozeForBlock } from "./utilities.js";
+import {
+	getNodeForValidator,
+	getValidatorsInSlotOrder,
+	prepareNodeValidators,
+	snoozeForBlock,
+	snoozeUntil,
+} from "./utilities.js";
 import type { Contracts } from "@mainsail/contracts";
 
 const { Propose, Prevote } = Enums.Consensus.Step;
