@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Plugin, Server as HapiServer, ServerInjectOptions, ServerInjectResponse, ServerRoute } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable, multiInject } from "@mainsail/container";
+import { inject, injectable, multiInject, tagged } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
 import { constants } from "../constants.js";
@@ -26,6 +26,10 @@ export class Server implements Contracts.P2P.Server {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "p2p")
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
+
 	@multiInject(Identifiers.P2P.Routes)
 	private readonly routes!: Contracts.P2P.Route[];
 
@@ -43,6 +47,7 @@ export class Server implements Contracts.P2P.Server {
 		this.server.app = this.app;
 		await this.server.register({
 			options: {
+				maxConnections: this.configuration.getRequired<number | false>("maxConnections"),
 				maxPayload: constants.MAX_PAYLOAD_SERVER,
 			},
 			plugin: hapiNesPlugin,
