@@ -68,7 +68,7 @@ describe<{
 
 		assert.instance(error, Exceptions.PoolError);
 		assert.equal(error.type, "ERR_WRONG_NETWORK");
-		assert.equal(error.message, `tx ${context. transaction.hash} network 30 doesn't match node's network 23`);
+		assert.equal(error.message, `tx ${context.transaction.hash} network 30 doesn't match node's network 23`);
 	});
 
 	it("InvalidTransactionDataError", (context) => {
