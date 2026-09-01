@@ -8,8 +8,8 @@ import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
-import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
-import { getValidators, prepareNodeValidators, snoozeForBlock, snoozeUntil } from "./utilities.js";
+import { boot, bootMany, bootstrap, bootstrapMany, runMany, setup, stop, stopMany } from "./setup.js";
+import { getNodeForValidator, getValidatorsInSlotOrder, prepareNodeValidators, snoozeForBlock } from "./utilities.js";
 import type { Contracts } from "@mainsail/contracts";
 
 const { Propose, Prevote } = Enums.Consensus.Step;
@@ -46,7 +46,13 @@ describe<{
 			);
 		}
 
-		context.validators = await getValidators(context.nodes[0], validators);
+		// These tests plant crash state before the real nodes boot, but slot order only exists on a
+		// bootstrapped chain — learn it from a throwaway observer (no validators, isolated P2P).
+		const probe = await setup(totalNodes, new P2PRegistry(), crypto, { secrets: [] });
+		await boot(probe);
+		await bootstrap(probe);
+		context.validators = await getValidatorsInSlotOrder(probe, validators);
+		await stop(probe);
 	});
 
 	afterEach(async ({ nodes }) => {
@@ -58,9 +64,9 @@ describe<{
 		validators,
 		p2p,
 	}) => {
-		// Node 1 prevoted some other block at (1, 0) in its previous life and crashed before the
-		// network decided; prevoting the freshly proposed block now would double-sign.
-		restoreCrashedValidator(nodes[1], validators[1], {
+		// The slot-1 validator prevoted some other block at (1, 0) in its previous life and crashed
+		// before the network decided; prevoting the freshly proposed block now would double-sign.
+		restoreCrashedValidator(getNodeForValidator(nodes, validators[1]), validators[1], {
 			blockNumber: 1,
 			round: 0,
 			step: Prevote,
@@ -94,9 +100,9 @@ describe<{
 		validators,
 		p2p,
 	}) => {
-		// Node 0 - the proposer - proposed some other block at (1, 0) and crashed; rebuilding and
-		// signing a new block for the same position would double-propose.
-		restoreCrashedValidator(nodes[0], validators[0], {
+		// The slot-0 validator - the proposer - proposed some other block at (1, 0) and crashed;
+		// rebuilding and signing a new block for the same position would double-propose.
+		restoreCrashedValidator(getNodeForValidator(nodes, validators[0]), validators[0], {
 			blockNumber: 1,
 			round: 0,
 			step: Propose,
