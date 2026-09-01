@@ -50,6 +50,34 @@ export const getValidators = async (
 	return result;
 };
 
+export const getValidatorsInSlotOrder = async (
+	app: Contracts.Kernel.Application,
+	validators: ValidatorsJson,
+): Promise<Validator[]> => {
+	const parsed = await getValidators(app, validators);
+	const validatorSet = app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
+
+	const inSlotOrder = Array.from<Validator>({ length: parsed.length });
+	for (const validator of parsed) {
+		inSlotOrder[validatorSet.getValidatorIndexByWalletAddress(validator.address)] = validator;
+	}
+
+	return inSlotOrder;
+};
+
+export const getNodeForValidator = (
+	nodes: Contracts.Kernel.Application[],
+	validator: Validator,
+): Contracts.Kernel.Application => {
+	const node = nodes.find((node) => node.config<string[]>("validators.secrets")?.includes(validator.mnemonic));
+
+	if (!node) {
+		throw new Error(`No node validator ${validator.address} found`);
+	}
+
+	return node;
+};
+
 export const makeProposal = async (
 	app: Contracts.Kernel.Application,
 	validator: Validator,
