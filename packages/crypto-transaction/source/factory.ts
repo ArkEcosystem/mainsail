@@ -107,7 +107,7 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 		assert.string(data.s);
 
 		if (!this.signatureEcdsa.isLowS({ r: data.r, s: data.s, v: data.v })) {
-			throw new InvalidTransactionBytesError("non-canonical signature (high S value)");
+			throw new Error("non-canonical signature (high S value)");
 		}
 
 		const unsignedHash = await this.hashFactory.toHashUnsigned(data);
