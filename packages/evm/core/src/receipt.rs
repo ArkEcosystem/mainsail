@@ -86,10 +86,47 @@ fn map_logs(logs: Vec<Log>) -> Vec<StoredLog> {
 
 #[cfg(test)]
 mod tests {
-    use crate::receipt::map_execution_result;
-    use alloy_primitives::address;
+    use crate::receipt::{StoredLog, map_execution_result};
+    use alloy_primitives::{Log, LogData, address, b256};
     use bytes::Bytes;
     use revm::context::result::{ExecutionResult, HaltReason, Output, ResultGas, SuccessReason};
+
+    fn sample_log() -> Log {
+        Log {
+            address: address!("00000000000000000000000000000000000000aa"),
+            data: LogData::new(
+                vec![
+                    b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+                    b256!("0000000000000000000000000000000000000000000000000000000000000002"),
+                ],
+                alloy_primitives::Bytes::from_static(&[0xde, 0xad, 0xbe, 0xef]),
+            )
+            .unwrap(),
+        }
+    }
+
+    #[test]
+    fn stored_log_bincode_matches_alloy_log() {
+        let log = sample_log();
+        let stored = StoredLog::from(log.clone());
+
+        let alloy_bytes = bincode::serialize(&log).unwrap();
+        assert_eq!(bincode::serialize(&stored).unwrap(), alloy_bytes);
+
+        let decoded: StoredLog = bincode::deserialize(&alloy_bytes).unwrap();
+        assert_eq!(decoded, stored);
+    }
+
+    #[test]
+    fn stored_log_json_matches_alloy_log() {
+        let log = sample_log();
+        let stored = StoredLog::from(log.clone());
+
+        assert_eq!(
+            serde_json::to_value(&stored).unwrap(),
+            serde_json::to_value(&log).unwrap()
+        );
+    }
 
     #[test]
     fn test_map_execution_result_call() {
