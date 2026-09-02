@@ -17,11 +17,12 @@ import {
 	makeProposal,
 	prepareNodeValidators,
 	snoozeForBlock,
+	snoozeUntil,
 } from "./utilities.js";
 import type { Contracts } from "@mainsail/contracts";
 
 describe<{
-	nodes: Contracts.Kernel.Application[],
+	nodes: Contracts.Kernel.Application[];
 	validators: Validator[];
 	p2p: P2PRegistry;
 }>("Propose", ({ beforeEach, afterEach, it, assert, stub }) => {
@@ -122,13 +123,7 @@ describe<{
 				.getMessages(1, 0)
 				.map((prevote) => prevote.blockHash)
 				.sort(),
-			[
-				undefined,
-				commit.block.hash,
-				commit.block.hash,
-				commit.block.hash,
-				commit.block.hash,
-			].sort(),
+			[undefined, commit.block.hash, commit.block.hash, commit.block.hash, commit.block.hash].sort(),
 		);
 
 		// Next block
@@ -164,6 +159,8 @@ describe<{
 		await assertBlockNumber(nodes, 1);
 		await assertBlockRound(nodes, 1);
 		await assertBlockHash(nodes);
+
+		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === totalNodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -260,6 +257,8 @@ describe<{
 		await assertBlockNumber(nodes, 1);
 		await assertBlockRound(nodes, 1);
 		await assertBlockHash(nodes);
+
+		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === totalNodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes

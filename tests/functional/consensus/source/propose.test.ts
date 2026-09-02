@@ -17,6 +17,7 @@ import {
 	prepareNodeValidators,
 	snoozeForBlock,
 	snoozeForRound,
+	snoozeUntil,
 } from "./utilities.js";
 import { makeCustomProposal, makeTransactionBuilderContext } from "./custom-proposal.js";
 import { EvmCalls } from "@mainsail/test-transaction-builders";
@@ -138,6 +139,12 @@ describe<{
 		await assertBlockRound(nodes, 1);
 		await assertBlockHash(nodes);
 
+		await snoozeUntil(
+			() =>
+				p2p.prevotes.getMessages(1, 0).length === totalNodes &&
+				p2p.precommits.getMessages(1, 0).length === totalNodes,
+		);
+
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
 		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
@@ -233,6 +240,8 @@ describe<{
 		await assertBlockRound(nodes, 1);
 		await assertBlockHash(nodes);
 
+		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === totalNodes);
+
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
 		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
@@ -281,6 +290,8 @@ describe<{
 			await p2p.broadcastProposal(proposal1, [3, 4]);
 
 			await snoozeForRound(nodes, round);
+
+			await snoozeUntil(() => p2p.precommits.getMessages(1, round).length === totalNodes);
 
 			assert.equal(p2p.proposals.getMessages(1, round).length, 2); // Assert number of proposals
 			assert.equal(p2p.prevotes.getMessages(1, round).length, totalNodes); // Assert number of prevotes
@@ -347,9 +358,11 @@ describe<{
 		await assertBlockRound(nodesSubset, 0);
 		await assertBlockHash(nodesSubset);
 
+		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === totalNodes);
+
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
-		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes - 1); // Assert number of precommits
+		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
 
 		// Assert all nodes prevote
 		assert.equal(
@@ -366,10 +379,19 @@ describe<{
 			].sort(),
 		);
 
-		// // Assert all nodes precommit (null)
+		// The majority precommits the block; the partitioned node precommits nil.
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockHash),
-			Array.from({ length: totalNodes - 1 }).fill(proposal0.getPayload().block.hash),
+			p2p.precommits
+				.getMessages(1, 0)
+				.map((precommit) => precommit.blockHash)
+				.sort(),
+			[
+				proposal0.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
+				undefined,
+			].sort(),
 		);
 
 		// Download blocks
@@ -408,6 +430,8 @@ describe<{
 		await assertBlockNumber(nodes, 1);
 		await assertBlockRound(nodes, 1);
 		await assertBlockHash(nodes);
+
+		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === totalNodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 5); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes

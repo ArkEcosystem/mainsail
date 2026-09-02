@@ -9,13 +9,19 @@ import { assertBlockHash, assertBlockNumber, assertBlockRound } from "./asserts.
 import { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { boot, bootMany, bootstrap, bootstrapMany, runMany, setup, stop, stopMany } from "./setup.js";
-import { getNodeForValidator, getValidatorsInSlotOrder, prepareNodeValidators, snoozeForBlock } from "./utilities.js";
+import {
+	getNodeForValidator,
+	getValidatorsInSlotOrder,
+	prepareNodeValidators,
+	snoozeForBlock,
+	snoozeUntil,
+} from "./utilities.js";
 import type { Contracts } from "@mainsail/contracts";
 
 const { Propose, Prevote } = Enums.Consensus.Step;
 
 describe<{
-	nodes: Contracts.Kernel.Application[],
+	nodes: Contracts.Kernel.Application[];
 	validators: Validator[];
 	p2p: P2PRegistry;
 }>("DoubleSign", ({ beforeEach, afterEach, it, assert }) => {
@@ -116,6 +122,8 @@ describe<{
 
 		// No proposal went out at round 0; every validator (the proposer included) prevoted nil
 		// after the propose timeout, which is a later step and past the watermark.
+		await snoozeUntil(() => p2p.prevotes.getMessages(1, 0).length === totalNodes);
+
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 0);
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes);
 
