@@ -1,10 +1,14 @@
 use alloy_primitives::Keccak256;
-use revm::primitives::B256;
-use serde::Serialize;
-use std::io::{self, Write};
+use revm::{
+    primitives::{Address, B256, U256},
+    state::{AccountInfo, Bytecode},
+};
+use std::collections::BTreeMap;
 
 use crate::{
     db::{GenesisInfo, PendingCommit},
+    legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
+    state_changes::StorageChangeset,
     state_commit::build_commit,
 };
 
@@ -30,46 +34,134 @@ pub fn calculate(
 
     let state = pending_commit
         .built_commit
-        .as_mut()
+        .as_ref()
         .expect("state commit exists");
+    let change_set = &state.change_set;
 
     let mut w = HashWriter::new();
+    w.put(DOMAIN_STATE_ROOT);
+    w.put_u64(state.key.0);
+    w.put(parent_hash.as_slice());
 
-    w.write(DOMAIN_STATE_ROOT)?;
-    w.write(&state.key.0.to_le_bytes())?;
-    w.write(parent_hash.as_slice())?;
-    encode_section(&mut w, TAG_GENESIS_INFO, genesis_info)?;
+    w.put_u8(TAG_GENESIS_INFO);
+    put_genesis_info(&mut w, genesis_info);
 
-    encode_section(&mut w, TAG_ACCOUNTS, &state.change_set.accounts)?;
-    encode_section(&mut w, TAG_CONTRACTS, &state.change_set.contracts)?;
-    encode_section(&mut w, TAG_STORAGE, &state.change_set.storage)?;
-    encode_section(
-        &mut w,
-        TAG_LEGACY_ATTRIBUTES,
-        &state.change_set.legacy_attributes,
-    )?;
-    encode_section(
-        &mut w,
-        TAG_LEGACY_COLD_WALLETS,
-        &state.change_set.legacy_cold_wallets,
-    )?;
-    encode_section(
-        &mut w,
-        TAG_MERGED_LEGACY_COLD_WALLETS,
-        &state.change_set.merged_legacy_cold_wallets,
-    )?;
+    w.put_u8(TAG_ACCOUNTS);
+    put_accounts(&mut w, &change_set.accounts);
+
+    w.put_u8(TAG_CONTRACTS);
+    put_contracts(&mut w, &change_set.contracts);
+
+    w.put_u8(TAG_STORAGE);
+    put_storage(&mut w, &change_set.storage);
+
+    w.put_u8(TAG_LEGACY_ATTRIBUTES);
+    put_attributes_map(&mut w, &change_set.legacy_attributes);
+
+    w.put_u8(TAG_LEGACY_COLD_WALLETS);
+    put_cold_wallets(&mut w, &change_set.legacy_cold_wallets);
+
+    w.put_u8(TAG_MERGED_LEGACY_COLD_WALLETS);
+    put_merged_cold_wallets(&mut w, &change_set.merged_legacy_cold_wallets);
 
     Ok(w.finalize())
 }
 
-fn encode_section<T: Serialize>(
-    w: &mut HashWriter,
-    tag: u8,
-    value: &T,
-) -> Result<(), crate::db::Error> {
-    w.write(&[tag])?;
-    bincode::serialize_into(w, value)?;
-    Ok(())
+fn put_genesis_info(w: &mut HashWriter, info: &GenesisInfo) {
+    w.put(info.account.as_slice());
+    w.put(info.deployer_account.as_slice());
+    w.put(info.validator_contract.as_slice());
+    w.put(info.username_contract.as_slice());
+    w.put_u64(info.initial_block_number);
+    w.put_u256(info.initial_supply);
+}
+
+fn put_accounts(w: &mut HashWriter, accounts: &[(Address, Option<AccountInfo>)]) {
+    w.put_len(accounts.len());
+
+    for (address, account) in accounts {
+        w.put(address.as_slice());
+
+        w.put_opt(account.as_ref(), |w, account| {
+            w.put_u256(account.balance);
+            w.put_u64(account.nonce);
+            w.put(account.code_hash.as_slice());
+        });
+    }
+}
+
+fn put_contracts(w: &mut HashWriter, contracts: &[(B256, Bytecode)]) {
+    w.put_len(contracts.len());
+
+    for (code_hash, _) in contracts {
+        w.put(code_hash.as_slice());
+    }
+}
+
+fn put_storage(w: &mut HashWriter, storage: &[StorageChangeset]) {
+    w.put_len(storage.len());
+
+    for change in storage {
+        w.put(change.address.as_slice());
+        w.put_u8(change.wipe_storage.into());
+        w.put_len(change.storage.len());
+
+        for (slot, value) in &change.storage {
+            w.put_u256(*slot);
+            w.put_u256(value.previous_or_original_value);
+            w.put_u256(value.present_value);
+        }
+    }
+}
+
+fn put_attributes(w: &mut HashWriter, attributes: &LegacyAccountAttributes) {
+    w.put_opt(attributes.legacy_nonce, HashWriter::put_u64);
+    w.put_opt(attributes.second_public_key.as_deref(), |w, key| {
+        w.put_bytes(key.as_bytes())
+    });
+    w.put_opt(attributes.multi_signature.as_ref(), |w, multi_signature| {
+        w.put_len(multi_signature.min);
+        w.put_len(multi_signature.public_keys.len());
+        for key in &multi_signature.public_keys {
+            w.put_bytes(key.as_bytes());
+        }
+    });
+}
+
+fn put_attributes_map(w: &mut HashWriter, attributes: &BTreeMap<Address, LegacyAccountAttributes>) {
+    w.put_len(attributes.len());
+
+    for (address, attributes) in attributes {
+        w.put(address.as_slice());
+        put_attributes(w, attributes);
+    }
+}
+
+fn put_cold_wallets(w: &mut HashWriter, wallets: &BTreeMap<LegacyAddress, LegacyColdWallet>) {
+    w.put_len(wallets.len());
+
+    for (address, wallet) in wallets {
+        w.put(address.as_slice());
+        w.put_u256(wallet.balance);
+        put_attributes(w, &wallet.legacy_attributes);
+        w.put_opt(
+            wallet.merge_info.as_ref(),
+            |w, (transaction_hash, address)| {
+                w.put(transaction_hash.as_slice());
+                w.put(address.as_slice());
+            },
+        );
+    }
+}
+
+fn put_merged_cold_wallets(w: &mut HashWriter, merged: &BTreeMap<Address, (B256, LegacyAddress)>) {
+    w.put_len(merged.len());
+
+    for (address, (transaction_hash, legacy_address)) in merged {
+        w.put(address.as_slice());
+        w.put(transaction_hash.as_slice());
+        w.put(legacy_address.as_slice());
+    }
 }
 
 struct HashWriter {
@@ -83,36 +175,52 @@ impl HashWriter {
         }
     }
 
+    #[inline]
+    fn put(&mut self, bytes: &[u8]) {
+        self.hasher.update(bytes);
+    }
+
+    #[inline]
+    fn put_u8(&mut self, value: u8) {
+        self.hasher.update([value]);
+    }
+
+    #[inline]
+    fn put_u64(&mut self, value: u64) {
+        self.hasher.update(value.to_be_bytes());
+    }
+
+    #[inline]
+    fn put_u256(&mut self, value: U256) {
+        self.hasher.update(value.to_be_bytes::<32>());
+    }
+
+    #[inline]
+    fn put_len(&mut self, value: usize) {
+        self.put_u64(value as u64);
+    }
+
+    #[inline]
+    fn put_bytes(&mut self, bytes: &[u8]) {
+        self.put_len(bytes.len());
+        self.put(bytes);
+    }
+
+    #[inline]
+    fn put_opt<T>(&mut self, value: Option<T>, put: impl FnOnce(&mut Self, T)) {
+        match value {
+            None => self.put_u8(0),
+            Some(value) => {
+                self.put_u8(1);
+                put(self, value);
+            }
+        }
+    }
+
     fn finalize(self) -> B256 {
         self.hasher.finalize()
     }
 }
-
-impl Write for HashWriter {
-    fn write(&mut self, buf: &[u8]) -> io::Result<usize> {
-        self.hasher.update(buf);
-        Ok(buf.len())
-    }
-
-    fn flush(&mut self) -> io::Result<()> {
-        Ok(())
-    }
-}
-
-// fn dump_to_json(
-//     state: &mut StateCommit,
-//     path: impl AsRef<std::path::Path>,
-// ) -> Result<(), crate::db::Error> {
-//     let cs = &state.change_set;
-
-//     let file = std::fs::File::create(path)
-//         .map_err(|e| crate::db::Error::State(format!("dump_to_json open: {e}")))?;
-
-//     serde_json::to_writer_pretty(file, cs)
-//         .map_err(|e| crate::db::Error::State(format!("dump_to_json write: {e}")))?;
-
-//     Ok(())
-// }
 
 #[cfg(test)]
 mod tests {
