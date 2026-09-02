@@ -76,7 +76,6 @@ export interface SerializeOptions {
 }
 
 export interface TransactionVerifier {
-	verifyHash(data: TransactionData): Promise<boolean>;
 	verifySchemaUnsigned(
 		data: TransactionUnsignedSerializable,
 	): Promise<SchemaValidationResult<TransactionUnsignedSerializable>>;

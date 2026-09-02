@@ -122,10 +122,6 @@ export class TransactionBuilder {
 		return this.#legacySecondSignWithKeyPair(await this.keyPairFactory.fromWIF(wif));
 	}
 
-	public async verify(): Promise<boolean> {
-		return this.verifier.verifyHash(this.data);
-	}
-
 	public async getStruct(): Promise<Contracts.Crypto.TransactionData> {
 		if (
 			!this.data.from ||

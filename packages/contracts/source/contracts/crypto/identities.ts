@@ -69,4 +69,5 @@ export interface SignatureEcdsa {
 	signRecoverable(message: Buffer, privateKey: Buffer): Promise<EcdsaSignature>;
 	verifyRecoverable(signature: EcdsaSignature, message: Buffer, publicKey: Buffer): Promise<boolean>;
 	recoverPublicKey(message: Buffer, signature: EcdsaSignature): string;
+	isLowS(signature: EcdsaSignature): boolean;
 }

@@ -137,14 +137,6 @@ describe<{
 		await assert.rejects(() => builder.getStruct(), MissingTransactionSignatureError);
 	});
 
-	it("#verify - should verify hash", async ({ app }) => {
-		let builder = app.resolve(TransactionBuilder);
-		assert.false(await builder.verify());
-
-		await builder.sign(wallet.passphrase);
-		assert.true(await builder.verify());
-	});
-
 	it("should work with modifiers", async ({ app }) => {
 		const transaction = {
 			hash: "e02f8d66bf5166568f052d8727c60694b3f449b61663214a37542326079fec50",

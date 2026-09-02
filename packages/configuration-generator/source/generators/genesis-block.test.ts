@@ -259,20 +259,4 @@ describe<{
 			"reverted during EVM execution",
 		);
 	});
-
-	it("#generate - should throw when a transaction fails hash verification", async ({
-		app,
-		generator,
-		mnemonicGenerator,
-	}) => {
-		stub(
-			app.get<Contracts.Crypto.TransactionVerifier>(AppIdentifiers.Cryptography.Transaction.Verifier),
-			"verifyHash",
-		).callsFake(async () => false);
-
-		await assert.rejects(
-			() => generator.generate(mnemonicGenerator.generate(), mnemonicGenerator.generateMany(2), baseOptions()),
-			"genesis block contains invalid transactions",
-		);
-	});
 });

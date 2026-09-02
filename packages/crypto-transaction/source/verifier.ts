@@ -16,17 +16,6 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	@inject(Identifiers.Cryptography.Transaction.HashFactory)
 	private readonly hashFactory!: Contracts.Crypto.TransactionHashFactory;
 
-	public async verifyHash(data: Contracts.Crypto.TransactionData): Promise<boolean> {
-		const { r, s, senderPublicKey, v } = data;
-
-		if (v === undefined || !r || !s || !senderPublicKey) {
-			return false;
-		}
-
-		const hash: Buffer = await this.hashFactory.toHashUnsigned(data);
-		return this.signatureFactory.verifyRecoverable({ r, s, v }, hash, Buffer.from(senderPublicKey, "hex"));
-	}
-
 	public async verifySchemaUnsigned(
 		data: Contracts.Crypto.TransactionUnsignedSerializable,
 	): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionUnsignedSerializable>> {
