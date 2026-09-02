@@ -640,6 +640,91 @@ mod tests {
     }
 
     #[test]
+    fn hash_independent_of_change_set_ordering() {
+        use crate::{state_changes::StorageChangeset, state_root};
+        use revm::{
+            database::states::StorageSlot, primitives::Bytes, state::AccountInfo, state::Bytecode,
+        };
+
+        let code = [
+            Bytecode::new_legacy(Bytes::from_static(&[0x60, 0x04, 0x56, 0x00, 0x5b])),
+            Bytecode::new_eip7702(address!("0000000000000000000000000000000000000009")),
+            Bytecode::new_legacy(Bytes::from_static(&[0x00])),
+        ];
+
+        let slots = vec![
+            (
+                U256::from(3),
+                StorageSlot::new_changed(U256::ZERO, U256::from(30)),
+            ),
+            (
+                U256::from(1),
+                StorageSlot::new_changed(U256::ZERO, U256::from(10)),
+            ),
+            (
+                U256::from(2),
+                StorageSlot::new_changed(U256::ZERO, U256::from(20)),
+            ),
+        ];
+
+        let change_set = StateChangeset {
+            accounts: vec![
+                (
+                    address!("0000000000000000000000000000000000000003"),
+                    Some(AccountInfo::from_balance(U256::from(3))),
+                ),
+                (address!("0000000000000000000000000000000000000001"), None),
+                (
+                    address!("0000000000000000000000000000000000000002"),
+                    Some(AccountInfo::from_balance(U256::from(2))),
+                ),
+            ],
+            contracts: code.iter().map(|c| (c.hash_slow(), c.clone())).collect(),
+            storage: vec![
+                StorageChangeset {
+                    address: address!("0000000000000000000000000000000000000005"),
+                    wipe_storage: false,
+                    storage: slots.clone(),
+                },
+                StorageChangeset {
+                    address: address!("0000000000000000000000000000000000000004"),
+                    wipe_storage: true,
+                    storage: slots,
+                },
+            ],
+            ..Default::default()
+        };
+
+        let root_of = |change_set: StateChangeset| {
+            let mut state = StateCommit {
+                change_set,
+                ..Default::default()
+            };
+            super::finalize(&mut state);
+
+            let mut pending = PendingCommit {
+                built_commit: Some(state),
+                ..Default::default()
+            };
+            state_root::calculate(&Default::default(), &mut pending, B256::ZERO).expect("ok")
+        };
+
+        let mut reversed = change_set.clone();
+        reversed.accounts.reverse();
+        reversed.contracts.reverse();
+        reversed.storage.reverse();
+        for change in &mut reversed.storage {
+            change.storage.reverse();
+        }
+
+        assert_eq!(
+            root_of(change_set),
+            root_of(reversed),
+            "the root must be independent of changeset ordering"
+        );
+    }
+
+    #[test]
     fn test_apply_rewards() {
         let path = tempfile::Builder::new()
             .prefix("evm.mdb")

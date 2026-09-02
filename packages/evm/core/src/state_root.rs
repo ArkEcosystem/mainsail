@@ -224,114 +224,49 @@ impl HashWriter {
 
 #[cfg(test)]
 mod tests {
-    use std::io::Write;
-
     use crate::{
         db::{GenesisInfo, PendingCommit},
-        state_changes::StateChangeset,
+        legacy::{
+            LegacyAccountAttributes, LegacyAddress, LegacyColdWallet, LegacyMultiSignatureAttribute,
+        },
+        state_changes::{StateChangeset, StorageChangeset},
         state_commit::StateCommit,
         state_root::{HashWriter, calculate},
     };
     use alloy_primitives::{B256, U256, address, b256, keccak256};
+    use revm::{
+        database::states::StorageSlot,
+        primitives::Bytes,
+        state::{AccountInfo, Bytecode},
+    };
 
-    #[test]
-    fn test_calculate_state_root_default() {
-        let result =
-            calculate(&Default::default(), &mut Default::default(), B256::ZERO).expect("ok");
-        assert_eq!(
-            result,
-            revm::primitives::b256!(
-                "0xed972bd9220a2354683cd776010d5a64de3e68d8eeced8f5987e303ff8768f70"
-            )
-        );
+    fn root_of(change_set: StateChangeset, parent_hash: B256) -> B256 {
+        let mut pending_commit = PendingCommit {
+            built_commit: Some(StateCommit {
+                change_set,
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+
+        calculate(&Default::default(), &mut pending_commit, parent_hash).expect("ok")
     }
 
     #[test]
-    fn test_calculate_state_root_storage() {
-        use crate::{
-            legacy::{LegacyAccountAttributes, LegacyAddress},
-            state_changes::StorageChangeset,
-        };
-        use alloy_primitives::{U256, address, b256};
-        use revm::{database::states::StorageSlot, state::AccountInfo};
+    fn test_hash_writer_matches_keccak256() {
+        let input = b"hello world";
 
-        let mut change_set = StateChangeset::default();
-        change_set.accounts.push((
-            address!("0000000000000000000000000000000000000001"),
-            Some(AccountInfo::from_balance(U256::from(1))),
-        ));
+        let mut writer = HashWriter::new();
+        writer.put(input);
 
-        let storage = vec![
-            (
-                U256::from(1),
-                StorageSlot::new_changed(U256::ZERO, U256::from(1234)),
-            ),
-            (
-                U256::from(2),
-                StorageSlot::new_changed(U256::ZERO, U256::from(5678)),
-            ),
-        ];
+        assert_eq!(writer.finalize(), keccak256(input));
+    }
 
-        change_set.storage.push(StorageChangeset {
-            address: address!("0000000000000000000000000000000000000002"),
-            storage: storage.clone(),
-            ..Default::default()
-        });
-
-        change_set.storage.push(StorageChangeset {
-            address: address!("0000000000000000000000000000000000000003"),
-            storage,
-            ..Default::default()
-        });
-
-        change_set.legacy_attributes.insert(
-            address!("0000000000000000000000000000000000000001"),
-            LegacyAccountAttributes {
-                legacy_nonce: Some(5),
-                second_public_key: Some("".into()),
-                ..Default::default()
-            },
-        );
-
-        let legacy_address: LegacyAddress =
-            "DJmvhhiQFSrEQCq9FUxvcLcpcBjx7K3yLt".try_into().unwrap();
-        change_set.legacy_cold_wallets.insert(
-            legacy_address.clone(),
-            crate::legacy::LegacyColdWallet {
-                address: legacy_address.clone(),
-                balance: U256::from(255),
-                legacy_attributes: LegacyAccountAttributes {
-                    legacy_nonce: Some(3),
-                    ..Default::default()
-                },
-                ..Default::default()
-            },
-        );
-
-        change_set.merged_legacy_cold_wallets.insert(
-            address!("0000000000000000000000000000000000000001"),
-            (
-                b256!("0000000000000000000000000000000000000000000000000000000000000001"),
-                legacy_address,
-            ),
-        );
-
-        let state = StateCommit {
-            change_set,
-            ..Default::default()
-        };
-
-        let mut pending_commit = PendingCommit {
-            built_commit: Some(state),
-            ..Default::default()
-        };
-
-        let result = calculate(&Default::default(), &mut pending_commit, B256::ZERO).expect("ok");
+    #[test]
+    fn test_calculate_state_root_default() {
         assert_eq!(
-            result,
-            revm::primitives::b256!(
-                "0x399fcde47d74f5131db840dbce5c86a13778f6fe1f3b64b203a7798ef67d3c1b"
-            )
+            calculate(&Default::default(), &mut Default::default(), B256::ZERO).expect("ok"),
+            b256!("0xcdb087797fbad2b262ac6e73c4547aad8d6222c179ed4b44e65ab84bd5799829")
         );
     }
 
@@ -350,25 +285,146 @@ mod tests {
             b256!("0000000000000000000000000000000000000000000000000000000000000001"),
         )
         .expect("ok");
+
         assert_eq!(
             result,
-            b256!("0x1e617f45632734dfa1d1e76d7f768d8f22337e097e3b4195e59a42bc449751f1")
+            b256!("0xe393577bd112ed50c5256678dfa8706d28bd16ad0d63dd60770b397347251e1d")
         );
     }
 
     #[test]
-    fn test_hash_writer_matches_keccak256_and_flush_is_ok() {
-        let input = b"hello world";
+    fn test_calculate_state_root_all_sections() {
+        let contract = Bytecode::new_legacy(Bytes::from_static(&[0x60, 0x04, 0x56, 0x00, 0x5b]));
+        let attributes = LegacyAccountAttributes {
+            legacy_nonce: Some(5),
+            second_public_key: Some("second".into()),
+            multi_signature: Some(LegacyMultiSignatureAttribute {
+                min: 2,
+                public_keys: vec!["first".into(), "second".into()],
+            }),
+        };
+        let legacy_address: LegacyAddress =
+            "DJmvhhiQFSrEQCq9FUxvcLcpcBjx7K3yLt".try_into().unwrap();
+        let merged_address = LegacyAddress::from([0xab; 21]);
 
-        let mut writer = HashWriter::new();
-        let written = writer.write(input).unwrap();
-        assert_eq!(written, input.len());
+        let mut change_set = StateChangeset {
+            accounts: vec![
+                (
+                    address!("0000000000000000000000000000000000000001"),
+                    Some(
+                        AccountInfo {
+                            balance: U256::from(1),
+                            nonce: 7,
+                            code_hash: contract.hash_slow(),
+                            ..Default::default()
+                        }
+                        .without_code(),
+                    ),
+                ),
+                // Selfdestructed.
+                (address!("0000000000000000000000000000000000000002"), None),
+            ],
+            contracts: vec![(contract.hash_slow(), contract)],
+            storage: vec![
+                StorageChangeset {
+                    address: address!("0000000000000000000000000000000000000003"),
+                    wipe_storage: true,
+                    storage: vec![(
+                        U256::from(1),
+                        StorageSlot::new_changed(U256::ZERO, U256::from(1234)),
+                    )],
+                },
+                StorageChangeset {
+                    address: address!("0000000000000000000000000000000000000004"),
+                    wipe_storage: false,
+                    storage: vec![
+                        (
+                            U256::from(1),
+                            StorageSlot::new_changed(U256::from(11), U256::from(22)),
+                        ),
+                        (
+                            U256::from(2),
+                            StorageSlot::new_changed(U256::ZERO, U256::from(5678)),
+                        ),
+                    ],
+                },
+                // Wiped with no surviving slots.
+                StorageChangeset {
+                    address: address!("0000000000000000000000000000000000000005"),
+                    wipe_storage: true,
+                    storage: vec![],
+                },
+            ],
+            ..Default::default()
+        };
 
-        writer.flush().unwrap();
+        change_set.legacy_attributes.insert(
+            address!("0000000000000000000000000000000000000001"),
+            attributes.clone(),
+        );
+        change_set.legacy_attributes.insert(
+            address!("0000000000000000000000000000000000000002"),
+            LegacyAccountAttributes::default(),
+        );
 
-        let actual = writer.finalize();
-        let expected = keccak256(input);
+        change_set.legacy_cold_wallets.insert(
+            legacy_address,
+            LegacyColdWallet {
+                address: legacy_address,
+                balance: U256::from(255),
+                legacy_attributes: attributes,
+                merge_info: None,
+            },
+        );
+        change_set.legacy_cold_wallets.insert(
+            merged_address,
+            LegacyColdWallet {
+                address: merged_address,
+                balance: U256::from(256),
+                legacy_attributes: LegacyAccountAttributes::default(),
+                merge_info: Some((
+                    b256!("0000000000000000000000000000000000000000000000000000000000000009"),
+                    address!("0000000000000000000000000000000000000001"),
+                )),
+            },
+        );
 
-        assert_eq!(actual, expected);
+        change_set.merged_legacy_cold_wallets.insert(
+            address!("0000000000000000000000000000000000000001"),
+            (
+                b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+                merged_address,
+            ),
+        );
+
+        assert_eq!(
+            root_of(change_set, B256::ZERO),
+            b256!("0x21fd261030ce1ea564e4234394d2d6602fbb32e6c58d79ffc18fafd91f2767f8")
+        );
+    }
+
+    #[test]
+    fn contracts_commit_to_code_hash_only() {
+        let code_hash = b256!("0000000000000000000000000000000000000000000000000000000000000007");
+
+        let root_of_code = |code: Bytecode| {
+            root_of(
+                StateChangeset {
+                    contracts: vec![(code_hash, code)],
+                    ..Default::default()
+                },
+                B256::ZERO,
+            )
+        };
+
+        assert_eq!(
+            root_of_code(Bytecode::new_legacy(Bytes::from_static(&[
+                0x60, 0x04, 0x56, 0x00, 0x5b
+            ]))),
+            root_of_code(Bytecode::new_eip7702(address!(
+                "0000000000000000000000000000000000000009"
+            ))),
+            "the contracts section must depend only on the code hash"
+        );
     }
 }
