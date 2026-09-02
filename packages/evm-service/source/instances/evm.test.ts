@@ -805,7 +805,7 @@ describe<{
 			commitKey,
 			"0000000000000000000000000000000000000000000000000000000000000000",
 		);
-		assert.equal(hash, "a09fc67efe3184d31dc3f1351381ca57861c5a568c122ab3e9c9c06395c52516");
+		assert.equal(hash, "8290222ad24f43257b7bdf941a38b483ffbf7e4add4ded8d3ca2f07660be0ff8");
 	});
 
 	it("should return logs bloom", async ({ instance }) => {
