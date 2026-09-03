@@ -42,8 +42,8 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 		const name = `blockPrepare ${consensus.getBlockNumber()}/${consensus.getRound()}`;
 
 		this.#timeoutStartRound = setTimeoutAsync(async () => {
-			await this.#runTimeoutHandler(name, () => this.#getConsensus().onTimeoutStartRound());
 			this.#timeoutStartRound = undefined;
+			await this.#runTimeoutHandler(name, () => this.#getConsensus().onTimeoutStartRound());
 		}, timeout);
 
 		return true;
@@ -55,10 +55,10 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 		}
 
 		this.#timeoutPropose = setTimeoutAsync(async () => {
+			this.#timeoutPropose = undefined;
 			await this.#runTimeoutHandler(`propose ${height}/${round}`, () =>
 				this.#getConsensus().onTimeoutPropose(height, round),
 			);
-			this.#timeoutPropose = undefined;
 		}, this.#getTimeout(round));
 
 		return true;
@@ -70,10 +70,10 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 		}
 
 		this.#timeoutPrevote = setTimeoutAsync(async () => {
+			this.#timeoutPrevote = undefined;
 			await this.#runTimeoutHandler(`prevote ${height}/${round}`, () =>
 				this.#getConsensus().onTimeoutPrevote(height, round),
 			);
-			this.#timeoutPrevote = undefined;
 		}, this.#getTimeout(round));
 
 		return true;
@@ -85,10 +85,10 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 		}
 
 		this.#timeoutPrecommit = setTimeoutAsync(async () => {
+			this.#timeoutPrecommit = undefined;
 			await this.#runTimeoutHandler(`precommit ${height}/${round}`, () =>
 				this.#getConsensus().onTimeoutPrecommit(height, round),
 			);
-			this.#timeoutPrecommit = undefined;
 		}, this.#getTimeout(round));
 
 		return true;

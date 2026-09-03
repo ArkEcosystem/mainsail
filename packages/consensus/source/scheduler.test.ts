@@ -273,6 +273,53 @@ describe<{
 		});
 	}
 
+	const runningHandlers: [string, (scheduler: Scheduler) => boolean][] = [
+		["onTimeoutStartRound", (scheduler) => scheduler.scheduleTimeoutBlockPrepare(8000)],
+		["onTimeoutPropose", (scheduler) => scheduler.scheduleTimeoutPropose(1, 2)],
+		["onTimeoutPrevote", (scheduler) => scheduler.scheduleTimeoutPrevote(1, 2)],
+		["onTimeoutPrecommit", (scheduler) => scheduler.scheduleTimeoutPrecommit(1, 2)],
+	];
+
+	for (const [handler, schedule] of runningHandlers) {
+		it(`#${handler} - should free the slot before the handler runs`, async ({ scheduler }) => {
+			const fakeTimers = clock();
+			let release!: () => void;
+			const spyHandler = stub(consensus, handler).callsFake(
+				() => new Promise<void>((resolve) => (release = resolve)),
+			);
+
+			assert.true(schedule(scheduler));
+			await fakeTimers.nextAsync();
+			spyHandler.calledOnce();
+
+			// The timer has fired, so a handler that moves consensus on (e.g. onTimeoutPrecommit starting the
+			// next round) must be able to schedule the same kind of timeout again while it is still running.
+			assert.true(schedule(scheduler));
+
+			release();
+			await fakeTimers.tickAsync(0);
+
+			// The re-scheduled timeout stays tracked once the first handler has finished, so clear() cancels it.
+			scheduler.clear();
+			await fakeTimers.nextAsync();
+
+			spyHandler.calledOnce();
+		});
+	}
+
+	it("#clear - should clear timeoutBlockPrepare", async ({ scheduler }) => {
+		const fakeTimers = clock();
+		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
+
+		assert.true(scheduler.scheduleTimeoutBlockPrepare(8000));
+		scheduler.clear();
+		await fakeTimers.nextAsync();
+
+		spyOnTimeoutStartRound.neverCalled();
+		// Cleared slots are free again.
+		assert.true(scheduler.scheduleTimeoutBlockPrepare(8000));
+	});
+
 	it("#clear - should clear timeoutPropose", async ({ scheduler }) => {
 		const fakeTimers = clock();
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPropose");
@@ -286,24 +333,41 @@ describe<{
 
 	it("#clear - should clear timeoutPrevote", async ({ scheduler }) => {
 		const fakeTimers = clock();
-		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrevote");
+		const spyOnTimeoutPrevote = spy(consensus, "onTimeoutPrevote");
 
 		assert.true(scheduler.scheduleTimeoutPrevote(1, 2));
 		scheduler.clear();
-
 		await fakeTimers.nextAsync();
 
-		spyOnTimeoutPropose.neverCalled();
+		spyOnTimeoutPrevote.neverCalled();
 	});
 
-	it("#clear - should clear timeoutPrevote", async ({ scheduler }) => {
+	it("#clear - should clear timeoutPrecommit", async ({ scheduler }) => {
 		const fakeTimers = clock();
-		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrecommit");
+		const spyOnTimeoutPrecommit = spy(consensus, "onTimeoutPrecommit");
 
 		assert.true(scheduler.scheduleTimeoutPrecommit(1, 2));
 		scheduler.clear();
 		await fakeTimers.nextAsync();
 
-		spyOnTimeoutPropose.neverCalled();
+		spyOnTimeoutPrecommit.neverCalled();
+	});
+
+	it("#clear - should clear every pending timeout at once", async ({ scheduler }) => {
+		const fakeTimers = clock();
+		const spies = ["onTimeoutStartRound", "onTimeoutPropose", "onTimeoutPrevote", "onTimeoutPrecommit"].map(
+			(handler) => spy(consensus, handler),
+		);
+
+		assert.true(scheduler.scheduleTimeoutBlockPrepare(8000));
+		assert.true(scheduler.scheduleTimeoutPropose(1, 2));
+		assert.true(scheduler.scheduleTimeoutPrevote(1, 2));
+		assert.true(scheduler.scheduleTimeoutPrecommit(1, 2));
+		scheduler.clear();
+		await fakeTimers.runAllAsync();
+
+		for (const spyHandler of spies) {
+			spyHandler.neverCalled();
+		}
 	});
 });
