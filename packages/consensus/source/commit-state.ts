@@ -50,7 +50,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 	}
 
 	public getProcessorResult(): Contracts.Processor.BlockProcessorResult {
-		if (this.#processorResult == undefined) {
+		if (this.#processorResult === undefined) {
 			throw new Error("Processor result is undefined.");
 		}
 
