@@ -23,11 +23,13 @@ class TestProcessor extends AbstractProcessor {
 describe<{
 	app: Application;
 	processor: TestProcessor;
+	configuration: any;
 	consensus: any;
 	logger: any;
 	timestampCalculator: any;
 }>("AbstractProcessor", ({ it, assert, beforeEach, spy, stub, clock }) => {
 	const lastBlock = { hash: "last-block-hash", number: 4 };
+	const tolerance = 100;
 
 	beforeEach((context) => {
 		context.consensus = {
@@ -44,10 +46,15 @@ describe<{
 			calculateMinimalTimestamp: () => 0,
 		};
 
+		context.configuration = {
+			getMilestone: () => ({ timeouts: { tolerance } }),
+		};
+
 		context.app = new Application();
 		context.app.bind(Identifiers.Consensus.Service).toConstantValue(context.consensus);
 		context.app.bind(Identifiers.Consensus.CommitLock).toConstantValue({});
 		context.app.bind(Identifiers.State.Store).toConstantValue({ getLastBlock: () => lastBlock });
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 		context.app.bind(Identifiers.BlockchainUtils.TimestampCalculator).toConstantValue(context.timestampCalculator);
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
@@ -92,17 +99,37 @@ describe<{
 		assert.true(processor.inBounds({ round: 1 }));
 	});
 
-	it("#isRoundInBounds - should tolerate a time drift of just under 500ms", ({ processor, timestampCalculator }) => {
+	it("#isRoundInBounds - should tolerate a time drift of just under the milestone tolerance", ({
+		processor,
+		timestampCalculator,
+	}) => {
 		const now = 1_000_000;
 		clock({ now });
 		const calculateMinimalTimestamp = stub(timestampCalculator, "calculateMinimalTimestamp");
 
-		// The bound is exclusive: now must be strictly after (minimal timestamp - 500).
-		calculateMinimalTimestamp.returnValue(now + 499);
+		// The bound is exclusive: now must be strictly after (minimal timestamp - tolerance). A block stamped at
+		// the minimal timestamp is then never more than the tolerance ahead, which is what the timestamp verifier
+		// allows, so an accepted proposal cannot carry a block the verifier rejects as a future block.
+		calculateMinimalTimestamp.returnValue(now + tolerance - 1);
 		assert.true(processor.inBounds({ round: 1 }));
 
-		calculateMinimalTimestamp.returnValue(now + 500);
+		calculateMinimalTimestamp.returnValue(now + tolerance);
 		assert.false(processor.inBounds({ round: 1 }));
+	});
+
+	it("#isRoundInBounds - should take the tolerance from the current milestone", ({
+		processor,
+		configuration,
+		timestampCalculator,
+	}) => {
+		const now = 1_000_000;
+		clock({ now });
+		const getMilestone = stub(configuration, "getMilestone").returnValue({ timeouts: { tolerance: 5000 } });
+		stub(timestampCalculator, "calculateMinimalTimestamp").returnValue(now + 4999);
+
+		assert.true(processor.inBounds({ round: 1 }));
+		getMilestone.calledOnce();
+		getMilestone.calledWith();
 	});
 
 	it("#isRoundInBounds - should reject a round whose minimal timestamp is still ahead", ({

@@ -16,6 +16,9 @@ export class AbstractProcessor {
 	@inject(Identifiers.State.Store)
 	protected readonly stateStore!: Contracts.State.Store;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	protected readonly configuration!: Contracts.Crypto.Configuration;
+
 	@inject(Identifiers.BlockchainUtils.TimestampCalculator)
 	private readonly timestampCalculator!: Contracts.BlockchainUtils.TimestampCalculator;
 
@@ -30,8 +33,10 @@ export class AbstractProcessor {
 	}
 
 	protected isRoundInBounds(message: { round: number }): boolean {
+		const { tolerance } = this.configuration.getMilestone().timeouts;
 		const earliestTime =
-			this.timestampCalculator.calculateMinimalTimestamp(this.stateStore.getLastBlock(), message.round) - 500; // Allow time drift between nodes
+			this.timestampCalculator.calculateMinimalTimestamp(this.stateStore.getLastBlock(), message.round) -
+			tolerance;
 
 		return dayjs().isAfter(dayjs(earliestTime));
 	}

@@ -14,6 +14,7 @@ describe<{
 	processor: MessageProcessor;
 	broadcaster: any;
 	commitLock: any;
+	configuration: any;
 	consensus: any;
 	logger: any;
 	roundState: any;
@@ -26,6 +27,7 @@ describe<{
 }>("MessageProcessor", ({ it, assert, beforeEach, stub, spy }) => {
 	const blockNumber = 1;
 	const round = 1;
+	const tolerance = 100;
 	const genesisBlockHash = "genesis-hash";
 	const previousBlockHash = "previous-hash";
 	const blsPublicKey = "aa".repeat(48);
@@ -58,6 +60,7 @@ describe<{
 		};
 		// Rounds are in bounds by default; individual tests move the minimal timestamp into the future.
 		context.timestampCalculator = { calculateMinimalTimestamp: () => Date.now() - 10_000 };
+		context.configuration = { getMilestone: () => ({ timeouts: { tolerance } }) };
 		context.logger = { error: () => {}, warn: () => {} };
 		context.serializer = { serializeMessageForSignature: async () => serializedForSignature };
 		context.validatorSet = { getValidator: () => ({ blsPublicKey }) };
@@ -77,6 +80,7 @@ describe<{
 		context.app.bind(Identifiers.Consensus.CommitLock).toConstantValue(context.commitLock);
 		context.app.bind(Identifiers.State.Store).toConstantValue(context.stateStore);
 		context.app.bind(Identifiers.BlockchainUtils.TimestampCalculator).toConstantValue(context.timestampCalculator);
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.app.bind(Identifiers.Cryptography.Message.Serializer).toConstantValue(context.serializer);
 		context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
@@ -149,11 +153,11 @@ describe<{
 		consensusSignature.neverCalled();
 	});
 
-	it("#process - should accept a message within the time drift allowance of the round bounds", async ({
+	it("#process - should accept a message within the milestone tolerance of the round bounds", async ({
 		processor,
 		timestampCalculator,
 	}) => {
-		stub(timestampCalculator, "calculateMinimalTimestamp").returnValue(Date.now() + 200);
+		stub(timestampCalculator, "calculateMinimalTimestamp").returnValue(Date.now() + tolerance / 2);
 
 		assert.equal(await processor.process(makeMessage()), Accepted);
 	});

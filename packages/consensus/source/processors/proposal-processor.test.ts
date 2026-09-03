@@ -31,6 +31,7 @@ describe<{
 	const round = 2;
 	const proposerIndex = 3;
 	const roundValidators = 4;
+	const tolerance = 100;
 	const blockHash = "block-hash";
 	const genesisBlockHash = "genesis-hash";
 	const previousBlockHash = "previous-hash";
@@ -72,7 +73,7 @@ describe<{
 		context.proposalSerializer = { serializeProposalUnsigned: async () => serializedUnsigned };
 		context.messageSerializer = { serializeMessageForSignature: async () => serializedPrevote };
 		context.consensusSignature = { verify: async () => true };
-		context.configuration = { getMilestone: () => ({ roundValidators }) };
+		context.configuration = { getMilestone: () => ({ roundValidators, timeouts: { tolerance } }) };
 		context.aggregator = { verify: async () => true };
 		context.proposerCalculator = { getValidatorIndex: () => proposerIndex };
 		context.validatorSet = { getValidator: () => ({ blsPublicKey }) };

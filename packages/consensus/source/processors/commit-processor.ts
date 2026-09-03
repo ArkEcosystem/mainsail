@@ -7,9 +7,6 @@ import { AbstractProcessor } from "./abstract-processor.js";
 
 @injectable()
 export class CommitProcessor extends AbstractProcessor implements Contracts.Consensus.CommitProcessor {
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.Configuration;
-
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer!: Contracts.Crypto.MessageSerializer;
 
