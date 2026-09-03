@@ -179,7 +179,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 
 			if (result.gasLeft < 0) {
 				this.logger.warn(
-					`Skipping tx ${transaction.hash} due to insufficient block space (tx.gasUsed=${gasUsed} gasLeft=${transaction.gasLimit} optimistic=${optimisticExecution})`,
+					`Skipping tx ${transaction.hash} due to insufficient block space (tx.gasUsed=${gasUsed} gasLeft=${result.gasLeft + gasUsed} optimistic=${optimisticExecution})`,
 				);
 
 				if (snapshotTaken) {
@@ -188,7 +188,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 				} else {
 					// In practice, this should never happen since the validator should reject transactions that exceed the block gas limit, but we check just in case.
 					throw new Error(
-						`Non-optimistic transaction processing requires more gas than remaining block space (tx.gasUsed=${gasUsed} gasLeft=${transaction.gasLimit})`,
+						`Non-optimistic transaction processing requires more gas than remaining block space (tx.gasUsed=${gasUsed} gasLeft=${result.gasLeft + gasUsed})`,
 					);
 				}
 			}
