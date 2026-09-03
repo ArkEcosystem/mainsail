@@ -37,11 +37,13 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		broadcast: boolean = true,
 	): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
-			if (!this.hasValidBlockNumberAndRound({ blockNumber: proposal.blockHeader.number, round: proposal.round })) {
+			if (
+				!this.hasValidBlockNumberAndRound({ blockNumber: proposal.blockHeader.number, round: proposal.round })
+			) {
 				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
-			if (!this.isRoundInBounds(proposal)) {
+			if (this.isRoundAheadOfTime(proposal)) {
 				return Enums.Consensus.ProcessorResult.Invalid;
 			}
 

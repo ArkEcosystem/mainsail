@@ -153,7 +153,7 @@ describe<{
 		getRoundState.calledWith(blockNumber, round + 3);
 	});
 
-	it("#process - should reject a proposal whose round is not in bounds yet", async ({
+	it("#process - should reject a proposal whose round is not in time bounds yet", async ({
 		processor,
 		proposerCalculator,
 		stateStore,

@@ -24,7 +24,7 @@ describe<{
 		onTimeoutPrecommit: () => {},
 		onTimeoutPrevote: () => {},
 		onTimeoutPropose: () => {},
-		onTimeoutStartRound: () => {},
+		onTimeoutBlockPrepare: () => {},
 	};
 
 	const config = {
@@ -85,29 +85,29 @@ describe<{
 		spyOnGetLastBlock.calledOnce();
 	});
 
-	it("#scheduleTimeoutBlockPrepare - should call onTimeoutStartRound", async ({ scheduler }) => {
+	it("#scheduleTimeoutBlockPrepare - should call onTimeoutBlockPrepare", async ({ scheduler }) => {
 		currentTimestamp = 2000;
 
 		const fakeTimers = clock();
-		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
+		const spyOnTimeoutBlockPrepare = spy(consensus, "onTimeoutBlockPrepare");
 
 		assert.true(scheduler.scheduleTimeoutBlockPrepare(8000));
 		await fakeTimers.nextAsync();
 
-		spyOnTimeoutStartRound.calledOnce();
+		spyOnTimeoutBlockPrepare.calledOnce();
 		assert.equal(fakeTimers.now, 6000); // 8000 - 2000
 	});
 
-	it("#scheduleTimeoutBlockPrepare - should call onTimeoutStartRound only once", async ({ scheduler }) => {
+	it("#scheduleTimeoutBlockPrepare - should call onTimeoutBlockPrepare only once", async ({ scheduler }) => {
 		const fakeTimers = clock();
-		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
+		const spyOnTimeoutBlockPrepare = spy(consensus, "onTimeoutBlockPrepare");
 
 		assert.true(scheduler.scheduleTimeoutBlockPrepare(8000));
 		assert.false(scheduler.scheduleTimeoutBlockPrepare(8000));
 		await fakeTimers.nextAsync();
 		await fakeTimers.nextAsync();
 
-		spyOnTimeoutStartRound.calledOnce();
+		spyOnTimeoutBlockPrepare.calledOnce();
 	});
 
 	it("#scheduleTimeoutBlockPrepare - should fire immediately when the timestamp has already passed", async ({
@@ -116,12 +116,12 @@ describe<{
 		currentTimestamp = 10_000;
 
 		const fakeTimers = clock();
-		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
+		const spyOnTimeoutBlockPrepare = spy(consensus, "onTimeoutBlockPrepare");
 
 		assert.true(scheduler.scheduleTimeoutBlockPrepare(8000));
 		await fakeTimers.nextAsync();
 
-		spyOnTimeoutStartRound.calledOnce();
+		spyOnTimeoutBlockPrepare.calledOnce();
 		assert.equal(fakeTimers.now, 0);
 	});
 
@@ -260,7 +260,7 @@ describe<{
 	const timeouts: [string, string, string, (scheduler: Scheduler) => boolean][] = [
 		[
 			"scheduleTimeoutBlockPrepare",
-			"onTimeoutStartRound",
+			"onTimeoutBlockPrepare",
 			"blockPrepare 1/0",
 			(scheduler) => scheduler.scheduleTimeoutBlockPrepare(8000),
 		],
@@ -338,13 +338,13 @@ describe<{
 
 	it("#clear - should clear timeoutBlockPrepare", async ({ scheduler }) => {
 		const fakeTimers = clock();
-		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
+		const spyOnTimeoutBlockPrepare = spy(consensus, "onTimeoutBlockPrepare");
 
 		assert.true(scheduler.scheduleTimeoutBlockPrepare(8000));
 		scheduler.clear();
 		await fakeTimers.nextAsync();
 
-		spyOnTimeoutStartRound.neverCalled();
+		spyOnTimeoutBlockPrepare.neverCalled();
 		// Cleared slots are free again.
 		assert.true(scheduler.scheduleTimeoutBlockPrepare(8000));
 	});
@@ -384,7 +384,7 @@ describe<{
 
 	it("#clear - should clear every pending timeout at once", async ({ scheduler }) => {
 		const fakeTimers = clock();
-		const spies = ["onTimeoutStartRound", "onTimeoutPropose", "onTimeoutPrevote", "onTimeoutPrecommit"].map(
+		const spies = ["onTimeoutBlockPrepare", "onTimeoutPropose", "onTimeoutPrevote", "onTimeoutPrecommit"].map(
 			(handler) => spy(consensus, handler),
 		);
 

@@ -116,8 +116,8 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	// Only for tests
-	public setValidRound(round: Contracts.Consensus.RoundState): void {
-		this.#validValue = round;
+	public setValidValue(roundState: Contracts.Consensus.RoundState): void {
+		this.#validValue = roundState;
 	}
 
 	// Only for tests
@@ -231,7 +231,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		const roundState = this.roundStateRepository.getRoundState(this.#blockNumber, this.#round);
 		this.logger.info(
-			`>> Starting new round: ${this.#getHeightRoundString()} with proposer: ${roundState.proposer.address}`,
+			`>> Starting new round: ${this.#getBlockNumberRoundString()} with proposer: ${roundState.proposer.address}`,
 			"consensus",
 		);
 
@@ -240,10 +240,10 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.scheduler.scheduleTimeoutBlockPrepare(this.scheduler.getNextBlockTimestamp(this.#roundStartTime));
 
 		// TODO: Skip on sync
-		await this.propose(roundState);
+		await this.prepareProposal(roundState);
 	}
 
-	public async onTimeoutStartRound(): Promise<void> {
+	public async onTimeoutBlockPrepare(): Promise<void> {
 		this.scheduler.scheduleTimeoutPropose(this.#blockNumber, this.#round);
 
 		if (this.#proposalPromise) {
@@ -280,7 +280,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		if (
 			this.#step !== Enums.Consensus.Step.Propose ||
-			this.#isInvalidRoundState(roundState) ||
+			!this.#isCurrentRoundState(roundState) ||
 			!proposal ||
 			proposal.validRound !== undefined
 		) {
@@ -300,7 +300,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		if (
 			this.#step !== Enums.Consensus.Step.Propose ||
-			this.#isInvalidRoundState(roundState) ||
+			!this.#isCurrentRoundState(roundState) ||
 			!proposal ||
 			!proposal.lockProof ||
 			proposal.validRound === undefined ||
@@ -329,7 +329,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		if (
 			this.#didMajorityPrevote ||
 			this.#step === Enums.Consensus.Step.Propose ||
-			this.#isInvalidRoundState(roundState) ||
+			!this.#isCurrentRoundState(roundState) ||
 			!proposal ||
 			!roundState.getProcessorResult().success
 		) {
@@ -355,7 +355,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	protected async onMajorityPrevoteAny(roundState: Contracts.Consensus.RoundState): Promise<void> {
-		if (this.#step !== Enums.Consensus.Step.Prevote || this.#isInvalidRoundState(roundState)) {
+		if (this.#step !== Enums.Consensus.Step.Prevote || !this.#isCurrentRoundState(roundState)) {
 			return;
 		}
 
@@ -365,11 +365,11 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	protected async onMajorityPrevoteNull(roundState: Contracts.Consensus.RoundState): Promise<void> {
-		if (this.#step !== Enums.Consensus.Step.Prevote || this.#isInvalidRoundState(roundState)) {
+		if (this.#step !== Enums.Consensus.Step.Prevote || !this.#isCurrentRoundState(roundState)) {
 			return;
 		}
 
-		this.logger.info(`Received +2/3 prevotes for ${this.#getHeightRoundString()}/null`, "consensus");
+		this.logger.info(`Received +2/3 prevotes for ${this.#getBlockNumberRoundString()}/null`, "consensus");
 
 		this.#step = Enums.Consensus.Step.Precommit;
 
@@ -378,12 +378,12 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	protected async onMajorityPrecommitAny(roundState: Contracts.Consensus.RoundState): Promise<void> {
-		if (this.#isInvalidRoundState(roundState)) {
+		if (!this.#isCurrentRoundState(roundState)) {
 			return;
 		}
 
 		if (this.scheduler.scheduleTimeoutPrecommit(this.#blockNumber, this.#round)) {
-			await this.eventDispatcher.dispatch(Events.ConsensusEvent.PrecommitedAny, this.getState());
+			await this.eventDispatcher.dispatch(Events.ConsensusEvent.PrecommittedAny, this.getState());
 		}
 	}
 
@@ -402,7 +402,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			}
 
 			this.logger.info(
-				`Received +2/3 precommits for ${this.#getHeightRoundString()}, but proposal is missing`,
+				`Received +2/3 precommits for ${this.#getBlockNumberRoundString()}, but proposal is missing`,
 				"consensus",
 			);
 			this.#didMajorityPrecommitAndProposalIsMissing = true;
@@ -423,7 +423,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		await this.eventDispatcher.dispatch(Events.ConsensusEvent.PrecommitedProposal, this.getState());
+		await this.eventDispatcher.dispatch(Events.ConsensusEvent.PrecommittedProposal, this.getState());
 
 		await this.commitLock.runExclusive(async () => {
 			try {
@@ -463,7 +463,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				return;
 			}
 
-			this.logger.info(`Timeout to propose ${this.#getHeightRoundString()} expired`, "consensus");
+			this.logger.info(`Timeout to propose ${this.#getBlockNumberRoundString()} expired`, "consensus");
 
 			this.#step = Enums.Consensus.Step.Prevote;
 			await this.prevote();
@@ -480,7 +480,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				return;
 			}
 
-			this.logger.info(`Timeout to prevote ${this.#getHeightRoundString()} expired`, "consensus");
+			this.logger.info(`Timeout to prevote ${this.#getBlockNumberRoundString()} expired`, "consensus");
 			this.roundStateRepository.getRoundState(this.#blockNumber, this.#round).logPrevotes();
 
 			this.#step = Enums.Consensus.Step.Precommit;
@@ -494,7 +494,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				return;
 			}
 
-			this.logger.info(`Timeout to precommit ${this.#getHeightRoundString()} expired`, "consensus");
+			this.logger.info(`Timeout to precommit ${this.#getBlockNumberRoundString()} expired`, "consensus");
 			this.roundStateRepository.getRoundState(this.#blockNumber, this.#round).logPrevotes();
 			this.roundStateRepository.getRoundState(this.#blockNumber, this.#round).logPrecommits();
 
@@ -502,19 +502,11 @@ export class Consensus implements Contracts.Consensus.Service {
 		});
 	}
 
-	#isInvalidRoundState(roundState: Contracts.Processor.ProcessableUnit): boolean {
-		if (roundState.blockNumber !== this.#blockNumber) {
-			return true;
-		}
-
-		if (roundState.round !== this.#round) {
-			return true;
-		}
-
-		return false;
+	#isCurrentRoundState(roundState: Contracts.Processor.ProcessableUnit): boolean {
+		return roundState.blockNumber === this.#blockNumber && roundState.round === this.#round;
 	}
 
-	public async propose(roundState: Contracts.Consensus.RoundState): Promise<void> {
+	public async prepareProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		if (roundState.hasProposal()) {
 			return;
 		}
@@ -537,16 +529,19 @@ export class Consensus implements Contracts.Consensus.Service {
 		registeredProposer: Contracts.Validator.Validator,
 	): Promise<Contracts.Crypto.Proposal | undefined> {
 		try {
-			return await this.#signProposal(roundState, registeredProposer);
+			return await this.#createProposal(roundState, registeredProposer);
 		} catch (rawError) {
 			const error = ensureError(rawError);
 
 			if (error instanceof DoubleSignError) {
 				// Signing is allowed again once a later round passes the recorded watermark.
-				this.logger.warn(`Skipped proposal for ${this.#getHeightRoundString()}: ${error.message}`, "consensus");
+				this.logger.warn(
+					`Skipped proposal for ${this.#getBlockNumberRoundString()}: ${error.message}`,
+					"consensus",
+				);
 			} else {
 				this.logger.error(
-					`Failed to create proposal for ${this.#getHeightRoundString()}: ${error.stack ?? error.message}`,
+					`Failed to create proposal for ${this.#getBlockNumberRoundString()}: ${error.stack ?? error.message}`,
 					"consensus",
 				);
 			}
@@ -555,7 +550,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 	}
 
-	async #signProposal(
+	async #createProposal(
 		roundState: Contracts.Consensus.RoundState,
 		registeredProposer: Contracts.Validator.Validator,
 	): Promise<Contracts.Crypto.Proposal> {
@@ -614,7 +609,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			} catch (error) {
 				if (error instanceof DoubleSignError) {
 					this.logger.warn(
-						`Skipped prevote for ${this.#getHeightRoundString()}: ${error.message}`,
+						`Skipped prevote for ${this.#getBlockNumberRoundString()}: ${error.message}`,
 						"consensus",
 					);
 					continue;
@@ -646,7 +641,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			} catch (error) {
 				if (error instanceof DoubleSignError) {
 					this.logger.warn(
-						`Skipped precommit for ${this.#getHeightRoundString()}: ${error.message}`,
+						`Skipped precommit for ${this.#getBlockNumberRoundString()}: ${error.message}`,
 						"consensus",
 					);
 					continue;
@@ -692,7 +687,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		this.logger.info(
-			`Completed consensus bootstrap for ${this.#getHeightRoundString()} with total round ${this.stateStore.getTotalRound()}`,
+			`Completed consensus bootstrap for ${this.#getBlockNumberRoundString()} with total round ${this.stateStore.getTotalRound()}`,
 			"consensus",
 		);
 
@@ -714,7 +709,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			} catch (rawError) {
 				const error = ensureError(rawError);
 				this.logger.error(
-					`Failed to process proposal ${this.#getHeightRoundString()}: ${error.message}`,
+					`Failed to process proposal ${this.#getBlockNumberRoundString()}: ${error.message}`,
 					"consensus",
 				);
 
@@ -733,7 +728,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 	}
 
-	#getHeightRoundString(): string {
+	#getBlockNumberRoundString(): string {
 		const number = this.#blockNumber.toLocaleString(Locale);
 		const consensusRound = this.#round.toLocaleString(Locale);
 

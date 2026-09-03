@@ -343,7 +343,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(block);
 		const spyDispatch = spy(eventDispatcher, "dispatch");
 
-		consensus.setValidRound(roundState);
+		consensus.setValidValue(roundState);
 		await consensus.startRound(1);
 
 		spyScheduleClear.calledOnce();
@@ -374,7 +374,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
 	});
 
-	it("#onTimeoutStartRound - should propose if proposal is ready", async ({
+	it("#onTimeoutBlockPrepare - should propose if proposal is ready", async ({
 		consensus,
 		proposalProcessor,
 		proposal,
@@ -384,7 +384,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyLoggerNotice = spy(logger, "notice");
 
 		consensus.setProposal(proposal, proposal.getData().block);
-		await consensus.onTimeoutStartRound();
+		await consensus.onTimeoutBlockPrepare();
 
 		spyProposalProcess.calledOnce();
 		spyProposalProcess.calledWith(proposal);
@@ -395,7 +395,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
 	});
 
-	it("#onTimeoutStartRound - should skip propose if already proposed", async ({
+	it("#onTimeoutBlockPrepare - should skip propose if already proposed", async ({
 		consensus,
 		proposalProcessor,
 		proposal,
@@ -404,8 +404,8 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyProposalProcess = spy(proposalProcessor, "process");
 
 		consensus.setProposal(proposal, proposal.getData().block);
-		await consensus.onTimeoutStartRound();
-		await consensus.onTimeoutStartRound();
+		await consensus.onTimeoutBlockPrepare();
+		await consensus.onTimeoutBlockPrepare();
 
 		spyProposalProcess.calledOnce();
 		spyProposalProcess.calledWith(proposal);
@@ -413,7 +413,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
 	});
 
-	it("#onTimeoutStartRound - should skip the proposal and continue when the double-sign guard refuses", async ({
+	it("#onTimeoutBlockPrepare - should skip the proposal and continue when the double-sign guard refuses", async ({
 		consensus,
 		validatorsRepository,
 		roundStateRepository,
@@ -442,14 +442,14 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyLoggerWarn = spy(logger, "warn");
 
 		await consensus.startRound(0);
-		await consensus.onTimeoutStartRound();
+		await consensus.onTimeoutBlockPrepare();
 
 		spyLoggerWarn.calledOnce();
 		spyProposalProcess.neverCalled();
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
 	});
 
-	it("#propose - should catch a forging failure instead of leaving an unhandled rejection", async ({
+	it("#prepareProposal - should catch a forging failure instead of leaving an unhandled rejection", async ({
 		consensus,
 		validatorsRepository,
 		roundStateRepository,
@@ -484,7 +484,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyLoggerError.calledOnce();
 
 		// Nothing is proposed and the step is untouched, so the propose timeout moves the round on.
-		await consensus.onTimeoutStartRound();
+		await consensus.onTimeoutBlockPrepare();
 
 		spyProposalProcess.neverCalled();
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
@@ -1427,7 +1427,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyScheduleTimeout.calledWith(1, 0);
 
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Events.ConsensusEvent.PrecommitedAny, {
+		spyDispatch.calledWith(Events.ConsensusEvent.PrecommittedAny, {
 			blockNumber: 1,
 			lockedRound: undefined,
 			round: 0,
@@ -1524,7 +1524,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyRoundStateRepositoryClear.calledOnce();
 		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0}/${proposal.getData().block.hash}`);
 		spyDispatch.calledOnce();
-		spyDispatch.calledWith(Events.ConsensusEvent.PrecommitedProposal, {
+		spyDispatch.calledWith(Events.ConsensusEvent.PrecommittedProposal, {
 			blockNumber: 1,
 			lockedRound: undefined,
 			round: 0,
@@ -1741,7 +1741,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await context.fakeTimers.nextAsync();
 	};
 
-	it("#onTimeoutStartRound - should report the proposal this node submits", async ({
+	it("#onTimeoutBlockPrepare - should report the proposal this node submits", async ({
 		consensus,
 		logger,
 		proposal,
@@ -1749,7 +1749,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyLoggerNotice = spy(logger, "notice");
 
 		consensus.setProposal(proposal, proposal.getData().block);
-		await consensus.onTimeoutStartRound();
+		await consensus.onTimeoutBlockPrepare();
 
 		spyLoggerNotice.calledOnce();
 		spyLoggerNotice.calledWith(
@@ -1757,13 +1757,13 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		);
 	});
 
-	it("#onTimeoutStartRound - should report nothing when there is no proposal to submit", async ({
+	it("#onTimeoutBlockPrepare - should report nothing when there is no proposal to submit", async ({
 		consensus,
 		logger,
 	}) => {
 		const spyLoggerNotice = spy(logger, "notice");
 
-		await consensus.onTimeoutStartRound();
+		await consensus.onTimeoutBlockPrepare();
 
 		spyLoggerNotice.neverCalled();
 	});
@@ -1808,7 +1808,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyLoggerNotice.calledWith(`❌ Missed our slot ${1}/${0} as ${OURS}, committed by ${THEIRS}`);
 	});
 
-	it("#propose - should report nothing while a round of ours is still in play", async (context) => {
+	it("#prepareProposal - should report nothing while a round of ours is still in play", async (context) => {
 		// A commit is accepted on block number alone, so the round we moved on from can still be the one
 		// that commits. Reporting a lost slot here would be a guess.
 		const { consensus, logger } = context;
@@ -1852,7 +1852,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyLoggerNotice.calledWith(`❌ Missed our slot ${1}/${1} as ourSecondValidator, committed by ${THEIRS}`);
 	});
 
-	it("#onTimeoutStartRound - should name the validator proposing, not the forger of a re-proposed block", async (context) => {
+	it("#onTimeoutBlockPrepare - should name the validator proposing, not the forger of a re-proposed block", async (context) => {
 		// A locked value is re-proposed as it stands, so its proposer can be another validator entirely.
 		const { consensus, block, logger, proposal } = context;
 		beOurProposer(context);
@@ -1861,7 +1861,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		await consensus.startRound(0);
 		consensus.setProposal(proposal, { ...block, proposer: THEIRS });
-		await consensus.onTimeoutStartRound();
+		await consensus.onTimeoutBlockPrepare();
 
 		spyLoggerNotice.calledWith(`📦 Proposing block ${1}/${0}/${block.hash} as ${OURS}`);
 	});
@@ -1897,7 +1897,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	});
 
 	it("#onMajorityPrecommit - should report nothing when the round already had a proposal", async (context) => {
-		// Restored mid-round: propose() returns before it can claim the slot, so nothing is reported.
+		// Restored mid-round: prepareProposal() returns before it can claim the slot, so nothing is reported.
 		const { consensus, block, logger } = context;
 		beOurProposer(context);
 		context.roundStateRepository.getRoundState = () => ({
@@ -1937,7 +1937,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyLoggerNotice = spy(logger, "notice");
 
 		consensus.setRound(0);
-		await consensus.propose(context.roundStateRepository.getRoundState());
+		await consensus.prepareProposal(context.roundStateRepository.getRoundState());
 		await commitBlock(context, { ...block, proposer: THEIRS });
 
 		// The next height arriving from a peer must not produce a second report for the same slot.
@@ -1959,7 +1959,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyLoggerNotice = spy(logger, "notice");
 
 		consensus.setRound(0);
-		await consensus.propose(context.roundStateRepository.getRoundState());
+		await consensus.prepareProposal(context.roundStateRepository.getRoundState());
 		await commitBlock(context, { ...block, number: 2, proposer: THEIRS });
 
 		spyLoggerNotice.neverCalled();

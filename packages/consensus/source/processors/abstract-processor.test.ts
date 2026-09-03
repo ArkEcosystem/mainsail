@@ -15,8 +15,8 @@ class TestProcessor extends AbstractProcessor {
 		return this.hasValidBlockNumberAndRound(message);
 	}
 
-	public inBounds(message: { round: number }): boolean {
-		return this.isRoundInBounds(message);
+	public isAheadOfTime(message: { round: number }): boolean {
+		return this.isRoundAheadOfTime(message);
 	}
 }
 
@@ -76,19 +76,19 @@ describe<{
 		assert.false(processor.isCurrent({ blockNumber: 5, round: 0 }));
 	});
 
-	it("#isRoundInBounds - should ask the calculator for the minimal timestamp of the round after the last block", ({
+	it("#isRoundAheadOfTime - should ask the calculator for the minimal timestamp of the round after the last block", ({
 		processor,
 		timestampCalculator,
 	}) => {
 		const calculateMinimalTimestamp = spy(timestampCalculator, "calculateMinimalTimestamp");
 
-		processor.inBounds({ round: 3 });
+		processor.isAheadOfTime({ round: 3 });
 
 		calculateMinimalTimestamp.calledOnce();
 		calculateMinimalTimestamp.calledWith(lastBlock, 3);
 	});
 
-	it("#isRoundInBounds - should accept a round once its minimal timestamp has passed", ({
+	it("#isRoundAheadOfTime - should not flag a round once its minimal timestamp has passed", ({
 		processor,
 		timestampCalculator,
 	}) => {
@@ -96,10 +96,10 @@ describe<{
 		clock({ now });
 		stub(timestampCalculator, "calculateMinimalTimestamp").returnValue(now - 1);
 
-		assert.true(processor.inBounds({ round: 1 }));
+		assert.false(processor.isAheadOfTime({ round: 1 }));
 	});
 
-	it("#isRoundInBounds - should tolerate a time drift of just under the milestone tolerance", ({
+	it("#isRoundAheadOfTime - should tolerate a time drift of just under the milestone tolerance", ({
 		processor,
 		timestampCalculator,
 	}) => {
@@ -111,13 +111,13 @@ describe<{
 		// the minimal timestamp is then never more than the tolerance ahead, which is what the timestamp verifier
 		// allows, so an accepted proposal cannot carry a block the verifier rejects as a future block.
 		calculateMinimalTimestamp.returnValue(now + tolerance - 1);
-		assert.true(processor.inBounds({ round: 1 }));
+		assert.false(processor.isAheadOfTime({ round: 1 }));
 
 		calculateMinimalTimestamp.returnValue(now + tolerance);
-		assert.false(processor.inBounds({ round: 1 }));
+		assert.true(processor.isAheadOfTime({ round: 1 }));
 	});
 
-	it("#isRoundInBounds - should take the tolerance from the current milestone", ({
+	it("#isRoundAheadOfTime - should take the tolerance from the current milestone", ({
 		processor,
 		configuration,
 		timestampCalculator,
@@ -127,12 +127,12 @@ describe<{
 		const getMilestone = stub(configuration, "getMilestone").returnValue({ timeouts: { tolerance: 5000 } });
 		stub(timestampCalculator, "calculateMinimalTimestamp").returnValue(now + 4999);
 
-		assert.true(processor.inBounds({ round: 1 }));
+		assert.false(processor.isAheadOfTime({ round: 1 }));
 		getMilestone.calledOnce();
 		getMilestone.calledWith();
 	});
 
-	it("#isRoundInBounds - should reject a round whose minimal timestamp is still ahead", ({
+	it("#isRoundAheadOfTime - should flag a round whose minimal timestamp is still ahead", ({
 		processor,
 		timestampCalculator,
 	}) => {
@@ -140,7 +140,7 @@ describe<{
 		clock({ now });
 		stub(timestampCalculator, "calculateMinimalTimestamp").returnValue(now + 60_000);
 
-		assert.false(processor.inBounds({ round: 1 }));
+		assert.true(processor.isAheadOfTime({ round: 1 }));
 	});
 
 	it("#handleRoundState - should log a failing handler instead of letting the rejection escape", async ({

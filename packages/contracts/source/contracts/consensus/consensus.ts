@@ -69,7 +69,7 @@ export interface Service {
 	getState(): State;
 	handle(roundState: RoundState): Promise<void>;
 	handleCommitState(commitState: ProcessableUnit): Promise<void>;
-	onTimeoutStartRound(): Promise<void>;
+	onTimeoutBlockPrepare(): Promise<void>;
 	onTimeoutPropose(blockNumber: number, round: number): Promise<void>;
 	onTimeoutPrevote(blockNumber: number, round: number): Promise<void>;
 	onTimeoutPrecommit(blockNumber: number, round: number): Promise<void>;

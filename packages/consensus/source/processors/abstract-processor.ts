@@ -32,13 +32,13 @@ export class AbstractProcessor {
 		);
 	}
 
-	protected isRoundInBounds(message: { round: number }): boolean {
+	protected isRoundAheadOfTime(message: { round: number }): boolean {
 		const { tolerance } = this.configuration.getMilestone().timeouts;
 		const earliestTime =
 			this.timestampCalculator.calculateMinimalTimestamp(this.stateStore.getLastBlock(), message.round) -
 			tolerance;
 
-		return dayjs().isAfter(dayjs(earliestTime));
+		return !dayjs().isAfter(dayjs(earliestTime));
 	}
 
 	protected handleRoundState(roundState: Contracts.Consensus.RoundState): void {

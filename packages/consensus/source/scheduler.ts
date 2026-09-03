@@ -43,7 +43,7 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 
 		this.#timeoutBlockPrepare = setTimeoutAsync(async () => {
 			this.#timeoutBlockPrepare = undefined;
-			await this.#runTimeoutHandler(name, () => this.#getConsensus().onTimeoutStartRound());
+			await this.#runTimeoutHandler(name, () => this.#getConsensus().onTimeoutBlockPrepare());
 		}, timeout);
 
 		return true;

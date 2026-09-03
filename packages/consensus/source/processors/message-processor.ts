@@ -44,12 +44,12 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
-			if (!this.isRoundInBounds(message)) {
+			if (this.isRoundAheadOfTime(message)) {
 				return Enums.Consensus.ProcessorResult.Invalid;
 			}
 
 			const roundState = this.roundStateRepo.getRoundState(message.blockNumber, message.round);
-			if (this.#hasMessage(roundState, message)) {
+			if (this.#isDuplicateMessage(roundState, message)) {
 				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
@@ -63,7 +63,7 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 			}
 
 			// A different message of the same validator may have been added while the signature was verified.
-			if (this.#hasMessage(roundState, message)) {
+			if (this.#isDuplicateMessage(roundState, message)) {
 				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
@@ -79,7 +79,7 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 		});
 	}
 
-	#hasMessage(roundState: Contracts.Consensus.RoundState, message: Contracts.Crypto.Message): boolean {
+	#isDuplicateMessage(roundState: Contracts.Consensus.RoundState, message: Contracts.Crypto.Message): boolean {
 		if (!roundState.hasMessage(message)) {
 			return false;
 		}
