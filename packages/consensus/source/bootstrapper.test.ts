@@ -37,14 +37,14 @@ describe<{
 	});
 
 	beforeEach((context) => {
-		context.roundState = { addMessage: () => {}, addProposal: () => {} };
+		context.roundState = { addMessage: () => {}, addProposal: () => {}, hasProposal: () => true };
 		context.roundStateRepository = { getRoundState: () => context.roundState };
 		context.storage = {
 			getMessages: async () => [],
 			getProposals: async () => [],
 			getState: async () => undefined,
 		};
-		context.logger = { info: () => {} };
+		context.logger = { info: () => {}, warn: () => {} };
 
 		context.app = new Application();
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
@@ -159,19 +159,64 @@ describe<{
 
 	it("#run - should attach the round state of the valid round as valid value", async ({
 		bootstrapper,
+		logger,
 		roundState,
 		roundStateRepository,
 		storage,
 	}) => {
 		stub(storage, "getState").resolvedValue(makeState({ validRound: 1 }));
 		const getRoundState = spy(roundStateRepository, "getRoundState");
+		const warn = spy(logger, "warn");
 
 		const result = await bootstrapper.run();
 
 		getRoundState.calledOnce();
 		getRoundState.calledWith(3, 1);
 		assert.is(result?.validValue, roundState);
+		assert.equal(result?.validRound, 1);
 		assert.undefined(result?.lockedValue);
+		warn.neverCalled();
+	});
+
+	it("#run - should drop the valid round when its proposal is not stored", async ({
+		bootstrapper,
+		logger,
+		roundState,
+		storage,
+	}) => {
+		// The valid value is re-proposed from its proposal, so without one it is useless; a fresh block gets proposed.
+		stub(storage, "getState").resolvedValue(makeState({ validRound: 1 }));
+		roundState.hasProposal = () => false;
+		const warn = spy(logger, "warn");
+
+		const result = await bootstrapper.run();
+
+		assert.undefined(result?.validValue);
+		assert.undefined(result?.validRound);
+		warn.calledOnce();
+		warn.calledWith(
+			"Consensus Bootstrap - Dropping valid round 3/1, because its proposal is not stored",
+			"consensus",
+		);
+	});
+
+	it("#run - should keep the locked round even when its proposal is not stored", async ({
+		bootstrapper,
+		logger,
+		roundState,
+		storage,
+	}) => {
+		// Only the round number of the lock is consumed, and forgetting a lock would weaken safety.
+		stub(storage, "getState").resolvedValue(makeState({ lockedRound: 1, validRound: 1 }));
+		roundState.hasProposal = () => false;
+		const warn = spy(logger, "warn");
+
+		const result = await bootstrapper.run();
+
+		assert.is(result?.lockedValue, roundState);
+		assert.equal(result?.lockedRound, 1);
+		assert.undefined(result?.validValue);
+		warn.calledOnce();
 	});
 
 	it("#run - should attach the round state of the locked round as locked value", async ({
