@@ -48,6 +48,7 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 			gasUsed,
 			fee,
 			randaoReveal,
+			previousBlock,
 		);
 	}
 
@@ -61,13 +62,12 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 		gasUsed: number,
 		fee: bigint,
 		randaoReveal: string,
+		previousBlock: Contracts.Crypto.Block,
 	): Promise<Contracts.Crypto.Block> {
-		const previousBlock = this.stateStore.getLastBlock();
 		const number = previousBlock.number + 1;
 		const milestone = this.cryptoConfiguration.getMilestone(number);
 
 		const payloadBuffers: Buffer[] = [];
-		const transactionData: Contracts.Crypto.TransactionData[] = [];
 
 		// The payload length needs to account for the overhead of each serialized transaction
 		// which is a uint32 per transaction to store the individual length.
@@ -77,7 +77,6 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 			assert.string(transaction.hash);
 
 			payloadBuffers.push(Buffer.from(transaction.hash, "hex"));
-			transactionData.push(transaction.toData());
 			payloadSize += transaction.serialized.length;
 		}
 
@@ -95,7 +94,7 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 				round,
 				stateRoot,
 				timestamp,
-				transactionsCount: transactionData.length,
+				transactionsCount: transactions.length,
 				transactionsRoot: this.hashFactory.sha256(payloadBuffers).toString("hex"),
 				version: 1,
 			},
