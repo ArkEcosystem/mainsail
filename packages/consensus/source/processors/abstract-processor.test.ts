@@ -12,7 +12,7 @@ class TestProcessor extends AbstractProcessor {
 	}
 
 	public isCurrent(message: { blockNumber: number; round: number }): boolean {
-		return this.hasValidBlockNumberOrRound(message);
+		return this.hasValidBlockNumberAndRound(message);
 	}
 
 	public inBounds(message: { round: number }): boolean {
@@ -61,7 +61,7 @@ describe<{
 		context.processor = context.app.resolve(TestProcessor);
 	});
 
-	it("#hasValidBlockNumberOrRound - should accept the current block number with the current or a later round", ({
+	it("#hasValidBlockNumberAndRound - should accept the current block number with the current or a later round", ({
 		processor,
 	}) => {
 		assert.true(processor.isCurrent({ blockNumber: 5, round: 2 }));
@@ -69,7 +69,7 @@ describe<{
 		assert.true(processor.isCurrent({ blockNumber: 5, round: 100 }));
 	});
 
-	it("#hasValidBlockNumberOrRound - should reject another block number or a past round", ({ processor }) => {
+	it("#hasValidBlockNumberAndRound - should reject another block number or a past round", ({ processor }) => {
 		assert.false(processor.isCurrent({ blockNumber: 4, round: 2 }));
 		assert.false(processor.isCurrent({ blockNumber: 6, round: 2 }));
 		assert.false(processor.isCurrent({ blockNumber: 5, round: 1 }));

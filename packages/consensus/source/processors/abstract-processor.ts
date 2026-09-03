@@ -25,7 +25,7 @@ export class AbstractProcessor {
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
-	protected hasValidBlockNumberOrRound(message: { blockNumber: number; round: number }): boolean {
+	protected hasValidBlockNumberAndRound(message: { blockNumber: number; round: number }): boolean {
 		return (
 			message.blockNumber === this.getConsensus().getBlockNumber() &&
 			message.round >= this.getConsensus().getRound()
