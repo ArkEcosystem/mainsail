@@ -49,10 +49,6 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#round;
 	}
 
-	public get persist(): boolean {
-		return true; // Store block in database every time
-	}
-
 	public get validators(): string[] {
 		return [...this.#validators.keys()];
 	}
