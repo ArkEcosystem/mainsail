@@ -3,9 +3,10 @@ import type { Contracts } from "@mainsail/contracts";
 import { percentile } from "@mainsail/blockchain-utils";
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { groupBy, pluralize, randomNumber, shuffle } from "@mainsail/utils";
+import { ensureError, groupBy, pluralize, randomNumber, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
-import delay from "delay";
+
+import { constants } from "./constants.js";
 
 @injectable()
 export class Service implements Contracts.P2P.Service {
@@ -28,13 +29,11 @@ export class Service implements Contracts.P2P.Service {
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.P2P.Peer.Disposer)
-	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
-
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#lastMinPeerCheck: dayjs.Dayjs = dayjs();
+	#verifyingPeers = new Set<string>();
 	#disposed = false;
 	#mainLoopTimeout?: NodeJS.Timeout = undefined;
 	#apiNodeCheckLoopTimeout?: NodeJS.Timeout = undefined;
@@ -61,13 +60,17 @@ export class Service implements Contracts.P2P.Service {
 	}
 
 	public async mainLoop(): Promise<void> {
-		await this.#checkMinPeers();
-		await this.#checkReceivedMessages();
-
-		if (!this.#disposed) {
-			this.#mainLoopTimeout = setTimeout(() => {
-				void this.mainLoop();
-			}, 2000);
+		try {
+			await this.#checkMinPeers();
+			await this.#checkReceivedMessages();
+		} catch (rawError) {
+			this.logger.error(`P2P main loop failed: ${ensureError(rawError).message}`, "p2p");
+		} finally {
+			if (!this.#disposed) {
+				this.#mainLoopTimeout = setTimeout(() => {
+					void this.mainLoop();
+				}, 2000);
+			}
 		}
 	}
 
@@ -106,58 +109,62 @@ export class Service implements Contracts.P2P.Service {
 	}
 
 	async #checkApiNodes(): Promise<void> {
-		await this.ApiNodeDiscoverer.discoverNewApiNodes();
-		await this.ApiNodeDiscoverer.refreshApiNodes();
-
-		if (!this.#disposed) {
-			const nextTimeout = randomNumber(10, 20) * 60 * 1000;
-			this.#apiNodeCheckLoopTimeout = setTimeout(() => {
-				void this.#checkApiNodes();
-			}, nextTimeout);
+		try {
+			await this.ApiNodeDiscoverer.discoverNewApiNodes();
+			await this.ApiNodeDiscoverer.refreshApiNodes();
+		} catch (rawError) {
+			this.logger.error(`API node check failed: ${ensureError(rawError).message}`, "p2p");
+		} finally {
+			if (!this.#disposed) {
+				const nextTimeout = randomNumber(10, 20) * 60 * 1000;
+				this.#apiNodeCheckLoopTimeout = setTimeout(() => {
+					void this.#checkApiNodes();
+				}, nextTimeout);
+			}
 		}
 	}
 
 	public async cleansePeers({ fast, peerCount }: { fast: boolean; peerCount: number }): Promise<void> {
-		const max = Math.min(this.repository.getPeers().length, peerCount);
-		const peers = shuffle(this.repository.getPeers()).slice(0, max);
+		const peers = shuffle(this.repository.getPeers().filter((peer) => !this.#verifyingPeers.has(peer.ip))).slice(
+			0,
+			peerCount,
+		);
 
-		if (max === 0) {
+		if (peers.length === 0) {
 			return;
 		}
 
 		let unresponsivePeers = 0;
-		const pingDelay = fast ? 1500 : this.configuration.getRequired<number>("verifyTimeout");
+		const verifyTimeout = fast
+			? constants.FAST_VERIFY_TIMEOUT
+			: this.configuration.getRequired<number>("verifyTimeout");
 
-		this.logger.info(`Checking ${pluralize("peer", max, true)}`, "p2p");
+		this.logger.info(`Checking ${pluralize("peer", peers.length, true)}`, "p2p");
 
-		// we use Promise.race to cut loose in case some communicator.ping() does not resolve within the delay
-		// in that case we want to keep on with our program execution while ping promises can finish in the background
-		// TODO: revisit
-		/* eslint-disable @typescript-eslint/no-misused-promises */
-		await new Promise<void>(async (resolve) => {
-			let isResolved = false;
+		const verifications = Promise.all(
+			peers.map(async (peer) => {
+				this.#verifyingPeers.add(peer.ip);
 
-			// Simulates Promise.race, but doesn't cause "multipleResolvers" process error
-			const resolvesFirst = () => {
-				if (!isResolved) {
-					isResolved = true;
-					resolve();
-				}
-			};
-
-			await Promise.all(
-				peers.map(async (peer) => {
+				try {
 					if (!(await this.peerVerifier.verify(peer))) {
 						unresponsivePeers++;
-
-						this.peerDisposer.disposePeer(peer.ip);
 					}
-				}),
-			).then(resolvesFirst);
-
-			await delay(pingDelay).finally(resolvesFirst);
+				} finally {
+					this.#verifyingPeers.delete(peer.ip);
+				}
+			}),
+		).catch((rawError) => {
+			this.logger.error(`Peer verification failed: ${ensureError(rawError).message}`, "p2p");
 		});
-		/* eslint-enable */
+
+		let cutoff: NodeJS.Timeout | undefined;
+		await Promise.race([
+			verifications,
+			new Promise<void>((resolve) => {
+				cutoff = setTimeout(resolve, verifyTimeout);
+			}),
+		]);
+		clearTimeout(cutoff);
 
 		if (unresponsivePeers > 0) {
 			this.logger.debug(`Removed ${pluralize("peer", unresponsivePeers, true)}`, "p2p");

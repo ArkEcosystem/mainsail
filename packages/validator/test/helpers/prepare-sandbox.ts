@@ -22,7 +22,10 @@ import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
 
-export const prepareSandbox = async (context: { app?: Application }): Promise<void> => {
+export const prepareSandbox = async (context: {
+	app?: Application;
+	doubleSignGuard?: Contracts.Validator.DoubleSignGuard;
+}): Promise<void> => {
 	context.app = new Application();
 	context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", crypto);
 	await context.app.resolve(CoreValidation).register();
@@ -94,6 +97,7 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 			number: 1,
 			parentHash: "0000000000000000000000000000000000000000000000000000000000000000",
 			stateRoot: "0000000000000000000000000000000000000000000000000000000000000000",
+			randaoReveal: "0".repeat(192),
 		}),
 	});
 
@@ -101,5 +105,7 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 		getValidatorIndexByWalletPublicKey: () => 0,
 	});
 
-	context.app.bind(Identifiers.Validator.DoubleSignGuard).toConstantValue({ guard: () => {} });
+	// Held on the context so tests can spy on it; the real guard is covered by double-sign-guard.test.ts.
+	context.doubleSignGuard = { guard: async () => {} };
+	context.app.bind(Identifiers.Validator.DoubleSignGuard).toConstantValue(context.doubleSignGuard);
 };

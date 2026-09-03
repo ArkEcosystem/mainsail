@@ -22,9 +22,6 @@ export class GenesisBlockGenerator {
 	@inject(Identifiers.Cryptography.Commit.Serializer)
 	private readonly commitSerializer!: Contracts.Crypto.CommitSerializer;
 
-	@inject(Identifiers.Cryptography.Transaction.Verifier)
-	private readonly transactionVerifier!: Contracts.Crypto.TransactionVerifier;
-
 	@inject(Identifiers.Cryptography.Transaction.Factory)
 	private readonly transactionFactory!: Contracts.Crypto.TransactionFactory;
 
@@ -96,6 +93,7 @@ export class GenesisBlockGenerator {
 		const blockContext = {
 			commitKey,
 			gasLimit: BigInt(30_000_000),
+			prevrandao: Buffer.alloc(32),
 			timestamp: BigInt(dayjs(options.epoch).valueOf()),
 			validatorAddress: proposer,
 		};
@@ -302,8 +300,6 @@ export class GenesisBlockGenerator {
 			serialized: serialized.toString("hex"),
 		};
 
-		await this.#ensureValidGenesisBlock(genesis);
-
 		return genesis;
 	}
 
@@ -394,6 +390,7 @@ export class GenesisBlockGenerator {
 						"0000000000000000000000000000000000000000000000000000000000000000",
 					payloadSize,
 					proposer: blockContext.validatorAddress,
+					randaoReveal: "00".repeat(96),
 					reward: 0n,
 					round: 0,
 					stateRoot: await this.evm.stateRoot(
@@ -410,16 +407,6 @@ export class GenesisBlockGenerator {
 			),
 			transactions: transactionData,
 		};
-	}
-
-	async #ensureValidGenesisBlock(genesis: Contracts.Crypto.Commit): Promise<void> {
-		const verifiedTransactions = await Promise.all(
-			genesis.block.transactions.map((transaction) => this.transactionVerifier.verifyHash(transaction)),
-		);
-
-		if (verifiedTransactions.includes(false)) {
-			throw new Error("genesis block contains invalid transactions");
-		}
 	}
 
 	async #importLegacySnapshotData(options: Contracts.NetworkGenerator.GenesisBlockOptions) {

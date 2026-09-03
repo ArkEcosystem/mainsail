@@ -256,6 +256,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		forger,
 	}) => {
 		const validator = {
+			getRandaoReveal: async () => "aa".repeat(96),
 			propose: () => {},
 		};
 
@@ -315,6 +316,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		forger,
 	}) => {
 		const validator = {
+			getRandaoReveal: async () => "aa".repeat(96),
 			propose: () => {},
 		};
 
@@ -489,6 +491,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const position = { blockNumber: 1, round: 0, step: Enums.Consensus.Step.Propose, value: "blockHash" };
 		const validator = {
 			propose: () => {},
+			getRandaoReveal: async () => "aa".repeat(96),
 		};
 
 		stub(forger, "forgeBlock").resolvedValue(block);

@@ -1,5 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
+import { getPrevrandao } from "@mainsail/blockchain-utils";
 import { Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { assert, ensureError, sleep } from "@mainsail/utils";
@@ -57,6 +58,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	protected readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
+	@inject(Identifiers.Cryptography.Hash.Factory)
+	private readonly hashFactory!: Contracts.Crypto.HashFactory;
+
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<Contracts.Processor.BlockProcessorResult> {
 		const processResult = { feeUsed: 0n, gasUsed: 0, receipts: new Map(), success: false };
 
@@ -74,6 +78,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 						round: BigInt(block.round),
 					},
 					gasLimit: BigInt(milestone.block.maxGasLimit),
+					prevrandao: this.#getPrevrandao(block),
 					timestamp: BigInt(block.timestamp),
 					validatorAddress: block.proposer,
 				},
@@ -222,6 +227,14 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		if (processorResult.feeUsed !== block.fee) {
 			throw new Error(`Block fee ${block.fee} does not match consumed fee ${processorResult.feeUsed}`);
 		}
+	}
+
+	#getPrevrandao(block: Contracts.Crypto.Block): Buffer {
+		if (block.number === this.configuration.getGenesisHeight()) {
+			return Buffer.alloc(32);
+		}
+
+		return getPrevrandao(this.hashFactory, this.stateStore.getLastBlock());
 	}
 
 	async #verifyStateRoot(block: Contracts.Crypto.Block): Promise<void> {

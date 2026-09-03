@@ -22,7 +22,7 @@
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"joi": "18.2.1"
+		"joi": "18.2.5"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
@@ -30,7 +30,7 @@
 		"@types/chance": "1.1.8",
 		"@types/fs-extra": "11.0.4",
 		"@types/tmp": "0.2.6",
-		"esmock": "2.7.5",
+		"esmock": "2.7.6",
 		"uvu": "0.5.6"
 	},
 	"engines": {

@@ -253,6 +253,7 @@ pub struct BlockHeaderData {
     pub reward: U256,
     pub payload_size: u32,
     pub proposer: Address,
+    pub randao_reveal: BlsSig,
 }
 
 #[derive(Default, Debug, Deserialize, Serialize, PartialEq, Eq)]
@@ -288,6 +289,7 @@ pub struct BlockContext {
     pub gas_limit: u64,
     pub timestamp: u64,
     pub validator_address: Address,
+    pub prevrandao: B256,
 }
 
 #[derive(Clone, Debug, Default)]

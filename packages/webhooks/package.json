@@ -20,22 +20,22 @@
 	},
 	"dependencies": {
 		"@hapi/boom": "10.0.1",
-		"@hapi/hapi": "21.4.9",
+		"@hapi/hapi": "21.4.10",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"fs-extra": "11.3.5",
-		"joi": "18.2.1",
+		"fs-extra": "11.4.0",
+		"joi": "18.2.5",
 		"lowdb": "7.0.1",
-		"uuid": "14.0.0"
+		"uuid": "14.0.2"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@types/fs-extra": "11.0.4",
 		"@types/tmp": "0.2.6",
-		"tmp": "0.2.5",
+		"tmp": "0.2.7",
 		"uvu": "0.5.6"
 	},
 	"engines": {

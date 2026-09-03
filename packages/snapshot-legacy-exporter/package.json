@@ -29,15 +29,15 @@
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"@mainsail/validation": "workspace:*",
-		"pg": "8.20.0",
-		"tmp": "0.2.5",
-		"typeorm": "0.3.29"
+		"pg": "8.23.0",
+		"tmp": "0.2.7",
+		"typeorm": "1.1.0"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"@types/fs-extra": "11.0.4",
-		"@types/pg": "8.20.0",
+		"@types/pg": "8.23.1",
 		"@types/pumpify": "1.4.5",
 		"@types/tmp": "0.2.6",
 		"env-paths": "4.0.0",

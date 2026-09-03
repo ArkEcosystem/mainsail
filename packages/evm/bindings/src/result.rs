@@ -184,6 +184,7 @@ impl JsBlockHeaderData {
             reward: utils::convert_u256_to_bigint(header.reward),
             payload_size: header.payload_size,
             proposer: header.proposer.to_string(),
+            randao_reveal: header.randao_reveal.encode_hex(),
         }
     }
 }

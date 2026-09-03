@@ -55,7 +55,7 @@ describe<{
 		assert.equal(result.size, "0x100");
 		assert.equal(result.gasLimit, "0x1c9c380");
 		assert.equal(result.gasUsed, "0x5208");
-		assert.equal(result.timestamp, "0x1000");
+		assert.equal(result.timestamp, "0x4");
 		assert.equal(result.transactions, [`0x${"a".repeat(64)}`, `0x${"b".repeat(64)}`]);
 		assert.equal(result.uncles, []);
 	});

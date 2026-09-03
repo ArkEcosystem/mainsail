@@ -5,7 +5,6 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import {
 	InsufficientBalanceError,
 	TransactionExceedsMaximumByteSizeError,
-	TransactionFailedToVerifyError,
 	TransactionFromWrongNetworkError,
 	UnexpectedNonceError,
 	TransactionFailedToPreverifyError,
@@ -115,10 +114,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new InsufficientBalanceError();
 		}
 
-		if (!(await this.verifier.verifyHash(transaction))) {
-			throw new TransactionFailedToVerifyError(transaction);
-		}
-
 		if (this.#wallet.hasLegacySecondPublicKey()) {
 			await this.verifier.verifyLegacySecondSignature(transaction, this.#wallet.legacySecondPublicKey());
 		} else {
@@ -148,7 +143,10 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		});
 
 		if (!preverified.success) {
-			throw new TransactionFailedToPreverifyError(transaction, new Error(preverified.error));
+			throw new TransactionFailedToPreverifyError(
+				transaction,
+				preverified.error ?? "Preverify failed for unknown reason",
+			);
 		}
 	}
 }

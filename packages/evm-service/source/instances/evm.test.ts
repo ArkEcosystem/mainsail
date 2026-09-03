@@ -60,6 +60,7 @@ describe<{
 		gasLimit: BigInt(10_000_000),
 		timestamp: BigInt(12345),
 		validatorAddress: zeroAddress,
+		prevrandao: Buffer.alloc(32),
 	};
 
 	it("#process - should deploy contract successfully", async ({ instance }) => {
@@ -188,7 +189,7 @@ describe<{
 		// }
 
 		assert.equal(data.blockHeight, 1245n);
-		assert.equal(data.blockTimestamp, 123_456_789n);
+		assert.equal(data.blockTimestamp, 123_456n);
 		assert.equal(data.blockGasLimit, 12_000_000n);
 		assert.equal(data.blockCoinbase, validator.address);
 		assert.equal(data.blockDifficulty, 0n); // difficulty always 0
@@ -804,7 +805,7 @@ describe<{
 			commitKey,
 			"0000000000000000000000000000000000000000000000000000000000000000",
 		);
-		assert.equal(hash, "a09fc67efe3184d31dc3f1351381ca57861c5a568c122ab3e9c9c06395c52516");
+		assert.equal(hash, "8290222ad24f43257b7bdf941a38b483ffbf7e4add4ded8d3ca2f07660be0ff8");
 	});
 
 	it("should return logs bloom", async ({ instance }) => {

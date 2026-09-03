@@ -37,7 +37,9 @@ use revm::{
     },
     database::{State, WrapDatabaseRef, bal::EvmDatabaseError},
     handler::EvmTr,
-    primitives::{Address, B256, Bytes, TxKind, U256, hex::ToHexExt, map::HashMap},
+    primitives::{
+        Address, B256, Bytes, TxKind, U256, hardfork::SpecId, hex::ToHexExt, map::HashMap,
+    },
     state::AccountInfo,
 };
 use tokio::sync::Semaphore;
@@ -221,85 +223,90 @@ impl EvmInner {
         }
     }
 
-    pub fn calculate_round_validators(
+    fn consensus_system_call(
         &mut self,
-        ctx: CalculateRoundValidatorsContext,
+        commit_key: CommitKey,
+        timestamp: u64,
+        validator_address: Address,
+        spec_id: SpecId,
+        calldata: Bytes,
+        label: &str,
     ) -> std::result::Result<(), EVMError<String>> {
-        if !self.pending_commits.contains_key(&ctx.commit_key) {
-            return Err(EVMError::Custom(format!(
-                "calculate_round_validators is missing commit key {:?}",
-                ctx.commit_key
-            )));
-        }
-
         let genesis_info = self.genesis_info()?;
 
-        let abi = ethers_contract::BaseContract::from(
-            ethers_core::abi::parse_abi(&["function calculateRoundValidators(uint8 n) external"])
-                .expect("encode abi"),
-        );
-
-        // encode abi into Bytes
-        let calldata = abi
-            .encode("calculateRoundValidators", ctx.round_validators)
-            .expect("encode calculateRoundValidators");
-
         let nonce = self
-            .get_account_nonce(&ctx.commit_key, genesis_info.deployer_account)
+            .get_account_nonce(&commit_key, genesis_info.deployer_account)
             .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
+
+        let Some(pending_commit) = self.pending_commits.get(&commit_key) else {
+            return Err(EVMError::Custom(format!(
+                "{label} is missing commit key {:?}",
+                commit_key
+            )));
+        };
 
         match self.transact_write(ExecutionContext {
             block_context: Some(BlockContext {
-                commit_key: ctx.commit_key,
+                commit_key,
                 gas_limit: u64::MAX,
-                timestamp: ctx.timestamp,
-                validator_address: ctx.validator_address,
+                timestamp,
+                validator_address,
+                prevrandao: pending_commit.block_context.prevrandao,
             }),
             from: genesis_info.deployer_account,
             to: Some(genesis_info.validator_contract),
-            data: Bytes::from(calldata.0),
+            data: calldata,
             value: U256::ZERO,
             nonce: Some(nonce),
             gas_limit: Some(u64::MAX),
             gas_price: 0,
-            spec_id: ctx.spec_id,
+            spec_id,
             tx_hash: None,
         }) {
             Ok((receipt, _)) => {
                 self.logger.log(
                     LogLevel::Debug,
-                    format!(
-                        "calculate_round_validators {:?} {:?}",
-                        ctx.commit_key, receipt
-                    ),
+                    format!("{label} {:?} {:?}", commit_key, receipt),
                 );
 
                 if !receipt.is_success() {
-                    return Err(EVMError::Custom(format!(
-                        "calculate_round_validators reverted: {receipt:?}"
-                    )));
+                    return Err(EVMError::Custom(format!("{label} reverted: {receipt:?}")));
                 }
                 Ok(())
             }
             Err(err) => Err(EVMError::Database(
-                format!("calculate_round_validators failed: {}", err).into(),
+                format!("{label} failed: {}", err).into(),
             )),
         }
+    }
+
+    pub fn calculate_round_validators(
+        &mut self,
+        ctx: CalculateRoundValidatorsContext,
+    ) -> std::result::Result<(), EVMError<String>> {
+        let abi = ethers_contract::BaseContract::from(
+            ethers_core::abi::parse_abi(&["function calculateRoundValidators(uint8 n) external"])
+                .expect("encode abi"),
+        );
+
+        let calldata = abi
+            .encode("calculateRoundValidators", ctx.round_validators)
+            .expect("encode calculateRoundValidators");
+
+        self.consensus_system_call(
+            ctx.commit_key,
+            ctx.timestamp,
+            ctx.validator_address,
+            ctx.spec_id,
+            Bytes::from(calldata.0),
+            "calculate_round_validators",
+        )
     }
 
     pub fn update_validator_registration_fee(
         &mut self,
         ctx: UpdateValidatorRegistrationFeeContext,
     ) -> std::result::Result<(), EVMError<String>> {
-        if !self.pending_commits.contains_key(&ctx.commit_key) {
-            return Err(EVMError::Custom(format!(
-                "update_validator_registration_fee is missing commit key {:?}",
-                ctx.commit_key
-            )));
-        }
-
-        let genesis_info = self.genesis_info()?;
-
         let abi = ethers_contract::BaseContract::from(
             ethers_core::abi::parse_abi(&["function setFee(uint128 fee) external"])
                 .expect("encode abi"),
@@ -307,47 +314,14 @@ impl EvmInner {
 
         let calldata = abi.encode("setFee", ctx.fee).expect("encode setFee");
 
-        let nonce = self
-            .get_account_nonce(&ctx.commit_key, genesis_info.deployer_account)
-            .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
-
-        match self.transact_write(ExecutionContext {
-            block_context: Some(BlockContext {
-                commit_key: ctx.commit_key,
-                gas_limit: u64::MAX,
-                timestamp: ctx.timestamp,
-                validator_address: ctx.validator_address,
-            }),
-            from: genesis_info.deployer_account,
-            to: Some(genesis_info.validator_contract),
-            data: Bytes::from(calldata.0),
-            value: U256::ZERO,
-            nonce: Some(nonce),
-            gas_limit: Some(u64::MAX),
-            gas_price: 0,
-            spec_id: ctx.spec_id,
-            tx_hash: None,
-        }) {
-            Ok((receipt, _)) => {
-                self.logger.log(
-                    LogLevel::Debug,
-                    format!(
-                        "update_validator_registration_fee {:?} {:?}",
-                        ctx.commit_key, receipt
-                    ),
-                );
-
-                if !receipt.is_success() {
-                    return Err(EVMError::Custom(format!(
-                        "update_validator_registration_fee reverted: {receipt:?}"
-                    )));
-                }
-                Ok(())
-            }
-            Err(err) => Err(EVMError::Database(
-                format!("update_validator_registration_fee failed: {}", err).into(),
-            )),
-        }
+        self.consensus_system_call(
+            ctx.commit_key,
+            ctx.timestamp,
+            ctx.validator_address,
+            ctx.spec_id,
+            Bytes::from(calldata.0),
+            "update_validator_registration_fee",
+        )
     }
 
     pub fn update_rewards_and_votes(
@@ -391,12 +365,15 @@ impl EvmInner {
                     .encode("updateVoters", voters.clone())
                     .expect("encode updateVoters");
 
+                let prev_randao = pending_commit.block_context.prevrandao;
+
                 match self.transact_write(ExecutionContext {
                     block_context: Some(BlockContext {
                         commit_key: ctx.commit_key,
                         gas_limit: u64::MAX,
                         timestamp: ctx.timestamp,
                         validator_address: ctx.validator_address,
+                        prevrandao: prev_randao,
                     }),
                     from: genesis_info.deployer_account,
                     to: Some(genesis_info.validator_contract),
@@ -1227,9 +1204,10 @@ impl EvmInner {
 
                 block_env.number = U256::from(block_ctx.commit_key.0);
                 block_env.beneficiary = block_ctx.validator_address;
-                block_env.timestamp = U256::from(block_ctx.timestamp);
+                block_env.timestamp = U256::from(block_ctx.timestamp / 1000);
                 block_env.gas_limit = block_ctx.gas_limit;
                 block_env.difficulty = U256::ZERO;
+                block_env.prevrandao = Some(block_ctx.prevrandao);
             })
             .modify_tx_chained(|tx_env: &mut TxEnv| {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or(u64::MAX);
@@ -1346,9 +1324,10 @@ impl EvmInner {
                 };
                 block_env.number = U256::from(block_ctx.commit_key.0);
                 block_env.beneficiary = block_ctx.validator_address;
-                block_env.timestamp = U256::from(block_ctx.timestamp);
+                block_env.timestamp = U256::from(block_ctx.timestamp / 1000);
                 block_env.gas_limit = block_ctx.gas_limit;
                 block_env.difficulty = U256::ZERO;
+                block_env.prevrandao = Some(block_ctx.prevrandao);
             })
             .modify_tx_chained(|tx_env: &mut TxEnv| {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or(u64::MAX);

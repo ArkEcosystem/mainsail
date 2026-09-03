@@ -30,12 +30,11 @@ export class Selector implements Contracts.TransactionPool.Selector {
 			transactions.push(transaction.toData());
 			bytesLeft -= 4;
 			bytesLeft -= transaction.serialized.length;
+			this.#index++;
 
 			if (transactions.length >= options.maxSize) {
 				break;
 			}
-
-			this.#index++;
 		}
 
 		return {

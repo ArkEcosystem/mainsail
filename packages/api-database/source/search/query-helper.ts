@@ -127,13 +127,21 @@ export class QueryHelper<TEntity> {
 			case "and": {
 				const built = expression.expressions.map((e) => this.getWhereExpressionSql(metadata, e));
 				const query = `(${built.map((b) => b.query).join(" AND ")})`;
-				const parameters = built.reduce((accumulator, b) => Object.assign({}, accumulator, b.parameters), {});
+				let parameters = {};
+
+				for (const b of built) {
+					parameters = Object.assign({}, parameters, b.parameters);
+				}
 				return { parameters, query };
 			}
 			case "or": {
 				const built = expression.expressions.map((e) => this.getWhereExpressionSql(metadata, e));
 				const query = `(${built.map((b) => b.query).join(" OR ")})`;
-				const parameters = built.reduce((accumulator, b) => Object.assign({}, accumulator, b.parameters), {});
+				let parameters = {};
+
+				for (const b of built) {
+					parameters = Object.assign({}, parameters, b.parameters);
+				}
 				return { parameters, query };
 			}
 			case "notNull": {

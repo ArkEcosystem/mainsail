@@ -189,6 +189,7 @@ describe<{
 				gasLimit: BigInt("10000000"),
 				timestamp: BigInt(genesisCommit.block.timestamp),
 				validatorAddress: genesisCommit.block.proposer,
+				prevrandao: Buffer.alloc(32),
 			},
 		});
 

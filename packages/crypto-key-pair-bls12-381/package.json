@@ -27,8 +27,8 @@
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"@noble/curves": "2.2.0",
-		"@scure/bip39": "2.2.0",
+		"@noble/curves": "2.3.0",
+		"@scure/bip39": "2.3.0",
 		"bls12-381-keygen": "0.2.4"
 	},
 	"devDependencies": {

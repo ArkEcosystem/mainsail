@@ -7,4 +7,8 @@ export interface RequestQuery {
 	[key: string]: any;
 }
 
-export type HapiRequest = Hapi.Request<{ Query: RequestQuery }>;
+export interface RequestParams {
+	[key: string]: string;
+}
+
+export type HapiRequest = Hapi.Request<{ Params: RequestParams; Query: RequestQuery }>;

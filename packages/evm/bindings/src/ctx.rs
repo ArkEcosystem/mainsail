@@ -80,6 +80,7 @@ pub struct JsBlockContext {
     pub gas_limit: BigInt,
     pub timestamp: BigInt,
     pub validator_address: String,
+    pub prevrandao: Buffer,
 }
 
 #[napi(object)]
@@ -143,6 +144,7 @@ pub struct JsBlockHeaderData {
     pub reward: BigInt,
     pub payload_size: u32,
     pub proposer: String,
+    pub randao_reveal: String,
 }
 
 #[napi(object)]
@@ -400,6 +402,7 @@ impl TryFrom<JsBlockHeaderData> for BlockHeaderData {
             fee: utils::convert_bigint_to_u256(value.fee, "fee")?,
             reward: utils::convert_bigint_to_u256(value.reward, "reward")?,
             payload_size: value.payload_size,
+            randao_reveal: utils::convert_string_to_bls_sig(value.randao_reveal)?,
         })
     }
 }
@@ -490,6 +493,7 @@ impl TryFrom<JsBlockContext> for BlockContext {
             gas_limit: utils::convert_bigint_to_u64(value.gas_limit, "gasLimit")?,
             timestamp: utils::convert_bigint_to_u64(value.timestamp, "timestamp")?,
             validator_address: utils::create_address_from_string(&value.validator_address)?,
+            prevrandao: utils::convert_js_buffer_to_b256(value.prevrandao, "prevrandao")?,
         })
     }
 }

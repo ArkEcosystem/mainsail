@@ -101,7 +101,6 @@ export interface PreverifyTransactionContext {
 	readonly nonce: bigint;
 	readonly data: Buffer;
 	readonly txHash: string;
-	readonly index?: number;
 	readonly specId: SpecId;
 	readonly blockGasLimit: bigint;
 }
@@ -166,6 +165,7 @@ export interface BlockContext {
 	readonly gasLimit: bigint;
 	readonly timestamp: bigint;
 	readonly validatorAddress: string;
+	readonly prevrandao: Buffer;
 }
 
 export interface CalculateRoundValidatorsContext {
