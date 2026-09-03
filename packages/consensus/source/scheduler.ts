@@ -19,7 +19,7 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	#timeoutStartRound?: NodeJS.Timeout;
+	#timeoutBlockPrepare?: NodeJS.Timeout;
 	#timeoutPropose?: NodeJS.Timeout;
 	#timeoutPrevote?: NodeJS.Timeout;
 	#timeoutPrecommit?: NodeJS.Timeout;
@@ -32,7 +32,7 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 	}
 
 	public scheduleTimeoutBlockPrepare(timestamp: number): boolean {
-		if (this.#timeoutStartRound) {
+		if (this.#timeoutBlockPrepare) {
 			return false;
 		}
 
@@ -41,53 +41,53 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 		const consensus = this.#getConsensus();
 		const name = `blockPrepare ${consensus.getBlockNumber()}/${consensus.getRound()}`;
 
-		this.#timeoutStartRound = setTimeoutAsync(async () => {
-			this.#timeoutStartRound = undefined;
+		this.#timeoutBlockPrepare = setTimeoutAsync(async () => {
+			this.#timeoutBlockPrepare = undefined;
 			await this.#runTimeoutHandler(name, () => this.#getConsensus().onTimeoutStartRound());
 		}, timeout);
 
 		return true;
 	}
 
-	public scheduleTimeoutPropose(height: number, round: number): boolean {
+	public scheduleTimeoutPropose(blockNumber: number, round: number): boolean {
 		if (this.#timeoutPropose) {
 			return false;
 		}
 
 		this.#timeoutPropose = setTimeoutAsync(async () => {
 			this.#timeoutPropose = undefined;
-			await this.#runTimeoutHandler(`propose ${height}/${round}`, () =>
-				this.#getConsensus().onTimeoutPropose(height, round),
+			await this.#runTimeoutHandler(`propose ${blockNumber}/${round}`, () =>
+				this.#getConsensus().onTimeoutPropose(blockNumber, round),
 			);
 		}, this.#getTimeout(round));
 
 		return true;
 	}
 
-	public scheduleTimeoutPrevote(height: number, round: number): boolean {
+	public scheduleTimeoutPrevote(blockNumber: number, round: number): boolean {
 		if (this.#timeoutPrevote) {
 			return false;
 		}
 
 		this.#timeoutPrevote = setTimeoutAsync(async () => {
 			this.#timeoutPrevote = undefined;
-			await this.#runTimeoutHandler(`prevote ${height}/${round}`, () =>
-				this.#getConsensus().onTimeoutPrevote(height, round),
+			await this.#runTimeoutHandler(`prevote ${blockNumber}/${round}`, () =>
+				this.#getConsensus().onTimeoutPrevote(blockNumber, round),
 			);
 		}, this.#getTimeout(round));
 
 		return true;
 	}
 
-	public scheduleTimeoutPrecommit(height: number, round: number): boolean {
+	public scheduleTimeoutPrecommit(blockNumber: number, round: number): boolean {
 		if (this.#timeoutPrecommit) {
 			return false;
 		}
 
 		this.#timeoutPrecommit = setTimeoutAsync(async () => {
 			this.#timeoutPrecommit = undefined;
-			await this.#runTimeoutHandler(`precommit ${height}/${round}`, () =>
-				this.#getConsensus().onTimeoutPrecommit(height, round),
+			await this.#runTimeoutHandler(`precommit ${blockNumber}/${round}`, () =>
+				this.#getConsensus().onTimeoutPrecommit(blockNumber, round),
 			);
 		}, this.#getTimeout(round));
 
@@ -95,9 +95,9 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 	}
 
 	public clear(): void {
-		if (this.#timeoutStartRound) {
-			clearTimeout(this.#timeoutStartRound);
-			this.#timeoutStartRound = undefined;
+		if (this.#timeoutBlockPrepare) {
+			clearTimeout(this.#timeoutBlockPrepare);
+			this.#timeoutBlockPrepare = undefined;
 		}
 
 		if (this.#timeoutPropose) {

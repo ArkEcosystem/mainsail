@@ -60,7 +60,8 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 		}
 
 		if (state.lockedRound !== undefined) {
-			// Only the round number of the locked value is consumed, so the round state needs no proposal.
+			// Only the round number of the locked value is consumed, so the round state needs no proposal. The lock
+			// is kept even when the valid value above was dropped, because forgetting it would weaken safety.
 			state.lockedValue = this.roundStateRepo.getRoundState(state.blockNumber, state.lockedRound);
 		}
 

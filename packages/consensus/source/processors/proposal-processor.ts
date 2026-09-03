@@ -67,7 +67,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 				void this.broadcaster.broadcastProposal(proposal);
 			}
 
-			// Add some time to allow the proposal to be broadcasted to other nodes before processing it.
+			// Add some time to allow the proposal to be broadcast to other nodes before processing it.
 			setTimeout(() => {
 				this.handleRoundState(roundState);
 			}, 0);
