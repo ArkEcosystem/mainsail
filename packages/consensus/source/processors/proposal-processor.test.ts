@@ -56,7 +56,8 @@ describe<{
 		} as unknown as Contracts.Crypto.Proposal;
 	};
 
-	const nextTick = () => new Promise((resolve) => setTimeout(resolve, 1));
+	// The processor defers handling with setTimeout(0); a 1ms timer queued afterwards runs behind it.
+	const flushTimers = () => new Promise((resolve) => setTimeout(resolve, 1));
 
 	beforeEach((context) => {
 		context.consensus = { getBlockNumber: () => blockNumber, getRound: () => round, handle: async () => {} };
@@ -105,6 +106,7 @@ describe<{
 		const runNonExclusive = spy(commitLock, "runNonExclusive");
 
 		await processor.process(makeProposal());
+		await flushTimers();
 
 		runNonExclusive.calledOnce();
 	});
@@ -117,10 +119,13 @@ describe<{
 		const getValidatorIndex = spy(proposerCalculator, "getValidatorIndex");
 		const getRoundState = spy(roundStateRepository, "getRoundState");
 
-		const proposal = makeProposal();
-		(proposal.blockHeader as any).number = blockNumber + 1;
+		const futureProposal = makeProposal();
+		(futureProposal.blockHeader as any).number = blockNumber + 1;
+		const pastProposal = makeProposal();
+		(pastProposal.blockHeader as any).number = blockNumber - 1;
 
-		assert.equal(await processor.process(proposal), Skipped);
+		assert.equal(await processor.process(futureProposal), Skipped);
+		assert.equal(await processor.process(pastProposal), Skipped);
 		getValidatorIndex.neverCalled();
 		getRoundState.neverCalled();
 	});
@@ -141,6 +146,7 @@ describe<{
 		const getRoundState = spy(roundStateRepository, "getRoundState");
 
 		assert.equal(await processor.process(makeProposal({ round: round + 3 })), Accepted);
+		await flushTimers();
 
 		getValidatorIndex.calledWith(round + 3);
 		getRoundState.calledWith(blockNumber, round + 3);
@@ -189,6 +195,7 @@ describe<{
 		const verify = spy(consensusSignature, "verify");
 
 		await processor.process(proposal);
+		await flushTimers();
 
 		serializeProposalUnsigned.calledOnce();
 		serializeProposalUnsigned.calledWith(proposal.toSerializableData());
@@ -222,7 +229,7 @@ describe<{
 		const handle = spy(consensus, "handle");
 
 		assert.equal(await processor.process(makeProposal()), Skipped);
-		await nextTick();
+		await flushTimers();
 
 		addProposal.neverCalled();
 		broadcastProposal.neverCalled();
@@ -249,7 +256,7 @@ describe<{
 		// Handling is deferred so the broadcast can go out before the block is processed.
 		handle.neverCalled();
 
-		await nextTick();
+		await flushTimers();
 
 		handle.calledOnce();
 		handle.calledWith(roundState);
@@ -266,7 +273,7 @@ describe<{
 		const handle = spy(consensus, "handle");
 
 		assert.equal(await processor.process(makeProposal(), false), Accepted);
-		await nextTick();
+		await flushTimers();
 
 		addProposal.calledOnce();
 		broadcastProposal.neverCalled();

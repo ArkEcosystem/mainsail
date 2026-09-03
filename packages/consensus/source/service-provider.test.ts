@@ -136,17 +136,15 @@ describe<{
 		const second = factory(commit);
 
 		assert.instance(second, CommitState);
-		assert.false(first === second);
+		assert.is.not(first, second);
 	});
 
-	it("#dispose - should dispose the consensus service", async () => {
-		const app = new Application();
+	it("#dispose - should dispose the consensus service", async ({ app, serviceProvider }) => {
 		const consensus = { dispose: async () => {} };
 		app.bind(Identifiers.Consensus.Service).toConstantValue(consensus);
-
 		const dispose = spy(consensus, "dispose");
 
-		await app.resolve(ServiceProvider).dispose();
+		await serviceProvider.dispose();
 
 		dispose.calledOnce();
 	});

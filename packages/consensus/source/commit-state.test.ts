@@ -35,8 +35,11 @@ describe<{
 		context.commitState = context.app.resolve(CommitState).configure(context.commit);
 	});
 
-	it("#configure - should return the commit state itself for chaining", ({ commitState }) => {
-		assert.instance(commitState, CommitState);
+	it("#configure - should return the commit state itself for chaining", ({ app, commit }) => {
+		// A fresh instance is needed here because the shared one is already configured in beforeEach.
+		const instance = app.resolve(CommitState);
+
+		assert.is(instance.configure(commit), instance);
 	});
 
 	it("#blockNumber - should be taken from the committed block", ({ commitState }) => {

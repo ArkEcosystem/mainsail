@@ -99,12 +99,14 @@ describe<{
 		assert.equal(roundState.getValidatorsSignedPrecommit(), [false, false, false, false]);
 	});
 
-	it("#configure - should pick the proposer for the configured round", ({ app, proposerCalculator }) => {
+	it("#configure - should return itself with the proposer of the configured round", ({ app, proposerCalculator }) => {
 		// A fresh instance is needed here because the shared one is already configured in beforeEach.
 		const getValidatorIndex = stub(proposerCalculator, "getValidatorIndex").returnValue(3);
+		const instance = app.resolve(RoundState);
 
-		const roundState = app.resolve(RoundState).configure(9, 4);
+		const roundState = instance.configure(9, 4);
 
+		assert.is(roundState, instance);
 		getValidatorIndex.calledOnce();
 		getValidatorIndex.calledWith(4);
 		assert.equal(roundState.blockNumber, 9);
@@ -288,7 +290,7 @@ describe<{
 		roundState.addPrevote(prevote(1));
 		assert.false(roundState.hasMajorityPrevotes());
 
-		// Votes for another block or for null do not count towards the proposal.
+		// Votes for another block do not count towards the proposal.
 		roundState.addPrevote(prevote(2, otherBlockHash));
 		assert.false(roundState.hasMajorityPrevotes());
 
@@ -371,7 +373,7 @@ describe<{
 		assert.true(roundState.hasMinorityPrevotesOrPrecommits());
 	});
 
-	it("#hasMinorityPrevotesOrPrecommits - should not add prevotes and precommits together", ({ roundState }) => {
+	it("#hasMinorityPrevotesOrPrecommits - should not combine prevote and precommit counts", ({ roundState }) => {
 		roundState.addPrevote(prevote(0));
 		roundState.addPrecommit(precommit(1));
 

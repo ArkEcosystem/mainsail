@@ -336,6 +336,43 @@ describe<{
 		);
 	});
 
+	it("#verify - should propagate signature verification errors", async ({ aggregator, worker }) => {
+		stub(worker, "publicKeyFactory").resolvedValue(aggregatedPublicKey);
+		stub(worker, "consensusSignature").rejectedValue(new Error("verify failed"));
+
+		await assert.rejects(
+			() =>
+				aggregator.verify(
+					{ signature: aggregatedSignature, validators: [true, true, true, true] },
+					Buffer.from("message"),
+					roundValidators,
+				),
+			"verify failed",
+		);
+	});
+
+	it("#verify - should verify a single signer when the round has one validator", async ({
+		aggregator,
+		validatorSet,
+		worker,
+	}) => {
+		const publicKeyFactory = stub(worker, "publicKeyFactory").resolvedValue(aggregatedPublicKey);
+		const consensusSignature = stub(worker, "consensusSignature").resolvedValue(true);
+		const getValidator = spy(validatorSet, "getValidator");
+
+		const result = await aggregator.verify(
+			{ signature: aggregatedSignature, validators: [true] },
+			Buffer.from("message"),
+			1,
+		);
+
+		assert.true(result);
+		getValidator.calledOnce();
+		getValidator.calledWith(0);
+		publicKeyFactory.calledWith("aggregate", publicKeyBuffers([0]));
+		consensusSignature.calledOnce();
+	});
+
 	it("#aggregate + #verify - should verify a proof against exactly the validators that produced it", async ({
 		aggregator,
 		validatorSet,

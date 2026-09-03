@@ -73,6 +73,16 @@ describe<{
 		handleCommitState.neverCalled();
 	});
 
+	it("#process - should skip a commit for a block consensus has not reached yet", async ({
+		processor,
+		consensus,
+	}) => {
+		const handleCommitState = spy(consensus, "handleCommitState");
+
+		assert.equal(await processor.process(makeCommit(2)), Enums.Consensus.ProcessorResult.Skipped);
+		handleCommitState.neverCalled();
+	});
+
 	it("#process - should report an invalid block as invalid", async ({ processor, commitState }) => {
 		commitState.getProcessorResult = () => ({ success: false });
 

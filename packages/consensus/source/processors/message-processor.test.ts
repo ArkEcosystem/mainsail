@@ -149,7 +149,7 @@ describe<{
 		consensusSignature.neverCalled();
 	});
 
-	it("#process - should tolerate up to 500ms of time drift for the round bounds", async ({
+	it("#process - should accept a message within the time drift allowance of the round bounds", async ({
 		processor,
 		timestampCalculator,
 	}) => {

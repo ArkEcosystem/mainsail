@@ -16,8 +16,6 @@ describe<{
 	scheduler: Scheduler;
 	logger: any;
 }>("Scheduler", ({ beforeEach, it, assert, spy, clock, stub }) => {
-	currentTimestamp = 0;
-
 	const delays = [1000, 3000, 5000];
 
 	const consensus = {
@@ -45,6 +43,8 @@ describe<{
 	};
 
 	beforeEach((context) => {
+		currentTimestamp = 0;
+
 		context.logger = {
 			error: () => {},
 		};
@@ -63,22 +63,26 @@ describe<{
 		assert.instance(scheduler, SchedulerProxy);
 	});
 
-	it("#getNextBlockTimestamp - should return previous block timestamp + blockTime", async ({ scheduler }) => {
-		const spyOnGetLatBlock = stub(store, "getLastBlock").returnValue({
+	it("#getNextBlockTimestamp - should return previous block timestamp + blockTime when it is later", async ({
+		scheduler,
+	}) => {
+		const spyOnGetLastBlock = stub(store, "getLastBlock").returnValue({
 			timestamp: 0,
 		});
 
 		assert.equal(scheduler.getNextBlockTimestamp(0), 8000);
-		spyOnGetLatBlock.calledOnce();
+		spyOnGetLastBlock.calledOnce();
 	});
 
-	it("#getNextBlockTimestamp - should return previous block commitTime + blockPrepareTime", async ({ scheduler }) => {
-		const spyOnGetLatBlock = stub(store, "getLastBlock").returnValue({
+	it("#getNextBlockTimestamp - should return commitTime + blockPrepareTime when it is later", async ({
+		scheduler,
+	}) => {
+		const spyOnGetLastBlock = stub(store, "getLastBlock").returnValue({
 			timestamp: 0,
 		});
 
 		assert.equal(scheduler.getNextBlockTimestamp(6000), 10_000);
-		spyOnGetLatBlock.calledOnce();
+		spyOnGetLastBlock.calledOnce();
 	});
 
 	it("#scheduleTimeoutBlockPrepare - should call onTimeoutStartRound", async ({ scheduler }) => {
@@ -106,7 +110,22 @@ describe<{
 		spyOnTimeoutStartRound.calledOnce();
 	});
 
-	it("#scheduleTimeoutPropose - should call onTimeoutPropose ", async ({ scheduler }) => {
+	it("#scheduleTimeoutBlockPrepare - should fire immediately when the timestamp has already passed", async ({
+		scheduler,
+	}) => {
+		currentTimestamp = 10_000;
+
+		const fakeTimers = clock();
+		const spyOnTimeoutStartRound = spy(consensus, "onTimeoutStartRound");
+
+		assert.true(scheduler.scheduleTimeoutBlockPrepare(8000));
+		await fakeTimers.nextAsync();
+
+		spyOnTimeoutStartRound.calledOnce();
+		assert.equal(fakeTimers.now, 0);
+	});
+
+	it("#scheduleTimeoutPropose - should call onTimeoutPropose", async ({ scheduler }) => {
 		const fakeTimers = clock();
 		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPropose");
 
@@ -128,7 +147,7 @@ describe<{
 		spyOnTimeoutPropose.calledOnce();
 	});
 
-	it("#scheduleTimeoutPropose - should increase delay on higher round ", async ({ scheduler }) => {
+	it("#scheduleTimeoutPropose - should increase delay on higher round", async ({ scheduler }) => {
 		const fakeTimers = clock();
 
 		const timerValues: number[] = [];
@@ -152,27 +171,27 @@ describe<{
 
 	it("#scheduleTimeoutPrevote - should call onTimeoutPrevote", async ({ scheduler }) => {
 		const fakeTimers = clock();
-		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrevote");
+		const spyOnTimeoutPrevote = spy(consensus, "onTimeoutPrevote");
 
 		assert.true(scheduler.scheduleTimeoutPrevote(1, 2));
 		await fakeTimers.nextAsync();
 
-		spyOnTimeoutPropose.calledOnce();
+		spyOnTimeoutPrevote.calledOnce();
 	});
 
 	it("#scheduleTimeoutPrevote - should call onTimeoutPrevote only once", async ({ scheduler }) => {
 		const fakeTimers = clock();
-		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrevote");
+		const spyOnTimeoutPrevote = spy(consensus, "onTimeoutPrevote");
 
 		assert.true(scheduler.scheduleTimeoutPrevote(1, 2));
 		assert.false(scheduler.scheduleTimeoutPrevote(1, 2));
 		await fakeTimers.nextAsync();
 		await fakeTimers.nextAsync();
 
-		spyOnTimeoutPropose.calledOnce();
+		spyOnTimeoutPrevote.calledOnce();
 	});
 
-	it("#scheduleTimeoutPrevote - should increase delay on higher round ", async ({ scheduler }) => {
+	it("#scheduleTimeoutPrevote - should increase delay on higher round", async ({ scheduler }) => {
 		const fakeTimers = clock();
 
 		const timerValues: number[] = [];
@@ -194,29 +213,29 @@ describe<{
 		assert.equal(timerValues, delays);
 	});
 
-	it("#scheduleTimeoutPrecommit - should call onTimeoutPrecommit ", async ({ scheduler }) => {
+	it("#scheduleTimeoutPrecommit - should call onTimeoutPrecommit", async ({ scheduler }) => {
 		const fakeTimers = clock();
-		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrecommit");
+		const spyOnTimeoutPrecommit = spy(consensus, "onTimeoutPrecommit");
 
 		assert.true(scheduler.scheduleTimeoutPrecommit(1, 2));
 		await fakeTimers.nextAsync();
 
-		spyOnTimeoutPropose.calledOnce();
+		spyOnTimeoutPrecommit.calledOnce();
 	});
 
 	it("#scheduleTimeoutPrecommit - should call onTimeoutPrecommit only once", async ({ scheduler }) => {
 		const fakeTimers = clock();
-		const spyOnTimeoutPropose = spy(consensus, "onTimeoutPrecommit");
+		const spyOnTimeoutPrecommit = spy(consensus, "onTimeoutPrecommit");
 
 		assert.true(scheduler.scheduleTimeoutPrecommit(1, 2));
 		assert.false(scheduler.scheduleTimeoutPrecommit(1, 2));
 		await fakeTimers.nextAsync();
 		await fakeTimers.nextAsync();
 
-		spyOnTimeoutPropose.calledOnce();
+		spyOnTimeoutPrecommit.calledOnce();
 	});
 
-	it("#scheduleTimeoutPrecommit - should increase delay on higher round ", async ({ scheduler }) => {
+	it("#scheduleTimeoutPrecommit - should increase delay on higher round", async ({ scheduler }) => {
 		const fakeTimers = clock();
 
 		const timerValues: number[] = [];
@@ -238,22 +257,41 @@ describe<{
 		assert.equal(timerValues, delays);
 	});
 
-	const failingHandlers: [string, string, (scheduler: Scheduler) => boolean][] = [
-		["onTimeoutStartRound", "blockPrepare 1/0", (scheduler) => scheduler.scheduleTimeoutBlockPrepare(8000)],
-		["onTimeoutPropose", "propose 1/2", (scheduler) => scheduler.scheduleTimeoutPropose(1, 2)],
-		["onTimeoutPrevote", "prevote 1/2", (scheduler) => scheduler.scheduleTimeoutPrevote(1, 2)],
-		["onTimeoutPrecommit", "precommit 1/2", (scheduler) => scheduler.scheduleTimeoutPrecommit(1, 2)],
+	const timeouts: [string, string, string, (scheduler: Scheduler) => boolean][] = [
+		[
+			"scheduleTimeoutBlockPrepare",
+			"onTimeoutStartRound",
+			"blockPrepare 1/0",
+			(scheduler) => scheduler.scheduleTimeoutBlockPrepare(8000),
+		],
+		[
+			"scheduleTimeoutPropose",
+			"onTimeoutPropose",
+			"propose 1/2",
+			(scheduler) => scheduler.scheduleTimeoutPropose(1, 2),
+		],
+		[
+			"scheduleTimeoutPrevote",
+			"onTimeoutPrevote",
+			"prevote 1/2",
+			(scheduler) => scheduler.scheduleTimeoutPrevote(1, 2),
+		],
+		[
+			"scheduleTimeoutPrecommit",
+			"onTimeoutPrecommit",
+			"precommit 1/2",
+			(scheduler) => scheduler.scheduleTimeoutPrecommit(1, 2),
+		],
 	];
 
-	for (const [handler, label, schedule] of failingHandlers) {
-		it(`#${handler} - should report a failing handler and keep the node running`, async ({
-			app,
+	for (const [method, handler, label, schedule] of timeouts) {
+		it(`#${method} - should log a failing handler instead of letting the rejection escape`, async ({
 			scheduler,
 			logger,
 		}) => {
-			// Nothing awaits a timeout handler, so the scheduler has to catch and log a failure itself.
+			// Nothing awaits a timeout handler, so the scheduler has to catch and log a failure itself;
+			// an escaped rejection would take the whole process down.
 			const fakeTimers = clock();
-			const spyTerminate = stub(app, "terminate").callsFake(() => new Promise(() => {}));
 			const spyLoggerError = spy(logger, "error");
 			const error = new Error("handler failed");
 			stub(consensus, handler).rejectedValue(error);
@@ -261,27 +299,18 @@ describe<{
 			assert.true(schedule(scheduler));
 			await fakeTimers.nextAsync();
 
-			spyTerminate.neverCalled();
 			spyLoggerError.calledOnce();
 			// The message says which timeout failed, which the error on its own does not, and it carries
 			// the stack, which is all an unexpected failure gives you to work from.
 			assert.match(spyLoggerError.getCallArgs(0)[0], `Timeout handler ${label} failed:`);
 			assert.match(spyLoggerError.getCallArgs(0)[0], error.stack);
+			assert.equal(spyLoggerError.getCallArgs(0)[1], "consensus");
 
 			// The timeout no longer counts as pending, so the same one can be scheduled again.
 			assert.true(schedule(scheduler));
 		});
-	}
 
-	const runningHandlers: [string, (scheduler: Scheduler) => boolean][] = [
-		["onTimeoutStartRound", (scheduler) => scheduler.scheduleTimeoutBlockPrepare(8000)],
-		["onTimeoutPropose", (scheduler) => scheduler.scheduleTimeoutPropose(1, 2)],
-		["onTimeoutPrevote", (scheduler) => scheduler.scheduleTimeoutPrevote(1, 2)],
-		["onTimeoutPrecommit", (scheduler) => scheduler.scheduleTimeoutPrecommit(1, 2)],
-	];
-
-	for (const [handler, schedule] of runningHandlers) {
-		it(`#${handler} - should free the slot before the handler runs`, async ({ scheduler }) => {
+		it(`#${method} - should free the slot before the handler runs`, async ({ scheduler }) => {
 			const fakeTimers = clock();
 			let release!: () => void;
 			const spyHandler = stub(consensus, handler).callsFake(

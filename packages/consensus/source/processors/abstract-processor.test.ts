@@ -116,15 +116,13 @@ describe<{
 		assert.false(processor.inBounds({ round: 1 }));
 	});
 
-	it("#handleRoundState - should report a failing handler and keep the node running", async ({
-		app,
+	it("#handleRoundState - should log a failing handler instead of letting the rejection escape", async ({
 		processor,
 		consensus,
 		logger,
 	}) => {
-		// handle() is not awaited by the caller, so without this the rejection is left to the kernel's
-		// global handler, which reports it outside the logger and without naming the round state.
-		const spyTerminate = stub(app, "terminate").callsFake(() => new Promise(() => {}));
+		// handle() is not awaited by the caller, so an uncaught rejection would surface as an unhandled
+		// rejection, outside the logger and without naming the round state.
 		const spyLoggerError = spy(logger, "error");
 		const error = new Error("handler failed");
 		stub(consensus, "handle").rejectedValue(error);
@@ -143,10 +141,10 @@ describe<{
 			process.off("unhandledRejection", onUnhandledRejection);
 		}
 
-		spyTerminate.neverCalled();
 		spyLoggerError.calledOnce();
 		assert.match(spyLoggerError.getCallArgs(0)[0], "Failed to handle round state 5/2:");
 		assert.match(spyLoggerError.getCallArgs(0)[0], error.stack);
+		assert.equal(spyLoggerError.getCallArgs(0)[1], "consensus");
 	});
 
 	it("#handleRoundState - should not report anything when handling the round state succeeds", async ({

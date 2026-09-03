@@ -65,9 +65,9 @@ describe<{
 		const second = repository.getRoundState(1, 1);
 		const third = repository.getRoundState(2, 0);
 
-		assert.false(first === second);
-		assert.false(first === third);
-		assert.false(second === third);
+		assert.is.not(first, second);
+		assert.is.not(first, third);
+		assert.is.not(second, third);
 		assert.equal(
 			[first, second, third].map((roundState) => [roundState.blockNumber, roundState.round]),
 			[
@@ -106,7 +106,7 @@ describe<{
 
 		const fresh = repository.getRoundState(1, 0);
 		assert.instance(fresh, RoundState);
-		assert.false(fresh === stale);
+		assert.is.not(fresh, stale);
 		assert.length(repository.getRoundStates(), 1);
 	});
 });
