@@ -292,7 +292,15 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.logger.info(`Received proposal ${this.#getBlockString(proposal.blockHeader)}`, "consensus");
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
-		await this.prevote(roundState.getProcessorResult().success ? proposal.blockHeader.hash : undefined);
+		// A validator locked on a block must not prevote a different one.
+		const isNotLockedOnAnotherBlock =
+			this.#lockedValue === undefined || this.#isLockedOnBlock(proposal.blockHeader.hash);
+
+		await this.prevote(
+			roundState.getProcessorResult().success && isNotLockedOnAnotherBlock
+				? proposal.blockHeader.hash
+				: undefined,
+		);
 	}
 
 	protected async onProposalLocked(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -316,7 +324,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		const lockedRound = this.getLockedRound();
 
-		if ((!lockedRound || lockedRound <= proposal.validRound) && roundState.getProcessorResult().success) {
+		if (
+			(!lockedRound || lockedRound <= proposal.validRound || this.#isLockedOnBlock(proposal.blockHeader.hash)) &&
+			roundState.getProcessorResult().success
+		) {
 			await this.prevote(proposal.blockHeader.hash);
 		} else {
 			await this.prevote();
@@ -502,6 +513,10 @@ export class Consensus implements Contracts.Consensus.Service {
 		});
 	}
 
+	#isLockedOnBlock(hash: string): boolean {
+		return this.#lockedValue?.getProposal()?.blockHeader.hash === hash;
+	}
+
 	#isInvalidRoundState(roundState: Contracts.Processor.ProcessableUnit): boolean {
 		if (roundState.blockNumber !== this.#blockNumber) {
 			return true;
@@ -560,6 +575,14 @@ export class Consensus implements Contracts.Consensus.Service {
 		registeredProposer: Contracts.Validator.Validator,
 	): Promise<Contracts.Crypto.Proposal> {
 		if (this.#validValue) {
+			// A valid value restored from consensus storage still holds a serialized payload, so the
+			// block has to be deserialized before it can be re-proposed. Deserializing is idempotent.
+			const validProposal = this.#validValue.getProposal();
+			// TODO: reject a proposal-less valid value at restore (bootstrapper.ts), so corrupt
+			// consensus state terminates on boot instead of here, mid-round.
+			assert.defined(validProposal);
+			await validProposal.deserializePayload();
+
 			this.#proposedBlock = this.#validValue.getBlock();
 			const lockProof = await this.#validValue.aggregatePrevotes();
 
@@ -666,6 +689,8 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		if (state) {
 			if (state.blockNumber === this.#blockNumber) {
+				// TODO: run() calls startRound() next, which overwrites this with Propose. Decide
+				// whether the restored step should survive, or stop persisting it.
 				this.#step = state.step;
 				this.#round = state.round;
 				this.#lockedValue = state.lockedValue;
