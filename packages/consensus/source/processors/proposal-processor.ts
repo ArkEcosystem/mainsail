@@ -17,9 +17,6 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@tagged("type", "consensus")
 	private readonly consensusSignature!: Contracts.Crypto.SignatureBls;
 
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.Configuration;
-
 	@inject(Identifiers.Consensus.Aggregator)
 	private readonly aggregator!: Contracts.Consensus.Aggregator;
 
@@ -40,12 +37,14 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		broadcast: boolean = true,
 	): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
-			if (!this.hasValidBlockNumberOrRound({ blockNumber: proposal.blockHeader.number, round: proposal.round })) {
+			if (
+				!this.hasValidBlockNumberAndRound({ blockNumber: proposal.blockHeader.number, round: proposal.round })
+			) {
 				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
-			if (!this.isRoundInBounds(proposal)) {
-				return Enums.Consensus.ProcessorResult.Invalid;
+			if (this.isRoundAheadOfTime(proposal)) {
+				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
 			if (!this.#hasValidProposer(proposal)) {
@@ -67,7 +66,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 				void this.broadcaster.broadcastProposal(proposal);
 			}
 
-			// Add some time to allow the proposal to be broadcasted to other nodes before processing it.
+			// Add some time to allow the proposal to be broadcast to other nodes before processing it.
 			setTimeout(() => {
 				this.handleRoundState(roundState);
 			}, 0);

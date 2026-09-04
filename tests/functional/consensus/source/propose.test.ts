@@ -76,7 +76,7 @@ describe<{
 
 	it("#missing propose - should not accept block", async ({ nodes, validators }) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
-		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
@@ -99,7 +99,7 @@ describe<{
 	it("#missing propose - should not accept block for 3 rounds", async ({ nodes, validators }) => {
 		const rounds = 3;
 		const node0 = getNodeForValidator(nodes, validators[0]);
-		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 
 		stubPropose.callsFake(async () => {});
 
@@ -122,7 +122,7 @@ describe<{
 
 	it("#invalid proposer - should not accept block", async ({ nodes, validators, p2p }) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
-		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
@@ -169,7 +169,7 @@ describe<{
 
 	it("#double propose - one by one - should take the first proposal", async ({ nodes, validators, p2p }) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
-		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
 		});
@@ -221,7 +221,7 @@ describe<{
 
 	it("#double propose - 50 : 50 split - should not accept block", async ({ nodes, validators, p2p }) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
-		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
 		});
@@ -277,7 +277,7 @@ describe<{
 		const rounds = 3;
 
 		const node0 = getNodeForValidator(nodes, validators[0]);
-		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 		stubPropose.callsFake(async () => {});
 
 		await runMany(nodes);
@@ -338,7 +338,7 @@ describe<{
 		p2p,
 	}) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
-		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
 		});
@@ -406,7 +406,7 @@ describe<{
 
 	it("#multi propose - propose per node - should not accept block", async ({ nodes, validators, p2p }) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
-		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
 		});
@@ -467,7 +467,7 @@ describe<{
 	it("should propose block with evm calls", async ({ nodes, validators }) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
 
-		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 		stubPropose.callsFake(async () => {
 			const context = makeTransactionBuilderContext(node0, nodes, validators);
 

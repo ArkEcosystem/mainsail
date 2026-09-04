@@ -53,8 +53,8 @@ export enum ConsensusEvent {
 	PrevotedProposal = "consensus.prevoted.proposal",
 	PrevotedAny = "consensus.prevoted.any",
 	PrevotedNull = "consensus.prevoted.null",
-	PrecommitedAny = "consensus.precommited.any",
-	PrecommitedProposal = "consensus.precommited.proposal",
+	PrecommittedAny = "consensus.precommitted.any",
+	PrecommittedProposal = "consensus.precommitted.proposal",
 }
 
 export enum DeployerEvent {

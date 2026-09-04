@@ -4,6 +4,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
 import { RoundState } from "./round-state.js";
+
 @injectable()
 export class RoundStateRepository implements Contracts.Consensus.RoundStateRepository {
 	@inject(Identifiers.Application.Instance)
@@ -14,11 +15,13 @@ export class RoundStateRepository implements Contracts.Consensus.RoundStateRepos
 	public getRoundState(blockNumber: number, round: number): Contracts.Consensus.RoundState {
 		const key = `${blockNumber}-${round}`;
 
-		if (!this.#roundStates.has(key)) {
-			this.#roundStates.set(key, this.#createRoundState(blockNumber, round));
+		let roundState = this.#roundStates.get(key);
+		if (!roundState) {
+			roundState = this.#createRoundState(blockNumber, round);
+			this.#roundStates.set(key, roundState);
 		}
 
-		return this.#roundStates.get(key)!;
+		return roundState;
 	}
 
 	public getRoundStates(): Contracts.Consensus.RoundState[] {

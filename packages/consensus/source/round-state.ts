@@ -49,10 +49,6 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#round;
 	}
 
-	public get persist(): boolean {
-		return true; // Store block in database every time
-	}
-
 	public get validators(): string[] {
 		return [...this.#validators.keys()];
 	}
@@ -112,10 +108,10 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 	public async getCommit(): Promise<Contracts.Crypto.Commit> {
 		if (!this.#commit) {
-			const majority = await this.aggregatePrecommits();
-
 			const proposal = this.getProposal();
 			assert.defined(proposal);
+
+			const majority = await this.aggregatePrecommits();
 
 			const round = proposal.round;
 			const block = proposal.getPayload().block;
@@ -362,11 +358,13 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#precommitsCount.get(blockHash) ?? 0;
 	}
 
-	#getSignatures(s: Map<number, { signature: string; blockHash?: string }>): Map<number, { signature: string }> {
+	#getSignatures(
+		messages: Map<number, { signature: string; blockHash?: string }>,
+	): Map<number, { signature: string }> {
 		assert.defined(this.#proposal);
 		const filtered: Map<number, { signature: string }> = new Map();
 
-		for (const [key, value] of s) {
+		for (const [key, value] of messages) {
 			if (value.blockHash === this.#proposal.blockHeader.hash) {
 				filtered.set(key, value);
 			}

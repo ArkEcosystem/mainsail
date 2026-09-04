@@ -1,6 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { isMajority } from "@mainsail/blockchain-utils";
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
@@ -8,12 +7,6 @@ import { AbstractProcessor } from "./abstract-processor.js";
 
 @injectable()
 export class CommitProcessor extends AbstractProcessor implements Contracts.Consensus.CommitProcessor {
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.Configuration;
-
-	@inject(Identifiers.ValidatorSet.Service)
-	private readonly validatorSet!: Contracts.ValidatorSet.Service;
-
 	@inject(Identifiers.Cryptography.Message.Serializer)
 	private readonly serializer!: Contracts.Crypto.MessageSerializer;
 
@@ -47,21 +40,6 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 	async hasValidSignature(commit: Contracts.Crypto.Commit, previousBlockHash: string): Promise<boolean> {
 		const { block, proof } = commit;
 
-		const publicKeys: Buffer[] = [];
-		for (const [index, validator] of proof.validators.entries()) {
-			if (!validator) {
-				continue;
-			}
-
-			const validatorPublicKey = this.validatorSet.getValidator(index).blsPublicKey;
-			publicKeys.push(Buffer.from(validatorPublicKey, "hex"));
-		}
-
-		const { roundValidators } = this.configuration.getMilestone(block.number);
-		if (!isMajority(publicKeys.length, roundValidators)) {
-			return false;
-		}
-
 		const precommit = await this.serializer.serializeMessageForSignature(
 			{
 				blockHash: block.hash,
@@ -74,6 +52,8 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 				previousBlockHash,
 			},
 		);
+
+		const { roundValidators } = this.configuration.getMilestone(block.number);
 
 		return this.aggregator.verify(proof, precommit, roundValidators);
 	}

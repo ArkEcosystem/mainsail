@@ -44,15 +44,25 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 		}
 
 		if (state.validRound !== undefined) {
-			// TODO: ensure validRound points to an existing round?
 			const roundState = this.roundStateRepo.getRoundState(state.blockNumber, state.validRound);
-			state.validValue = roundState;
+
+			// The valid value gets re-proposed, which needs its proposal. State and proposals are stored in one
+			// transaction, so a missing proposal means the store was tampered with; propose a fresh block instead.
+			if (roundState.hasProposal()) {
+				state.validValue = roundState;
+			} else {
+				this.logger.warn(
+					`Consensus Bootstrap - Dropping valid round ${state.blockNumber}/${state.validRound}, because its proposal is not stored`,
+					"consensus",
+				);
+				state.validRound = undefined;
+			}
 		}
 
 		if (state.lockedRound !== undefined) {
-			// TODO: ensure lockedRound points to an existing round?
-			const roundState = this.roundStateRepo.getRoundState(state.blockNumber, state.lockedRound);
-			state.lockedValue = roundState;
+			// Only the round number of the locked value is consumed, so the round state needs no proposal. The lock
+			// is kept even when the valid value above was dropped, because forgetting it would weaken safety.
+			state.lockedValue = this.roundStateRepo.getRoundState(state.blockNumber, state.lockedRound);
 		}
 
 		return state;

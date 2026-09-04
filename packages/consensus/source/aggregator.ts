@@ -13,49 +13,56 @@ export class Aggregator implements Contracts.Consensus.Aggregator {
 	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
 	public async aggregate(
-		majority: Map<number, { signature: string }>,
+		signatures: Map<number, { signature: string }>,
 		roundValidators: number,
 	): Promise<Contracts.Crypto.AggregatedSignature> {
-		if (!isMajority(majority.size, roundValidators)) {
+		if (!isMajority(signatures.size, roundValidators)) {
 			throw new Error("Failed to aggregate signatures, because the majority is not reached.");
 		}
 
-		const signatures: Buffer[] = [];
+		const validators: boolean[] = Array.from({ length: roundValidators }, () => false);
+		const buffers: Buffer[] = [];
 
-		const validators: boolean[] = Array.from<boolean>({ length: roundValidators }).fill(false);
+		for (const [validatorIndex, { signature }] of signatures) {
+			if (!Number.isInteger(validatorIndex) || validatorIndex < 0 || validatorIndex >= roundValidators) {
+				throw new Error(
+					`Failed to aggregate signatures, because validator index ${validatorIndex} is out of range.`,
+				);
+			}
 
-		for (const [key, { signature }] of majority) {
-			signatures.push(Buffer.from(signature, "hex"));
-			validators[key] = true;
+			validators[validatorIndex] = true;
+			buffers.push(Buffer.from(signature, "hex"));
 		}
 
-		const worker = this.workerPool.getWorker();
-		const signature = await worker.consensusSignature("aggregate", signatures);
+		const signature = await this.workerPool.getWorker().consensusSignature("aggregate", buffers);
 
-		return {
-			signature,
-			validators,
-		};
+		return { signature, validators };
 	}
 
-	async verify(
+	public async verify(
 		signature: Contracts.Crypto.AggregatedSignature,
 		data: Buffer,
 		roundValidators: number,
 	): Promise<boolean> {
-		const validatorPublicKeys: Buffer[] = signature.validators
-			.map((v, index) => (v ? Buffer.from(this.validatorSet.getValidator(index).blsPublicKey, "hex") : undefined))
-			.filter((item): item is Buffer<ArrayBuffer> => !!item);
+		if (signature.validators.length !== roundValidators) {
+			return false;
+		}
 
-		if (!isMajority(validatorPublicKeys.length, roundValidators)) {
+		const publicKeys: Buffer[] = [];
+		for (const [validatorIndex, signed] of signature.validators.entries()) {
+			if (signed) {
+				publicKeys.push(Buffer.from(this.validatorSet.getValidator(validatorIndex).blsPublicKey, "hex"));
+			}
+		}
+
+		if (!isMajority(publicKeys.length, roundValidators)) {
 			return false;
 		}
 
 		const worker = this.workerPool.getWorker();
+		const aggregatedPublicKey = await worker.publicKeyFactory("aggregate", publicKeys);
 
-		const aggregatedPublicKey = await worker.publicKeyFactory("aggregate", validatorPublicKeys);
-
-		return await worker.consensusSignature(
+		return worker.consensusSignature(
 			"verify",
 			Buffer.from(signature.signature, "hex"),
 			data,
