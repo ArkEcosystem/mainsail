@@ -80,6 +80,24 @@ export interface AccountUpdate {
 	readonly legacyMergeInfo?: AccountMergeInfo;
 }
 
+export type ContractEvent = {
+	readonly txHash: string;
+	readonly txIndex: number;
+} & (
+	| { readonly event: "Voted"; readonly voter: string; readonly validator: string }
+	| { readonly event: "Unvoted"; readonly voter: string; readonly validator: string }
+	| { readonly event: "ValidatorRegistered"; readonly addr: string; readonly blsPublicKey: string }
+	| { readonly event: "ValidatorResigned"; readonly addr: string }
+	| { readonly event: "ValidatorUpdated"; readonly addr: string; readonly blsPublicKey: string }
+	| {
+			readonly event: "UsernameRegistered";
+			readonly addr: string;
+			readonly username: string;
+			readonly previousUsername?: string;
+	  }
+	| { readonly event: "UsernameResigned"; readonly addr: string; readonly username: string }
+);
+
 export interface AccountUpdateContext {
 	readonly account: string;
 	readonly commitKey: CommitKey;

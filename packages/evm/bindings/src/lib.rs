@@ -15,6 +15,7 @@ use mainsail_evm_core::{
         BlockContext, BlockHeaderData, CommitData, CommitKey, GenesisInfo, PendingCommit,
         PersistentDB, PersistentDBOptions, ProofData, TransactionData, TxnDatabaseReader,
     },
+    events::ContractEvent,
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
     logs_bloom,
@@ -895,7 +896,7 @@ impl EvmInner {
         &mut self,
         commit_key: CommitKey,
         commit_data: Option<CommitData>,
-    ) -> std::result::Result<Vec<AccountUpdate>, EVMError<String>> {
+    ) -> std::result::Result<(Vec<AccountUpdate>, Vec<ContractEvent>), EVMError<String>> {
         if !self.pending_commits.contains_key(&commit_key) {
             return Err(EVMError::Custom(format!(
                 "commit is missing commit key {:?}",
@@ -1848,9 +1849,10 @@ impl JsEvmWrapper {
         self.write(
             env,
             move |evm| evm.commit(commit_key, commit_data),
-            |_, result| {
+            |_, (dirty_accounts, events)| {
                 Ok(result::JsCommitResult::new(CommitResult {
-                    dirty_accounts: result,
+                    dirty_accounts,
+                    events,
                 })?)
             },
         )
