@@ -40,10 +40,12 @@ describe<{
 		({
 			blockNumber: genesisCommit.block.number,
 			getAccountUpdates: () => [],
+			getContractEvents: () => [],
 			getBlock: () => genesisCommit.block,
 			getCommit: async () => genesisCommit,
 			round: genesisCommit.block.round,
 			setAccountUpdates: () => {},
+			setContractEvents: () => {},
 		}) as unknown as Contracts.Processor.ProcessableUnit;
 
 	// Valid legacy (base58check) addresses: one imported as a cold wallet by the tests

@@ -80,6 +80,7 @@ export const commitGenesis = async (
 	await instance.onCommit({
 		blockNumber: block.number,
 		getAccountUpdates: () => [],
+		getContractEvents: () => [],
 		getBlock: () => block,
 		getCommit: async () => genesisCommit,
 		getProcessorResult: () => ({
@@ -91,6 +92,7 @@ export const commitGenesis = async (
 		hasProcessorResult: () => false,
 		round: block.round,
 		setAccountUpdates: () => {},
+		setContractEvents: () => {},
 		setProcessorResult: () => {},
 	});
 
