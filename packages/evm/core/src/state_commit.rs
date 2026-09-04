@@ -1,6 +1,6 @@
 use std::{borrow::Cow, collections::BTreeMap};
 
-use alloy_sol_types::SolEvent;
+use alloy_sol_types::SolEventInterface;
 use rayon::{
     iter::{IntoParallelRefMutIterator, ParallelIterator},
     slice::ParallelSliceMut,
@@ -14,6 +14,7 @@ use revm::{
 
 use crate::{
     db::{CommitData, CommitKey, Error, GenesisInfo, PendingCommit, PersistentDB},
+    events::{self, ConsensusV1Events, ContractEvent, ContractEventData, UsernamesV1Events},
     state_changes::{self, AccountMergeInfo, AccountUpdate},
 };
 
@@ -119,7 +120,7 @@ pub fn commit_to_db(
     db: &mut PersistentDB,
     mut pending_commit: PendingCommit,
     commit_data: Option<CommitData>,
-) -> Result<Vec<AccountUpdate>, crate::db::Error> {
+) -> Result<(Vec<AccountUpdate>, Vec<ContractEvent>), crate::db::Error> {
     let genesis_info = db.genesis_info.clone();
     let mut commit = match pending_commit.built_commit {
         Some(commit) => commit,
@@ -128,7 +129,7 @@ pub fn commit_to_db(
 
     commit_with_resize_retry(|| db.commit(&mut commit, &commit_data), || db.resize())?;
 
-    Ok(collect_dirty_accounts(commit, &genesis_info))
+    Ok(collect_dirty_accounts_and_events(commit, &genesis_info))
 }
 
 /// Maximum number of resize-and-retry attempts after an initial `DbFull` on commit.
@@ -164,11 +165,12 @@ fn finalize(state: &mut StateCommit) {
         .par_sort_unstable_by_key(|a| a.address);
 }
 
-fn collect_dirty_accounts(
+fn collect_dirty_accounts_and_events(
     commit: StateCommit,
     genesis_info: &Option<GenesisInfo>,
-) -> Vec<AccountUpdate> {
+) -> (Vec<AccountUpdate>, Vec<ContractEvent>) {
     let mut dirty_accounts = HashMap::with_capacity(commit.change_set.accounts.len());
+    let mut events: Vec<ContractEvent> = Vec::new();
 
     for (address, account) in commit.change_set.accounts {
         // A destroyed (selfdestructed) account comes through as `None`; surface it as a
@@ -205,83 +207,144 @@ fn collect_dirty_accounts(
         // least the 21000-gas intrinsic cost, so each entry's cumulative total is strictly
         // greater than the previous one's — the key is guaranteed unique and monotonic,
         // never tied.
-        let mut results: Vec<&(ExecutionResult, u64)> = commit.results.values().collect();
-        results.sort_by_key(|(_, cumulative_gas_used)| *cumulative_gas_used);
+        let mut results: Vec<(&B256, &(ExecutionResult, u64))> = commit.results.iter().collect();
+        results.sort_by_key(|(_, (_, cumulative_gas_used))| *cumulative_gas_used);
 
-        for (receipt, _) in results {
+        for (tx_index, (tx_hash, (receipt, _))) in results.into_iter().enumerate() {
+            let make_event = |data: ContractEventData| ContractEvent {
+                tx_hash: *tx_hash,
+                tx_index: tx_index as u32,
+                data,
+            };
+
             match receipt {
                 ExecutionResult::Success { logs, .. } => {
                     for log in logs {
                         match log.address {
                             _ if log.address == info.validator_contract => {
-                                // Attempt to decode the log as a Voted event
-                                if let Ok(event) = crate::events::Voted::decode_log(&log) {
-                                    // println!(
-                                    //     "Voted event (from={:?} to={:?})",
-                                    //     event.data.voter, event.data.validator,
-                                    // );
-
-                                    dirty_accounts.get_mut(&event.voter).and_then(|account| {
-                                        account.vote = Some(event.validator);
-                                        account.unvote = None; // cancel out any previous unvote if one happened in same commit
-                                        Some(account)
-                                    });
-
+                                let Ok(decoded) = ConsensusV1Events::decode_log(log) else {
                                     continue;
-                                }
+                                };
 
-                                // Attempt to decode the log as a Unvoted event
-                                if let Ok(event) = crate::events::Unvoted::decode_log(&log) {
-                                    // println!(
-                                    //     "Unvoted event (from={:?} removed vote={:?})",
-                                    //     event.data.voter, event.data.validator,
-                                    // );
+                                match decoded.data {
+                                    ConsensusV1Events::Voted(events::Voted {
+                                        voter,
+                                        validator,
+                                    }) => {
+                                        dirty_accounts.get_mut(&voter).and_then(|account| {
+                                            account.vote = Some(validator);
+                                            account.unvote = None; // cancel out any previous unvote if one happened in same commit
+                                            Some(account)
+                                        });
 
-                                    dirty_accounts.get_mut(&event.voter).and_then(|account| {
-                                        account.unvote = Some(event.validator);
-                                        account.vote = None; // cancel out any previous vote if one happened in same commit
-                                        Some(account)
-                                    });
+                                        events.push(make_event(ContractEventData::Voted {
+                                            voter,
+                                            validator,
+                                        }));
+                                    }
+                                    ConsensusV1Events::Unvoted(events::Unvoted {
+                                        voter,
+                                        validator,
+                                    }) => {
+                                        dirty_accounts.get_mut(&voter).and_then(|account| {
+                                            account.unvote = Some(validator);
+                                            account.vote = None; // cancel out any previous vote if one happened in same commit
+                                            Some(account)
+                                        });
 
-                                    continue;
+                                        events.push(make_event(ContractEventData::Unvoted {
+                                            voter,
+                                            validator,
+                                        }));
+                                    }
+                                    ConsensusV1Events::ValidatorRegistered(
+                                        events::ValidatorRegistered {
+                                            addr,
+                                            blsPublicKey: bls_public_key,
+                                        },
+                                    ) => {
+                                        events.push(make_event(
+                                            ContractEventData::ValidatorRegistered {
+                                                addr,
+                                                bls_public_key,
+                                            },
+                                        ));
+                                    }
+                                    ConsensusV1Events::ValidatorResigned(
+                                        events::ValidatorResigned { addr },
+                                    ) => {
+                                        events.push(make_event(
+                                            ContractEventData::ValidatorResigned { addr },
+                                        ));
+                                    }
+                                    ConsensusV1Events::ValidatorUpdated(
+                                        events::ValidatorUpdated {
+                                            addr,
+                                            blsPublicKey: bls_public_key,
+                                        },
+                                    ) => {
+                                        events.push(make_event(
+                                            ContractEventData::ValidatorUpdated {
+                                                addr,
+                                                bls_public_key,
+                                            },
+                                        ));
+                                    }
                                 }
                             }
                             _ if log.address == info.username_contract => {
-                                // Attempt to decode log as a UsernameRegistered event
-                                if let Ok(event) =
-                                    crate::events::UsernameRegistered::decode_log(&log)
-                                {
-                                    dirty_accounts.get_mut(&event.addr).and_then(|account| {
-                                        account.username = Some(event.username.clone());
-                                        account.username_resigned = false; // cancel out any previous resignation if one happened in same commit
-                                        Some(account)
-                                    });
+                                let Ok(decoded) = UsernamesV1Events::decode_log(log) else {
                                     continue;
-                                }
+                                };
 
-                                // Attempt to decode log as a UsernameResigned event
-                                if let Ok(event) = crate::events::UsernameResigned::decode_log(&log)
-                                {
-                                    dirty_accounts.get_mut(&event.addr).and_then(|account| {
-                                        account.username = None; // cancel out any previous registration if one happened in same commit
-                                        account.username_resigned = true;
-                                        Some(account)
-                                    });
-                                    continue;
+                                match decoded.data {
+                                    UsernamesV1Events::UsernameRegistered(
+                                        events::UsernameRegistered {
+                                            addr,
+                                            username,
+                                            previousUsername: previous_username,
+                                        },
+                                    ) => {
+                                        dirty_accounts.get_mut(&addr).and_then(|account| {
+                                            account.username = Some(username.clone());
+                                            account.username_resigned = false; // cancel out any previous resignation if one happened in same commit
+                                            Some(account)
+                                        });
+
+                                        events.push(make_event(
+                                            ContractEventData::UsernameRegistered {
+                                                addr,
+                                                username,
+                                                previous_username: (!previous_username.is_empty())
+                                                    .then_some(previous_username),
+                                            },
+                                        ));
+                                    }
+                                    UsernamesV1Events::UsernameResigned(
+                                        events::UsernameResigned { addr, username },
+                                    ) => {
+                                        dirty_accounts.get_mut(&addr).and_then(|account| {
+                                            account.username = None; // cancel out any previous registration if one happened in same commit
+                                            account.username_resigned = true;
+                                            Some(account)
+                                        });
+
+                                        events.push(make_event(
+                                            ContractEventData::UsernameResigned { addr, username },
+                                        ));
+                                    }
                                 }
                             }
                             _ => (), // ignore
                         }
                     }
-
-                    //
                 }
                 ExecutionResult::Revert { .. } | ExecutionResult::Halt { .. } => (), // ignore
             }
         }
     }
 
-    dirty_accounts.into_values().collect()
+    (dirty_accounts.into_values().collect(), events)
 }
 
 #[cfg(test)]
