@@ -59,7 +59,7 @@ describe<{
 		const [sender, other] = wallets;
 		const voter = getAddress(sender.address);
 		const validator = getAddress(other.address);
-		const blsPublicKey = `0x${"aa".repeat(48)}`;
+		const blsPublicKey = "aa".repeat(48);
 
 		const consensusContract = getContractAddress({ from: voter, nonce: 0n });
 		const usernamesContract = getContractAddress({ from: voter, nonce: 1n });
@@ -102,7 +102,7 @@ describe<{
 		const usernamesTxHash = getRandomTxHash();
 
 		for (const [nonce, txHash, to, functionName, args] of [
-			[2n, consensusTxHash, consensusContract, "emitConsensusEvents", [voter, validator, blsPublicKey]],
+			[2n, consensusTxHash, consensusContract, "emitConsensusEvents", [voter, validator, `0x${blsPublicKey}`]],
 			[3n, usernamesTxHash, usernamesContract, "emitUsernameEvents", [voter]],
 		] as const) {
 			const { receipt } = await evm.process({
@@ -127,15 +127,15 @@ describe<{
 		assert.equal(
 			events.map(normalize),
 			[
-				{ event: "Voted", txHash: `0x${consensusTxHash}`, txIndex: 0, validator, voter },
-				{ event: "Unvoted", txHash: `0x${consensusTxHash}`, txIndex: 0, validator, voter },
-				{ addr: voter, blsPublicKey, event: "ValidatorRegistered", txHash: `0x${consensusTxHash}`, txIndex: 0 },
-				{ addr: voter, event: "ValidatorResigned", txHash: `0x${consensusTxHash}`, txIndex: 0 },
-				{ addr: voter, blsPublicKey, event: "ValidatorUpdated", txHash: `0x${consensusTxHash}`, txIndex: 0 },
+				{ event: "Voted", txHash: consensusTxHash, txIndex: 0, validator, voter },
+				{ event: "Unvoted", txHash: consensusTxHash, txIndex: 0, validator, voter },
+				{ addr: voter, blsPublicKey, event: "ValidatorRegistered", txHash: consensusTxHash, txIndex: 0 },
+				{ addr: voter, event: "ValidatorResigned", txHash: consensusTxHash, txIndex: 0 },
+				{ addr: voter, blsPublicKey, event: "ValidatorUpdated", txHash: consensusTxHash, txIndex: 0 },
 				{
 					addr: voter,
 					event: "UsernameRegistered",
-					txHash: `0x${usernamesTxHash}`,
+					txHash: usernamesTxHash,
 					txIndex: 1,
 					username: "alice",
 				},
@@ -143,11 +143,11 @@ describe<{
 					addr: voter,
 					event: "UsernameRegistered",
 					previousUsername: "alice",
-					txHash: `0x${usernamesTxHash}`,
+					txHash: usernamesTxHash,
 					txIndex: 1,
 					username: "bob",
 				},
-				{ addr: voter, event: "UsernameResigned", txHash: `0x${usernamesTxHash}`, txIndex: 1, username: "bob" },
+				{ addr: voter, event: "UsernameResigned", txHash: usernamesTxHash, txIndex: 1, username: "bob" },
 			].map(normalize),
 		);
 
