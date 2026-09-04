@@ -355,8 +355,11 @@ mod tests {
     use crate::{
         db::{Error, GenesisInfo, PendingCommit, PersistentDB},
         events,
+        events::{ContractEvent, ContractEventData},
         state_changes::{AccountMergeInfo, AccountUpdate, StateChangeset},
-        state_commit::{StateCommit, apply_rewards, build_commit, collect_dirty_accounts},
+        state_commit::{
+            StateCommit, apply_rewards, build_commit, collect_dirty_accounts_and_events,
+        },
     };
     use crate::{
         legacy::{LegacyAccountAttributes, LegacyAddress},
@@ -468,6 +471,29 @@ mod tests {
                             .encode_log_data(),
                         },
                         Log {
+                            address: genesis_info.validator_contract,
+                            data: events::ValidatorRegistered {
+                                addr: address!("0000000000000000000000000000000000000001"),
+                                blsPublicKey: alloy_primitives::Bytes::from_static(&[0xaa; 48]),
+                            }
+                            .encode_log_data(),
+                        },
+                        Log {
+                            address: genesis_info.validator_contract,
+                            data: events::ValidatorResigned {
+                                addr: address!("0000000000000000000000000000000000000002"),
+                            }
+                            .encode_log_data(),
+                        },
+                        Log {
+                            address: genesis_info.validator_contract,
+                            data: events::ValidatorUpdated {
+                                addr: address!("0000000000000000000000000000000000000001"),
+                                blsPublicKey: alloy_primitives::Bytes::from_static(&[0xbb; 48]),
+                            }
+                            .encode_log_data(),
+                        },
+                        Log {
                             address: genesis_info.username_contract,
                             data: events::UsernameRegistered {
                                 addr: address!("0000000000000000000000000000000000000001"),
@@ -524,7 +550,8 @@ mod tests {
             ..Default::default()
         };
 
-        let mut account_updates = collect_dirty_accounts(state, &Some(genesis_info));
+        let (mut account_updates, events) =
+            collect_dirty_accounts_and_events(state, &Some(genesis_info));
         account_updates.sort_by_key(|k| k.address);
 
         assert_eq!(
@@ -557,6 +584,47 @@ mod tests {
                 }
             ]
         );
+
+        let tx_hash = b256!("0000000000000000000000000000000000000000000000000000000000000001");
+        let event = |data: ContractEventData| ContractEvent {
+            tx_hash,
+            tx_index: 0,
+            data,
+        };
+
+        assert_eq!(
+            events,
+            vec![
+                event(ContractEventData::Voted {
+                    voter: address!("0000000000000000000000000000000000000001"),
+                    validator: address!("0000000000000000000000000000000000000002"),
+                }),
+                event(ContractEventData::Unvoted {
+                    voter: address!("0000000000000000000000000000000000000002"),
+                    validator: address!("0000000000000000000000000000000000000004"),
+                }),
+                event(ContractEventData::ValidatorRegistered {
+                    addr: address!("0000000000000000000000000000000000000001"),
+                    bls_public_key: alloy_primitives::Bytes::from_static(&[0xaa; 48]),
+                }),
+                event(ContractEventData::ValidatorResigned {
+                    addr: address!("0000000000000000000000000000000000000002"),
+                }),
+                event(ContractEventData::ValidatorUpdated {
+                    addr: address!("0000000000000000000000000000000000000001"),
+                    bls_public_key: alloy_primitives::Bytes::from_static(&[0xbb; 48]),
+                }),
+                event(ContractEventData::UsernameRegistered {
+                    addr: address!("0000000000000000000000000000000000000001"),
+                    username: "test".into(),
+                    previous_username: None,
+                }),
+                event(ContractEventData::UsernameResigned {
+                    addr: address!("0000000000000000000000000000000000000002"),
+                    username: "resigned".into(),
+                }),
+            ]
+        );
     }
 
     #[test]
@@ -575,8 +643,10 @@ mod tests {
             ..Default::default()
         };
 
-        let mut account_updates = collect_dirty_accounts(state, &None);
+        let (mut account_updates, events) = collect_dirty_accounts_and_events(state, &None);
         account_updates.sort_by_key(|u| u.address);
+
+        assert!(events.is_empty());
 
         // A selfdestructed account must surface as a zeroed update — consumers (api-sync
         // wallet table) would otherwise keep the stale pre-destruction balance forever.
@@ -685,7 +755,8 @@ mod tests {
             ..Default::default()
         };
 
-        let account_updates = collect_dirty_accounts(state, &Some(genesis_info));
+        let (account_updates, events) =
+            collect_dirty_accounts_and_events(state, &Some(genesis_info));
 
         assert_eq!(
             account_updates,
@@ -699,6 +770,47 @@ mod tests {
                 username_resigned: true,
                 merge_info: None
             }]
+        );
+
+        assert_eq!(
+            events,
+            vec![
+                ContractEvent {
+                    tx_hash: b256!(
+                        "0000000000000000000000000000000000000000000000000000000000000004"
+                    ),
+                    tx_index: 0,
+                    data: ContractEventData::Voted { voter, validator },
+                },
+                ContractEvent {
+                    tx_hash: b256!(
+                        "0000000000000000000000000000000000000000000000000000000000000003"
+                    ),
+                    tx_index: 1,
+                    data: ContractEventData::Unvoted { voter, validator },
+                },
+                ContractEvent {
+                    tx_hash: b256!(
+                        "0000000000000000000000000000000000000000000000000000000000000002"
+                    ),
+                    tx_index: 2,
+                    data: ContractEventData::UsernameRegistered {
+                        addr: voter,
+                        username: "test".into(),
+                        previous_username: None,
+                    },
+                },
+                ContractEvent {
+                    tx_hash: b256!(
+                        "0000000000000000000000000000000000000000000000000000000000000001"
+                    ),
+                    tx_index: 3,
+                    data: ContractEventData::UsernameResigned {
+                        addr: voter,
+                        username: "test".into(),
+                    },
+                },
+            ]
         );
     }
 
