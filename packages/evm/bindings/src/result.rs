@@ -1,6 +1,7 @@
 use mainsail_evm_core::{
     account::AccountInfoExtended,
     db::{BlockHeaderData, ProofData, TransactionData},
+    events::{ContractEvent, ContractEventData},
     legacy::{LegacyAccountAttributes, LegacyColdWallet, LegacyMultiSignatureAttribute},
     receipt::TxReceipt,
     state_changes::AccountUpdate,
@@ -44,6 +45,7 @@ impl JsSimulateResult {
 #[napi(object, object_from_js = false)]
 pub struct JsCommitResult {
     pub dirty_accounts: Vec<JsAccountUpdate>,
+    pub events: Vec<JsContractEvent>,
 }
 
 impl JsCommitResult {
@@ -53,7 +55,77 @@ impl JsCommitResult {
             dirty_accounts.push(JsAccountUpdate::new(item));
         }
 
-        Ok(Self { dirty_accounts })
+        let mut events = Vec::with_capacity(result.events.len());
+        for item in result.events {
+            events.push(JsContractEvent::new(item));
+        }
+
+        Ok(Self {
+            dirty_accounts,
+            events,
+        })
+    }
+}
+
+#[napi(object)]
+#[derive(Default)]
+pub struct JsContractEvent {
+    pub event: String,
+    pub tx_hash: String,
+    pub tx_index: u32,
+    pub voter: Option<String>,
+    pub validator: Option<String>,
+    pub addr: Option<String>,
+    pub username: Option<String>,
+    pub previous_username: Option<String>,
+    pub bls_public_key: Option<String>,
+}
+
+impl JsContractEvent {
+    pub fn new(event: ContractEvent) -> Self {
+        let mut js_event = Self {
+            event: event.data.name().to_string(),
+            tx_hash: event.tx_hash.to_string(),
+            tx_index: event.tx_index,
+            ..Default::default()
+        };
+
+        match event.data {
+            ContractEventData::Voted { voter, validator }
+            | ContractEventData::Unvoted { voter, validator } => {
+                js_event.voter = Some(voter.to_checksum(None));
+                js_event.validator = Some(validator.to_checksum(None));
+            }
+            ContractEventData::ValidatorRegistered {
+                addr,
+                bls_public_key,
+            }
+            | ContractEventData::ValidatorUpdated {
+                addr,
+                bls_public_key,
+            } => {
+                js_event.addr = Some(addr.to_checksum(None));
+                js_event.bls_public_key = Some(bls_public_key.to_string());
+            }
+            ContractEventData::ValidatorResigned { addr } => {
+                js_event.addr = Some(addr.to_checksum(None));
+            }
+            ContractEventData::UsernameRegistered {
+                addr,
+                username,
+                previous_username,
+            } => {
+                js_event.addr = Some(addr.to_checksum(None));
+                js_event.username = Some(username);
+                js_event.previous_username = previous_username;
+            }
+            ContractEventData::UsernameResigned { addr, username } => {
+                js_event.addr = Some(addr.to_checksum(None));
+                js_event.username = Some(username);
+            }
+        }
+
+        js_event
     }
 }
 
@@ -106,6 +178,7 @@ pub struct JsTransactionReceipt {
 #[derive(Default)]
 pub struct CommitResult {
     pub dirty_accounts: Vec<AccountUpdate>,
+    pub events: Vec<ContractEvent>,
 }
 
 pub struct TxViewResult {
