@@ -18,8 +18,8 @@ describe<{
 
 	const blockData = { hash: blockHash, number: 3 };
 	const contractEvents: Contracts.Evm.ContractEvent[] = [
-		{ event: "Voted", txHash: `0x${"1".repeat(64)}`, txIndex: 0, validator, voter },
-		{ addr: validator, event: "ValidatorResigned", txHash: `0x${"2".repeat(64)}`, txIndex: 1 },
+		{ event: "Voted", txHash: "1".repeat(64), txIndex: 0, validator, voter },
+		{ addr: validator, event: "ValidatorResigned", txHash: "2".repeat(64), txIndex: 1 },
 	];
 
 	beforeEach((context) => {

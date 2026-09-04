@@ -85,7 +85,7 @@ impl JsContractEvent {
     pub fn new(event: ContractEvent) -> Self {
         let mut js_event = Self {
             event: event.data.name().to_string(),
-            tx_hash: event.tx_hash.to_string(),
+            tx_hash: format!("{:x}", event.tx_hash),
             tx_index: event.tx_index,
             ..Default::default()
         };
@@ -105,7 +105,7 @@ impl JsContractEvent {
                 bls_public_key,
             } => {
                 js_event.addr = Some(addr.to_checksum(None));
-                js_event.bls_public_key = Some(bls_public_key.to_string());
+                js_event.bls_public_key = Some(bls_public_key.encode_hex());
             }
             ContractEventData::ValidatorResigned { addr } => {
                 js_event.addr = Some(addr.to_checksum(None));
