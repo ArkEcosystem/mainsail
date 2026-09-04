@@ -10,6 +10,7 @@ import { describe } from "@mainsail/test-runner";
 import * as MainsailContractEvents from "../../test/fixtures/MainsailContractEvents.json";
 import { wallets } from "../../test/fixtures/wallets";
 import { prepareSandbox } from "../../test/helpers/prepare-sandbox";
+import { EvmInstance } from "./evm";
 import { setGracefulCleanup } from "tmp";
 
 describe<{
@@ -202,6 +203,81 @@ describe<{
 		// Without genesis info the contract addresses are unknown, so nothing decodes.
 		const { events } = await evm.commit(commitKey);
 		assert.empty(events);
+	});
+
+	it("#onCommit - should forward the contract events to the processable unit", async ({ app }) => {
+		const instance = app.resolve<EvmInstance>(EvmInstance);
+
+		try {
+			const [sender] = wallets;
+			const voter = getAddress(sender.address);
+			const usernamesContract = getContractAddress({ from: voter, nonce: 0n });
+
+			await instance.initializeGenesis({
+				account: voter,
+				deployerAccount: "0x0000000000000000000000000000000000000001",
+				initialBlockNumber: 0n,
+				initialSupply: 0n,
+				usernameContract: usernamesContract,
+				validatorContract: "0x0000000000000000000000000000000000000002",
+			});
+
+			const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
+			await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+
+			for (const [nonce, data, to] of [
+				[0n, MainsailContractEvents.bytecode.object, undefined],
+				[
+					1n,
+					encodeFunctionData({
+						abi: MainsailContractEvents.abi,
+						args: [voter],
+						functionName: "emitUsernameEvents",
+					}),
+					usernamesContract,
+				],
+			] as const) {
+				const { receipt } = await instance.process({
+					commitKey,
+					data: Buffer.from(data.slice(2), "hex"),
+					from: voter,
+					gasLimit: BigInt(1_000_000),
+					nonce,
+					to,
+					txHash: getRandomTxHash(),
+					value: 0n,
+					...txConfig,
+				});
+				assert.equal(receipt.status, 1);
+			}
+
+			let capturedUpdates: Contracts.Evm.AccountUpdate[] | undefined;
+			let capturedEvents: Contracts.Evm.ContractEvent[] | undefined;
+
+			await instance.onCommit({
+				blockNumber: commitKey.blockNumber,
+				getBlock: () => ({ number: commitKey.blockNumber, round: commitKey.round }),
+				round: commitKey.round,
+				setAccountUpdates: (accounts: Contracts.Evm.AccountUpdate[]) => {
+					capturedUpdates = accounts;
+				},
+				setContractEvents: (events: Contracts.Evm.ContractEvent[]) => {
+					capturedEvents = events;
+				},
+			} as unknown as Contracts.Processor.ProcessableUnit);
+
+			assert.defined(capturedUpdates);
+			assert.equal(
+				capturedEvents!.map((event) => ({ event: event.event, username: (event as any).username })),
+				[
+					{ event: "UsernameRegistered", username: "alice" },
+					{ event: "UsernameRegistered", username: "bob" },
+					{ event: "UsernameResigned", username: "bob" },
+				],
+			);
+		} finally {
+			await instance.dispose();
+		}
 	});
 
 	it("fixture - should declare the exact event signatures of the deployed contracts", () => {
