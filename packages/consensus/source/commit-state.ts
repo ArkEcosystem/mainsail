@@ -12,6 +12,7 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 	#processorResult?: Contracts.Processor.BlockProcessorResult;
 	#validators = new Map<string, Contracts.State.ValidatorWallet>();
 	#accountUpdates: Array<Contracts.Evm.AccountUpdate> = [];
+	#contractEvents: Array<Contracts.Evm.ContractEvent> = [];
 
 	public get blockNumber(): number {
 		return this.#commit.block.number;
@@ -63,6 +64,14 @@ export class CommitState implements Contracts.Processor.ProcessableUnit {
 
 	public setAccountUpdates(accounts: Array<Contracts.Evm.AccountUpdate>): void {
 		this.#accountUpdates = accounts;
+	}
+
+	public getContractEvents(): Array<Contracts.Evm.ContractEvent> {
+		return this.#contractEvents;
+	}
+
+	public setContractEvents(events: Array<Contracts.Evm.ContractEvent>): void {
+		this.#contractEvents = events;
 	}
 
 	public async getCommit(): Promise<Contracts.Crypto.Commit> {

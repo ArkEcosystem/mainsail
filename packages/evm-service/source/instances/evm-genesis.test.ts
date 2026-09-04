@@ -175,6 +175,7 @@ describe<{
 				getBlock: () => ({ number: 0n, round: 0n }),
 				round: 0n,
 				setAccountUpdates: () => {},
+				setContractEvents: () => {},
 			} as any);
 
 			// After: the block reward has been credited to the proposer.
