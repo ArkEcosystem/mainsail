@@ -44,7 +44,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			}
 
 			if (this.isRoundAheadOfTime(proposal)) {
-				return Enums.Consensus.ProcessorResult.Invalid;
+				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
 			if (!this.#hasValidProposer(proposal)) {

@@ -153,7 +153,7 @@ describe<{
 		getRoundState.calledWith(blockNumber, round + 3);
 	});
 
-	it("#process - should reject a proposal whose round is not in time bounds yet", async ({
+	it("#process - should skip a proposal whose round is not in time bounds yet", async ({
 		processor,
 		proposerCalculator,
 		stateStore,
@@ -164,7 +164,7 @@ describe<{
 		);
 		const getValidatorIndex = spy(proposerCalculator, "getValidatorIndex");
 
-		assert.equal(await processor.process(makeProposal()), Invalid);
+		assert.equal(await processor.process(makeProposal()), Skipped);
 
 		calculateMinimalTimestamp.calledWith(stateStore.getLastBlock(), round);
 		getValidatorIndex.neverCalled();

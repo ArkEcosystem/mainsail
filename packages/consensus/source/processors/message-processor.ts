@@ -45,7 +45,7 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 			}
 
 			if (this.isRoundAheadOfTime(message)) {
-				return Enums.Consensus.ProcessorResult.Invalid;
+				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
 			const roundState = this.roundStateRepo.getRoundState(message.blockNumber, message.round);

@@ -133,7 +133,7 @@ describe<{
 		getRoundState.calledWith(blockNumber, round + 5);
 	});
 
-	it("#process - should reject a message whose round is not in bounds yet", async ({
+	it("#process - should skip a message whose round is not in bounds yet", async ({
 		processor,
 		roundStateRepository,
 		stateStore,
@@ -146,7 +146,7 @@ describe<{
 		const getRoundState = spy(roundStateRepository, "getRoundState");
 		const consensusSignature = spy(worker, "consensusSignature");
 
-		assert.equal(await processor.process(makeMessage()), Invalid);
+		assert.equal(await processor.process(makeMessage()), Skipped);
 
 		calculateMinimalTimestamp.calledWith(stateStore.getLastBlock(), round);
 		getRoundState.neverCalled();
