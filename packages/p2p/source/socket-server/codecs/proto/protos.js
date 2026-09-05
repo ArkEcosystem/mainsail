@@ -868,8 +868,8 @@ export const shared = $root.shared = (() => {
          * @property {number|null} [round] Headers round
          * @property {number|null} [step] Headers step
          * @property {string|null} [proposedBlockHash] Headers proposedBlockHash
-         * @property {Array.<boolean>|null} [validatorsSignedPrevote] Headers validatorsSignedPrevote
-         * @property {Array.<boolean>|null} [validatorsSignedPrecommit] Headers validatorsSignedPrecommit
+         * @property {Uint8Array|null} [validatorsSignedPrevote] Headers validatorsSignedPrevote
+         * @property {Uint8Array|null} [validatorsSignedPrecommit] Headers validatorsSignedPrecommit
          * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
@@ -895,8 +895,6 @@ export const shared = $root.shared = (() => {
          * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
         const Headers = function (properties) {
-            this.validatorsSignedPrevote = [];
-            this.validatorsSignedPrecommit = [];
             if (properties)
                 for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
@@ -945,19 +943,19 @@ export const shared = $root.shared = (() => {
 
         /**
          * Headers validatorsSignedPrevote.
-         * @member {Array.<boolean>} validatorsSignedPrevote
+         * @member {Uint8Array} validatorsSignedPrevote
          * @memberof shared.Headers
          * @instance
          */
-        Headers.prototype.validatorsSignedPrevote = $util.emptyArray;
+        Headers.prototype.validatorsSignedPrevote = $util.newBuffer([]);
 
         /**
          * Headers validatorsSignedPrecommit.
-         * @member {Array.<boolean>} validatorsSignedPrecommit
+         * @member {Uint8Array} validatorsSignedPrecommit
          * @memberof shared.Headers
          * @instance
          */
-        Headers.prototype.validatorsSignedPrecommit = $util.emptyArray;
+        Headers.prototype.validatorsSignedPrecommit = $util.newBuffer([]);
 
         // OneOf field names bound to virtual getters and setters
         let $oneOfFields;
@@ -1010,18 +1008,10 @@ export const shared = $root.shared = (() => {
                 writer.uint32(/* id 4, wireType 0 =*/32).uint32(message.step);
             if (message.proposedBlockHash != null && $Object.hasOwnProperty.call(message, "proposedBlockHash"))
                 writer.uint32(/* id 5, wireType 2 =*/42).string(message.proposedBlockHash);
-            if (message.validatorsSignedPrevote != null && message.validatorsSignedPrevote.length) {
-                writer.uint32(/* id 6, wireType 2 =*/50).fork();
-                for (let i = 0; i < message.validatorsSignedPrevote.length; ++i)
-                    writer.bool(message.validatorsSignedPrevote[i]);
-                writer.ldelim();
-            }
-            if (message.validatorsSignedPrecommit != null && message.validatorsSignedPrecommit.length) {
-                writer.uint32(/* id 7, wireType 2 =*/58).fork();
-                for (let i = 0; i < message.validatorsSignedPrecommit.length; ++i)
-                    writer.bool(message.validatorsSignedPrecommit[i]);
-                writer.ldelim();
-            }
+            if (message.validatorsSignedPrevote != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrevote"))
+                writer.uint32(/* id 6, wireType 2 =*/50).bytes(message.validatorsSignedPrevote);
+            if (message.validatorsSignedPrecommit != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrecommit"))
+                writer.uint32(/* id 7, wireType 2 =*/58).bytes(message.validatorsSignedPrecommit);
             if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
                 for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
@@ -1113,35 +1103,21 @@ export const shared = $root.shared = (() => {
                         continue;
                     }
                 case 6: {
-                        if (wireType === 2) {
-                            if (!(message.validatorsSignedPrevote && message.validatorsSignedPrevote.length))
-                                message.validatorsSignedPrevote = [];
-                            let end2 = reader.uint32() + reader.pos;
-                            while (reader.pos < end2)
-                                message.validatorsSignedPrevote.push(reader.bool());
-                            continue;
-                        }
-                        if (wireType !== 0)
+                        if (wireType !== 2)
                             break;
-                        if (!(message.validatorsSignedPrevote && message.validatorsSignedPrevote.length))
-                            message.validatorsSignedPrevote = [];
-                        message.validatorsSignedPrevote.push(reader.bool());
+                        if ((value = reader.bytes()).length)
+                            message.validatorsSignedPrevote = value;
+                        else
+                            delete message.validatorsSignedPrevote;
                         continue;
                     }
                 case 7: {
-                        if (wireType === 2) {
-                            if (!(message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length))
-                                message.validatorsSignedPrecommit = [];
-                            let end2 = reader.uint32() + reader.pos;
-                            while (reader.pos < end2)
-                                message.validatorsSignedPrecommit.push(reader.bool());
-                            continue;
-                        }
-                        if (wireType !== 0)
+                        if (wireType !== 2)
                             break;
-                        if (!(message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length))
-                            message.validatorsSignedPrecommit = [];
-                        message.validatorsSignedPrecommit.push(reader.bool());
+                        if ((value = reader.bytes()).length)
+                            message.validatorsSignedPrecommit = value;
+                        else
+                            delete message.validatorsSignedPrecommit;
                         continue;
                     }
                 }
@@ -1205,20 +1181,12 @@ export const shared = $root.shared = (() => {
                 if (!$util.isString(message.proposedBlockHash))
                     return "proposedBlockHash: string expected";
             }
-            if (message.validatorsSignedPrevote != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrevote")) {
-                if (!$Array.isArray(message.validatorsSignedPrevote))
-                    return "validatorsSignedPrevote: array expected";
-                for (let i = 0; i < message.validatorsSignedPrevote.length; ++i)
-                    if (typeof message.validatorsSignedPrevote[i] !== "boolean")
-                        return "validatorsSignedPrevote: boolean[] expected";
-            }
-            if (message.validatorsSignedPrecommit != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrecommit")) {
-                if (!$Array.isArray(message.validatorsSignedPrecommit))
-                    return "validatorsSignedPrecommit: array expected";
-                for (let i = 0; i < message.validatorsSignedPrecommit.length; ++i)
-                    if (typeof message.validatorsSignedPrecommit[i] !== "boolean")
-                        return "validatorsSignedPrecommit: boolean[] expected";
-            }
+            if (message.validatorsSignedPrevote != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrevote"))
+                if (!(message.validatorsSignedPrevote && typeof message.validatorsSignedPrevote.length === "number" || $util.isString(message.validatorsSignedPrevote)))
+                    return "validatorsSignedPrevote: buffer expected";
+            if (message.validatorsSignedPrecommit != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrecommit"))
+                if (!(message.validatorsSignedPrecommit && typeof message.validatorsSignedPrecommit.length === "number" || $util.isString(message.validatorsSignedPrecommit)))
+                    return "validatorsSignedPrecommit: buffer expected";
             return null;
         };
 
@@ -1254,20 +1222,18 @@ export const shared = $root.shared = (() => {
                     message.step = object.step >>> 0;
             if (object.proposedBlockHash != null)
                 message.proposedBlockHash = $String(object.proposedBlockHash);
-            if (object.validatorsSignedPrevote) {
-                if (!$Array.isArray(object.validatorsSignedPrevote))
-                    throw $TypeError(".shared.Headers.validatorsSignedPrevote: array expected");
-                message.validatorsSignedPrevote = $Array(object.validatorsSignedPrevote.length);
-                for (let i = 0; i < object.validatorsSignedPrevote.length; ++i)
-                    message.validatorsSignedPrevote[i] = $Boolean(object.validatorsSignedPrevote[i]);
-            }
-            if (object.validatorsSignedPrecommit) {
-                if (!$Array.isArray(object.validatorsSignedPrecommit))
-                    throw $TypeError(".shared.Headers.validatorsSignedPrecommit: array expected");
-                message.validatorsSignedPrecommit = $Array(object.validatorsSignedPrecommit.length);
-                for (let i = 0; i < object.validatorsSignedPrecommit.length; ++i)
-                    message.validatorsSignedPrecommit[i] = $Boolean(object.validatorsSignedPrecommit[i]);
-            }
+            if (object.validatorsSignedPrevote != null)
+                if (object.validatorsSignedPrevote.length)
+                    if (typeof object.validatorsSignedPrevote === "string")
+                        $util.base64.decode(object.validatorsSignedPrevote, message.validatorsSignedPrevote = $util.newBuffer($util.base64.length(object.validatorsSignedPrevote)), 0);
+                    else if (object.validatorsSignedPrevote.length >= 0)
+                        message.validatorsSignedPrevote = object.validatorsSignedPrevote;
+            if (object.validatorsSignedPrecommit != null)
+                if (object.validatorsSignedPrecommit.length)
+                    if (typeof object.validatorsSignedPrecommit === "string")
+                        $util.base64.decode(object.validatorsSignedPrecommit, message.validatorsSignedPrecommit = $util.newBuffer($util.base64.length(object.validatorsSignedPrecommit)), 0);
+                    else if (object.validatorsSignedPrecommit.length >= 0)
+                        message.validatorsSignedPrecommit = object.validatorsSignedPrecommit;
             return message;
         };
 
@@ -1288,15 +1254,25 @@ export const shared = $root.shared = (() => {
             if (_depth > $util.recursionLimit)
                 throw $Error("max depth exceeded");
             let object = {};
-            if (options.arrays || options.defaults) {
-                object.validatorsSignedPrevote = [];
-                object.validatorsSignedPrecommit = [];
-            }
             if (options.defaults) {
                 object.version = "";
                 object.blockNumber = 0;
                 object.round = 0;
                 object.step = 0;
+                if (options.bytes === $String)
+                    object.validatorsSignedPrevote = "";
+                else {
+                    object.validatorsSignedPrevote = [];
+                    if (options.bytes !== $Array)
+                        object.validatorsSignedPrevote = $util.newBuffer(object.validatorsSignedPrevote);
+                }
+                if (options.bytes === $String)
+                    object.validatorsSignedPrecommit = "";
+                else {
+                    object.validatorsSignedPrecommit = [];
+                    if (options.bytes !== $Array)
+                        object.validatorsSignedPrecommit = $util.newBuffer(object.validatorsSignedPrecommit);
+                }
             }
             if (message.version != null && $Object.hasOwnProperty.call(message, "version"))
                 object.version = message.version;
@@ -1308,16 +1284,10 @@ export const shared = $root.shared = (() => {
                 object.step = message.step;
             if (message.proposedBlockHash != null && $Object.hasOwnProperty.call(message, "proposedBlockHash"))
                 object.proposedBlockHash = message.proposedBlockHash;
-            if (message.validatorsSignedPrevote && message.validatorsSignedPrevote.length) {
-                object.validatorsSignedPrevote = $Array(message.validatorsSignedPrevote.length);
-                for (let j = 0; j < message.validatorsSignedPrevote.length; ++j)
-                    object.validatorsSignedPrevote[j] = message.validatorsSignedPrevote[j];
-            }
-            if (message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length) {
-                object.validatorsSignedPrecommit = $Array(message.validatorsSignedPrecommit.length);
-                for (let j = 0; j < message.validatorsSignedPrecommit.length; ++j)
-                    object.validatorsSignedPrecommit[j] = message.validatorsSignedPrecommit[j];
-            }
+            if (message.validatorsSignedPrevote != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrevote"))
+                object.validatorsSignedPrevote = options.bytes === $String ? $util.base64.encode(message.validatorsSignedPrevote, 0, message.validatorsSignedPrevote.length) : options.bytes === $Array ? $Array.prototype.slice.call(message.validatorsSignedPrevote) : message.validatorsSignedPrevote;
+            if (message.validatorsSignedPrecommit != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrecommit"))
+                object.validatorsSignedPrecommit = options.bytes === $String ? $util.base64.encode(message.validatorsSignedPrecommit, 0, message.validatorsSignedPrecommit.length) : options.bytes === $Array ? $Array.prototype.slice.call(message.validatorsSignedPrecommit) : message.validatorsSignedPrecommit;
             return object;
         };
 
@@ -2325,8 +2295,8 @@ export const getMessages = $root.getMessages = (() => {
          * @typedef {Object} getMessages.GetMessagesQuery.$Properties
          * @property {number|null} [blockNumber] GetMessagesQuery blockNumber
          * @property {number|null} [round] GetMessagesQuery round
-         * @property {Array.<boolean>|null} [validatorsSignedPrevote] GetMessagesQuery validatorsSignedPrevote
-         * @property {Array.<boolean>|null} [validatorsSignedPrecommit] GetMessagesQuery validatorsSignedPrecommit
+         * @property {Uint8Array|null} [validatorsSignedPrevote] GetMessagesQuery validatorsSignedPrevote
+         * @property {Uint8Array|null} [validatorsSignedPrecommit] GetMessagesQuery validatorsSignedPrecommit
          * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
@@ -2352,8 +2322,6 @@ export const getMessages = $root.getMessages = (() => {
          * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
         const GetMessagesQuery = function (properties) {
-            this.validatorsSignedPrevote = [];
-            this.validatorsSignedPrecommit = [];
             if (properties)
                 for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
@@ -2378,19 +2346,19 @@ export const getMessages = $root.getMessages = (() => {
 
         /**
          * GetMessagesQuery validatorsSignedPrevote.
-         * @member {Array.<boolean>} validatorsSignedPrevote
+         * @member {Uint8Array} validatorsSignedPrevote
          * @memberof getMessages.GetMessagesQuery
          * @instance
          */
-        GetMessagesQuery.prototype.validatorsSignedPrevote = $util.emptyArray;
+        GetMessagesQuery.prototype.validatorsSignedPrevote = $util.newBuffer([]);
 
         /**
          * GetMessagesQuery validatorsSignedPrecommit.
-         * @member {Array.<boolean>} validatorsSignedPrecommit
+         * @member {Uint8Array} validatorsSignedPrecommit
          * @memberof getMessages.GetMessagesQuery
          * @instance
          */
-        GetMessagesQuery.prototype.validatorsSignedPrecommit = $util.emptyArray;
+        GetMessagesQuery.prototype.validatorsSignedPrecommit = $util.newBuffer([]);
 
         /**
          * Creates a new GetMessagesQuery instance using the specified properties.
@@ -2428,18 +2396,10 @@ export const getMessages = $root.getMessages = (() => {
                 writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.blockNumber);
             if (message.round != null && $Object.hasOwnProperty.call(message, "round"))
                 writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.round);
-            if (message.validatorsSignedPrevote != null && message.validatorsSignedPrevote.length) {
-                writer.uint32(/* id 3, wireType 2 =*/26).fork();
-                for (let i = 0; i < message.validatorsSignedPrevote.length; ++i)
-                    writer.bool(message.validatorsSignedPrevote[i]);
-                writer.ldelim();
-            }
-            if (message.validatorsSignedPrecommit != null && message.validatorsSignedPrecommit.length) {
-                writer.uint32(/* id 4, wireType 2 =*/34).fork();
-                for (let i = 0; i < message.validatorsSignedPrecommit.length; ++i)
-                    writer.bool(message.validatorsSignedPrecommit[i]);
-                writer.ldelim();
-            }
+            if (message.validatorsSignedPrevote != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrevote"))
+                writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.validatorsSignedPrevote);
+            if (message.validatorsSignedPrecommit != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrecommit"))
+                writer.uint32(/* id 4, wireType 2 =*/34).bytes(message.validatorsSignedPrecommit);
             if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
                 for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
@@ -2506,35 +2466,21 @@ export const getMessages = $root.getMessages = (() => {
                         continue;
                     }
                 case 3: {
-                        if (wireType === 2) {
-                            if (!(message.validatorsSignedPrevote && message.validatorsSignedPrevote.length))
-                                message.validatorsSignedPrevote = [];
-                            let end2 = reader.uint32() + reader.pos;
-                            while (reader.pos < end2)
-                                message.validatorsSignedPrevote.push(reader.bool());
-                            continue;
-                        }
-                        if (wireType !== 0)
+                        if (wireType !== 2)
                             break;
-                        if (!(message.validatorsSignedPrevote && message.validatorsSignedPrevote.length))
-                            message.validatorsSignedPrevote = [];
-                        message.validatorsSignedPrevote.push(reader.bool());
+                        if ((value = reader.bytes()).length)
+                            message.validatorsSignedPrevote = value;
+                        else
+                            delete message.validatorsSignedPrevote;
                         continue;
                     }
                 case 4: {
-                        if (wireType === 2) {
-                            if (!(message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length))
-                                message.validatorsSignedPrecommit = [];
-                            let end2 = reader.uint32() + reader.pos;
-                            while (reader.pos < end2)
-                                message.validatorsSignedPrecommit.push(reader.bool());
-                            continue;
-                        }
-                        if (wireType !== 0)
+                        if (wireType !== 2)
                             break;
-                        if (!(message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length))
-                            message.validatorsSignedPrecommit = [];
-                        message.validatorsSignedPrecommit.push(reader.bool());
+                        if ((value = reader.bytes()).length)
+                            message.validatorsSignedPrecommit = value;
+                        else
+                            delete message.validatorsSignedPrecommit;
                         continue;
                     }
                 }
@@ -2586,20 +2532,12 @@ export const getMessages = $root.getMessages = (() => {
             if (message.round != null && $Object.hasOwnProperty.call(message, "round"))
                 if (!$util.isInteger(message.round))
                     return "round: integer expected";
-            if (message.validatorsSignedPrevote != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrevote")) {
-                if (!$Array.isArray(message.validatorsSignedPrevote))
-                    return "validatorsSignedPrevote: array expected";
-                for (let i = 0; i < message.validatorsSignedPrevote.length; ++i)
-                    if (typeof message.validatorsSignedPrevote[i] !== "boolean")
-                        return "validatorsSignedPrevote: boolean[] expected";
-            }
-            if (message.validatorsSignedPrecommit != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrecommit")) {
-                if (!$Array.isArray(message.validatorsSignedPrecommit))
-                    return "validatorsSignedPrecommit: array expected";
-                for (let i = 0; i < message.validatorsSignedPrecommit.length; ++i)
-                    if (typeof message.validatorsSignedPrecommit[i] !== "boolean")
-                        return "validatorsSignedPrecommit: boolean[] expected";
-            }
+            if (message.validatorsSignedPrevote != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrevote"))
+                if (!(message.validatorsSignedPrevote && typeof message.validatorsSignedPrevote.length === "number" || $util.isString(message.validatorsSignedPrevote)))
+                    return "validatorsSignedPrevote: buffer expected";
+            if (message.validatorsSignedPrecommit != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrecommit"))
+                if (!(message.validatorsSignedPrecommit && typeof message.validatorsSignedPrecommit.length === "number" || $util.isString(message.validatorsSignedPrecommit)))
+                    return "validatorsSignedPrecommit: buffer expected";
             return null;
         };
 
@@ -2627,20 +2565,18 @@ export const getMessages = $root.getMessages = (() => {
             if (object.round != null)
                 if ($Number(object.round) !== 0)
                     message.round = object.round >>> 0;
-            if (object.validatorsSignedPrevote) {
-                if (!$Array.isArray(object.validatorsSignedPrevote))
-                    throw $TypeError(".getMessages.GetMessagesQuery.validatorsSignedPrevote: array expected");
-                message.validatorsSignedPrevote = $Array(object.validatorsSignedPrevote.length);
-                for (let i = 0; i < object.validatorsSignedPrevote.length; ++i)
-                    message.validatorsSignedPrevote[i] = $Boolean(object.validatorsSignedPrevote[i]);
-            }
-            if (object.validatorsSignedPrecommit) {
-                if (!$Array.isArray(object.validatorsSignedPrecommit))
-                    throw $TypeError(".getMessages.GetMessagesQuery.validatorsSignedPrecommit: array expected");
-                message.validatorsSignedPrecommit = $Array(object.validatorsSignedPrecommit.length);
-                for (let i = 0; i < object.validatorsSignedPrecommit.length; ++i)
-                    message.validatorsSignedPrecommit[i] = $Boolean(object.validatorsSignedPrecommit[i]);
-            }
+            if (object.validatorsSignedPrevote != null)
+                if (object.validatorsSignedPrevote.length)
+                    if (typeof object.validatorsSignedPrevote === "string")
+                        $util.base64.decode(object.validatorsSignedPrevote, message.validatorsSignedPrevote = $util.newBuffer($util.base64.length(object.validatorsSignedPrevote)), 0);
+                    else if (object.validatorsSignedPrevote.length >= 0)
+                        message.validatorsSignedPrevote = object.validatorsSignedPrevote;
+            if (object.validatorsSignedPrecommit != null)
+                if (object.validatorsSignedPrecommit.length)
+                    if (typeof object.validatorsSignedPrecommit === "string")
+                        $util.base64.decode(object.validatorsSignedPrecommit, message.validatorsSignedPrecommit = $util.newBuffer($util.base64.length(object.validatorsSignedPrecommit)), 0);
+                    else if (object.validatorsSignedPrecommit.length >= 0)
+                        message.validatorsSignedPrecommit = object.validatorsSignedPrecommit;
             return message;
         };
 
@@ -2661,28 +2597,32 @@ export const getMessages = $root.getMessages = (() => {
             if (_depth > $util.recursionLimit)
                 throw $Error("max depth exceeded");
             let object = {};
-            if (options.arrays || options.defaults) {
-                object.validatorsSignedPrevote = [];
-                object.validatorsSignedPrecommit = [];
-            }
             if (options.defaults) {
                 object.blockNumber = 0;
                 object.round = 0;
+                if (options.bytes === $String)
+                    object.validatorsSignedPrevote = "";
+                else {
+                    object.validatorsSignedPrevote = [];
+                    if (options.bytes !== $Array)
+                        object.validatorsSignedPrevote = $util.newBuffer(object.validatorsSignedPrevote);
+                }
+                if (options.bytes === $String)
+                    object.validatorsSignedPrecommit = "";
+                else {
+                    object.validatorsSignedPrecommit = [];
+                    if (options.bytes !== $Array)
+                        object.validatorsSignedPrecommit = $util.newBuffer(object.validatorsSignedPrecommit);
+                }
             }
             if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
                 object.blockNumber = message.blockNumber;
             if (message.round != null && $Object.hasOwnProperty.call(message, "round"))
                 object.round = message.round;
-            if (message.validatorsSignedPrevote && message.validatorsSignedPrevote.length) {
-                object.validatorsSignedPrevote = $Array(message.validatorsSignedPrevote.length);
-                for (let j = 0; j < message.validatorsSignedPrevote.length; ++j)
-                    object.validatorsSignedPrevote[j] = message.validatorsSignedPrevote[j];
-            }
-            if (message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length) {
-                object.validatorsSignedPrecommit = $Array(message.validatorsSignedPrecommit.length);
-                for (let j = 0; j < message.validatorsSignedPrecommit.length; ++j)
-                    object.validatorsSignedPrecommit[j] = message.validatorsSignedPrecommit[j];
-            }
+            if (message.validatorsSignedPrevote != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrevote"))
+                object.validatorsSignedPrevote = options.bytes === $String ? $util.base64.encode(message.validatorsSignedPrevote, 0, message.validatorsSignedPrevote.length) : options.bytes === $Array ? $Array.prototype.slice.call(message.validatorsSignedPrevote) : message.validatorsSignedPrevote;
+            if (message.validatorsSignedPrecommit != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrecommit"))
+                object.validatorsSignedPrecommit = options.bytes === $String ? $util.base64.encode(message.validatorsSignedPrecommit, 0, message.validatorsSignedPrecommit.length) : options.bytes === $Array ? $Array.prototype.slice.call(message.validatorsSignedPrecommit) : message.validatorsSignedPrecommit;
             return object;
         };
 
