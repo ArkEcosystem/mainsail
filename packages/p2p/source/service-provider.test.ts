@@ -124,6 +124,7 @@ describe<{
 
 		assert.array(result.value.blacklist);
 		assert.number(result.value.getBlocksTimeout);
+		assert.number(result.value.maxConnections);
 		assert.number(result.value.maxPeersBroadcast);
 		assert.number(result.value.maxSameSubnetPeers);
 		assert.number(result.value.minimumNetworkReach);
@@ -241,6 +242,24 @@ describe<{
 
 		assert.defined(result.error);
 		assert.equal(result.error?.message, '"maxSameSubnetPeers" must be a number');
+	});
+
+	it("should parse process.env.MAINSAIL_P2P_MAX_CONNECTIONS", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_MAX_CONNECTIONS = "2500";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.maxConnections, 2500);
+	});
+
+	it("should throw if process.env.MAINSAIL_P2P_MAX_CONNECTIONS is not number", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_MAX_CONNECTIONS = "dummy";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.defined(result.error);
+		assert.equal(result.error?.message, '"maxConnections" must be a number');
 	});
 
 	it("should parse process.env.MAINSAIL_P2P_MAX_PEERS_BROADCAST", async ({ serviceProvider }) => {
