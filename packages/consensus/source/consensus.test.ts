@@ -571,7 +571,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await consensus.onTimeoutBlockPrepare();
 
 		spyProposalProcess.calledOnce();
-		assert.equal(spyProposalProcess.getCallArgs(0)[0].round, 1);
+		assert.equal((spyProposalProcess.getCallArgs(0)[0] as { round: number }).round, 1);
 	});
 
 	it("#prepareProposal - should sign for the round the proposal was requested in when the round moves on while forging", async ({
@@ -698,6 +698,116 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyMessageProcess.neverCalled();
 		spyLoggerWarn.calledOnce();
+	});
+
+	// Own votes and events are fire-and-forget. A rejection there must be reported, not left unhandled: Node
+	// takes the process down on an unhandled rejection, and a node that dies is worse than one that skips a vote.
+	const collectUnhandledRejections = async (run: () => Promise<void>): Promise<unknown[]> => {
+		const unhandled: unknown[] = [];
+		const onUnhandledRejection = (reason: unknown) => unhandled.push(reason);
+		process.on("unhandledRejection", onUnhandledRejection);
+
+		try {
+			await run();
+			await new Promise((resolve) => setImmediate(resolve));
+			await new Promise((resolve) => setImmediate(resolve));
+		} finally {
+			process.off("unhandledRejection", onUnhandledRejection);
+		}
+
+		return unhandled;
+	};
+
+	it("#prevote - should report a failure to process the own vote instead of leaving an unhandled rejection", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		messageProcessor,
+		logger,
+		proposer,
+	}) => {
+		const prevote = { blockNumber: 1, round: 0, type: Enums.Crypto.MessageType.Prevote, validatorIndex: 1 };
+		const validator = { prevote: async () => prevote };
+
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		const spyMessageProcess = stub(messageProcessor, "process").rejectedValue(new Error("worker is gone"));
+		const spyLoggerError = spy(logger, "error");
+
+		const unhandled = await collectUnhandledRejections(() => consensus.prevote("blockHash"));
+
+		assert.equal(unhandled, []);
+		spyMessageProcess.calledOnce();
+		spyMessageProcess.calledWith(prevote);
+		spyLoggerError.calledOnce();
+		assert.startsWith(spyLoggerError.getCallArgs(0)[0] as string, "Processing own prevote failed: ");
+	});
+
+	it("#precommit - should report a failure to process the own vote instead of leaving an unhandled rejection", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		messageProcessor,
+		logger,
+		proposer,
+	}) => {
+		const precommit = { blockNumber: 1, round: 0, type: Enums.Crypto.MessageType.Precommit, validatorIndex: 1 };
+		const validator = { precommit: async () => precommit };
+
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		const spyMessageProcess = stub(messageProcessor, "process").rejectedValue(new Error("worker is gone"));
+		const spyLoggerError = spy(logger, "error");
+
+		const unhandled = await collectUnhandledRejections(() => consensus.precommit("blockHash"));
+
+		assert.equal(unhandled, []);
+		spyMessageProcess.calledOnce();
+		spyMessageProcess.calledWith(precommit);
+		spyLoggerError.calledOnce();
+		assert.startsWith(spyLoggerError.getCallArgs(0)[0] as string, "Processing own precommit failed: ");
+	});
+
+	it("#prepareProposal - should still propose and report a failing block-forged listener instead of leaving an unhandled rejection", async ({
+		consensus,
+		validatorsRepository,
+		roundStateRepository,
+		validatorSet,
+		proposalProcessor,
+		eventDispatcher,
+		proposer,
+		logger,
+		forger,
+		block,
+		proposal,
+	}) => {
+		const validator = { getRandaoReveal: async () => "aa".repeat(96), propose: async () => proposal };
+
+		stub(forger, "forgeBlock").resolvedValue(block);
+		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		stub(eventDispatcher, "dispatch").callsFake(async (event: unknown) => {
+			if (event === Events.BlockEvent.Forged) {
+				throw new Error("listener is broken");
+			}
+		});
+
+		const spyProposalProcess = spy(proposalProcessor, "process");
+		const spyLoggerError = spy(logger, "error");
+
+		const unhandled = await collectUnhandledRejections(async () => {
+			await consensus.startRound(0);
+			await consensus.onTimeoutBlockPrepare();
+		});
+
+		assert.equal(unhandled, []);
+		spyProposalProcess.calledOnce();
+		spyProposalProcess.calledWith(proposal);
+		spyLoggerError.calledOnce();
+		assert.startsWith(spyLoggerError.getCallArgs(0)[0] as string, "Dispatching block forged event failed: ");
 	});
 
 	it("#startRound - local validator should locked value", async () => {});

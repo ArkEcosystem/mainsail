@@ -590,7 +590,9 @@ export class Consensus implements Contracts.Consensus.Service {
 		);
 		this.logger.info(`Created proposal with new block ${this.#getBlockString(block)}`, "consensus");
 
-		void this.eventDispatcher.dispatch(Events.BlockEvent.Forged, block);
+		this.#runInBackground("Dispatching block forged event", () =>
+			this.eventDispatcher.dispatch(Events.BlockEvent.Forged, block),
+		);
 
 		return registeredProposer.propose(validatorIndex, round, undefined, block);
 	}
@@ -623,7 +625,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				throw error;
 			}
 
-			void this.messageProcessor.process(prevote);
+			this.#runInBackground("Processing own prevote", () => this.messageProcessor.process(prevote));
 		}
 	}
 
@@ -655,7 +657,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				throw error;
 			}
 
-			void this.messageProcessor.process(precommit);
+			this.#runInBackground("Processing own precommit", () => this.messageProcessor.process(precommit));
 		}
 	}
 
@@ -731,6 +733,20 @@ export class Consensus implements Contracts.Consensus.Service {
 				commitState.setProcessorResult(FAILED_PROCESSOR_RESULT);
 			}
 		}
+	}
+
+	// Work nobody waits for: own votes go through the message processor like any peer's, and events fan out
+	// to their listeners. A rejection there is reported instead of escaping as an unhandled rejection,
+	// which would take the process down.
+	#runInBackground(task: string, callback: () => Promise<unknown>): void {
+		void (async () => {
+			try {
+				await callback();
+			} catch (rawError) {
+				const error = ensureError(rawError);
+				this.logger.error(`${task} failed: ${error.stack ?? error.message}`, "consensus");
+			}
+		})();
 	}
 
 	#getBlockNumberRoundString(): string {
