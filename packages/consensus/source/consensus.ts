@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Enums, Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { DoubleSignError } from "@mainsail/exceptions";
-import { assert, ensureError, Lock } from "@mainsail/utils";
+import { ensureError, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 type OwnSlot = { address: string; blockNumber: number; round: number };
@@ -78,7 +78,6 @@ export class Consensus implements Contracts.Consensus.Service {
 	#pendingJobs = new Set<Contracts.Consensus.RoundState>();
 
 	#ownSlots: OwnSlot[] = [];
-	#proposedBlock?: Contracts.Crypto.Block;
 	#proposalPromise?: Promise<Contracts.Crypto.Proposal | undefined>;
 	#roundStartTime = 0;
 
@@ -121,9 +120,8 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	// Only for tests
-	public setProposal(proposalPromise: Promise<Contracts.Crypto.Proposal>, block: Contracts.Crypto.Block): void {
+	public setProposal(proposalPromise: Promise<Contracts.Crypto.Proposal>): void {
 		this.#proposalPromise = proposalPromise;
-		this.#proposedBlock = block;
 	}
 
 	public getState(): Contracts.Consensus.State {
@@ -222,6 +220,10 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#didMajorityPrecommit = false;
 		this.#roundStartTime = dayjs().valueOf();
 
+		// A proposal still being built belongs to the round that just ended. Dropping it here keeps
+		// onTimeoutBlockPrepare from submitting it under this round, or from mistaking it for this round's own.
+		this.#proposalPromise = undefined;
+
 		this.scheduler.clear();
 		this.statisticService.newRound(this.#blockNumber, round);
 
@@ -246,33 +248,41 @@ export class Consensus implements Contracts.Consensus.Service {
 	public async onTimeoutBlockPrepare(): Promise<void> {
 		this.scheduler.scheduleTimeoutPropose(this.#blockNumber, this.#round);
 
-		if (this.#proposalPromise) {
-			const proposal = await this.#proposalPromise;
-			this.#proposalPromise = undefined;
-
-			if (proposal === undefined) {
-				// Nothing to propose: either the double-sign guard refused this position, or building the
-				// proposal failed. #makeProposal reported which. The propose timeout scheduled above lets
-				// the round time out so consensus moves on.
-				return;
-			}
-
-			assert.defined(this.#proposedBlock);
-
-			const ownSlot = this.#ownSlots.find(
-				(slot) => slot.blockNumber === this.#blockNumber && slot.round === this.#round,
-			);
-
-			this.logger.notice(
-				`📦 Proposing block ${this.#getBlockString(this.#proposedBlock)} as ${
-					ownSlot?.address ?? this.#proposedBlock.proposer
-				}`,
-				"consensus",
-			);
-
-			this.#proposedBlock = undefined;
-			await this.proposalProcessor.process(proposal);
+		const proposalPromise = this.#proposalPromise;
+		if (!proposalPromise) {
+			return;
 		}
+
+		const proposal = await proposalPromise;
+
+		// Building the block can outlast the round. startRound then drops the pending proposal or replaces it
+		// with the next round's, so a promise that is no longer the pending one is stale and must not be
+		// submitted, nor clear the one that superseded it.
+		if (this.#proposalPromise !== proposalPromise) {
+			return;
+		}
+
+		this.#proposalPromise = undefined;
+
+		if (proposal === undefined) {
+			// Nothing to propose: either the double-sign guard refused this position, or building the
+			// proposal failed. #makeProposal reported which. The propose timeout scheduled above lets
+			// the round time out so consensus moves on.
+			return;
+		}
+
+		const ownSlot = this.#ownSlots.find(
+			(slot) => slot.blockNumber === proposal.blockHeader.number && slot.round === proposal.round,
+		);
+
+		this.logger.notice(
+			`📦 Proposing block ${this.#getBlockString(proposal.blockHeader)} as ${
+				ownSlot?.address ?? proposal.blockHeader.proposer
+			}`,
+			"consensus",
+		);
+
+		await this.proposalProcessor.process(proposal);
 	}
 
 	protected async onProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {
@@ -528,6 +538,10 @@ export class Consensus implements Contracts.Consensus.Service {
 		roundState: Contracts.Consensus.RoundState,
 		registeredProposer: Contracts.Validator.Validator,
 	): Promise<Contracts.Crypto.Proposal | undefined> {
+		// Read before the first await: the round can move on while the proposal is built, and the report
+		// must name the position that was skipped, not whichever round is live by then.
+		const position = this.#getBlockNumberRoundString();
+
 		try {
 			return await this.#createProposal(roundState, registeredProposer);
 		} catch (rawError) {
@@ -535,13 +549,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 			if (error instanceof DoubleSignError) {
 				// Signing is allowed again once a later round passes the recorded watermark.
-				this.logger.warn(
-					`Skipped proposal for ${this.#getBlockNumberRoundString()}: ${error.message}`,
-					"consensus",
-				);
+				this.logger.warn(`Skipped proposal for ${position}: ${error.message}`, "consensus");
 			} else {
 				this.logger.error(
-					`Failed to create proposal for ${this.#getBlockNumberRoundString()}: ${error.stack ?? error.message}`,
+					`Failed to create proposal for ${position}: ${error.stack ?? error.message}`,
 					"consensus",
 				);
 			}
@@ -554,40 +565,34 @@ export class Consensus implements Contracts.Consensus.Service {
 		roundState: Contracts.Consensus.RoundState,
 		registeredProposer: Contracts.Validator.Validator,
 	): Promise<Contracts.Crypto.Proposal> {
-		if (this.#validValue) {
-			this.#proposedBlock = this.#validValue.getBlock();
-			const lockProof = await this.#validValue.aggregatePrevotes();
+		// The position is fixed here, before the first await. Building the block can outlast the round, and
+		// the proposal has to be signed for the round it was requested in, not for the one live at signing
+		// time; the double-sign guard then settles which of two overlapping proposals gets out.
+		const blockNumber = this.#blockNumber;
+		const round = this.#round;
+		const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.address);
 
-			this.logger.info(
-				`Created proposal with existing block ${this.#getBlockString(this.#proposedBlock)}`,
-				"consensus",
-			);
+		const validValue = this.#validValue;
+		if (validValue) {
+			const block = validValue.getBlock();
+			const lockProof = await validValue.aggregatePrevotes();
 
-			return await registeredProposer.propose(
-				this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.address),
-				this.#round,
-				this.#validValue.round,
-				this.#proposedBlock,
-				lockProof,
-			);
+			this.logger.info(`Created proposal with existing block ${this.#getBlockString(block)}`, "consensus");
+
+			return await registeredProposer.propose(validatorIndex, round, validValue.round, block, lockProof);
 		}
 
-		this.#proposedBlock = this.#proposedBlock = await this.blockForger.forgeBlock(
+		const block = await this.blockForger.forgeBlock(
 			roundState.proposer.address,
-			this.#round,
+			round,
 			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
-			await registeredProposer.getRandaoReveal(this.#blockNumber),
+			await registeredProposer.getRandaoReveal(blockNumber),
 		);
-		this.logger.info(`Created proposal with new block ${this.#getBlockString(this.#proposedBlock)}`, "consensus");
+		this.logger.info(`Created proposal with new block ${this.#getBlockString(block)}`, "consensus");
 
-		void this.eventDispatcher.dispatch(Events.BlockEvent.Forged, this.#proposedBlock);
+		void this.eventDispatcher.dispatch(Events.BlockEvent.Forged, block);
 
-		return registeredProposer.propose(
-			this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.address),
-			this.#round,
-			undefined,
-			this.#proposedBlock,
-		);
+		return registeredProposer.propose(validatorIndex, round, undefined, block);
 	}
 
 	public async prevote(value?: string): Promise<void> {

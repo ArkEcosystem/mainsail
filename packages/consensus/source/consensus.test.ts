@@ -383,7 +383,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyProposalProcess = spy(proposalProcessor, "process");
 		const spyLoggerNotice = spy(logger, "notice");
 
-		consensus.setProposal(proposal, proposal.getData().block);
+		consensus.setProposal(proposal);
 		await consensus.onTimeoutBlockPrepare();
 
 		spyProposalProcess.calledOnce();
@@ -403,7 +403,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	}) => {
 		const spyProposalProcess = spy(proposalProcessor, "process");
 
-		consensus.setProposal(proposal, proposal.getData().block);
+		consensus.setProposal(proposal);
 		await consensus.onTimeoutBlockPrepare();
 		await consensus.onTimeoutBlockPrepare();
 
@@ -488,6 +488,158 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyProposalProcess.neverCalled();
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
+	});
+
+	// Building a block takes time, and the round can move on before it is done (a timeout, or f+1 messages
+	// for a higher round). The proposal that comes out of it belongs to the round that ended.
+	it("#startRound - should drop a proposal that is still being built when the round moves on", async ({
+		consensus,
+		validatorsRepository,
+		roundStateRepository,
+		validatorSet,
+		proposalProcessor,
+		proposer,
+		logger,
+		forger,
+		block,
+		proposal,
+	}) => {
+		let finishForging: (block: unknown) => void = () => {};
+		const validator = { getRandaoReveal: async () => "aa".repeat(96), propose: async () => proposal };
+
+		stub(forger, "forgeBlock").returnValue(new Promise((resolve) => (finishForging = resolve)));
+		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
+		// Ours in round 0 only.
+		stub(validatorsRepository, "getValidator").callsFake(() =>
+			consensus.getRound() === 0 ? validator : undefined,
+		);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		const spyProposalProcess = spy(proposalProcessor, "process");
+		const spyLoggerNotice = spy(logger, "notice");
+
+		await consensus.startRound(0);
+		await consensus.startRound(1);
+
+		finishForging(block);
+		await new Promise((resolve) => setImmediate(resolve));
+		await consensus.onTimeoutBlockPrepare();
+
+		spyProposalProcess.neverCalled();
+		spyLoggerNotice.neverCalled();
+	});
+
+	it("#onTimeoutBlockPrepare - should ignore a stale proposal without dropping the one of the new round", async ({
+		consensus,
+		validatorsRepository,
+		roundStateRepository,
+		validatorSet,
+		proposalProcessor,
+		proposer,
+		forger,
+		block,
+		proposal,
+	}) => {
+		// This node holds both rounds. Round 0 is slow to forge; round 1 starts before it is done and forges
+		// at once. The round 0 handler is still waiting when round 1 replaces its promise.
+		let finishForgingRound0: (block: unknown) => void = () => {};
+		const validator = {
+			getRandaoReveal: async () => "aa".repeat(96),
+			propose: async (_: number, round: number) => ({ ...proposal, round }),
+		};
+
+		stub(forger, "forgeBlock").callsFake((_: string, round: number) =>
+			round === 0
+				? new Promise((resolve) => (finishForgingRound0 = resolve))
+				: Promise.resolve({ ...block, round }),
+		);
+		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		const spyProposalProcess = spy(proposalProcessor, "process");
+
+		await consensus.startRound(0);
+		const staleTimeout = consensus.onTimeoutBlockPrepare();
+
+		await consensus.startRound(1);
+		finishForgingRound0(block);
+		await staleTimeout;
+
+		spyProposalProcess.neverCalled();
+
+		await consensus.onTimeoutBlockPrepare();
+
+		spyProposalProcess.calledOnce();
+		assert.equal(spyProposalProcess.getCallArgs(0)[0].round, 1);
+	});
+
+	it("#prepareProposal - should sign for the round the proposal was requested in when the round moves on while forging", async ({
+		consensus,
+		validatorsRepository,
+		roundStateRepository,
+		validatorSet,
+		proposer,
+		forger,
+		block,
+		proposal,
+	}) => {
+		let finishForging: (block: unknown) => void = () => {};
+		const validator = { getRandaoReveal: async () => "aa".repeat(96), propose: () => {} };
+
+		const spyForgerForgeBlock = stub(forger, "forgeBlock").returnValue(
+			new Promise((resolve) => (finishForging = resolve)),
+		);
+		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
+
+		await consensus.startRound(0);
+		consensus.setRound(1); // The round moves on while the block is still being forged.
+
+		finishForging(block);
+		await consensus.onTimeoutBlockPrepare();
+
+		spyForgerForgeBlock.calledOnce();
+		spyForgerForgeBlock.calledWith(proposer.address, 0);
+		spyValidatorPropose.calledOnce();
+		spyValidatorPropose.calledWith(1, 0, undefined, block);
+	});
+
+	it("#prepareProposal - should re-propose the valid value for the round it was requested in when the round moves on", async ({
+		consensus,
+		validatorsRepository,
+		roundStateRepository,
+		validatorSet,
+		proposer,
+		roundState,
+		forger,
+		block,
+		proposal,
+	}) => {
+		let finishAggregating: (lockProof: unknown) => void = () => {};
+		const lockProof = { signature: "signature", validators: [] };
+		const validator = { getRandaoReveal: async () => "aa".repeat(96), propose: () => {} };
+
+		const spyForgerForgeBlock = spy(forger, "forgeBlock");
+		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		stub(roundState, "aggregatePrevotes").returnValue(new Promise((resolve) => (finishAggregating = resolve)));
+		stub(roundState, "getBlock").returnValue(block);
+		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
+
+		consensus.setValidValue(roundState);
+		await consensus.startRound(1);
+		consensus.setRound(2); // The round moves on while the lock proof is still being aggregated.
+
+		finishAggregating(lockProof);
+		await consensus.onTimeoutBlockPrepare();
+
+		spyForgerForgeBlock.neverCalled();
+		spyValidatorPropose.calledOnce();
+		spyValidatorPropose.calledWith(1, 1, 0, block, lockProof); // validator index, round, validRound, block, lockProof
 	});
 
 	it("#prevote - should skip the vote and continue when the double-sign guard refuses", async ({
@@ -1748,7 +1900,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	}) => {
 		const spyLoggerNotice = spy(logger, "notice");
 
-		consensus.setProposal(proposal, proposal.getData().block);
+		consensus.setProposal(proposal);
 		await consensus.onTimeoutBlockPrepare();
 
 		spyLoggerNotice.calledOnce();
@@ -1860,7 +2012,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyLoggerNotice = spy(logger, "notice");
 
 		await consensus.startRound(0);
-		consensus.setProposal(proposal, { ...block, proposer: THEIRS });
+		consensus.setProposal({ ...proposal, blockHeader: { ...block, proposer: THEIRS } });
 		await consensus.onTimeoutBlockPrepare();
 
 		spyLoggerNotice.calledWith(`📦 Proposing block ${1}/${0}/${block.hash} as ${OURS}`);
