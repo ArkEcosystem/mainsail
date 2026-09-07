@@ -1856,45 +1856,114 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getBlockNumber(), 1);
 	});
 
-	it("#onMajorityPrecommit - should log and do nothing if proposal is missing", async ({
+	it("#onMajorityPrecommitWithoutProposal - should report the missing proposal once per round", async ({
+		consensus,
+		roundState,
+		logger,
+	}) => {
+		const spyLoggerInfo = spy(logger, "info");
+
+		consensus.onMajorityPrecommitWithoutProposal(roundState);
+		consensus.onMajorityPrecommitWithoutProposal(roundState);
+
+		spyLoggerInfo.calledOnce();
+		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0}, but proposal is missing`);
+	});
+
+	it("#onMajorityPrecommitWithoutProposal - should ignore another round or block number", async ({
+		consensus,
+		logger,
+	}) => {
+		const spyLoggerInfo = spy(logger, "info");
+
+		consensus.onMajorityPrecommitWithoutProposal({ blockNumber: 1, round: 1 } as Contracts.Consensus.RoundState);
+		consensus.onMajorityPrecommitWithoutProposal({ blockNumber: 2, round: 0 } as Contracts.Consensus.RoundState);
+
+		spyLoggerInfo.neverCalled();
+	});
+
+	it("#onMajorityPrecommitWithoutProposal - should report again in the next round", async ({
+		consensus,
+		roundState,
+		logger,
+	}) => {
+		const spyLoggerInfo = spy(logger, "info");
+
+		consensus.onMajorityPrecommitWithoutProposal(roundState);
+		await consensus.startRound(1);
+		consensus.onMajorityPrecommitWithoutProposal({ blockNumber: 1, round: 1 } as Contracts.Consensus.RoundState);
+
+		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0}, but proposal is missing`);
+		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${1}, but proposal is missing`);
+	});
+
+	it("#handle - should report +2/3 precommits for a block whose proposal is missing", async ({
 		consensus,
 		blockProcessor,
 		roundState,
 		logger,
-		roundStateRepository,
-		proposal,
 	}) => {
-		const fakeTimers = clock();
+		roundState.getProposal = () => undefined;
+		roundState.hasMajorityPrevotes = () => false;
+		roundState.hasMajorityPrevotesAny = () => false;
+		roundState.hasMajorityPrevotesNull = () => false;
+		roundState.hasMajorityPrecommitsAny = () => false;
+		roundState.hasMajorityPrecommits = () => false;
+		roundState.hasMajorityPrecommitsWithoutProposal = () => true;
+		roundState.hasMinorityPrevotesOrPrecommits = () => false;
 
-		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.getData().block);
+		const spyBlockProcessorProcess = spy(blockProcessor, "process");
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
-		const spyRoundStateRepositoryClear = stub(roundStateRepository, "clear");
-		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 		const spyLoggerInfo = spy(logger, "info");
 
-		roundState.hasProcessorResult = () => false;
+		await consensus.handle(roundState);
 
-		assert.equal(consensus.getBlockNumber(), 1);
-		void consensus.onMajorityPrecommit(roundState);
-		await fakeTimers.nextAsync();
-
-		spyRoundStateGetBlock.neverCalled();
+		spyBlockProcessorProcess.neverCalled();
 		spyBlockProcessorCommit.neverCalled();
-		spyConsensusStartRound.neverCalled();
-		spyRoundStateRepositoryClear.neverCalled();
 		spyLoggerInfo.calledOnce();
 		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0}, but proposal is missing`);
 		assert.equal(consensus.getBlockNumber(), 1);
+	});
 
-		// Should not try again
-		void consensus.onMajorityPrecommit(roundState);
-		await fakeTimers.nextAsync();
+	it("#handle - should process the proposal before acting on +2/3 precommits", async ({
+		consensus,
+		blockProcessor,
+		proposalProcessor,
+		roundState,
+		validatorSet,
+		proposal,
+		block,
+	}) => {
+		// onMajorityPrecommit relies on the unit carrying a processor result. hasMajorityPrecommits() is false
+		// without a proposal, and handle() runs a present proposal through the processor before anything else,
+		// so the result is there by the time the precommits are acted on.
+		let processorResult: Contracts.Processor.BlockProcessorResult | undefined;
+		roundState.getBlock = () => block;
+		roundState.hasProcessorResult = () => processorResult !== undefined;
+		roundState.setProcessorResult = (result) => (processorResult = result);
+		roundState.getProcessorResult = () => processorResult!;
+		roundState.hasMajorityPrevotes = () => false;
+		roundState.hasMajorityPrevotesAny = () => false;
+		roundState.hasMajorityPrevotesNull = () => false;
+		roundState.hasMajorityPrecommitsAny = () => false;
+		roundState.hasMajorityPrecommits = () => true;
+		roundState.hasMajorityPrecommitsWithoutProposal = () => false;
+		roundState.hasMinorityPrevotesOrPrecommits = () => false;
+		proposal.deserializePayload = async () => {};
+		proposalProcessor.hasValidLockProof = async () => true;
 
-		spyRoundStateGetBlock.neverCalled();
-		spyBlockProcessorCommit.neverCalled();
-		spyConsensusStartRound.neverCalled();
-		spyRoundStateRepositoryClear.neverCalled();
-		spyLoggerInfo.calledOnce(); // still only called once from previous attempt
+		stub(validatorSet, "getRoundValidators").returnValue([]);
+		stub(consensus, "startRound").callsFake(async () => {});
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").resolvedValue({ success: true });
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+
+		await consensus.handle(roundState);
+
+		spyBlockProcessorProcess.calledOnce();
+		spyBlockProcessorProcess.calledWith(roundState);
+		spyBlockProcessorCommit.calledOnce();
+		spyBlockProcessorCommit.calledWith(roundState);
+		assert.equal(consensus.getBlockNumber(), 2);
 	});
 
 	it("#onMajorityPrecommit - should be called only once", async ({

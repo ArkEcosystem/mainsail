@@ -357,6 +357,35 @@ describe<{
 		assert.true(roundState.hasMajorityPrecommitsAny());
 	});
 
+	it("#hasMajorityPrecommitsWithoutProposal - should be false while a proposal is present", ({ roundState }) => {
+		roundState.addProposal(makeProposal());
+		for (const index of [0, 1, 2, 3]) {
+			roundState.addPrecommit(precommit(index));
+		}
+
+		assert.false(roundState.hasMajorityPrecommitsWithoutProposal());
+	});
+
+	it("#hasMajorityPrecommitsWithoutProposal - should not count null precommits", ({ roundState }) => {
+		for (const index of [0, 1, 2, 3]) {
+			roundState.addPrecommit(nullPrecommit(index));
+		}
+
+		assert.false(roundState.hasMajorityPrecommitsWithoutProposal());
+	});
+
+	it("#hasMajorityPrecommitsWithoutProposal - should require more than 2/3 precommits for one block", ({
+		roundState,
+	}) => {
+		roundState.addPrecommit(precommit(0));
+		roundState.addPrecommit(precommit(1));
+		roundState.addPrecommit(precommit(2, otherBlockHash));
+		assert.false(roundState.hasMajorityPrecommitsWithoutProposal());
+
+		roundState.addPrecommit(precommit(3));
+		assert.true(roundState.hasMajorityPrecommitsWithoutProposal());
+	});
+
 	it("#hasMinorityPrevotesOrPrecommits - should require more than 1/3 prevotes", ({ roundState }) => {
 		roundState.addPrevote(prevote(0));
 		assert.false(roundState.hasMinorityPrevotesOrPrecommits());

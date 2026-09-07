@@ -73,7 +73,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	#didMajorityPrevote = false;
 	#didMajorityPrecommit = false;
-	#didMajorityPrecommitAndProposalIsMissing = false;
+	#didMajorityPrecommitWithoutProposal = false;
 	#isDisposed = false;
 	#pendingJobs = new Set<Contracts.Consensus.RoundState>();
 
@@ -195,6 +195,10 @@ export class Consensus implements Contracts.Consensus.Service {
 				await this.onMajorityPrecommit(roundState);
 			}
 
+			if (roundState.hasMajorityPrecommitsWithoutProposal()) {
+				this.onMajorityPrecommitWithoutProposal(roundState);
+			}
+
 			if (roundState.hasMinorityPrevotesOrPrecommits()) {
 				await this.onMinorityWithHigherRound(roundState);
 			}
@@ -218,6 +222,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#step = Enums.Consensus.Step.Propose;
 		this.#didMajorityPrevote = false;
 		this.#didMajorityPrecommit = false;
+		this.#didMajorityPrecommitWithoutProposal = false;
 		this.#roundStartTime = dayjs().valueOf();
 
 		// A proposal still being built belongs to the round that just ended. Dropping it here keeps
@@ -406,19 +411,9 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		if (processState.hasProcessorResult() === false) {
-			if (this.#didMajorityPrecommitAndProposalIsMissing) {
-				return;
-			}
-
-			this.logger.info(
-				`Received +2/3 precommits for ${this.#getBlockNumberRoundString()}, but proposal is missing`,
-				"consensus",
-			);
-			this.#didMajorityPrecommitAndProposalIsMissing = true;
-			return;
-		}
-
+		// The unit always carries a processor result here. handle() gets this far only with a proposal, which
+		// #processProposal has run by then, and handleCommitState() runs #processBlock first. A unit without a
+		// result is a caller bug, and getProcessorResult() throws on it.
 		if (isRoundState) {
 			// Sets it only once for round state
 			this.#didMajorityPrecommit = true;
@@ -453,6 +448,22 @@ export class Consensus implements Contracts.Consensus.Service {
 
 			await this.startRound(0);
 		});
+	}
+
+	protected onMajorityPrecommitWithoutProposal(roundState: Contracts.Consensus.RoundState): void {
+		if (this.#didMajorityPrecommitWithoutProposal || !this.#isCurrentRoundState(roundState)) {
+			return;
+		}
+
+		// The network decided this round on a block whose proposal never reached this node. There is nothing to
+		// act on: the proposal downloader fetches it while the round lasts, and once peers move on the commit
+		// arrives through block download. Reported once per round, so the gap shows up in the log.
+		this.#didMajorityPrecommitWithoutProposal = true;
+
+		this.logger.info(
+			`Received +2/3 precommits for ${this.#getBlockNumberRoundString()}, but proposal is missing`,
+			"consensus",
+		);
 	}
 
 	protected async onMinorityWithHigherRound(roundState: Contracts.Processor.ProcessableUnit): Promise<void> {
