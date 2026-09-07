@@ -76,8 +76,29 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	}
 
 	async hasValidLockProof(proposal: Contracts.Crypto.Proposal): Promise<boolean> {
-		if (proposal.validRound === undefined) {
+		if (proposal.validRound === undefined && proposal.lockProof === undefined) {
 			return true;
+		}
+
+		// A re-proposal carries both: validRound names the round its value was found valid in, and lockProof
+		// holds the +2/3 prevotes of that round. One without the other is malformed. The proposal factory
+		// rejects such bytes already; this keeps the check self-contained.
+		if (proposal.lockProof === undefined) {
+			this.logger.debug(
+				`Received proposal ${proposal.blockHeader.number}/${proposal.round} has validRound ${proposal.validRound} but no lock proof`,
+				"consensus",
+			);
+
+			return false;
+		}
+
+		if (proposal.validRound === undefined) {
+			this.logger.debug(
+				`Received proposal ${proposal.blockHeader.number}/${proposal.round} has a lock proof but no validRound`,
+				"consensus",
+			);
+
+			return false;
 		}
 
 		if (proposal.validRound >= proposal.round) {
@@ -87,14 +108,6 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			);
 
 			return false;
-		}
-
-		if (!proposal.lockProof) {
-			this.logger.debug(
-				`Received proposal ${proposal.blockHeader.number}/${proposal.round} with missing lock proof`,
-				"consensus",
-			);
-			return true;
 		}
 
 		const data = await this.messageSerializer.serializeMessageForSignature(

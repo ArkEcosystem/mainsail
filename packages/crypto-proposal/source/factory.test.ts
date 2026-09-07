@@ -26,6 +26,9 @@ describe<{
 	identity: Types.Identity;
 }>("Factory", ({ it, assert, beforeEach }) => {
 	const proposals = [Proposal, ProposalWithValidRound, ProposalWithLockProof, ProposalWithLockProofAndValidRound];
+	// validRound and lockProof come together or not at all; a proposal with only one of them is malformed.
+	const wellFormedProposals = [Proposal, ProposalWithLockProofAndValidRound];
+	const halfPairedProposals = [ProposalWithValidRound, ProposalWithLockProof];
 
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
@@ -71,7 +74,11 @@ describe<{
 	});
 
 	it("#makeProposal - should correctly make signed proposal", async ({ factory, identity }) => {
-		for (const { proposalDataSerializableUnsigned, proposalDataSerializable, proposalData } of proposals) {
+		for (const {
+			proposalDataSerializableUnsigned,
+			proposalDataSerializable,
+			proposalData,
+		} of wellFormedProposals) {
 			const proposal = await factory.makeProposal(proposalDataSerializableUnsigned, identity.keys);
 
 			assert.equal(proposal.toSerializableData(), proposalDataSerializable);
@@ -87,13 +94,36 @@ describe<{
 		);
 	});
 
+	it("#makeProposal - should reject a validRound without a lockProof and the reverse", async ({
+		factory,
+		identity,
+	}) => {
+		for (const { proposalDataSerializableUnsigned } of halfPairedProposals) {
+			await assert.rejects(
+				() => factory.makeProposal(proposalDataSerializableUnsigned, identity.keys),
+				MessageSchemaError,
+			);
+		}
+	});
+
 	it("#makeProposalFromBytes - should be ok", async ({ factory }) => {
-		for (const { proposalSerialized, proposalDataSerializable, proposalData } of proposals) {
+		for (const { proposalSerialized, proposalDataSerializable, proposalData } of wellFormedProposals) {
 			const proposal = await factory.makeProposalFromBytes(Buffer.from(proposalSerialized, "hex"));
 
 			assert.equal(proposal.toSerializableData(), proposalDataSerializable);
 			assert.equal(proposal.blockHeader, blockHeader);
 			assert.equal(proposal.toData(), proposalData);
+		}
+	});
+
+	it("#makeProposalFromBytes - should reject a validRound without a lockProof and the reverse", async ({
+		factory,
+	}) => {
+		for (const { proposalSerialized } of halfPairedProposals) {
+			await assert.rejects(
+				() => factory.makeProposalFromBytes(Buffer.from(proposalSerialized, "hex")),
+				MessageSchemaError,
+			);
 		}
 	});
 
