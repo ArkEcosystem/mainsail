@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { assert } from "@mainsail/utils";
 
 import { AbstractProcessor } from "./abstract-processor.js";
 
@@ -129,7 +130,10 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 	}
 
 	#takePendingMessages(serializedHex: string): PendingSignatureCheck[] {
-		const pendingMessages = this.#pendingMessages.get(serializedHex) ?? [];
+		// Only the caller that registered the entry takes it, after its own set(), so it is always present.
+		const pendingMessages = this.#pendingMessages.get(serializedHex);
+		assert.defined(pendingMessages);
+
 		this.#pendingMessages.delete(serializedHex);
 
 		return pendingMessages;

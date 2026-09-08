@@ -2910,4 +2910,297 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyConsensusStartRound.neverCalled();
 	});
+
+	it("#run - should bootstrap, start the round and handle its round state", async ({
+		consensus,
+		bootstrapper,
+		cryptoConfiguration,
+		state,
+		roundState,
+		roundStateRepository,
+		logger,
+		eventDispatcher,
+	}) => {
+		state.getLastBlock = () => ({ number: 0 });
+		state.getTotalRound = () => 0;
+		cryptoConfiguration.getHeight = () => 1;
+
+		const requestedRoundStates: [number, number][] = [];
+		roundStateRepository.getRoundState = (blockNumber: number, round: number) => {
+			requestedRoundStates.push([blockNumber, round]);
+			return roundState;
+		};
+
+		const spyBootstrapperRun = stub(bootstrapper, "run").resolvedValue(undefined);
+		const spyStartRound = stub(consensus, "startRound").callsFake(async () => {});
+		const spyHandle = stub(consensus, "handle").callsFake(async () => {});
+		const spyLoggerInfo = spy(logger, "info");
+		const spyDispatch = spy(eventDispatcher, "dispatch");
+
+		await consensus.run();
+
+		spyBootstrapperRun.calledOnce();
+		spyLoggerInfo.calledWith(`Completed consensus bootstrap for ${1}/${0} with total round ${0}`);
+		spyDispatch.calledOnce();
+		spyDispatch.calledWith(Events.ConsensusEvent.Bootstrapped, {
+			blockNumber: 1,
+			lockedRound: undefined,
+			round: 0,
+			step: Enums.Consensus.Step.Propose,
+			validRound: undefined,
+		});
+		spyStartRound.calledOnce();
+		spyStartRound.calledWith(0);
+		spyHandle.calledOnce();
+		spyHandle.calledWith(roundState);
+		assert.equal(requestedRoundStates, [[1, 0]]);
+		assert.equal(consensus.getBlockNumber(), 1);
+		assert.equal(consensus.getRound(), 0);
+	});
+
+	it("#run - should restore the stored state of the next block and replay its earlier rounds", async ({
+		consensus,
+		bootstrapper,
+		cryptoConfiguration,
+		state,
+		roundState,
+		roundStateRepository,
+		eventDispatcher,
+	}) => {
+		state.getLastBlock = () => ({ number: 0 });
+		state.getTotalRound = () => 0;
+		cryptoConfiguration.getHeight = () => 1;
+
+		const requestedRoundStates: [number, number][] = [];
+		roundStateRepository.getRoundState = (blockNumber: number, round: number) => {
+			requestedRoundStates.push([blockNumber, round]);
+			return roundState;
+		};
+
+		const lockedValue = { ...roundState, round: 1 } as unknown as Contracts.Consensus.RoundState;
+		stub(bootstrapper, "run").resolvedValue({
+			blockNumber: 1,
+			lockedRound: 1,
+			lockedValue,
+			round: 2,
+			step: Enums.Consensus.Step.Precommit,
+			validRound: 1,
+			validValue: lockedValue,
+		});
+		const spyStartRound = stub(consensus, "startRound").callsFake(async () => {});
+		const handledRoundStates: Contracts.Consensus.RoundState[] = [];
+		stub(consensus, "handle").callsFake(async (handledRoundState: Contracts.Consensus.RoundState) => {
+			handledRoundStates.push(handledRoundState);
+		});
+		const spyDispatch = spy(eventDispatcher, "dispatch");
+
+		await consensus.run();
+
+		spyDispatch.calledWith(Events.ConsensusEvent.Bootstrapped, {
+			blockNumber: 1,
+			lockedRound: 1,
+			round: 2,
+			step: Enums.Consensus.Step.Precommit,
+			validRound: 1,
+		});
+		spyStartRound.calledOnce();
+		spyStartRound.calledWith(2);
+		// The current round first, then the earlier ones, in case a proposal and +2/3 precommits were stored for them.
+		assert.equal(handledRoundStates, [roundState, roundState, roundState]);
+		assert.equal(requestedRoundStates, [
+			[1, 2],
+			[1, 0],
+			[1, 1],
+		]);
+		assert.equal(consensus.getRound(), 2);
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Precommit);
+		assert.equal(consensus.getLockedRound(), 1);
+		assert.equal(consensus.getValidRound(), 1);
+	});
+
+	it("#run - should skip restoring a stored state that belongs to another block", async ({
+		consensus,
+		bootstrapper,
+		cryptoConfiguration,
+		state,
+		roundStateRepository,
+		logger,
+	}) => {
+		state.getLastBlock = () => ({ number: 0 });
+		state.getTotalRound = () => 0;
+		cryptoConfiguration.getHeight = () => 1;
+
+		stub(bootstrapper, "run").resolvedValue({
+			blockNumber: 5,
+			lockedRound: undefined,
+			round: 3,
+			step: Enums.Consensus.Step.Precommit,
+			validRound: undefined,
+		});
+		const spyClear = spy(roundStateRepository, "clear");
+		const spyStartRound = stub(consensus, "startRound").callsFake(async () => {});
+		const spyHandle = stub(consensus, "handle").callsFake(async () => {});
+		const spyLoggerWarn = spy(logger, "warn");
+
+		await consensus.run();
+
+		spyLoggerWarn.calledOnce();
+		spyLoggerWarn.calledWith(`Skipping state restore, because stored block number is ${5}, but should be ${1}`);
+		spyClear.calledOnce();
+		spyStartRound.calledOnce();
+		spyStartRound.calledWith(0);
+		spyHandle.calledOnce();
+		assert.equal(consensus.getRound(), 0);
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
+		assert.undefined(consensus.getLockedRound());
+	});
+
+	it("#run - should terminate when the bootstrapped block number does not match the configuration", async ({
+		app,
+		consensus,
+		bootstrapper,
+		cryptoConfiguration,
+		state,
+	}) => {
+		state.getLastBlock = () => ({ number: 0 });
+		state.getTotalRound = () => 0;
+		cryptoConfiguration.getHeight = () => 7;
+
+		stub(bootstrapper, "run").resolvedValue(undefined);
+		const spyStartRound = stub(consensus, "startRound").callsFake(async () => {});
+		const spyHandle = stub(consensus, "handle").callsFake(async () => {});
+
+		let terminated: { reason?: string; error?: Error } | undefined;
+		stub(app, "terminate").callsFake(async (reason?: string, error?: Error) => {
+			terminated = { error, reason };
+		});
+
+		await consensus.run();
+
+		assert.defined(terminated);
+		assert.equal(terminated!.reason, "Consensus bootstrap error");
+		assert.equal(
+			terminated!.error?.message,
+			"bootstrapped block number 1 does not match configuration block number 7",
+		);
+		spyStartRound.neverCalled();
+		spyHandle.neverCalled();
+	});
+
+	it("#handleCommitState - should process the block and commit it", async ({
+		consensus,
+		blockProcessor,
+		roundStateRepository,
+		block,
+		logger,
+	}) => {
+		let processorResult: Contracts.Processor.BlockProcessorResult | undefined;
+		const commitState = {
+			blockNumber: 1,
+			getBlock: () => block,
+			getProcessorResult: () => processorResult!,
+			hasProcessorResult: () => processorResult !== undefined,
+			round: 0,
+			setProcessorResult: (result: Contracts.Processor.BlockProcessorResult) => (processorResult = result),
+		} as unknown as Contracts.Processor.ProcessableUnit;
+
+		const spyProcess = stub(blockProcessor, "process").resolvedValue({ success: true });
+		const spyCommit = spy(blockProcessor, "commit");
+		const spyClear = stub(roundStateRepository, "clear");
+		const spyStartRound = stub(consensus, "startRound").callsFake(async () => {});
+		const spyLoggerInfo = spy(logger, "info");
+
+		await consensus.handleCommitState(commitState);
+
+		spyProcess.calledOnce();
+		spyProcess.calledWith(commitState);
+		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0}/${block.hash}`);
+		spyCommit.calledOnce();
+		spyCommit.calledWith(commitState);
+		spyClear.calledOnce();
+		spyStartRound.calledOnce();
+		spyStartRound.calledWith(0);
+		assert.equal(consensus.getBlockNumber(), 2);
+	});
+
+	it("#handleCommitState - should reuse an existing processor result", async ({
+		consensus,
+		blockProcessor,
+		roundStateRepository,
+		block,
+	}) => {
+		const commitState = {
+			blockNumber: 1,
+			getBlock: () => block,
+			getProcessorResult: () => ({ success: true }),
+			hasProcessorResult: () => true,
+			round: 0,
+			setProcessorResult: () => {},
+		} as unknown as Contracts.Processor.ProcessableUnit;
+
+		const spyProcess = spy(blockProcessor, "process");
+		const spyCommit = spy(blockProcessor, "commit");
+		stub(roundStateRepository, "clear");
+		stub(consensus, "startRound").callsFake(async () => {});
+
+		await consensus.handleCommitState(commitState);
+
+		spyProcess.neverCalled();
+		spyCommit.calledOnce();
+		spyCommit.calledWith(commitState);
+		assert.equal(consensus.getBlockNumber(), 2);
+	});
+
+	it("#handleCommitState - should mark the block as invalid and skip the commit when processing throws", async ({
+		consensus,
+		blockProcessor,
+		block,
+		logger,
+	}) => {
+		let processorResult: Contracts.Processor.BlockProcessorResult | undefined;
+		const commitState = {
+			blockNumber: 1,
+			getBlock: () => block,
+			getProcessorResult: () => processorResult!,
+			hasProcessorResult: () => processorResult !== undefined,
+			round: 0,
+			setProcessorResult: (result: Contracts.Processor.BlockProcessorResult) => (processorResult = result),
+		} as unknown as Contracts.Processor.ProcessableUnit;
+
+		const spyProcess = stub(blockProcessor, "process").rejectedValue(new Error("boom"));
+		const spyCommit = spy(blockProcessor, "commit");
+		const spyStartRound = stub(consensus, "startRound").callsFake(async () => {});
+		const spyLoggerInfo = spy(logger, "info");
+
+		await consensus.handleCommitState(commitState);
+
+		spyProcess.calledOnce();
+		assert.defined(processorResult);
+		assert.false(processorResult!.success);
+		spyLoggerInfo.calledWith(`Block ${1}/${0}/${block.hash} is invalid`);
+		spyCommit.neverCalled();
+		spyStartRound.neverCalled();
+		assert.equal(consensus.getBlockNumber(), 1);
+	});
+
+	it("#handleCommitState - should do nothing once disposed", async ({ consensus, blockProcessor, block }) => {
+		const commitState = {
+			blockNumber: 1,
+			getBlock: () => block,
+			getProcessorResult: () => ({ success: true }),
+			hasProcessorResult: () => false,
+			round: 0,
+			setProcessorResult: () => {},
+		} as unknown as Contracts.Processor.ProcessableUnit;
+
+		const spyProcess = spy(blockProcessor, "process");
+		const spyCommit = spy(blockProcessor, "commit");
+
+		await consensus.dispose();
+		await consensus.handleCommitState(commitState);
+
+		spyProcess.neverCalled();
+		spyCommit.neverCalled();
+		assert.equal(consensus.getBlockNumber(), 1);
+	});
 });
