@@ -92,18 +92,8 @@ export class Consensus implements Contracts.Consensus.Service {
 		return this.#round;
 	}
 
-	// TODO: Only for tests
-	public setRound(round: number): void {
-		this.#round = round;
-	}
-
 	public getStep(): Contracts.Consensus.Step {
 		return this.#step;
-	}
-
-	// TODO: Only for tests
-	public setStep(step: Contracts.Consensus.Step): void {
-		this.#step = step;
 	}
 
 	public getLockedRound(): number | undefined {
@@ -114,12 +104,20 @@ export class Consensus implements Contracts.Consensus.Service {
 		return this.#validValue ? this.#validValue.round : undefined;
 	}
 
-	// Only for tests
+	// Test seams. None of these is part of Contracts.Consensus.Service, so nothing resolved from the container can
+	// reach them; they let tests place the state machine at a position without replaying the rounds leading there.
+	public setRound(round: number): void {
+		this.#round = round;
+	}
+
+	public setStep(step: Contracts.Consensus.Step): void {
+		this.#step = step;
+	}
+
 	public setValidValue(roundState: Contracts.Consensus.RoundState): void {
 		this.#validValue = roundState;
 	}
 
-	// Only for tests
 	public setProposal(proposalPromise: Promise<Contracts.Crypto.Proposal>): void {
 		this.#proposalPromise = proposalPromise;
 	}
