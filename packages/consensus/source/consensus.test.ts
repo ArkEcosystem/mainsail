@@ -1040,9 +1040,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
 	});
 
-	// TODO: Handle on processor
-	it("#onProposal - broadcast prevote null, if block processor throws", async ({ consensus }) => {});
-
 	it("#onProposal - broadcast prevote null, if locked on another value", async ({
 		consensus,
 		validatorSet,
@@ -2230,6 +2227,61 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getBlockNumber(), 2);
 	});
 
+	it("#handle - should prevote null when the block processor throws", async ({
+		consensus,
+		blockProcessor,
+		proposalProcessor,
+		validatorSet,
+		validatorsRepository,
+		messageProcessor,
+		roundState,
+		proposal,
+		proposer,
+		logger,
+	}) => {
+		// #processProposal turns a throwing processor into a failed result instead of letting the error escape,
+		// so the proposal counts as invalid and onProposal prevotes nil for it.
+		let processorResult: Contracts.Processor.BlockProcessorResult | undefined;
+		roundState.hasProcessorResult = () => processorResult !== undefined;
+		roundState.setProcessorResult = (result) => (processorResult = result);
+		roundState.getProcessorResult = () => processorResult!;
+		roundState.hasMajorityPrevotes = () => false;
+		roundState.hasMajorityPrevotesAny = () => false;
+		roundState.hasMajorityPrevotesNull = () => false;
+		roundState.hasMajorityPrecommitsAny = () => false;
+		roundState.hasMajorityPrecommits = () => false;
+		roundState.hasMajorityPrecommitsWithoutProposal = () => false;
+		roundState.hasMinorityPrevotesOrPrecommits = () => false;
+		proposal.deserializePayload = async () => {};
+		proposalProcessor.hasValidLockProof = async () => true;
+
+		const prevote = { blockNumber: 1, round: 0 };
+		const validator = { prevote: () => {} };
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").rejectedValue(new Error("processor failed"));
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyMessageProcess = spy(messageProcessor, "process");
+		const spyLoggerError = spy(logger, "error");
+
+		await consensus.handle(roundState);
+
+		spyBlockProcessorProcess.calledOnce();
+		spyBlockProcessorProcess.calledWith(roundState);
+		spyLoggerError.calledOnce();
+		spyLoggerError.calledWith(`Failed to process proposal ${1}/${0}: processor failed`);
+		assert.equal(processorResult?.success, false);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 0, undefined);
+		spyMessageProcess.calledOnce();
+		spyMessageProcess.calledWith(prevote);
+		spyBlockProcessorCommit.neverCalled();
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
+	});
+
 	it("#onMajorityPrecommit - should be called only once", async ({
 		consensus,
 		blockProcessor,
@@ -2277,24 +2329,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyBlockProcessorCommit.neverCalled();
 		spyConsensusStartRound.neverCalled();
 	});
-
-	// TODO: fix
-	// it("#onMajorityPrecommit - should return if proposal is undefined", async ({
-	// 	consensus,
-	// 	blockProcessor,
-	// 	roundState,
-	// }) => {
-	// 	const spyBlockProcessorCommit = spy(blockProcessor, "commit");
-	// 	const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
-
-	// 	roundState.getProcessorResult = () => ({ success: true });
-
-	// 	roundState.getProposal = () => undefined;
-	// 	await consensus.onMajorityPrecommit(roundState);
-
-	// 	spyBlockProcessorCommit.neverCalled();
-	// 	spyConsensusStartRound.neverCalled();
-	// });
 
 	// Our own slot reporting. False reports are the thing to guard against here: a node runner who sees
 	// a missed slot that did not happen has no way to tell it apart from a real one.
