@@ -1208,7 +1208,58 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
 	});
 
-	it("#onProposalLocked - broadcast prevote block hash, if block is valid and valid round is higher or equal than lockedRound ", async () => {});
+	it("#onProposalLocked - broadcast prevote block hash, if block is valid and valid round is higher or equal than lockedRound", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		block,
+		proposal,
+		proposer,
+	}) => {
+		const validator = {
+			precommit: () => {},
+			prevote: () => {},
+		};
+		stub(validator, "precommit").resolvedValue({ blockNumber: 1, round: 0 });
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue({ blockNumber: 1, round: 2 });
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		// Round 0: +2/3 prevotes for block A lock this node on it.
+		roundState.getProcessorResult = () => ({ success: true }) as any;
+		consensus.setStep(Enums.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevote(roundState);
+
+		assert.equal(consensus.getLockedRound(), 0);
+
+		// Round 2: block B is re-proposed with +2/3 prevotes from round 1, later than our lock. Tendermint line 29,
+		// lockedRound <= vr: the newer proof unlocks this node.
+		const otherBlock = { ...block, hash: "otherBlockHash", round: 1 };
+		const reProposal = {
+			...proposal,
+			blockHeader: otherBlock,
+			getData: () => ({ block: otherBlock }),
+			lockProof: { signature: "1234", validators: [] },
+			round: 2,
+			validRound: 1,
+		};
+		const nextRoundState = {
+			...roundState,
+			getProcessorResult: () => ({ success: true }),
+			getProposal: () => reProposal,
+			round: 2,
+		} as unknown as Contracts.Consensus.RoundState;
+		consensus.setRound(2);
+		consensus.setStep(Enums.Consensus.Step.Propose);
+
+		await consensus.onProposalLocked(nextRoundState);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 2, otherBlock.hash);
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
+	});
 
 	it("#onProposalLocked - broadcast prevote null, if block is valid and lockedRound is undefined", async ({
 		consensus,
@@ -1272,7 +1323,119 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
 	});
 
-	it("#onProposalLocked - broadcast prevote null, if block is valid and lockedRound is higher than validRound", async () => {});
+	it("#onProposalLocked - broadcast prevote null, if block is valid and lockedRound is higher than validRound", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		block,
+		proposal,
+		proposer,
+	}) => {
+		const validator = {
+			precommit: () => {},
+			prevote: () => {},
+		};
+		stub(validator, "precommit").resolvedValue({ blockNumber: 1, round: 1 });
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue({ blockNumber: 1, round: 2 });
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		// Round 1: +2/3 prevotes for block A lock this node on it.
+		const lockRoundState = {
+			...roundState,
+			getProcessorResult: () => ({ success: true }),
+			round: 1,
+		} as unknown as Contracts.Consensus.RoundState;
+		consensus.setRound(1);
+		consensus.setStep(Enums.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevote(lockRoundState);
+
+		assert.equal(consensus.getLockedRound(), 1);
+
+		// Round 2: another block B comes with a proof from round 0, older than our lock on A. Neither part of
+		// Tendermint line 29 holds, so the lock keeps this node from prevoting B.
+		const otherBlock = { ...block, hash: "otherBlockHash", round: 0 };
+		const reProposal = {
+			...proposal,
+			blockHeader: otherBlock,
+			getData: () => ({ block: otherBlock }),
+			lockProof: { signature: "1234", validators: [] },
+			round: 2,
+			validRound: 0,
+		};
+		const nextRoundState = {
+			...roundState,
+			getProcessorResult: () => ({ success: true }),
+			getProposal: () => reProposal,
+			round: 2,
+		} as unknown as Contracts.Consensus.RoundState;
+		consensus.setRound(2);
+		consensus.setStep(Enums.Consensus.Step.Propose);
+
+		await consensus.onProposalLocked(nextRoundState);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 2, undefined); // validatorIndex, blockNumber, round, no block hash
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
+		assert.equal(consensus.getLockedRound(), 1);
+	});
+
+	it("#onProposalLocked - broadcast prevote block hash, if locked on the re-proposed block, even with an older valid round", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		block,
+		proposal,
+		proposer,
+	}) => {
+		const validator = {
+			precommit: () => {},
+			prevote: () => {},
+		};
+		stub(validator, "precommit").resolvedValue({ blockNumber: 1, round: 1 });
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue({ blockNumber: 1, round: 2 });
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		// Round 1: +2/3 prevotes for block A lock this node on it.
+		const lockRoundState = {
+			...roundState,
+			getProcessorResult: () => ({ success: true }),
+			round: 1,
+		} as unknown as Contracts.Consensus.RoundState;
+		consensus.setRound(1);
+		consensus.setStep(Enums.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevote(lockRoundState);
+
+		assert.equal(consensus.getLockedRound(), 1);
+
+		// Round 2: a proposer that missed the round 1 prevotes re-proposes A itself with its proof from round 0.
+		// lockedRound > vr, but lockedValue = v: Tendermint line 29 lets this node prevote its own locked block.
+		const reProposal = {
+			...proposal,
+			lockProof: { signature: "1234", validators: [] },
+			round: 2,
+			validRound: 0,
+		};
+		const nextRoundState = {
+			...roundState,
+			getProcessorResult: () => ({ success: true }),
+			getProposal: () => reProposal,
+			round: 2,
+		} as unknown as Contracts.Consensus.RoundState;
+		consensus.setRound(2);
+		consensus.setStep(Enums.Consensus.Step.Propose);
+
+		await consensus.onProposalLocked(nextRoundState);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 2, block.hash);
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
+	});
 
 	it("#onProposalLocked - should return if step === prevote", async ({ consensus, roundState, proposal }) => {
 		proposal.validRound = 0;

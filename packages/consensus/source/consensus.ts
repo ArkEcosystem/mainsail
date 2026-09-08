@@ -352,9 +352,16 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.logger.info(`Received locked proposal ${this.#getBlockString(proposal.blockHeader)}`, "consensus");
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
-		const lockedRound = this.getLockedRound();
+		// Tendermint line 29: valid(v) ∧ (lockedRound ≤ vr ∨ lockedValue = v). A re-proposal keeps the original
+		// block, so it can be the very block this node is locked on, brought with a proof from a round older than
+		// the lock. Prevoting for the locked value itself is always safe.
+		const lockedValue = this.#lockedValue;
+		const isAllowedByLock =
+			lockedValue === undefined ||
+			lockedValue.round <= proposal.validRound ||
+			lockedValue.getProposal()?.blockHeader.hash === proposal.blockHeader.hash;
 
-		if ((!lockedRound || lockedRound <= proposal.validRound) && roundState.getProcessorResult().success) {
+		if (isAllowedByLock && roundState.getProcessorResult().success) {
 			await this.prevote(proposal.blockHeader.hash);
 		} else {
 			await this.prevote();
