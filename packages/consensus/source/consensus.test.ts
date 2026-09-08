@@ -1043,7 +1043,108 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	// TODO: Handle on processor
 	it("#onProposal - broadcast prevote null, if block processor throws", async ({ consensus }) => {});
 
-	it("#onProposal - broadcast prevote null, if locked value exists", async ({ consensus }) => {});
+	it("#onProposal - broadcast prevote null, if locked on another value", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		block,
+		logger,
+		proposal,
+		proposer,
+	}) => {
+		const validator = {
+			precommit: () => {},
+			prevote: () => {},
+		};
+		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue({ blockNumber: 1, round: 0 });
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue({ blockNumber: 1, round: 1 });
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		const spyLoggerInfo = spy(logger, "info");
+
+		// Round 0: +2/3 prevotes for block A lock this node on it.
+		roundState.getProcessorResult = () => ({ success: true }) as any;
+		consensus.setStep(Enums.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevote(roundState);
+
+		assert.equal(consensus.getLockedRound(), 0);
+		spyValidatorPrecommit.calledOnce();
+		spyValidatorPrecommit.calledWith(1, 1, 0, block.hash);
+
+		// Round 1: a proposer that missed those prevotes proposes a fresh block B, without a valid round.
+		const otherBlock = { ...block, hash: "otherBlockHash", round: 1 };
+		const otherProposal = {
+			...proposal,
+			blockHeader: otherBlock,
+			getData: () => ({ block: otherBlock }),
+			round: 1,
+			validRound: undefined,
+		};
+		const nextRoundState = {
+			...roundState,
+			getProcessorResult: () => ({ success: true }),
+			getProposal: () => otherProposal,
+			round: 1,
+		} as unknown as Contracts.Consensus.RoundState;
+		consensus.setRound(1);
+		consensus.setStep(Enums.Consensus.Step.Propose);
+
+		await consensus.onProposal(nextRoundState);
+
+		// The lock wins over the fresh proposal: a nil prevote, and the lock stays on A.
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 1, undefined); // validatorIndex, blockNumber, round, no block hash
+		spyLoggerInfo.calledWith(`Prevoting nil for 1/1/otherBlockHash, because locked on 0/${block.hash}`);
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
+		assert.equal(consensus.getLockedRound(), 0);
+	});
+
+	it("#onProposal - broadcast prevote null, if locked, even when the fresh proposal carries the locked block", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		block,
+		proposal,
+		proposer,
+	}) => {
+		const validator = {
+			precommit: () => {},
+			prevote: () => {},
+		};
+		stub(validator, "precommit").resolvedValue({ blockNumber: 1, round: 0 });
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue({ blockNumber: 1, round: 1 });
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		// Round 0: +2/3 prevotes for block A lock this node on it.
+		roundState.getProcessorResult = () => ({ success: true }) as any;
+		consensus.setStep(Enums.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevote(roundState);
+
+		assert.equal(consensus.getLockedRound(), 0);
+
+		// Round 1: a fresh proposal carrying the very block this node is locked on, but without validRound and lock
+		// proof. Stricter than Tendermint line 23: the proof has to come along, so this still gets nil.
+		const sameProposal = { ...proposal, round: 1, validRound: undefined };
+		const nextRoundState = {
+			...roundState,
+			getProcessorResult: () => ({ success: true }),
+			getProposal: () => sameProposal,
+			round: 1,
+		} as unknown as Contracts.Consensus.RoundState;
+		consensus.setRound(1);
+		consensus.setStep(Enums.Consensus.Step.Propose);
+
+		await consensus.onProposal(nextRoundState);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 1, undefined);
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
+	});
 
 	it("#onProposalLocked - broadcast prevote block hash, if block is valid and lockedRound is undefined", async ({
 		consensus,

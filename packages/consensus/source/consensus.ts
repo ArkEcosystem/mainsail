@@ -307,6 +307,23 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.logger.info(`Received proposal ${this.#getBlockString(proposal.blockHeader)}`, "consensus");
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
+		// A locked node prevotes nil for any fresh proposal. Prevoting for a fresh value while locked on another one
+		// could help form +2/3 prevotes for a second block at this height, and with it a fork. This is stricter
+		// than Tendermint line 23, which also accepts a fresh proposal of the locked value itself: an honest
+		// proposer re-proposes its valid value with validRound and a lock proof, which onProposalLocked handles,
+		// and a block forged in a later round carries that round in its hash, so it never equals the locked one.
+		// A proposer that wants our vote for our locked block has to bring the proof.
+		const lockedValue = this.#lockedValue;
+		if (lockedValue !== undefined) {
+			const lockedHash = lockedValue.getProposal()?.blockHeader.hash;
+			this.logger.info(
+				`Prevoting nil for ${this.#getBlockString(proposal.blockHeader)}, because locked on ${lockedValue.round}/${lockedHash}`,
+				"consensus",
+			);
+			await this.prevote();
+			return;
+		}
+
 		await this.prevote(roundState.getProcessorResult().success ? proposal.blockHeader.hash : undefined);
 	}
 
