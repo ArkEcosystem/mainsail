@@ -290,15 +290,19 @@ export class Consensus implements Contracts.Consensus.Service {
 		await this.proposalProcessor.process(proposal);
 	}
 
+	// The handlers below follow Algorithm 1 of "The latest gossip on BFT consensus" (Buchman, Kwon, Milosevic,
+	// 2018). Each guard quotes the "upon" clause of its rule, with the line number in the paper, stated positively:
+	// the handler runs when all of it holds.
 	protected async onProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		const proposal = roundState.getProposal();
 
-		if (
-			this.#step !== Enums.Consensus.Step.Propose ||
-			!this.#isCurrentRoundState(roundState) ||
-			!proposal ||
-			proposal.validRound !== undefined
-		) {
+		// Tendermint line 22: upon ⟨PROPOSAL, h, r, v, −1⟩ from proposer(h, r) while step = propose.
+		if (!(
+			this.#step === Enums.Consensus.Step.Propose &&
+			this.#isCurrentRoundState(roundState) &&
+			proposal !== undefined &&
+			proposal.validRound === undefined
+		)) {
 			return;
 		}
 
@@ -330,14 +334,16 @@ export class Consensus implements Contracts.Consensus.Service {
 	protected async onProposalLocked(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		const proposal = roundState.getProposal();
 
-		if (
-			this.#step !== Enums.Consensus.Step.Propose ||
-			!this.#isCurrentRoundState(roundState) ||
-			!proposal ||
-			!proposal.lockProof ||
-			proposal.validRound === undefined ||
-			proposal.validRound >= this.#round
-		) {
+		// Tendermint line 28: upon ⟨PROPOSAL, h, r, v, vr⟩ from proposer(h, r) and +2/3 ⟨PREVOTE, h, vr, id(v)⟩
+		// while step = propose ∧ 0 ≤ vr < r. The +2/3 prevotes are the lock proof, verified in #processProposal.
+		if (!(
+			this.#step === Enums.Consensus.Step.Propose &&
+			this.#isCurrentRoundState(roundState) &&
+			proposal !== undefined &&
+			proposal.lockProof !== undefined &&
+			proposal.validRound !== undefined &&
+			proposal.validRound < this.#round
+		)) {
 			return;
 		}
 
@@ -358,13 +364,15 @@ export class Consensus implements Contracts.Consensus.Service {
 	protected async onMajorityPrevote(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		const proposal = roundState.getProposal();
 
-		if (
-			this.#didMajorityPrevote ||
-			this.#step === Enums.Consensus.Step.Propose ||
-			!this.#isCurrentRoundState(roundState) ||
-			!proposal ||
-			!roundState.getProcessorResult().success
-		) {
+		// Tendermint line 36: upon ⟨PROPOSAL, h, r, v, ∗⟩ from proposer(h, r) and +2/3 ⟨PREVOTE, h, r, id(v)⟩
+		// while valid(v) ∧ step ≥ prevote, for the first time.
+		if (!(
+			!this.#didMajorityPrevote &&
+			this.#step >= Enums.Consensus.Step.Prevote &&
+			this.#isCurrentRoundState(roundState) &&
+			proposal !== undefined &&
+			roundState.getProcessorResult().success
+		)) {
 			return;
 		}
 
@@ -387,7 +395,9 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	protected async onMajorityPrevoteAny(roundState: Contracts.Consensus.RoundState): Promise<void> {
-		if (this.#step !== Enums.Consensus.Step.Prevote || !this.#isCurrentRoundState(roundState)) {
+		// Tendermint line 34: upon +2/3 ⟨PREVOTE, h, r, ∗⟩ while step = prevote, for the first time. The scheduler
+		// reports whether the timeout was newly scheduled, which stands for "for the first time".
+		if (!(this.#step === Enums.Consensus.Step.Prevote && this.#isCurrentRoundState(roundState))) {
 			return;
 		}
 
@@ -397,7 +407,8 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	protected async onMajorityPrevoteNull(roundState: Contracts.Consensus.RoundState): Promise<void> {
-		if (this.#step !== Enums.Consensus.Step.Prevote || !this.#isCurrentRoundState(roundState)) {
+		// Tendermint line 44: upon +2/3 ⟨PREVOTE, h, r, nil⟩ while step = prevote.
+		if (!(this.#step === Enums.Consensus.Step.Prevote && this.#isCurrentRoundState(roundState))) {
 			return;
 		}
 
@@ -410,6 +421,8 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	protected async onMajorityPrecommitAny(roundState: Contracts.Consensus.RoundState): Promise<void> {
+		// Tendermint line 47: upon +2/3 ⟨PRECOMMIT, h, r, ∗⟩ for the first time. The scheduler reports whether the
+		// timeout was newly scheduled, which stands for "for the first time".
 		if (!this.#isCurrentRoundState(roundState)) {
 			return;
 		}
@@ -423,8 +436,11 @@ export class Consensus implements Contracts.Consensus.Service {
 		processState: Contracts.Processor.ProcessableUnit,
 		isRoundState: boolean = true,
 	): Promise<void> {
+		// Tendermint line 49: upon ⟨PROPOSAL, h, r, v, ∗⟩ from proposer(h, r) and +2/3 ⟨PRECOMMIT, h, r, id(v)⟩
+		// while decision[h] = nil. Any round r qualifies, not only the current one. A round state is acted on
+		// once; a commit state carries no such flag.
 		// TODO: Only block number must match. Round can be any. Add tests
-		if ((isRoundState && this.#didMajorityPrecommit) || processState.blockNumber !== this.#blockNumber) {
+		if (!(processState.blockNumber === this.#blockNumber && (!isRoundState || !this.#didMajorityPrecommit))) {
 			return;
 		}
 
@@ -468,7 +484,8 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	protected onMajorityPrecommitWithoutProposal(roundState: Contracts.Consensus.RoundState): void {
-		if (this.#didMajorityPrecommitWithoutProposal || !this.#isCurrentRoundState(roundState)) {
+		// Outside Algorithm 1. Runs once per round, while the round is the current one.
+		if (!(!this.#didMajorityPrecommitWithoutProposal && this.#isCurrentRoundState(roundState))) {
 			return;
 		}
 
@@ -484,7 +501,8 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	protected async onMinorityWithHigherRound(roundState: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (roundState.blockNumber !== this.#blockNumber || roundState.round <= this.#round) {
+		// Tendermint line 55: upon f+1 ⟨∗, h, round, ∗, ∗⟩ with round > r.
+		if (!(roundState.blockNumber === this.#blockNumber && roundState.round > this.#round)) {
 			return;
 		}
 
@@ -493,11 +511,12 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async onTimeoutPropose(blockNumber: number, round: number): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
-			if (
-				this.#step !== Enums.Consensus.Step.Propose ||
-				this.#blockNumber !== blockNumber ||
-				this.#round !== round
-			) {
+			// Tendermint line 57: OnTimeoutPropose(h, r) acts if h = h_p ∧ r = round_p ∧ step = propose.
+			if (!(
+				this.#step === Enums.Consensus.Step.Propose &&
+				this.#blockNumber === blockNumber &&
+				this.#round === round
+			)) {
 				return;
 			}
 
@@ -510,11 +529,12 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async onTimeoutPrevote(blockNumber: number, round: number): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
-			if (
-				this.#step !== Enums.Consensus.Step.Prevote ||
-				this.#blockNumber !== blockNumber ||
-				this.#round !== round
-			) {
+			// Tendermint line 61: OnTimeoutPrevote(h, r) acts if h = h_p ∧ r = round_p ∧ step = prevote.
+			if (!(
+				this.#step === Enums.Consensus.Step.Prevote &&
+				this.#blockNumber === blockNumber &&
+				this.#round === round
+			)) {
 				return;
 			}
 
@@ -528,7 +548,8 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async onTimeoutPrecommit(blockNumber: number, round: number): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
-			if (this.#blockNumber !== blockNumber || this.#round !== round) {
+			// Tendermint line 65: OnTimeoutPrecommit(h, r) acts if h = h_p ∧ r = round_p.
+			if (!(this.#blockNumber === blockNumber && this.#round === round)) {
 				return;
 			}
 
