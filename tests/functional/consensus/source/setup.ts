@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { Application, Bootstrap, Providers, Services } from "@mainsail/kernel";
+import { copyFileSync } from "fs";
 import { join } from "path";
 import { dirSync } from "tmp";
 
@@ -14,11 +15,20 @@ import { Worker } from "./worker.js";
 
 type PluginOptions = Record<string, any>;
 
+type SetupOptions = {
+	// Load the real consensus storage (LMDB under the data path) instead of the no-op stub. It persists the
+	// consensus state on dispose, which is what lets `restart` bring a node back mid-round.
+	consensusStorage?: boolean;
+	// Reuse this data directory instead of a fresh temporary one.
+	dataPath?: string;
+};
+
 const setup = async (
 	id: number,
 	p2pRegistry: P2PRegistry,
 	crypto: any,
 	validators: ValidatorsJson,
+	options: SetupOptions = {},
 ): Promise<Contracts.Kernel.Application> => {
 	const app = new Application();
 
@@ -32,12 +42,14 @@ const setup = async (
 	app.bind(Identifiers.P2P.Broadcaster).toConstantValue(p2pRegistry.makeBroadcaster(id));
 	app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => {} });
 
-	app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
-		getMessages: async () => [],
-		getProposals: async () => [],
-		getState: async () => {},
-		persist: async () => {},
-	});
+	if (!options.consensusStorage) {
+		app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
+			getMessages: async () => [],
+			getProposals: async () => [],
+			getState: async () => {},
+			persist: async () => {},
+		});
+	}
 
 	app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
 		getTransactions: async () => ({ remaining: 0, transactions: [] }),
@@ -57,7 +69,7 @@ const setup = async (
 	await app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
-	app.bind("path.data").toConstantValue(dirSync({ unsafeCleanup: true }).name);
+	app.bind("path.data").toConstantValue(options.dataPath ?? dirSync({ unsafeCleanup: true }).name);
 	app.bind("path.config").toConstantValue(join(import.meta.dirname, `../config`));
 	app.bind("path.cache").toConstantValue("");
 	app.bind("path.log").toConstantValue("");
@@ -102,10 +114,11 @@ const setup = async (
 		"@mainsail/evm-consensus",
 		"@mainsail/forger",
 		"@mainsail/validator",
+		...(options.consensusStorage ? ["@mainsail/consensus-storage"] : []),
 		"@mainsail/consensus",
 	];
 
-	const options = {
+	const pluginOptions = {
 		"@mainsail/state": {
 			snapshots: {
 				enabled: false,
@@ -114,7 +127,7 @@ const setup = async (
 	};
 
 	for (const packageId of packages) {
-		await loadPlugin(app, packageId, options);
+		await loadPlugin(app, packageId, pluginOptions);
 	}
 
 	// Rebinds
@@ -238,4 +251,26 @@ const stopMany = async (apps: Contracts.Kernel.Application[]) => {
 	}
 };
 
-export { boot, bootMany, bootstrap, bootstrapMany, run, runMany, setup, stop, stopMany };
+
+const restart = async (
+	app: Contracts.Kernel.Application,
+	id: number,
+	p2pRegistry: P2PRegistry,
+	crypto: any,
+	validators: ValidatorsJson,
+): Promise<Contracts.Kernel.Application> => {
+	await stop(app);
+	p2pRegistry.unregisterNode(id);
+
+	const dataPath = dirSync({ unsafeCleanup: true }).name;
+	copyFileSync(join(app.dataPath(), "consensus.mdb"), join(dataPath, "consensus.mdb"));
+
+	const restarted = await setup(id, p2pRegistry, crypto, validators, { consensusStorage: true, dataPath });
+	await boot(restarted);
+	await bootstrap(restarted);
+	await run(restarted);
+
+	return restarted;
+};
+
+export { boot, bootMany, bootstrap, bootstrapMany, restart, run, runMany, setup, stop, stopMany };

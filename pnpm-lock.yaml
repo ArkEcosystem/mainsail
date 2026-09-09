@@ -3425,6 +3425,9 @@ importers:
       '@mainsail/consensus':
         specifier: workspace:*
         version: link:../../../packages/consensus
+      '@mainsail/consensus-storage':
+        specifier: workspace:*
+        version: link:../../../packages/consensus-storage
       '@mainsail/constants':
         specifier: workspace:*
         version: link:../../../packages/constants

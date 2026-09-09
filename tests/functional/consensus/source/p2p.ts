@@ -79,6 +79,12 @@ export class P2PRegistry {
 		this.#nodes.set(id, node);
 	}
 
+	public unregisterNode(id: number): void {
+		if (!this.#nodes.delete(id)) {
+			throw new Error(`Node with id ${id} does not exist.`);
+		}
+	}
+
 	public getOtherNodes(id: number): Contracts.Kernel.Application[] {
 		return [...this.#nodes.entries()].filter(([nodeId]) => nodeId !== id).map(([, node]) => node);
 	}
