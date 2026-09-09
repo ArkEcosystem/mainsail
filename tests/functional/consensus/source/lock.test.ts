@@ -172,6 +172,22 @@ describe<{
 			[undefined, undefined, undefined, undefined, undefined],
 		);
 		await assertBlockNumber(nodes, 0);
+
+		// The lock does not expire with the round: round 2 brings yet another fresh block, and the four locked nodes
+		// prevote null again.
+		await snoozeUntil(() => p2p.prevotes.getMessages(1, 2).length === totalNodes);
+
+		const [round2Proposal] = p2p.proposals.getMessages(1, 2);
+		assert.defined(round2Proposal);
+		assert.undefined(round2Proposal.validRound);
+		assert.not.equal(round2Proposal.blockHeader.hash, round0Proposal.blockHeader.hash);
+		assert.equal(
+			p2p.prevotes
+				.getMessages(1, 2)
+				.map((prevote) => prevote.blockHash)
+				.sort(),
+			[round2Proposal.blockHeader.hash, undefined, undefined, undefined, undefined].sort(),
+		);
 	});
 
 	it("should prevote the locked block, if the lock proof is older than the lock", async ({
