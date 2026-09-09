@@ -12,6 +12,7 @@ describe<{
 	app: Application;
 	bootstrapper: Bootstrapper;
 	logger: any;
+	proposal: any;
 	roundState: any;
 	roundStateRepository: any;
 	storage: any;
@@ -37,7 +38,8 @@ describe<{
 	});
 
 	beforeEach((context) => {
-		context.roundState = { addMessage: () => {}, addProposal: () => {}, hasProposal: () => true };
+		context.proposal = { deserializePayload: async () => {} };
+		context.roundState = { addMessage: () => {}, addProposal: () => {}, getProposal: () => context.proposal };
 		context.roundStateRepository = { getRoundState: () => context.roundState };
 		context.storage = {
 			getMessages: async () => [],
@@ -178,6 +180,33 @@ describe<{
 		warn.neverCalled();
 	});
 
+	it("#run - should deserialize the proposal payload of the valid value", async ({
+		bootstrapper,
+		proposal,
+		roundState,
+		storage,
+	}) => {
+		// The valid value gets re-proposed, which needs its block; a stored proposal still holds it serialized.
+		stub(storage, "getState").resolvedValue(makeState({ validRound: 1 }));
+		const deserializePayload = spy(proposal, "deserializePayload");
+
+		const result = await bootstrapper.run();
+
+		deserializePayload.calledOnce();
+		assert.is(result?.validValue, roundState);
+	});
+
+	it("#run - should propagate a payload deserialization failure of the valid value", async ({
+		bootstrapper,
+		proposal,
+		storage,
+	}) => {
+		stub(storage, "getState").resolvedValue(makeState({ validRound: 1 }));
+		stub(proposal, "deserializePayload").rejectedValue(new Error("corrupt payload"));
+
+		await assert.rejects(() => bootstrapper.run(), "corrupt payload");
+	});
+
 	it("#run - should drop the valid round when its proposal is not stored", async ({
 		bootstrapper,
 		logger,
@@ -186,7 +215,7 @@ describe<{
 	}) => {
 		// The valid value is re-proposed from its proposal, so without one it is useless; a fresh block gets proposed.
 		stub(storage, "getState").resolvedValue(makeState({ validRound: 1 }));
-		roundState.hasProposal = () => false;
+		roundState.getProposal = () => undefined;
 		const warn = spy(logger, "warn");
 
 		const result = await bootstrapper.run();
@@ -208,7 +237,7 @@ describe<{
 	}) => {
 		// Only the round number of the lock is consumed, and forgetting a lock would weaken safety.
 		stub(storage, "getState").resolvedValue(makeState({ lockedRound: 1, validRound: 1 }));
-		roundState.hasProposal = () => false;
+		roundState.getProposal = () => undefined;
 		const warn = spy(logger, "warn");
 
 		const result = await bootstrapper.run();
@@ -221,12 +250,14 @@ describe<{
 
 	it("#run - should attach the round state of the locked round as locked value", async ({
 		bootstrapper,
+		proposal,
 		roundState,
 		roundStateRepository,
 		storage,
 	}) => {
 		stub(storage, "getState").resolvedValue(makeState({ lockedRound: 1 }));
 		const getRoundState = spy(roundStateRepository, "getRoundState");
+		const deserializePayload = spy(proposal, "deserializePayload");
 
 		const result = await bootstrapper.run();
 
@@ -234,6 +265,8 @@ describe<{
 		getRoundState.calledWith(3, 1);
 		assert.is(result?.lockedValue, roundState);
 		assert.undefined(result?.validValue);
+		// Only the round number of the lock is consumed, so its proposal is left alone.
+		deserializePayload.neverCalled();
 	});
 
 	it("#run - should treat round 0 as a referenced round", async ({

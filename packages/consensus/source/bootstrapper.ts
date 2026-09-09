@@ -45,10 +45,12 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 
 		if (state.validRound !== undefined) {
 			const roundState = this.roundStateRepo.getRoundState(state.blockNumber, state.validRound);
+			const proposal = roundState.getProposal();
 
 			// The valid value gets re-proposed, which needs its proposal. State and proposals are stored in one
 			// transaction, so a missing proposal means the store was tampered with; propose a fresh block instead.
-			if (roundState.hasProposal()) {
+			if (proposal) {
+				await proposal.deserializePayload();
 				state.validValue = roundState;
 			} else {
 				this.logger.warn(
