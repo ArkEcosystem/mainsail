@@ -15,6 +15,13 @@ const consensusPublicKey = validatorKeys[0].consensusKeyPair.publicKey;
 const GENESIS_BLOCK_HASH = "0000000000000000000000000000000000000000000000000000000000000001";
 const PREVIOUS_BLOCK_HASH = "0000000000000000000000000000000000000000000000000000000000000000";
 
+// A validRound must travel with the lock proof of that round; the proposal factory rejects one without the other.
+// 96-byte (192 hex) placeholder signature; validators must match roundValidators (53).
+const lockProof: Contracts.Crypto.AggregatedSignature = {
+	signature: "a".repeat(192),
+	validators: Array.from({ length: 53 }, () => true),
+};
+
 describe<{
 	app: Application;
 	validator: Contracts.Validator.Validator;
@@ -75,7 +82,7 @@ describe<{
 		forger,
 	}) => {
 		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
-		const proposal = await validator.propose(0, 3, 1, block);
+		const proposal = await validator.propose(0, 3, 1, block, lockProof);
 
 		assert.equal(proposal.round, 3);
 		assert.equal(proposal.validRound, 1);
@@ -87,16 +94,33 @@ describe<{
 		forger,
 	}) => {
 		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
-		const lockProof: Contracts.Crypto.AggregatedSignature = {
-			// 96-byte (192 hex) placeholder signature; validators must match roundValidators (53).
-			signature: "a".repeat(192),
-			validators: Array.from({ length: 53 }, () => true),
-		};
-
 		const proposal = await validator.propose(0, 3, 1, block, lockProof);
 
 		assert.defined(proposal.lockProof);
 		assert.equal(proposal.lockProof?.signature, lockProof.signature);
+	});
+
+	it("#propose - should reject a valid round without a lock proof", async ({
+		validator,
+		generatorAddress,
+		forger,
+	}) => {
+		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
+
+		await assert.rejects(() => validator.propose(0, 3, 1, block), "validRound requires a lockProof");
+	});
+
+	it("#propose - should reject a lock proof without a valid round", async ({
+		validator,
+		generatorAddress,
+		forger,
+	}) => {
+		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
+
+		await assert.rejects(
+			() => validator.propose(0, 3, undefined, block, lockProof),
+			"lockProof requires a validRound",
+		);
 	});
 
 	it("#prevote - should create a signed prevote for the given block", async ({

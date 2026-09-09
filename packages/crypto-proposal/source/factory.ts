@@ -50,6 +50,16 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 			Buffer.from(proposalData.payloadSerialized, "hex"),
 		);
 
+		// validRound names the round the re-proposed value was found valid in, lockProof holds the +2/3 prevotes
+		// of that round. They travel apart, one in the header and one in the payload, so no schema sees both;
+		// the pairing is checked here instead.
+		if ((proposalData.validRound === undefined) !== (lockProof === undefined)) {
+			throw new MessageSchemaError(
+				"proposal",
+				lockProof === undefined ? "validRound requires a lockProof" : "lockProof requires a validRound",
+			);
+		}
+
 		return this.app.resolve<Proposal>(Proposal).initialize({
 			...proposalData,
 			blockHeader,

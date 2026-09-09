@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Enums, Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { DoubleSignError } from "@mainsail/exceptions";
-import { assert, ensureError, Lock } from "@mainsail/utils";
+import { ensureError, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 type OwnSlot = { address: string; blockNumber: number; round: number };
@@ -73,12 +73,11 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	#didMajorityPrevote = false;
 	#didMajorityPrecommit = false;
-	#didMajorityPrecommitAndProposalIsMissing = false;
+	#didMajorityPrecommitWithoutProposal = false;
 	#isDisposed = false;
 	#pendingJobs = new Set<Contracts.Consensus.RoundState>();
 
 	#ownSlots: OwnSlot[] = [];
-	#proposedBlock?: Contracts.Crypto.Block;
 	#proposalPromise?: Promise<Contracts.Crypto.Proposal | undefined>;
 	#roundStartTime = 0;
 
@@ -93,18 +92,8 @@ export class Consensus implements Contracts.Consensus.Service {
 		return this.#round;
 	}
 
-	// TODO: Only for tests
-	public setRound(round: number): void {
-		this.#round = round;
-	}
-
 	public getStep(): Contracts.Consensus.Step {
 		return this.#step;
-	}
-
-	// TODO: Only for tests
-	public setStep(step: Contracts.Consensus.Step): void {
-		this.#step = step;
 	}
 
 	public getLockedRound(): number | undefined {
@@ -115,15 +104,22 @@ export class Consensus implements Contracts.Consensus.Service {
 		return this.#validValue ? this.#validValue.round : undefined;
 	}
 
-	// Only for tests
+	// Test seams. None of these is part of Contracts.Consensus.Service, so nothing resolved from the container can
+	// reach them; they let tests place the state machine at a position without replaying the rounds leading there.
+	public setRound(round: number): void {
+		this.#round = round;
+	}
+
+	public setStep(step: Contracts.Consensus.Step): void {
+		this.#step = step;
+	}
+
 	public setValidValue(roundState: Contracts.Consensus.RoundState): void {
 		this.#validValue = roundState;
 	}
 
-	// Only for tests
-	public setProposal(proposalPromise: Promise<Contracts.Crypto.Proposal>, block: Contracts.Crypto.Block): void {
+	public setProposal(proposalPromise: Promise<Contracts.Crypto.Proposal>): void {
 		this.#proposalPromise = proposalPromise;
-		this.#proposedBlock = block;
 	}
 
 	public getState(): Contracts.Consensus.State {
@@ -197,6 +193,10 @@ export class Consensus implements Contracts.Consensus.Service {
 				await this.onMajorityPrecommit(roundState);
 			}
 
+			if (roundState.hasMajorityPrecommitsWithoutProposal()) {
+				this.onMajorityPrecommitWithoutProposal(roundState);
+			}
+
 			if (roundState.hasMinorityPrevotesOrPrecommits()) {
 				await this.onMinorityWithHigherRound(roundState);
 			}
@@ -220,7 +220,12 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#step = Enums.Consensus.Step.Propose;
 		this.#didMajorityPrevote = false;
 		this.#didMajorityPrecommit = false;
+		this.#didMajorityPrecommitWithoutProposal = false;
 		this.#roundStartTime = dayjs().valueOf();
+
+		// A proposal still being built belongs to the round that just ended. Dropping it here keeps
+		// onTimeoutBlockPrepare from submitting it under this round, or from mistaking it for this round's own.
+		this.#proposalPromise = undefined;
 
 		this.scheduler.clear();
 		this.statisticService.newRound(this.#blockNumber, round);
@@ -246,44 +251,56 @@ export class Consensus implements Contracts.Consensus.Service {
 	public async onTimeoutBlockPrepare(): Promise<void> {
 		this.scheduler.scheduleTimeoutPropose(this.#blockNumber, this.#round);
 
-		if (this.#proposalPromise) {
-			const proposal = await this.#proposalPromise;
-			this.#proposalPromise = undefined;
-
-			if (proposal === undefined) {
-				// Nothing to propose: either the double-sign guard refused this position, or building the
-				// proposal failed. #makeProposal reported which. The propose timeout scheduled above lets
-				// the round time out so consensus moves on.
-				return;
-			}
-
-			assert.defined(this.#proposedBlock);
-
-			const ownSlot = this.#ownSlots.find(
-				(slot) => slot.blockNumber === this.#blockNumber && slot.round === this.#round,
-			);
-
-			this.logger.notice(
-				`📦 Proposing block ${this.#getBlockString(this.#proposedBlock)} as ${
-					ownSlot?.address ?? this.#proposedBlock.proposer
-				}`,
-				"consensus",
-			);
-
-			this.#proposedBlock = undefined;
-			await this.proposalProcessor.process(proposal);
+		const proposalPromise = this.#proposalPromise;
+		if (!proposalPromise) {
+			return;
 		}
+
+		const proposal = await proposalPromise;
+
+		// Building the block can outlast the round. startRound then drops the pending proposal or replaces it
+		// with the next round's, so a promise that is no longer the pending one is stale and must not be
+		// submitted, nor clear the one that superseded it.
+		if (this.#proposalPromise !== proposalPromise) {
+			return;
+		}
+
+		this.#proposalPromise = undefined;
+
+		if (proposal === undefined) {
+			// Nothing to propose: either the double-sign guard refused this position, or building the
+			// proposal failed. #makeProposal reported which. The propose timeout scheduled above lets
+			// the round time out so consensus moves on.
+			return;
+		}
+
+		const ownSlot = this.#ownSlots.find(
+			(slot) => slot.blockNumber === proposal.blockHeader.number && slot.round === proposal.round,
+		);
+
+		this.logger.notice(
+			`📦 Proposing block ${this.#getBlockString(proposal.blockHeader)} as ${
+				ownSlot?.address ?? proposal.blockHeader.proposer
+			}`,
+			"consensus",
+		);
+
+		await this.proposalProcessor.process(proposal);
 	}
 
+	// The handlers below follow Algorithm 1 of "The latest gossip on BFT consensus" (Buchman, Kwon, Milosevic,
+	// 2018). Each guard quotes the "upon" clause of its rule, with the line number in the paper, stated positively:
+	// the handler runs when all of it holds.
 	protected async onProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		const proposal = roundState.getProposal();
 
-		if (
-			this.#step !== Enums.Consensus.Step.Propose ||
-			!this.#isCurrentRoundState(roundState) ||
-			!proposal ||
-			proposal.validRound !== undefined
-		) {
+		// Tendermint line 22: upon ⟨PROPOSAL, h, r, v, −1⟩ from proposer(h, r) while step = propose.
+		if (!(
+			this.#step === Enums.Consensus.Step.Propose &&
+			this.#isCurrentRoundState(roundState) &&
+			proposal !== undefined &&
+			proposal.validRound === undefined
+		)) {
 			return;
 		}
 
@@ -292,20 +309,39 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.logger.info(`Received proposal ${this.#getBlockString(proposal.blockHeader)}`, "consensus");
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
+		// A locked node prevotes nil for any fresh proposal. Prevoting for a fresh value while locked on another one
+		// could help form +2/3 prevotes for a second block at this height, and with it a fork. This is stricter
+		// than Tendermint line 23, which also accepts a fresh proposal of the locked value itself: an honest
+		// proposer re-proposes its valid value with validRound and a lock proof, which onProposalLocked handles,
+		// and a block forged in a later round carries that round in its hash, so it never equals the locked one.
+		// A proposer that wants our vote for our locked block has to bring the proof.
+		const lockedValue = this.#lockedValue;
+		if (lockedValue !== undefined) {
+			const lockedHash = lockedValue.getProposal()?.blockHeader.hash;
+			this.logger.info(
+				`Prevoting nil for ${this.#getBlockString(proposal.blockHeader)}, because locked on ${lockedValue.round}/${lockedHash}`,
+				"consensus",
+			);
+			await this.prevote();
+			return;
+		}
+
 		await this.prevote(roundState.getProcessorResult().success ? proposal.blockHeader.hash : undefined);
 	}
 
 	protected async onProposalLocked(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		const proposal = roundState.getProposal();
 
-		if (
-			this.#step !== Enums.Consensus.Step.Propose ||
-			!this.#isCurrentRoundState(roundState) ||
-			!proposal ||
-			!proposal.lockProof ||
-			proposal.validRound === undefined ||
-			proposal.validRound >= this.#round
-		) {
+		// Tendermint line 28: upon ⟨PROPOSAL, h, r, v, vr⟩ from proposer(h, r) and +2/3 ⟨PREVOTE, h, vr, id(v)⟩
+		// while step = propose ∧ 0 ≤ vr < r. The +2/3 prevotes are the lock proof, verified in #processProposal.
+		if (!(
+			this.#step === Enums.Consensus.Step.Propose &&
+			this.#isCurrentRoundState(roundState) &&
+			proposal !== undefined &&
+			proposal.lockProof !== undefined &&
+			proposal.validRound !== undefined &&
+			proposal.validRound < this.#round
+		)) {
 			return;
 		}
 
@@ -314,9 +350,16 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.logger.info(`Received locked proposal ${this.#getBlockString(proposal.blockHeader)}`, "consensus");
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
 
-		const lockedRound = this.getLockedRound();
+		// Tendermint line 29: valid(v) ∧ (lockedRound ≤ vr ∨ lockedValue = v). A re-proposal keeps the original
+		// block, so it can be the very block this node is locked on, brought with a proof from a round older than
+		// the lock. Prevoting for the locked value itself is always safe.
+		const lockedValue = this.#lockedValue;
+		const isAllowedByLock =
+			lockedValue === undefined ||
+			lockedValue.round <= proposal.validRound ||
+			lockedValue.getProposal()?.blockHeader.hash === proposal.blockHeader.hash;
 
-		if ((!lockedRound || lockedRound <= proposal.validRound) && roundState.getProcessorResult().success) {
+		if (isAllowedByLock && roundState.getProcessorResult().success) {
 			await this.prevote(proposal.blockHeader.hash);
 		} else {
 			await this.prevote();
@@ -326,13 +369,15 @@ export class Consensus implements Contracts.Consensus.Service {
 	protected async onMajorityPrevote(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		const proposal = roundState.getProposal();
 
-		if (
-			this.#didMajorityPrevote ||
-			this.#step === Enums.Consensus.Step.Propose ||
-			!this.#isCurrentRoundState(roundState) ||
-			!proposal ||
-			!roundState.getProcessorResult().success
-		) {
+		// Tendermint line 36: upon ⟨PROPOSAL, h, r, v, ∗⟩ from proposer(h, r) and +2/3 ⟨PREVOTE, h, r, id(v)⟩
+		// while valid(v) ∧ step ≥ prevote, for the first time.
+		if (!(
+			!this.#didMajorityPrevote &&
+			this.#step >= Enums.Consensus.Step.Prevote &&
+			this.#isCurrentRoundState(roundState) &&
+			proposal !== undefined &&
+			roundState.getProcessorResult().success
+		)) {
 			return;
 		}
 
@@ -355,7 +400,9 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	protected async onMajorityPrevoteAny(roundState: Contracts.Consensus.RoundState): Promise<void> {
-		if (this.#step !== Enums.Consensus.Step.Prevote || !this.#isCurrentRoundState(roundState)) {
+		// Tendermint line 34: upon +2/3 ⟨PREVOTE, h, r, ∗⟩ while step = prevote, for the first time. The scheduler
+		// reports whether the timeout was newly scheduled, which stands for "for the first time".
+		if (!(this.#step === Enums.Consensus.Step.Prevote && this.#isCurrentRoundState(roundState))) {
 			return;
 		}
 
@@ -365,7 +412,8 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	protected async onMajorityPrevoteNull(roundState: Contracts.Consensus.RoundState): Promise<void> {
-		if (this.#step !== Enums.Consensus.Step.Prevote || !this.#isCurrentRoundState(roundState)) {
+		// Tendermint line 44: upon +2/3 ⟨PREVOTE, h, r, nil⟩ while step = prevote.
+		if (!(this.#step === Enums.Consensus.Step.Prevote && this.#isCurrentRoundState(roundState))) {
 			return;
 		}
 
@@ -378,6 +426,8 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	protected async onMajorityPrecommitAny(roundState: Contracts.Consensus.RoundState): Promise<void> {
+		// Tendermint line 47: upon +2/3 ⟨PRECOMMIT, h, r, ∗⟩ for the first time. The scheduler reports whether the
+		// timeout was newly scheduled, which stands for "for the first time".
 		if (!this.#isCurrentRoundState(roundState)) {
 			return;
 		}
@@ -391,24 +441,17 @@ export class Consensus implements Contracts.Consensus.Service {
 		processState: Contracts.Processor.ProcessableUnit,
 		isRoundState: boolean = true,
 	): Promise<void> {
-		// TODO: Only block number must match. Round can be any. Add tests
-		if ((isRoundState && this.#didMajorityPrecommit) || processState.blockNumber !== this.#blockNumber) {
+		// Tendermint line 49: upon ⟨PROPOSAL, h, r, v, ∗⟩ from proposer(h, r) and +2/3 ⟨PRECOMMIT, h, r, id(v)⟩
+		// while decision[h] = nil. Any round r of the height qualifies, not only the current one; run() replays
+		// the earlier rounds for this. The flag holds until startRound and keeps a round state whose block failed
+		// from being reported again on every further message of the round. A commit state carries no such flag.
+		if (!(processState.blockNumber === this.#blockNumber && (!isRoundState || !this.#didMajorityPrecommit))) {
 			return;
 		}
 
-		if (processState.hasProcessorResult() === false) {
-			if (this.#didMajorityPrecommitAndProposalIsMissing) {
-				return;
-			}
-
-			this.logger.info(
-				`Received +2/3 precommits for ${this.#getBlockNumberRoundString()}, but proposal is missing`,
-				"consensus",
-			);
-			this.#didMajorityPrecommitAndProposalIsMissing = true;
-			return;
-		}
-
+		// The unit always carries a processor result here. handle() gets this far only with a proposal, which
+		// #processProposal has run by then, and handleCommitState() runs #processBlock first. A unit without a
+		// result is a caller bug, and getProcessorResult() throws on it.
 		if (isRoundState) {
 			// Sets it only once for round state
 			this.#didMajorityPrecommit = true;
@@ -445,8 +488,26 @@ export class Consensus implements Contracts.Consensus.Service {
 		});
 	}
 
+	protected onMajorityPrecommitWithoutProposal(roundState: Contracts.Consensus.RoundState): void {
+		// Outside Algorithm 1. Runs once per round, while the round is the current one.
+		if (!(!this.#didMajorityPrecommitWithoutProposal && this.#isCurrentRoundState(roundState))) {
+			return;
+		}
+
+		// The network decided this round on a block whose proposal never reached this node. There is nothing to
+		// act on: the proposal downloader fetches it while the round lasts, and once peers move on the commit
+		// arrives through block download. Reported once per round, so the gap shows up in the log.
+		this.#didMajorityPrecommitWithoutProposal = true;
+
+		this.logger.info(
+			`Received +2/3 precommits for ${this.#getBlockNumberRoundString()}, but proposal is missing`,
+			"consensus",
+		);
+	}
+
 	protected async onMinorityWithHigherRound(roundState: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (roundState.blockNumber !== this.#blockNumber || roundState.round <= this.#round) {
+		// Tendermint line 55: upon f+1 ⟨∗, h, round, ∗, ∗⟩ with round > r.
+		if (!(roundState.blockNumber === this.#blockNumber && roundState.round > this.#round)) {
 			return;
 		}
 
@@ -455,11 +516,12 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async onTimeoutPropose(blockNumber: number, round: number): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
-			if (
-				this.#step !== Enums.Consensus.Step.Propose ||
-				this.#blockNumber !== blockNumber ||
-				this.#round !== round
-			) {
+			// Tendermint line 57: OnTimeoutPropose(h, r) acts if h = h_p ∧ r = round_p ∧ step = propose.
+			if (!(
+				this.#step === Enums.Consensus.Step.Propose &&
+				this.#blockNumber === blockNumber &&
+				this.#round === round
+			)) {
 				return;
 			}
 
@@ -472,11 +534,12 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async onTimeoutPrevote(blockNumber: number, round: number): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
-			if (
-				this.#step !== Enums.Consensus.Step.Prevote ||
-				this.#blockNumber !== blockNumber ||
-				this.#round !== round
-			) {
+			// Tendermint line 61: OnTimeoutPrevote(h, r) acts if h = h_p ∧ r = round_p ∧ step = prevote.
+			if (!(
+				this.#step === Enums.Consensus.Step.Prevote &&
+				this.#blockNumber === blockNumber &&
+				this.#round === round
+			)) {
 				return;
 			}
 
@@ -490,7 +553,8 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async onTimeoutPrecommit(blockNumber: number, round: number): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
-			if (this.#blockNumber !== blockNumber || this.#round !== round) {
+			// Tendermint line 65: OnTimeoutPrecommit(h, r) acts if h = h_p ∧ r = round_p.
+			if (!(this.#blockNumber === blockNumber && this.#round === round)) {
 				return;
 			}
 
@@ -528,6 +592,10 @@ export class Consensus implements Contracts.Consensus.Service {
 		roundState: Contracts.Consensus.RoundState,
 		registeredProposer: Contracts.Validator.Validator,
 	): Promise<Contracts.Crypto.Proposal | undefined> {
+		// Read before the first await: the round can move on while the proposal is built, and the report
+		// must name the position that was skipped, not whichever round is live by then.
+		const position = this.#getBlockNumberRoundString();
+
 		try {
 			return await this.#createProposal(roundState, registeredProposer);
 		} catch (rawError) {
@@ -535,13 +603,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 			if (error instanceof DoubleSignError) {
 				// Signing is allowed again once a later round passes the recorded watermark.
-				this.logger.warn(
-					`Skipped proposal for ${this.#getBlockNumberRoundString()}: ${error.message}`,
-					"consensus",
-				);
+				this.logger.warn(`Skipped proposal for ${position}: ${error.message}`, "consensus");
 			} else {
 				this.logger.error(
-					`Failed to create proposal for ${this.#getBlockNumberRoundString()}: ${error.stack ?? error.message}`,
+					`Failed to create proposal for ${position}: ${error.stack ?? error.message}`,
 					"consensus",
 				);
 			}
@@ -554,40 +619,36 @@ export class Consensus implements Contracts.Consensus.Service {
 		roundState: Contracts.Consensus.RoundState,
 		registeredProposer: Contracts.Validator.Validator,
 	): Promise<Contracts.Crypto.Proposal> {
-		if (this.#validValue) {
-			this.#proposedBlock = this.#validValue.getBlock();
-			const lockProof = await this.#validValue.aggregatePrevotes();
+		// The position is fixed here, before the first await. Building the block can outlast the round, and
+		// the proposal has to be signed for the round it was requested in, not for the one live at signing
+		// time; the double-sign guard then settles which of two overlapping proposals gets out.
+		const blockNumber = this.#blockNumber;
+		const round = this.#round;
+		const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.address);
 
-			this.logger.info(
-				`Created proposal with existing block ${this.#getBlockString(this.#proposedBlock)}`,
-				"consensus",
-			);
+		const validValue = this.#validValue;
+		if (validValue) {
+			const block = validValue.getBlock();
+			const lockProof = await validValue.aggregatePrevotes();
 
-			return await registeredProposer.propose(
-				this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.address),
-				this.#round,
-				this.#validValue.round,
-				this.#proposedBlock,
-				lockProof,
-			);
+			this.logger.info(`Created proposal with existing block ${this.#getBlockString(block)}`, "consensus");
+
+			return await registeredProposer.propose(validatorIndex, round, validValue.round, block, lockProof);
 		}
 
-		this.#proposedBlock = this.#proposedBlock = await this.blockForger.forgeBlock(
+		const block = await this.blockForger.forgeBlock(
 			roundState.proposer.address,
-			this.#round,
+			round,
 			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
-			await registeredProposer.getRandaoReveal(this.#blockNumber),
+			await registeredProposer.getRandaoReveal(blockNumber),
 		);
-		this.logger.info(`Created proposal with new block ${this.#getBlockString(this.#proposedBlock)}`, "consensus");
+		this.logger.info(`Created proposal with new block ${this.#getBlockString(block)}`, "consensus");
 
-		void this.eventDispatcher.dispatch(Events.BlockEvent.Forged, this.#proposedBlock);
-
-		return registeredProposer.propose(
-			this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.address),
-			this.#round,
-			undefined,
-			this.#proposedBlock,
+		this.#runInBackground("Dispatching block forged event", () =>
+			this.eventDispatcher.dispatch(Events.BlockEvent.Forged, block),
 		);
+
+		return registeredProposer.propose(validatorIndex, round, undefined, block);
 	}
 
 	public async prevote(value?: string): Promise<void> {
@@ -618,7 +679,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				throw error;
 			}
 
-			void this.messageProcessor.process(prevote);
+			this.#runInBackground("Processing own prevote", () => this.messageProcessor.process(prevote));
 		}
 	}
 
@@ -650,7 +711,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				throw error;
 			}
 
-			void this.messageProcessor.process(precommit);
+			this.#runInBackground("Processing own precommit", () => this.messageProcessor.process(precommit));
 		}
 	}
 
@@ -726,6 +787,20 @@ export class Consensus implements Contracts.Consensus.Service {
 				commitState.setProcessorResult(FAILED_PROCESSOR_RESULT);
 			}
 		}
+	}
+
+	// Work nobody waits for: own votes go through the message processor like any peer's, and events fan out
+	// to their listeners. A rejection there is reported instead of escaping as an unhandled rejection,
+	// which would take the process down.
+	#runInBackground(task: string, callback: () => Promise<unknown>): void {
+		void (async () => {
+			try {
+				await callback();
+			} catch (rawError) {
+				const error = ensureError(rawError);
+				this.logger.error(`${task} failed: ${error.stack ?? error.message}`, "consensus");
+			}
+		})();
 	}
 
 	#getBlockNumberRoundString(): string {

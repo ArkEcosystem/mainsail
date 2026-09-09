@@ -21,6 +21,7 @@ export interface RoundState extends ProcessableUnit {
 	hasMajorityPrevotesNull(): boolean;
 	hasMajorityPrecommits(): boolean;
 	hasMajorityPrecommitsAny(): boolean;
+	hasMajorityPrecommitsWithoutProposal(): boolean;
 	hasMinorityPrevotesOrPrecommits(): boolean;
 	getPrevote(validatorIndex: number): Message | undefined;
 	getPrecommit(validatorIndex: number): Message | undefined;

@@ -262,6 +262,22 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#isMajority(this.#precommits.size);
 	}
 
+	// More than 2/3 precommits for one block while the proposal for it never arrived. Null precommits do not
+	// count: they mark a round that failed, not a block this node is missing.
+	public hasMajorityPrecommitsWithoutProposal(): boolean {
+		if (this.#proposal) {
+			return false;
+		}
+
+		for (const [blockHash, count] of this.#precommitsCount) {
+			if (blockHash !== undefined && this.#isMajority(count)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public hasMinorityPrevotesOrPrecommits(): boolean {
 		return this.#hasMinorityPrevotes() || this.#hasMinorityPrecommits();
 	}

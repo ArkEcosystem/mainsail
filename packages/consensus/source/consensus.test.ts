@@ -383,7 +383,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyProposalProcess = spy(proposalProcessor, "process");
 		const spyLoggerNotice = spy(logger, "notice");
 
-		consensus.setProposal(proposal, proposal.getData().block);
+		consensus.setProposal(proposal);
 		await consensus.onTimeoutBlockPrepare();
 
 		spyProposalProcess.calledOnce();
@@ -403,7 +403,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	}) => {
 		const spyProposalProcess = spy(proposalProcessor, "process");
 
-		consensus.setProposal(proposal, proposal.getData().block);
+		consensus.setProposal(proposal);
 		await consensus.onTimeoutBlockPrepare();
 		await consensus.onTimeoutBlockPrepare();
 
@@ -490,6 +490,158 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
 	});
 
+	// Building a block takes time, and the round can move on before it is done (a timeout, or f+1 messages
+	// for a higher round). The proposal that comes out of it belongs to the round that ended.
+	it("#startRound - should drop a proposal that is still being built when the round moves on", async ({
+		consensus,
+		validatorsRepository,
+		roundStateRepository,
+		validatorSet,
+		proposalProcessor,
+		proposer,
+		logger,
+		forger,
+		block,
+		proposal,
+	}) => {
+		let finishForging: (block: unknown) => void = () => {};
+		const validator = { getRandaoReveal: async () => "aa".repeat(96), propose: async () => proposal };
+
+		stub(forger, "forgeBlock").returnValue(new Promise((resolve) => (finishForging = resolve)));
+		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
+		// Ours in round 0 only.
+		stub(validatorsRepository, "getValidator").callsFake(() =>
+			consensus.getRound() === 0 ? validator : undefined,
+		);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		const spyProposalProcess = spy(proposalProcessor, "process");
+		const spyLoggerNotice = spy(logger, "notice");
+
+		await consensus.startRound(0);
+		await consensus.startRound(1);
+
+		finishForging(block);
+		await new Promise((resolve) => setImmediate(resolve));
+		await consensus.onTimeoutBlockPrepare();
+
+		spyProposalProcess.neverCalled();
+		spyLoggerNotice.neverCalled();
+	});
+
+	it("#onTimeoutBlockPrepare - should ignore a stale proposal without dropping the one of the new round", async ({
+		consensus,
+		validatorsRepository,
+		roundStateRepository,
+		validatorSet,
+		proposalProcessor,
+		proposer,
+		forger,
+		block,
+		proposal,
+	}) => {
+		// This node holds both rounds. Round 0 is slow to forge; round 1 starts before it is done and forges
+		// at once. The round 0 handler is still waiting when round 1 replaces its promise.
+		let finishForgingRound0: (block: unknown) => void = () => {};
+		const validator = {
+			getRandaoReveal: async () => "aa".repeat(96),
+			propose: async (_: number, round: number) => ({ ...proposal, round }),
+		};
+
+		stub(forger, "forgeBlock").callsFake((_: string, round: number) =>
+			round === 0
+				? new Promise((resolve) => (finishForgingRound0 = resolve))
+				: Promise.resolve({ ...block, round }),
+		);
+		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		const spyProposalProcess = spy(proposalProcessor, "process");
+
+		await consensus.startRound(0);
+		const staleTimeout = consensus.onTimeoutBlockPrepare();
+
+		await consensus.startRound(1);
+		finishForgingRound0(block);
+		await staleTimeout;
+
+		spyProposalProcess.neverCalled();
+
+		await consensus.onTimeoutBlockPrepare();
+
+		spyProposalProcess.calledOnce();
+		assert.equal((spyProposalProcess.getCallArgs(0)[0] as { round: number }).round, 1);
+	});
+
+	it("#prepareProposal - should sign for the round the proposal was requested in when the round moves on while forging", async ({
+		consensus,
+		validatorsRepository,
+		roundStateRepository,
+		validatorSet,
+		proposer,
+		forger,
+		block,
+		proposal,
+	}) => {
+		let finishForging: (block: unknown) => void = () => {};
+		const validator = { getRandaoReveal: async () => "aa".repeat(96), propose: () => {} };
+
+		const spyForgerForgeBlock = stub(forger, "forgeBlock").returnValue(
+			new Promise((resolve) => (finishForging = resolve)),
+		);
+		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
+
+		await consensus.startRound(0);
+		consensus.setRound(1); // The round moves on while the block is still being forged.
+
+		finishForging(block);
+		await consensus.onTimeoutBlockPrepare();
+
+		spyForgerForgeBlock.calledOnce();
+		spyForgerForgeBlock.calledWith(proposer.address, 0);
+		spyValidatorPropose.calledOnce();
+		spyValidatorPropose.calledWith(1, 0, undefined, block);
+	});
+
+	it("#prepareProposal - should re-propose the valid value for the round it was requested in when the round moves on", async ({
+		consensus,
+		validatorsRepository,
+		roundStateRepository,
+		validatorSet,
+		proposer,
+		roundState,
+		forger,
+		block,
+		proposal,
+	}) => {
+		let finishAggregating: (lockProof: unknown) => void = () => {};
+		const lockProof = { signature: "signature", validators: [] };
+		const validator = { getRandaoReveal: async () => "aa".repeat(96), propose: () => {} };
+
+		const spyForgerForgeBlock = spy(forger, "forgeBlock");
+		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		stub(roundState, "aggregatePrevotes").returnValue(new Promise((resolve) => (finishAggregating = resolve)));
+		stub(roundState, "getBlock").returnValue(block);
+		const spyValidatorPropose = stub(validator, "propose").resolvedValue(proposal);
+
+		consensus.setValidValue(roundState);
+		await consensus.startRound(1);
+		consensus.setRound(2); // The round moves on while the lock proof is still being aggregated.
+
+		finishAggregating(lockProof);
+		await consensus.onTimeoutBlockPrepare();
+
+		spyForgerForgeBlock.neverCalled();
+		spyValidatorPropose.calledOnce();
+		spyValidatorPropose.calledWith(1, 1, 0, block, lockProof); // validator index, round, validRound, block, lockProof
+	});
+
 	it("#prevote - should skip the vote and continue when the double-sign guard refuses", async ({
 		consensus,
 		validatorSet,
@@ -546,6 +698,116 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyMessageProcess.neverCalled();
 		spyLoggerWarn.calledOnce();
+	});
+
+	// Own votes and events are fire-and-forget. A rejection there must be reported, not left unhandled: Node
+	// takes the process down on an unhandled rejection, and a node that dies is worse than one that skips a vote.
+	const collectUnhandledRejections = async (run: () => Promise<void>): Promise<unknown[]> => {
+		const unhandled: unknown[] = [];
+		const onUnhandledRejection = (reason: unknown) => unhandled.push(reason);
+		process.on("unhandledRejection", onUnhandledRejection);
+
+		try {
+			await run();
+			await new Promise((resolve) => setImmediate(resolve));
+			await new Promise((resolve) => setImmediate(resolve));
+		} finally {
+			process.off("unhandledRejection", onUnhandledRejection);
+		}
+
+		return unhandled;
+	};
+
+	it("#prevote - should report a failure to process the own vote instead of leaving an unhandled rejection", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		messageProcessor,
+		logger,
+		proposer,
+	}) => {
+		const prevote = { blockNumber: 1, round: 0, type: Enums.Crypto.MessageType.Prevote, validatorIndex: 1 };
+		const validator = { prevote: async () => prevote };
+
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		const spyMessageProcess = stub(messageProcessor, "process").rejectedValue(new Error("worker is gone"));
+		const spyLoggerError = spy(logger, "error");
+
+		const unhandled = await collectUnhandledRejections(() => consensus.prevote("blockHash"));
+
+		assert.equal(unhandled, []);
+		spyMessageProcess.calledOnce();
+		spyMessageProcess.calledWith(prevote);
+		spyLoggerError.calledOnce();
+		assert.startsWith(spyLoggerError.getCallArgs(0)[0] as string, "Processing own prevote failed: ");
+	});
+
+	it("#precommit - should report a failure to process the own vote instead of leaving an unhandled rejection", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		messageProcessor,
+		logger,
+		proposer,
+	}) => {
+		const precommit = { blockNumber: 1, round: 0, type: Enums.Crypto.MessageType.Precommit, validatorIndex: 1 };
+		const validator = { precommit: async () => precommit };
+
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		const spyMessageProcess = stub(messageProcessor, "process").rejectedValue(new Error("worker is gone"));
+		const spyLoggerError = spy(logger, "error");
+
+		const unhandled = await collectUnhandledRejections(() => consensus.precommit("blockHash"));
+
+		assert.equal(unhandled, []);
+		spyMessageProcess.calledOnce();
+		spyMessageProcess.calledWith(precommit);
+		spyLoggerError.calledOnce();
+		assert.startsWith(spyLoggerError.getCallArgs(0)[0] as string, "Processing own precommit failed: ");
+	});
+
+	it("#prepareProposal - should still propose and report a failing block-forged listener instead of leaving an unhandled rejection", async ({
+		consensus,
+		validatorsRepository,
+		roundStateRepository,
+		validatorSet,
+		proposalProcessor,
+		eventDispatcher,
+		proposer,
+		logger,
+		forger,
+		block,
+		proposal,
+	}) => {
+		const validator = { getRandaoReveal: async () => "aa".repeat(96), propose: async () => proposal };
+
+		stub(forger, "forgeBlock").resolvedValue(block);
+		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		stub(eventDispatcher, "dispatch").callsFake(async (event: unknown) => {
+			if (event === Events.BlockEvent.Forged) {
+				throw new Error("listener is broken");
+			}
+		});
+
+		const spyProposalProcess = spy(proposalProcessor, "process");
+		const spyLoggerError = spy(logger, "error");
+
+		const unhandled = await collectUnhandledRejections(async () => {
+			await consensus.startRound(0);
+			await consensus.onTimeoutBlockPrepare();
+		});
+
+		assert.equal(unhandled, []);
+		spyProposalProcess.calledOnce();
+		spyProposalProcess.calledWith(proposal);
+		spyLoggerError.calledOnce();
+		assert.startsWith(spyLoggerError.getCallArgs(0)[0] as string, "Dispatching block forged event failed: ");
 	});
 
 	it("#startRound - local validator should locked value", async () => {});
@@ -778,10 +1040,108 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
 	});
 
-	// TODO: Handle on processor
-	it("#onProposal - broadcast prevote null, if block processor throws", async ({ consensus }) => {});
+	it("#onProposal - broadcast prevote null, if locked on another value", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		block,
+		logger,
+		proposal,
+		proposer,
+	}) => {
+		const validator = {
+			precommit: () => {},
+			prevote: () => {},
+		};
+		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue({ blockNumber: 1, round: 0 });
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue({ blockNumber: 1, round: 1 });
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		const spyLoggerInfo = spy(logger, "info");
 
-	it("#onProposal - broadcast prevote null, if locked value exists", async ({ consensus }) => {});
+		// Round 0: +2/3 prevotes for block A lock this node on it.
+		roundState.getProcessorResult = () => ({ success: true }) as any;
+		consensus.setStep(Enums.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevote(roundState);
+
+		assert.equal(consensus.getLockedRound(), 0);
+		spyValidatorPrecommit.calledOnce();
+		spyValidatorPrecommit.calledWith(1, 1, 0, block.hash);
+
+		// Round 1: a proposer that missed those prevotes proposes a fresh block B, without a valid round.
+		const otherBlock = { ...block, hash: "otherBlockHash", round: 1 };
+		const otherProposal = {
+			...proposal,
+			blockHeader: otherBlock,
+			getData: () => ({ block: otherBlock }),
+			round: 1,
+			validRound: undefined,
+		};
+		const nextRoundState = {
+			...roundState,
+			getProcessorResult: () => ({ success: true }),
+			getProposal: () => otherProposal,
+			round: 1,
+		} as unknown as Contracts.Consensus.RoundState;
+		consensus.setRound(1);
+		consensus.setStep(Enums.Consensus.Step.Propose);
+
+		await consensus.onProposal(nextRoundState);
+
+		// The lock wins over the fresh proposal: a nil prevote, and the lock stays on A.
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 1, undefined); // validatorIndex, blockNumber, round, no block hash
+		spyLoggerInfo.calledWith(`Prevoting nil for 1/1/otherBlockHash, because locked on 0/${block.hash}`);
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
+		assert.equal(consensus.getLockedRound(), 0);
+	});
+
+	it("#onProposal - broadcast prevote null, if locked, even when the fresh proposal carries the locked block", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		block,
+		proposal,
+		proposer,
+	}) => {
+		const validator = {
+			precommit: () => {},
+			prevote: () => {},
+		};
+		stub(validator, "precommit").resolvedValue({ blockNumber: 1, round: 0 });
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue({ blockNumber: 1, round: 1 });
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		// Round 0: +2/3 prevotes for block A lock this node on it.
+		roundState.getProcessorResult = () => ({ success: true }) as any;
+		consensus.setStep(Enums.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevote(roundState);
+
+		assert.equal(consensus.getLockedRound(), 0);
+
+		// Round 1: a fresh proposal carrying the very block this node is locked on, but without validRound and lock
+		// proof. Stricter than Tendermint line 23: the proof has to come along, so this still gets nil.
+		const sameProposal = { ...proposal, round: 1, validRound: undefined };
+		const nextRoundState = {
+			...roundState,
+			getProcessorResult: () => ({ success: true }),
+			getProposal: () => sameProposal,
+			round: 1,
+		} as unknown as Contracts.Consensus.RoundState;
+		consensus.setRound(1);
+		consensus.setStep(Enums.Consensus.Step.Propose);
+
+		await consensus.onProposal(nextRoundState);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 1, undefined);
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
+	});
 
 	it("#onProposalLocked - broadcast prevote block hash, if block is valid and lockedRound is undefined", async ({
 		consensus,
@@ -845,7 +1205,58 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
 	});
 
-	it("#onProposalLocked - broadcast prevote block hash, if block is valid and valid round is higher or equal than lockedRound ", async () => {});
+	it("#onProposalLocked - broadcast prevote block hash, if block is valid and valid round is higher or equal than lockedRound", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		block,
+		proposal,
+		proposer,
+	}) => {
+		const validator = {
+			precommit: () => {},
+			prevote: () => {},
+		};
+		stub(validator, "precommit").resolvedValue({ blockNumber: 1, round: 0 });
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue({ blockNumber: 1, round: 2 });
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		// Round 0: +2/3 prevotes for block A lock this node on it.
+		roundState.getProcessorResult = () => ({ success: true }) as any;
+		consensus.setStep(Enums.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevote(roundState);
+
+		assert.equal(consensus.getLockedRound(), 0);
+
+		// Round 2: block B is re-proposed with +2/3 prevotes from round 1, later than our lock. Tendermint line 29,
+		// lockedRound <= vr: the newer proof unlocks this node.
+		const otherBlock = { ...block, hash: "otherBlockHash", round: 1 };
+		const reProposal = {
+			...proposal,
+			blockHeader: otherBlock,
+			getData: () => ({ block: otherBlock }),
+			lockProof: { signature: "1234", validators: [] },
+			round: 2,
+			validRound: 1,
+		};
+		const nextRoundState = {
+			...roundState,
+			getProcessorResult: () => ({ success: true }),
+			getProposal: () => reProposal,
+			round: 2,
+		} as unknown as Contracts.Consensus.RoundState;
+		consensus.setRound(2);
+		consensus.setStep(Enums.Consensus.Step.Propose);
+
+		await consensus.onProposalLocked(nextRoundState);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 2, otherBlock.hash);
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
+	});
 
 	it("#onProposalLocked - broadcast prevote null, if block is valid and lockedRound is undefined", async ({
 		consensus,
@@ -909,7 +1320,119 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
 	});
 
-	it("#onProposalLocked - broadcast prevote null, if block is valid and lockedRound is higher than validRound", async () => {});
+	it("#onProposalLocked - broadcast prevote null, if block is valid and lockedRound is higher than validRound", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		block,
+		proposal,
+		proposer,
+	}) => {
+		const validator = {
+			precommit: () => {},
+			prevote: () => {},
+		};
+		stub(validator, "precommit").resolvedValue({ blockNumber: 1, round: 1 });
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue({ blockNumber: 1, round: 2 });
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		// Round 1: +2/3 prevotes for block A lock this node on it.
+		const lockRoundState = {
+			...roundState,
+			getProcessorResult: () => ({ success: true }),
+			round: 1,
+		} as unknown as Contracts.Consensus.RoundState;
+		consensus.setRound(1);
+		consensus.setStep(Enums.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevote(lockRoundState);
+
+		assert.equal(consensus.getLockedRound(), 1);
+
+		// Round 2: another block B comes with a proof from round 0, older than our lock on A. Neither part of
+		// Tendermint line 29 holds, so the lock keeps this node from prevoting B.
+		const otherBlock = { ...block, hash: "otherBlockHash", round: 0 };
+		const reProposal = {
+			...proposal,
+			blockHeader: otherBlock,
+			getData: () => ({ block: otherBlock }),
+			lockProof: { signature: "1234", validators: [] },
+			round: 2,
+			validRound: 0,
+		};
+		const nextRoundState = {
+			...roundState,
+			getProcessorResult: () => ({ success: true }),
+			getProposal: () => reProposal,
+			round: 2,
+		} as unknown as Contracts.Consensus.RoundState;
+		consensus.setRound(2);
+		consensus.setStep(Enums.Consensus.Step.Propose);
+
+		await consensus.onProposalLocked(nextRoundState);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 2, undefined); // validatorIndex, blockNumber, round, no block hash
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
+		assert.equal(consensus.getLockedRound(), 1);
+	});
+
+	it("#onProposalLocked - broadcast prevote block hash, if locked on the re-proposed block, even with an older valid round", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		block,
+		proposal,
+		proposer,
+	}) => {
+		const validator = {
+			precommit: () => {},
+			prevote: () => {},
+		};
+		stub(validator, "precommit").resolvedValue({ blockNumber: 1, round: 1 });
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue({ blockNumber: 1, round: 2 });
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		// Round 1: +2/3 prevotes for block A lock this node on it.
+		const lockRoundState = {
+			...roundState,
+			getProcessorResult: () => ({ success: true }),
+			round: 1,
+		} as unknown as Contracts.Consensus.RoundState;
+		consensus.setRound(1);
+		consensus.setStep(Enums.Consensus.Step.Prevote);
+		await consensus.onMajorityPrevote(lockRoundState);
+
+		assert.equal(consensus.getLockedRound(), 1);
+
+		// Round 2: a proposer that missed the round 1 prevotes re-proposes A itself with its proof from round 0.
+		// lockedRound > vr, but lockedValue = v: Tendermint line 29 lets this node prevote its own locked block.
+		const reProposal = {
+			...proposal,
+			lockProof: { signature: "1234", validators: [] },
+			round: 2,
+			validRound: 0,
+		};
+		const nextRoundState = {
+			...roundState,
+			getProcessorResult: () => ({ success: true }),
+			getProposal: () => reProposal,
+			round: 2,
+		} as unknown as Contracts.Consensus.RoundState;
+		consensus.setRound(2);
+		consensus.setStep(Enums.Consensus.Step.Propose);
+
+		await consensus.onProposalLocked(nextRoundState);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 2, block.hash);
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
+	});
 
 	it("#onProposalLocked - should return if step === prevote", async ({ consensus, roundState, proposal }) => {
 		proposal.validRound = 0;
@@ -1594,45 +2117,228 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getBlockNumber(), 1);
 	});
 
-	it("#onMajorityPrecommit - should log and do nothing if proposal is missing", async ({
+	it("#onMajorityPrecommitWithoutProposal - should report the missing proposal once per round", async ({
+		consensus,
+		roundState,
+		logger,
+	}) => {
+		const spyLoggerInfo = spy(logger, "info");
+
+		consensus.onMajorityPrecommitWithoutProposal(roundState);
+		consensus.onMajorityPrecommitWithoutProposal(roundState);
+
+		spyLoggerInfo.calledOnce();
+		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0}, but proposal is missing`);
+	});
+
+	it("#onMajorityPrecommitWithoutProposal - should ignore another round or block number", async ({
+		consensus,
+		logger,
+	}) => {
+		const spyLoggerInfo = spy(logger, "info");
+
+		consensus.onMajorityPrecommitWithoutProposal({ blockNumber: 1, round: 1 } as Contracts.Consensus.RoundState);
+		consensus.onMajorityPrecommitWithoutProposal({ blockNumber: 2, round: 0 } as Contracts.Consensus.RoundState);
+
+		spyLoggerInfo.neverCalled();
+	});
+
+	it("#onMajorityPrecommitWithoutProposal - should report again in the next round", async ({
+		consensus,
+		roundState,
+		logger,
+	}) => {
+		const spyLoggerInfo = spy(logger, "info");
+
+		consensus.onMajorityPrecommitWithoutProposal(roundState);
+		await consensus.startRound(1);
+		consensus.onMajorityPrecommitWithoutProposal({ blockNumber: 1, round: 1 } as Contracts.Consensus.RoundState);
+
+		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0}, but proposal is missing`);
+		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${1}, but proposal is missing`);
+	});
+
+	it("#handle - should report +2/3 precommits for a block whose proposal is missing", async ({
 		consensus,
 		blockProcessor,
 		roundState,
 		logger,
-		roundStateRepository,
-		proposal,
 	}) => {
-		const fakeTimers = clock();
+		roundState.getProposal = () => undefined;
+		roundState.hasMajorityPrevotes = () => false;
+		roundState.hasMajorityPrevotesAny = () => false;
+		roundState.hasMajorityPrevotesNull = () => false;
+		roundState.hasMajorityPrecommitsAny = () => false;
+		roundState.hasMajorityPrecommits = () => false;
+		roundState.hasMajorityPrecommitsWithoutProposal = () => true;
+		roundState.hasMinorityPrevotesOrPrecommits = () => false;
 
-		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.getData().block);
+		const spyBlockProcessorProcess = spy(blockProcessor, "process");
 		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
-		const spyRoundStateRepositoryClear = stub(roundStateRepository, "clear");
-		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
 		const spyLoggerInfo = spy(logger, "info");
 
-		roundState.hasProcessorResult = () => false;
+		await consensus.handle(roundState);
 
-		assert.equal(consensus.getBlockNumber(), 1);
-		void consensus.onMajorityPrecommit(roundState);
-		await fakeTimers.nextAsync();
-
-		spyRoundStateGetBlock.neverCalled();
+		spyBlockProcessorProcess.neverCalled();
 		spyBlockProcessorCommit.neverCalled();
-		spyConsensusStartRound.neverCalled();
-		spyRoundStateRepositoryClear.neverCalled();
 		spyLoggerInfo.calledOnce();
 		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0}, but proposal is missing`);
 		assert.equal(consensus.getBlockNumber(), 1);
+	});
 
-		// Should not try again
-		void consensus.onMajorityPrecommit(roundState);
-		await fakeTimers.nextAsync();
+	it("#handle - should process the proposal before acting on +2/3 precommits", async ({
+		consensus,
+		blockProcessor,
+		proposalProcessor,
+		roundState,
+		validatorSet,
+		proposal,
+		block,
+	}) => {
+		// onMajorityPrecommit relies on the unit carrying a processor result. hasMajorityPrecommits() is false
+		// without a proposal, and handle() runs a present proposal through the processor before anything else,
+		// so the result is there by the time the precommits are acted on.
+		let processorResult: Contracts.Processor.BlockProcessorResult | undefined;
+		roundState.getBlock = () => block;
+		roundState.hasProcessorResult = () => processorResult !== undefined;
+		roundState.setProcessorResult = (result) => (processorResult = result);
+		roundState.getProcessorResult = () => processorResult!;
+		roundState.hasMajorityPrevotes = () => false;
+		roundState.hasMajorityPrevotesAny = () => false;
+		roundState.hasMajorityPrevotesNull = () => false;
+		roundState.hasMajorityPrecommitsAny = () => false;
+		roundState.hasMajorityPrecommits = () => true;
+		roundState.hasMajorityPrecommitsWithoutProposal = () => false;
+		roundState.hasMinorityPrevotesOrPrecommits = () => false;
+		proposal.deserializePayload = async () => {};
+		proposalProcessor.hasValidLockProof = async () => true;
 
-		spyRoundStateGetBlock.neverCalled();
+		stub(validatorSet, "getRoundValidators").returnValue([]);
+		stub(consensus, "startRound").callsFake(async () => {});
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").resolvedValue({ success: true });
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+
+		await consensus.handle(roundState);
+
+		spyBlockProcessorProcess.calledOnce();
+		spyBlockProcessorProcess.calledWith(roundState);
+		spyBlockProcessorCommit.calledOnce();
+		spyBlockProcessorCommit.calledWith(roundState);
+		assert.equal(consensus.getBlockNumber(), 2);
+	});
+
+	it("#handle - should prevote null when the block processor throws", async ({
+		consensus,
+		blockProcessor,
+		proposalProcessor,
+		validatorSet,
+		validatorsRepository,
+		messageProcessor,
+		roundState,
+		proposal,
+		proposer,
+		logger,
+	}) => {
+		// #processProposal turns a throwing processor into a failed result instead of letting the error escape,
+		// so the proposal counts as invalid and onProposal prevotes nil for it.
+		let processorResult: Contracts.Processor.BlockProcessorResult | undefined;
+		roundState.hasProcessorResult = () => processorResult !== undefined;
+		roundState.setProcessorResult = (result) => (processorResult = result);
+		roundState.getProcessorResult = () => processorResult!;
+		roundState.hasMajorityPrevotes = () => false;
+		roundState.hasMajorityPrevotesAny = () => false;
+		roundState.hasMajorityPrevotesNull = () => false;
+		roundState.hasMajorityPrecommitsAny = () => false;
+		roundState.hasMajorityPrecommits = () => false;
+		roundState.hasMajorityPrecommitsWithoutProposal = () => false;
+		roundState.hasMinorityPrevotesOrPrecommits = () => false;
+		proposal.deserializePayload = async () => {};
+		proposalProcessor.hasValidLockProof = async () => true;
+
+		const prevote = { blockNumber: 1, round: 0 };
+		const validator = { prevote: () => {} };
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue(prevote);
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").rejectedValue(new Error("processor failed"));
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyMessageProcess = spy(messageProcessor, "process");
+		const spyLoggerError = spy(logger, "error");
+
+		await consensus.handle(roundState);
+
+		spyBlockProcessorProcess.calledOnce();
+		spyBlockProcessorProcess.calledWith(roundState);
+		spyLoggerError.calledOnce();
+		spyLoggerError.calledWith(`Failed to process proposal ${1}/${0}: processor failed`);
+		assert.equal(processorResult?.success, false);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 0, undefined);
+		spyMessageProcess.calledOnce();
+		spyMessageProcess.calledWith(prevote);
 		spyBlockProcessorCommit.neverCalled();
-		spyConsensusStartRound.neverCalled();
-		spyRoundStateRepositoryClear.neverCalled();
-		spyLoggerInfo.calledOnce(); // still only called once from previous attempt
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
+	});
+
+	it("#handle - should commit a block from an earlier round than the current one", async ({
+		consensus,
+		blockProcessor,
+		proposalProcessor,
+		scheduler,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		proposal,
+		proposer,
+		block,
+	}) => {
+		// run() replays the earlier rounds of the height after bootstrap for exactly this case: a fully decided
+		// round this node already moved past. The round-bound handlers stay quiet for it, the commit goes through.
+		let processorResult: Contracts.Processor.BlockProcessorResult | undefined;
+		roundState.getBlock = () => block;
+		roundState.hasProcessorResult = () => processorResult !== undefined;
+		roundState.setProcessorResult = (result) => (processorResult = result);
+		roundState.getProcessorResult = () => processorResult!;
+		roundState.hasMajorityPrevotes = () => true;
+		roundState.hasMajorityPrevotesAny = () => true;
+		roundState.hasMajorityPrevotesNull = () => false;
+		roundState.hasMajorityPrecommitsAny = () => true;
+		roundState.hasMajorityPrecommits = () => true;
+		roundState.hasMajorityPrecommitsWithoutProposal = () => false;
+		roundState.hasMinorityPrevotesOrPrecommits = () => false;
+		proposal.deserializePayload = async () => {};
+		proposalProcessor.hasValidLockProof = async () => true;
+
+		const validator = { precommit: () => {}, prevote: () => {} };
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue({});
+		const spyValidatorPrecommit = stub(validator, "precommit").resolvedValue({});
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(async () => {});
+		const spyBlockProcessorProcess = stub(blockProcessor, "process").resolvedValue({ success: true });
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyScheduleTimeoutPrevote = spy(scheduler, "scheduleTimeoutPrevote");
+		const spyScheduleTimeoutPrecommit = spy(scheduler, "scheduleTimeoutPrecommit");
+
+		consensus.setRound(2);
+		await consensus.handle(roundState);
+
+		spyBlockProcessorProcess.calledOnce();
+		spyBlockProcessorProcess.calledWith(roundState);
+		spyBlockProcessorCommit.calledOnce();
+		spyBlockProcessorCommit.calledWith(roundState);
+		spyConsensusStartRound.calledOnce();
+		spyConsensusStartRound.calledWith(0);
+		assert.equal(consensus.getBlockNumber(), 2);
+
+		spyValidatorPrevote.neverCalled();
+		spyValidatorPrecommit.neverCalled();
+		spyScheduleTimeoutPrevote.neverCalled();
+		spyScheduleTimeoutPrecommit.neverCalled();
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
 	});
 
 	it("#onMajorityPrecommit - should be called only once", async ({
@@ -1666,6 +2372,40 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getBlockNumber(), 2);
 	});
 
+	it("#onMajorityPrecommit - should commit a block from an earlier round than the current one", async ({
+		consensus,
+		blockProcessor,
+		roundState,
+		roundStateRepository,
+		logger,
+		proposal,
+	}) => {
+		// Tendermint line 49 accepts +2/3 precommits from any round of the height. The network may have decided a
+		// round this node already moved past, so only the block number is checked here, not the round.
+		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.getData().block);
+		const spyRoundStateRepositoryClear = stub(roundStateRepository, "clear");
+		const spyBlockProcessorCommit = spy(blockProcessor, "commit");
+		const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
+		const spyLoggerInfo = spy(logger, "info");
+
+		roundState.hasProcessorResult = () => true;
+		roundState.getProcessorResult = () => ({ success: true });
+
+		consensus.setRound(2);
+		assert.equal(roundState.round, 0);
+
+		await consensus.onMajorityPrecommit(roundState);
+
+		spyRoundStateGetBlock.calledOnce();
+		spyBlockProcessorCommit.calledOnce();
+		spyBlockProcessorCommit.calledWith(roundState);
+		spyRoundStateRepositoryClear.calledOnce();
+		spyConsensusStartRound.calledOnce();
+		spyConsensusStartRound.calledWith(0);
+		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${2}(${0})/${proposal.getData().block.hash}`);
+		assert.equal(consensus.getBlockNumber(), 2);
+	});
+
 	it("#onMajorityPrecommit - should return if blockNumber doesn't match", async ({
 		consensus,
 		blockProcessor,
@@ -1682,24 +2422,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyBlockProcessorCommit.neverCalled();
 		spyConsensusStartRound.neverCalled();
 	});
-
-	// TODO: fix
-	// it("#onMajorityPrecommit - should return if proposal is undefined", async ({
-	// 	consensus,
-	// 	blockProcessor,
-	// 	roundState,
-	// }) => {
-	// 	const spyBlockProcessorCommit = spy(blockProcessor, "commit");
-	// 	const spyConsensusStartRound = stub(consensus, "startRound").callsFake(() => {});
-
-	// 	roundState.getProcessorResult = () => ({ success: true });
-
-	// 	roundState.getProposal = () => undefined;
-	// 	await consensus.onMajorityPrecommit(roundState);
-
-	// 	spyBlockProcessorCommit.neverCalled();
-	// 	spyConsensusStartRound.neverCalled();
-	// });
 
 	// Our own slot reporting. False reports are the thing to guard against here: a node runner who sees
 	// a missed slot that did not happen has no way to tell it apart from a real one.
@@ -1748,7 +2470,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	}) => {
 		const spyLoggerNotice = spy(logger, "notice");
 
-		consensus.setProposal(proposal, proposal.getData().block);
+		consensus.setProposal(proposal);
 		await consensus.onTimeoutBlockPrepare();
 
 		spyLoggerNotice.calledOnce();
@@ -1860,7 +2582,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyLoggerNotice = spy(logger, "notice");
 
 		await consensus.startRound(0);
-		consensus.setProposal(proposal, { ...block, proposer: THEIRS });
+		consensus.setProposal({ ...proposal, blockHeader: { ...block, proposer: THEIRS } });
 		await consensus.onTimeoutBlockPrepare();
 
 		spyLoggerNotice.calledWith(`📦 Proposing block ${1}/${0}/${block.hash} as ${OURS}`);
@@ -2187,5 +2909,298 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await fakeTimers.nextAsync();
 
 		spyConsensusStartRound.neverCalled();
+	});
+
+	it("#run - should bootstrap, start the round and handle its round state", async ({
+		consensus,
+		bootstrapper,
+		cryptoConfiguration,
+		state,
+		roundState,
+		roundStateRepository,
+		logger,
+		eventDispatcher,
+	}) => {
+		state.getLastBlock = () => ({ number: 0 });
+		state.getTotalRound = () => 0;
+		cryptoConfiguration.getHeight = () => 1;
+
+		const requestedRoundStates: [number, number][] = [];
+		roundStateRepository.getRoundState = (blockNumber: number, round: number) => {
+			requestedRoundStates.push([blockNumber, round]);
+			return roundState;
+		};
+
+		const spyBootstrapperRun = stub(bootstrapper, "run").resolvedValue(undefined);
+		const spyStartRound = stub(consensus, "startRound").callsFake(async () => {});
+		const spyHandle = stub(consensus, "handle").callsFake(async () => {});
+		const spyLoggerInfo = spy(logger, "info");
+		const spyDispatch = spy(eventDispatcher, "dispatch");
+
+		await consensus.run();
+
+		spyBootstrapperRun.calledOnce();
+		spyLoggerInfo.calledWith(`Completed consensus bootstrap for ${1}/${0} with total round ${0}`);
+		spyDispatch.calledOnce();
+		spyDispatch.calledWith(Events.ConsensusEvent.Bootstrapped, {
+			blockNumber: 1,
+			lockedRound: undefined,
+			round: 0,
+			step: Enums.Consensus.Step.Propose,
+			validRound: undefined,
+		});
+		spyStartRound.calledOnce();
+		spyStartRound.calledWith(0);
+		spyHandle.calledOnce();
+		spyHandle.calledWith(roundState);
+		assert.equal(requestedRoundStates, [[1, 0]]);
+		assert.equal(consensus.getBlockNumber(), 1);
+		assert.equal(consensus.getRound(), 0);
+	});
+
+	it("#run - should restore the stored state of the next block and replay its earlier rounds", async ({
+		consensus,
+		bootstrapper,
+		cryptoConfiguration,
+		state,
+		roundState,
+		roundStateRepository,
+		eventDispatcher,
+	}) => {
+		state.getLastBlock = () => ({ number: 0 });
+		state.getTotalRound = () => 0;
+		cryptoConfiguration.getHeight = () => 1;
+
+		const requestedRoundStates: [number, number][] = [];
+		roundStateRepository.getRoundState = (blockNumber: number, round: number) => {
+			requestedRoundStates.push([blockNumber, round]);
+			return roundState;
+		};
+
+		const lockedValue = { ...roundState, round: 1 } as unknown as Contracts.Consensus.RoundState;
+		stub(bootstrapper, "run").resolvedValue({
+			blockNumber: 1,
+			lockedRound: 1,
+			lockedValue,
+			round: 2,
+			step: Enums.Consensus.Step.Precommit,
+			validRound: 1,
+			validValue: lockedValue,
+		});
+		const spyStartRound = stub(consensus, "startRound").callsFake(async () => {});
+		const handledRoundStates: Contracts.Consensus.RoundState[] = [];
+		stub(consensus, "handle").callsFake(async (handledRoundState: Contracts.Consensus.RoundState) => {
+			handledRoundStates.push(handledRoundState);
+		});
+		const spyDispatch = spy(eventDispatcher, "dispatch");
+
+		await consensus.run();
+
+		spyDispatch.calledWith(Events.ConsensusEvent.Bootstrapped, {
+			blockNumber: 1,
+			lockedRound: 1,
+			round: 2,
+			step: Enums.Consensus.Step.Precommit,
+			validRound: 1,
+		});
+		spyStartRound.calledOnce();
+		spyStartRound.calledWith(2);
+		// The current round first, then the earlier ones, in case a proposal and +2/3 precommits were stored for them.
+		assert.equal(handledRoundStates, [roundState, roundState, roundState]);
+		assert.equal(requestedRoundStates, [
+			[1, 2],
+			[1, 0],
+			[1, 1],
+		]);
+		assert.equal(consensus.getRound(), 2);
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Precommit);
+		assert.equal(consensus.getLockedRound(), 1);
+		assert.equal(consensus.getValidRound(), 1);
+	});
+
+	it("#run - should skip restoring a stored state that belongs to another block", async ({
+		consensus,
+		bootstrapper,
+		cryptoConfiguration,
+		state,
+		roundStateRepository,
+		logger,
+	}) => {
+		state.getLastBlock = () => ({ number: 0 });
+		state.getTotalRound = () => 0;
+		cryptoConfiguration.getHeight = () => 1;
+
+		stub(bootstrapper, "run").resolvedValue({
+			blockNumber: 5,
+			lockedRound: undefined,
+			round: 3,
+			step: Enums.Consensus.Step.Precommit,
+			validRound: undefined,
+		});
+		const spyClear = spy(roundStateRepository, "clear");
+		const spyStartRound = stub(consensus, "startRound").callsFake(async () => {});
+		const spyHandle = stub(consensus, "handle").callsFake(async () => {});
+		const spyLoggerWarn = spy(logger, "warn");
+
+		await consensus.run();
+
+		spyLoggerWarn.calledOnce();
+		spyLoggerWarn.calledWith(`Skipping state restore, because stored block number is ${5}, but should be ${1}`);
+		spyClear.calledOnce();
+		spyStartRound.calledOnce();
+		spyStartRound.calledWith(0);
+		spyHandle.calledOnce();
+		assert.equal(consensus.getRound(), 0);
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
+		assert.undefined(consensus.getLockedRound());
+	});
+
+	it("#run - should terminate when the bootstrapped block number does not match the configuration", async ({
+		app,
+		consensus,
+		bootstrapper,
+		cryptoConfiguration,
+		state,
+	}) => {
+		state.getLastBlock = () => ({ number: 0 });
+		state.getTotalRound = () => 0;
+		cryptoConfiguration.getHeight = () => 7;
+
+		stub(bootstrapper, "run").resolvedValue(undefined);
+		const spyStartRound = stub(consensus, "startRound").callsFake(async () => {});
+		const spyHandle = stub(consensus, "handle").callsFake(async () => {});
+
+		let terminated: { reason?: string; error?: Error } | undefined;
+		stub(app, "terminate").callsFake(async (reason?: string, error?: Error) => {
+			terminated = { error, reason };
+		});
+
+		await consensus.run();
+
+		assert.defined(terminated);
+		assert.equal(terminated!.reason, "Consensus bootstrap error");
+		assert.equal(
+			terminated!.error?.message,
+			"bootstrapped block number 1 does not match configuration block number 7",
+		);
+		spyStartRound.neverCalled();
+		spyHandle.neverCalled();
+	});
+
+	it("#handleCommitState - should process the block and commit it", async ({
+		consensus,
+		blockProcessor,
+		roundStateRepository,
+		block,
+		logger,
+	}) => {
+		let processorResult: Contracts.Processor.BlockProcessorResult | undefined;
+		const commitState = {
+			blockNumber: 1,
+			getBlock: () => block,
+			getProcessorResult: () => processorResult!,
+			hasProcessorResult: () => processorResult !== undefined,
+			round: 0,
+			setProcessorResult: (result: Contracts.Processor.BlockProcessorResult) => (processorResult = result),
+		} as unknown as Contracts.Processor.ProcessableUnit;
+
+		const spyProcess = stub(blockProcessor, "process").resolvedValue({ success: true });
+		const spyCommit = spy(blockProcessor, "commit");
+		const spyClear = stub(roundStateRepository, "clear");
+		const spyStartRound = stub(consensus, "startRound").callsFake(async () => {});
+		const spyLoggerInfo = spy(logger, "info");
+
+		await consensus.handleCommitState(commitState);
+
+		spyProcess.calledOnce();
+		spyProcess.calledWith(commitState);
+		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0}/${block.hash}`);
+		spyCommit.calledOnce();
+		spyCommit.calledWith(commitState);
+		spyClear.calledOnce();
+		spyStartRound.calledOnce();
+		spyStartRound.calledWith(0);
+		assert.equal(consensus.getBlockNumber(), 2);
+	});
+
+	it("#handleCommitState - should reuse an existing processor result", async ({
+		consensus,
+		blockProcessor,
+		roundStateRepository,
+		block,
+	}) => {
+		const commitState = {
+			blockNumber: 1,
+			getBlock: () => block,
+			getProcessorResult: () => ({ success: true }),
+			hasProcessorResult: () => true,
+			round: 0,
+			setProcessorResult: () => {},
+		} as unknown as Contracts.Processor.ProcessableUnit;
+
+		const spyProcess = spy(blockProcessor, "process");
+		const spyCommit = spy(blockProcessor, "commit");
+		stub(roundStateRepository, "clear");
+		stub(consensus, "startRound").callsFake(async () => {});
+
+		await consensus.handleCommitState(commitState);
+
+		spyProcess.neverCalled();
+		spyCommit.calledOnce();
+		spyCommit.calledWith(commitState);
+		assert.equal(consensus.getBlockNumber(), 2);
+	});
+
+	it("#handleCommitState - should mark the block as invalid and skip the commit when processing throws", async ({
+		consensus,
+		blockProcessor,
+		block,
+		logger,
+	}) => {
+		let processorResult: Contracts.Processor.BlockProcessorResult | undefined;
+		const commitState = {
+			blockNumber: 1,
+			getBlock: () => block,
+			getProcessorResult: () => processorResult!,
+			hasProcessorResult: () => processorResult !== undefined,
+			round: 0,
+			setProcessorResult: (result: Contracts.Processor.BlockProcessorResult) => (processorResult = result),
+		} as unknown as Contracts.Processor.ProcessableUnit;
+
+		const spyProcess = stub(blockProcessor, "process").rejectedValue(new Error("boom"));
+		const spyCommit = spy(blockProcessor, "commit");
+		const spyStartRound = stub(consensus, "startRound").callsFake(async () => {});
+		const spyLoggerInfo = spy(logger, "info");
+
+		await consensus.handleCommitState(commitState);
+
+		spyProcess.calledOnce();
+		assert.defined(processorResult);
+		assert.false(processorResult!.success);
+		spyLoggerInfo.calledWith(`Block ${1}/${0}/${block.hash} is invalid`);
+		spyCommit.neverCalled();
+		spyStartRound.neverCalled();
+		assert.equal(consensus.getBlockNumber(), 1);
+	});
+
+	it("#handleCommitState - should do nothing once disposed", async ({ consensus, blockProcessor, block }) => {
+		const commitState = {
+			blockNumber: 1,
+			getBlock: () => block,
+			getProcessorResult: () => ({ success: true }),
+			hasProcessorResult: () => false,
+			round: 0,
+			setProcessorResult: () => {},
+		} as unknown as Contracts.Processor.ProcessableUnit;
+
+		const spyProcess = spy(blockProcessor, "process");
+		const spyCommit = spy(blockProcessor, "commit");
+
+		await consensus.dispose();
+		await consensus.handleCommitState(commitState);
+
+		spyProcess.neverCalled();
+		spyCommit.neverCalled();
+		assert.equal(consensus.getBlockNumber(), 1);
 	});
 });

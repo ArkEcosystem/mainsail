@@ -281,7 +281,7 @@ describe<{
 		handle.calledOnce();
 	});
 
-	it("#hasValidLockProof - should accept a proposal without a valid round", async ({
+	it("#hasValidLockProof - should accept a proposal without a valid round and lock proof", async ({
 		processor,
 		aggregator,
 		logger,
@@ -291,11 +291,26 @@ describe<{
 		const serializeMessageForSignature = spy(messageSerializer, "serializeMessageForSignature");
 		const debug = spy(logger, "debug");
 
-		assert.true(await processor.hasValidLockProof(makeProposal({ lockProof })));
+		assert.true(await processor.hasValidLockProof(makeProposal()));
 
 		verify.neverCalled();
 		serializeMessageForSignature.neverCalled();
 		debug.neverCalled();
+	});
+
+	it("#hasValidLockProof - should reject a lock proof without a valid round and log it", async ({
+		processor,
+		aggregator,
+		logger,
+	}) => {
+		const verify = spy(aggregator, "verify");
+		const debug = spy(logger, "debug");
+
+		assert.false(await processor.hasValidLockProof(makeProposal({ lockProof })));
+
+		verify.neverCalled();
+		debug.calledOnce();
+		debug.calledWith(`Received proposal ${blockNumber}/${round} has a lock proof but no validRound`, "consensus");
 	});
 
 	it("#hasValidLockProof - should reject a valid round that is not lower than the proposal round", async ({
@@ -323,7 +338,7 @@ describe<{
 		);
 	});
 
-	it("#hasValidLockProof - should accept a proposal without a lock proof and log it", async ({
+	it("#hasValidLockProof - should reject a valid round without a lock proof and log it", async ({
 		processor,
 		aggregator,
 		logger,
@@ -331,11 +346,14 @@ describe<{
 		const verify = spy(aggregator, "verify");
 		const debug = spy(logger, "debug");
 
-		assert.true(await processor.hasValidLockProof(makeProposal({ validRound: round - 1 })));
+		assert.false(await processor.hasValidLockProof(makeProposal({ validRound: round - 1 })));
 
 		verify.neverCalled();
 		debug.calledOnce();
-		debug.calledWith(`Received proposal ${blockNumber}/${round} with missing lock proof`, "consensus");
+		debug.calledWith(
+			`Received proposal ${blockNumber}/${round} has validRound ${round - 1} but no lock proof`,
+			"consensus",
+		);
 	});
 
 	it("#hasValidLockProof - should verify the lock proof against the prevote of the valid round", async ({
