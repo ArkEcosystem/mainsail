@@ -15,6 +15,7 @@ RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 py3-setuptools
     && echo "servers pool.ntp.org" > /etc/ntpd.conf \
     && echo "servers time.google.com" >> /etc/ntpd.conf \
     && npm install -g npm@latest \
+    && su node -c "npm config set allow-scripts=pnpm --location=user" \
     && su node -c "curl https://sh.rustup.rs -sSf | sh -s -- -y" \
     && su node -c "npm install --prefix=/home/node/.pnpm -g pnpm" \
     && su node -c "pnpm config set --global enable-global-virtual-store false" \

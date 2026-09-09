@@ -118,12 +118,14 @@ success "Installed node.js & npm!"
 heading "Installing pnpm..."
 
     sudo npm install -g npm@latest
+    npm config set allow-scripts=pnpm --location=user
+    info "(npm) allow-scripts=pnpm"
     npm install --prefix=~/.pnpm -g pnpm
     if ! $(grep -Eq "(PNPM_HOME)" "$HOME/.bashrc"); then
-        echo 'export PNPM_HOME=~/.pnpm' >> ~/.bashrc
+        echo 'export PNPM_HOME=$HOME/.pnpm' >> ~/.bashrc
         echo 'export PATH=$PATH:$PNPM_HOME/bin' >> ~/.bashrc
     fi
-    export PNPM_HOME=~/.pnpm
+    export PNPM_HOME=$HOME/.pnpm
     export PATH=$PATH:$PNPM_HOME/bin
     pnpm config set --global enable-global-virtual-store false
     info "(pnpm) Global Virtual Store: disabled"
@@ -173,7 +175,7 @@ if [ ! -z "$MAINSAIL" ] ; then
 fi
 
 allowBuild() {
-    packages=("@chainsafe/blst" "bcrypto" "better-sqlite3" "bstring" "lmdb" "msgpackr-extract" "nsfw" "protobufjs")
+    packages=("@mainsail/evm" "@chainsafe/blst" "bcrypto" "better-sqlite3" "bstring" "lmdb" "msgpackr-extract" "nsfw" "protobufjs")
     params=""
        for package in "${packages[@]}"; do
           params+="--allow-build=\"${package}\" "
@@ -181,7 +183,7 @@ allowBuild() {
 }
 
 addCore() {
-    packages=(@chainsafe/blst bcrypto better-sqlite3 bstring lmdb msgpackr-extract nsfw protobufjs)
+    packages=(@mainsail/evm chainsafe/blst bcrypto better-sqlite3 bstring lmdb msgpackr-extract nsfw protobufjs)
         params=""
        for package in "${packages[@]}"; do
           params+="--allow-build=${package} "
