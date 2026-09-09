@@ -489,6 +489,14 @@ describe<{
 
 		await runMany(nodes);
 
+		// The custom block itself is confirmed in round 0, with its transaction. Checking block 2 alone would
+		// not tell a rejected block 1 (re-proposed empty in round 1) from an accepted one.
+		await snoozeForBlock(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 0);
+		await assertBlockHash(nodes);
+		assert.equal((await getLastCommit(nodes[0])).block.transactionsCount, 1);
+
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);

@@ -1,8 +1,8 @@
 import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import type { Contracts } from "@mainsail/contracts";
 
-import { randaoMessage } from "@mainsail/blockchain-utils";
-import { Enums, Identifiers } from "@mainsail/constants";
+import { getPrevrandao, randaoMessage } from "@mainsail/blockchain-utils";
+import { Identifiers } from "@mainsail/constants";
 import { Proposal } from "@mainsail/crypto-proposal";
 import { assert } from "@mainsail/utils";
 import { randomBytes } from "crypto";
@@ -10,161 +10,182 @@ import dayjs from "dayjs";
 
 import type { Validator } from "./contracts.js";
 
-// To create blocks containing arbitrary transactions, the transactions have to be added
-// in serialized form as the serializer could just fail e.g. due to malformed bytes etc.
-//
-// That's why the steps are as follows:
-//
-// 1) prepare (invalid) transactions in serialized form
-// 2) create empty serialized block
-// 3) concat with serialized transactions buffer
-// 4) manually make & sign proposal
-//
-// 1-3) replicates 'forger.forgeBlock'
-// 4) replicates 'messageFactory.makeProposal'
+export type BlockOverrides = Partial<Parameters<Contracts.Crypto.BlockFactory["make"]>[0]>;
+
+// Builds the proposal of the slot-0 validator for the next block, with the given transactions and header
+// overrides. It mirrors BlockForger.forgeBlock, with two differences that let a test play a misbehaving
+// proposer: the transactions bypass the pool, so the block can carry transactions the pool would refuse
+// (a failing transaction stays in the block and is charged its gas limit), and any header field can be
+// replaced afterwards, so the block can lie about its contents. Without overrides and with valid
+// transactions the block is valid.
 export const makeCustomProposal = async (
 	{ app, validators }: { app: Contracts.Kernel.Application; validators: Validator[] },
 	transactions: Contracts.Crypto.Transaction[] = [],
+	overrides: BlockOverrides = {},
 ): Promise<Contracts.Crypto.Proposal> => {
-	const previousBlock = app.get<Contracts.State.Store>(Identifiers.State.Store).getLastBlock();
+	const stateStore = app.get<Contracts.State.Store>(Identifiers.State.Store);
+	const previousBlock = stateStore.getLastBlock();
+	const blockNumber = previousBlock.number + 1;
 
-	const cryptoConfiguration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
-	const milestone = cryptoConfiguration.getMilestone();
+	const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
+	const milestone = configuration.getMilestone(blockNumber);
+	const hashFactory = app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
+	const roundCalculator = app.get<Contracts.BlockchainUtils.RoundCalculator>(
+		Identifiers.BlockchainUtils.RoundCalculator,
+	);
 
+	const proposer = validators[0];
+	const round = app.get<Consensus>(Identifiers.Consensus.Service).getRound();
+	const timestamp = dayjs().valueOf();
+	const commitKey: Contracts.Evm.CommitKey = { blockNumber: BigInt(blockNumber), round: BigInt(round) };
+
+	// The validator instance is the one the forger uses; its pending commit is dropped again below.
 	const evm = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "validator");
 
-	// 2)
-	const round = app.get<Consensus>(Identifiers.Consensus.Service).getRound();
+	let gasUsed = 0;
+	let fee = 0n;
+	let logsBloom: string;
+	let stateRoot: string;
 
-	// 3)
-	// update block buffer
-	// - payloadHash
-	// - payloadSize
-	// - transactions
-	// - amount + fee
+	try {
+		await evm.initializeGenesis(app.get<Contracts.Evm.GenesisInfo>(Identifiers.EvmConsensus.GenesisInfo));
+		await evm.prepareNextCommit({
+			blockContext: {
+				commitKey,
+				gasLimit: BigInt(milestone.block.maxGasLimit),
+				prevrandao: getPrevrandao(hashFactory, previousBlock),
+				timestamp: BigInt(timestamp),
+				validatorAddress: proposer.address,
+			},
+		});
 
-	const totals: { amount: bigint; fee: bigint; gasUsed: number } = {
-		amount: 0n,
-		fee: 0n,
-		gasUsed: 0,
-	};
+		for (const transaction of transactions) {
+			let transactionGasUsed = BigInt(transaction.gasLimit);
 
-	const payloadBuffers: Buffer[] = [];
-	const transactionBuffers: Buffer[] = [];
-
-	const commitKey = {
-		blockNumber: BigInt(previousBlock.number + 1),
-		round: BigInt(round),
-	};
-
-	const transactionData: Contracts.Crypto.TransactionData[] = [];
-	let payloadSize = 2;
-
-	for (const transaction of transactions.values()) {
-		let result = { gasRefunded: 0n, gasUsed: 0n, logs: [] as any, status: 0 };
-
-		try {
-			result = (
-				await evm.process({
-					commitKey: commitKey,
+			try {
+				const { receipt } = await evm.process({
+					commitKey,
 					data: Buffer.from(transaction.data.slice(2), "hex"),
 					from: transaction.from,
 					gasLimit: BigInt(transaction.gasLimit),
 					gasPrice: BigInt(transaction.gasPrice),
+					legacyAddress: transaction.senderLegacyAddress,
 					nonce: transaction.nonce,
-					specId: Enums.Evm.SpecId.OSAKA,
+					specId: milestone.evmSpec,
 					to: transaction.to,
 					txHash: transaction.hash,
 					value: transaction.value,
-				})
-			).receipt;
-		} catch {
-			result = { ...result, gasUsed: BigInt(transaction.gasLimit) };
+				});
+
+				transactionGasUsed = receipt.gasUsed;
+			} catch {
+				// The transaction cannot be executed. A proposer that skipped validation would still include it.
+			}
+
+			gasUsed += Number(transactionGasUsed);
+			fee += BigInt(transaction.gasPrice) * transactionGasUsed;
 		}
 
-		assert.string(transaction.hash);
-		transactionData.push(transaction);
+		await evm.updateRewardsAndVotes({
+			blockReward: BigInt(milestone.reward),
+			commitKey,
+			specId: milestone.evmSpec,
+			timestamp: BigInt(timestamp),
+			validatorAddress: proposer.address,
+		});
 
-		totals.amount += transaction.value;
-		totals.fee += BigInt(transaction.gasPrice) * result.gasUsed;
-		totals.gasUsed += Number(result.gasUsed);
+		if (roundCalculator.isNewRound(blockNumber + 1)) {
+			const nextMilestone = configuration.getMilestone(blockNumber + 1);
 
-		payloadBuffers.push(Buffer.from(transaction.hash, "hex"));
+			await evm.updateValidatorRegistrationFee({
+				commitKey,
+				fee: BigInt(nextMilestone.validatorRegistrationFee),
+				specId: nextMilestone.evmSpec,
+				timestamp: BigInt(timestamp),
+				validatorAddress: proposer.address,
+			});
 
-		const buffer = Buffer.alloc(transaction.serialized.byteLength + 2);
-		buffer.writeUint16LE(transaction.serialized.byteLength, 0);
-		buffer.fill(transaction.serialized, 2, transaction.serialized.byteLength);
-		transactionBuffers.push(buffer);
+			await evm.calculateRoundValidators({
+				commitKey,
+				roundValidators: BigInt(nextMilestone.roundValidators),
+				specId: nextMilestone.evmSpec,
+				timestamp: BigInt(timestamp),
+				validatorAddress: proposer.address,
+			});
+		}
 
-		payloadSize += transaction.serialized.byteLength + 2;
+		logsBloom = await evm.logsBloom(commitKey);
+		stateRoot = await evm.stateRoot(commitKey, previousBlock.stateRoot);
+	} finally {
+		await evm.dispose();
 	}
 
-	await evm.dispose();
+	const payloadBuffers: Buffer[] = [];
+	let payloadSize = transactions.length * 4;
 
-	const hashFactory = app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
-	const blockFactory = app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory);
+	for (const transaction of transactions) {
+		assert.string(transaction.hash);
 
-	const stateStore = app.get<Contracts.State.Store>(Identifiers.State.Store);
+		payloadBuffers.push(Buffer.from(transaction.hash, "hex"));
+		payloadSize += transaction.serialized.length;
+	}
+
 	const randaoReveal = await app
 		.getTagged<Contracts.Crypto.SignatureBls>(Identifiers.Cryptography.Signature.Instance, "type", "consensus")
 		.sign(
-			randaoMessage(
-				stateStore.getGenesisCommit().block.hash,
-				stateStore.getLastBlock().randaoReveal,
-				Number(commitKey.blockNumber),
-			),
-			Buffer.from(validators[0].consensusPrivateKey, "hex"),
+			randaoMessage(stateStore.getGenesisCommit().block.hash, previousBlock.randaoReveal, blockNumber),
+			Buffer.from(proposer.consensusPrivateKey, "hex"),
 		);
 
-	const block = await blockFactory.make(
+	const block = await app.get<Contracts.Crypto.BlockFactory>(Identifiers.Cryptography.Block.Factory).make(
 		{
-			fee: totals.fee,
-			gasUsed: totals.gasUsed,
-			logsBloom: "0".repeat(512),
-			number: Number(commitKey.blockNumber),
+			fee,
+			gasUsed,
+			logsBloom,
+			number: blockNumber,
 			parentHash: previousBlock.hash,
 			payloadSize,
-			proposer: validators[0].address,
+			proposer: proposer.address,
 			randaoReveal,
 			reward: BigInt(milestone.reward),
 			round,
-			stateRoot: "0".repeat(64),
-			timestamp: dayjs().valueOf(),
-			transactionsCount: transactionData.length,
+			stateRoot,
+			timestamp,
+			transactionsCount: transactions.length,
 			transactionsRoot: hashFactory.sha256(payloadBuffers).toString("hex"),
 			version: 1,
+			...overrides,
 		},
 		transactions,
 	);
 
-	const messageSerializer = app.get<Contracts.Crypto.ProposalSerializer>(
+	// Signed by hand rather than through Validator.propose, so that the proposal is built and signed whatever
+	// the block contains.
+	const proposalSerializer = app.get<Contracts.Crypto.ProposalSerializer>(
 		Identifiers.Cryptography.Proposal.Serializer,
 	);
 
-	const proposedBytes = await messageSerializer.serializePayload({
-		block,
-		lockProof: undefined,
-	});
+	const payloadSerialized = (await proposalSerializer.serializePayload({ block, lockProof: undefined })).toString(
+		"hex",
+	);
 
-	const serializedProposal = await messageSerializer.serializeProposalUnsigned({
-		payloadSerialized: proposedBytes.toString("hex"),
+	const proposalUnsigned = await proposalSerializer.serializeProposalUnsigned({
+		payloadSerialized,
 		round,
 		validatorIndex: 0,
 		validRound: undefined,
 	});
 
-	const proposalSignature = await app
+	const signature = await app
 		.getTagged<Contracts.Crypto.SignatureBls>(Identifiers.Cryptography.Signature.Instance, "type", "consensus")
-		.sign(serializedProposal, Buffer.from(validators[0].consensusPrivateKey, "hex"));
-
-	const signedProposal = Buffer.concat([serializedProposal, Buffer.from(proposalSignature, "hex")]);
+		.sign(proposalUnsigned, Buffer.from(proposer.consensusPrivateKey, "hex"));
 
 	const proposal = app.resolve(Proposal).initialize({
 		blockHeader: block,
-		payloadSerialized: proposedBytes.toString("hex"),
+		payloadSerialized,
 		round,
-		serialized: signedProposal,
-		signature: proposalSignature,
+		serialized: Buffer.concat([proposalUnsigned, Buffer.from(signature, "hex")]),
+		signature,
 		validatorIndex: 0,
 	});
 
