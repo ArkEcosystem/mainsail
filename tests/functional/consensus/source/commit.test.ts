@@ -1,4 +1,4 @@
-import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
+import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import type { Contracts } from "@mainsail/contracts";
 import { Enums, Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
@@ -7,7 +7,7 @@ import { describe } from "@mainsail/test-runner";
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound, assertInvalidBlock } from "./asserts.js";
-import { Validator } from "./contracts.js";
+import type { Validator } from "./contracts.js";
 import { makeCustomProposal } from "./custom-proposal.js";
 import { disconnect } from "./faults.js";
 import { P2PRegistry } from "./p2p.js";

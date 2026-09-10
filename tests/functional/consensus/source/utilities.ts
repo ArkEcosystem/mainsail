@@ -84,6 +84,19 @@ export const getValidatorIndex = (app: Contracts.Kernel.Application, validator: 
 		.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
 		.getValidatorIndexByWalletAddress(validator.address);
 
+// The signing validator that `app` hosts for `validator`.
+export const getSigner = (app: Contracts.Kernel.Application, validator: Validator): Contracts.Validator.Validator => {
+	const signer = app
+		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
+		.getValidator(validator.consensusPublicKey);
+
+	if (!signer) {
+		throw new Error(`Validator ${validator.consensusPublicKey} not found`);
+	}
+
+	return signer;
+};
+
 export const makeProposal = async (
 	app: Contracts.Kernel.Application,
 	validator: Validator,
@@ -92,13 +105,7 @@ export const makeProposal = async (
 	timestamp: number,
 ): Promise<Contracts.Crypto.Proposal> => {
 	const forger = app.get<Contracts.Forger.BlockForger>(Identifiers.Forger.Block);
-	const proposer = app
-		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
-		.getValidator(validator.consensusPublicKey);
-
-	if (!proposer) {
-		throw new Error(`Validator ${validator.consensusPublicKey} not found`);
-	}
+	const proposer = getSigner(app, validator);
 
 	await sleep(1); // Sleep to avoid same timestamp
 
@@ -108,7 +115,7 @@ export const makeProposal = async (
 		timestamp,
 		await proposer.getRandaoReveal(blockNumber),
 	);
-	const proposal = await proposer.propose(0, round, undefined, block);
+	const proposal = await proposer.propose(getValidatorIndex(app, validator), round, undefined, block);
 
 	await proposal.deserializePayload();
 	return proposal;
@@ -121,13 +128,7 @@ export const makePrevote = async (
 	round: number,
 	blockHash?: string,
 ): Promise<Contracts.Crypto.Message> => {
-	const proposer = app
-		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
-		.getValidator(validator.consensusPublicKey);
-
-	if (!proposer) {
-		throw new Error(`Validator ${validator.consensusPublicKey} not found`);
-	}
+	const proposer = getSigner(app, validator);
 
 	return await proposer.prevote(getValidatorIndex(app, validator), blockNumber, round, blockHash);
 };
@@ -139,13 +140,7 @@ export const makePrecommit = async (
 	round: number,
 	blockHash?: string,
 ): Promise<Contracts.Crypto.Message> => {
-	const proposer = app
-		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
-		.getValidator(validator.consensusPublicKey);
-
-	if (!proposer) {
-		throw new Error(`Validator ${validator.consensusPublicKey} not found`);
-	}
+	const proposer = getSigner(app, validator);
 
 	return await proposer.precommit(getValidatorIndex(app, validator), blockNumber, round, blockHash);
 };
@@ -180,12 +175,7 @@ export const makeReProposal = async (
 		.get<Contracts.Consensus.Aggregator>(Identifiers.Consensus.Aggregator)
 		.aggregate(signatures, roundValidators);
 
-	const proposer = app
-		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
-		.getValidator(validator.consensusPublicKey);
-	if (!proposer) {
-		throw new Error(`Validator ${validator.consensusPublicKey} not found`);
-	}
+	const proposer = getSigner(app, validator);
 
 	return proposer.propose(getValidatorIndex(app, validator), round, validRound, block, lockProof);
 };

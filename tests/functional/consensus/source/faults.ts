@@ -1,6 +1,6 @@
 import type { Stub } from "@mainsail/test-runner/distribution/stub.js";
 
-import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
+import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import type { Contracts } from "@mainsail/contracts";
 import { Enums, Identifiers } from "@mainsail/constants";
 

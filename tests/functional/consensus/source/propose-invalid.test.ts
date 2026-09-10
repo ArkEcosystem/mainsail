@@ -1,4 +1,4 @@
-import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
+import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
@@ -8,8 +8,9 @@ import { EvmCalls } from "@mainsail/test-transaction-builders";
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound, assertInvalidBlock } from "./asserts.js";
-import { Validator } from "./contracts.js";
-import { BlockOverrides, makeCustomProposal, makeTransactionBuilderContext } from "./custom-proposal.js";
+import type { Validator } from "./contracts.js";
+import type { BlockOverrides } from "./custom-proposal.js";
+import { makeCustomProposal, makeTransactionBuilderContext } from "./custom-proposal.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import {

@@ -5,7 +5,7 @@ import { describe } from "@mainsail/test-runner";
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound, assertCommitRound } from "./asserts.js";
-import { Validator } from "./contracts.js";
+import type { Validator } from "./contracts.js";
 import { disconnect, skipProposalsBeforeRound } from "./faults.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";

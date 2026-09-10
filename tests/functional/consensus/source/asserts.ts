@@ -1,7 +1,9 @@
 import type { Contracts } from "@mainsail/contracts";
 import { assert } from "@mainsail/test-runner";
 
-import { getLastCommit, InvalidBlock } from "./utilities.js";
+import type { InvalidBlock } from "./utilities.js";
+
+import { getLastCommit } from "./utilities.js";
 
 export const assertBlockNumber = async (
 	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],

@@ -1,13 +1,14 @@
-import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
+import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import { Enums, Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
 
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound, assertCommitRound } from "./asserts.js";
-import { Validator } from "./contracts.js";
+import type { Validator } from "./contracts.js";
 import { ignoreForeignPrevotes, loseMessagesOn, precommitNullInRounds, skipPrevoteInRound } from "./faults.js";
-import { Messages, P2PRegistry } from "./p2p.js";
+import type { Messages } from "./p2p.js";
+import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, restart, runMany, setup, stopMany } from "./setup.js";
 import {
 	getNodeForValidator,
