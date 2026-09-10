@@ -44,10 +44,12 @@ describe<{
 		stubProcess.callsFake(async (...arguments_: unknown[]) => {
 			const proposal = arguments_[0] as Contracts.Crypto.Proposal;
 
-			if (proposal.blockHeader.number === 1 && proposal.round === 0) {
-				released ??= release().then(() => stubProcess.restore());
-				await released;
+			if (proposal.blockHeader.number !== 1 || proposal.round !== 0) {
+				return process(proposal, arguments_[1] as boolean | undefined);
 			}
+
+			released ??= release().then(() => stubProcess.restore());
+			await released;
 
 			const result = await process(proposal, arguments_[1] as boolean | undefined);
 			results.push(result);

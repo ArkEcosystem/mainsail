@@ -6,10 +6,11 @@ import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound, assertCommitRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
-import { P2PRegistry } from "./p2p.js";
+import { Messages, P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, restart, runMany, setup, stopMany } from "./setup.js";
 import {
 	getNodeForValidator,
+	getValidatorIndex,
 	getValidatorsInSlotOrder,
 	makePrecommit,
 	prepareNodeValidators,
@@ -94,6 +95,93 @@ describe<{
 
 			stubPrevote.restore();
 		});
+	};
+
+	// Message loss on `node`: the proposals of the given rounds, and the prevotes of the given validators in the given
+	// rounds, never reach its processors. Everything else passes, and what the node sends is not affected. Validators
+	// are named by their index in the validator set, the one their votes carry.
+	const loseMessagesOn = (node: Contracts.Kernel.Application) => {
+		const droppedProposals = new Set<number>();
+		const droppedPrevotes = new Set<string>();
+
+		const proposalProcessor = node.get<Contracts.Consensus.ProposalProcessor>(
+			Identifiers.Consensus.Processor.Proposal,
+		);
+		const processProposal = proposalProcessor.process.bind(proposalProcessor);
+
+		stub(proposalProcessor, "process").callsFake(async (...arguments_: unknown[]) => {
+			const proposal = arguments_[0] as Contracts.Crypto.Proposal;
+
+			if (proposal.blockHeader.number === 1 && droppedProposals.has(proposal.round)) {
+				return Enums.Consensus.ProcessorResult.Skipped;
+			}
+
+			return processProposal(proposal, arguments_[1] as boolean | undefined);
+		});
+
+		const messageProcessor = node.get<Contracts.Consensus.MessageProcessor>(
+			Identifiers.Consensus.Processor.Message,
+		);
+		const processMessage = messageProcessor.process.bind(messageProcessor);
+
+		stub(messageProcessor, "process").callsFake(async (...arguments_: unknown[]) => {
+			const message = arguments_[0] as Contracts.Crypto.Message;
+
+			if (
+				message.type === Enums.Crypto.MessageType.Prevote &&
+				message.blockNumber === 1 &&
+				droppedPrevotes.has(`${message.round}:${message.validatorIndex}`)
+			) {
+				return Enums.Consensus.ProcessorResult.Skipped;
+			}
+
+			return processMessage(message, arguments_[1] as boolean | undefined);
+		});
+
+		return {
+			dropPrevote: (round: number, validatorIndex: number) => droppedPrevotes.add(`${round}:${validatorIndex}`),
+			dropProposal: (round: number) => droppedProposals.add(round),
+		};
+	};
+
+	// The proposal a proposer whose valid value dates from `validRound` sends in `round`: the block of that round
+	// again, proven by the +2/3 prevotes it gathered there. Built from the messages the network saw, so that a test
+	// can stand in for the rotating proposer the pinned harness lacks. Signed by `validator` on `node`.
+	const makeReProposal = async (
+		node: Contracts.Kernel.Application,
+		validator: Validator,
+		p2p: P2PRegistry,
+		round: number,
+		validRound: number,
+	): Promise<Contracts.Crypto.Proposal> => {
+		const [proposal] = p2p.proposals.getMessages(1, validRound);
+		if (!proposal.isDataDeserialized) {
+			await proposal.deserializePayload();
+		}
+		const block = proposal.getPayload().block;
+
+		const signatures = new Map<number, { signature: string }>();
+		for (const prevote of p2p.prevotes.getMessages(1, validRound)) {
+			if (prevote.blockHash === block.hash) {
+				signatures.set(prevote.validatorIndex, { signature: prevote.signature });
+			}
+		}
+
+		const { roundValidators } = node
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.getMilestone(1);
+		const lockProof = await node
+			.get<Contracts.Consensus.Aggregator>(Identifiers.Consensus.Aggregator)
+			.aggregate(signatures, roundValidators);
+
+		const proposer = node
+			.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
+			.getValidator(validator.consensusPublicKey);
+		if (!proposer) {
+			throw new Error(`Validator ${validator.consensusPublicKey} not found`);
+		}
+
+		return proposer.propose(getValidatorIndex(node, validator), round, validRound, block, lockProof);
 	};
 
 	beforeEach(async (context) => {
@@ -381,5 +469,125 @@ describe<{
 			[undefined, undefined, undefined, undefined, undefined],
 		);
 		await assertBlockNumber(nodes, 0);
+	});
+
+	it("should prevote null for a re-proposed block, if locked on another block in a round newer than the lock proof", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		// Tendermint line 29, the refusing branch: a re-proposal of A with a proof from round 0 reaches nodes locked on
+		// B since round 1. Their lock is newer than the proof and on another block, so they prevote null, while the
+		// nodes without a lock prevote A. Validators are named by their index in the validator set; validator 0 is
+		// the proposer, pinned by the harness.
+		//
+		// Round 0: the proposer forges A and validators 0-3 prevote it, but message loss keeps everybody from seeing
+		// the polka: validator 4 misses the proposal and prevotes null, validators 0-3 each miss one prevote. Nobody
+		// locks, the round ends on null precommits, and the network holds +2/3 prevotes for A.
+		// Round 1: the proposer, without a valid value, forges B. Validators 0-2 see the polka and lock B; validator 3
+		// misses one prevote and validator 4 the proposal, so they do not. Three precommits for B are below +2/3 and
+		// the round ends.
+		// Round 2: the harness pins the proposer, so the test sends what a rotating proposer with valid value A would
+		// send: A again, validRound 0, proven by the round-0 prevotes.
+		// Round 3: the proposer re-proposes its own valid value B, which no lock forbids.
+		const nodeOfValidator = (validatorIndex: number) => getNodeForValidator(nodes, validators[validatorIndex]);
+		const lossOfValidator = validators.map((validator) => loseMessagesOn(getNodeForValidator(nodes, validator)));
+
+		lossOfValidator[4].dropProposal(0);
+		lossOfValidator[4].dropProposal(1);
+		for (const validatorIndex of [0, 1, 2, 3]) {
+			lossOfValidator[validatorIndex].dropPrevote(0, (validatorIndex + 1) % 4);
+		}
+		lossOfValidator[3].dropPrevote(1, 2);
+
+		const proposerNode = nodeOfValidator(0);
+		const proposerConsensus = proposerNode.get<Consensus>(Identifiers.Consensus.Service);
+		const prepareProposal = proposerConsensus.prepareProposal.bind(proposerConsensus);
+		const stubPrepare = stub(proposerConsensus, "prepareProposal");
+
+		let lockedRoundsBeforeRound2: (number | undefined)[] = [];
+
+		stubPrepare.callsFake(async (...arguments_: unknown[]) => {
+			if (proposerConsensus.getRound() !== 2) {
+				await prepareProposal(arguments_[0] as Contracts.Consensus.RoundState);
+				return;
+			}
+
+			stubPrepare.restore();
+			lockedRoundsBeforeRound2 = validators.map((validator) =>
+				getNodeForValidator(nodes, validator).get<Consensus>(Identifiers.Consensus.Service).getLockedRound(),
+			);
+
+			void proposerNode
+				.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
+				.process(await makeReProposal(proposerNode, validators[0], p2p, 2, 0));
+		});
+
+		await runMany(nodes);
+		await snoozeForBlock(nodes);
+
+		// The block hashes voted for in `round`, one list per validator, in validator order.
+		const votesByValidator = (messages: Messages<Contracts.Crypto.Message>, round: number) =>
+			validators.map((_, validatorIndex) =>
+				messages.getMessagesByValidator(1, round, validatorIndex).map((message) => message.blockHash),
+			);
+
+		const [proposalA] = p2p.proposals.getMessages(1, 0);
+		const [proposalB] = p2p.proposals.getMessages(1, 1);
+		const [reProposalA] = p2p.proposals.getMessages(1, 2);
+		const [reProposalB] = p2p.proposals.getMessages(1, 3);
+		assert.defined(proposalA);
+		assert.defined(proposalB);
+		assert.defined(reProposalA);
+		assert.defined(reProposalB);
+
+		const hashA = proposalA.blockHeader.hash;
+		const hashB = proposalB.blockHeader.hash;
+		assert.not.equal(hashA, hashB);
+
+		// Round 0: A, prevoted by validators 0-3 (the polka the network holds); nobody locks, everybody precommits
+		// null.
+		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
+		assert.undefined(proposalA.validRound);
+		assert.equal(votesByValidator(p2p.prevotes, 0), [[hashA], [hashA], [hashA], [hashA], [undefined]]);
+		assert.equal(votesByValidator(p2p.precommits, 0), [
+			[undefined],
+			[undefined],
+			[undefined],
+			[undefined],
+			[undefined],
+		]);
+
+		// Round 1: a fresh B; validators 0-2 see the polka, lock and precommit it, validators 3 and 4 do not.
+		assert.equal(p2p.proposals.getMessages(1, 1).length, 1); // Assert number of proposals
+		assert.undefined(proposalB.validRound);
+		assert.equal(votesByValidator(p2p.prevotes, 1), [[hashB], [hashB], [hashB], [hashB], [undefined]]);
+		assert.equal(votesByValidator(p2p.precommits, 1), [[hashB], [hashB], [hashB], [undefined], [undefined]]);
+		assert.equal(lockedRoundsBeforeRound2, [1, 1, 1, undefined, undefined]);
+
+		// Round 2: A comes back with the round-0 proof. For validators 0-2 the lock (round 1) is newer than the proof
+		// (round 0) and on another block, so they prevote null. Validators 3 and 4, unlocked, prevote A.
+		assert.equal(p2p.proposals.getMessages(1, 2).length, 1); // Assert number of proposals
+		assert.equal(reProposalA.blockHeader.hash, hashA);
+		assert.equal(reProposalA.validRound, 0);
+		assert.equal(votesByValidator(p2p.prevotes, 2), [[undefined], [undefined], [undefined], [hashA], [hashA]]);
+		assert.equal(votesByValidator(p2p.precommits, 2), [
+			[undefined],
+			[undefined],
+			[undefined],
+			[undefined],
+			[undefined],
+		]);
+
+		// Round 3: the proposer re-proposes its valid value B with the round-1 proof, and everybody prevotes it.
+		assert.equal(p2p.proposals.getMessages(1, 3).length, 1); // Assert number of proposals
+		assert.equal(reProposalB.blockHeader.hash, hashB);
+		assert.equal(reProposalB.validRound, 1);
+		assert.equal(votesByValidator(p2p.prevotes, 3), [[hashB], [hashB], [hashB], [hashB], [hashB]]);
+
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 1); // B was forged in round 1...
+		await assertCommitRound(nodes, 3); // ...and committed in round 3
+		await assertBlockHash(nodes, hashB);
 	});
 });
