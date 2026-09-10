@@ -48,7 +48,11 @@ describe<{
 		await stopMany(nodes);
 	});
 
-	it("should confirm block, if < minority does not precommit", async ({ nodes, validators, p2p }) => {
+	it("should confirm the block, if fewer than 1/3 of the validators do not precommit", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrecommit = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "precommit");
 
@@ -75,7 +79,11 @@ describe<{
 		await assertBlockHash(nodes);
 	});
 
-	it("should not confirm block, if > minority does not precommit", async ({ nodes, validators, p2p }) => {
+	it("should not confirm a block, if more than 1/3 of the validators do not precommit", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrecommit0 = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "precommit");
 		stubPrecommit0.callsFake(async () => {
@@ -105,7 +113,11 @@ describe<{
 		}
 	});
 
-	it("should confirm block, if < minority precommits null", async ({ nodes, validators, p2p }) => {
+	it("should confirm the block, if fewer than 1/3 of the validators precommit null", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrecommit = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "precommit");
 		const precommit = await makePrecommit(node0, validators[0], 1, 0);
@@ -144,7 +156,11 @@ describe<{
 		await assertBlockHash(nodes);
 	});
 
-	it("should re-propose block, if one missed, malicious sends null", async ({ nodes, validators, p2p }) => {
+	it("should re-propose the block and confirm it in round 1, if one validator misses its precommit and one precommits null", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrecommit0 = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "precommit");
 		stubPrecommit0.callsFake(async () => {
@@ -189,7 +205,7 @@ describe<{
 		await assertBlockHash(nodes);
 	});
 
-	it("should re-propose block, if one missed, malicious sends random block id", async ({
+	it("should re-propose the block and confirm it in round 1, if one validator misses its precommit and one precommits another block", async ({
 		nodes,
 		validators,
 		p2p,
@@ -240,7 +256,7 @@ describe<{
 		await assertBlockHash(nodes);
 	});
 
-	it("should re-propose block, if one missed, malicious sends multiple random block ids", async ({
+	it("should re-propose the block and confirm it in round 1, if one validator misses its precommit and one precommits several other blocks", async ({
 		nodes,
 		validators,
 		p2p,

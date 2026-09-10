@@ -33,7 +33,7 @@ describe<{
 		await stopMany(nodes);
 	});
 
-	it("should create new block", async ({ nodes }) => {
+	it("should confirm a block", async ({ nodes }) => {
 		await snoozeForBlock(nodes);
 
 		const commit = await getLastCommit(nodes[0]);
@@ -42,7 +42,7 @@ describe<{
 		await assertBlockHash(nodes, commit.block.hash);
 	});
 
-	it("should create 3 new block", async ({ nodes }) => {
+	it("should confirm 3 blocks", async ({ nodes }) => {
 		await snoozeForBlock(nodes, 3);
 
 		const commit = await getLastCommit(nodes[0]);
