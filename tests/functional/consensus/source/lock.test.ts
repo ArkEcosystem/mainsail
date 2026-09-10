@@ -6,13 +6,14 @@ import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound, assertCommitRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
+import { ignoreForeignPrevotes, loseMessagesOn, precommitNullInRounds, skipPrevoteInRound } from "./faults.js";
 import { Messages, P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, restart, runMany, setup, stopMany } from "./setup.js";
 import {
 	getNodeForValidator,
-	getValidatorIndex,
 	getValidatorsInSlotOrder,
 	makePrecommit,
+	makeReProposal,
 	prepareNodeValidators,
 	snoozeForBlock,
 	snoozeUntil,
@@ -31,158 +32,6 @@ describe<{
 	const nodeValidators = (nodeIndex: number) => prepareNodeValidators(validators, nodeIndex, totalNodes);
 
 	// The harness pins the proposer to slot 0 (proposer-calculator.ts), so validators[0] proposes every round.
-
-	// Drops the other validators' prevotes of `round` on `node`, so it never sees +2/3 prevotes there and
-	// neither locks nor updates its valid value in that round.
-	const ignoreForeignPrevotes = (node: Contracts.Kernel.Application, validatorIndex: number, round: number) => {
-		const messageProcessor = node.get<Contracts.Consensus.MessageProcessor>(
-			Identifiers.Consensus.Processor.Message,
-		);
-		const process = messageProcessor.process.bind(messageProcessor);
-
-		stub(messageProcessor, "process").callsFake(async (...arguments_: unknown[]) => {
-			const message = arguments_[0] as Contracts.Crypto.Message;
-
-			if (
-				message.type === Enums.Crypto.MessageType.Prevote &&
-				message.round === round &&
-				message.validatorIndex !== validatorIndex
-			) {
-				return Enums.Consensus.ProcessorResult.Skipped;
-			}
-
-			return process(message, arguments_[1] as boolean | undefined);
-		});
-	};
-
-	// Replaces the validator's precommits in `rounds` with null precommits, then restores the real precommit.
-	// Those rounds still gather +2/3 precommits for something, so consensus moves on, but not +2/3 for the
-	// block, so nothing commits and the locks survive into the next round.
-	const precommitNullInRounds = (
-		node: Contracts.Kernel.Application,
-		validator: Validator,
-		rounds: number[],
-		p2p: P2PRegistry,
-	) => {
-		const consensus = node.get<Consensus>(Identifiers.Consensus.Service);
-		const stubPrecommit = stub(consensus, "precommit");
-
-		stubPrecommit.callsFake(async (...arguments_: unknown[]) => {
-			const round = consensus.getRound();
-
-			if (!rounds.includes(round)) {
-				stubPrecommit.restore();
-				await consensus.precommit(arguments_[0] as string | undefined);
-				return;
-			}
-
-			await p2p.broadcastMessage(await makePrecommit(node, validator, 1, round));
-		});
-	};
-
-	// Swallows the validator's prevote of `round` and restores the real prevote afterwards. With one prevote short of
-	// +2/3, the round cannot end until somebody else supplies it.
-	const skipPrevoteInRound = (node: Contracts.Kernel.Application, round: number) => {
-		const consensus = node.get<Consensus>(Identifiers.Consensus.Service);
-		const prevote = consensus.prevote.bind(consensus);
-		const stubPrevote = stub(consensus, "prevote");
-
-		stubPrevote.callsFake(async (...arguments_: unknown[]) => {
-			if (consensus.getRound() !== round) {
-				await prevote(arguments_[0] as string | undefined);
-				return;
-			}
-
-			stubPrevote.restore();
-		});
-	};
-
-	// Message loss on `node`: the proposals of the given rounds, and the prevotes of the given validators in the given
-	// rounds, never reach its processors. Everything else passes, and what the node sends is not affected. Validators
-	// are named by their index in the validator set, the one their votes carry.
-	const loseMessagesOn = (node: Contracts.Kernel.Application) => {
-		const droppedProposals = new Set<number>();
-		const droppedPrevotes = new Set<string>();
-
-		const proposalProcessor = node.get<Contracts.Consensus.ProposalProcessor>(
-			Identifiers.Consensus.Processor.Proposal,
-		);
-		const processProposal = proposalProcessor.process.bind(proposalProcessor);
-
-		stub(proposalProcessor, "process").callsFake(async (...arguments_: unknown[]) => {
-			const proposal = arguments_[0] as Contracts.Crypto.Proposal;
-
-			if (proposal.blockHeader.number === 1 && droppedProposals.has(proposal.round)) {
-				return Enums.Consensus.ProcessorResult.Skipped;
-			}
-
-			return processProposal(proposal, arguments_[1] as boolean | undefined);
-		});
-
-		const messageProcessor = node.get<Contracts.Consensus.MessageProcessor>(
-			Identifiers.Consensus.Processor.Message,
-		);
-		const processMessage = messageProcessor.process.bind(messageProcessor);
-
-		stub(messageProcessor, "process").callsFake(async (...arguments_: unknown[]) => {
-			const message = arguments_[0] as Contracts.Crypto.Message;
-
-			if (
-				message.type === Enums.Crypto.MessageType.Prevote &&
-				message.blockNumber === 1 &&
-				droppedPrevotes.has(`${message.round}:${message.validatorIndex}`)
-			) {
-				return Enums.Consensus.ProcessorResult.Skipped;
-			}
-
-			return processMessage(message, arguments_[1] as boolean | undefined);
-		});
-
-		return {
-			dropPrevote: (round: number, validatorIndex: number) => droppedPrevotes.add(`${round}:${validatorIndex}`),
-			dropProposal: (round: number) => droppedProposals.add(round),
-		};
-	};
-
-	// The proposal a proposer whose valid value dates from `validRound` sends in `round`: the block of that round
-	// again, proven by the +2/3 prevotes it gathered there. Built from the messages the network saw, so that a test
-	// can stand in for the rotating proposer the pinned harness lacks. Signed by `validator` on `node`.
-	const makeReProposal = async (
-		node: Contracts.Kernel.Application,
-		validator: Validator,
-		p2p: P2PRegistry,
-		round: number,
-		validRound: number,
-	): Promise<Contracts.Crypto.Proposal> => {
-		const [proposal] = p2p.proposals.getMessages(1, validRound);
-		if (!proposal.isDataDeserialized) {
-			await proposal.deserializePayload();
-		}
-		const block = proposal.getPayload().block;
-
-		const signatures = new Map<number, { signature: string }>();
-		for (const prevote of p2p.prevotes.getMessages(1, validRound)) {
-			if (prevote.blockHash === block.hash) {
-				signatures.set(prevote.validatorIndex, { signature: prevote.signature });
-			}
-		}
-
-		const { roundValidators } = node
-			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-			.getMilestone(1);
-		const lockProof = await node
-			.get<Contracts.Consensus.Aggregator>(Identifiers.Consensus.Aggregator)
-			.aggregate(signatures, roundValidators);
-
-		const proposer = node
-			.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
-			.getValidator(validator.consensusPublicKey);
-		if (!proposer) {
-			throw new Error(`Validator ${validator.consensusPublicKey} not found`);
-		}
-
-		return proposer.propose(getValidatorIndex(node, validator), round, validRound, block, lockProof);
-	};
 
 	beforeEach(async (context) => {
 		context.p2p = new P2PRegistry();
@@ -208,10 +57,10 @@ describe<{
 	it("should prevote null for a fresh proposal, if locked on another block", async ({ nodes, validators, p2p }) => {
 		// The proposer drops the others' round-0 prevotes, so it never locks and has no valid value to re-propose:
 		// in round 1 it forges a fresh block, while the other nodes are locked on the round-0 block.
-		ignoreForeignPrevotes(getNodeForValidator(nodes, validators[0]), 0, 0);
+		ignoreForeignPrevotes(stub, getNodeForValidator(nodes, validators[0]), 0, 0);
 
 		// 3 of 5 precommits for the round-0 block is below +2/3, so round 0 fails and the locks hold.
-		precommitNullInRounds(getNodeForValidator(nodes, validators[4]), validators[4], [0], p2p);
+		precommitNullInRounds(stub, getNodeForValidator(nodes, validators[4]), validators[4], [0], p2p);
 
 		await runMany(nodes);
 		await snoozeUntil(() => p2p.precommits.getMessages(1, 1).length === totalNodes);
@@ -286,11 +135,11 @@ describe<{
 		// The proposer drops the others' round-1 prevotes, so its valid value stays at round 0 and it keeps
 		// re-proposing the block with validRound 0. The other nodes see +2/3 prevotes in round 1 and re-lock the
 		// same block at round 1, so from round 2 on their lockedRound is higher than the validRound they receive.
-		ignoreForeignPrevotes(getNodeForValidator(nodes, validators[0]), 0, 1);
+		ignoreForeignPrevotes(stub, getNodeForValidator(nodes, validators[0]), 0, 1);
 
 		// Hold rounds 0 and 1 below +2/3 precommits for the block, so it can only commit in round 2.
-		precommitNullInRounds(getNodeForValidator(nodes, validators[3]), validators[3], [0, 1], p2p);
-		precommitNullInRounds(getNodeForValidator(nodes, validators[4]), validators[4], [0, 1], p2p);
+		precommitNullInRounds(stub, getNodeForValidator(nodes, validators[3]), validators[3], [0, 1], p2p);
+		precommitNullInRounds(stub, getNodeForValidator(nodes, validators[4]), validators[4], [0, 1], p2p);
 
 		await runMany(nodes);
 		await snoozeForBlock(nodes);
@@ -337,12 +186,12 @@ describe<{
 		// others stay locked at round 0. In round 2 it re-proposes the block with validRound 1, a proof newer than
 		// the others' lock, which they have to accept.
 		for (const index of [1, 2, 3, 4]) {
-			ignoreForeignPrevotes(getNodeForValidator(nodes, validators[index]), index, 1);
+			ignoreForeignPrevotes(stub, getNodeForValidator(nodes, validators[index]), index, 1);
 		}
 
 		// Hold round 0 below +2/3 precommits for the block, so the locks survive into round 1.
-		precommitNullInRounds(getNodeForValidator(nodes, validators[3]), validators[3], [0], p2p);
-		precommitNullInRounds(getNodeForValidator(nodes, validators[4]), validators[4], [0], p2p);
+		precommitNullInRounds(stub, getNodeForValidator(nodes, validators[3]), validators[3], [0], p2p);
+		precommitNullInRounds(stub, getNodeForValidator(nodes, validators[4]), validators[4], [0], p2p);
 
 		await runMany(nodes);
 
@@ -407,17 +256,17 @@ describe<{
 	}) => {
 		// The proposer drops the others' round-0 prevotes, so it never locks and forges a fresh block in round 1,
 		// while the other nodes are locked on the round-0 block.
-		ignoreForeignPrevotes(getNodeForValidator(nodes, validators[0]), 0, 0);
+		ignoreForeignPrevotes(stub, getNodeForValidator(nodes, validators[0]), 0, 0);
 
 		// 3 of 5 precommits for the round-0 block is below +2/3, so round 0 fails and the locks hold.
-		precommitNullInRounds(getNodeForValidator(nodes, validators[4]), validators[4], [0], p2p);
+		precommitNullInRounds(stub, getNodeForValidator(nodes, validators[4]), validators[4], [0], p2p);
 
 		// Nodes 1 and 4 hold back their round-1 prevote. With 3 of 5 prevotes the round cannot end, so the network
 		// waits in round 1 while node 1 restarts. Node 1 comes back on a new consensus instance, so the real prevote
 		// it then casts is its only one for the round.
 		const node1 = getNodeForValidator(nodes, validators[1]);
-		skipPrevoteInRound(node1, 1);
-		skipPrevoteInRound(getNodeForValidator(nodes, validators[4]), 1);
+		skipPrevoteInRound(stub, node1, 1);
+		skipPrevoteInRound(stub, getNodeForValidator(nodes, validators[4]), 1);
 
 		await runMany(nodes);
 		await snoozeUntil(() => p2p.proposals.getMessages(1, 1).length === 1);
@@ -491,7 +340,9 @@ describe<{
 		// send: A again, validRound 0, proven by the round-0 prevotes.
 		// Round 3: the proposer re-proposes its own valid value B, which no lock forbids.
 		const nodeOfValidator = (validatorIndex: number) => getNodeForValidator(nodes, validators[validatorIndex]);
-		const lossOfValidator = validators.map((validator) => loseMessagesOn(getNodeForValidator(nodes, validator)));
+		const lossOfValidator = validators.map((validator) =>
+			loseMessagesOn(stub, getNodeForValidator(nodes, validator)),
+		);
 
 		lossOfValidator[4].dropProposal(0);
 		lossOfValidator[4].dropProposal(1);

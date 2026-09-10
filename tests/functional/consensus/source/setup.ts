@@ -251,7 +251,6 @@ const stopMany = async (apps: Contracts.Kernel.Application[]) => {
 	}
 };
 
-
 const restart = async (
 	app: Contracts.Kernel.Application,
 	id: number,

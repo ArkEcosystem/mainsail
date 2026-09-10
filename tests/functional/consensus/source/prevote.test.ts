@@ -1,5 +1,5 @@
 import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
 import { sleep } from "@mainsail/utils";
 
@@ -25,7 +25,7 @@ describe<{
 	nodes: Contracts.Kernel.Application[];
 	validators: Validator[];
 	p2p: P2PRegistry;
-}>("Propose", ({ beforeEach, afterEach, it, assert, stub }) => {
+}>("Prevote", ({ beforeEach, afterEach, it, assert, stub }) => {
 	const totalNodes = 5;
 
 	beforeEach(async (context) => {
@@ -89,9 +89,21 @@ describe<{
 		});
 
 		await runMany(nodes);
+		await snoozeUntil(() => p2p.prevotes.getMessages(1, 0).length === totalNodes - 2);
 		await sleep(500);
 
+		// Three prevotes are below +2/3 for the block and below +2/3 of any kind, so nobody precommits and no timeout
+		// runs: every node stays in round 0 at the prevote step, and nothing is confirmed.
+		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes - 2);
 		assert.equal(p2p.precommits.getMessages(1, 0).length, 0);
+		await assertBlockNumber(nodes, 0);
+		for (const node of nodes) {
+			const consensus = node.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
+			assert.equal(
+				[consensus.getBlockNumber(), consensus.getRound(), consensus.getStep()],
+				[1, 0, Enums.Consensus.Step.Prevote],
+			);
+		}
 	});
 
 	it("should confirm block, if < minority prevote null", async ({ nodes, validators, p2p }) => {

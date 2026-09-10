@@ -9,6 +9,7 @@ import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound, assertInvalidBlock } from "./asserts.js";
 import { Validator } from "./contracts.js";
 import { makeCustomProposal } from "./custom-proposal.js";
+import { disconnect } from "./faults.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import {
@@ -32,27 +33,6 @@ describe<{
 	p2p: P2PRegistry;
 }>("Commit", ({ beforeEach, afterEach, it, assert, stub }) => {
 	const totalNodes = 5;
-
-	// Cuts `node` off from the network: every proposal and message reaching its processors is dropped, its own
-	// votes included, so it neither hears nor says anything. Returns the function that reconnects it.
-	const disconnect = (node: Contracts.Kernel.Application): (() => void) => {
-		const stubs = [
-			stub(
-				node.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal),
-				"process",
-			).resolvedValue(Skipped),
-			stub(
-				node.get<Contracts.Consensus.MessageProcessor>(Identifiers.Consensus.Processor.Message),
-				"process",
-			).resolvedValue(Skipped),
-		];
-
-		return () => {
-			for (const stubbed of stubs) {
-				stubbed.restore();
-			}
-		};
-	};
 
 	const commitProcessorOf = (node: Contracts.Kernel.Application) =>
 		node.get<Contracts.Consensus.CommitProcessor>(Identifiers.Consensus.Processor.Commit);
@@ -87,7 +67,7 @@ describe<{
 		const others = nodes.filter((node) => node !== node4);
 
 		// Node 4 is cut off while the others forge three blocks without it.
-		const reconnect = disconnect(node4);
+		const reconnect = disconnect(stub, node4);
 
 		await runMany(nodes);
 		await snoozeForBlock(others, 3);
@@ -146,7 +126,7 @@ describe<{
 		const others = nodes.filter((node) => node !== node4);
 
 		// Node 4 misses blocks 1 and 2.
-		disconnect(node4);
+		disconnect(stub, node4);
 
 		await runMany(nodes);
 		await snoozeForBlock(others, 2);

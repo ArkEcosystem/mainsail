@@ -210,40 +210,17 @@ export const makeTransactionBuilderContext = (
 
 	return {
 		...context,
-		fundedWalletProvider: async (
-			context: { app: Contracts.Kernel.Application; wallets: Contracts.Crypto.KeyPair[] },
-			amount?: bigint,
-		): Promise<Contracts.Crypto.KeyPair> => {
-			// create a random wallet with funds (without sending a transaction)
-			const { app } = context;
-
-			const seed = randomBytes(32).toString("hex");
-
-			const randomKeyPair = await app
+		// A fresh key pair. The funds are the caller's business; the genesis wallets are funded already.
+		fundedWalletProvider: async (context: {
+			app: Contracts.Kernel.Application;
+			wallets: Contracts.Crypto.KeyPair[];
+		}): Promise<Contracts.Crypto.KeyPair> =>
+			context.app
 				.getTagged<Contracts.Crypto.KeyPairFactory>(
 					Identifiers.Cryptography.Identity.KeyPair.Factory,
 					"type",
 					"wallet",
 				)
-				.fromMnemonic(seed);
-
-			// const recipient = await app
-			// 	.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Identity.Address.Factory)
-			// 	.fromPublicKey(randomKeyPair.publicKey);
-
-			// amount = amount ?? 10000000000n;
-
-			// for (const node of nodes) {
-			// 	const { walletRepository } = app
-			// 		.get<Contracts.State.Store>(Identifiers.State.Store)
-			// 		.getStore();
-			// 	const wallet = walletRepository.findByAddress(recipient);
-			// 	wallet.setBalance(amount);
-			// }
-
-			// console.log("random funded wallet", recipient, randomKeyPair.publicKey);
-
-			return randomKeyPair;
-		},
+				.fromMnemonic(randomBytes(32).toString("hex")),
 	};
 };

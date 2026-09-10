@@ -1,12 +1,12 @@
-import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import type { Contracts } from "@mainsail/contracts";
-import { Enums, Events, Identifiers } from "@mainsail/constants";
+import { Events, Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
 
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound, assertCommitRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
+import { disconnect, skipProposalsBeforeRound } from "./faults.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import { getNodeForValidator, getValidatorsInSlotOrder, prepareNodeValidators, snoozeForBlock } from "./utilities.js";
@@ -35,51 +35,6 @@ describe<{
 		}
 
 		return startedRounds;
-	};
-
-	// Cuts `node` off from the network: every proposal and message reaching its processors is dropped, its own
-	// votes included, so it neither hears nor says anything. Returns the function that reconnects it.
-	const disconnect = (node: Contracts.Kernel.Application): (() => void) => {
-		const stubs = [
-			stub(
-				node.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal),
-				"process",
-			).resolvedValue(Enums.Consensus.ProcessorResult.Skipped),
-			stub(
-				node.get<Contracts.Consensus.MessageProcessor>(Identifiers.Consensus.Processor.Message),
-				"process",
-			).resolvedValue(Enums.Consensus.ProcessorResult.Skipped),
-		];
-
-		return () => {
-			for (const stubbed of stubs) {
-				stubbed.restore();
-			}
-		};
-	};
-
-	// The proposer fails to build a block before `round` (an overloaded node, say), so the earlier rounds time out
-	// on nil. From `round` on it proposes as usual; `beforeProposing` runs at the start of that round, before any
-	// message of the round exists.
-	const skipProposalsBeforeRound = (
-		node: Contracts.Kernel.Application,
-		round: number,
-		beforeProposing: () => void,
-	) => {
-		const consensus = node.get<Consensus>(Identifiers.Consensus.Service);
-		const prepareProposal = consensus.prepareProposal.bind(consensus);
-		const stubPrepare = stub(consensus, "prepareProposal");
-
-		stubPrepare.callsFake(async (...arguments_: unknown[]) => {
-			if (consensus.getRound() < round) {
-				return;
-			}
-
-			stubPrepare.restore();
-			beforeProposing();
-
-			await prepareProposal(arguments_[0] as Contracts.Consensus.RoundState);
-		});
 	};
 
 	beforeEach(async (context) => {
@@ -117,8 +72,8 @@ describe<{
 		// those rounds end on nil for the four connected nodes, as the protocol prescribes. Node 4, hearing
 		// nothing, stays in round 0. It is reconnected the moment the proposer starts round 2, before any message
 		// of that round exists, so everything it then hears is genuine.
-		const reconnect = disconnect(node4);
-		skipProposalsBeforeRound(node0, skippedTo, reconnect);
+		const reconnect = disconnect(stub, node4);
+		skipProposalsBeforeRound(stub, node0, skippedTo, reconnect);
 
 		await runMany(nodes);
 		await snoozeForBlock(nodes);

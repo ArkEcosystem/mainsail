@@ -3,6 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { sleep } from "@mainsail/utils";
 
 import type { Validator, ValidatorsJson } from "./contracts.js";
+import type { P2PRegistry } from "./p2p.js";
 
 export const prepareNodeValidators = (validators: ValidatorsJson, nodeIndex: number, totalNodes: number) => {
 	const secrets = validators.secrets;
@@ -128,14 +129,7 @@ export const makePrevote = async (
 		throw new Error(`Validator ${validator.consensusPublicKey} not found`);
 	}
 
-	return await proposer.prevote(
-		app
-			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-			.getValidatorIndexByWalletAddress(validator.address),
-		blockNumber,
-		round,
-		blockHash,
-	);
+	return await proposer.prevote(getValidatorIndex(app, validator), blockNumber, round, blockHash);
 };
 
 export const makePrecommit = async (
@@ -153,14 +147,47 @@ export const makePrecommit = async (
 		throw new Error(`Validator ${validator.consensusPublicKey} not found`);
 	}
 
-	return await proposer.precommit(
-		app
-			.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
-			.getValidatorIndexByWalletAddress(validator.address),
-		blockNumber,
-		round,
-		blockHash,
-	);
+	return await proposer.precommit(getValidatorIndex(app, validator), blockNumber, round, blockHash);
+};
+
+// The proposal a proposer whose valid value dates from `validRound` sends in `round`: the block of that round
+// again, proven by the +2/3 prevotes it gathered there. Built from the messages the network saw, so that a test
+// can stand in for the rotating proposer the pinned harness lacks. Signed by `validator` on `app`.
+export const makeReProposal = async (
+	app: Contracts.Kernel.Application,
+	validator: Validator,
+	p2p: P2PRegistry,
+	round: number,
+	validRound: number,
+): Promise<Contracts.Crypto.Proposal> => {
+	const [proposal] = p2p.proposals.getMessages(1, validRound);
+	if (!proposal.isDataDeserialized) {
+		await proposal.deserializePayload();
+	}
+	const block = proposal.getPayload().block;
+
+	const signatures = new Map<number, { signature: string }>();
+	for (const prevote of p2p.prevotes.getMessages(1, validRound)) {
+		if (prevote.blockHash === block.hash) {
+			signatures.set(prevote.validatorIndex, { signature: prevote.signature });
+		}
+	}
+
+	const { roundValidators } = app
+		.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+		.getMilestone(1);
+	const lockProof = await app
+		.get<Contracts.Consensus.Aggregator>(Identifiers.Consensus.Aggregator)
+		.aggregate(signatures, roundValidators);
+
+	const proposer = app
+		.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository)
+		.getValidator(validator.consensusPublicKey);
+	if (!proposer) {
+		throw new Error(`Validator ${validator.consensusPublicKey} not found`);
+	}
+
+	return proposer.propose(getValidatorIndex(app, validator), round, validRound, block, lockProof);
 };
 
 export const snoozeUntil = async (predicate: () => boolean, timeout = 10_000, interval = 10): Promise<void> => {
@@ -312,10 +339,10 @@ export const getCommits = async (
 export const getLastCommit = async (app: Contracts.Kernel.Application): Promise<Contracts.Crypto.Commit> => {
 	const databaseService = app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
 
-	const lasCommit = await databaseService.getLastCommit();
+	const lastCommit = await databaseService.getLastCommit();
 	const [serialized] = await databaseService.findCommitBuffers(
-		lasCommit.block.number,
-		lasCommit.block.number,
+		lastCommit.block.number,
+		lastCommit.block.number,
 		Number.MAX_SAFE_INTEGER,
 	);
 

@@ -3,7 +3,10 @@ import { assert } from "@mainsail/test-runner";
 
 import { getLastCommit, InvalidBlock } from "./utilities.js";
 
-export const assertBlockNumber = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], blockNumber: number): Promise<void> => {
+export const assertBlockNumber = async (
+	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
+	blockNumber: number,
+): Promise<void> => {
 	const nodes = Array.isArray(app) ? app : [app];
 
 	for (const node of nodes) {
@@ -13,7 +16,10 @@ export const assertBlockNumber = async (app: Contracts.Kernel.Application | Cont
 	}
 };
 
-export const assertBlockRound = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], round: number): Promise<void> => {
+export const assertBlockRound = async (
+	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
+	round: number,
+): Promise<void> => {
 	const nodes = Array.isArray(app) ? app : [app];
 
 	for (const node of nodes) {
@@ -23,7 +29,10 @@ export const assertBlockRound = async (app: Contracts.Kernel.Application | Contr
 	}
 };
 
-export const assertCommitRound = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], round: number): Promise<void> => {
+export const assertCommitRound = async (
+	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
+	round: number,
+): Promise<void> => {
 	const nodes = Array.isArray(app) ? app : [app];
 
 	for (const node of nodes) {
@@ -33,7 +42,10 @@ export const assertCommitRound = async (app: Contracts.Kernel.Application | Cont
 	}
 };
 
-export const assertBlockHash = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], id?: string): Promise<void> => {
+export const assertBlockHash = async (
+	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
+	id?: string,
+): Promise<void> => {
 	const nodes = Array.isArray(app) ? app : [app];
 
 	if (id === undefined) {

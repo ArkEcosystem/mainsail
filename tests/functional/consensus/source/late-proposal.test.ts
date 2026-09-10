@@ -7,6 +7,7 @@ import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound, assertCommitRound } from "./asserts.js";
 import { Validator } from "./contracts.js";
+import { holdProposal } from "./faults.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import {
@@ -26,39 +27,6 @@ describe<{
 	p2p: P2PRegistry;
 }>("Late proposal", ({ beforeEach, afterEach, it, assert, stub }) => {
 	const totalNodes = 5;
-
-	// Holds the proposal for block 1, round 0 back on `node` until `release` resolves, then processes it as usual.
-	// Every peer re-broadcasts a proposal it accepts, so several copies reach the node; all of them wait for the
-	// same release, and the real processor then skips the duplicates. The outcome of every held copy is collected
-	// in `results`.
-	const holdProposal = (node: Contracts.Kernel.Application, release: () => Promise<void>) => {
-		const proposalProcessor = node.get<Contracts.Consensus.ProposalProcessor>(
-			Identifiers.Consensus.Processor.Proposal,
-		);
-		const process = proposalProcessor.process.bind(proposalProcessor);
-		const stubProcess = stub(proposalProcessor, "process");
-
-		const results: Contracts.Consensus.ProcessorResult[] = [];
-		let released: Promise<void> | undefined;
-
-		stubProcess.callsFake(async (...arguments_: unknown[]) => {
-			const proposal = arguments_[0] as Contracts.Crypto.Proposal;
-
-			if (proposal.blockHeader.number !== 1 || proposal.round !== 0) {
-				return process(proposal, arguments_[1] as boolean | undefined);
-			}
-
-			released ??= release().then(() => stubProcess.restore());
-			await released;
-
-			const result = await process(proposal, arguments_[1] as boolean | undefined);
-			results.push(result);
-
-			return result;
-		});
-
-		return { results };
-	};
 
 	beforeEach(async (context) => {
 		context.p2p = new P2PRegistry();
@@ -93,7 +61,7 @@ describe<{
 
 		// Node 4 sees the proposal only once the rest of the network has decided on the block.
 		let precommitsBeforeProposal = 0;
-		holdProposal(node4, async () => {
+		holdProposal(stub, node4, async () => {
 			await snoozeUntil(() => roundState().hasMajorityPrecommitsWithoutProposal());
 			precommitsBeforeProposal = roundState().getPrecommits().length;
 		});
@@ -138,7 +106,7 @@ describe<{
 		// The propose timeout of node 4 expires just before the proposal arrives: it prevotes nil and moves on
 		// to the prevote step.
 		let stepBeforeProposal: Contracts.Consensus.Step | undefined;
-		holdProposal(node4, async () => {
+		holdProposal(stub, node4, async () => {
 			await consensus.onTimeoutPropose(1, 0);
 			stepBeforeProposal = consensus.getStep();
 		});
@@ -192,7 +160,7 @@ describe<{
 		// Both timeouts of node 4 expire before the proposal arrives: it prevotes nil, precommits nil, and is in the
 		// precommit step when the proposal finally comes.
 		let stepBeforeProposal: Contracts.Consensus.Step | undefined;
-		holdProposal(node4, async () => {
+		holdProposal(stub, node4, async () => {
 			await consensus.onTimeoutPropose(1, 0);
 			await consensus.onTimeoutPrevote(1, 0);
 			stepBeforeProposal = consensus.getStep();
@@ -255,7 +223,7 @@ describe<{
 		// The +2/3 precommits of the others start the precommit timeout on node 4, which moves it on to round 1.
 		// Only then does the proposal for round 0 arrive.
 		let roundBeforeProposal: number | undefined;
-		const held = holdProposal(node4, async () => {
+		const held = holdProposal(stub, node4, async () => {
 			await snoozeUntil(() => consensus.getRound() >= 1);
 			roundBeforeProposal = consensus.getRound();
 		});

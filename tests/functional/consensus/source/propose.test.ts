@@ -130,7 +130,13 @@ describe<{
 
 		await runMany(nodes);
 
-		const proposal0 = await makeProposal(getNodeForValidator(nodes, validators[1]), validators[1], 1, 0, Date.now());
+		const proposal0 = await makeProposal(
+			getNodeForValidator(nodes, validators[1]),
+			validators[1],
+			1,
+			0,
+			Date.now(),
+		);
 		await p2p.broadcastProposal(proposal0);
 
 		await snoozeForBlock(nodes);
