@@ -10,6 +10,7 @@ import { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import {
+	getCommits,
 	getLastCommit,
 	getNodeForValidator,
 	getValidatorIndex,
@@ -28,7 +29,8 @@ describe<{
 
 	// Holds the proposal for block 1, round 0 back on `node` until `release` resolves, then processes it as usual.
 	// Every peer re-broadcasts a proposal it accepts, so several copies reach the node; all of them wait for the
-	// same release, and the real processor then skips the duplicates.
+	// same release, and the real processor then skips the duplicates. The outcome of every held copy is collected
+	// in `results`.
 	const holdProposal = (node: Contracts.Kernel.Application, release: () => Promise<void>) => {
 		const proposalProcessor = node.get<Contracts.Consensus.ProposalProcessor>(
 			Identifiers.Consensus.Processor.Proposal,
@@ -36,6 +38,7 @@ describe<{
 		const process = proposalProcessor.process.bind(proposalProcessor);
 		const stubProcess = stub(proposalProcessor, "process");
 
+		const results: Contracts.Consensus.ProcessorResult[] = [];
 		let released: Promise<void> | undefined;
 
 		stubProcess.callsFake(async (...arguments_: unknown[]) => {
@@ -46,8 +49,13 @@ describe<{
 				await released;
 			}
 
-			return process(proposal, arguments_[1] as boolean | undefined);
+			const result = await process(proposal, arguments_[1] as boolean | undefined);
+			results.push(result);
+
+			return result;
 		});
+
+		return { results };
 	};
 
 	beforeEach(async (context) => {
@@ -169,5 +177,118 @@ describe<{
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
 		await assertBlockRound(nodes, 0);
+	});
+
+	it("should still confirm the block after precommitting nil, when the proposal arrives with +2/3 votes for it", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node4 = getNodeForValidator(nodes, validators[4]);
+		const consensus = node4.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
+
+		// Both timeouts of node 4 expire before the proposal arrives: it prevotes nil, precommits nil, and is in the
+		// precommit step when the proposal finally comes.
+		let stepBeforeProposal: Contracts.Consensus.Step | undefined;
+		holdProposal(node4, async () => {
+			await consensus.onTimeoutPropose(1, 0);
+			await consensus.onTimeoutPrevote(1, 0);
+			stepBeforeProposal = consensus.getStep();
+		});
+
+		await runMany(nodes);
+		await snoozeForBlock(nodes);
+
+		assert.equal(stepBeforeProposal, Enums.Consensus.Step.Precommit);
+
+		const blockHash = (await getLastCommit(node4)).block.hash;
+		const validatorIndex = getValidatorIndex(node4, validators[4]);
+
+		// Node 4 voted nil twice, the others for the block...
+		assert.equal(
+			p2p.prevotes.getMessagesByValidator(1, 0, validatorIndex).map((prevote) => prevote.blockHash),
+			[undefined],
+		);
+		assert.equal(
+			p2p.precommits.getMessagesByValidator(1, 0, validatorIndex).map((precommit) => precommit.blockHash),
+			[undefined],
+		);
+		assert.equal(
+			p2p.prevotes
+				.getMessages(1, 0)
+				.map((prevote) => prevote.blockHash)
+				.sort(),
+			[blockHash, blockHash, blockHash, blockHash, undefined].sort(),
+		);
+		assert.equal(
+			p2p.precommits
+				.getMessages(1, 0)
+				.map((precommit) => precommit.blockHash)
+				.sort(),
+			[blockHash, blockHash, blockHash, blockHash, undefined].sort(),
+		);
+
+		// ...yet with the proposal and +2/3 precommits for it in hand, node 4 confirms the block with everybody
+		// else (Tendermint line 49): its own nil votes do not stand in the way of the decision.
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 0);
+		await assertCommitRound(nodes, 0);
+		await assertBlockHash(nodes);
+
+		// Next block
+		await snoozeForBlock(nodes, 2);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 0);
+	});
+
+	it("should drop a proposal for a round it has already left, and take the block from the commit instead", async ({
+		nodes,
+		validators,
+	}) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
+		const node4 = getNodeForValidator(nodes, validators[4]);
+		const others = nodes.filter((node) => node !== node4);
+		const consensus = node4.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
+
+		// The +2/3 precommits of the others start the precommit timeout on node 4, which moves it on to round 1.
+		// Only then does the proposal for round 0 arrive.
+		let roundBeforeProposal: number | undefined;
+		const held = holdProposal(node4, async () => {
+			await snoozeUntil(() => consensus.getRound() >= 1);
+			roundBeforeProposal = consensus.getRound();
+		});
+
+		await runMany(nodes);
+		await snoozeForBlock(others);
+		await snoozeUntil(() => held.results.length > 0);
+
+		assert.equal(roundBeforeProposal, 1);
+
+		// Every copy of the proposal is skipped: round 0 is over for node 4, so the block never reaches its round
+		// state and node 4 stays behind, while the others confirmed the block in round 0 and moved on.
+		assert.true(held.results.every((result) => result === Enums.Consensus.ProcessorResult.Skipped));
+		assert.false(
+			node4
+				.get<Contracts.Consensus.RoundStateRepository>(Identifiers.Consensus.RoundStateRepository)
+				.getRoundState(1, 0)
+				.hasProposal(),
+		);
+		await assertBlockNumber([node4], 0);
+		assert.equal(consensus.getBlockNumber(), 1);
+
+		const [commit] = await getCommits(node0, 1, 1);
+		assert.defined(commit);
+		assert.equal(commit.proof.round, 0);
+
+		// The commit of the others is the way back, as the block downloader would deliver it: node 4 applies it
+		// and holds the same block 1.
+		assert.equal(
+			await node4
+				.get<Contracts.Consensus.CommitProcessor>(Identifiers.Consensus.Processor.Commit)
+				.process(commit),
+			Enums.Consensus.ProcessorResult.Accepted,
+		);
+		await assertBlockNumber([node4], 1);
+		await assertBlockHash([node4], commit.block.hash);
 	});
 });
