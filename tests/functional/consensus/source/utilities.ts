@@ -78,6 +78,11 @@ export const getNodeForValidator = (
 	return node;
 };
 
+export const getValidatorIndex = (app: Contracts.Kernel.Application, validator: Validator): number =>
+	app
+		.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service)
+		.getValidatorIndexByWalletAddress(validator.address);
+
 export const makeProposal = async (
 	app: Contracts.Kernel.Application,
 	validator: Validator,
@@ -287,6 +292,22 @@ export async function snoozeForInvalidBlock(
 		return function_(app);
 	}
 }
+
+export const getCommits = async (
+	app: Contracts.Kernel.Application,
+	start: number,
+	end: number,
+): Promise<Contracts.Crypto.Commit[]> => {
+	const commits: Contracts.Crypto.Commit[] = [];
+
+	for await (const commit of app
+		.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service)
+		.readCommits(start, end)) {
+		commits.push(commit);
+	}
+
+	return commits;
+};
 
 export const getLastCommit = async (app: Contracts.Kernel.Application): Promise<Contracts.Crypto.Commit> => {
 	const databaseService = app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
