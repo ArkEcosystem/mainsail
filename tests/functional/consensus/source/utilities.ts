@@ -145,6 +145,30 @@ export const makePrecommit = async (
 	return await proposer.precommit(getValidatorIndex(app, validator), blockNumber, round, blockHash);
 };
 
+// The lock proof for `blockHash` in `round`: the prevotes for it that the network saw there, aggregated. With
+// +2/3 of them it is what a re-proposal of the block has to carry.
+export const makeLockProof = async (
+	app: Contracts.Kernel.Application,
+	p2p: P2PRegistry,
+	round: number,
+	blockHash: string,
+): Promise<Contracts.Crypto.AggregatedSignature> => {
+	const signatures = new Map<number, { signature: string }>();
+	for (const prevote of p2p.prevotes.getMessages(1, round)) {
+		if (prevote.blockHash === blockHash) {
+			signatures.set(prevote.validatorIndex, { signature: prevote.signature });
+		}
+	}
+
+	const { roundValidators } = app
+		.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+		.getMilestone(1);
+
+	return app
+		.get<Contracts.Consensus.Aggregator>(Identifiers.Consensus.Aggregator)
+		.aggregate(signatures, roundValidators);
+};
+
 // The proposal a proposer whose valid value dates from `validRound` sends in `round`: the block of that round
 // again, proven by the +2/3 prevotes it gathered there. Built from the messages the network saw, so that a test
 // can stand in for the rotating proposer the pinned harness lacks. Signed by `validator` on `app`.
@@ -161,23 +185,13 @@ export const makeReProposal = async (
 	}
 	const block = proposal.getPayload().block;
 
-	const signatures = new Map<number, { signature: string }>();
-	for (const prevote of p2p.prevotes.getMessages(1, validRound)) {
-		if (prevote.blockHash === block.hash) {
-			signatures.set(prevote.validatorIndex, { signature: prevote.signature });
-		}
-	}
-
-	const { roundValidators } = app
-		.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
-		.getMilestone(1);
-	const lockProof = await app
-		.get<Contracts.Consensus.Aggregator>(Identifiers.Consensus.Aggregator)
-		.aggregate(signatures, roundValidators);
-
-	const proposer = getSigner(app, validator);
-
-	return proposer.propose(getValidatorIndex(app, validator), round, validRound, block, lockProof);
+	return getSigner(app, validator).propose(
+		getValidatorIndex(app, validator),
+		round,
+		validRound,
+		block,
+		await makeLockProof(app, p2p, validRound, block.hash),
+	);
 };
 
 export const snoozeUntil = async (predicate: () => boolean, timeout = 10_000, interval = 10): Promise<void> => {
