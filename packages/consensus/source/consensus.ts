@@ -136,17 +136,27 @@ export class Consensus implements Contracts.Consensus.Service {
 		try {
 			await this.#handlerLock.runExclusive(async () => {
 				await this.#bootstrap();
-				await this.startRound(this.#round);
+				await this.#beginRound();
 
 				if (this.#isDisposed) {
 					return;
 				}
 
-				await this.applyRules(this.roundStateRepository.getRoundState(this.#blockNumber, this.#round));
+				// Every stored round of the height, in order. An earlier round can hold the proposal and +2/3
+				// precommits that decide the height, the current one is where this node takes part again, and a
+				// later one can carry the f+1 messages that move it on. A commit changes the height, which leaves
+				// the remaining round states stale.
+				const roundStates = this.roundStateRepository
+					.getRoundStates()
+					.filter((roundState) => roundState.blockNumber === this.#blockNumber)
+					.sort((a, b) => a.round - b.round);
 
-				// Rerun previous rounds, in case proposal & +2/3 precommits were received
-				for (let index = 0; index < this.#round; index++) {
-					await this.applyRules(this.roundStateRepository.getRoundState(this.#blockNumber, index));
+				for (const roundState of roundStates) {
+					if (roundState.blockNumber !== this.#blockNumber) {
+						break;
+					}
+
+					await this.applyRules(roundState);
 				}
 			});
 		} catch (rawError) {
@@ -231,6 +241,11 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#didMajorityPrevote = false;
 		this.#didMajorityPrecommit = false;
 		this.#didMajorityPrecommitWithoutProposal = false;
+
+		await this.#beginRound();
+	}
+
+	async #beginRound(): Promise<void> {
 		this.#roundStartTime = dayjs().valueOf();
 
 		// A proposal still being built belongs to the round that just ended. Dropping it here keeps
@@ -238,7 +253,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#proposalPromise = undefined;
 
 		this.scheduler.clear();
-		this.statisticService.newRound(this.#blockNumber, round);
+		this.statisticService.newRound(this.#blockNumber, this.#round);
 
 		if (this.#isDisposed) {
 			return;
@@ -252,9 +267,14 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.RoundStarted, this.getState());
 
+		// Past the propose step the round has its proposal, or its propose timeout, behind it. .
+		if (this.#step !== Enums.Consensus.Step.Propose) {
+			return;
+		}
+
 		this.scheduler.scheduleTimeoutBlockPrepare(this.scheduler.getNextBlockTimestamp(this.#roundStartTime));
 
-		// TODO: Skip on sync
+			// TODO: Skip on sync
 		await this.prepareProposal(roundState);
 	}
 
