@@ -2,6 +2,7 @@ import type { Contracts, Utils } from "@mainsail/contracts";
 
 import { Enums, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
@@ -20,7 +21,33 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
-	public async loadRounds(): Promise<void> {
+	public async bootstrap(): Promise<Contracts.Consensus.State> {
+		const blockNumber = this.stateStore.getLastBlock().number + 1;
+
+		if (blockNumber !== this.configuration.getHeight()) {
+			throw new Error(
+				`bootstrapped block number ${blockNumber} does not match configuration block number ${this.configuration.getHeight()}`,
+			);
+		}
+
+		try {
+			await this.#loadRounds();
+
+			return this.#completed(await this.#getConsensusState(blockNumber));
+		} catch (rawError) {
+			const error = ensureError(rawError);
+
+			this.logger.error(
+				`Discarding stored consensus state for ${blockNumber.toLocaleString(Locale)}: ${error.message}`,
+				"consensus",
+			);
+			this.roundStateRepo.clear();
+
+			return this.#completed(this.#initialState(blockNumber));
+		}
+	}
+
+	async #loadRounds(): Promise<void> {
 		const proposals = await this.storage.getProposals();
 
 		this.logger.info(`Consensus Bootstrap - Proposals: ${proposals.length}`, "consensus");
@@ -44,62 +71,79 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 		}
 	}
 
-	// The state consensus starts from: the stored one when it belongs to the next block, otherwise the start of
-	// round 0, in which case the loaded round states go as well.
-	public async getConsensusState(): Promise<Contracts.Consensus.State> {
-		const blockNumber = this.stateStore.getLastBlock().number + 1;
-
-		if (blockNumber !== this.configuration.getHeight()) {
-			throw new Error(
-				`bootstrapped block number ${blockNumber} does not match configuration block number ${this.configuration.getHeight()}`,
-			);
-		}
-
+	async #getConsensusState(blockNumber: number): Promise<Contracts.Consensus.State> {
 		const stored = await this.storage.getState();
+		const roundStates = this.roundStateRepo.getRoundStates();
 
-		if (stored === undefined || stored.blockNumber !== blockNumber) {
-			if (stored !== undefined) {
-				const storedBlockNumber = stored.blockNumber.toLocaleString(Locale);
-				const currentBlockNumber = blockNumber.toLocaleString(Locale);
-
-				this.logger.warn(
-					`Skipping state restore, because stored block number is ${storedBlockNumber}, but should be ${currentBlockNumber}`,
-					"consensus",
-				);
+		if (stored === undefined) {
+			if (roundStates.length > 0) {
+				throw new Error("proposals or messages are stored without a state");
 			}
 
+			return this.#initialState(blockNumber);
+		}
+
+		if (stored.blockNumber < blockNumber) {
+			// Expected after a crash: the state is persisted on a clean shutdown only, so the store names the block
+			// the node was at back then. Nothing of it applies to the block at hand.
+			const storedBlockNumber = stored.blockNumber.toLocaleString(Locale);
+			const currentBlockNumber = blockNumber.toLocaleString(Locale);
+
+			this.logger.warn(
+				`Skipping state restore, because stored block number is ${storedBlockNumber}, but should be ${currentBlockNumber}`,
+				"consensus",
+			);
 			this.roundStateRepo.clear();
 
-			return this.#completed({ blockNumber, round: 0, step: Enums.Consensus.Step.Propose });
+			return this.#initialState(blockNumber);
+		}
+
+		if (stored.blockNumber > blockNumber) {
+			throw new Error(`stored block number ${stored.blockNumber} is ahead of the database`);
+		}
+
+		for (const roundState of roundStates) {
+			if (roundState.blockNumber !== blockNumber) {
+				throw new Error(`round state ${roundState.blockNumber}/${roundState.round} belongs to another block`);
+			}
 		}
 
 		const state = { ...stored } as Utils.Mutable<Contracts.Consensus.State>;
 
 		if (state.validRound !== undefined) {
-			const roundState = this.roundStateRepo.getRoundState(state.blockNumber, state.validRound);
-			const proposal = roundState.getProposal();
-
-			// The valid value gets re-proposed, which needs its proposal. State and proposals are stored in one
-			// transaction, so a missing proposal means the store was tampered with; propose a fresh block instead.
-			if (proposal) {
-				await proposal.deserializePayload();
-				state.validValue = roundState;
-			} else {
-				this.logger.warn(
-					`Consensus Bootstrap - Dropping valid round ${state.blockNumber}/${state.validRound}, because its proposal is not stored`,
-					"consensus",
-				);
-				state.validRound = undefined;
-			}
+			state.validValue = await this.#getProvenRoundState(blockNumber, state.validRound, "valid");
 		}
 
 		if (state.lockedRound !== undefined) {
-			// Only the round number of the locked value is consumed, so the round state needs no proposal. The lock
-			// is kept even when the valid value above was dropped, because forgetting it would weaken safety.
-			state.lockedValue = this.roundStateRepo.getRoundState(state.blockNumber, state.lockedRound);
+			state.lockedValue = await this.#getProvenRoundState(blockNumber, state.lockedRound, "locked");
 		}
 
-		return this.#completed(state);
+		return state;
+	}
+
+	async #getProvenRoundState(
+		blockNumber: number,
+		round: number,
+		kind: string,
+	): Promise<Contracts.Consensus.RoundState> {
+		const roundState = this.roundStateRepo.getRoundState(blockNumber, round);
+		const proposal = roundState.getProposal();
+
+		if (proposal === undefined) {
+			throw new Error(`the proposal of ${kind} round ${round} is not stored`);
+		}
+
+		await proposal.deserializePayload();
+
+		if (!roundState.hasMajorityPrevotes()) {
+			throw new Error(`the +2/3 prevotes of ${kind} round ${round} are not stored`);
+		}
+
+		return roundState;
+	}
+
+	#initialState(blockNumber: number): Contracts.Consensus.State {
+		return { blockNumber, round: 0, step: Enums.Consensus.Step.Propose };
 	}
 
 	#completed(state: Contracts.Consensus.State): Contracts.Consensus.State {

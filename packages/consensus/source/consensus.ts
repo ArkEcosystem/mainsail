@@ -110,28 +110,23 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	public async run(state: Contracts.Consensus.State): Promise<void> {
-		try {
-			await this.#handlerLock.runExclusive(async () => {
-				this.#blockNumber = state.blockNumber;
-				this.#round = state.round;
-				this.#step = state.step;
-				this.#lockedValue = state.lockedValue;
-				this.#validValue = state.validValue;
+		await this.#handlerLock.runExclusive(async () => {
+			this.#blockNumber = state.blockNumber;
+			this.#round = state.round;
+			this.#step = state.step;
+			this.#lockedValue = state.lockedValue;
+			this.#validValue = state.validValue;
 
-				await this.eventDispatcher.dispatch(Events.ConsensusEvent.Bootstrapped, this.getState());
+			await this.eventDispatcher.dispatch(Events.ConsensusEvent.Bootstrapped, this.getState());
 
-				await this.#beginRound();
+			await this.#beginRound();
 
-				if (this.#isDisposed) {
-					return;
-				}
+			if (this.#isDisposed) {
+				return;
+			}
 
-				await this.applyRules(this.roundStateRepository.getRoundState(this.#blockNumber, this.#round));
-			});
-		} catch (rawError) {
-			const error = ensureError(rawError);
-			await this.app.terminate("Consensus bootstrap error", error);
-		}
+			await this.applyRules(this.roundStateRepository.getRoundState(this.#blockNumber, this.#round));
+		});
 	}
 
 	public async dispose(): Promise<void> {

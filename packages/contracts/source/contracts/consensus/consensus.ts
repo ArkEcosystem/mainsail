@@ -84,8 +84,7 @@ export interface State extends StateData {
 }
 
 export interface Bootstrapper {
-	loadRounds(): Promise<void>;
-	getConsensusState(): Promise<State>;
+	bootstrap(): Promise<State>;
 }
 
 export interface Scheduler {
