@@ -11,6 +11,9 @@ export class Bootstrapper {
 	@inject(Identifiers.Consensus.Service)
 	private readonly consensus!: Contracts.Consensus.Service;
 
+	@inject(Identifiers.Consensus.Bootstrapper)
+	private readonly consensusBootstrapper!: Contracts.Consensus.Bootstrapper;
+
 	@inject(Identifiers.State.Store)
 	private stateStore!: Contracts.State.Store;
 
@@ -85,7 +88,8 @@ export class Bootstrapper {
 			.start(this.stateStore.getBlockNumber())
 			.catch((error) => this.app.terminate("evm-api worker failed to start", error));
 
-		await this.consensus.run();
+		await this.consensusBootstrapper.loadRounds();
+		await this.consensus.run(await this.consensusBootstrapper.getConsensusState());
 
 		await this.p2pServer.boot();
 		await this.p2pService.boot();

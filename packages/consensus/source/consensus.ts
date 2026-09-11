@@ -20,17 +20,8 @@ export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Consensus.Bootstrapper)
-	private readonly bootstrapper!: Contracts.Consensus.Bootstrapper;
-
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.Configuration;
-
 	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly processor!: Contracts.Processor.BlockProcessor;
-
-	@inject(Identifiers.State.Store)
-	private readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.Consensus.Processor.Proposal)
 	private readonly proposalProcessor!: Contracts.Consensus.ProposalProcessor;
@@ -108,24 +99,6 @@ export class Consensus implements Contracts.Consensus.Service {
 		return this.#isDisposed;
 	}
 
-	// Test seams. None of these is part of Contracts.Consensus.Service, so nothing resolved from the container can
-	// reach them; they let tests place the state machine at a position without replaying the rounds leading there.
-	public setRound(round: number): void {
-		this.#round = round;
-	}
-
-	public setStep(step: Contracts.Consensus.Step): void {
-		this.#step = step;
-	}
-
-	public setValidValue(roundState: Contracts.Consensus.RoundState): void {
-		this.#validValue = roundState;
-	}
-
-	public setProposal(proposalPromise: Promise<Contracts.Crypto.Proposal>): void {
-		this.#proposalPromise = proposalPromise;
-	}
-
 	public getState(): Contracts.Consensus.State {
 		return {
 			blockNumber: this.#blockNumber,
@@ -136,10 +109,17 @@ export class Consensus implements Contracts.Consensus.Service {
 		};
 	}
 
-	public async run(): Promise<void> {
+	public async run(state: Contracts.Consensus.State): Promise<void> {
 		try {
 			await this.#handlerLock.runExclusive(async () => {
-				await this.#bootstrap();
+				this.#blockNumber = state.blockNumber;
+				this.#round = state.round;
+				this.#step = state.step;
+				this.#lockedValue = state.lockedValue;
+				this.#validValue = state.validValue;
+
+				await this.eventDispatcher.dispatch(Events.ConsensusEvent.Bootstrapped, this.getState());
+
 				await this.#beginRound();
 
 				if (this.#isDisposed) {
@@ -744,46 +724,6 @@ export class Consensus implements Contracts.Consensus.Service {
 
 			this.#runInBackground("Processing own precommit", () => this.messageProcessor.process(precommit));
 		}
-	}
-
-	async #bootstrap(): Promise<void> {
-		this.#blockNumber = this.stateStore.getLastBlock().number + 1;
-
-		const state = await this.bootstrapper.run();
-
-		if (state) {
-			if (state.blockNumber === this.#blockNumber) {
-				this.#step = state.step;
-				this.#round = state.round;
-				this.#lockedValue = state.lockedValue;
-				this.#validValue = state.validValue;
-			} else {
-				const storedBlockNumber = state.blockNumber.toLocaleString(Locale);
-				const currentBlockNumber = this.#blockNumber.toLocaleString(Locale);
-
-				this.logger.warn(
-					`Skipping state restore, because stored block number is ${storedBlockNumber}, but should be ${currentBlockNumber}`,
-					"consensus",
-				);
-
-				this.roundStateRepository.clear();
-			}
-		}
-
-		if (this.#blockNumber !== this.configuration.getHeight()) {
-			throw new Error(
-				`bootstrapped block number ${
-					this.#blockNumber
-				} does not match configuration block number ${this.configuration.getHeight()}`,
-			);
-		}
-
-		this.logger.info(
-			`Completed consensus bootstrap for ${this.#getBlockNumberRoundString()} with total round ${this.stateStore.getTotalRound()}`,
-			"consensus",
-		);
-
-		await this.eventDispatcher.dispatch(Events.ConsensusEvent.Bootstrapped, this.getState());
 	}
 
 	async #processProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {

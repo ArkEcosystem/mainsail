@@ -63,7 +63,7 @@ export interface RoundStateRepository {
 }
 
 export interface Service {
-	run(): Promise<void>;
+	run(state: State): Promise<void>;
 	getBlockNumber(): number;
 	getRound(): number;
 	getStep(): Step;
@@ -84,7 +84,8 @@ export interface State extends StateData {
 }
 
 export interface Bootstrapper {
-	run(): Promise<State | undefined>;
+	loadRounds(): Promise<void>;
+	getConsensusState(): Promise<State>;
 }
 
 export interface Scheduler {
