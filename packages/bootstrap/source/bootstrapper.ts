@@ -85,8 +85,7 @@ export class Bootstrapper {
 			.start(this.stateStore.getBlockNumber())
 			.catch((error) => this.app.terminate("evm-api worker failed to start", error));
 
-		// TODO: Check if we can extract bootstrap
-		void this.consensus.run();
+		await this.consensus.run();
 
 		await this.p2pServer.boot();
 		await this.p2pService.boot();
