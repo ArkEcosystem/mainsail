@@ -61,7 +61,12 @@ describe<{
 	const flushTimers = () => new Promise((resolve) => setTimeout(resolve, 1));
 
 	beforeEach((context) => {
-		context.consensus = { getBlockNumber: () => blockNumber, getRound: () => round, handle: async () => {} };
+		context.consensus = {
+			getBlockNumber: () => blockNumber,
+			getRound: () => round,
+			handle: async () => {},
+			isDisposed: () => false,
+		};
 		context.commitLock = { runNonExclusive: async (callback: () => Promise<unknown>) => callback() };
 		context.stateStore = {
 			getGenesisCommit: () => ({ block: { hash: genesisBlockHash } }),
@@ -110,6 +115,23 @@ describe<{
 		await flushTimers();
 
 		runNonExclusive.calledOnce();
+	});
+
+	it("#process - should skip every proposal once consensus is disposed", async ({
+		processor,
+		consensus,
+		proposerCalculator,
+		roundStateRepository,
+	}) => {
+		// The round states are persisted right after dispose; nothing may be added to them any more.
+		consensus.isDisposed = () => true;
+		const getValidatorIndex = spy(proposerCalculator, "getValidatorIndex");
+		const getRoundState = spy(roundStateRepository, "getRoundState");
+
+		assert.equal(await processor.process(makeProposal()), Skipped);
+
+		getValidatorIndex.neverCalled();
+		getRoundState.neverCalled();
 	});
 
 	it("#process - should skip a proposal for another block number", async ({
