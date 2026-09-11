@@ -1,5 +1,5 @@
 import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Enums, Identifiers } from "@mainsail/constants";
+import { Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
 
 import crypto from "../config/crypto.json" with { type: "json" };
@@ -17,6 +17,7 @@ import {
 	makeReProposal,
 	prepareNodeValidators,
 	snoozeForBlock,
+	snoozeForRound,
 	snoozeUntil,
 } from "./utilities.js";
 import type { Contracts } from "@mainsail/contracts";
@@ -262,16 +263,31 @@ describe<{
 		// 3 of 5 precommits for the round-0 block is below +2/3, so round 0 fails and the locks hold.
 		precommitNullInRounds(stub, getNodeForValidator(nodes, validators[4]), validators[4], [0], p2p);
 
-		// Nodes 1 and 4 hold back their round-1 prevote. With 3 of 5 prevotes the round cannot end, so the network
-		// waits in round 1 while node 1 restarts. Node 1 comes back on a new consensus instance, so the real prevote
-		// it then casts is its only one for the round.
+		// Node 4 holds back its round-1 prevote, and the round-1 proposal never reaches node 1 before its restart:
+		// node 1 goes down in round 1 at the propose step, locked on the round-0 block. With 3 of 5 prevotes the
+		// round cannot end, so the network waits in round 1 for node 1. Its propose timeout is held off as well, so
+		// that the step it goes down at does not depend on how long the restart takes.
 		const node1 = getNodeForValidator(nodes, validators[1]);
-		skipPrevoteInRound(stub, node1, 1);
 		skipPrevoteInRound(stub, getNodeForValidator(nodes, validators[4]), 1);
+		loseMessagesOn(stub, node1).dropProposal(1);
+		stub(node1.get<Consensus>(Identifiers.Consensus.Service), "onTimeoutPropose").callsFake(async () => {});
 
 		await runMany(nodes);
-		await snoozeUntil(() => p2p.proposals.getMessages(1, 1).length === 1);
+		await snoozeForRound(node1, 1);
 
+		const nodeIndex = nodes.indexOf(node1);
+		const restarted = await restart(node1, nodeIndex, p2p, crypto, nodeValidators(nodeIndex));
+		nodes[nodeIndex] = restarted;
+
+		// The lock, the valid value and the pending round come back from consensus storage, at the step the node
+		// went down at. (A node past the propose step has cast its prevote and would not cast it again.)
+		const consensus = restarted.get<Consensus>(Identifiers.Consensus.Service);
+		assert.equal(consensus.getRound(), 1);
+		assert.equal(consensus.getLockedRound(), 0);
+		assert.equal(consensus.getValidRound(), 0);
+
+		// Meanwhile the network proposed the fresh block and is stuck one prevote short.
+		await snoozeUntil(() => p2p.proposals.getMessages(1, 1).length === 1);
 		const [round0Proposal] = p2p.proposals.getMessages(1, 0);
 		const [round1Proposal] = p2p.proposals.getMessages(1, 1);
 		assert.defined(round0Proposal);
@@ -279,26 +295,10 @@ describe<{
 		assert.undefined(round1Proposal.validRound);
 		assert.not.equal(round1Proposal.blockHeader.hash, round0Proposal.blockHeader.hash);
 
-		// Node 1 has processed the fresh proposal, so it moved to the prevote step, and the network is stuck one
-		// prevote short.
-		const consensusBeforeRestart = node1.get<Consensus>(Identifiers.Consensus.Service);
-		await snoozeUntil(
-			() =>
-				consensusBeforeRestart.getRound() === 1 &&
-				consensusBeforeRestart.getStep() === Enums.Consensus.Step.Prevote &&
-				p2p.prevotes.getMessages(1, 1).length === 3,
-		);
-
-		const nodeIndex = nodes.indexOf(node1);
-		const restarted = await restart(node1, nodeIndex, p2p, crypto, nodeValidators(nodeIndex));
-		nodes[nodeIndex] = restarted;
-
-		// The lock, the valid value and the pending round come back from consensus storage...
-		const consensus = restarted.get<Consensus>(Identifiers.Consensus.Service);
-		assert.equal(consensus.getLockedRound(), 0);
-		assert.equal(consensus.getValidRound(), 0);
-
-		// ...so the restarted node prevotes null for the fresh block, which is the prevote round 1 was waiting for.
+		// The fresh proposal reaches the restarted node the way the proposal downloader would deliver it (a copy that
+		// already got there while the node booted is skipped) and meets the lock: the node prevotes null for it,
+		// which is the prevote round 1 was waiting for.
+		await p2p.postProposal(restarted, round1Proposal);
 		await snoozeUntil(() => p2p.prevotes.getMessages(1, 1).length === totalNodes - 1);
 		assert.equal(
 			p2p.prevotes.getMessagesByValidator(1, 1, 1).map((prevote) => prevote.blockHash),

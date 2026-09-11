@@ -225,8 +225,9 @@ const bootstrapMany = async (apps: Contracts.Kernel.Application[]) => {
 };
 
 const run = async (app: Contracts.Kernel.Application) => {
+	const bootstrapper = app.get<Contracts.Consensus.Bootstrapper>(Identifiers.Consensus.Bootstrapper);
 	const consensus = app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
-	await consensus.run();
+	await consensus.run(await bootstrapper.bootstrap());
 };
 
 const runMany = async (apps: Contracts.Kernel.Application[]) => {
