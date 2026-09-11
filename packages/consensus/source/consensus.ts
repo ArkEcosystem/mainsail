@@ -134,15 +134,21 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async run(): Promise<void> {
 		try {
-			await this.#bootstrap();
-			await this.startRound(this.#round);
+			await this.#handlerLock.runExclusive(async () => {
+				await this.#bootstrap();
+				await this.startRound(this.#round);
 
-			await this.handle(this.roundStateRepository.getRoundState(this.#blockNumber, this.#round));
+				if (this.#isDisposed) {
+					return;
+				}
 
-			// Rerun previous rounds, in case proposal & +2/3 precommits were received
-			for (let index = 0; index < this.#round; index++) {
-				await this.handle(this.roundStateRepository.getRoundState(this.#blockNumber, index));
-			}
+				await this.applyRules(this.roundStateRepository.getRoundState(this.#blockNumber, this.#round));
+
+				// Rerun previous rounds, in case proposal & +2/3 precommits were received
+				for (let index = 0; index < this.#round; index++) {
+					await this.applyRules(this.roundStateRepository.getRoundState(this.#blockNumber, index));
+				}
+			});
 		} catch (rawError) {
 			const error = ensureError(rawError);
 			await this.app.terminate("Consensus bootstrap error", error);
@@ -168,39 +174,43 @@ export class Consensus implements Contracts.Consensus.Service {
 				return;
 			}
 
-			await this.#processProposal(roundState);
-
-			await this.onProposal(roundState);
-			await this.onProposalLocked(roundState);
-
-			if (roundState.hasMajorityPrevotes()) {
-				await this.onMajorityPrevote(roundState);
-			}
-
-			if (roundState.hasMajorityPrevotesAny()) {
-				await this.onMajorityPrevoteAny(roundState);
-			}
-
-			if (roundState.hasMajorityPrevotesNull()) {
-				await this.onMajorityPrevoteNull(roundState);
-			}
-
-			if (roundState.hasMajorityPrecommitsAny()) {
-				await this.onMajorityPrecommitAny(roundState);
-			}
-
-			if (roundState.hasMajorityPrecommits()) {
-				await this.onMajorityPrecommit(roundState);
-			}
-
-			if (roundState.hasMajorityPrecommitsWithoutProposal()) {
-				this.onMajorityPrecommitWithoutProposal(roundState);
-			}
-
-			if (roundState.hasMinorityPrevotesOrPrecommits()) {
-				await this.onMinorityWithHigherRound(roundState);
-			}
+			await this.applyRules(roundState);
 		});
+	}
+
+	protected async applyRules(roundState: Contracts.Consensus.RoundState): Promise<void> {
+		await this.#processProposal(roundState);
+
+		await this.onProposal(roundState);
+		await this.onProposalLocked(roundState);
+
+		if (roundState.hasMajorityPrevotes()) {
+			await this.onMajorityPrevote(roundState);
+		}
+
+		if (roundState.hasMajorityPrevotesAny()) {
+			await this.onMajorityPrevoteAny(roundState);
+		}
+
+		if (roundState.hasMajorityPrevotesNull()) {
+			await this.onMajorityPrevoteNull(roundState);
+		}
+
+		if (roundState.hasMajorityPrecommitsAny()) {
+			await this.onMajorityPrecommitAny(roundState);
+		}
+
+		if (roundState.hasMajorityPrecommits()) {
+			await this.onMajorityPrecommit(roundState);
+		}
+
+		if (roundState.hasMajorityPrecommitsWithoutProposal()) {
+			this.onMajorityPrecommitWithoutProposal(roundState);
+		}
+
+		if (roundState.hasMinorityPrevotesOrPrecommits()) {
+			await this.onMinorityWithHigherRound(roundState);
+		}
 	}
 
 	async handleCommitState(commitState: Contracts.Processor.ProcessableUnit): Promise<void> {
