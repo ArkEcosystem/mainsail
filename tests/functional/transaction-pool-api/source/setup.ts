@@ -220,8 +220,9 @@ const bootstrap = async (app: Application) => {
 
 	app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 
+	const bootstrapper = app.get<Contracts.Consensus.Bootstrapper>(Identifiers.Consensus.Bootstrapper);
 	const consensus = app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
-	void consensus.run();
+	await consensus.run(await bootstrapper.bootstrap());
 };
 
 const shutdown = async (app: Contracts.Kernel.Application) => {

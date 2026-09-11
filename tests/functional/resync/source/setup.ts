@@ -10,14 +10,18 @@ import { Worker } from "./worker.js";
 
 type PluginOptions = Record<string, any>;
 
+const runConsensus = async (app: Contracts.Kernel.Application): Promise<void> => {
+	const bootstrapper = app.get<Contracts.Consensus.Bootstrapper>(Identifiers.Consensus.Bootstrapper);
+	const consensus = app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
+	await consensus.run(await bootstrapper.bootstrap());
+};
 
 const setupSyncNode = async (dataDirectory: string): Promise<Contracts.Kernel.Application> => {
 	const app = new Application();
 
 	await setupNode(app, dataDirectory, "../paths/config", "sync-node");
 
-	const consensus = app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
-	void consensus.run();
+	await runConsensus(app);
 
 	return app;
 };
@@ -27,8 +31,7 @@ const setupLegacySyncNode = async (dataDirectory: string): Promise<Contracts.Ker
 
 	await setupNode(app, dataDirectory, "../paths/config-snapshot", "sync-node-legacy");
 
-	const consensus = app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
-	void consensus.run();
+	await runConsensus(app);
 
 	return app;
 };
@@ -39,7 +42,7 @@ const setupRestoreNode = async (dataDirectory: string): Promise<Contracts.Kernel
 	await setupNode(app, dataDirectory, "../paths/config", "restore-node");
 
 	return app;
-}
+};
 
 const setupLegacyRestoreNode = async (dataDirectory: string): Promise<Contracts.Kernel.Application> => {
 	const app = new Application();
@@ -47,43 +50,45 @@ const setupLegacyRestoreNode = async (dataDirectory: string): Promise<Contracts.
 	await setupNode(app, dataDirectory, "../paths/config-snapshot", "restore-node-legacy");
 
 	return app;
-}
+};
 
-const setupNode = async (app: Application, dataDirectory: string, configDirectory: string, name: string): Promise<void> => {
+const setupNode = async (
+	app: Application,
+	dataDirectory: string,
+	configDirectory: string,
+	name: string,
+): Promise<void> => {
 	app.bind(Identifiers.Application.Name).toConstantValue(name);
 	app.bind(Identifiers.Application.Version).toConstantValue("1.0");
 	app.bind(Identifiers.Config.Flags).toConstantValue({});
 	app.bind(Identifiers.Config.Plugins).toConstantValue({});
-	app
-		.bind(Identifiers.Services.EventDispatcher.Service)
-		.to(Services.Events.MemoryEventDispatcher)
-		.inSingletonScope();
+	app.bind(Identifiers.Services.EventDispatcher.Service).to(Services.Events.MemoryEventDispatcher).inSingletonScope();
 
 	app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
 		getMessages: async () => [],
 		getProposals: async () => [],
-		getState: async () => { },
-		persist: async () => { },
+		getState: async () => {},
+		persist: async () => {},
 	});
 
 	app.bind(Identifiers.P2P.Broadcaster).toConstantValue({
-		broadcastMessage: async () => { },
-		broadcastProposal: async () => { },
+		broadcastMessage: async () => {},
+		broadcastProposal: async () => {},
 	});
-	app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => { } });
+	app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => {} });
 
 	app.bind(Identifiers.TransactionPool.Broadcaster).toConstantValue({
-		broadcastTransactions: async () => { },
+		broadcastTransactions: async () => {},
 	});
 	app.bind(Identifiers.TransactionPool.Worker).to(PoolWorker).inSingletonScope();
 	app.bind(Identifiers.Evm.Worker).toConstantValue({
-		onCommit: async () => { },
+		onCommit: async () => {},
 	});
 
 	app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
-	app
-		.bind(Identifiers.CryptoWorker.WorkerPool)
-		.toConstantValue({ getWorker: () => app.get<Worker>(Identifiers.CryptoWorker.Worker.Instance) });
+	app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue({
+		getWorker: () => app.get<Worker>(Identifiers.CryptoWorker.Worker.Instance),
+	});
 
 	await app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
 	await app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
@@ -116,7 +121,7 @@ const setupNode = async (app: Application, dataDirectory: string, configDirector
 			database: {
 				applicationName: `mainsail/${name}`,
 				database: name,
-			}
+			},
 		},
 		"@mainsail/api-sync": {
 			maxSyncAttempts: 1,
@@ -212,14 +217,13 @@ const getPluginConfiguration = async (
 	let defaults = {};
 	try {
 		({ defaults } = await import(`${packageId}/distribution/defaults.js`));
-	} catch { }
+	} catch {}
 
 	return app
 		.resolve(Providers.PluginConfiguration)
 		.from(packageId, defaults)
 		.merge(options[packageId] || {});
 };
-
 
 const bootstrap = async (app: Contracts.Kernel.Application): Promise<void> => {
 	process.env[EnvironmentVariables.MAINSAIL_API_SYNC_LOG_EXTRA] = "true";
@@ -235,9 +239,9 @@ const bootstrap = async (app: Contracts.Kernel.Application): Promise<void> => {
 
 	const databaseService = app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
 	if (await databaseService.isEmpty()) {
-		const commitState = app.get<Contracts.Consensus.CommitStateFactory>(
-			Identifiers.Consensus.CommitState.Factory,
-		)(genesisCommit);
+		const commitState = app.get<Contracts.Consensus.CommitStateFactory>(Identifiers.Consensus.CommitState.Factory)(
+			genesisCommit,
+		);
 
 		const blockProcessor = app.get<Contracts.Processor.BlockProcessor>(Identifiers.Processor.BlockProcessor);
 
@@ -265,7 +269,10 @@ const bootstrap = async (app: Contracts.Kernel.Application): Promise<void> => {
 	app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 };
 
-const tryImportSnapshot = async (app: Contracts.Kernel.Application, genesisCommit: Contracts.Crypto.Commit): Promise<void> => {
+const tryImportSnapshot = async (
+	app: Contracts.Kernel.Application,
+	genesisCommit: Contracts.Crypto.Commit,
+): Promise<void> => {
 	const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const milestone = configuration.getMilestone();
 
@@ -280,23 +287,23 @@ const tryImportSnapshot = async (app: Contracts.Kernel.Application, genesisCommi
 
 	const snapshotImporter = app.get<Contracts.Snapshot.LegacyImporter>(Identifiers.Snapshot.Legacy.Importer);
 	await snapshotImporter.run(genesisCommit);
-}
+};
 
 const ensureDatabaseExists = async (database: string): Promise<void> => {
 	// run from default postgres database
 	await runDatabaseQuery("test_db", async (dataSource: TypeOrm.DataSource): Promise<void> => {
-		const result = await dataSource.query(
-			`SELECT 1 FROM pg_database WHERE datname = $1`,
-			[database]
-		);
+		const result = await dataSource.query(`SELECT 1 FROM pg_database WHERE datname = $1`, [database]);
 
 		if (result.length === 0) {
 			await dataSource.query(`CREATE DATABASE "${database}"`);
 		}
 	});
-}
+};
 
-const runDatabaseQuery = async <T>(databaseName: string, callback: (dataSource: TypeOrm.DataSource) => Promise<T>): Promise<T> => {
+const runDatabaseQuery = async <T>(
+	databaseName: string,
+	callback: (dataSource: TypeOrm.DataSource) => Promise<T>,
+): Promise<T> => {
 	const nodeDatabase = new TypeOrm.DataSource({
 		database: databaseName,
 		host: process.env.MAINSAIL_DB_HOST || "127.0.0.1",
@@ -320,7 +327,7 @@ const runDatabaseQuery = async <T>(databaseName: string, callback: (dataSource: 
 	} finally {
 		await nodeDatabase.destroy();
 	}
-}
+};
 
 const shutdown = async (app: Contracts.Kernel.Application): Promise<void> => {
 	const serviceProviders: Providers.ServiceProvider[] = app
@@ -336,4 +343,12 @@ const shutdown = async (app: Contracts.Kernel.Application): Promise<void> => {
 	}
 };
 
-export { bootstrap, runDatabaseQuery, setupLegacyRestoreNode, setupLegacySyncNode, setupRestoreNode, setupSyncNode, shutdown };
+export {
+	bootstrap,
+	runDatabaseQuery,
+	setupLegacyRestoreNode,
+	setupLegacySyncNode,
+	setupRestoreNode,
+	setupSyncNode,
+	shutdown,
+};

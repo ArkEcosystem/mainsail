@@ -98,23 +98,22 @@ describe<{
 	each(
 		"should reject block with %s, and confirm the next proposal",
 		async ({ context: { nodes, validators, p2p }, dataset }) => {
+			// The proposer builds no block of its own for round 0; the bad one below takes its place. From round 1 on
+			// it proposes as usual.
 			const node0 = getNodeForValidator(nodes, validators[0]);
 			const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
-
 			stubPropose.callsFake(async () => {
 				stubPropose.restore();
-
-				const proposal = await dataset.build(node0, nodes, validators);
-
-				void node0
-					.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
-					.process(proposal);
 			});
 
-			// Listen before the nodes run: the proposer processes its own proposal as soon as it is built.
+			// Listen before the nodes run: the rejection comes as soon as the proposal is processed.
 			const invalidBlocks = snoozeForInvalidBlock(nodes, 1);
 
 			await runMany(nodes);
+
+			// Built for block 1, round 0, once every node is up and reachable, and sent to all of them, the proposer
+			// included, the way its own proposal would go out.
+			await p2p.broadcastProposal(await dataset.build(node0, nodes, validators));
 
 			assertInvalidBlock(await invalidBlocks, dataset.error, 1);
 

@@ -486,30 +486,26 @@ describe<{
 		await assertBlockRound(nodes, 0);
 	});
 
-	it("should confirm a block carrying an EVM call", async ({ nodes, validators }) => {
+	it("should confirm a block carrying an EVM call", async ({ nodes, validators, p2p }) => {
+		// The proposer builds no block of its own for round 0; the custom one below takes its place.
 		const node0 = getNodeForValidator(nodes, validators[0]);
-
 		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 		stubPropose.callsFake(async () => {
-			const context = makeTransactionBuilderContext(node0, nodes, validators);
-
-			const transactions: Contracts.Crypto.Transaction[] = [];
-			for (let i = 0; i < 1; i++) {
-				transactions.push(
-					await EvmCalls.makeEvmCall(context, { nonceOffset: i, recipient: validators[0].address }),
-				);
-			}
-
-			const proposal = await makeCustomProposal({ app: node0, validators }, transactions);
-
-			void node0
-				.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
-				.process(proposal);
-
 			stubPropose.restore();
 		});
 
 		await runMany(nodes);
+
+		// Built for block 1, round 0, once every node is up and reachable, and sent to all of them, the proposer
+		// included, the way its own proposal would go out.
+		const context = makeTransactionBuilderContext(node0, nodes, validators);
+		const transactions: Contracts.Crypto.Transaction[] = [];
+		for (let i = 0; i < 1; i++) {
+			transactions.push(
+				await EvmCalls.makeEvmCall(context, { nonceOffset: i, recipient: validators[0].address }),
+			);
+		}
+		await p2p.broadcastProposal(await makeCustomProposal({ app: node0, validators }, transactions));
 
 		// The custom block itself is confirmed in round 0, with its transaction. Checking block 2 alone would
 		// not tell a rejected block 1 (re-proposed empty in round 1) from an accepted one.
