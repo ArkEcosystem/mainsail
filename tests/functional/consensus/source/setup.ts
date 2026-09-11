@@ -15,6 +15,10 @@ import { Worker } from "./worker.js";
 
 type PluginOptions = Record<string, any>;
 
+// The id and P2P registry a node registers with in run(), once consensus runs, the way the P2P server boots after
+// consensus in production; until then no proposal or message reaches it.
+const nodeToRegister = new WeakMap<Contracts.Kernel.Application, { id: number; p2pRegistry: P2PRegistry }>();
+
 type SetupOptions = {
 	// Load the real consensus storage (LMDB under the data path) instead of the no-op stub. It persists the
 	// consensus state on dispose, which is what lets `restart` bring a node back mid-round.
@@ -38,7 +42,7 @@ const setup = async (
 	app.bind(Identifiers.Config.Plugins).toConstantValue({});
 	app.bind(Identifiers.Services.EventDispatcher.Service).to(Services.Events.MemoryEventDispatcher).inSingletonScope();
 
-	p2pRegistry.registerNode(id, app);
+	nodeToRegister.set(app, { id, p2pRegistry });
 	app.bind(Identifiers.P2P.Broadcaster).toConstantValue(p2pRegistry.makeBroadcaster(id));
 	app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => {} });
 
@@ -228,6 +232,14 @@ const run = async (app: Contracts.Kernel.Application) => {
 	const bootstrapper = app.get<Contracts.Consensus.Bootstrapper>(Identifiers.Consensus.Bootstrapper);
 	const consensus = app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
 	await consensus.run(await bootstrapper.bootstrap());
+
+	// Reachable from here on, as a node whose P2P server booted after consensus.
+	const node = nodeToRegister.get(app);
+	if (node === undefined) {
+		throw new Error("The node was not set up with a P2P registry.");
+	}
+
+	node.p2pRegistry.registerNode(node.id, app);
 };
 
 const runMany = async (apps: Contracts.Kernel.Application[]) => {

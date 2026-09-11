@@ -63,8 +63,9 @@ describe<{
 		await stopMany(nodes);
 	});
 
-	// The forged messages below are sent before consensus runs, so that they reach every node ahead of the genuine
-	// ones and cannot be mistaken for duplicates of them.
+	// The forged messages below are sent the moment consensus runs, so that they reach every node ahead of the
+	// genuine ones, the first of which is the proposal a block prepare time later, and cannot be mistaken for
+	// duplicates of them.
 
 	it("should reject a prevote signed by another validator than the one it names", async ({
 		nodes,
@@ -79,12 +80,12 @@ describe<{
 			0,
 			undefined,
 		);
+		await runMany(nodes);
 		await p2p.broadcastMessage(forged);
 
 		assert.equal(await resultsOf(p2p, forged), onEveryNode(Invalid));
 
 		// The forged prevote is not counted: the block is confirmed in round 0 on everybody's genuine votes.
-		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
@@ -108,12 +109,12 @@ describe<{
 			block,
 		);
 		await forged.deserializePayload();
+		await runMany(nodes);
 		await p2p.broadcastProposal(forged);
 
 		assert.equal(await resultsOf(p2p, forged), onEveryNode(Invalid));
 
 		// The forged proposal leaves no trace: the proposer's genuine one is confirmed in round 0.
-		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
 		const [genuine] = p2p.proposals.getMessages(1, 0).filter((proposal) => proposal !== forged);
@@ -132,11 +133,11 @@ describe<{
 		// Validator 1 proposes in its own name, in a round that is not its turn.
 		const node1 = getNodeForValidator(nodes, validators[1]);
 		const uninvited = await makeProposal(node1, validators[1], 1, 0, Date.now());
+		await runMany(nodes);
 		await p2p.broadcastProposal(uninvited);
 
 		assert.equal(await resultsOf(p2p, uninvited), onEveryNode(Invalid));
 
-		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
 		const [genuine] = p2p.proposals.getMessages(1, 0).filter((proposal) => proposal !== uninvited);
