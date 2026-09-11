@@ -104,6 +104,10 @@ export class Consensus implements Contracts.Consensus.Service {
 		return this.#validValue ? this.#validValue.round : undefined;
 	}
 
+	public isDisposed(): boolean {
+		return this.#isDisposed;
+	}
+
 	// Test seams. None of these is part of Contracts.Consensus.Service, so nothing resolved from the container can
 	// reach them; they let tests place the state machine at a position without replaying the rounds leading there.
 	public setRound(round: number): void {
@@ -142,22 +146,7 @@ export class Consensus implements Contracts.Consensus.Service {
 					return;
 				}
 
-				// Every stored round of the height, in order. An earlier round can hold the proposal and +2/3
-				// precommits that decide the height, the current one is where this node takes part again, and a
-				// later one can carry the f+1 messages that move it on. A commit changes the height, which leaves
-				// the remaining round states stale.
-				const roundStates = this.roundStateRepository
-					.getRoundStates()
-					.filter((roundState) => roundState.blockNumber === this.#blockNumber)
-					.sort((a, b) => a.round - b.round);
-
-				for (const roundState of roundStates) {
-					if (roundState.blockNumber !== this.#blockNumber) {
-						break;
-					}
-
-					await this.applyRules(roundState);
-				}
+				await this.applyRules(this.roundStateRepository.getRoundState(this.#blockNumber, this.#round));
 			});
 		} catch (rawError) {
 			const error = ensureError(rawError);
@@ -274,7 +263,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		this.scheduler.scheduleTimeoutBlockPrepare(this.scheduler.getNextBlockTimestamp(this.#roundStartTime));
 
-			// TODO: Skip on sync
+		// TODO: Skip on sync
 		await this.prepareProposal(roundState);
 	}
 
@@ -546,6 +535,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async onTimeoutPropose(blockNumber: number, round: number): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
+			if (this.#isDisposed) {
+				return;
+			}
+
 			// Tendermint line 57: OnTimeoutPropose(h, r) acts if h = h_p ∧ r = round_p ∧ step = propose.
 			if (!(
 				this.#step === Enums.Consensus.Step.Propose &&
@@ -564,6 +557,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async onTimeoutPrevote(blockNumber: number, round: number): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
+			if (this.#isDisposed) {
+				return;
+			}
+
 			// Tendermint line 61: OnTimeoutPrevote(h, r) acts if h = h_p ∧ r = round_p ∧ step = prevote.
 			if (!(
 				this.#step === Enums.Consensus.Step.Prevote &&
@@ -583,6 +580,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async onTimeoutPrecommit(blockNumber: number, round: number): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
+			if (this.#isDisposed) {
+				return;
+			}
+
 			// Tendermint line 65: OnTimeoutPrecommit(h, r) acts if h = h_p ∧ r = round_p.
 			if (!(this.#blockNumber === blockNumber && this.#round === round)) {
 				return;

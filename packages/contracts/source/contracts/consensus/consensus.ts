@@ -75,6 +75,7 @@ export interface Service {
 	onTimeoutPrevote(blockNumber: number, round: number): Promise<void>;
 	onTimeoutPrecommit(blockNumber: number, round: number): Promise<void>;
 	dispose(): Promise<void>;
+	isDisposed(): boolean;
 }
 
 export interface State extends StateData {
