@@ -17,6 +17,7 @@
 	"devDependencies": {
 		"@mainsail/blockchain-utils": "workspace:*",
 		"@mainsail/consensus": "workspace:*",
+		"@mainsail/consensus-storage": "workspace:*",
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",

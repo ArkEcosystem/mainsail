@@ -6,7 +6,7 @@ import { writeFileSync } from "fs";
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound } from "./asserts.js";
-import { Validator } from "./contracts.js";
+import type { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { boot, bootMany, bootstrap, bootstrapMany, runMany, setup, stop, stopMany } from "./setup.js";
 import {

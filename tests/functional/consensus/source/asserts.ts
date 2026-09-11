@@ -1,10 +1,14 @@
 import type { Contracts } from "@mainsail/contracts";
-import * as Exceptions from "@mainsail/exceptions";
 import { assert } from "@mainsail/test-runner";
 
-import { getLastCommit, snoozeForInvalidBlock } from "./utilities.js";
+import type { InvalidBlock } from "./utilities.js";
 
-export const assertBlockNumber = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], blockNumber: number): Promise<void> => {
+import { getLastCommit } from "./utilities.js";
+
+export const assertBlockNumber = async (
+	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
+	blockNumber: number,
+): Promise<void> => {
 	const nodes = Array.isArray(app) ? app : [app];
 
 	for (const node of nodes) {
@@ -14,7 +18,10 @@ export const assertBlockNumber = async (app: Contracts.Kernel.Application | Cont
 	}
 };
 
-export const assertBlockRound = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], round: number): Promise<void> => {
+export const assertBlockRound = async (
+	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
+	round: number,
+): Promise<void> => {
 	const nodes = Array.isArray(app) ? app : [app];
 
 	for (const node of nodes) {
@@ -24,7 +31,10 @@ export const assertBlockRound = async (app: Contracts.Kernel.Application | Contr
 	}
 };
 
-export const assertCommitRound = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], round: number): Promise<void> => {
+export const assertCommitRound = async (
+	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
+	round: number,
+): Promise<void> => {
 	const nodes = Array.isArray(app) ? app : [app];
 
 	for (const node of nodes) {
@@ -34,7 +44,10 @@ export const assertCommitRound = async (app: Contracts.Kernel.Application | Cont
 	}
 };
 
-export const assertBlockHash = async (app: Contracts.Kernel.Application | Contracts.Kernel.Application[], id?: string): Promise<void> => {
+export const assertBlockHash = async (
+	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
+	id?: string,
+): Promise<void> => {
 	const nodes = Array.isArray(app) ? app : [app];
 
 	if (id === undefined) {
@@ -49,25 +62,23 @@ export const assertBlockHash = async (app: Contracts.Kernel.Application | Contra
 	}
 };
 
-export const assertInvalidBlock = async (
-	exception: Contracts.Kernel.Container.Newable<Exceptions.Exception>,
-	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
+// `invalidBlocks` are the BlockEvent.Invalid payloads collected with snoozeForInvalidBlock, one per node.
+// `expected` is either the exception class a block verifier throws, or a pattern for the message of the plain
+// Error raised deeper in block processing (transaction execution, gas and fee totals, state root).
+export const assertInvalidBlock = (
+	invalidBlocks: InvalidBlock[],
+	expected: Contracts.Kernel.Container.Newable<Error> | RegExp,
 	blockNumber: number,
 	round: number = 0,
-): Promise<void> => {
-	const nodes = Array.isArray(app) ? app : [app];
-	const invalidBlocks = await snoozeForInvalidBlock(nodes, blockNumber);
-
-	assert.length(nodes, invalidBlocks.length);
-
+): void => {
 	for (const { block, error } of invalidBlocks) {
 		assert.equal(block.number, blockNumber);
 		assert.equal(block.round, round);
 
-		if (!(error instanceof exception)) {
-			console.log(exception.name, error);
+		if (expected instanceof RegExp) {
+			assert.match(error.message, expected);
+		} else {
+			assert.instance(error, expected);
 		}
-
-		assert.instance(error, exception);
 	}
 };

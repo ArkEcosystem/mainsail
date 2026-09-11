@@ -1,12 +1,12 @@
-import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Identifiers } from "@mainsail/constants";
+import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
 import { sleep } from "@mainsail/utils";
 
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound } from "./asserts.js";
-import { Validator } from "./contracts.js";
+import type { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import {
@@ -25,7 +25,7 @@ describe<{
 	nodes: Contracts.Kernel.Application[];
 	validators: Validator[];
 	p2p: P2PRegistry;
-}>("Propose", ({ beforeEach, afterEach, it, assert, stub }) => {
+}>("Prevote", ({ beforeEach, afterEach, it, assert, stub }) => {
 	const totalNodes = 5;
 
 	beforeEach(async (context) => {
@@ -48,7 +48,11 @@ describe<{
 		await stopMany(nodes);
 	});
 
-	it("should confirm block, if < minority does not prevote", async ({ nodes, validators, p2p }) => {
+	it("should confirm the block, if fewer than 1/3 of the validators do not prevote", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrevote = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
@@ -75,7 +79,11 @@ describe<{
 		await assertBlockHash(nodes);
 	});
 
-	it("should not confirm block, if > minority does not prevote", async ({ nodes, validators, p2p }) => {
+	it("should not confirm a block, if more than 1/3 of the validators do not prevote", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrevote0 = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote0.callsFake(async () => {
@@ -89,12 +97,28 @@ describe<{
 		});
 
 		await runMany(nodes);
+		await snoozeUntil(() => p2p.prevotes.getMessages(1, 0).length === totalNodes - 2);
 		await sleep(500);
 
+		// Three prevotes are below +2/3 for the block and below +2/3 of any kind, so nobody precommits and no timeout
+		// runs: every node stays in round 0 at the prevote step, and nothing is confirmed.
+		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes - 2);
 		assert.equal(p2p.precommits.getMessages(1, 0).length, 0);
+		await assertBlockNumber(nodes, 0);
+		for (const node of nodes) {
+			const consensus = node.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
+			assert.equal(
+				[consensus.getBlockNumber(), consensus.getRound(), consensus.getStep()],
+				[1, 0, Enums.Consensus.Step.Prevote],
+			);
+		}
 	});
 
-	it("should confirm block, if < minority prevote null", async ({ nodes, validators, p2p }) => {
+	it("should confirm the block, if fewer than 1/3 of the validators prevote null", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrevote = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
@@ -134,7 +158,11 @@ describe<{
 		await assertBlockHash(nodes);
 	});
 
-	it("should not confirm block, if > minority prevote null", async ({ nodes, validators, p2p }) => {
+	it("should confirm a block only in round 1, if more than 1/3 of the validators prevote null", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrevote0 = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		const prevote0 = await makePrevote(node0, validators[0], 1, 0);
@@ -185,7 +213,11 @@ describe<{
 		await assertBlockHash(nodes);
 	});
 
-	it("should confirm block, if < minority prevote random block", async ({ nodes, validators, p2p }) => {
+	it("should confirm the block, if fewer than 1/3 of the validators prevote another block", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrevote = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
@@ -232,7 +264,11 @@ describe<{
 		await assertBlockHash(nodes);
 	});
 
-	it("should not confirm block, if > minority prevote random block", async ({ nodes, validators, p2p }) => {
+	it("should confirm a block only in round 1, if more than 1/3 of the validators prevote another block", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
 		const node1 = getNodeForValidator(nodes, validators[1]);
 
@@ -289,7 +325,11 @@ describe<{
 		await assertBlockHash(nodes);
 	});
 
-	it("should confirm block, if < minority prevote multiple random blocks", async ({ nodes, validators, p2p }) => {
+	it("should confirm the block, if fewer than 1/3 of the validators prevote several other blocks", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
 		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrevote = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
