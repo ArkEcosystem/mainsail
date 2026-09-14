@@ -52,7 +52,12 @@ describe<{
 	};
 
 	beforeEach((context) => {
-		context.consensus = { getBlockNumber: () => blockNumber, getRound: () => round, handle: async () => {} };
+		context.consensus = {
+			getBlockNumber: () => blockNumber,
+			getRound: () => round,
+			handle: async () => {},
+			isDisposed: () => false,
+		};
 		context.commitLock = { runNonExclusive: async (callback: () => Promise<unknown>) => callback() };
 		context.stateStore = {
 			getGenesisCommit: () => ({ block: { hash: genesisBlockHash } }),
@@ -97,6 +102,23 @@ describe<{
 		await processor.process(makeMessage());
 
 		runNonExclusive.calledOnce();
+	});
+
+	it("#process - should skip every message once consensus is disposed", async ({
+		processor,
+		consensus,
+		roundStateRepository,
+		worker,
+	}) => {
+		// The round states are persisted right after dispose; nothing may be added to them any more.
+		consensus.isDisposed = () => true;
+		const getRoundState = spy(roundStateRepository, "getRoundState");
+		const consensusSignature = spy(worker, "consensusSignature");
+
+		assert.equal(await processor.process(makeMessage()), Skipped);
+
+		getRoundState.neverCalled();
+		consensusSignature.neverCalled();
 	});
 
 	it("#process - should skip a message for another block number", async ({

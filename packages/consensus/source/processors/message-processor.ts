@@ -41,6 +41,10 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 		broadcast: boolean = true,
 	): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
+			if (this.isConsensusDisposed()) {
+				return Enums.Consensus.ProcessorResult.Skipped;
+			}
+
 			if (!this.hasValidBlockNumberAndRound(message)) {
 				return Enums.Consensus.ProcessorResult.Skipped;
 			}

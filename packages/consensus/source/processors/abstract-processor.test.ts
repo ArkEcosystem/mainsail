@@ -18,6 +18,10 @@ class TestProcessor extends AbstractProcessor {
 	public isAheadOfTime(message: { round: number }): boolean {
 		return this.isRoundAheadOfTime(message);
 	}
+
+	public isDisposed(): boolean {
+		return this.isConsensusDisposed();
+	}
 }
 
 describe<{
@@ -36,6 +40,7 @@ describe<{
 			getBlockNumber: () => 5,
 			getRound: () => 2,
 			handle: async () => {},
+			isDisposed: () => false,
 		};
 
 		context.logger = {
@@ -187,5 +192,13 @@ describe<{
 
 		spyHandle.calledOnce();
 		spyLoggerError.neverCalled();
+	});
+
+	it("#isConsensusDisposed - should follow the consensus service", ({ processor, consensus }) => {
+		assert.false(processor.isDisposed());
+
+		consensus.isDisposed = () => true;
+
+		assert.true(processor.isDisposed());
 	});
 });

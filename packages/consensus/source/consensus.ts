@@ -20,17 +20,8 @@ export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Consensus.Bootstrapper)
-	private readonly bootstrapper!: Contracts.Consensus.Bootstrapper;
-
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.Configuration;
-
 	@inject(Identifiers.Processor.BlockProcessor)
 	private readonly processor!: Contracts.Processor.BlockProcessor;
-
-	@inject(Identifiers.State.Store)
-	private readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.Consensus.Processor.Proposal)
 	private readonly proposalProcessor!: Contracts.Consensus.ProposalProcessor;
@@ -104,22 +95,8 @@ export class Consensus implements Contracts.Consensus.Service {
 		return this.#validValue ? this.#validValue.round : undefined;
 	}
 
-	// Test seams. None of these is part of Contracts.Consensus.Service, so nothing resolved from the container can
-	// reach them; they let tests place the state machine at a position without replaying the rounds leading there.
-	public setRound(round: number): void {
-		this.#round = round;
-	}
-
-	public setStep(step: Contracts.Consensus.Step): void {
-		this.#step = step;
-	}
-
-	public setValidValue(roundState: Contracts.Consensus.RoundState): void {
-		this.#validValue = roundState;
-	}
-
-	public setProposal(proposalPromise: Promise<Contracts.Crypto.Proposal>): void {
-		this.#proposalPromise = proposalPromise;
+	public isDisposed(): boolean {
+		return this.#isDisposed;
 	}
 
 	public getState(): Contracts.Consensus.State {
@@ -132,21 +109,24 @@ export class Consensus implements Contracts.Consensus.Service {
 		};
 	}
 
-	public async run(): Promise<void> {
-		try {
-			await this.#bootstrap();
-			await this.startRound(this.#round);
+	public async run(state: Contracts.Consensus.State): Promise<void> {
+		await this.#handlerLock.runExclusive(async () => {
+			this.#blockNumber = state.blockNumber;
+			this.#round = state.round;
+			this.#step = state.step;
+			this.#lockedValue = state.lockedValue;
+			this.#validValue = state.validValue;
 
-			await this.handle(this.roundStateRepository.getRoundState(this.#blockNumber, this.#round));
+			await this.eventDispatcher.dispatch(Events.ConsensusEvent.Bootstrapped, this.getState());
 
-			// Rerun previous rounds, in case proposal & +2/3 precommits were received
-			for (let index = 0; index < this.#round; index++) {
-				await this.handle(this.roundStateRepository.getRoundState(this.#blockNumber, index));
+			await this.#beginRound();
+
+			if (this.#isDisposed) {
+				return;
 			}
-		} catch (rawError) {
-			const error = ensureError(rawError);
-			await this.app.terminate("Consensus bootstrap error", error);
-		}
+
+			await this.applyRules(this.roundStateRepository.getRoundState(this.#blockNumber, this.#round));
+		});
 	}
 
 	public async dispose(): Promise<void> {
@@ -168,39 +148,43 @@ export class Consensus implements Contracts.Consensus.Service {
 				return;
 			}
 
-			await this.#processProposal(roundState);
-
-			await this.onProposal(roundState);
-			await this.onProposalLocked(roundState);
-
-			if (roundState.hasMajorityPrevotes()) {
-				await this.onMajorityPrevote(roundState);
-			}
-
-			if (roundState.hasMajorityPrevotesAny()) {
-				await this.onMajorityPrevoteAny(roundState);
-			}
-
-			if (roundState.hasMajorityPrevotesNull()) {
-				await this.onMajorityPrevoteNull(roundState);
-			}
-
-			if (roundState.hasMajorityPrecommitsAny()) {
-				await this.onMajorityPrecommitAny(roundState);
-			}
-
-			if (roundState.hasMajorityPrecommits()) {
-				await this.onMajorityPrecommit(roundState);
-			}
-
-			if (roundState.hasMajorityPrecommitsWithoutProposal()) {
-				this.onMajorityPrecommitWithoutProposal(roundState);
-			}
-
-			if (roundState.hasMinorityPrevotesOrPrecommits()) {
-				await this.onMinorityWithHigherRound(roundState);
-			}
+			await this.applyRules(roundState);
 		});
+	}
+
+	protected async applyRules(roundState: Contracts.Consensus.RoundState): Promise<void> {
+		await this.#processProposal(roundState);
+
+		await this.onProposal(roundState);
+		await this.onProposalLocked(roundState);
+
+		if (roundState.hasMajorityPrevotes()) {
+			await this.onMajorityPrevote(roundState);
+		}
+
+		if (roundState.hasMajorityPrevotesAny()) {
+			await this.onMajorityPrevoteAny(roundState);
+		}
+
+		if (roundState.hasMajorityPrevotesNull()) {
+			await this.onMajorityPrevoteNull(roundState);
+		}
+
+		if (roundState.hasMajorityPrecommitsAny()) {
+			await this.onMajorityPrecommitAny(roundState);
+		}
+
+		if (roundState.hasMajorityPrecommits()) {
+			await this.onMajorityPrecommit(roundState);
+		}
+
+		if (roundState.hasMajorityPrecommitsWithoutProposal()) {
+			this.onMajorityPrecommitWithoutProposal(roundState);
+		}
+
+		if (roundState.hasMinorityPrevotesOrPrecommits()) {
+			await this.onMinorityWithHigherRound(roundState);
+		}
 	}
 
 	async handleCommitState(commitState: Contracts.Processor.ProcessableUnit): Promise<void> {
@@ -221,6 +205,11 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#didMajorityPrevote = false;
 		this.#didMajorityPrecommit = false;
 		this.#didMajorityPrecommitWithoutProposal = false;
+
+		await this.#beginRound();
+	}
+
+	async #beginRound(): Promise<void> {
 		this.#roundStartTime = dayjs().valueOf();
 
 		// A proposal still being built belongs to the round that just ended. Dropping it here keeps
@@ -228,7 +217,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#proposalPromise = undefined;
 
 		this.scheduler.clear();
-		this.statisticService.newRound(this.#blockNumber, round);
+		this.statisticService.newRound(this.#blockNumber, this.#round);
 
 		if (this.#isDisposed) {
 			return;
@@ -241,6 +230,11 @@ export class Consensus implements Contracts.Consensus.Service {
 		);
 
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.RoundStarted, this.getState());
+
+		// Past the propose step the round has its proposal, or its propose timeout, behind it. .
+		if (this.#step !== Enums.Consensus.Step.Propose) {
+			return;
+		}
 
 		this.scheduler.scheduleTimeoutBlockPrepare(this.scheduler.getNextBlockTimestamp(this.#roundStartTime));
 
@@ -516,6 +510,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async onTimeoutPropose(blockNumber: number, round: number): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
+			if (this.#isDisposed) {
+				return;
+			}
+
 			// Tendermint line 57: OnTimeoutPropose(h, r) acts if h = h_p ∧ r = round_p ∧ step = propose.
 			if (!(
 				this.#step === Enums.Consensus.Step.Propose &&
@@ -534,6 +532,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async onTimeoutPrevote(blockNumber: number, round: number): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
+			if (this.#isDisposed) {
+				return;
+			}
+
 			// Tendermint line 61: OnTimeoutPrevote(h, r) acts if h = h_p ∧ r = round_p ∧ step = prevote.
 			if (!(
 				this.#step === Enums.Consensus.Step.Prevote &&
@@ -553,6 +555,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async onTimeoutPrecommit(blockNumber: number, round: number): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
+			if (this.#isDisposed) {
+				return;
+			}
+
 			// Tendermint line 65: OnTimeoutPrecommit(h, r) acts if h = h_p ∧ r = round_p.
 			if (!(this.#blockNumber === blockNumber && this.#round === round)) {
 				return;
@@ -713,46 +719,6 @@ export class Consensus implements Contracts.Consensus.Service {
 
 			this.#runInBackground("Processing own precommit", () => this.messageProcessor.process(precommit));
 		}
-	}
-
-	async #bootstrap(): Promise<void> {
-		this.#blockNumber = this.stateStore.getLastBlock().number + 1;
-
-		const state = await this.bootstrapper.run();
-
-		if (state) {
-			if (state.blockNumber === this.#blockNumber) {
-				this.#step = state.step;
-				this.#round = state.round;
-				this.#lockedValue = state.lockedValue;
-				this.#validValue = state.validValue;
-			} else {
-				const storedBlockNumber = state.blockNumber.toLocaleString(Locale);
-				const currentBlockNumber = this.#blockNumber.toLocaleString(Locale);
-
-				this.logger.warn(
-					`Skipping state restore, because stored block number is ${storedBlockNumber}, but should be ${currentBlockNumber}`,
-					"consensus",
-				);
-
-				this.roundStateRepository.clear();
-			}
-		}
-
-		if (this.#blockNumber !== this.configuration.getHeight()) {
-			throw new Error(
-				`bootstrapped block number ${
-					this.#blockNumber
-				} does not match configuration block number ${this.configuration.getHeight()}`,
-			);
-		}
-
-		this.logger.info(
-			`Completed consensus bootstrap for ${this.#getBlockNumberRoundString()} with total round ${this.stateStore.getTotalRound()}`,
-			"consensus",
-		);
-
-		await this.eventDispatcher.dispatch(Events.ConsensusEvent.Bootstrapped, this.getState());
 	}
 
 	async #processProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {

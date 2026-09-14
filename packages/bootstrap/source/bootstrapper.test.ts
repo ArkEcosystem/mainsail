@@ -21,11 +21,13 @@ describe<{
 	txPoolWorker: any;
 	evmWorker: any;
 	consensus: any;
+	consensusBootstrapper: any;
 	p2pServer: any;
 	p2pService: any;
 	apiSync: any;
 }>("Bootstrapper", ({ beforeEach, it, assert, spy, stub }) => {
 	const genesisCommitJson = {};
+	const consensusState = { blockNumber: 2, round: 0, step: 0 };
 	const genesisCommit = {
 		block: {
 			hash: "aaaaa",
@@ -100,6 +102,10 @@ describe<{
 			run: () => {},
 		};
 
+		context.consensusBootstrapper = {
+			bootstrap: async () => consensusState,
+		};
+
 		context.p2pServer = {
 			boot: () => {},
 		};
@@ -115,6 +121,7 @@ describe<{
 		const app = new Application();
 
 		app.bind(Identifiers.Consensus.Service).toConstantValue(context.consensus);
+		app.bind(Identifiers.Consensus.Bootstrapper).toConstantValue(context.consensusBootstrapper);
 		app.bind(Identifiers.State.Store).toConstantValue(context.stateStore);
 		app.bind(Identifiers.State.State).toConstantValue(context.state);
 		app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
@@ -145,6 +152,7 @@ describe<{
 		txPoolWorker,
 		evmWorker,
 		consensus,
+		consensusBootstrapper,
 		p2pServer,
 		p2pService,
 		apiSync,
@@ -180,6 +188,7 @@ describe<{
 		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
 		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
 		const spyEvmWorkerStart = spy(evmWorker, "start");
+		const spyConsensusBootstrap = spy(consensusBootstrapper, "bootstrap");
 		const spyConsensusRun = spy(consensus, "run");
 		const spyP2PServerBoot = spy(p2pServer, "boot");
 		const spyP2PServiceBoot = spy(p2pService, "boot");
@@ -211,7 +220,9 @@ describe<{
 		spyPrintLoadedValidators.calledOnce();
 		spyTxPoolWorkerStart.calledOnce();
 		spyEvmWorkerStart.calledOnce();
+		spyConsensusBootstrap.calledOnce();
 		spyConsensusRun.calledOnce();
+		spyConsensusRun.calledWith(consensusState);
 		spyP2PServerBoot.calledOnce();
 		spyP2PServiceBoot.calledOnce();
 	});
@@ -227,6 +238,7 @@ describe<{
 		txPoolWorker,
 		evmWorker,
 		consensus,
+		consensusBootstrapper,
 		p2pServer,
 		p2pService,
 		apiSync,
@@ -259,6 +271,7 @@ describe<{
 		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
 		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
 		const spyEvmWorkerStart = spy(evmWorker, "start");
+		const spyConsensusBootstrap = spy(consensusBootstrapper, "bootstrap");
 		const spyConsensusRun = spy(consensus, "run");
 		const spyP2PServerBoot = spy(p2pServer, "boot");
 		const spyP2PServiceBoot = spy(p2pService, "boot");
@@ -290,7 +303,9 @@ describe<{
 		spyPrintLoadedValidators.calledOnce();
 		spyTxPoolWorkerStart.calledOnce();
 		spyEvmWorkerStart.calledOnce();
+		spyConsensusBootstrap.calledOnce();
 		spyConsensusRun.calledOnce();
+		spyConsensusRun.calledWith(consensusState);
 		spyP2PServerBoot.calledOnce();
 		spyP2PServiceBoot.calledOnce();
 	});
@@ -309,6 +324,7 @@ describe<{
 		txPoolWorker,
 		evmWorker,
 		consensus,
+		consensusBootstrapper,
 		p2pServer,
 		p2pService,
 	}) => {
@@ -330,6 +346,7 @@ describe<{
 		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
 		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
 		const spyEvmWorkerStart = spy(evmWorker, "start");
+		const spyConsensusBootstrap = spy(consensusBootstrapper, "bootstrap");
 		const spyConsensusRun = spy(consensus, "run");
 		const spyP2PServerBoot = spy(p2pServer, "boot");
 		const spyP2PServiceBoot = spy(p2pService, "boot");
@@ -359,7 +376,9 @@ describe<{
 		spyPrintLoadedValidators.calledOnce();
 		spyTxPoolWorkerStart.calledOnce();
 		spyEvmWorkerStart.calledOnce();
+		spyConsensusBootstrap.calledOnce();
 		spyConsensusRun.calledOnce();
+		spyConsensusRun.calledWith(consensusState);
 		spyP2PServerBoot.calledOnce();
 		spyP2PServiceBoot.calledOnce();
 	});
@@ -378,6 +397,7 @@ describe<{
 		txPoolWorker,
 		evmWorker,
 		consensus,
+		consensusBootstrapper,
 		p2pServer,
 		p2pService,
 	}) => {
@@ -413,6 +433,7 @@ describe<{
 		const spyPrintLoadedValidators = spy(validatorRepository, "printLoadedValidators");
 		const spyTxPoolWorkerStart = spy(txPoolWorker, "start");
 		const spyEvmWorkerStart = spy(evmWorker, "start");
+		const spyConsensusBootstrap = spy(consensusBootstrapper, "bootstrap");
 		const spyConsensusRun = spy(consensus, "run");
 		const spyP2PServerBoot = spy(p2pServer, "boot");
 		const spyP2PServiceBoot = spy(p2pService, "boot");
@@ -443,9 +464,44 @@ describe<{
 		spyPrintLoadedValidators.calledOnce();
 		spyTxPoolWorkerStart.calledOnce();
 		spyEvmWorkerStart.calledOnce();
+		spyConsensusBootstrap.calledOnce();
 		spyConsensusRun.calledOnce();
+		spyConsensusRun.calledWith(consensusState);
 		spyP2PServerBoot.calledOnce();
 		spyP2PServiceBoot.calledOnce();
+	});
+
+	it("should restore consensus and run it before booting P2P", async ({
+		bootstrapper,
+		databaseService,
+		consensus,
+		consensusBootstrapper,
+		p2pServer,
+		p2pService,
+	}) => {
+		// Restored before P2P is up, no proposal or message can reach the rules on the default state.
+		stub(databaseService, "isEmpty").returnValue(false);
+		stub(databaseService, "getLastCommit").returnValue(genesisCommit);
+		stub(databaseService, "getState").returnValue({ totalRound: 0 });
+
+		const calls: string[] = [];
+		stub(consensusBootstrapper, "bootstrap").callsFake(async () => {
+			calls.push("bootstrap");
+			return consensusState;
+		});
+		stub(consensus, "run").callsFake(async () => {
+			calls.push("run");
+		});
+		stub(p2pServer, "boot").callsFake(async () => {
+			calls.push("p2pServer");
+		});
+		stub(p2pService, "boot").callsFake(async () => {
+			calls.push("p2pService");
+		});
+
+		await bootstrapper.bootstrap();
+
+		assert.equal(calls, ["bootstrap", "run", "p2pServer", "p2pService"]);
 	});
 
 	it("should throw if stored genesis block doesn't match genesis block from config", async ({
