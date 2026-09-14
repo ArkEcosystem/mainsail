@@ -253,8 +253,12 @@ const stop = async (app: Contracts.Kernel.Application) => {
 		Identifiers.ServiceProvider.Repository,
 	);
 
-	for (const serviceProvider of serviceProviderRepository.all()) {
-		await serviceProviderRepository.dispose(serviceProvider.name());
+	for (const serviceProvider of serviceProviderRepository.allLoadedProviders().reverse()) {
+		try {
+			await serviceProviderRepository.dispose(serviceProvider.name());
+		} catch {
+			/* */
+		}
 	}
 };
 
