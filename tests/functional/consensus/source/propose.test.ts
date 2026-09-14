@@ -55,22 +55,22 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 		assert.equal((await getLastCommit(nodes[0])).block.proposer, validators[0].address);
 
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 		assert.equal((await getLastCommit(nodes[0])).block.proposer, validators[0].address);
 
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 3);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 3, 0);
+		await assertBlockHash(nodes, 3);
 		assert.equal((await getLastCommit(nodes[0])).block.proposer, validators[0].address);
 	});
 
@@ -87,13 +87,13 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
 	it("should confirm the block in round 4, if the proposer misses 3 rounds", async ({ nodes, validators }) => {
@@ -111,13 +111,13 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, rounds + 1); // +1 for accepted block
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, rounds + 1); // +1 for accepted block
+		await assertBlockHash(nodes, 1);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
 	it("should prevote null for a proposal from the wrong proposer, and confirm a block in round 1", async ({
@@ -146,8 +146,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
 
 		await snoozeUntil(
 			() =>
@@ -174,7 +174,7 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
 	it("should take the first of two proposals from the proposer", async ({ nodes, validators, p2p }) => {
@@ -195,8 +195,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes, proposal0.getPayload().block.hash);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1, proposal0.getPayload().block.hash);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -226,7 +226,7 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
 	it("should confirm a block only in round 1, if two proposals split the nodes 3 : 2", async ({
@@ -251,8 +251,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
 
 		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === totalNodes);
 
@@ -284,7 +284,7 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
 	it("should confirm a block only in round 4, if two proposals split the nodes 3 : 2 for 3 rounds", async ({
@@ -341,13 +341,13 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, rounds + 1); // +1 for accepted block
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, rounds + 1); // +1 for accepted block
+		await assertBlockHash(nodes, 1);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
 	it("should confirm the proposal that reached +2/3 of the nodes, if two proposals split them 4 : 1", async ({
@@ -373,8 +373,8 @@ describe<{
 		await snoozeForBlock(nodesSubset);
 
 		await assertBlockNumber(nodesSubset, 1);
-		await assertBlockRound(nodesSubset, 0);
-		await assertBlockHash(nodesSubset);
+		await assertBlockRound(nodesSubset, 1, 0);
+		await assertBlockHash(nodesSubset, 1);
 
 		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === totalNodes);
 
@@ -419,7 +419,7 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
 	it("should confirm a block only in round 1, if every node receives a different proposal", async ({
@@ -450,8 +450,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
 
 		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === totalNodes);
 
@@ -483,7 +483,7 @@ describe<{
 		// // Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
 	it("should confirm a block carrying an EVM call", async ({ nodes, validators, p2p }) => {
@@ -511,13 +511,13 @@ describe<{
 		// not tell a rejected block 1 (re-proposed empty in round 1) from an accepted one.
 		await snoozeForBlock(nodes);
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 		assert.equal((await getLastCommit(nodes[0])).block.transactionsCount, 1);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 });

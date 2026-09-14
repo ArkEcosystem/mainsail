@@ -4,7 +4,13 @@ import { describe } from "@mainsail/test-runner";
 
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
-import { assertBlockHash, assertBlockNumber, assertBlockRound, assertCommitRound } from "./asserts.js";
+import {
+	assertBlockHash,
+	assertBlockNumber,
+	assertBlockRound,
+	assertCommitRound,
+	assertLastBlockNumber,
+} from "./asserts.js";
 import type { Validator } from "./contracts.js";
 import { ignoreForeignPrevotes, loseMessagesOn, precommitNullInRounds, skipPrevoteInRound } from "./faults.js";
 import type { Messages } from "./p2p.js";
@@ -110,7 +116,7 @@ describe<{
 			p2p.precommits.getMessages(1, 1).map((precommit) => precommit.blockHash),
 			[undefined, undefined, undefined, undefined, undefined],
 		);
-		await assertBlockNumber(nodes, 0);
+		await assertLastBlockNumber(nodes, 0);
 
 		// The lock does not expire with the round: round 2 brings yet another fresh block, and the four locked nodes
 		// prevote null again.
@@ -151,9 +157,9 @@ describe<{
 		assert.defined(round0Proposal);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0); // The round-0 block is re-proposed...
-		await assertCommitRound(nodes, 2); // ...and committed in round 2
-		await assertBlockHash(nodes, round0Proposal.blockHeader.hash);
+		await assertBlockRound(nodes, 1, 0); // The round-0 block is re-proposed...
+		await assertCommitRound(nodes, 1, 2); // ...and committed in round 2
+		await assertBlockHash(nodes, 1, round0Proposal.blockHeader.hash);
 
 		// Rounds 1 and 2 re-propose the same block, always proven by the round-0 prevotes.
 		for (const round of [1, 2]) {
@@ -214,9 +220,9 @@ describe<{
 		assert.defined(round0Proposal);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0); // The round-0 block is re-proposed...
-		await assertCommitRound(nodes, 2); // ...and committed in round 2
-		await assertBlockHash(nodes, round0Proposal.blockHeader.hash);
+		await assertBlockRound(nodes, 1, 0); // The round-0 block is re-proposed...
+		await assertCommitRound(nodes, 1, 2); // ...and committed in round 2
+		await assertBlockHash(nodes, 1, round0Proposal.blockHeader.hash);
 
 		// Round 1 re-proposes with the round-0 proof, round 2 with the round-1 proof.
 		for (const [round, validRound] of [
@@ -318,7 +324,7 @@ describe<{
 			p2p.precommits.getMessages(1, 1).map((precommit) => precommit.blockHash),
 			[undefined, undefined, undefined, undefined, undefined],
 		);
-		await assertBlockNumber(nodes, 0);
+		await assertLastBlockNumber(nodes, 0);
 	});
 
 	it("should prevote null for a re-proposed block, if locked on another block in a round newer than the lock proof", async ({
@@ -438,8 +444,8 @@ describe<{
 		assert.equal(votesByValidator(p2p.prevotes, 3), [[hashB], [hashB], [hashB], [hashB], [hashB]]);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 1); // B was forged in round 1...
-		await assertCommitRound(nodes, 3); // ...and committed in round 3
-		await assertBlockHash(nodes, hashB);
+		await assertBlockRound(nodes, 1, 1); // B was forged in round 1...
+		await assertCommitRound(nodes, 1, 3); // ...and committed in round 3
+		await assertBlockHash(nodes, 1, hashB);
 	});
 });

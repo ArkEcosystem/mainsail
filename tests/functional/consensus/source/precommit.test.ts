@@ -5,7 +5,13 @@ import { sleep } from "@mainsail/utils";
 
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
-import { assertBlockHash, assertBlockNumber, assertBlockRound, assertCommitRound } from "./asserts.js";
+import {
+	assertBlockHash,
+	assertBlockNumber,
+	assertBlockRound,
+	assertCommitRound,
+	assertLastBlockNumber,
+} from "./asserts.js";
 import type { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
@@ -64,8 +70,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -75,8 +81,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 	});
 
 	it("should not confirm a block, if more than 1/3 of the validators do not precommit", async ({
@@ -103,7 +109,7 @@ describe<{
 		// Three precommits are below +2/3 of any kind, so no timeout runs: every node stays in round 0 at the
 		// precommit step, and nothing is confirmed.
 		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes - 2);
-		await assertBlockNumber(nodes, 0);
+		await assertLastBlockNumber(nodes, 0);
 		for (const node of nodes) {
 			const consensus = node.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
 			assert.equal(
@@ -131,8 +137,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -152,8 +158,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 	});
 
 	it("should re-propose the block and confirm it in round 1, if one validator misses its precommit and one precommits null", async ({
@@ -179,9 +185,9 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0); // Block should be locked and re-proposed
-		await assertCommitRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0); // Block should be locked and re-proposed
+		await assertCommitRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -201,8 +207,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 	});
 
 	it("should re-propose the block and confirm it in round 1, if one validator misses its precommit and one precommits another block", async ({
@@ -230,9 +236,9 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0); // Block should be locked and re-proposed
-		await assertCommitRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0); // Block should be locked and re-proposed
+		await assertCommitRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -252,8 +258,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 	});
 
 	it("should re-propose the block and confirm it in round 1, if one validator misses its precommit and one precommits several other blocks", async ({
@@ -293,9 +299,9 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0); // Block should be locked and re-proposed
-		await assertCommitRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0); // Block should be locked and re-proposed
+		await assertCommitRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -324,7 +330,7 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 	});
 });

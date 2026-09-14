@@ -3,62 +3,69 @@ import { assert } from "@mainsail/test-runner";
 
 import type { InvalidBlock } from "./utilities.js";
 
-import { getLastCommit } from "./utilities.js";
+import { getCommit, getLastBlockNumber, getLastCommit } from "./utilities.js";
 
-export const assertBlockNumber = async (
-	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
+type Nodes = Contracts.Kernel.Application | Contracts.Kernel.Application[];
+
+const toNodes = (app: Nodes): Contracts.Kernel.Application[] => (Array.isArray(app) ? app : [app]);
+
+// The chain keeps growing while a test asserts, so these read the commit of `blockNumber` rather than the last one:
+// by the time the last commit is read, a node may already be a block further. `assertLastBlockNumber` is the
+// exception, for a node that must not have advanced.
+const getCommitOf = async (
+	node: Contracts.Kernel.Application,
 	blockNumber: number,
-): Promise<void> => {
-	const nodes = Array.isArray(app) ? app : [app];
+): Promise<Contracts.Crypto.Commit> => {
+	const commit = await getCommit(node, blockNumber);
+	if (commit === undefined) {
+		throw new Error(`Block ${blockNumber} is not committed, the last block is ${await getLastBlockNumber(node)}.`);
+	}
 
-	for (const node of nodes) {
+	return commit;
+};
+
+// Every node has committed `blockNumber`.
+export const assertBlockNumber = async (app: Nodes, blockNumber: number): Promise<void> => {
+	for (const node of toNodes(app)) {
+		await getCommitOf(node, blockNumber);
+	}
+};
+
+// The last block of every node is exactly `blockNumber`.
+export const assertLastBlockNumber = async (app: Nodes, blockNumber: number): Promise<void> => {
+	for (const node of toNodes(app)) {
 		const commit = await getLastCommit(node);
 		assert.defined(commit);
 		assert.equal(commit.block.number, blockNumber);
 	}
 };
 
-export const assertBlockRound = async (
-	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
-	round: number,
-): Promise<void> => {
-	const nodes = Array.isArray(app) ? app : [app];
-
-	for (const node of nodes) {
-		const commit = await getLastCommit(node);
-		assert.defined(commit);
+export const assertBlockRound = async (app: Nodes, blockNumber: number, round: number): Promise<void> => {
+	for (const node of toNodes(app)) {
+		const commit = await getCommitOf(node, blockNumber);
 		assert.equal(commit.block.round, round);
 	}
 };
 
-export const assertCommitRound = async (
-	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
-	round: number,
-): Promise<void> => {
-	const nodes = Array.isArray(app) ? app : [app];
-
-	for (const node of nodes) {
-		const commit = await getLastCommit(node);
-		assert.defined(commit);
+export const assertCommitRound = async (app: Nodes, blockNumber: number, round: number): Promise<void> => {
+	for (const node of toNodes(app)) {
+		const commit = await getCommitOf(node, blockNumber);
 		assert.equal(commit.proof.round, round);
 	}
 };
 
-export const assertBlockHash = async (
-	app: Contracts.Kernel.Application | Contracts.Kernel.Application[],
-	id?: string,
-): Promise<void> => {
-	const nodes = Array.isArray(app) ? app : [app];
+// Every node holds the same `blockNumber`, and the given one if `hash` is passed.
+export const assertBlockHash = async (app: Nodes, blockNumber: number, hash?: string): Promise<void> => {
+	const nodes = toNodes(app);
 
-	if (id === undefined) {
-		const commit = await getLastCommit(nodes[0]);
-		id = commit.block.hash;
+	if (hash === undefined) {
+		const commit = await getCommitOf(nodes[0], blockNumber);
+		hash = commit.block.hash;
 	}
 
 	for (const node of nodes) {
-		const commit = await getLastCommit(node);
-		assert.defined(commit);
-		assert.equal(commit.block!.hash, id);
+		const commit = await getCommitOf(node, blockNumber);
+		assert.equal(commit.block.hash, hash);
 	}
 };
 

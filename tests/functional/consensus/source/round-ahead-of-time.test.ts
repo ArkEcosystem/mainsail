@@ -96,8 +96,8 @@ describe<{
 		// The dropped proposal does not disturb the current round.
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 	});
 
 	it("should skip a prevote for a round that cannot have started yet", async ({ nodes, validators, p2p }) => {
@@ -119,7 +119,7 @@ describe<{
 
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 	});
 });

@@ -6,7 +6,13 @@ import { describe } from "@mainsail/test-runner";
 
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
-import { assertBlockHash, assertBlockNumber, assertBlockRound, assertInvalidBlock } from "./asserts.js";
+import {
+	assertBlockHash,
+	assertBlockNumber,
+	assertBlockRound,
+	assertInvalidBlock,
+	assertLastBlockNumber,
+} from "./asserts.js";
 import type { Validator } from "./contracts.js";
 import { makeCustomProposal } from "./custom-proposal.js";
 import { disconnect } from "./faults.js";
@@ -72,7 +78,7 @@ describe<{
 		await runMany(nodes);
 		await snoozeForBlock(others, 3);
 		await assertBlockNumber(others, 3);
-		await assertBlockNumber([node4], 0);
+		await assertLastBlockNumber([node4], 0);
 
 		// Hold the chain still, so that node 4 has a fixed target: the proposer stops proposing, and the others
 		// run into rounds without a proposal.
@@ -93,7 +99,7 @@ describe<{
 
 		// ...and holds the same chain as the others.
 		await assertBlockNumber(nodes, target);
-		await assertBlockHash(nodes);
+		await assertBlockHash(nodes, target);
 
 		// The proposer proposes again: node 4 catches the round the others are in and confirms the next block
 		// with them, then votes in round 0 of the block after like everybody else.
@@ -101,12 +107,12 @@ describe<{
 
 		await snoozeForBlock(nodes, target + 1);
 		await assertBlockNumber(nodes, target + 1);
-		await assertBlockHash(nodes);
+		await assertBlockHash(nodes, target + 1);
 
 		await snoozeForBlock(nodes, target + 2);
 		await assertBlockNumber(nodes, target + 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, target + 2, 0);
+		await assertBlockHash(nodes, target + 2);
 
 		const blockHash = (await getLastCommit(node0)).block.hash;
 		const validatorIndex = getValidatorIndex(node4, validators[4]);
@@ -136,18 +142,18 @@ describe<{
 
 		// Block 2 cannot be applied before block 1...
 		assert.equal(await commitProcessor.process(commit2), Skipped);
-		await assertBlockNumber([node4], 0);
+		await assertLastBlockNumber([node4], 0);
 
 		// ...block 1 can, and only once...
 		assert.equal(await commitProcessor.process(commit1), Accepted);
-		await assertBlockNumber([node4], 1);
+		await assertLastBlockNumber([node4], 1);
 		assert.equal(await commitProcessor.process(commit1), Skipped);
-		await assertBlockNumber([node4], 1);
+		await assertLastBlockNumber([node4], 1);
 
 		// ...and then block 2.
 		assert.equal(await commitProcessor.process(commit2), Accepted);
-		await assertBlockNumber([node4], 2);
-		await assertBlockHash([node4], commit2.block.hash);
+		await assertLastBlockNumber([node4], 2);
+		await assertBlockHash([node4], 2, commit2.block.hash);
 	});
 
 	it("should tell a genuine proof from a tampered one", async ({ nodes }) => {
@@ -207,15 +213,15 @@ describe<{
 		const invalidBlock = snoozeForInvalidBlock(node4, 1);
 		assert.equal(await commitProcessorOf(node4).process(forgedCommit), Invalid);
 		assertInvalidBlock([await invalidBlock], Exceptions.InvalidReward, 1);
-		await assertBlockNumber([node4], 0);
+		await assertLastBlockNumber([node4], 0);
 
 		// Consensus goes on to confirm a proper block 1 on every node, node 4 included.
 		await runMany(nodes);
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 		assert.not.equal((await getLastCommit(node4)).block.hash, proposal.blockHeader.hash);
 	});
 });

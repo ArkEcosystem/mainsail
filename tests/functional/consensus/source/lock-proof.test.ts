@@ -192,9 +192,9 @@ describe<{
 			);
 
 			await assertBlockNumber(nodes, 1);
-			await assertBlockRound(nodes, 0); // A was forged in round 0...
-			await assertCommitRound(nodes, dataset.round + 1); // ...and committed in the round after the bad one
-			await assertBlockHash(nodes, proposalA.blockHeader.hash);
+			await assertBlockRound(nodes, 1, 0); // A was forged in round 0...
+			await assertCommitRound(nodes, 1, dataset.round + 1); // ...and committed in the round after the bad one
+			await assertBlockHash(nodes, 1, proposalA.blockHeader.hash);
 		},
 		[
 			dataset(

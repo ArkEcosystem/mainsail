@@ -89,8 +89,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes);
 	});
 
@@ -121,8 +121,8 @@ describe<{
 		assert.defined(genuine);
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes, genuine.blockHeader.hash);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1, genuine.blockHeader.hash);
 	});
 
 	it("should reject a proposal from a validator that is not the proposer of the round", async ({
@@ -144,8 +144,8 @@ describe<{
 		assert.defined(genuine);
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes, genuine.blockHeader.hash);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1, genuine.blockHeader.hash);
 	});
 
 	it("should skip a proposal and a prevote for a round it has moved past", async ({ nodes, validators, p2p }) => {
@@ -176,8 +176,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
 	});
 
 	it("should skip a proposal and a prevote for a block it has already committed", async ({
@@ -217,7 +217,7 @@ describe<{
 		await snoozeForBlock(nodes, 2);
 
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 	});
 });

@@ -340,6 +340,15 @@ export const getCommits = async (
 	return commits;
 };
 
+export const getCommit = async (
+	app: Contracts.Kernel.Application,
+	blockNumber: number,
+): Promise<Contracts.Crypto.Commit | undefined> => {
+	const [commit] = await getCommits(app, blockNumber, blockNumber);
+
+	return commit;
+};
+
 export const getLastCommit = async (app: Contracts.Kernel.Application): Promise<Contracts.Crypto.Commit> => {
 	const databaseService = app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
 

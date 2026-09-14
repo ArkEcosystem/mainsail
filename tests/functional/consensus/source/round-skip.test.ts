@@ -114,13 +114,13 @@ describe<{
 		);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, skippedTo);
-		await assertCommitRound(nodes, skippedTo);
-		await assertBlockHash(nodes, proposal.blockHeader.hash);
+		await assertBlockRound(nodes, 1, skippedTo);
+		await assertCommitRound(nodes, 1, skippedTo);
+		await assertBlockHash(nodes, 1, proposal.blockHeader.hash);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 });
