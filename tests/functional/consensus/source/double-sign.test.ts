@@ -92,8 +92,8 @@ describe<{
 		// and later steps at the same position are past the watermark and unaffected.
 		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes);
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 
 		// The chain has moved past the watermark, so the validator signs again normally.
 		await snoozeForBlock(nodes);
@@ -130,7 +130,7 @@ describe<{
 		// The next round is past the watermark, so the same proposer proposes and the block confirms.
 		assert.equal(p2p.proposals.getMessages(1, 1).length, 1);
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
 	});
 });

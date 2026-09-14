@@ -5,7 +5,13 @@ import { describe } from "@mainsail/test-runner";
 
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
-import { assertBlockHash, assertBlockNumber, assertBlockRound, assertCommitRound } from "./asserts.js";
+import {
+	assertBlockHash,
+	assertBlockNumber,
+	assertBlockRound,
+	assertCommitRound,
+	assertLastBlockNumber,
+} from "./asserts.js";
 import type { Validator } from "./contracts.js";
 import { holdProposal } from "./faults.js";
 import { P2PRegistry } from "./p2p.js";
@@ -73,9 +79,9 @@ describe<{
 		// precommits it already held.
 		assert.equal(precommitsBeforeProposal, totalNodes - 1);
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertCommitRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertCommitRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 
 		// Node 4 still cast its own votes for the block, late.
 		const blockHash = (await getLastCommit(node4)).block.hash;
@@ -92,7 +98,7 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
 	it("should lock and precommit the block on +2/3 prevotes for it, even after prevoting nil on the propose timeout", async ({
@@ -139,14 +145,14 @@ describe<{
 			Array.from({ length: totalNodes }).fill(blockHash),
 		);
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertCommitRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertCommitRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
 	it("should still confirm the block after precommitting nil, when the proposal arrives with +2/3 votes for it", async ({
@@ -201,14 +207,14 @@ describe<{
 		// ...yet with the proposal and +2/3 precommits for it in hand, node 4 confirms the block with everybody
 		// else (Tendermint line 49): its own nil votes do not stand in the way of the decision.
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertCommitRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertCommitRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
 	it("should drop a proposal for a round it has already left, and take the block from the commit instead", async ({
@@ -243,7 +249,7 @@ describe<{
 				.getRoundState(1, 0)
 				.hasProposal(),
 		);
-		await assertBlockNumber([node4], 0);
+		await assertLastBlockNumber([node4], 0);
 		assert.equal(consensus.getBlockNumber(), 1);
 
 		const [commit] = await getCommits(node0, 1, 1);
@@ -258,7 +264,7 @@ describe<{
 				.process(commit),
 			Enums.Consensus.ProcessorResult.Accepted,
 		);
-		await assertBlockNumber([node4], 1);
-		await assertBlockHash([node4], commit.block.hash);
+		await assertLastBlockNumber([node4], 1);
+		await assertBlockHash([node4], 1, commit.block.hash);
 	});
 });

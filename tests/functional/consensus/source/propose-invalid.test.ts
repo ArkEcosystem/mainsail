@@ -136,14 +136,14 @@ describe<{
 			// ...so the proposer forges a fresh block, which is confirmed in round 1.
 			await snoozeForBlock(nodes);
 			await assertBlockNumber(nodes, 1);
-			await assertBlockRound(nodes, 1);
-			await assertBlockHash(nodes);
+			await assertBlockRound(nodes, 1, 1);
+			await assertBlockHash(nodes, 1);
 			assert.not.equal((await getLastCommit(nodes[0])).block.hash, rejectedProposal.blockHeader.hash);
 
 			// Next block
 			await snoozeForBlock(nodes, 2);
 			await assertBlockNumber(nodes, 2);
-			await assertBlockRound(nodes, 0);
+			await assertBlockRound(nodes, 2, 0);
 		},
 		[
 			dataset(

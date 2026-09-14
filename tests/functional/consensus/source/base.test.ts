@@ -5,7 +5,7 @@ import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber } from "./asserts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
-import { getLastCommit, prepareNodeValidators, snoozeForBlock } from "./utilities.js";
+import { prepareNodeValidators, snoozeForBlock } from "./utilities.js";
 import type { Contracts } from "@mainsail/contracts";
 
 describe<{
@@ -36,18 +36,14 @@ describe<{
 	it("should confirm a block", async ({ nodes }) => {
 		await snoozeForBlock(nodes);
 
-		const commit = await getLastCommit(nodes[0]);
-
 		await assertBlockNumber(nodes, 1);
-		await assertBlockHash(nodes, commit.block.hash);
+		await assertBlockHash(nodes, 1);
 	});
 
 	it("should confirm 3 blocks", async ({ nodes }) => {
 		await snoozeForBlock(nodes, 3);
 
-		const commit = await getLastCommit(nodes[0]);
-
 		await assertBlockNumber(nodes, 3);
-		await assertBlockHash(nodes, commit.block.hash);
+		await assertBlockHash(nodes, 3);
 	});
 });

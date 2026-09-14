@@ -44,8 +44,8 @@ describe<{
 
 		// The observer holds the same chain as the validators...
 		await assertBlockNumber(nodes, blocks);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, blocks, 0);
+		await assertBlockHash(nodes, blocks);
 
 		// ...while only the five validators ever proposed or voted.
 		for (let blockNumber = 1; blockNumber <= blocks; blockNumber++) {
