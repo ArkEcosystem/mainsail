@@ -8,7 +8,6 @@ import { getRandomPeer } from "../utils/index.js";
 
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;
-	peerHeader: Contracts.P2P.HeaderData;
 	blockNumber: number;
 	round: number;
 };
@@ -78,7 +77,6 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		const job: DownloadJob = {
 			blockNumber: peer.header.blockNumber,
 			peer,
-			peerHeader: peer.header,
 			round: peer.header.round,
 		};
 

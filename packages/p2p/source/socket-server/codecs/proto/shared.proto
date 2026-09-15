@@ -8,8 +8,8 @@ message Headers {
     uint32 round = 3;
     uint32 step = 4;
 	optional string proposedBlockHash = 5;
-	repeated bool validatorsSignedPrevote = 6;
-	repeated bool validatorsSignedPrecommit = 7;
+	bytes validatorsSignedPrevote = 6;
+	bytes validatorsSignedPrecommit = 7;
 }
 
 message PeerLike {
