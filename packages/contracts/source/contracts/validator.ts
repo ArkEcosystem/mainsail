@@ -1,5 +1,6 @@
 import type { Step } from "./consensus/enums.js";
 import type { AggregatedSignature, Block, KeyPair, Message, Proposal } from "./crypto/index.js";
+import type { EventListener } from "./kernel/events.js";
 
 export interface ValidatorKeyPair {
 	readonly publicKey: string;
@@ -34,6 +35,11 @@ export interface Validator {
 export interface ValidatorRepository {
 	getValidator(publicKey: string): Validator | undefined;
 	printLoadedValidators(): void;
+}
+
+export interface ProposerReporter extends EventListener {
+	boot(): void;
+	dispose(): void;
 }
 
 export interface SigningPosition {

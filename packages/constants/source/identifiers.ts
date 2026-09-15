@@ -318,6 +318,7 @@ export const Identifiers = {
 	},
 	Validator: {
 		DoubleSignGuard: Symbol("Validator<DoubleSignGuard>"),
+		Reporter: Symbol("Validator<Reporter>"),
 		Repository: Symbol("Validator<Repository>"),
 	},
 	ValidatorSet: {

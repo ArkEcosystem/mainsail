@@ -8,6 +8,7 @@ import { assert } from "@mainsail/utils";
 
 import { DoubleSignGuard } from "./double-sign-guard.js";
 import { BIP38, BIP39 } from "./keys/index.js";
+import { ProposerReporter } from "./proposer-reporter.js";
 import { ValidatorRepository } from "./validator-repository.js";
 import { Validator } from "./validator.js";
 
@@ -16,6 +17,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Validator.DoubleSignGuard).to(DoubleSignGuard).inSingletonScope();
 		this.app.bind(Identifiers.Validator.Repository).to(ValidatorRepository).inSingletonScope();
+		this.app.bind(Identifiers.Validator.Reporter).to(ProposerReporter).inSingletonScope();
 	}
 
 	public async boot(): Promise<void> {
@@ -60,6 +62,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}
 
 		this.app.get<ValidatorRepository>(Identifiers.Validator.Repository).configure(validators);
+
+		// Only a node that runs validators ever holds a proposer slot, so only such a node reports on them.
+		if (validators.length > 0) {
+			this.app.get<Contracts.Validator.ProposerReporter>(Identifiers.Validator.Reporter).boot();
+		}
+	}
+
+	public async dispose(): Promise<void> {
+		this.app.get<Contracts.Validator.ProposerReporter>(Identifiers.Validator.Reporter).dispose();
 	}
 
 	#getConsensusKeyPairFromSecret(secret: string): Promise<Contracts.Crypto.KeyPair> {
