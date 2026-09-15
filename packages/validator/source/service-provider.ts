@@ -63,7 +63,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.get<ValidatorRepository>(Identifiers.Validator.Repository).configure(validators);
 
-		// Only a node that runs validators ever holds a proposer slot, so only such a node reports on them.
 		if (validators.length > 0) {
 			this.app.get<Contracts.Validator.ProposerReporter>(Identifiers.Validator.Reporter).boot();
 		}

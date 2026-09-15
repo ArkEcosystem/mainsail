@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
-type OwnSlot = { address: string; round: number };
+type OwnRound = { address: string; round: number };
 
 // Reports, for the validators this node runs, the proposals it submits and whether the block committed at a block
 // number is theirs or one they missed. It follows consensus through its events and holds nothing of it.
@@ -27,7 +27,7 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 	// The rounds of a block number in which one of this node's validators was the proposer. Keyed by block number
 	// because the commit of one block number and the first round of the next arrive as separate events, and a
 	// listener has no say in which of them it handles first.
-	readonly #ownSlots = new Map<number, OwnSlot[]>();
+	readonly #ownRounds = new Map<number, OwnRound[]>();
 
 	public boot(): void {
 		this.events.listenMany(this.#subscriptions());
@@ -70,43 +70,43 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 			return;
 		}
 
-		const ownSlots = this.#ownSlots.get(blockNumber) ?? [];
-		if (ownSlots.some((slot) => slot.round === round)) {
+		const ownRounds = this.#ownRounds.get(blockNumber) ?? [];
+		if (ownRounds.some((ownRound) => ownRound.round === round)) {
 			return;
 		}
 
-		ownSlots.push({ address: proposer.address, round });
-		this.#ownSlots.set(blockNumber, ownSlots);
+		ownRounds.push({ address: proposer.address, round });
+		this.#ownRounds.set(blockNumber, ownRounds);
 	}
 
 	#onProposed(proposal: Contracts.Crypto.Proposal): void {
 		const { blockHeader, round } = proposal;
 
-		// A re-proposed block keeps the proposer that forged it, so the slot names the validator proposing here.
-		const ownSlot = this.#ownSlots.get(blockHeader.number)?.find((slot) => slot.round === round);
+		// A re-proposed block keeps the proposer that forged it, so the own round names the validator proposing here.
+		const ownRound = this.#ownRounds.get(blockHeader.number)?.find((ownRound) => ownRound.round === round);
 
 		this.logger.notice(
-			`📦 Proposing block ${this.#blockString(blockHeader, round)} as ${ownSlot?.address ?? blockHeader.proposer}`,
+			`📦 Proposing block ${this.#blockString(blockHeader, round)} as ${ownRound?.address ?? blockHeader.proposer}`,
 			"consensus",
 		);
 	}
 
 	#onBlockApplied(block: Contracts.Crypto.BlockData): void {
-		const ownSlots = this.#ownSlots.get(block.number);
+		const ownRounds = this.#ownRounds.get(block.number);
 
 		// The committed block settles its block number and every earlier one.
-		for (const blockNumber of this.#ownSlots.keys()) {
+		for (const blockNumber of this.#ownRounds.keys()) {
 			if (blockNumber <= block.number) {
-				this.#ownSlots.delete(blockNumber);
+				this.#ownRounds.delete(blockNumber);
 			}
 		}
 
-		if (ownSlots === undefined) {
+		if (ownRounds === undefined) {
 			return;
 		}
 
 		// Whichever of our rounds it came from, and whoever ended up proposing it: the block is ours.
-		if (ownSlots.some((slot) => slot.address === block.proposer)) {
+		if (ownRounds.some((ownRound) => ownRound.address === block.proposer)) {
 			this.logger.notice(
 				`✅ Committed our block ${this.#position(block.number, block.round)} as ${block.proposer}`,
 				"consensus",
@@ -114,9 +114,9 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 			return;
 		}
 
-		for (const slot of ownSlots) {
+		for (const ownRound of ownRounds) {
 			this.logger.notice(
-				`❌ Missed our slot ${this.#position(block.number, slot.round)} as ${slot.address}, committed by ${block.proposer}`,
+				`❌ Missed our round ${this.#position(block.number, ownRound.round)} as ${ownRound.address}, committed by ${block.proposer}`,
 				"consensus",
 			);
 		}
