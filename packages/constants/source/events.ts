@@ -49,6 +49,7 @@ export enum PeerEvent {
 export enum ConsensusEvent {
 	Bootstrapped = "consensus.bootstrapped",
 	RoundStarted = "consensus.round.started",
+	Proposed = "consensus.proposed",
 	ProposalAccepted = "consensus.proposal.accepted",
 	PrevotedProposal = "consensus.prevoted.proposal",
 	PrevotedAny = "consensus.prevoted.any",

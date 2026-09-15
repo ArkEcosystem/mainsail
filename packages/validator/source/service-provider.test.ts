@@ -14,6 +14,7 @@ describe<{
 	keyPairFactory: Contracts.Crypto.KeyPairFactory;
 	keyPair: Contracts.Crypto.KeyPair;
 	repository: { configure: (validators: Contracts.Validator.Validator[]) => unknown };
+	reporter: { boot: () => void; dispose: () => void };
 }>("ServiceProvider", ({ it, assert, beforeEach, spy }) => {
 	const { mnemonic } = validatorKeys[0];
 	const hexPrivateKey = validatorKeys[0].consensusKeyPair.privateKey;
@@ -44,17 +45,22 @@ describe<{
 		context.repository = { configure: () => {} };
 		context.app.bind(Identifiers.Validator.Repository).toConstantValue(context.repository);
 
+		// A stub reporter so boot's and dispose's calls into it are observable.
+		context.reporter = { boot: () => {}, dispose: () => {} };
+		context.app.bind(Identifiers.Validator.Reporter).toConstantValue(context.reporter);
+
 		context.serviceProvider = context.app.resolve(ServiceProvider);
 	});
 
-	it("#register - should bind the validator repository", async () => {
-		// Use a fresh app so register binds against the real (unstubbed) identifier.
+	it("#register - should bind the validator repository and the proposer reporter", async () => {
+		// Use a fresh app so register binds against the real (unstubbed) identifiers.
 		const freshApp = new Application();
 		const serviceProvider = freshApp.resolve(ServiceProvider);
 
 		await serviceProvider.register();
 
 		assert.true(freshApp.isBound(Identifiers.Validator.Repository));
+		assert.true(freshApp.isBound(Identifiers.Validator.Reporter));
 	});
 
 	it("#boot - should load a validator from a mnemonic secret", async ({
@@ -108,6 +114,42 @@ describe<{
 		await serviceProvider.boot();
 
 		assert.length(configure.getCallArgs(0)[0], 2);
+	});
+
+	it("#boot - should start the proposer reporter once validators are loaded", async ({
+		app,
+		serviceProvider,
+		reporter,
+	}) => {
+		app.config("validators", { secrets: [mnemonic] });
+
+		const boot = spy(reporter, "boot");
+
+		await serviceProvider.boot();
+
+		boot.calledOnce();
+	});
+
+	it("#boot - should leave the proposer reporter off when no validators are loaded", async ({
+		app,
+		serviceProvider,
+		reporter,
+	}) => {
+		app.config("validators", { secrets: [] });
+
+		const boot = spy(reporter, "boot");
+
+		await serviceProvider.boot();
+
+		boot.neverCalled();
+	});
+
+	it("#dispose - should stop the proposer reporter", async ({ serviceProvider, reporter }) => {
+		const dispose = spy(reporter, "dispose");
+
+		await serviceProvider.dispose();
+
+		dispose.calledOnce();
 	});
 
 	it("#boot - should throw for a secret that is neither a mnemonic nor a private key", async ({
