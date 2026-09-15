@@ -113,7 +113,7 @@ describe<{
 		notice.calledWith(`📦 Proposing block ${1}/${0}/${block.hash} as ${OURS.address}`);
 	});
 
-	it("#handle - should name the validator proposing, not the forger of a re-proposed block", async ({
+	it("#handle - should report a re-proposal with the validator proposing it and the forger of its block", async ({
 		reporter,
 		logger,
 		block,
@@ -126,7 +126,26 @@ describe<{
 		await roundStarted(reporter, 1, 1);
 		await proposed(reporter, { ...block, proposer: THEIRS.address }, 1, 0);
 
-		notice.calledWith(`📦 Proposing block ${1}/${1}(${0})/${block.hash} as ${OURS.address}`);
+		notice.calledWith(
+			`📦 Re-proposing block ${1}/${1}(${0})/${block.hash} as ${OURS.address}, forged by ${THEIRS.address}`,
+		);
+	});
+
+	it("#handle - should report a re-proposal of a block another validator of ours forged", async ({
+		reporter,
+		logger,
+		block,
+		proposerByRound,
+	}) => {
+		proposerByRound[1] = OUR_SECOND;
+		const notice = spy(logger, "notice");
+
+		await roundStarted(reporter, 1, 1);
+		await proposed(reporter, block, 1, 0);
+
+		notice.calledWith(
+			`📦 Re-proposing block ${1}/${1}(${0})/${block.hash} as ${OUR_SECOND.address}, forged by ${OURS.address}`,
+		);
 	});
 
 	it("#handle - should fall back to the block proposer when the round was not seen starting", async ({

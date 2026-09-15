@@ -63,7 +63,6 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 	}
 
 	#onRoundStarted({ blockNumber, round }: Contracts.Consensus.StateData): void {
-		// The same derivation consensus uses for its round state, so the two agree on who proposes.
 		const proposer = this.validatorSet.getRoundValidators()[this.proposerCalculator.getValidatorIndex(round)];
 
 		if (proposer === undefined || this.validatorsRepository.getValidator(proposer.blsPublicKey) === undefined) {
@@ -80,15 +79,17 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 	}
 
 	#onProposed(proposal: Contracts.Crypto.Proposal): void {
-		const { blockHeader, round } = proposal;
+		const { blockHeader, round, validRound } = proposal;
 
-		// A re-proposed block keeps the proposer that forged it, so the own round names the validator proposing here.
 		const ownRound = this.#ownRounds.get(blockHeader.number)?.find((ownRound) => ownRound.round === round);
+		const submission = `${this.#blockString(blockHeader, round)} as ${ownRound?.address ?? blockHeader.proposer}`;
 
-		this.logger.notice(
-			`📦 Proposing block ${this.#blockString(blockHeader, round)} as ${ownRound?.address ?? blockHeader.proposer}`,
-			"consensus",
-		);
+		if (validRound === undefined) {
+			this.logger.notice(`📦 Proposing block ${submission}`, "consensus");
+			return;
+		}
+
+		this.logger.notice(`📦 Re-proposing block ${submission}, forged by ${blockHeader.proposer}`, "consensus");
 	}
 
 	#onBlockApplied(block: Contracts.Crypto.BlockData): void {
