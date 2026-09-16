@@ -54,6 +54,9 @@ export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.P2P.Statistic.Service)
 	private readonly statisticService!: Contracts.P2P.StatisticService;
 
+	@inject(Identifiers.P2P.PendingCommits)
+	private readonly pendingCommits!: Contracts.P2P.PendingCommits;
+
 	#blockNumber = 1;
 	#round = 0;
 	#step: Contracts.Consensus.Step = Enums.Consensus.Step.Propose;
@@ -235,7 +238,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		this.scheduler.scheduleTimeoutBlockPrepare(this.scheduler.getNextBlockTimestamp(this.#roundStartTime));
 
-		// TODO: Skip on sync
+		if (this.pendingCommits.has(this.#blockNumber)) {
+			return;
+		}
+
 		await this.prepareProposal(roundState);
 	}
 

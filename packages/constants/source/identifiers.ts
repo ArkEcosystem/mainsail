@@ -217,6 +217,7 @@ export const Identifiers = {
 			Repository: Symbol("P2P<Peer.Repository>"),
 			Verifier: Symbol("P2P<Peer.Verifier>"),
 		},
+		PendingCommits: Symbol("P2P<PendingCommits>"),
 		Routes: Symbol("P2P<Routes>"),
 		Server: Symbol("P2P<Server>"),
 		Service: Symbol("P2P<Service>"),

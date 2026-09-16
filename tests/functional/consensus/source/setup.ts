@@ -45,6 +45,7 @@ const setup = async (
 	nodeToRegister.set(app, { id, p2pRegistry });
 	app.bind(Identifiers.P2P.Broadcaster).toConstantValue(p2pRegistry.makeBroadcaster(id));
 	app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => {} });
+	app.bind(Identifiers.P2P.PendingCommits).toConstantValue({ has: () => false });
 
 	if (!options.consensusStorage) {
 		app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{

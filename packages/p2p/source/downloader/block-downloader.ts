@@ -44,6 +44,9 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.P2P.State)
 	private readonly state!: Contracts.P2P.State;
 
+	@inject(Identifiers.P2P.PendingCommits)
+	private readonly pendingCommits!: Contracts.P2P.PendingCommits;
+
 	@inject(Identifiers.Consensus.Processor.Commit)
 	private readonly commitProcessor!: Contracts.Consensus.CommitProcessor;
 
@@ -168,7 +171,11 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 					throw new Error(`Received block(s) with invalid signature(s)`);
 				}
 
+				this.pendingCommits.add(commits);
+
 				for (const commit of commits) {
+					this.pendingCommits.take(commit.block.number);
+
 					const response = await this.commitProcessor.process(commit);
 					if (response === Enums.Consensus.ProcessorResult.Invalid) {
 						throw new Error(`Received block is invalid`);
@@ -184,6 +191,8 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 			const error = ensureError(rawError);
 			this.#handleJobError(job, error);
 			return;
+		} finally {
+			this.pendingCommits.clear();
 		}
 
 		if (job.blockNumberTo !== number - 1) {

@@ -76,6 +76,7 @@ const setupNode = async (
 		broadcastProposal: async () => {},
 	});
 	app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => {} });
+	app.bind(Identifiers.P2P.PendingCommits).toConstantValue({ has: () => false });
 
 	app.bind(Identifiers.TransactionPool.Broadcaster).toConstantValue({
 		broadcastTransactions: async () => {},

@@ -3,11 +3,13 @@ import { Application } from "@mainsail/kernel";
 import { sleep } from "@mainsail/utils";
 
 import { describe } from "@mainsail/test-runner";
+import { PendingCommits } from "../pending-commits";
 import { BlockDownloader } from "./block-downloader";
 
 describe<{
 	app: Application;
 	downloader: BlockDownloader;
+	pendingCommits: PendingCommits;
 }>("BlockDownloader", ({ it, assert, beforeEach, stub }) => {
 	const communicator = { getBlocks: async () => ({ blocks: [] }) };
 	const repository = { getPeers: () => [] };
@@ -34,8 +36,27 @@ describe<{
 		return buffer;
 	};
 
+	// The block numbers consensus would find pending right now, probed over the range the tests use.
+	const pendingBlockNumbers = (pendingCommits: PendingCommits): number[] =>
+		[1, 2, 3, 4].filter((number) => pendingCommits.has(number));
+
+	// Accepts every commit and records, per block number, which block numbers were pending while it was
+	// processed. That is the moment consensus starts the next round and asks the pending commits.
+	const recordPendingWhileProcessing = (pendingCommits: PendingCommits): Record<number, number[]> => {
+		const pendingWhileProcessing: Record<number, number[]> = {};
+
+		stub(commitProcessor, "process").callsFake(async (commit: any) => {
+			pendingWhileProcessing[commit.block.number] = pendingBlockNumbers(pendingCommits);
+			return Enums.Consensus.ProcessorResult.Accepted;
+		});
+
+		return pendingWhileProcessing;
+	};
+
 	beforeEach((context) => {
 		context.app = new Application();
+		// The real store: the tests below check what consensus would see in it while a commit is processed.
+		context.pendingCommits = context.app.resolve(PendingCommits);
 
 		context.app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(communicator);
 		context.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(repository);
@@ -44,6 +65,7 @@ describe<{
 		context.app.bind(Identifiers.BlockchainUtils.RoundCalculator).toConstantValue(roundCalculator);
 		context.app.bind(Identifiers.State.Store).toConstantValue(stateStore);
 		context.app.bind(Identifiers.P2P.State).toConstantValue(state);
+		context.app.bind(Identifiers.P2P.PendingCommits).toConstantValue(context.pendingCommits);
 		context.app.bind(Identifiers.Consensus.Processor.Commit).toConstantValue(commitProcessor);
 		context.app.bind(Identifiers.Cryptography.Commit.Factory).toConstantValue(commitFactory);
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
@@ -104,6 +126,65 @@ describe<{
 		banPeer.neverCalled();
 		assert.false(downloader.isDownloading());
 		getBlocks.calledTimes(2);
+	});
+
+	it("#download - should keep the later commits of a verified slice pending while each commit is processed", async ({
+		downloader,
+		pendingCommits,
+	}) => {
+		stub(communicator, "getBlocks").resolvedValue({ blocks: [makeBlock(1), makeBlock(2), makeBlock(3)] });
+		const pendingWhileProcessing = recordPendingWhileProcessing(pendingCommits);
+
+		// Job for blocks 1-3; the default round calculator verifies them as one slice.
+		downloader.download(makePeer(4));
+		await sleep(10);
+
+		// While block 1 is processed, blocks 2 and 3 are pending: consensus starting round 2/0 finds block 2 and
+		// does not propose. The commit being processed is never pending itself, and nothing is left at the end.
+		assert.equal(pendingWhileProcessing, { 1: [2, 3], 2: [3], 3: [] });
+		assert.equal(pendingBlockNumbers(pendingCommits), []);
+		assert.false(downloader.isDownloading());
+	});
+
+	it("#download - should not keep commits pending before their slice is verified", async ({
+		downloader,
+		pendingCommits,
+	}) => {
+		// The downloader verifies and processes one round at a time. With rounds of two blocks, blocks 1-2 are
+		// processed before the signatures of blocks 3-4 are even checked.
+		stub(roundCalculator, "calculateRound").callsFake((number: number) =>
+			number <= 2 ? { maxValidators: 2, roundHeight: 1 } : { maxValidators: 2, roundHeight: 3 },
+		);
+		stub(communicator, "getBlocks").resolvedValue({
+			blocks: [makeBlock(1), makeBlock(2), makeBlock(3), makeBlock(4)],
+		});
+		const pendingWhileProcessing = recordPendingWhileProcessing(pendingCommits);
+
+		// Job for blocks 1-4.
+		downloader.download(makePeer(5));
+		await sleep(10);
+
+		// Block 3 is not pending while block 2 is processed: its signature is unchecked, so it must not make
+		// consensus skip a proposal. It becomes pending only with its own slice.
+		assert.equal(pendingWhileProcessing, { 1: [2], 2: [], 3: [4], 4: [] });
+		assert.false(downloader.isDownloading());
+	});
+
+	it("#download - should drop the pending commits when processing the slice fails", async ({
+		downloader,
+		pendingCommits,
+	}) => {
+		stub(communicator, "getBlocks").resolvedValue({ blocks: [makeBlock(1), makeBlock(2), makeBlock(3)] });
+		stub(commitProcessor, "process").resolvedValue(Enums.Consensus.ProcessorResult.Invalid);
+		const banPeer = stub(peerDisposer, "banPeer");
+
+		downloader.download(makePeer(4));
+		await sleep(10);
+
+		// Blocks 2 and 3 were pending when block 1 failed; nothing may claim they are decided any longer.
+		banPeer.calledOnce();
+		assert.equal(pendingBlockNumbers(pendingCommits), []);
+		assert.false(downloader.isDownloading());
 	});
 
 	it("#download - should ban the peer and replay with another peer when the request fails", async ({
