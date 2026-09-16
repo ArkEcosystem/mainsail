@@ -19,6 +19,7 @@ export * from "./peer-processor.js";
 export * from "./peer-repository.js";
 export * from "./peer-verifier.js";
 export * from "./peer.js";
+export * from "./pending-commits.js";
 export * from "./server.js";
 export * from "./service.js";
 export * from "./state.js";

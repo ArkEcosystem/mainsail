@@ -31,6 +31,7 @@ import { PeerProcessor } from "./peer-processor.js";
 import { PeerRepository } from "./peer-repository.js";
 import { PeerVerifier } from "./peer-verifier.js";
 import { Peer } from "./peer.js";
+import { PendingCommits } from "./pending-commits.js";
 import { Service } from "./service.js";
 import {
 	GetApiNodesRoute,
@@ -187,6 +188,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.Server).to(Server).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.State).to(State).inSingletonScope();
+
+		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
 
 		for (const route of [
 			GetApiNodesRoute,
