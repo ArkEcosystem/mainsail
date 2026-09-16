@@ -26,6 +26,7 @@ type Context = {
 	roundState: Contracts.Consensus.RoundState;
 	roundStateRepository: any;
 	peerStatistic: any;
+	pendingCommits: any;
 	forger: any;
 };
 
@@ -124,6 +125,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			newRound: () => {},
 		};
 
+		context.pendingCommits = {
+			has: () => false,
+		};
+
 		context.forger = {
 			forgeBlock: () => {},
 		};
@@ -142,6 +147,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.app.bind(Identifiers.Consensus.RoundStateRepository).toConstantValue(context.roundStateRepository);
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		context.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue(context.peerStatistic);
+		context.app.bind(Identifiers.P2P.PendingCommits).toConstantValue(context.pendingCommits);
 		context.app.bind(Identifiers.Forger.Block).toConstantValue(context.forger);
 
 		context.consensus = context.app.resolve(Consensus);
@@ -308,6 +314,43 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			validRound: undefined,
 		});
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
+	});
+
+	it("#startRound - should not prepare a proposal while the block downloader holds a commit for the block number", async ({
+		consensus,
+		scheduler,
+		validatorsRepository,
+		roundStateRepository,
+		proposer,
+		pendingCommits,
+		eventDispatcher,
+	}) => {
+		const spyScheduleTimeoutBlockPrepare = spy(scheduler, "scheduleTimeoutBlockPrepare");
+		const spyHas = stub(pendingCommits, "has").returnValue(true);
+		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue({});
+		const spyPrepareProposal = spy(consensus, "prepareProposal");
+		stub(roundStateRepository, "getRoundState").returnValue({
+			hasProposal: () => false,
+			proposer,
+		});
+		const spyDispatch = spy(eventDispatcher, "dispatch");
+
+		await consensus.startRound(0);
+
+		// The round is announced and the block-prepare timeout armed as usual; only the proposal is held off,
+		// because the downloader is about to commit the block for this very block number.
+		spyDispatch.calledWith(Events.ConsensusEvent.RoundStarted, {
+			blockNumber: 1,
+			lockedRound: undefined,
+			round: 0,
+			step: Enums.Consensus.Step.Propose,
+			validRound: undefined,
+		});
+		spyScheduleTimeoutBlockPrepare.calledOnce();
+		spyHas.calledOnce();
+		spyHas.calledWith(1);
+		spyPrepareProposal.neverCalled();
+		spyGetValidator.neverCalled();
 	});
 
 	it("#startRound - local validator should propose validRound", async ({
