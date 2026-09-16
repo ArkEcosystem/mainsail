@@ -173,8 +173,6 @@ const setupNode = async (
 		await loadPlugin(app, packageId, options);
 	}
 
-	app.rebind(Identifiers.Validator.DoubleSignGuard).toConstantValue({ guard: async () => {} });
-
 	for (const packageId of packages) {
 		await bootPlugin(app, packageId);
 	}

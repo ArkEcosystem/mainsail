@@ -1,6 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers, Events, Enums } from "@mainsail/constants";
-import { DoubleSignError } from "@mainsail/exceptions";
 import { Lock } from "@mainsail/utils";
 
 import { Application } from "@mainsail/kernel";
@@ -490,42 +489,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
 	});
 
-	it("#onTimeoutBlockPrepare - should skip the proposal and continue when the double-sign guard refuses", async ({
-		consensus,
-		validatorsRepository,
-		roundStateRepository,
-		validatorSet,
-		proposalProcessor,
-		proposer,
-		logger,
-		forger,
-		block,
-	}) => {
-		const position = { blockNumber: 1, round: 0, step: Enums.Consensus.Step.Propose, value: "blockHash" };
-		const validator = {
-			propose: () => {},
-			getRandaoReveal: async () => "aa".repeat(96),
-		};
-
-		stub(forger, "forgeBlock").resolvedValue(block);
-		stub(validator, "propose").rejectedValue(
-			new DoubleSignError("publicKey", { ...position, value: "conflictingHash" }, position),
-		);
-		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
-		stub(validatorsRepository, "getValidator").returnValue(validator);
-		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
-
-		const spyProposalProcess = spy(proposalProcessor, "process");
-		const spyLoggerWarn = spy(logger, "warn");
-
-		await consensus.startRound(0);
-		await consensus.onTimeoutBlockPrepare();
-
-		spyLoggerWarn.calledOnce();
-		spyProposalProcess.neverCalled();
-		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
-	});
-
 	it("#prepareProposal - should catch a forging failure instead of leaving an unhandled rejection", async ({
 		consensus,
 		validatorsRepository,
@@ -717,64 +680,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyForgerForgeBlock.neverCalled();
 		spyValidatorPropose.calledOnce();
 		spyValidatorPropose.calledWith(1, 1, 0, block, lockProof); // validator index, round, validRound, block, lockProof
-	});
-
-	it("#prevote - should skip the vote and continue when the double-sign guard refuses", async ({
-		consensus,
-		validatorSet,
-		validatorsRepository,
-		messageProcessor,
-		logger,
-		proposer,
-	}) => {
-		const position = { blockNumber: 1, round: 0, step: Enums.Consensus.Step.Prevote, value: "blockHash" };
-		const validator = {
-			prevote: () => {},
-		};
-
-		stub(validator, "prevote").rejectedValue(
-			new DoubleSignError("publicKey", { ...position, value: "conflictingHash" }, position),
-		);
-		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
-		stub(validatorsRepository, "getValidator").returnValue(validator);
-		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
-
-		const spyMessageProcess = spy(messageProcessor, "process");
-		const spyLoggerWarn = spy(logger, "warn");
-
-		await consensus.prevote("blockHash");
-
-		spyMessageProcess.neverCalled();
-		spyLoggerWarn.calledOnce();
-	});
-
-	it("#precommit - should skip the vote and continue when the double-sign guard refuses", async ({
-		consensus,
-		validatorSet,
-		validatorsRepository,
-		messageProcessor,
-		logger,
-		proposer,
-	}) => {
-		const position = { blockNumber: 1, round: 0, step: Enums.Consensus.Step.Precommit, value: "blockHash" };
-		const validator = {
-			precommit: () => {},
-		};
-
-		stub(validator, "precommit").rejectedValue(
-			new DoubleSignError("publicKey", { ...position, value: "conflictingHash" }, position),
-		);
-		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
-		stub(validatorsRepository, "getValidator").returnValue(validator);
-		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
-
-		const spyMessageProcess = spy(messageProcessor, "process");
-		const spyLoggerWarn = spy(logger, "warn");
-
-		await consensus.precommit("blockHash");
-
-		spyMessageProcess.neverCalled();
-		spyLoggerWarn.calledOnce();
 	});
 
 	// Own votes and events are fire-and-forget. A rejection there must be reported, not left unhandled: Node

@@ -137,7 +137,6 @@ const setup = async (
 
 	// Rebinds
 	app.rebind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
-	app.rebind(Identifiers.Validator.DoubleSignGuard).toConstantValue({ guard: async () => {} });
 
 	return app;
 };
