@@ -2,7 +2,6 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { DoubleSignError } from "@mainsail/exceptions";
 import { ensureError, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -265,9 +264,8 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#proposalPromise = undefined;
 
 		if (proposal === undefined) {
-			// Nothing to propose: either the double-sign guard refused this position, or building the
-			// proposal failed. #makeProposal reported which. The propose timeout scheduled above lets
-			// the round time out so consensus moves on.
+			// Building the proposal failed, and #makeProposal reported it. The propose timeout scheduled
+			// above lets the round time out so consensus moves on.
 			return;
 		}
 
@@ -598,16 +596,10 @@ export class Consensus implements Contracts.Consensus.Service {
 			return await this.#createProposal(roundState, registeredProposer);
 		} catch (rawError) {
 			const error = ensureError(rawError);
-
-			if (error instanceof DoubleSignError) {
-				// Signing is allowed again once a later round passes the recorded watermark.
-				this.logger.warn(`Skipped proposal for ${position}: ${error.message}`, "consensus");
-			} else {
-				this.logger.error(
-					`Failed to create proposal for ${position}: ${error.stack ?? error.message}`,
-					"consensus",
-				);
-			}
+			this.logger.error(
+				`Failed to create proposal for ${position}: ${error.stack ?? error.message}`,
+				"consensus",
+			);
 
 			return undefined;
 		}
@@ -619,7 +611,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	): Promise<Contracts.Crypto.Proposal> {
 		// The position is fixed here, before the first await. Building the block can outlast the round, and
 		// the proposal has to be signed for the round it was requested in, not for the one live at signing
-		// time; the double-sign guard then settles which of two overlapping proposals gets out.
+		// time; onTimeoutBlockPrepare then drops a proposal whose round has already ended.
 		const blockNumber = this.#blockNumber;
 		const round = this.#round;
 		const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.address);
@@ -662,20 +654,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				continue;
 			}
 
-			let prevote: Contracts.Crypto.Message;
-			try {
-				prevote = await localValidator.prevote(validatorIndex, this.#blockNumber, this.#round, value);
-			} catch (error) {
-				if (error instanceof DoubleSignError) {
-					this.logger.warn(
-						`Skipped prevote for ${this.#getBlockNumberRoundString()}: ${error.message}`,
-						"consensus",
-					);
-					continue;
-				}
-
-				throw error;
-			}
+			const prevote = await localValidator.prevote(validatorIndex, this.#blockNumber, this.#round, value);
 
 			this.#runInBackground("Processing own prevote", () => this.messageProcessor.process(prevote));
 		}
@@ -694,20 +673,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				continue;
 			}
 
-			let precommit: Contracts.Crypto.Message;
-			try {
-				precommit = await localValidator.precommit(validatorIndex, this.#blockNumber, this.#round, value);
-			} catch (error) {
-				if (error instanceof DoubleSignError) {
-					this.logger.warn(
-						`Skipped precommit for ${this.#getBlockNumberRoundString()}: ${error.message}`,
-						"consensus",
-					);
-					continue;
-				}
-
-				throw error;
-			}
+			const precommit = await localValidator.precommit(validatorIndex, this.#blockNumber, this.#round, value);
 
 			this.#runInBackground("Processing own precommit", () => this.messageProcessor.process(precommit));
 		}
