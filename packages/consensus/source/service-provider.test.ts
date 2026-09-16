@@ -63,6 +63,7 @@ describe<{
 		context.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue({});
 		context.app.bind(Identifiers.Forger.Block).toConstantValue({});
 		context.app.bind(Identifiers.P2P.Broadcaster).toConstantValue({});
+		context.app.bind(Identifiers.P2P.PendingCommits).toConstantValue({});
 		context.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({});
 		context.app.bind(Identifiers.Processor.BlockProcessor).toConstantValue({});
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({});
