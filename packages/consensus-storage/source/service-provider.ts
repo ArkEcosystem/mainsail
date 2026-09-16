@@ -17,7 +17,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async dispose(): Promise<void> {
-		await this.#storeConsensusState();
+		await this.app
+			.get<Contracts.ConsensusStorage.Service>(Identifiers.ConsensusStorage.Service)
+			.saveState(this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service).getState());
 
 		await this.app.get<RootDatabase>(Identifiers.ConsensusStorage.Root).close();
 	}
@@ -32,28 +34,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app
 			.bind(Identifiers.ConsensusStorage.Storage.Proposal)
-			.toConstantValue(storage.openDB({ name: "proposals" }));
+			.toConstantValue(storage.openDB({ encoding: "binary", name: "proposals" }));
 		this.app
 			.bind(Identifiers.ConsensusStorage.Storage.Message)
-			.toConstantValue(storage.openDB({ name: "message" }));
+			.toConstantValue(storage.openDB({ encoding: "binary", name: "message" }));
 		this.app
 			.bind(Identifiers.ConsensusStorage.Storage.ConsensusState)
 			.toConstantValue(storage.openDB({ name: "consensus" }));
-	}
-
-	async #storeConsensusState() {
-		const roundStates = this.app
-			.get<Contracts.Consensus.RoundStateRepository>(Identifiers.Consensus.RoundStateRepository)
-			.getRoundStates();
-
-		const storage = this.app.get<Service>(Identifiers.ConsensusStorage.Service);
-
-		await storage.persist({
-			messages: roundStates.flatMap((roundState) => roundState.getMessages()),
-			proposals: roundStates
-				.map((roundState) => roundState.getProposal())
-				.filter((proposal): proposal is Contracts.Crypto.Proposal => !!proposal),
-			state: this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service).getState(),
-		});
 	}
 }

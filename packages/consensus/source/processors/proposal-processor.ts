@@ -32,6 +32,9 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@inject(Identifiers.P2P.Broadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
+	@inject(Identifiers.ConsensusStorage.Service)
+	private readonly storage!: Contracts.ConsensusStorage.Service;
+
 	async process(
 		proposal: Contracts.Crypto.Proposal,
 		broadcast: boolean = true,
@@ -65,6 +68,8 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			}
 
 			roundState.addProposal(proposal);
+
+			await this.storage.saveProposal(proposal);
 
 			if (broadcast) {
 				void this.broadcaster.broadcastProposal(proposal);
