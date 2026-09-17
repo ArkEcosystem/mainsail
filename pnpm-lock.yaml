@@ -840,9 +840,6 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/exceptions':
-        specifier: workspace:*
-        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -877,9 +874,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
       lmdb:
         specifier: 3.5.6
         version: 3.5.6
@@ -3207,9 +3201,6 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/exceptions':
-        specifier: workspace:*
-        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
