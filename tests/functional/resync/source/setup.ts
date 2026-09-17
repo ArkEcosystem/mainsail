@@ -65,10 +65,13 @@ const setupNode = async (
 	app.bind(Identifiers.Services.EventDispatcher.Service).to(Services.Events.MemoryEventDispatcher).inSingletonScope();
 
 	app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
+		clear: async () => {},
 		getMessages: async () => [],
 		getProposals: async () => [],
-		getState: async () => {},
-		persist: async () => {},
+		getState: async () => undefined,
+		saveMessage: async () => {},
+		saveProposal: async () => {},
+		saveState: async () => {},
 	});
 
 	app.bind(Identifiers.P2P.Broadcaster).toConstantValue({
