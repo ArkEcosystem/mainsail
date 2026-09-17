@@ -24,6 +24,7 @@ describe<{
 	roundState: any;
 	roundStateRepository: any;
 	stateStore: any;
+	storage: any;
 	timestampCalculator: any;
 	validatorSet: any;
 }>("ProposalProcessor", ({ it, assert, beforeEach, stub, spy }) => {
@@ -85,6 +86,7 @@ describe<{
 		context.roundState = { addProposal: () => {}, blockNumber, hasProposal: () => false, round };
 		context.roundStateRepository = { getRoundState: () => context.roundState };
 		context.broadcaster = { broadcastProposal: async () => {} };
+		context.storage = { saveProposal: async () => {} };
 
 		context.app = new Application();
 		context.app.bind(Identifiers.Consensus.Service).toConstantValue(context.consensus);
@@ -104,6 +106,7 @@ describe<{
 		context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
 		context.app.bind(Identifiers.Consensus.RoundStateRepository).toConstantValue(context.roundStateRepository);
 		context.app.bind(Identifiers.P2P.Broadcaster).toConstantValue(context.broadcaster);
+		context.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(context.storage);
 
 		context.processor = context.app.resolve(ProposalProcessor);
 	});
@@ -259,14 +262,16 @@ describe<{
 		handle.neverCalled();
 	});
 
-	it("#process - should add and broadcast an accepted proposal and handle the round state deferred", async ({
+	it("#process - should add, store and broadcast an accepted proposal and handle the round state deferred", async ({
 		processor,
 		roundState,
 		broadcaster,
 		consensus,
+		storage,
 	}) => {
 		const proposal = makeProposal();
 		const addProposal = spy(roundState, "addProposal");
+		const saveProposal = spy(storage, "saveProposal");
 		const broadcastProposal = spy(broadcaster, "broadcastProposal");
 		const handle = spy(consensus, "handle");
 
@@ -274,6 +279,8 @@ describe<{
 
 		addProposal.calledOnce();
 		addProposal.calledWith(proposal);
+		saveProposal.calledOnce();
+		saveProposal.calledWith(proposal);
 		broadcastProposal.calledOnce();
 		broadcastProposal.calledWith(proposal);
 		// Handling is deferred so the broadcast can go out before the block is processed.
@@ -283,6 +290,44 @@ describe<{
 
 		handle.calledOnce();
 		handle.calledWith(roundState);
+	});
+
+	it("#process - should store the proposal after adding it and before broadcasting it", async ({
+		processor,
+		roundState,
+		broadcaster,
+		storage,
+	}) => {
+		// Only what the round state accepted goes to disk, and nothing goes out before it is on disk.
+		const calls: string[] = [];
+		roundState.addProposal = () => calls.push("add");
+		storage.saveProposal = async () => {
+			calls.push("store");
+		};
+		broadcaster.broadcastProposal = async () => {
+			calls.push("broadcast");
+		};
+
+		await processor.process(makeProposal());
+
+		assert.equal(calls, ["add", "store", "broadcast"]);
+	});
+
+	it("#process - should not broadcast a proposal that could not be stored", async ({
+		processor,
+		broadcaster,
+		consensus,
+		storage,
+	}) => {
+		stub(storage, "saveProposal").rejectedValue(new Error("disk is full"));
+		const broadcastProposal = spy(broadcaster, "broadcastProposal");
+		const handle = spy(consensus, "handle");
+
+		await assert.rejects(() => processor.process(makeProposal()), "disk is full");
+		await flushTimers();
+
+		broadcastProposal.neverCalled();
+		handle.neverCalled();
 	});
 
 	it("#process - should not broadcast when broadcasting is disabled", async ({

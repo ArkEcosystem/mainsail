@@ -1,38 +1,73 @@
-import { Identifiers, Enums } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
 
+import { Enums, Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
-import { dirSync, setGracefulCleanup } from "tmp";
-
 import { describe } from "@mainsail/test-runner";
-import { Service } from "./service";
-
 import { open } from "lmdb";
 import { join } from "path";
-import { Contracts } from "@mainsail/contracts";
+import { dirSync, setGracefulCleanup } from "tmp";
+
+import { Service } from "./service";
+
+const { Prevote, Precommit } = Enums.Crypto.MessageType;
 
 describe<{
 	app: Application;
 	service: Service;
 }>("Service", ({ beforeEach, it, assert }) => {
-	const state0: Contracts.Consensus.StateData = {
-		blockNumber: 0,
+	const state1: Contracts.Consensus.StateData = {
+		blockNumber: 1,
+		lockedRound: undefined,
+		round: 0,
+		step: Enums.Consensus.Step.Propose,
+		validRound: undefined,
+	};
+
+	const state1Round2: Contracts.Consensus.StateData = {
+		blockNumber: 1,
+		lockedRound: 1,
+		round: 2,
+		step: Enums.Consensus.Step.Prevote,
+		validRound: 1,
+	};
+
+	const state2: Contracts.Consensus.StateData = {
+		blockNumber: 2,
+		lockedRound: undefined,
 		round: 0,
 		step: Enums.Consensus.Step.Precommit,
 		validRound: undefined,
-		lockedRound: undefined,
 	};
 
-	const state1: Contracts.Consensus.StateData = {
-		blockNumber: 1,
-		round: 1,
-		step: Enums.Consensus.Step.Prevote,
-		validRound: 0,
-		lockedRound: 0,
-	};
+	const makeProposal = (
+		blockNumber: number,
+		round: number,
+		validatorIndex: number,
+		serialized: string,
+	): Contracts.Crypto.Proposal =>
+		({
+			blockHeader: { number: blockNumber },
+			round,
+			serialized: Buffer.from(serialized),
+			validatorIndex,
+		}) as unknown as Contracts.Crypto.Proposal;
+
+	const makeMessage = (
+		blockNumber: number,
+		round: number,
+		validatorIndex: number,
+		type: Contracts.Crypto.MessageType,
+		serialized: string,
+	): Contracts.Crypto.Message =>
+		({
+			blockNumber,
+			round,
+			serialized: Buffer.from(serialized),
+			type,
+			validatorIndex,
+		}) as unknown as Contracts.Crypto.Message;
 
 	beforeEach((context) => {
-		const app = new Application();
-
 		setGracefulCleanup();
 		const storage = open({
 			compression: true,
@@ -40,148 +75,168 @@ describe<{
 			path: join(dirSync().name, "consensus.mdb"),
 		});
 
-		app.bind(Identifiers.ConsensusStorage.Root).toConstantValue(storage);
-		app.bind(Identifiers.ConsensusStorage.Storage.Proposal).toConstantValue(storage.openDB({ name: "proposals" }));
-		app.bind(Identifiers.ConsensusStorage.Storage.Message).toConstantValue(storage.openDB({ name: "message" }));
-		app.bind(Identifiers.ConsensusStorage.Storage.ConsensusState).toConstantValue(
-			storage.openDB({ name: "consensus" }),
-		);
+		context.app = new Application();
+		context.app.bind(Identifiers.ConsensusStorage.Root).toConstantValue(storage);
+		context.app
+			.bind(Identifiers.ConsensusStorage.Storage.Proposal)
+			.toConstantValue(storage.openDB({ encoding: "binary", name: "proposals" }));
+		context.app
+			.bind(Identifiers.ConsensusStorage.Storage.Message)
+			.toConstantValue(storage.openDB({ encoding: "binary", name: "message" }));
+		context.app
+			.bind(Identifiers.ConsensusStorage.Storage.ConsensusState)
+			.toConstantValue(storage.openDB({ name: "consensus" }));
 
-		app.bind(Identifiers.Cryptography.Proposal.Factory).toConstantValue({
-			makeProposalFromBytes: (a: any) => a,
+		// The factories hand the stored bytes back, so the tests compare bytes.
+		context.app.bind(Identifiers.Cryptography.Proposal.Factory).toConstantValue({
+			makeProposalFromBytes: async (bytes: Buffer) => bytes,
 		});
-		app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue({
-			makeMessageFromBytes: (a: any) => a,
+		context.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue({
+			makeMessageFromBytes: async (bytes: Buffer) => bytes,
 		});
 
-		context.service = app.resolve(Service);
-		context.app = app;
+		context.service = context.app.resolve(Service);
 	});
 
-	it("#getState - should return undefined", async ({ service }) => {
+	it("#getState - should return undefined when nothing is stored", async ({ service }) => {
 		assert.undefined(await service.getState());
 	});
 
-	it("#getState - should return latest stored state", async ({ service }) => {
+	it("#getProposals - should return an empty array when nothing is stored", async ({ service }) => {
+		assert.equal(await service.getProposals(), []);
+	});
+
+	it("#getMessages - should return an empty array when nothing is stored", async ({ service }) => {
+		assert.equal(await service.getMessages(), []);
+	});
+
+	it("#saveState - should store the state data", async ({ service }) => {
+		await service.saveState(state1Round2);
+
+		assert.equal(await service.getState(), state1Round2);
+	});
+
+	it("#saveState - should store only the state data of a consensus state", async ({ service }) => {
+		// The live consensus state also carries the locked and valid round states, which do not belong on disk.
+		await service.saveState({ ...state1Round2, lockedValue: { round: 1 }, validValue: { round: 1 } } as never);
+
+		assert.equal(await service.getState(), state1Round2);
+	});
+
+	it("#saveState - should replace the state of the same block", async ({ service }) => {
+		await service.saveState(state1);
+		await service.saveState(state1Round2);
+
+		assert.equal(await service.getState(), state1Round2);
+	});
+
+	it("#saveProposal - should store the proposal bytes under its round and validator index", async ({ service }) => {
+		await service.saveProposal(makeProposal(1, 0, 3, "proposal-0-3"));
+		await service.saveProposal(makeProposal(1, 1, 4, "proposal-1-4"));
+		// Same round and validator index: the later bytes replace the earlier ones.
+		await service.saveProposal(makeProposal(1, 1, 4, "proposal-1-4-again"));
+
+		assert.equal(await service.getProposals(), [Buffer.from("proposal-0-3"), Buffer.from("proposal-1-4-again")]);
+	});
+
+	it("#saveMessage - should store the message bytes under its round, validator index and type", async ({
+		service,
+	}) => {
+		await service.saveMessage(makeMessage(1, 0, 3, Prevote, "prevote-0-3"));
+		await service.saveMessage(makeMessage(1, 0, 3, Precommit, "precommit-0-3"));
+		await service.saveMessage(makeMessage(1, 1, 4, Prevote, "prevote-1-4"));
+
+		assert.equal(await service.getMessages(), [
+			Buffer.from("prevote-0-3"),
+			Buffer.from("precommit-0-3"),
+			Buffer.from("prevote-1-4"),
+		]);
+	});
+
+	it("should keep every record of the stored block", async ({ service }) => {
+		await service.saveState(state1);
+		await service.saveProposal(makeProposal(1, 0, 3, "proposal"));
+		await service.saveMessage(makeMessage(1, 0, 3, Prevote, "prevote"));
+		await service.saveState(state1Round2);
+		await service.saveMessage(makeMessage(1, 2, 4, Precommit, "precommit"));
+
+		assert.equal(await service.getState(), state1Round2);
+		assert.equal(await service.getProposals(), [Buffer.from("proposal")]);
+		assert.equal(await service.getMessages(), [Buffer.from("prevote"), Buffer.from("precommit")]);
+	});
+
+	it("should drop the records of the stored block with the first record of a higher block", async ({ service }) => {
+		await service.saveState(state1Round2);
+		await service.saveProposal(makeProposal(1, 0, 3, "proposal"));
+		await service.saveMessage(makeMessage(1, 0, 3, Prevote, "prevote"));
+
+		await service.saveMessage(makeMessage(2, 0, 5, Prevote, "prevote-of-block-2"));
+
 		assert.undefined(await service.getState());
-
-		await service.persist({
-			state: state0,
-			proposals: [],
-			messages: [],
-		});
-		assert.equal(await service.getState(), state0);
 		assert.equal(await service.getProposals(), []);
-		assert.equal(await service.getMessages(), []);
+		assert.equal(await service.getMessages(), [Buffer.from("prevote-of-block-2")]);
 
-		await service.persist({
-			state: state1,
-			proposals: [],
-			messages: [],
-		});
-		assert.equal(await service.getState(), state1);
+		await service.saveState(state2);
+
+		assert.equal(await service.getState(), state2);
+		assert.equal(await service.getMessages(), [Buffer.from("prevote-of-block-2")]);
+	});
+
+	it("should drop the stored records once when the first records of a higher block arrive together", async ({
+		service,
+	}) => {
+		await service.saveMessage(makeMessage(1, 0, 3, Prevote, "prevote-of-block-1"));
+
+		await Promise.all([
+			service.saveMessage(makeMessage(2, 0, 3, Prevote, "prevote-of-block-2")),
+			service.saveProposal(makeProposal(2, 0, 4, "proposal-of-block-2")),
+			service.saveState(state2),
+		]);
+
+		assert.equal(await service.getState(), state2);
+		assert.equal(await service.getProposals(), [Buffer.from("proposal-of-block-2")]);
+		assert.equal(await service.getMessages(), [Buffer.from("prevote-of-block-2")]);
+	});
+
+	it("should take the stored block from the stored state when created", async ({ app, service }) => {
+		// A restart creates a new service over the same store; it must know which block the records belong to.
+		await service.saveState(state2);
+		await service.saveMessage(makeMessage(2, 0, 3, Prevote, "prevote-of-block-2"));
+
+		const restarted = app.resolve(Service);
+
+		await restarted.saveMessage(makeMessage(2, 0, 4, Prevote, "another-prevote-of-block-2"));
+		assert.equal(await restarted.getMessages(), [
+			Buffer.from("prevote-of-block-2"),
+			Buffer.from("another-prevote-of-block-2"),
+		]);
+
+		await restarted.saveMessage(makeMessage(3, 0, 3, Prevote, "prevote-of-block-3"));
+		assert.undefined(await restarted.getState());
+		assert.equal(await restarted.getMessages(), [Buffer.from("prevote-of-block-3")]);
+	});
+
+	it("#clear - should drop every record", async ({ service }) => {
+		await service.saveState(state2);
+		await service.saveProposal(makeProposal(2, 0, 3, "proposal"));
+		await service.saveMessage(makeMessage(2, 0, 3, Prevote, "prevote"));
+
+		await service.clear();
+
+		assert.undefined(await service.getState());
 		assert.equal(await service.getProposals(), []);
 		assert.equal(await service.getMessages(), []);
 	});
 
-	it("#getProposals - should return empty array", async ({ service }) => {
-		assert.equal(await service.getProposals(), []);
-	});
+	it("#clear - should accept records of a lower block afterwards", async ({ service }) => {
+		// After a database reset the node continues at an earlier block than the one the store held.
+		await service.saveState(state2);
 
-	it("#getProposals - should return latest stored proposals", async ({ service }) => {
-		assert.equal(await service.getProposals(), []);
-
-		const proposalSerialized1 = Buffer.from("1_1");
-		const proposalSerialized2 = Buffer.from("1_2");
-		const proposalSerialized3 = Buffer.from("1_3");
-
-		const proposal1 = {
-			round: 1,
-			validatorIndex: 1,
-			serialized: proposalSerialized1,
-		} as Contracts.Crypto.Proposal;
-
-		const proposal2 = {
-			round: 2,
-			validatorIndex: 2,
-			serialized: proposalSerialized2,
-		} as Contracts.Crypto.Proposal;
-
-		const proposal3 = {
-			round: 3,
-			validatorIndex: 3,
-			serialized: proposalSerialized3,
-		} as Contracts.Crypto.Proposal;
-
-		await service.persist({
-			state: state0,
-			proposals: [proposal1, proposal2],
-			messages: [],
-		});
-
-		assert.equal(await service.getState(), state0);
-		assert.equal(await service.getProposals(), [proposalSerialized1, proposalSerialized2]);
-		assert.equal(await service.getMessages(), []);
-
-		// Clear
-		await service.persist({
-			state: state1,
-			proposals: [proposal3],
-			messages: [],
-		});
+		await service.clear();
+		await service.saveState(state1);
+		await service.saveMessage(makeMessage(1, 0, 3, Prevote, "prevote"));
 
 		assert.equal(await service.getState(), state1);
-		assert.equal(await service.getProposals(), [proposalSerialized3]);
-		assert.equal(await service.getMessages(), []);
-	});
-
-	it("#getMessages - should return empty array", async ({ service }) => {
-		assert.equal(await service.getMessages(), []);
-	});
-
-	it("#getMessages - should return latest stored messages", async ({ service }) => {
-		assert.equal(await service.getMessages(), []);
-
-		const messageSerialized1 = Buffer.from("1_1");
-		const messageSerialized2 = Buffer.from("1_2");
-		const messageSerialized3 = Buffer.from("1_3");
-
-		const message1 = {
-			round: 1,
-			validatorIndex: 1,
-			serialized: messageSerialized1,
-		} as Contracts.Crypto.Message;
-
-		const message2 = {
-			round: 2,
-			validatorIndex: 2,
-			serialized: messageSerialized2,
-		} as Contracts.Crypto.Message;
-
-		const message3 = {
-			round: 3,
-			validatorIndex: 3,
-			serialized: messageSerialized3,
-		} as Contracts.Crypto.Message;
-
-		await service.persist({
-			state: state0,
-			proposals: [],
-			messages: [message1, message2],
-		});
-
-		assert.equal(await service.getState(), state0);
-		assert.equal(await service.getProposals(), []);
-		assert.equal(await service.getMessages(), [messageSerialized1, messageSerialized2]);
-
-		await service.persist({
-			state: state1,
-			proposals: [],
-			messages: [message3],
-		});
-
-		assert.equal(await service.getState(), state1);
-		assert.equal(await service.getProposals(), []);
-		assert.equal(await service.getMessages(), [messageSerialized3]);
+		assert.equal(await service.getMessages(), [Buffer.from("prevote")]);
 	});
 });

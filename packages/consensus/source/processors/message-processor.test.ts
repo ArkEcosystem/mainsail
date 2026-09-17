@@ -21,6 +21,7 @@ describe<{
 	roundStateRepository: any;
 	serializer: any;
 	stateStore: any;
+	storage: any;
 	timestampCalculator: any;
 	validatorSet: any;
 	worker: any;
@@ -78,6 +79,7 @@ describe<{
 		};
 		context.roundStateRepository = { getRoundState: () => context.roundState };
 		context.broadcaster = { broadcastMessage: async () => {} };
+		context.storage = { saveMessage: async () => {} };
 		context.worker = { consensusSignature: async () => true };
 
 		context.app = new Application();
@@ -91,6 +93,7 @@ describe<{
 		context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
 		context.app.bind(Identifiers.Consensus.RoundStateRepository).toConstantValue(context.roundStateRepository);
 		context.app.bind(Identifiers.P2P.Broadcaster).toConstantValue(context.broadcaster);
+		context.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(context.storage);
 		context.app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue({ getWorker: () => context.worker });
 
 		context.processor = context.app.resolve(MessageProcessor);
@@ -281,14 +284,16 @@ describe<{
 		handle.neverCalled();
 	});
 
-	it("#process - should add, broadcast and handle an accepted message", async ({
+	it("#process - should add, store, broadcast and handle an accepted message", async ({
 		processor,
 		roundState,
 		broadcaster,
 		consensus,
+		storage,
 	}) => {
 		const message = makeMessage();
 		const addMessage = spy(roundState, "addMessage");
+		const saveMessage = spy(storage, "saveMessage");
 		const broadcastMessage = spy(broadcaster, "broadcastMessage");
 		const handle = spy(consensus, "handle");
 
@@ -296,10 +301,53 @@ describe<{
 
 		addMessage.calledOnce();
 		addMessage.calledWith(message);
+		saveMessage.calledOnce();
+		saveMessage.calledWith(message);
 		broadcastMessage.calledOnce();
 		broadcastMessage.calledWith(message);
 		handle.calledOnce();
 		handle.calledWith(roundState);
+	});
+
+	it("#process - should store the message after adding it and before broadcasting it", async ({
+		processor,
+		roundState,
+		broadcaster,
+		consensus,
+		storage,
+	}) => {
+		// Only what the round state accepted goes to disk, and nothing goes out before it is on disk.
+		const calls: string[] = [];
+		roundState.addMessage = () => calls.push("add");
+		storage.saveMessage = async () => {
+			calls.push("store");
+		};
+		broadcaster.broadcastMessage = async () => {
+			calls.push("broadcast");
+		};
+		consensus.handle = async () => {
+			calls.push("handle");
+		};
+
+		await processor.process(makeMessage());
+
+		assert.equal(calls, ["add", "store", "broadcast", "handle"]);
+	});
+
+	it("#process - should not broadcast a message that could not be stored", async ({
+		processor,
+		broadcaster,
+		consensus,
+		storage,
+	}) => {
+		stub(storage, "saveMessage").rejectedValue(new Error("disk is full"));
+		const broadcastMessage = spy(broadcaster, "broadcastMessage");
+		const handle = spy(consensus, "handle");
+
+		await assert.rejects(() => processor.process(makeMessage()), "disk is full");
+
+		broadcastMessage.neverCalled();
+		handle.neverCalled();
 	});
 
 	it("#process - should not broadcast when broadcasting is disabled", async ({

@@ -8,7 +8,7 @@ import { Bootstrapper } from "./bootstrapper";
 
 const { Prevote, Precommit } = Enums.Crypto.MessageType;
 
-describe<{
+type Context = {
 	app: Application;
 	bootstrapper: Bootstrapper;
 	configuration: any;
@@ -18,13 +18,19 @@ describe<{
 	roundStateRepository: any;
 	stateStore: any;
 	storage: any;
-}>("Bootstrapper", ({ it, assert, beforeEach, stub, spy }) => {
+};
+
+describe<Context>("Bootstrapper", ({ it, assert, beforeEach, stub, spy, each }) => {
 	// The database holds block 2, so consensus starts at block 3.
 	const blockNumber = 3;
 	const totalRound = 7;
 
 	const initialState = { blockNumber, round: 0, step: Enums.Consensus.Step.Propose };
-	const discarding = (reason: string) => `Discarding stored consensus state for 3: ${reason}`;
+	const completed = `Completed consensus bootstrap for 3/0 with total round ${totalRound}`;
+	const loaded = (proposals: number, prevotes: number, precommits: number, dropped = 0) =>
+		`Consensus Bootstrap - Proposals: ${proposals}, Prevotes: ${prevotes}, Precommits: ${precommits}` +
+		(dropped > 0 ? `, dropped ${dropped} records of another block` : "");
+	const refusing = (reason: string) => `refusing to start on an inconsistent consensus store: ${reason}`;
 
 	const makeProposal = (number: number, round: number): Contracts.Crypto.Proposal =>
 		({ blockHeader: { number }, round }) as unknown as Contracts.Crypto.Proposal;
@@ -54,12 +60,9 @@ describe<{
 			hasMajorityPrevotes: () => true,
 			round: 1,
 		};
-		context.roundStateRepository = {
-			clear: () => {},
-			getRoundState: () => context.roundState,
-			getRoundStates: () => [],
-		};
+		context.roundStateRepository = { getRoundState: () => context.roundState };
 		context.storage = {
+			clear: async () => {},
 			getMessages: async () => [],
 			getProposals: async () => [],
 			getState: async () => undefined,
@@ -78,28 +81,23 @@ describe<{
 		context.bootstrapper = context.app.resolve(Bootstrapper);
 	});
 
-	it("#bootstrap - should throw when the database disagrees with the crypto configuration", async ({
+	it("#bootstrap - should throw before reading the store when the database disagrees with the crypto configuration", async ({
 		bootstrapper,
 		configuration,
 		storage,
 	}) => {
-		// Not a store issue, so no fallback: the node is misconfigured and has to stop.
 		configuration.getHeight = () => 7;
-		const getProposals = spy(storage, "getProposals");
+		const getMessages = spy(storage, "getMessages");
 
 		await assert.rejects(
 			() => bootstrapper.bootstrap(),
 			"bootstrapped block number 3 does not match configuration block number 7",
 		);
-		getProposals.neverCalled();
+		getMessages.neverCalled();
 	});
 
-	it("#bootstrap - should start at round 0 when nothing is stored", async ({
-		bootstrapper,
-		logger,
-		roundStateRepository,
-	}) => {
-		const clear = spy(roundStateRepository, "clear");
+	it("#bootstrap - should start at round 0 when nothing is stored", async ({ bootstrapper, logger, storage }) => {
+		const clear = spy(storage, "clear");
 		const info = spy(logger, "info");
 		const warn = spy(logger, "warn");
 		const error = spy(logger, "error");
@@ -107,33 +105,66 @@ describe<{
 		assert.equal(await bootstrapper.bootstrap(), initialState);
 
 		clear.neverCalled();
-		info.calledTimes(3);
-		info.calledNthWith(0, "Consensus Bootstrap - Proposals: 0", "consensus");
-		info.calledNthWith(1, "Consensus Bootstrap - Prevotes: 0, Precommits: 0", "consensus");
-		info.calledNthWith(2, `Completed consensus bootstrap for 3/0 with total round ${totalRound}`, "consensus");
+		info.calledTimes(2);
+		info.calledNthWith(0, loaded(0, 0, 0), "consensus");
+		info.calledNthWith(1, completed, "consensus");
 		warn.neverCalled();
 		error.neverCalled();
 	});
 
-	it("#bootstrap - should start at round 0 with a warning when the stored state is older than the database", async ({
+	it("#bootstrap - should start at round 0 and drop the records of an older block", async ({
 		bootstrapper,
 		logger,
-		roundStateRepository,
+		roundState,
 		storage,
 	}) => {
-		// Expected after a crash: the state is persisted on a clean shutdown only. Whatever rounds were loaded
-		// belong to that older block and go.
+		// The normal case after a commit: nothing is written when a block is committed, so the store still holds
+		// the previous block until the first record of the new one.
 		stub(storage, "getState").resolvedValue(makeState({ blockNumber: 2 }));
-		const clear = spy(roundStateRepository, "clear");
+		stub(storage, "getProposals").resolvedValue([makeProposal(2, 0)]);
+		stub(storage, "getMessages").resolvedValue([makeMessage(Prevote, 2, 0, 0), makeMessage(Precommit, 2, 0, 0)]);
+		const addProposal = spy(roundState, "addProposal");
+		const addMessage = spy(roundState, "addMessage");
+		const clear = spy(storage, "clear");
+		const info = spy(logger, "info");
 		const warn = spy(logger, "warn");
 		const error = spy(logger, "error");
 
 		assert.equal(await bootstrapper.bootstrap(), initialState);
 
-		clear.calledOnce();
-		warn.calledOnce();
-		warn.calledWith("Skipping state restore, because stored block number is 2, but should be 3", "consensus");
+		addProposal.neverCalled();
+		addMessage.neverCalled();
+		clear.neverCalled();
+		info.calledWith(loaded(0, 0, 0, 3), "consensus");
+		warn.neverCalled();
 		error.neverCalled();
+	});
+
+	it("#bootstrap - should keep the loaded round states and start at round 0 when no state is stored", async ({
+		bootstrapper,
+		logger,
+		roundState,
+		storage,
+	}) => {
+		// The state is written before an own signature and on a lock only. Without one, nothing of this node's
+		// is at stake, and round 0 is safe; the stored messages of the others are in the round states already.
+		const proposal = makeProposal(blockNumber, 0);
+		const message = makeMessage(Prevote, blockNumber, 0, 0);
+		stub(storage, "getProposals").resolvedValue([proposal]);
+		stub(storage, "getMessages").resolvedValue([message]);
+		const addProposal = spy(roundState, "addProposal");
+		const addMessage = spy(roundState, "addMessage");
+		const info = spy(logger, "info");
+		const warn = spy(logger, "warn");
+
+		assert.equal(await bootstrapper.bootstrap(), initialState);
+
+		addProposal.calledOnce();
+		addProposal.calledWith(proposal);
+		addMessage.calledOnce();
+		addMessage.calledWith(message);
+		info.calledWith(loaded(1, 1, 0), "consensus");
+		warn.neverCalled();
 	});
 
 	it("#bootstrap - should return the stored state when it references no round", async ({
@@ -156,7 +187,7 @@ describe<{
 		info.calledWith(`Completed consensus bootstrap for 3/2 with total round ${totalRound}`, "consensus");
 	});
 
-	it("#bootstrap - should load every stored proposal into the round state of its block number and round", async ({
+	it("#bootstrap - should load every stored proposal of the block into the round state of its round", async ({
 		bootstrapper,
 		logger,
 		roundState,
@@ -172,7 +203,7 @@ describe<{
 
 		await bootstrapper.bootstrap();
 
-		info.calledWith("Consensus Bootstrap - Proposals: 2", "consensus");
+		info.calledWith(loaded(2, 0, 0), "consensus");
 		getRoundState.calledTimes(2);
 		getRoundState.calledNthWith(0, blockNumber, 0);
 		getRoundState.calledNthWith(1, blockNumber, 1);
@@ -182,7 +213,7 @@ describe<{
 		}
 	});
 
-	it("#bootstrap - should load every stored message into the round state of its block number and round", async ({
+	it("#bootstrap - should load every stored message of the block into the round state of its round", async ({
 		bootstrapper,
 		logger,
 		roundState,
@@ -202,7 +233,7 @@ describe<{
 
 		await bootstrapper.bootstrap();
 
-		info.calledWith("Consensus Bootstrap - Prevotes: 2, Precommits: 1", "consensus");
+		info.calledWith(loaded(0, 2, 1), "consensus");
 		getRoundState.calledTimes(3);
 		getRoundState.calledNthWith(0, blockNumber, 0);
 		getRoundState.calledNthWith(1, blockNumber, 1);
@@ -229,6 +260,30 @@ describe<{
 		await bootstrapper.bootstrap();
 
 		assert.equal(calls, ["proposal", "message", "message"]);
+	});
+
+	it("#bootstrap - should drop the records of other blocks while loading the block's own", async ({
+		bootstrapper,
+		logger,
+		roundState,
+		storage,
+	}) => {
+		const proposal = makeProposal(blockNumber, 0);
+		const message = makeMessage(Prevote, blockNumber, 0, 0);
+		stub(storage, "getState").resolvedValue(makeState());
+		stub(storage, "getProposals").resolvedValue([proposal, makeProposal(blockNumber + 1, 0)]);
+		stub(storage, "getMessages").resolvedValue([message, makeMessage(Precommit, blockNumber - 1, 1, 1)]);
+		const addProposal = spy(roundState, "addProposal");
+		const addMessage = spy(roundState, "addMessage");
+		const info = spy(logger, "info");
+
+		await bootstrapper.bootstrap();
+
+		addProposal.calledOnce();
+		addProposal.calledWith(proposal);
+		addMessage.calledOnce();
+		addMessage.calledWith(message);
+		info.calledWith(loaded(1, 1, 0, 2), "consensus");
 	});
 
 	it("#bootstrap - should attach the round state of the valid round as valid value", async ({
@@ -305,203 +360,134 @@ describe<{
 		assert.equal(result.lockedRound, 1);
 	});
 
-	// Everything below leaves the store unusable. Nothing of it is kept: a lock without the round state that proves
-	// it could neither be re-proposed nor verified, so consensus starts at round 0 and the rounds are dropped.
+	each(
+		"#bootstrap - should clear an unreadable store and start at round 0",
+		async ({
+			context: { bootstrapper, logger, roundState, storage },
+			dataset: method,
+		}: {
+			context: Context;
+			dataset: string;
+		}) => {
+			// Records an earlier version wrote, for example. Left in place, every later start at this block would
+			// fail on them and lose what was stored since.
+			stub(storage, method).rejectedValue(new Error(`${method} failed`));
+			const addProposal = spy(roundState, "addProposal");
+			const clear = spy(storage, "clear");
+			const error = spy(logger, "error");
+			const info = spy(logger, "info");
 
-	it("#bootstrap - should discard the store when the state cannot be read", async ({
+			assert.equal(await bootstrapper.bootstrap(), initialState);
+
+			addProposal.neverCalled();
+			clear.calledOnce();
+			error.calledOnce();
+			assert.equal(error.getCallArgs(0), [
+				`Clearing the unreadable consensus store: ${method} failed`,
+				"consensus",
+			]);
+			info.calledWith(completed, "consensus");
+		},
+		["getMessages", "getProposals", "getState"],
+	);
+
+	it("#bootstrap - should clear a stored state that is ahead of the database and start at round 0", async ({
 		bootstrapper,
 		logger,
-		roundStateRepository,
+		roundState,
 		storage,
 	}) => {
-		stub(storage, "getState").rejectedValue(new Error("lmdb is gone"));
-		const clear = spy(roundStateRepository, "clear");
-		const error = spy(logger, "error");
-
-		assert.equal(await bootstrapper.bootstrap(), initialState);
-
-		clear.calledOnce();
-		error.calledOnce();
-		error.calledWith(discarding("lmdb is gone"), "consensus");
-	});
-
-	it("#bootstrap - should discard a stored state that is ahead of the database", async ({
-		bootstrapper,
-		logger,
-		roundStateRepository,
-		storage,
-	}) => {
+		// The database was reset to an earlier block. What was signed at the later ones goes with the store.
 		stub(storage, "getState").resolvedValue(makeState({ blockNumber: 5 }));
-		const clear = spy(roundStateRepository, "clear");
+		stub(storage, "getProposals").resolvedValue([makeProposal(5, 0)]);
+		const addProposal = spy(roundState, "addProposal");
+		const clear = spy(storage, "clear");
+		const warn = spy(logger, "warn");
 		const error = spy(logger, "error");
+		const info = spy(logger, "info");
 
 		assert.equal(await bootstrapper.bootstrap(), initialState);
 
+		addProposal.neverCalled();
 		clear.calledOnce();
-		error.calledOnce();
-		error.calledWith(discarding("stored block number 5 is ahead of the database"), "consensus");
+		warn.calledOnce();
+		warn.calledWith("Clearing the stored consensus state of 5, which is ahead of the database at 3", "consensus");
+		error.neverCalled();
+		info.calledWith(completed, "consensus");
 	});
 
-	it("#bootstrap - should discard proposals or messages that are stored without a state", async ({
+	// Every message is stored before the rules run on it, so the proof of a stored lock or valid value is always
+	// stored with it. A missing proof means the store is damaged, and nothing else keeps the node from signing the
+	// block again, so it refuses to start rather than guess.
+
+	it("#bootstrap - should refuse to start when the proposal of the valid round is not stored", async ({
 		bootstrapper,
-		logger,
 		roundState,
-		roundStateRepository,
 		storage,
 	}) => {
-		// State and rounds are stored in one transaction; rounds on their own mean the store is inconsistent.
-		stub(storage, "getProposals").resolvedValue([makeProposal(blockNumber, 0)]);
-		roundStateRepository.getRoundStates = () => [roundState];
-		const clear = spy(roundStateRepository, "clear");
-		const error = spy(logger, "error");
-
-		assert.equal(await bootstrapper.bootstrap(), initialState);
-
-		clear.calledOnce();
-		error.calledWith(discarding("proposals or messages are stored without a state"), "consensus");
-	});
-
-	it("#bootstrap - should discard the store when a loaded round state belongs to another block", async ({
-		bootstrapper,
-		logger,
-		roundState,
-		roundStateRepository,
-		storage,
-	}) => {
-		stub(storage, "getState").resolvedValue(makeState());
-		roundStateRepository.getRoundStates = () => [
-			roundState,
-			{ ...roundState, blockNumber: blockNumber + 1, round: 0 },
-		];
-		const clear = spy(roundStateRepository, "clear");
-		const error = spy(logger, "error");
-
-		assert.equal(await bootstrapper.bootstrap(), initialState);
-
-		clear.calledOnce();
-		error.calledWith(discarding("round state 4/0 belongs to another block"), "consensus");
-	});
-
-	it("#bootstrap - should discard the store when the proposal of the valid round is not stored", async ({
-		bootstrapper,
-		logger,
-		roundState,
-		roundStateRepository,
-		storage,
-	}) => {
-		// State and proposals are stored in one transaction, so a missing proposal means the store is inconsistent.
 		stub(storage, "getState").resolvedValue(makeState({ validRound: 1 }));
 		roundState.getProposal = () => undefined;
-		const clear = spy(roundStateRepository, "clear");
-		const error = spy(logger, "error");
+		const clear = spy(storage, "clear");
 
-		assert.equal(await bootstrapper.bootstrap(), initialState);
-
-		clear.calledOnce();
-		error.calledWith(discarding("the proposal of valid round 1 is not stored"), "consensus");
+		await assert.rejects(() => bootstrapper.bootstrap(), refusing("the proposal of valid round 3/1 is not stored"));
+		clear.neverCalled();
 	});
 
-	it("#bootstrap - should discard the store when the +2/3 prevotes of the valid round are not stored", async ({
+	it("#bootstrap - should refuse to start when the +2/3 prevotes of the valid round are not stored", async ({
 		bootstrapper,
-		logger,
 		roundState,
 		storage,
 	}) => {
-		// A valid value comes from rule 36, which needs the proposal and +2/3 prevotes for it.
 		stub(storage, "getState").resolvedValue(makeState({ validRound: 1 }));
 		roundState.hasMajorityPrevotes = () => false;
-		const error = spy(logger, "error");
 
-		assert.equal(await bootstrapper.bootstrap(), initialState);
-
-		error.calledWith(discarding("the +2/3 prevotes of valid round 1 are not stored"), "consensus");
+		await assert.rejects(
+			() => bootstrapper.bootstrap(),
+			refusing("the +2/3 prevotes of valid round 3/1 are not stored"),
+		);
 	});
 
-	it("#bootstrap - should discard the whole store when the proposal of the locked round is not stored", async ({
+	it("#bootstrap - should refuse to start when the proposal of the locked round is not stored", async ({
 		bootstrapper,
-		logger,
 		roundState,
-		roundStateRepository,
 		storage,
 	}) => {
-		stub(storage, "getState").resolvedValue(makeState({ lockedRound: 1, validRound: 1 }));
+		stub(storage, "getState").resolvedValue(makeState({ lockedRound: 1 }));
 		roundState.getProposal = () => undefined;
-		const clear = spy(roundStateRepository, "clear");
-		const error = spy(logger, "error");
+		const clear = spy(storage, "clear");
 
-		const result = await bootstrapper.bootstrap();
-
-		assert.equal(result, initialState);
-		assert.undefined(result.lockedRound);
-		assert.undefined(result.lockedValue);
-		clear.calledOnce();
-		error.calledOnce();
+		await assert.rejects(
+			() => bootstrapper.bootstrap(),
+			refusing("the proposal of locked round 3/1 is not stored"),
+		);
+		clear.neverCalled();
 	});
 
-	it("#bootstrap - should discard the store when a proposal payload does not deserialize", async ({
+	it("#bootstrap - should refuse to start when the proposal of the locked round does not deserialize", async ({
 		bootstrapper,
-		logger,
 		proposal,
-		roundStateRepository,
 		storage,
 	}) => {
-		stub(storage, "getState").resolvedValue(makeState({ validRound: 1 }));
+		// The payload was deserialized before the lock was taken, so a payload that fails now is damage.
+		stub(storage, "getState").resolvedValue(makeState({ lockedRound: 1 }));
 		stub(proposal, "deserializePayload").rejectedValue(new Error("corrupt payload"));
-		const clear = spy(roundStateRepository, "clear");
-		const error = spy(logger, "error");
 
-		assert.equal(await bootstrapper.bootstrap(), initialState);
-
-		clear.calledOnce();
-		error.calledWith(discarding("corrupt payload"), "consensus");
+		await assert.rejects(() => bootstrapper.bootstrap(), "corrupt payload");
 	});
 
-	it("#bootstrap - should discard the store when the proposals cannot be read", async ({
+	it("#bootstrap - should let a round state that rejects a stored record stop the start", async ({
 		bootstrapper,
-		logger,
-		roundStateRepository,
-		storage,
-	}) => {
-		stub(storage, "getProposals").rejectedValue(new Error("storage failure"));
-		const clear = spy(roundStateRepository, "clear");
-		const error = spy(logger, "error");
-
-		assert.equal(await bootstrapper.bootstrap(), initialState);
-
-		clear.calledOnce();
-		error.calledWith(discarding("storage failure"), "consensus");
-	});
-
-	it("#bootstrap - should discard the store when a round state rejects an entry", async ({
-		bootstrapper,
-		logger,
 		roundState,
-		roundStateRepository,
 		storage,
 	}) => {
+		// Keys are unique per round, validator and type, so a rejected record is damage as well.
 		stub(storage, "getProposals").resolvedValue([makeProposal(blockNumber, 0)]);
 		stub(roundState, "addProposal").callsFake(() => {
 			throw new Error("Proposal already exists.");
 		});
-		const clear = spy(roundStateRepository, "clear");
-		const error = spy(logger, "error");
+		const clear = spy(storage, "clear");
 
-		assert.equal(await bootstrapper.bootstrap(), initialState);
-
-		clear.calledOnce();
-		error.calledWith(discarding("Proposal already exists."), "consensus");
-	});
-
-	it("#bootstrap - should report the completed bootstrap after discarding the store", async ({
-		bootstrapper,
-		logger,
-		storage,
-	}) => {
-		stub(storage, "getState").resolvedValue(makeState({ blockNumber: 5 }));
-		const info = spy(logger, "info");
-
-		await bootstrapper.bootstrap();
-
-		info.calledWith(`Completed consensus bootstrap for 3/0 with total round ${totalRound}`, "consensus");
+		await assert.rejects(() => bootstrapper.bootstrap(), "Proposal already exists.");
+		clear.neverCalled();
 	});
 });
