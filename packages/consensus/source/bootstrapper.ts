@@ -74,10 +74,7 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 		} catch (rawError) {
 			const error = ensureError(rawError);
 
-			this.logger.error(
-				`Clearing the unreadable consensus store: ${error.message}`,
-				"consensus",
-			);
+			this.logger.error(`Clearing the unreadable consensus store: ${error.message}`, "consensus");
 			await this.storage.clear();
 
 			return undefined;
