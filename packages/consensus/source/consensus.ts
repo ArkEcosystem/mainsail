@@ -56,6 +56,9 @@ export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.P2P.PendingCommits)
 	private readonly pendingCommits!: Contracts.P2P.PendingCommits;
 
+	@inject(Identifiers.ConsensusStorage.Service)
+	private readonly storage!: Contracts.ConsensusStorage.Service;
+
 	#blockNumber = 1;
 	#round = 0;
 	#step: Contracts.Consensus.Step = Enums.Consensus.Step.Propose;
@@ -205,6 +208,11 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#didMajorityPrecommit = false;
 		this.#didMajorityPrecommitWithoutProposal = false;
 
+		// Round 0 is the position the bootstrapper assumes without a stored state.
+		if (round > 0) {
+			await this.#persistState();
+		}
+
 		await this.#beginRound();
 	}
 
@@ -293,6 +301,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		this.#step = Enums.Consensus.Step.Prevote;
+		await this.#persistState();
 
 		this.logger.info(`Received proposal ${this.#getBlockString(proposal.blockHeader)}`, "consensus");
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
@@ -334,6 +343,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		this.#step = Enums.Consensus.Step.Prevote;
+		await this.#persistState();
 
 		this.logger.info(`Received locked proposal ${this.#getBlockString(proposal.blockHeader)}`, "consensus");
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
@@ -377,11 +387,13 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#lockedValue = roundState;
 			this.#validValue = roundState;
 			this.#step = Enums.Consensus.Step.Precommit;
+			await this.#persistState();
 
 			await this.eventDispatcher.dispatch(Events.ConsensusEvent.PrevotedProposal, this.getState());
 			await this.precommit(proposal.blockHeader.hash);
 		} else {
 			this.#validValue = roundState;
+			await this.#persistState();
 
 			await this.eventDispatcher.dispatch(Events.ConsensusEvent.PrevotedProposal, this.getState());
 		}
@@ -408,6 +420,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.logger.info(`Received +2/3 prevotes for ${this.#getBlockNumberRoundString()}/null`, "consensus");
 
 		this.#step = Enums.Consensus.Step.Precommit;
+		await this.#persistState();
 
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.PrevotedNull, this.getState());
 		await this.precommit();
@@ -518,6 +531,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.logger.info(`Timeout to propose ${this.#getBlockNumberRoundString()} expired`, "consensus");
 
 			this.#step = Enums.Consensus.Step.Prevote;
+			await this.#persistState();
 			await this.prevote();
 		});
 	}
@@ -541,6 +555,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.roundStateRepository.getRoundState(this.#blockNumber, this.#round).logPrevotes();
 
 			this.#step = Enums.Consensus.Step.Precommit;
+			await this.#persistState();
 			await this.precommit();
 		});
 	}
@@ -677,6 +692,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 			this.#runInBackground("Processing own precommit", () => this.messageProcessor.process(precommit));
 		}
+	}
+
+	async #persistState(): Promise<void> {
+		await this.storage.saveState(this.getState());
 	}
 
 	async #processProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {
