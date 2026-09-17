@@ -1,5 +1,3 @@
-import type { Contracts } from "@mainsail/contracts";
-
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
@@ -17,10 +15,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app
-			.get<Contracts.ConsensusStorage.Service>(Identifiers.ConsensusStorage.Service)
-			.saveState(this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service).getState());
-
 		await this.app.get<RootDatabase>(Identifiers.ConsensusStorage.Root).close();
 	}
 
