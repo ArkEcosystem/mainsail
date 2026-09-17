@@ -658,18 +658,9 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async prevote(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#blockNumber, this.#round);
-		for (const validator of this.validatorSet.getRoundValidators()) {
-			const localValidator = this.validatorsRepository.getValidator(validator.blsPublicKey);
-			if (localValidator === undefined) {
-				continue;
-			}
-
-			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(validator.address);
-			if (roundState.hasPrevote(validatorIndex)) {
-				continue;
-			}
-
-			const prevote = await localValidator.prevote(validatorIndex, this.#blockNumber, this.#round, value);
+		const validators = this.#getValidators((validatorIndex) => roundState.hasPrevote(validatorIndex));
+		for (const { validator, validatorIndex } of validators) {
+			const prevote = await validator.prevote(validatorIndex, this.#blockNumber, this.#round, value);
 
 			this.#runInBackground("Processing own prevote", () => this.messageProcessor.process(prevote));
 		}
@@ -677,21 +668,34 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async precommit(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#blockNumber, this.#round);
-		for (const validator of this.validatorSet.getRoundValidators()) {
-			const localValidator = this.validatorsRepository.getValidator(validator.blsPublicKey);
-			if (localValidator === undefined) {
-				continue;
-			}
-
-			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(validator.address);
-			if (roundState.hasPrecommit(validatorIndex)) {
-				continue;
-			}
-
-			const precommit = await localValidator.precommit(validatorIndex, this.#blockNumber, this.#round, value);
+		const validators = this.#getValidators((validatorIndex) => roundState.hasPrecommit(validatorIndex));
+		for (const { validator, validatorIndex } of validators) {
+			const precommit = await validator.precommit(validatorIndex, this.#blockNumber, this.#round, value);
 
 			this.#runInBackground("Processing own precommit", () => this.messageProcessor.process(precommit));
 		}
+	}
+
+	#getValidators(
+		hasMessage: (validatorIndex: number) => boolean,
+	): { validator: Contracts.Validator.Validator; validatorIndex: number }[] {
+		const validators: { validator: Contracts.Validator.Validator; validatorIndex: number }[] = [];
+
+		for (const roundValidator of this.validatorSet.getRoundValidators()) {
+			const validator = this.validatorsRepository.getValidator(roundValidator.blsPublicKey);
+			if (validator === undefined) {
+				continue;
+			}
+
+			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(roundValidator.address);
+			if (hasMessage(validatorIndex)) {
+				continue;
+			}
+
+			validators.push({ validator, validatorIndex });
+		}
+
+		return validators;
 	}
 
 	async #persistState(): Promise<void> {
