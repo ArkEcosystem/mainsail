@@ -77,6 +77,16 @@ export class Service implements Contracts.ConsensusStorage.Service {
 		});
 	}
 
+	public async clear(): Promise<void> {
+		this.#blockNumber = 0;
+
+		await this.rootStorage.transaction(() => {
+			this.#clear();
+		});
+
+		await this.rootStorage.flushed;
+	}
+
 	public async getProposals(): Promise<Contracts.Crypto.Proposal[]> {
 		const proposals = [...this.proposalStorage.getRange().map((item) => item.value)];
 		return Promise.all(proposals.map((proposal) => this.proposalFactory.makeProposalFromBytes(proposal)));
