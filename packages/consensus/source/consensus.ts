@@ -277,6 +277,8 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
+		await this.storage.saveProposal(proposal);
+
 		this.#runInBackground("Dispatching proposed event", () =>
 			this.eventDispatcher.dispatch(Events.ConsensusEvent.Proposed, proposal),
 		);
@@ -661,6 +663,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		const validators = this.#getValidators((validatorIndex) => roundState.hasPrevote(validatorIndex));
 		for (const { validator, validatorIndex } of validators) {
 			const prevote = await validator.prevote(validatorIndex, this.#blockNumber, this.#round, value);
+			await this.storage.saveMessage(prevote);
 
 			this.#runInBackground("Processing own prevote", () => this.messageProcessor.process(prevote));
 		}
@@ -671,6 +674,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		const validators = this.#getValidators((validatorIndex) => roundState.hasPrecommit(validatorIndex));
 		for (const { validator, validatorIndex } of validators) {
 			const precommit = await validator.precommit(validatorIndex, this.#blockNumber, this.#round, value);
+			await this.storage.saveMessage(precommit);
 
 			this.#runInBackground("Processing own precommit", () => this.messageProcessor.process(precommit));
 		}
