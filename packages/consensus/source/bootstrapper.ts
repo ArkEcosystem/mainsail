@@ -45,23 +45,20 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 
 		const { state } = records;
 
-		if (state === undefined || state.blockNumber < blockNumber) {
-			// Nothing signed and no lock taken at this block, so round 0 is safe to start from; the messages of
-			// this block that are stored are in the round states already.
-			return this.#completed(this.#initialState(blockNumber));
+		if (state !== undefined && state.blockNumber === blockNumber) {
+			return this.#completed(await this.#restoreState(blockNumber, state));
 		}
 
-		if (state.blockNumber > blockNumber) {
+		if (state !== undefined && state.blockNumber > blockNumber) {
 			this.logger.warn(
 				`Clearing the stored consensus state of ${state.blockNumber.toLocaleString(Locale)}, which is ahead of the database at ${blockNumber.toLocaleString(Locale)}`,
 				"consensus",
 			);
 			await this.storage.clear();
-
-			return this.#completed(this.#initialState(blockNumber));
 		}
 
-		return this.#completed(await this.#restoreState(blockNumber, state));
+
+		return this.#completed(this.#initialState(blockNumber));
 	}
 
 	async #readRecords(): Promise<Records | undefined> {
