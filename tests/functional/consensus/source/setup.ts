@@ -49,10 +49,13 @@ const setup = async (
 
 	if (!options.consensusStorage) {
 		app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
+			clear: async () => {},
 			getMessages: async () => [],
 			getProposals: async () => [],
-			getState: async () => {},
-			persist: async () => {},
+			getState: async () => undefined,
+			saveMessage: async () => {},
+			saveProposal: async () => {},
+			saveState: async () => {},
 		});
 	}
 
@@ -137,7 +140,6 @@ const setup = async (
 
 	// Rebinds
 	app.rebind(Identifiers.BlockchainUtils.ProposerCalculator).to(ProposerCalculator).inSingletonScope();
-	app.rebind(Identifiers.Validator.DoubleSignGuard).toConstantValue({ guard: async () => {} });
 
 	return app;
 };

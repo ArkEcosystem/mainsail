@@ -9,8 +9,6 @@ import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { BIP39 } from "./keys/bip39";
 import { Validator } from "./validator";
 
-const consensusPublicKey = validatorKeys[0].consensusKeyPair.publicKey;
-
 // Mirrors the state store stub in prepareSandbox.
 const GENESIS_BLOCK_HASH = "0000000000000000000000000000000000000000000000000000000000000001";
 const PREVIOUS_BLOCK_HASH = "0000000000000000000000000000000000000000000000000000000000000000";
@@ -27,7 +25,6 @@ describe<{
 	validator: Contracts.Validator.Validator;
 	generatorAddress: string;
 	forger: Contracts.Forger.BlockForger;
-	doubleSignGuard: Contracts.Validator.DoubleSignGuard;
 	messageFactory: Contracts.Crypto.MessageFactory;
 }>("Validator", ({ it, assert, beforeEach, spy }) => {
 	beforeEach(async (context) => {
@@ -176,109 +173,6 @@ describe<{
 		const keyPair = await new BIP39().configure(validatorKeys[0].consensusKeyPair);
 
 		assert.equal(validator.configure(keyPair), validator);
-	});
-
-	it("#propose - should guard the proposed position before signing", async ({
-		validator,
-		generatorAddress,
-		forger,
-		doubleSignGuard,
-	}) => {
-		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
-		const guard = spy(doubleSignGuard, "guard");
-
-		await validator.propose(0, 2, undefined, block);
-
-		guard.calledOnce();
-		guard.calledWith(consensusPublicKey, {
-			blockNumber: block.number,
-			round: 2,
-			step: Enums.Consensus.Step.Propose,
-			value: block.hash,
-		});
-	});
-
-	it("#propose - should not produce a proposal when the guard rejects", async ({
-		validator,
-		generatorAddress,
-		forger,
-		doubleSignGuard,
-	}) => {
-		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
-		doubleSignGuard.guard = async () => {
-			throw new Error("double sign");
-		};
-
-		await assert.rejects(() => validator.propose(0, 2, undefined, block), "double sign");
-	});
-
-	it("#prevote - should guard the prevote position before signing", async ({
-		validator,
-		generatorAddress,
-		forger,
-		doubleSignGuard,
-	}) => {
-		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
-		const guard = spy(doubleSignGuard, "guard");
-
-		await validator.prevote(0, 1, 2, block.hash);
-
-		guard.calledOnce();
-		guard.calledWith(consensusPublicKey, {
-			blockNumber: 1,
-			round: 2,
-			step: Enums.Consensus.Step.Prevote,
-			value: block.hash,
-		});
-	});
-
-	it("#prevote - should guard a nil vote with no value", async ({ validator, doubleSignGuard }) => {
-		const guard = spy(doubleSignGuard, "guard");
-
-		await validator.prevote(0, 1, 2, undefined);
-
-		guard.calledWith(consensusPublicKey, {
-			blockNumber: 1,
-			round: 2,
-			step: Enums.Consensus.Step.Prevote,
-			value: undefined,
-		});
-	});
-
-	it("#prevote - should not produce a prevote when the guard rejects", async ({ validator, doubleSignGuard }) => {
-		doubleSignGuard.guard = async () => {
-			throw new Error("double sign");
-		};
-
-		await assert.rejects(() => validator.prevote(0, 1, 2, undefined), "double sign");
-	});
-
-	it("#precommit - should guard the precommit position before signing", async ({
-		validator,
-		generatorAddress,
-		forger,
-		doubleSignGuard,
-	}) => {
-		const block = await forger.forgeBlock(generatorAddress, 1, 0, await validator.getRandaoReveal(2));
-		const guard = spy(doubleSignGuard, "guard");
-
-		await validator.precommit(0, 1, 2, block.hash);
-
-		guard.calledOnce();
-		guard.calledWith(consensusPublicKey, {
-			blockNumber: 1,
-			round: 2,
-			step: Enums.Consensus.Step.Precommit,
-			value: block.hash,
-		});
-	});
-
-	it("#precommit - should not produce a precommit when the guard rejects", async ({ validator, doubleSignGuard }) => {
-		doubleSignGuard.guard = async () => {
-			throw new Error("double sign");
-		};
-
-		await assert.rejects(() => validator.precommit(0, 1, 2, undefined), "double sign");
 	});
 
 	it("#prevote - should sign against the genesis and previous block hashes", async ({

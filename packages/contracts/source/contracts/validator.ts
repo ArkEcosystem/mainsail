@@ -1,4 +1,3 @@
-import type { Step } from "./consensus/enums.js";
 import type { AggregatedSignature, Block, KeyPair, Message, Proposal } from "./crypto/index.js";
 import type { EventListener } from "./kernel/events.js";
 
@@ -40,15 +39,4 @@ export interface ValidatorRepository {
 export interface ProposerReporter extends EventListener {
 	boot(): void;
 	dispose(): void;
-}
-
-export interface SigningPosition {
-	readonly blockNumber: number;
-	readonly round: number;
-	readonly step: Step;
-	readonly value?: string; // block hash being signed; undefined for a nil vote
-}
-
-export interface DoubleSignGuard {
-	guard(publicKey: string, position: SigningPosition): Promise<void>;
 }

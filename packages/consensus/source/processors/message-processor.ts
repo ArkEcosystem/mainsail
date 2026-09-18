@@ -31,6 +31,9 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 	@inject(Identifiers.P2P.Broadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
+	@inject(Identifiers.ConsensusStorage.Service)
+	private readonly storage!: Contracts.ConsensusStorage.Service;
+
 	@inject(Identifiers.CryptoWorker.WorkerPool)
 	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
@@ -73,6 +76,8 @@ export class MessageProcessor extends AbstractProcessor implements Contracts.Con
 			}
 
 			roundState.addMessage(message);
+
+			await this.storage.saveMessage(message);
 
 			if (broadcast) {
 				void this.broadcaster.broadcastMessage(message);

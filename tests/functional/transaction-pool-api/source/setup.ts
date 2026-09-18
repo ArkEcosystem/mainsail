@@ -20,10 +20,13 @@ const setup = async (): Promise<Contracts.Kernel.Application> => {
 	app.bind(Identifiers.Services.EventDispatcher.Service).to(Services.Events.MemoryEventDispatcher).inSingletonScope();
 
 	app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
+		clear: async () => {},
 		getMessages: async () => [],
 		getProposals: async () => [],
-		getState: async () => {},
-		persist: async () => {},
+		getState: async () => undefined,
+		saveMessage: async () => {},
+		saveProposal: async () => {},
+		saveState: async () => {},
 	});
 
 	app.bind(Identifiers.P2P.Broadcaster).toConstantValue({
@@ -114,8 +117,6 @@ const setup = async (): Promise<Contracts.Kernel.Application> => {
 	for (const packageId of packages) {
 		await loadPlugin(app, packageId, options);
 	}
-
-	app.rebind(Identifiers.Validator.DoubleSignGuard).toConstantValue({ guard: async () => {} });
 
 	for (const packageId of packages) {
 		await bootPlugin(app, packageId);

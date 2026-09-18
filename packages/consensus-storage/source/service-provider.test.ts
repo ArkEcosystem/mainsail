@@ -1,9 +1,10 @@
-import { Identifiers } from "@mainsail/constants";
+import type { Database, RootDatabase } from "lmdb";
 
+import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import { dirSync, setGracefulCleanup } from "tmp";
 
-import { describe } from "@mainsail/test-runner";
 import { ServiceProvider } from "./service-provider";
 
 describe<{
@@ -24,7 +25,7 @@ describe<{
 		context.app = app;
 	});
 
-	it("#register - should be ok", async ({ serviceProvider, app }) => {
+	it("#register - should bind the storage and the service", async ({ serviceProvider, app }) => {
 		await serviceProvider.register();
 
 		assert.true(app.isBound(Identifiers.ConsensusStorage.Root));
@@ -34,72 +35,29 @@ describe<{
 		assert.true(app.isBound(Identifiers.ConsensusStorage.Service));
 	});
 
-	it("#dispose - should call persist with round and consensus state data", async ({ serviceProvider, app }) => {
+	it("#register - should store proposals and messages as bytes", async ({ serviceProvider, app }) => {
 		await serviceProvider.register();
+		const bytes = Buffer.from("01ff", "hex");
 
-		const message1 = {
-			msg: 1,
-		};
+		for (const identifier of [
+			Identifiers.ConsensusStorage.Storage.Proposal,
+			Identifiers.ConsensusStorage.Storage.Message,
+		]) {
+			const storage = app.get<Database<Buffer>>(identifier);
+			await storage.put("key", bytes);
 
-		const message2 = {
-			msg: 2,
-		};
+			const stored = storage.get("key");
+			assert.true(Buffer.isBuffer(stored));
+			assert.true(stored.equals(bytes));
+		}
+	});
 
-		const message3 = {
-			msg: 3,
-		};
-
-		const message4 = {
-			msg: 4,
-		};
-
-		const proposal1 = {
-			proposal: 1,
-		};
-
-		const proposal2 = {
-			proposal: 2,
-		};
-
-		app.bind(Identifiers.Consensus.RoundStateRepository).toConstantValue({
-			getRoundStates: () => [
-				{
-					getMessages: () => [message1],
-					getProposal: () => proposal1,
-				},
-				{
-					getMessages: () => [message2, message3],
-					getProposal: () => proposal2,
-				},
-				{
-					getMessages: () => [message4],
-					getProposal: () => undefined,
-				},
-			],
-		});
-
-		const state = {
-			state: 1,
-		};
-
-		app.bind(Identifiers.Consensus.Service).toConstantValue({
-			getState: () => state,
-		});
-
-		const consensusStorageService = {
-			persist: () => {},
-		};
-		app.rebind(Identifiers.ConsensusStorage.Service).toConstantValue(consensusStorageService);
-
-		const spyPersist = spy(consensusStorageService, "persist");
+	it("#dispose - should close the root storage", async ({ serviceProvider, app }) => {
+		await serviceProvider.register();
+		const close = spy(app.get<RootDatabase>(Identifiers.ConsensusStorage.Root), "close");
 
 		await serviceProvider.dispose();
 
-		spyPersist.calledOnce();
-		spyPersist.calledWith({
-			messages: [message1, message2, message3, message4],
-			proposals: [proposal1, proposal2],
-			state: state,
-		});
+		close.calledOnce();
 	});
 });

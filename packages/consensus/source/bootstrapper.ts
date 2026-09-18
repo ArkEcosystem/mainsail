@@ -4,6 +4,12 @@ import { Enums, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
+type Records = {
+	state: Contracts.Consensus.StateData | undefined;
+	proposals: Contracts.Crypto.Proposal[];
+	messages: Contracts.Crypto.Message[];
+};
+
 @injectable()
 export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 	@inject(Identifiers.Services.Log.Service)
@@ -30,92 +36,86 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 			);
 		}
 
-		try {
-			await this.#loadRounds();
+		const records = await this.#readRecords();
+		if (records === undefined) {
+			return this.#completed(this.#initialState(blockNumber));
+		}
 
-			return this.#completed(await this.#getConsensusState(blockNumber));
-		} catch (rawError) {
-			const error = ensureError(rawError);
+		this.#loadRounds(blockNumber, records);
 
-			this.logger.error(
-				`Discarding stored consensus state for ${blockNumber.toLocaleString(Locale)}: ${error.message}`,
+		const { state } = records;
+
+		if (state === undefined || state.blockNumber < blockNumber) {
+			// Nothing signed and no lock taken at this block, so round 0 is safe to start from; the messages of
+			// this block that are stored are in the round states already.
+			return this.#completed(this.#initialState(blockNumber));
+		}
+
+		if (state.blockNumber > blockNumber) {
+			this.logger.warn(
+				`Clearing the stored consensus state of ${state.blockNumber.toLocaleString(Locale)}, which is ahead of the database at ${blockNumber.toLocaleString(Locale)}`,
 				"consensus",
 			);
-			this.roundStateRepo.clear();
+			await this.storage.clear();
 
 			return this.#completed(this.#initialState(blockNumber));
 		}
+
+		return this.#completed(await this.#restoreState(blockNumber, state));
 	}
 
-	async #loadRounds(): Promise<void> {
-		const proposals = await this.storage.getProposals();
+	async #readRecords(): Promise<Records | undefined> {
+		try {
+			return {
+				messages: await this.storage.getMessages(),
+				proposals: await this.storage.getProposals(),
+				state: await this.storage.getState(),
+			};
+		} catch (rawError) {
+			const error = ensureError(rawError);
 
-		this.logger.info(`Consensus Bootstrap - Proposals: ${proposals.length}`, "consensus");
+			this.logger.error(`Clearing the unreadable consensus store: ${error.message}`, "consensus");
+			await this.storage.clear();
 
-		for (const proposal of proposals) {
-			this.roundStateRepo.getRoundState(proposal.blockHeader.number, proposal.round).addProposal(proposal);
+			return undefined;
+		}
+	}
+
+	#loadRounds(blockNumber: number, { messages, proposals }: Records): void {
+		const proposalsOfBlock = proposals.filter((proposal) => proposal.blockHeader.number === blockNumber);
+		const messagesOfBlock = messages.filter((message) => message.blockNumber === blockNumber);
+
+		for (const proposal of proposalsOfBlock) {
+			this.roundStateRepo.getRoundState(blockNumber, proposal.round).addProposal(proposal);
 		}
 
-		const messages = await this.storage.getMessages();
+		for (const message of messagesOfBlock) {
+			this.roundStateRepo.getRoundState(blockNumber, message.round).addMessage(message);
+		}
 
-		const prevotes = messages.filter((message) => message.type === Enums.Crypto.MessageType.Prevote);
-		const precommits = messages.filter((message) => message.type === Enums.Crypto.MessageType.Precommit);
+		const prevotes = messagesOfBlock.filter((message) => message.type === Enums.Crypto.MessageType.Prevote);
+		const precommits = messagesOfBlock.filter((message) => message.type === Enums.Crypto.MessageType.Precommit);
+		const dropped = proposals.length - proposalsOfBlock.length + messages.length - messagesOfBlock.length;
 
 		this.logger.info(
-			`Consensus Bootstrap - Prevotes: ${prevotes.length}, Precommits: ${precommits.length}`,
+			`Consensus Bootstrap - Proposals: ${proposalsOfBlock.length}, Prevotes: ${prevotes.length}, Precommits: ${precommits.length}` +
+				(dropped > 0 ? `, dropped ${dropped} records of another block` : ""),
 			"consensus",
 		);
-
-		for (const message of messages) {
-			this.roundStateRepo.getRoundState(message.blockNumber, message.round).addMessage(message);
-		}
 	}
 
-	async #getConsensusState(blockNumber: number): Promise<Contracts.Consensus.State> {
-		const stored = await this.storage.getState();
-		const roundStates = this.roundStateRepo.getRoundStates();
-
-		if (stored === undefined) {
-			if (roundStates.length > 0) {
-				throw new Error("proposals or messages are stored without a state");
-			}
-
-			return this.#initialState(blockNumber);
-		}
-
-		if (stored.blockNumber < blockNumber) {
-			// Expected after a crash: the state is persisted on a clean shutdown only, so the store names the block
-			// the node was at back then. Nothing of it applies to the block at hand.
-			const storedBlockNumber = stored.blockNumber.toLocaleString(Locale);
-			const currentBlockNumber = blockNumber.toLocaleString(Locale);
-
-			this.logger.warn(
-				`Skipping state restore, because stored block number is ${storedBlockNumber}, but should be ${currentBlockNumber}`,
-				"consensus",
-			);
-			this.roundStateRepo.clear();
-
-			return this.#initialState(blockNumber);
-		}
-
-		if (stored.blockNumber > blockNumber) {
-			throw new Error(`stored block number ${stored.blockNumber} is ahead of the database`);
-		}
-
-		for (const roundState of roundStates) {
-			if (roundState.blockNumber !== blockNumber) {
-				throw new Error(`round state ${roundState.blockNumber}/${roundState.round} belongs to another block`);
-			}
-		}
-
+	async #restoreState(
+		blockNumber: number,
+		stored: Contracts.Consensus.StateData,
+	): Promise<Contracts.Consensus.State> {
 		const state = { ...stored } as Utils.Mutable<Contracts.Consensus.State>;
 
-		if (state.validRound !== undefined) {
-			state.validValue = await this.#getProvenRoundState(blockNumber, state.validRound, "valid");
+		if (stored.validRound !== undefined) {
+			state.validValue = await this.#getProvenRoundState(blockNumber, stored.validRound, "valid");
 		}
 
-		if (state.lockedRound !== undefined) {
-			state.lockedValue = await this.#getProvenRoundState(blockNumber, state.lockedRound, "locked");
+		if (stored.lockedRound !== undefined) {
+			state.lockedValue = await this.#getProvenRoundState(blockNumber, stored.lockedRound, "locked");
 		}
 
 		return state;
@@ -126,17 +126,22 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 		round: number,
 		kind: string,
 	): Promise<Contracts.Consensus.RoundState> {
+		const position = `${blockNumber.toLocaleString(Locale)}/${round.toLocaleString(Locale)}`;
 		const roundState = this.roundStateRepo.getRoundState(blockNumber, round);
 		const proposal = roundState.getProposal();
 
 		if (proposal === undefined) {
-			throw new Error(`the proposal of ${kind} round ${round} is not stored`);
+			throw new Error(
+				`refusing to start on an inconsistent consensus store: the proposal of ${kind} round ${position} is not stored`,
+			);
 		}
 
 		await proposal.deserializePayload();
 
 		if (!roundState.hasMajorityPrevotes()) {
-			throw new Error(`the +2/3 prevotes of ${kind} round ${round} are not stored`);
+			throw new Error(
+				`refusing to start on an inconsistent consensus store: the +2/3 prevotes of ${kind} round ${position} are not stored`,
+			);
 		}
 
 		return roundState;

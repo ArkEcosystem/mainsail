@@ -2,7 +2,6 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Enums, Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { DoubleSignError } from "@mainsail/exceptions";
 import { ensureError, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -56,6 +55,9 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	@inject(Identifiers.P2P.PendingCommits)
 	private readonly pendingCommits!: Contracts.P2P.PendingCommits;
+
+	@inject(Identifiers.ConsensusStorage.Service)
+	private readonly storage!: Contracts.ConsensusStorage.Service;
 
 	#blockNumber = 1;
 	#round = 0;
@@ -206,6 +208,11 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#didMajorityPrecommit = false;
 		this.#didMajorityPrecommitWithoutProposal = false;
 
+		// Round 0 is the position the bootstrapper assumes without a stored state.
+		if (round > 0) {
+			await this.#persistState();
+		}
+
 		await this.#beginRound();
 	}
 
@@ -265,11 +272,12 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#proposalPromise = undefined;
 
 		if (proposal === undefined) {
-			// Nothing to propose: either the double-sign guard refused this position, or building the
-			// proposal failed. #makeProposal reported which. The propose timeout scheduled above lets
-			// the round time out so consensus moves on.
+			// Building the proposal failed, and #makeProposal reported it. The propose timeout scheduled
+			// above lets the round time out so consensus moves on.
 			return;
 		}
+
+		await this.storage.saveProposal(proposal);
 
 		this.#runInBackground("Dispatching proposed event", () =>
 			this.eventDispatcher.dispatch(Events.ConsensusEvent.Proposed, proposal),
@@ -295,6 +303,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		this.#step = Enums.Consensus.Step.Prevote;
+		await this.#persistState();
 
 		this.logger.info(`Received proposal ${this.#getBlockString(proposal.blockHeader)}`, "consensus");
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
@@ -336,6 +345,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		this.#step = Enums.Consensus.Step.Prevote;
+		await this.#persistState();
 
 		this.logger.info(`Received locked proposal ${this.#getBlockString(proposal.blockHeader)}`, "consensus");
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.ProposalAccepted, this.getState());
@@ -379,11 +389,13 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#lockedValue = roundState;
 			this.#validValue = roundState;
 			this.#step = Enums.Consensus.Step.Precommit;
+			await this.#persistState();
 
 			await this.eventDispatcher.dispatch(Events.ConsensusEvent.PrevotedProposal, this.getState());
 			await this.precommit(proposal.blockHeader.hash);
 		} else {
 			this.#validValue = roundState;
+			await this.#persistState();
 
 			await this.eventDispatcher.dispatch(Events.ConsensusEvent.PrevotedProposal, this.getState());
 		}
@@ -410,6 +422,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.logger.info(`Received +2/3 prevotes for ${this.#getBlockNumberRoundString()}/null`, "consensus");
 
 		this.#step = Enums.Consensus.Step.Precommit;
+		await this.#persistState();
 
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.PrevotedNull, this.getState());
 		await this.precommit();
@@ -520,6 +533,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.logger.info(`Timeout to propose ${this.#getBlockNumberRoundString()} expired`, "consensus");
 
 			this.#step = Enums.Consensus.Step.Prevote;
+			await this.#persistState();
 			await this.prevote();
 		});
 	}
@@ -543,6 +557,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.roundStateRepository.getRoundState(this.#blockNumber, this.#round).logPrevotes();
 
 			this.#step = Enums.Consensus.Step.Precommit;
+			await this.#persistState();
 			await this.precommit();
 		});
 	}
@@ -598,16 +613,10 @@ export class Consensus implements Contracts.Consensus.Service {
 			return await this.#createProposal(roundState, registeredProposer);
 		} catch (rawError) {
 			const error = ensureError(rawError);
-
-			if (error instanceof DoubleSignError) {
-				// Signing is allowed again once a later round passes the recorded watermark.
-				this.logger.warn(`Skipped proposal for ${position}: ${error.message}`, "consensus");
-			} else {
-				this.logger.error(
-					`Failed to create proposal for ${position}: ${error.stack ?? error.message}`,
-					"consensus",
-				);
-			}
+			this.logger.error(
+				`Failed to create proposal for ${position}: ${error.stack ?? error.message}`,
+				"consensus",
+			);
 
 			return undefined;
 		}
@@ -619,7 +628,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	): Promise<Contracts.Crypto.Proposal> {
 		// The position is fixed here, before the first await. Building the block can outlast the round, and
 		// the proposal has to be signed for the round it was requested in, not for the one live at signing
-		// time; the double-sign guard then settles which of two overlapping proposals gets out.
+		// time; onTimeoutBlockPrepare then drops a proposal whose round has already ended.
 		const blockNumber = this.#blockNumber;
 		const round = this.#round;
 		const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(roundState.proposer.address);
@@ -651,31 +660,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async prevote(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#blockNumber, this.#round);
-		for (const validator of this.validatorSet.getRoundValidators()) {
-			const localValidator = this.validatorsRepository.getValidator(validator.blsPublicKey);
-			if (localValidator === undefined) {
-				continue;
-			}
-
-			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(validator.address);
-			if (roundState.hasPrevote(validatorIndex)) {
-				continue;
-			}
-
-			let prevote: Contracts.Crypto.Message;
-			try {
-				prevote = await localValidator.prevote(validatorIndex, this.#blockNumber, this.#round, value);
-			} catch (error) {
-				if (error instanceof DoubleSignError) {
-					this.logger.warn(
-						`Skipped prevote for ${this.#getBlockNumberRoundString()}: ${error.message}`,
-						"consensus",
-					);
-					continue;
-				}
-
-				throw error;
-			}
+		const validators = this.#getValidators((validatorIndex) => roundState.hasPrevote(validatorIndex));
+		for (const { validator, validatorIndex } of validators) {
+			const prevote = await validator.prevote(validatorIndex, this.#blockNumber, this.#round, value);
+			await this.storage.saveMessage(prevote);
 
 			this.#runInBackground("Processing own prevote", () => this.messageProcessor.process(prevote));
 		}
@@ -683,34 +671,39 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	public async precommit(value?: string): Promise<void> {
 		const roundState = this.roundStateRepository.getRoundState(this.#blockNumber, this.#round);
-		for (const validator of this.validatorSet.getRoundValidators()) {
-			const localValidator = this.validatorsRepository.getValidator(validator.blsPublicKey);
-			if (localValidator === undefined) {
-				continue;
-			}
-
-			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(validator.address);
-			if (roundState.hasPrecommit(validatorIndex)) {
-				continue;
-			}
-
-			let precommit: Contracts.Crypto.Message;
-			try {
-				precommit = await localValidator.precommit(validatorIndex, this.#blockNumber, this.#round, value);
-			} catch (error) {
-				if (error instanceof DoubleSignError) {
-					this.logger.warn(
-						`Skipped precommit for ${this.#getBlockNumberRoundString()}: ${error.message}`,
-						"consensus",
-					);
-					continue;
-				}
-
-				throw error;
-			}
+		const validators = this.#getValidators((validatorIndex) => roundState.hasPrecommit(validatorIndex));
+		for (const { validator, validatorIndex } of validators) {
+			const precommit = await validator.precommit(validatorIndex, this.#blockNumber, this.#round, value);
+			await this.storage.saveMessage(precommit);
 
 			this.#runInBackground("Processing own precommit", () => this.messageProcessor.process(precommit));
 		}
+	}
+
+	#getValidators(
+		hasMessage: (validatorIndex: number) => boolean,
+	): { validator: Contracts.Validator.Validator; validatorIndex: number }[] {
+		const validators: { validator: Contracts.Validator.Validator; validatorIndex: number }[] = [];
+
+		for (const roundValidator of this.validatorSet.getRoundValidators()) {
+			const validator = this.validatorsRepository.getValidator(roundValidator.blsPublicKey);
+			if (validator === undefined) {
+				continue;
+			}
+
+			const validatorIndex = this.validatorSet.getValidatorIndexByWalletAddress(roundValidator.address);
+			if (hasMessage(validatorIndex)) {
+				continue;
+			}
+
+			validators.push({ validator, validatorIndex });
+		}
+
+		return validators;
+	}
+
+	async #persistState(): Promise<void> {
+		await this.storage.saveState(this.getState());
 	}
 
 	async #processProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {
