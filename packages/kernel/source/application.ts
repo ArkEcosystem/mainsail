@@ -237,14 +237,17 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 			Identifiers.ServiceProvider.Repository,
 		).allLoadedProviders();
 
+		const logger = this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service);
+
 		for (const serviceProvider of serviceProviders.reverse()) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).debug(
-				`Disposing ${serviceProvider.name()}...`,
-			);
+			logger.debug(`Disposing ${serviceProvider.name()}...`);
 
 			try {
 				await serviceProvider.dispose();
-			} catch {}
+			} catch (rawError) {
+				const error = ensureError(rawError);
+				logger.error(`Failed to dispose ${serviceProvider.name()}: ${error.stack ?? error.message}`);
+			}
 		}
 	}
 
