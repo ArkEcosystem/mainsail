@@ -127,6 +127,32 @@ describe<{
 		}
 	});
 
+	it("#makeProposal - should reject a validRound that is not lower than the round", async ({ factory, identity }) => {
+		// The fixture re-proposes in round 1 a value found valid in round 0; the same or a later round is malformed.
+		const { proposalDataSerializableUnsigned } = ProposalWithLockProofAndValidRound;
+
+		for (const validRound of [proposalDataSerializableUnsigned.round, proposalDataSerializableUnsigned.round + 1]) {
+			await assert.rejects(
+				() => factory.makeProposal({ ...proposalDataSerializableUnsigned, validRound }, identity.keys),
+				MessageSchemaError,
+			);
+		}
+	});
+
+	it("#makeProposalFromBytes - should reject a validRound that is not lower than the round", async ({
+		app,
+		factory,
+	}) => {
+		const serializer = app.get<Contracts.Crypto.ProposalSerializer>(Identifiers.Cryptography.Proposal.Serializer);
+		const { proposalDataSerializable } = ProposalWithLockProofAndValidRound;
+
+		for (const validRound of [proposalDataSerializable.round, proposalDataSerializable.round + 1]) {
+			const serialized = await serializer.serializeProposal({ ...proposalDataSerializable, validRound });
+
+			await assert.rejects(() => factory.makeProposalFromBytes(serialized), MessageSchemaError);
+		}
+	});
+
 	it("#makeProposalFromBytes - should throw with trailing bytes", async ({ factory }) => {
 		for (const hex of ["00", "01", "430123231", "aaaaaaaaaaaaaaaa", "0".repeat(255)]) {
 			await assert.rejects(
