@@ -41,6 +41,10 @@ describe<{
 	const store = {
 		getLastBlock: () => {},
 	};
+	const timestampCalculator = {
+		calculateMinimalTimestamp: (block: { timestamp: number }, round: number) =>
+			block.timestamp + 8000 + round * 1000,
+	};
 
 	beforeEach((context) => {
 		currentTimestamp = 0;
@@ -54,6 +58,7 @@ describe<{
 		context.app.bind(Identifiers.Consensus.Service).toConstantValue(consensus);
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(config);
 		context.app.bind(Identifiers.State.Store).toConstantValue(store);
+		context.app.bind(Identifiers.BlockchainUtils.TimestampCalculator).toConstantValue(timestampCalculator);
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
 		context.scheduler = context.app.resolve(SchedulerProxy);
@@ -70,7 +75,7 @@ describe<{
 			timestamp: 0,
 		});
 
-		assert.equal(scheduler.getNextBlockTimestamp(0), 8000);
+		assert.equal(scheduler.getNextBlockTimestamp(0, 0), 8000);
 		spyOnGetLastBlock.calledOnce();
 	});
 
@@ -81,8 +86,22 @@ describe<{
 			timestamp: 0,
 		});
 
-		assert.equal(scheduler.getNextBlockTimestamp(6000), 10_000);
+		assert.equal(scheduler.getNextBlockTimestamp(6000, 0), 10_000);
 		spyOnGetLastBlock.calledOnce();
+	});
+
+	it("#getNextBlockTimestamp - should return the minimal timestamp of the round when it is later", async ({
+		scheduler,
+	}) => {
+		// A round entered ahead of its schedule must still stamp its block where the timestamp verifier accepts it.
+		const lastBlock = { timestamp: 0 };
+		stub(store, "getLastBlock").returnValue(lastBlock);
+		const calculateMinimalTimestamp = stub(timestampCalculator, "calculateMinimalTimestamp").returnValue(20_000);
+
+		assert.equal(scheduler.getNextBlockTimestamp(6000, 3), 20_000);
+
+		calculateMinimalTimestamp.calledOnce();
+		calculateMinimalTimestamp.calledWith(lastBlock, 3);
 	});
 
 	it("#scheduleTimeoutBlockPrepare - should call onTimeoutBlockPrepare", async ({ scheduler }) => {

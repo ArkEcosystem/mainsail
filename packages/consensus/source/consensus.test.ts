@@ -177,10 +177,12 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	// proposal for it.
 	const moveToRound = async (consensus: Consensus, round: number): Promise<void> => {
 		const prepareProposal = stub(consensus, "prepareProposal").callsFake(async () => {});
+		const applyRules = stub(consensus, "applyRules").callsFake(async () => {});
 
 		await consensus.startRound(round);
 
 		prepareProposal.restore();
+		applyRules.restore();
 	};
 
 	it("#getBlockNumber - should return initial value", async ({ consensus }) => {
@@ -231,6 +233,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		logger,
 		peerStatistic,
 	}) => {
+		stub(consensus, "applyRules").callsFake(async () => {});
 		const spyScheduleClear = spy(scheduler, "clear");
 		const spyScheduleTimeoutBlockPrepare = spy(scheduler, "scheduleTimeoutBlockPrepare");
 		const spyLoggerInfo = spy(logger, "info");
@@ -251,7 +254,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(proposer.blsPublicKey);
-		spyGetRoundState.calledOnce();
+		spyGetRoundState.calledTimes(2);
 		spyGetRoundState.calledWith(1, 0);
 		spyLoggerInfo.calledWith(`>> Starting new round: ${1}/${0} with proposer: ${proposer.address}`);
 		spyDispatch.calledOnce();
@@ -277,6 +280,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		scheduler,
 		forger,
 	}) => {
+		stub(consensus, "applyRules").callsFake(async () => {});
 		const validator = {
 			getRandaoReveal: async () => "aa".repeat(96),
 			propose: () => {},
@@ -301,7 +305,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyScheduleClear.calledOnce();
 		spyScheduleTimeoutBlockPrepare.calledOnce();
 
-		spyGetRoundState.calledTimes(1);
+		spyGetRoundState.calledTimes(2);
 		spyGetRoundState.calledWith(1, 0);
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(proposer.blsPublicKey);
@@ -375,6 +379,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		forger,
 	}) => {
 		await startAt(consensus, { validValue: roundState });
+		stub(consensus, "applyRules").callsFake(async () => {});
 
 		const validator = {
 			getRandaoReveal: async () => "aa".repeat(96),
@@ -410,7 +415,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyScheduleClear.calledOnce();
 		spyScheduleTimeoutBlockPrepare.calledOnce();
 
-		spyGetRoundState.calledTimes(1);
+		spyGetRoundState.calledTimes(2);
 		spyGetRoundState.calledWith(1, 1);
 		spyGetValidator.calledOnce();
 		spyGetValidator.calledWith(proposer.blsPublicKey);
@@ -2220,7 +2225,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		const spyLoggerInfo = spy(logger, "info");
 
 		consensus.onMajorityPrecommitWithoutProposal(roundState);
-		await consensus.startRound(1);
+		await moveToRound(consensus, 1);
 		consensus.onMajorityPrecommitWithoutProposal({ blockNumber: 1, round: 1 } as Contracts.Consensus.RoundState);
 
 		spyLoggerInfo.calledWith(`Received +2/3 precommits for ${1}/${0}, but proposal is missing`);
@@ -3065,6 +3070,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	});
 
 	it("#startRound - should store the state of a round above 0", async ({ consensus, storage }) => {
+		stub(consensus, "applyRules").callsFake(async () => {});
 		const spySaveState = spy(storage, "saveState");
 
 		await consensus.startRound(2);
@@ -3080,6 +3086,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 	});
 
 	it("#startRound - should not store the state of round 0", async ({ consensus, storage }) => {
+		stub(consensus, "applyRules").callsFake(async () => {});
 		// Round 0 is what the bootstrapper assumes without a stored state, so a commit writes nothing.
 		const spySaveState = spy(storage, "saveState");
 
@@ -3093,6 +3100,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		storage,
 		eventDispatcher,
 	}) => {
+		stub(consensus, "applyRules").callsFake(async () => {});
 		const calls: string[] = [];
 		storage.saveState = async () => {
 			calls.push("store");
@@ -3258,5 +3266,73 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spySaveProposal.calledOnce();
 		spySaveProposal.calledWith(proposal);
 		assert.equal(calls, ["store", "announce", "process"]);
+	});
+
+	it("#startRound - should apply the rules to the round state of the new round", async ({
+		consensus,
+		roundState,
+	}) => {
+		// A round entered on f+1 messages of it, or on a late precommit timeout, may already hold its proposal and
+		// votes, which were skipped on arrival as not of the current round.
+		const applyRules = stub(consensus, "applyRules").callsFake(async () => {});
+
+		await consensus.startRound(1);
+
+		applyRules.calledOnce();
+		applyRules.calledWith(roundState);
+	});
+
+	it("#startRound - should not apply the rules once disposed", async ({ consensus }) => {
+		const applyRules = stub(consensus, "applyRules").callsFake(async () => {});
+
+		await consensus.dispose();
+		await consensus.startRound(1);
+
+		applyRules.neverCalled();
+	});
+
+	it("#handle - should leave a round state of another block alone", async ({
+		consensus,
+		blockProcessor,
+		messageProcessor,
+		roundState,
+	}) => {
+		// The block was committed while the round state waited on the handler lock.
+		const stale = { ...roundState, blockNumber: 2 } as unknown as Contracts.Consensus.RoundState;
+		const spyGetProposal = spy(stale, "getProposal");
+		const spyProcess = spy(blockProcessor, "process");
+		const spyMessageProcess = spy(messageProcessor, "process");
+
+		await consensus.handle(stale);
+
+		spyGetProposal.neverCalled();
+		spyProcess.neverCalled();
+		spyMessageProcess.neverCalled();
+	});
+
+	it("#handleCommitState - should leave a commit state of another block alone", async ({
+		consensus,
+		blockProcessor,
+		block,
+	}) => {
+		let processorResult: Contracts.Processor.BlockProcessorResult | undefined;
+		const commitState = {
+			blockNumber: 2,
+			getBlock: () => block,
+			getProcessorResult: () => processorResult!,
+			hasProcessorResult: () => processorResult !== undefined,
+			round: 0,
+			setProcessorResult: (result: Contracts.Processor.BlockProcessorResult) => (processorResult = result),
+		} as unknown as Contracts.Processor.ProcessableUnit;
+
+		const spyProcess = spy(blockProcessor, "process");
+		const spyCommit = spy(blockProcessor, "commit");
+
+		await consensus.handleCommitState(commitState);
+
+		spyProcess.neverCalled();
+		spyCommit.neverCalled();
+		assert.false(commitState.hasProcessorResult());
+		assert.equal(consensus.getBlockNumber(), 1);
 	});
 });
