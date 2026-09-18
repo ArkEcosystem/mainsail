@@ -2126,32 +2126,32 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getBlockNumber(), 2);
 	});
 
-	it("#onMajorityPrecommit - should terminate if processor throws", async ({
+	it("#onMajorityPrecommit - should fail the application and leave the block undecided if the commit throws", async ({
 		app,
 		consensus,
 		blockProcessor,
 		roundState,
 		proposal,
 	}) => {
-		const fakeTimers = clock();
-
 		const error = new Error("error");
-		const spyAppTerminate = stub(app, "terminate").callsFake(() => {});
+		// Never resolves: the termination disposes consensus, which waits for the handler lock this call holds.
+		const spyAppTerminate = stub(app, "terminate").callsFake(() => new Promise(() => {}));
 		const spyRoundStateGetBlock = stub(roundState, "getBlock").returnValue(proposal.getData().block);
 		const spyBlockProcessorCommit = stub(blockProcessor, "commit").rejectedValue(error);
+		const spyStartRound = stub(consensus, "startRound").callsFake(async () => {});
 
 		roundState.hasProcessorResult = () => true;
 		roundState.getProcessorResult = () => ({ success: true });
 
-		assert.equal(consensus.getBlockNumber(), 1);
-		void consensus.onMajorityPrecommit(roundState);
-		await fakeTimers.nextAsync();
+		await assert.rejects(() => consensus.onMajorityPrecommit(roundState), "error");
 
 		spyRoundStateGetBlock.calledOnce();
 		spyBlockProcessorCommit.calledOnce();
 		spyBlockProcessorCommit.calledWith(roundState);
 		spyAppTerminate.calledOnce();
 		spyAppTerminate.calledWith("Failed to commit block", error);
+		spyStartRound.neverCalled();
+		assert.equal(consensus.getBlockNumber(), 1);
 	});
 
 	it("#onMajorityPrecommit - should log and do nothing if result is invalid", async ({

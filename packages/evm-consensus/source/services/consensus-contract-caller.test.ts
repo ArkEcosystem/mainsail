@@ -69,13 +69,15 @@ describe<{
 		);
 	});
 
-	it("#view - should terminate the application when the call fails", async ({ app, evm, caller }) => {
+	it("#view - should fail the application and throw when the call fails", async ({ app, evm, caller }) => {
 		evm.view = async () => ({ output: undefined, success: false });
-		const terminate = stub(app, "terminate").callsFake(() => {
-			throw new Error("terminated");
-		});
+		// Never resolves: the call runs inside a commit, which holds the lock that disposing consensus waits for.
+		const terminate = stub(app, "terminate").callsFake(() => new Promise(() => {}));
 
-		await assert.rejects(() => caller.view("getVotesCount"), "terminated");
-		terminate.calledWith("getVotesCount failed");
+		await assert.rejects(() => caller.view("getVotesCount"), "Consensus contract call getVotesCount failed");
+
+		terminate.calledOnce();
+		assert.equal(terminate.getCallArgs(0)[0], "getVotesCount failed");
+		assert.equal((terminate.getCallArgs(0)[1] as Error).message, "Consensus contract call getVotesCount failed");
 	});
 });
