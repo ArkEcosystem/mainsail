@@ -25,16 +25,14 @@ export class CommitProcessor extends AbstractProcessor implements Contracts.Cons
 
 		await this.getConsensus().handleCommitState(commitState);
 
-		if (commitState.getProcessorResult().success) {
-			return Enums.Consensus.ProcessorResult.Accepted;
+		// Consensus left the unit alone: it is disposed, or the block was committed meanwhile.
+		if (!commitState.hasProcessorResult()) {
+			return Enums.Consensus.ProcessorResult.Skipped;
 		}
 
-		// A failed result only proves the block is bad while it is still the one being
-		// decided. If consensus moved past it meanwhile — committed via live gossip while
-		// this unit waited on the handler lock — the failure is stale, not evidence.
-		return this.#hasValidBlockNumber(commit)
-			? Enums.Consensus.ProcessorResult.Invalid
-			: Enums.Consensus.ProcessorResult.Skipped;
+		return commitState.getProcessorResult().success
+			? Enums.Consensus.ProcessorResult.Accepted
+			: Enums.Consensus.ProcessorResult.Invalid;
 	}
 
 	async hasValidSignature(commit: Contracts.Crypto.Commit, previousBlockHash: string): Promise<boolean> {

@@ -155,6 +155,10 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	protected async applyRules(roundState: Contracts.Consensus.RoundState): Promise<void> {
+		if (roundState.blockNumber !== this.#blockNumber) {
+			return;
+		}
+
 		await this.#processProposal(roundState);
 
 		await this.onProposal(roundState);
@@ -191,7 +195,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	async handleCommitState(commitState: Contracts.Processor.ProcessableUnit): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
-			if (this.#isDisposed) {
+			if (this.#isDisposed || commitState.blockNumber !== this.#blockNumber) {
 				return;
 			}
 
