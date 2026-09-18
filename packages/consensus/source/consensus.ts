@@ -218,6 +218,13 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		await this.#beginRound();
+
+		if (this.#isDisposed) {
+			return;
+		}
+
+		// A round entered on f+1 messages of it, or on a late precommit timeout, may already hold its proposal
+		await this.applyRules(this.roundStateRepository.getRoundState(this.#blockNumber, this.#round));
 	}
 
 	async #beginRound(): Promise<void> {
@@ -511,7 +518,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		);
 	}
 
-	protected async onMinorityWithHigherRound(roundState: Contracts.Processor.ProcessableUnit): Promise<void> {
+	protected async onMinorityWithHigherRound(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		// Tendermint line 55: upon f+1 ⟨∗, h, round, ∗, ∗⟩ with round > r.
 		if (!(roundState.blockNumber === this.#blockNumber && roundState.round > this.#round)) {
 			return;
