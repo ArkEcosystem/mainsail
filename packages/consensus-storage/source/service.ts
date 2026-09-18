@@ -34,7 +34,8 @@ export class Service implements Contracts.ConsensusStorage.Service {
 
 	@postConstruct()
 	public initialize(): void {
-		this.#blockNumber = this.stateStorage.get(STATE_KEY)?.blockNumber ?? 0;
+		const blockNumber = this.stateStorage.get(STATE_KEY)?.blockNumber;
+		this.#blockNumber = typeof blockNumber === "number" && Number.isInteger(blockNumber) ? blockNumber : 0;
 	}
 
 	public async getState(): Promise<Contracts.Consensus.StateData | undefined> {
