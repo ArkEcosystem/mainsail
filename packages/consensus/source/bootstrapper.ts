@@ -57,7 +57,6 @@ export class Bootstrapper implements Contracts.Consensus.Bootstrapper {
 			await this.storage.clear();
 		}
 
-
 		return this.#completed(this.#initialState(blockNumber));
 	}
 
