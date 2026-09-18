@@ -16,6 +16,9 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
+	@inject(Identifiers.BlockchainUtils.TimestampCalculator)
+	private readonly timestampCalculator!: Contracts.BlockchainUtils.TimestampCalculator;
+
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -24,10 +27,10 @@ export class Scheduler implements Contracts.Consensus.Scheduler {
 	#timeoutPrevote?: NodeJS.Timeout;
 	#timeoutPrecommit?: NodeJS.Timeout;
 
-	public getNextBlockTimestamp(commitTime: number): number {
+	public getNextBlockTimestamp(commitTime: number, round: number): number {
 		return Math.max(
 			commitTime + this.cryptoConfiguration.getMilestone().timeouts.blockPrepareTime,
-			this.stateStore.getLastBlock().timestamp + this.cryptoConfiguration.getMilestone().timeouts.blockTime,
+			this.timestampCalculator.calculateMinimalTimestamp(this.stateStore.getLastBlock(), round),
 		);
 	}
 

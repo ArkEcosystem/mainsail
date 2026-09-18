@@ -247,7 +247,9 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		this.scheduler.scheduleTimeoutBlockPrepare(this.scheduler.getNextBlockTimestamp(this.#roundStartTime));
+		this.scheduler.scheduleTimeoutBlockPrepare(
+			this.scheduler.getNextBlockTimestamp(this.#roundStartTime, this.#round),
+		);
 
 		if (this.pendingCommits.has(this.#blockNumber)) {
 			return;
@@ -649,7 +651,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		const block = await this.blockForger.forgeBlock(
 			roundState.proposer.address,
 			round,
-			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
+			this.scheduler.getNextBlockTimestamp(this.#roundStartTime, round),
 			await registeredProposer.getRandaoReveal(blockNumber),
 		);
 		this.logger.info(`Created proposal with new block ${this.#getBlockString(block)}`, "consensus");
