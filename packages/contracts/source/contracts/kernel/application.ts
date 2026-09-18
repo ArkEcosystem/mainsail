@@ -48,6 +48,8 @@ export interface Application {
 
 	terminate(reason?: string, error?: Error): Promise<never>;
 
+	fail(reason: string, error: Error): never;
+
 	bind<T>(serviceIdentifier: ServiceIdentifier<T>): BindToFluentSyntax<T>;
 
 	rebind<T>(serviceIdentifier: ServiceIdentifier<T>): BindToFluentSyntax<T>;

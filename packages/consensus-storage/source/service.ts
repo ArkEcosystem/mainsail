@@ -118,7 +118,7 @@ export class Service implements Contracts.ConsensusStorage.Service {
 			await this.rootStorage.transaction(write);
 			await this.rootStorage.flushed;
 		} catch (rawError) {
-			await this.app.terminate("Failed to write the consensus store", ensureError(rawError));
+			this.app.fail("Failed to write the consensus store", ensureError(rawError));
 		}
 	}
 

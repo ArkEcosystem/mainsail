@@ -140,6 +140,14 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 		return !isMainThread;
 	}
 
+	// Terminates from inside an operation that holds a lock a disposing service provider waits for. Termination
+	// runs detached and the error unwinds the caller, which releases the lock.
+	public fail(reason: string, error: Error): never {
+		void this.terminate(reason, error);
+
+		throw error;
+	}
+
 	public async terminate(reason?: string, error?: Error): Promise<never> {
 		this.#booted = false;
 
