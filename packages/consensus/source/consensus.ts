@@ -475,8 +475,7 @@ export class Consensus implements Contracts.Consensus.Service {
 			try {
 				await this.processor.commit(processState);
 			} catch (rawError) {
-				const error = ensureError(rawError);
-				await this.app.terminate("Failed to commit block", error);
+				this.app.fail("Failed to commit block", ensureError(rawError));
 			}
 
 			this.roundStateRepository.clear();

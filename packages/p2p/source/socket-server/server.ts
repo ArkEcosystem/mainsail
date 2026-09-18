@@ -86,8 +86,7 @@ export class Server implements Contracts.P2P.Server {
 			await this.server.stop();
 			this.logger.info(`${this.name} stopped at ${this.server.info.uri}`, "p2p");
 		} catch (rawError) {
-			const error = ensureError(rawError);
-			await this.app.terminate(`Failed to stop ${this.name} Server!`, error);
+			this.app.fail(`Failed to stop ${this.name} Server!`, ensureError(rawError));
 		}
 	}
 

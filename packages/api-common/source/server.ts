@@ -117,8 +117,7 @@ export abstract class AbstractServer {
 
 			this.logger.info(`${this.prettyName} Server stopped at ${this.server.info.uri}`);
 		} catch (rawError) {
-			const error = ensureError(rawError);
-			await this.app.terminate(`Failed to stop ${this.prettyName} Server!`, error);
+			this.app.fail(`Failed to stop ${this.prettyName} Server!`, ensureError(rawError));
 		}
 	}
 

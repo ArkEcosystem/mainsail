@@ -71,8 +71,7 @@ export class Server {
 
 			this.logger.info(`Webhook Server stopped at ${this.#server.info.uri}`);
 		} catch (rawError) {
-			const error = ensureError(rawError);
-			await this.app.terminate(`Failed to stop Webhook Server!`, error);
+			this.app.fail(`Failed to stop Webhook Server!`, ensureError(rawError));
 		}
 	}
 

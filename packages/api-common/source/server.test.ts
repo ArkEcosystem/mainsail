@@ -331,16 +331,18 @@ describe<{
 		terminate.calledOnce();
 	});
 
-	it("dispose - failure path terminates the application", async ({ subject, app }) => {
+	it("dispose - failure path terminates the application and rethrows", async ({ subject, app }) => {
 		await subject.initialize(Enums.Api.ServerType.Http, { host: "127.0.0.1", port: 0 });
 
+		const error = new Error("stop failed");
 		const terminate = stub(app, "terminate").resolvedValue(undefined);
 		const internalServer = (subject as any)["server"];
-		stub(internalServer, "stop").rejectedValue(new Error("stop failed"));
+		stub(internalServer, "stop").rejectedValue(error);
 
-		await subject.dispose();
+		await assert.rejects(() => subject.dispose(), "stop failed");
 
 		terminate.calledOnce();
+		terminate.calledWith(`Failed to stop ${(subject as any)["prettyName"]} Server!`, error);
 	});
 
 	it("registerPlugins - registers a plugin", async ({ subject }) => {

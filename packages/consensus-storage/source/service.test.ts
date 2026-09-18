@@ -1,4 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
+import type { RootDatabase } from "lmdb";
 
 import { Enums, Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
@@ -13,8 +14,9 @@ const { Prevote, Precommit } = Enums.Crypto.MessageType;
 
 describe<{
 	app: Application;
+	rootStorage: RootDatabase;
 	service: Service;
-}>("Service", ({ beforeEach, it, assert }) => {
+}>("Service", ({ beforeEach, it, assert, stub }) => {
 	const state1: Contracts.Consensus.StateData = {
 		blockNumber: 1,
 		lockedRound: undefined,
@@ -76,6 +78,7 @@ describe<{
 		});
 
 		context.app = new Application();
+		context.rootStorage = storage;
 		context.app.bind(Identifiers.ConsensusStorage.Root).toConstantValue(storage);
 		context.app
 			.bind(Identifiers.ConsensusStorage.Storage.Proposal)
@@ -238,5 +241,17 @@ describe<{
 
 		assert.equal(await service.getState(), state1);
 		assert.equal(await service.getMessages(), [Buffer.from("prevote")]);
+	});
+
+	it("should fail the application when a write cannot be committed", async ({ app, rootStorage, service }) => {
+		const error = new Error("disk is full");
+		stub(rootStorage, "transaction").rejectedValue(error);
+		// Never resolves, like a termination waiting on a lock the caller holds; the write must not wait for it.
+		const terminate = stub(app, "terminate").callsFake(() => new Promise(() => {}));
+
+		await assert.rejects(() => service.saveMessage(makeMessage(1, 0, 3, Prevote, "prevote")), "disk is full");
+
+		terminate.calledOnce();
+		terminate.calledWith("Failed to write the consensus store", error);
 	});
 });

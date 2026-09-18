@@ -3,11 +3,15 @@ import type { Database, RootDatabase } from "lmdb";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 const STATE_KEY = "consensus-state";
 
 @injectable()
 export class Service implements Contracts.ConsensusStorage.Service {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.ConsensusStorage.Root)
 	private readonly rootStorage!: RootDatabase;
 
@@ -80,11 +84,9 @@ export class Service implements Contracts.ConsensusStorage.Service {
 	public async clear(): Promise<void> {
 		this.#blockNumber = 0;
 
-		await this.rootStorage.transaction(() => {
+		await this.#commit(() => {
 			this.#clear();
 		});
-
-		await this.rootStorage.flushed;
 	}
 
 	public async getProposals(): Promise<Contracts.Crypto.Proposal[]> {
@@ -101,15 +103,23 @@ export class Service implements Contracts.ConsensusStorage.Service {
 		const replacesStoredBlock = blockNumber > this.#blockNumber;
 		this.#blockNumber = Math.max(this.#blockNumber, blockNumber);
 
-		await this.rootStorage.transaction(() => {
+		await this.#commit(() => {
 			if (replacesStoredBlock) {
 				this.#clear();
 			}
 
 			write();
 		});
+	}
 
-		await this.rootStorage.flushed;
+	// A node that cannot record what it signed stops, rather than go on without the record.
+	async #commit(write: () => void): Promise<void> {
+		try {
+			await this.rootStorage.transaction(write);
+			await this.rootStorage.flushed;
+		} catch (rawError) {
+			this.app.fail("Failed to write the consensus store", ensureError(rawError));
+		}
 	}
 
 	#clear(): void {
