@@ -129,7 +129,10 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		let error: Error | undefined;
 
 		try {
-			const result = await this.communicator.getProposal(job.peer);
+			const result = await this.communicator.getProposal(job.peer, {
+				blockNumber: job.blockNumber,
+				round: job.round,
+			});
 
 			if (result.proposal.length === 0) {
 				return;

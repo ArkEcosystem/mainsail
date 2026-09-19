@@ -17,22 +17,17 @@ export class GetProposalController implements Contracts.P2P.Controller {
 			proposal: Buffer.alloc(0),
 		};
 
-		const { blockNumber, round } = request.payload.headers;
-
 		const consensus = this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
 		const roundStateRepo = this.app.get<Contracts.Consensus.RoundStateRepository>(
 			Identifiers.Consensus.RoundStateRepository,
 		);
 
-		if (blockNumber !== consensus.getBlockNumber()) {
+		const { query } = request.payload;
+		if (query.blockNumber !== consensus.getBlockNumber() || query.round > consensus.getRound()) {
 			return result;
 		}
 
-		if (round > consensus.getRound()) {
-			return result;
-		}
-
-		const roundState = roundStateRepo.getRoundState(blockNumber, round);
+		const roundState = roundStateRepo.getRoundState(query.blockNumber, query.round);
 		const proposal = roundState.getProposal();
 
 		if (!proposal) {
