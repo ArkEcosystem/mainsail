@@ -13,38 +13,25 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 		request: Contracts.P2P.GetMessagesRequest,
 		h: Hapi.ResponseToolkit,
 	): Promise<Contracts.P2P.GetMessagesResponse> {
-		const { blockNumber, round, validatorsSignedPrecommit, validatorsSignedPrevote } = request.payload.headers;
-
 		const consensus = this.app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
 		const roundStateRepo = this.app.get<Contracts.Consensus.RoundStateRepository>(
 			Identifiers.Consensus.RoundStateRepository,
 		);
 
-		if (blockNumber !== consensus.getBlockNumber() || round > consensus.getRound()) {
+		const { query } = request.payload;
+		if (query.blockNumber !== consensus.getBlockNumber() || query.round > consensus.getRound()) {
 			return {
 				precommits: [],
 				prevotes: [],
 			};
 		}
 
-		// Use the highest round with minority prevotes
-		let roundState = roundStateRepo.getRoundState(blockNumber, consensus.getRound());
-		if (roundState.round >= 1 && roundState.round > round && !roundState.hasMinorityPrevotesOrPrecommits()) {
-			roundState = roundStateRepo.getRoundState(blockNumber, consensus.getRound() - 1);
-		}
+		const roundState = roundStateRepo.getRoundState(query.blockNumber, query.round);
 
-		if (round === roundState.round) {
-			// Return only missing messages
-			return {
-				precommits: this.getPrecommits(validatorsSignedPrecommit, roundState),
-				prevotes: this.getPrevotes(validatorsSignedPrevote, roundState),
-			};
-		} else {
-			return {
-				precommits: roundState.getPrecommits().map((precommit) => precommit.serialized),
-				prevotes: roundState.getPrevotes().map((prevote) => prevote.serialized),
-			};
-		}
+		return {
+			precommits: this.getPrecommits(query.validatorsSignedPrecommit, roundState),
+			prevotes: this.getPrevotes(query.validatorsSignedPrevote, roundState),
+		};
 	}
 
 	private getPrevotes(
