@@ -175,6 +175,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 			commitData,
 		);
 		unit.setAccountUpdates(result.dirtyAccounts);
+		unit.setContractEvents(result.events as Contracts.Evm.ContractEvent[]);
 	}
 
 	public async codeAt(address: string, blockNumber?: bigint): Promise<string> {
