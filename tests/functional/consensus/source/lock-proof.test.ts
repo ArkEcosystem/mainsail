@@ -2,6 +2,7 @@ import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
+import { MessageSchemaError } from "@mainsail/exceptions";
 import { describe } from "@mainsail/test-runner";
 
 import crypto from "../config/crypto.json" with { type: "json" };
@@ -63,7 +64,7 @@ describe<{
 	nodes: Node[];
 	validators: Validator[];
 	p2p: P2PRegistry;
-}>("Lock proof", ({ beforeEach, afterEach, each, assert, stub }) => {
+}>("Lock proof", ({ beforeEach, afterEach, each, it, assert, stub }) => {
 	const totalNodes = 5;
 
 	beforeEach(async (context) => {
@@ -220,9 +221,92 @@ describe<{
 				1,
 				async ({ node0, validators, blockA, proofA }) => reProposal(node0, validators[0], 2, 1, blockA, proofA),
 			),
-			dataset("a validRound that is not before the round", 1, 1, async ({ node0, validators, blockA, proofA }) =>
-				reProposal(node0, validators[0], 1, 1, blockA, proofA),
-			),
 		],
 	);
+
+	// A validRound that is not before the round is not a proof problem but a malformed proposal: the proposal factory
+	// refuses to build one and to read one from the wire, so consensus never sees it. Round 0 runs as above; in round
+	// 1 the proposer tries the malformed re-proposal, gets nothing to send, and the round ends on null; round 2
+	// brings the honest re-proposal of A.
+	it("should not let a re-proposal with a validRound that is not before the round be built or read, and confirm the honest re-proposal in the next round", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
+		const consensus = node0.get<Consensus>(Identifiers.Consensus.Service);
+
+		for (const index of [3, 4]) {
+			precommitNullInRounds(stub, getNodeForValidator(nodes, validators[index]), validators[index], [0], p2p);
+		}
+
+		let refusal: unknown;
+		const prepareProposal = consensus.prepareProposal.bind(consensus);
+		stub(consensus, "prepareProposal").callsFake(async (...arguments_: unknown[]) => {
+			if (consensus.getRound() !== 1) {
+				await prepareProposal(arguments_[0] as Contracts.Consensus.RoundState);
+				return;
+			}
+
+			const [proposalA] = p2p.proposals.getMessages(1, 0);
+			if (!proposalA.isDataDeserialized) {
+				await proposalA.deserializePayload();
+			}
+			const blockA = proposalA.getPayload().block;
+
+			try {
+				await reProposal(node0, validators[0], 1, 1, blockA, await makeLockProof(node0, p2p, 0, blockA.hash));
+			} catch (error) {
+				refusal = error;
+			}
+		});
+
+		await runMany(nodes);
+		await snoozeForBlock(nodes);
+
+		// The proposer could not even sign it.
+		assert.instance(refusal, MessageSchemaError);
+		assert.match((refusal as Error).message, "validRound must be lower than round");
+
+		const [proposalA] = p2p.proposals.getMessages(1, 0);
+		const [honestReProposal] = p2p.proposals.getMessages(1, 2);
+		assert.defined(proposalA);
+		assert.defined(honestReProposal);
+
+		// Nor can such bytes be read from the wire, which is what a peer that sent them would run into.
+		const malformed = await node0
+			.get<Contracts.Crypto.ProposalSerializer>(Identifiers.Cryptography.Proposal.Serializer)
+			.serializeProposal({ ...honestReProposal.toSerializableData(), validRound: honestReProposal.round });
+		await assert.rejects(
+			() =>
+				getNodeForValidator(nodes, validators[1])
+					.get<Contracts.Crypto.ProposalFactory>(Identifiers.Cryptography.Proposal.Factory)
+					.makeProposalFromBytes(malformed),
+			"validRound must be lower than round",
+		);
+
+		// Round 1 went by without a proposal and on null votes.
+		assert.equal(p2p.proposals.getMessages(1, 1).length, 0);
+		assert.equal(
+			p2p.prevotes.getMessages(1, 1).map((prevote) => prevote.blockHash),
+			Array.from({ length: totalNodes }).fill(undefined),
+		);
+		assert.equal(
+			p2p.precommits.getMessages(1, 1).map((precommit) => precommit.blockHash),
+			Array.from({ length: totalNodes }).fill(undefined),
+		);
+
+		// Round 2: the proposer re-proposes A with the genuine round-0 proof, and everybody prevotes it.
+		assert.equal(honestReProposal.blockHeader.hash, proposalA.blockHeader.hash);
+		assert.equal(honestReProposal.validRound, 0);
+		assert.equal(
+			p2p.prevotes.getMessages(1, 2).map((prevote) => prevote.blockHash),
+			Array.from({ length: totalNodes }).fill(proposalA.blockHeader.hash),
+		);
+
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 1, 0);
+		await assertCommitRound(nodes, 1, 2);
+		await assertBlockHash(nodes, 1, proposalA.blockHeader.hash);
+	});
 });
