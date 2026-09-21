@@ -31,6 +31,7 @@ describe<{
 		};
 		context.commitState = {
 			getProcessorResult: () => ({ success: true }),
+			hasProcessorResult: () => true,
 		};
 		context.commitStateFactory = stubFn().callsFake(() => context.commitState);
 		context.aggregator = { verify: async () => true };
@@ -89,20 +90,14 @@ describe<{
 		assert.equal(await processor.process(makeCommit(1)), Enums.Consensus.ProcessorResult.Invalid);
 	});
 
-	it("#process - should skip, not invalidate, a block that consensus committed while the unit waited on the handler lock", async ({
-		processor,
-		consensus,
-		commitState,
-	}) => {
-		// Live gossip commits block 1 while this unit waits on the handler lock; the stale
-		// unit then fails verification (BlockNotChained). That is a lost race, not evidence
-		// of a bad block — reporting Invalid here makes the downloader ban an honest peer.
-		stub(consensus, "handleCommitState").callsFake(async () => {
-			consensus.getBlockNumber = () => 2;
-			commitState.getProcessorResult = () => ({ success: false });
-		});
+	it("#process - should skip a commit that consensus left without a result", async ({ processor, commitState }) => {
+		// Consensus is disposed, or the block was committed while the unit waited on the handler lock. Either way
+		// the unit was never processed and says nothing about the block, so the peer that sent it is not to blame.
+		commitState.hasProcessorResult = () => false;
+		const getProcessorResult = spy(commitState, "getProcessorResult");
 
 		assert.equal(await processor.process(makeCommit(1)), Enums.Consensus.ProcessorResult.Skipped);
+		getProcessorResult.neverCalled();
 	});
 
 	it("#process - should build the commit state from the commit and hand it to consensus", async ({
