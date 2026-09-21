@@ -211,3 +211,18 @@ export const skipPrevoteInRound = (stub: StubFactory, node: Contracts.Kernel.App
 		stubPrevote.restore();
 	});
 };
+
+export const skipPrecommitInRound = (stub: StubFactory, node: Contracts.Kernel.Application, round: number) => {
+	const consensus = node.get<Consensus>(Identifiers.Consensus.Service);
+	const precommit = consensus.precommit.bind(consensus);
+	const stubPrecommit = stub(consensus, "precommit");
+
+	stubPrecommit.callsFake(async (...arguments_: unknown[]) => {
+		if (consensus.getRound() !== round) {
+			await precommit(arguments_[0] as string | undefined);
+			return;
+		}
+
+		stubPrecommit.restore();
+	});
+};
