@@ -254,4 +254,18 @@ describe<{
 		terminate.calledOnce();
 		terminate.calledWith("Failed to write the consensus store", error);
 	});
+
+	it("should replace the stored records when the stored state names no block", async ({ app, service }) => {
+		// A damaged state must not stop the store from replacing its records with those of the next block.
+		await service.saveMessage(makeMessage(1, 0, 3, Prevote, "stale-prevote"));
+		app.get<{ putSync: (key: string, value: unknown) => void }>(
+			Identifiers.ConsensusStorage.Storage.ConsensusState,
+		).putSync("consensus-state", { blockNumber: "garbage" });
+
+		const restarted = app.resolve(Service);
+		await restarted.saveMessage(makeMessage(1, 0, 4, Prevote, "prevote"));
+
+		assert.undefined(await restarted.getState());
+		assert.equal(await restarted.getMessages(), [Buffer.from("prevote")]);
+	});
 });

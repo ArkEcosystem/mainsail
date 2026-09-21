@@ -155,6 +155,10 @@ export class Consensus implements Contracts.Consensus.Service {
 	}
 
 	protected async applyRules(roundState: Contracts.Consensus.RoundState): Promise<void> {
+		if (roundState.blockNumber !== this.#blockNumber) {
+			return;
+		}
+
 		await this.#processProposal(roundState);
 
 		await this.onProposal(roundState);
@@ -191,7 +195,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	async handleCommitState(commitState: Contracts.Processor.ProcessableUnit): Promise<void> {
 		await this.#handlerLock.runExclusive(async () => {
-			if (this.#isDisposed) {
+			if (this.#isDisposed || commitState.blockNumber !== this.#blockNumber) {
 				return;
 			}
 
@@ -214,6 +218,13 @@ export class Consensus implements Contracts.Consensus.Service {
 		}
 
 		await this.#beginRound();
+
+		if (this.#isDisposed) {
+			return;
+		}
+
+		// A round entered on f+1 messages of it, or on a late precommit timeout, may already hold its proposal
+		await this.applyRules(this.roundStateRepository.getRoundState(this.#blockNumber, this.#round));
 	}
 
 	async #beginRound(): Promise<void> {
@@ -243,7 +254,9 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
-		this.scheduler.scheduleTimeoutBlockPrepare(this.scheduler.getNextBlockTimestamp(this.#roundStartTime));
+		this.scheduler.scheduleTimeoutBlockPrepare(
+			this.scheduler.getNextBlockTimestamp(this.#roundStartTime, this.#round),
+		);
 
 		if (this.pendingCommits.has(this.#blockNumber)) {
 			return;
@@ -505,7 +518,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		);
 	}
 
-	protected async onMinorityWithHigherRound(roundState: Contracts.Processor.ProcessableUnit): Promise<void> {
+	protected async onMinorityWithHigherRound(roundState: Contracts.Consensus.RoundState): Promise<void> {
 		// Tendermint line 55: upon f+1 ⟨∗, h, round, ∗, ∗⟩ with round > r.
 		if (!(roundState.blockNumber === this.#blockNumber && roundState.round > this.#round)) {
 			return;
@@ -645,7 +658,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		const block = await this.blockForger.forgeBlock(
 			roundState.proposer.address,
 			round,
-			this.scheduler.getNextBlockTimestamp(this.#roundStartTime),
+			this.scheduler.getNextBlockTimestamp(this.#roundStartTime, round),
 			await registeredProposer.getRandaoReveal(blockNumber),
 		);
 		this.logger.info(`Created proposal with new block ${this.#getBlockString(block)}`, "consensus");

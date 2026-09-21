@@ -167,6 +167,22 @@ describe<Context>("Bootstrapper", ({ it, assert, beforeEach, stub, spy, each }) 
 		warn.neverCalled();
 	});
 
+	it("#bootstrap - should start at round 0 when the stored state names no block", async ({
+		bootstrapper,
+		roundStateRepository,
+		storage,
+	}) => {
+		// A damaged state must not reach run(); only a state of this very block is restored.
+		stub(storage, "getState").resolvedValue(makeState({ blockNumber: "garbage" as unknown as number }));
+		const getRoundState = spy(roundStateRepository, "getRoundState");
+		const clear = spy(storage, "clear");
+
+		assert.equal(await bootstrapper.bootstrap(), initialState);
+
+		getRoundState.neverCalled();
+		clear.neverCalled();
+	});
+
 	it("#bootstrap - should return the stored state when it references no round", async ({
 		bootstrapper,
 		logger,
