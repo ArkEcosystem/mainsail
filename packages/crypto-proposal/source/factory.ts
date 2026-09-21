@@ -60,6 +60,10 @@ export class Factory implements Contracts.Crypto.ProposalFactory {
 			);
 		}
 
+		if (proposalData.validRound !== undefined && proposalData.validRound >= proposalData.round) {
+			throw new MessageSchemaError("proposal", "validRound must be lower than round");
+		}
+
 		return this.app.resolve<Proposal>(Proposal).initialize({
 			...proposalData,
 			blockHeader,
