@@ -44,10 +44,6 @@ export interface Aggregator {
 	verify(signature: AggregatedSignature, data: Buffer, roundValidators: number): Promise<boolean>;
 }
 
-export interface Verifier {
-	hasValidProposalLockProof(roundState: RoundState): Promise<boolean>;
-}
-
 export interface StateData {
 	readonly blockNumber: number;
 	readonly round: number;
@@ -88,7 +84,7 @@ export interface Bootstrapper {
 }
 
 export interface Scheduler {
-	getNextBlockTimestamp(commitTime: number, round: number): number;
+	getNextBlockTimestamp(roundStartTime: number, round: number): number;
 	scheduleTimeoutBlockPrepare(timestamp: number): boolean;
 	scheduleTimeoutPropose(blockNumber: number, round: number): boolean;
 	scheduleTimeoutPrevote(blockNumber: number, round: number): boolean;

@@ -627,6 +627,39 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal((spyProposalProcess.getCallArgs(0)[0] as { round: number }).round, 1);
 	});
 
+	it("#onTimeoutBlockPrepare - should drop a proposal that finishes forging after dispose", async ({
+		consensus,
+		validatorsRepository,
+		roundStateRepository,
+		validatorSet,
+		proposalProcessor,
+		storage,
+		proposer,
+		forger,
+		block,
+		proposal,
+	}) => {
+		let finishForging: (block: unknown) => void = () => {};
+		stub(forger, "forgeBlock").callsFake(() => new Promise((resolve) => (finishForging = resolve)));
+		stub(roundStateRepository, "getRoundState").returnValue({ hasProposal: () => false, proposer });
+		stub(validatorsRepository, "getValidator").returnValue({
+			getRandaoReveal: async () => "aa".repeat(96),
+			propose: async () => proposal,
+		});
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		const spySaveProposal = spy(storage, "saveProposal");
+		const spyProposalProcess = spy(proposalProcessor, "process");
+
+		await consensus.startRound(0);
+		const timeout = consensus.onTimeoutBlockPrepare();
+
+		await consensus.dispose();
+		finishForging(block);
+		await timeout;
+
+		spySaveProposal.neverCalled();
+		spyProposalProcess.neverCalled();
+	});
 	it("#prepareProposal - should sign for the round the proposal was requested in when the round moves on while forging", async ({
 		consensus,
 		validatorsRepository,
@@ -867,6 +900,23 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
 	});
 
+	it("#onProposal - should return if the proposal has no processor result", async ({
+		consensus,
+		storage,
+		validatorSet,
+		roundState,
+	}) => {
+		// The proposal processor added it after #processProposal looked; its handle() call runs the rules again.
+		const spyGetRoundValidators = spy(validatorSet, "getRoundValidators");
+		const spySaveState = spy(storage, "saveState");
+
+		await consensus.onProposal(roundState);
+
+		spyGetRoundValidators.neverCalled();
+		spySaveState.neverCalled();
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
+	});
+
 	it("#onProposal - should return if not from valid proposer", async ({ consensus }) => {});
 
 	it("#onProposal - broadcast prevote block hash, if block is valid & not locked", async ({
@@ -882,6 +932,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		eventDispatcher,
 	}) => {
 		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue({ success: true });
+		stub(roundState, "hasProcessorResult").returnValue(true);
 
 		const prevote = {
 			blockNumber: 1,
@@ -948,6 +999,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		eventDispatcher,
 	}) => {
 		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue({ success: false });
+		stub(roundState, "hasProcessorResult").returnValue(true);
 
 		const prevote = {
 			blockNumber: 2,
@@ -1005,6 +1057,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		eventDispatcher,
 	}) => {
 		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue({ success: true });
+		stub(roundState, "hasProcessorResult").returnValue(true);
 
 		const prevote = {
 			blockNumber: 2,
@@ -1091,6 +1144,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			...roundState,
 			getProcessorResult: () => ({ success: true }),
 			getProposal: () => otherProposal,
+			hasProcessorResult: () => true,
 			round: 1,
 		} as unknown as Contracts.Consensus.RoundState;
 		await moveToRound(consensus, 1);
@@ -1138,6 +1192,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			...roundState,
 			getProcessorResult: () => ({ success: true }),
 			getProposal: () => sameProposal,
+			hasProcessorResult: () => true,
 			round: 1,
 		} as unknown as Contracts.Consensus.RoundState;
 		await moveToRound(consensus, 1);
@@ -1165,6 +1220,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await startAt(consensus, { round: 1 });
 
 		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue({ success: true });
+		stub(roundState, "hasProcessorResult").returnValue(true);
 
 		const prevote = {
 			blockNumber: 1,
@@ -1265,6 +1321,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			...roundState,
 			getProcessorResult: () => ({ success: true }),
 			getProposal: () => reProposal,
+			hasProcessorResult: () => true,
 			round: 2,
 		} as unknown as Contracts.Consensus.RoundState;
 		await moveToRound(consensus, 2);
@@ -1290,6 +1347,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		await startAt(consensus, { round: 1 });
 
 		const spyGetProcessorResult = stub(roundState, "getProcessorResult").returnValue({ success: true });
+		stub(roundState, "hasProcessorResult").returnValue(true);
 
 		const prevote = {
 			blockNumber: 1,
@@ -1384,6 +1442,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			...roundState,
 			getProcessorResult: () => ({ success: true }),
 			getProposal: () => reProposal,
+			hasProcessorResult: () => true,
 			round: 2,
 		} as unknown as Contracts.Consensus.RoundState;
 		await moveToRound(consensus, 2);
@@ -1438,6 +1497,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			...roundState,
 			getProcessorResult: () => ({ success: true }),
 			getProposal: () => reProposal,
+			hasProcessorResult: () => true,
 			round: 2,
 		} as unknown as Contracts.Consensus.RoundState;
 		await moveToRound(consensus, 2);
@@ -1537,6 +1597,28 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		roundState = { ...roundState, round: 1 };
 		await consensus.onProposalLocked(roundState);
 
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
+	});
+
+	it("#onProposalLocked - should return if the proposal has no processor result", async ({
+		consensus,
+		storage,
+		validatorSet,
+		roundState,
+		proposal,
+	}) => {
+		await startAt(consensus, { round: 1 });
+
+		const spyGetRoundValidators = spy(validatorSet, "getRoundValidators");
+		const spySaveState = spy(storage, "saveState");
+
+		proposal.lockProof = { signature: "1234", validators: [] };
+		proposal.validRound = 0;
+		roundState = { ...roundState, round: 1 };
+		await consensus.onProposalLocked(roundState);
+
+		spyGetRoundValidators.neverCalled();
+		spySaveState.neverCalled();
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
 	});
 
@@ -3310,6 +3392,39 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		spyMessageProcess.neverCalled();
 	});
 
+	it("#handle - should leave a proposal added after the processor check to the next run", async ({
+		consensus,
+		blockProcessor,
+		storage,
+		validatorSet,
+		roundState,
+		proposal,
+	}) => {
+		// The proposal processor adds a proposal without the handler lock. Here it lands in the microtask between
+		// #processProposal and onProposal, so the rules meet a proposal without a processor result.
+		let lookups = 0;
+		roundState.getProposal = () => (lookups++ === 0 ? undefined : proposal);
+		roundState.getProcessorResult = () => {
+			throw new Error("Processor result is undefined.");
+		};
+		roundState.hasMajorityPrevotes = () => false;
+		roundState.hasMajorityPrevotesAny = () => false;
+		roundState.hasMajorityPrevotesNull = () => false;
+		roundState.hasMajorityPrecommitsAny = () => false;
+		roundState.hasMajorityPrecommits = () => false;
+		roundState.hasMajorityPrecommitsWithoutProposal = () => false;
+		roundState.hasMinorityPrevotesOrPrecommits = () => false;
+		const spyProcess = spy(blockProcessor, "process");
+		const spyGetRoundValidators = spy(validatorSet, "getRoundValidators");
+		const spySaveState = spy(storage, "saveState");
+
+		await consensus.handle(roundState);
+
+		spyProcess.neverCalled();
+		spyGetRoundValidators.neverCalled();
+		spySaveState.neverCalled();
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
+	});
 	it("#handleCommitState - should leave a commit state of another block alone", async ({
 		consensus,
 		blockProcessor,

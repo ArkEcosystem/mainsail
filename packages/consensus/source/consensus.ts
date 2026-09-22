@@ -5,13 +5,6 @@ import { inject, injectable } from "@mainsail/container";
 import { ensureError, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 
-const FAILED_PROCESSOR_RESULT: Contracts.Processor.BlockProcessorResult = {
-	feeUsed: 0n,
-	gasUsed: 0,
-	receipts: new Map(),
-	success: false,
-};
-
 @injectable()
 export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.Application.Instance)
@@ -249,7 +242,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.RoundStarted, this.getState());
 
-		// Past the propose step the round has its proposal, or its propose timeout, behind it. .
+		// Past the propose step the round has its proposal, or its propose timeout, behind it.
 		if (this.#step !== Enums.Consensus.Step.Propose) {
 			return;
 		}
@@ -277,8 +270,8 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		// Building the block can outlast the round. startRound then drops the pending proposal or replaces it
 		// with the next round's, so a promise that is no longer the pending one is stale and must not be
-		// submitted, nor clear the one that superseded it.
-		if (this.#proposalPromise !== proposalPromise) {
+		// submitted, nor clear the one that superseded it. Once disposed, the store may already be closed.
+		if (this.#isDisposed || this.#proposalPromise !== proposalPromise) {
 			return;
 		}
 
@@ -310,7 +303,8 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#step === Enums.Consensus.Step.Propose &&
 			this.#isCurrentRoundState(roundState) &&
 			proposal !== undefined &&
-			proposal.validRound === undefined
+			proposal.validRound === undefined &&
+			roundState.hasProcessorResult()
 		)) {
 			return;
 		}
@@ -345,14 +339,15 @@ export class Consensus implements Contracts.Consensus.Service {
 		const proposal = roundState.getProposal();
 
 		// Tendermint line 28: upon ⟨PROPOSAL, h, r, v, vr⟩ from proposer(h, r) and +2/3 ⟨PREVOTE, h, vr, id(v)⟩
-		// while step = propose ∧ 0 ≤ vr < r. The +2/3 prevotes are the lock proof, verified in #processProposal.
+		// while step = propose ∧ 0 ≤ vr < r. The +2/3 prevotes are the lock proof, verified in #processProposal.,
 		if (!(
 			this.#step === Enums.Consensus.Step.Propose &&
 			this.#isCurrentRoundState(roundState) &&
 			proposal !== undefined &&
 			proposal.lockProof !== undefined &&
 			proposal.validRound !== undefined &&
-			proposal.validRound < this.#round
+			proposal.validRound < this.#round &&
+			roundState.hasProcessorResult()
 		)) {
 			return;
 		}
@@ -458,9 +453,10 @@ export class Consensus implements Contracts.Consensus.Service {
 		isRoundState: boolean = true,
 	): Promise<void> {
 		// Tendermint line 49: upon ⟨PROPOSAL, h, r, v, ∗⟩ from proposer(h, r) and +2/3 ⟨PRECOMMIT, h, r, id(v)⟩
-		// while decision[h] = nil. Any round r of the height qualifies, not only the current one; run() replays
-		// the earlier rounds for this. The flag holds until startRound and keeps a round state whose block failed
-		// from being reported again on every further message of the round. A commit state carries no such flag.
+		// while decision[h] = nil. Any round r of the height qualifies, not only the current one: a round state
+		// queued behind the handler lock is handled after the round has moved on. The flag holds until startRound
+		// and keeps a round state whose block failed from being reported again on every further message of the
+		// round. A commit state carries no such flag.
 		if (!(processState.blockNumber === this.#blockNumber && (!isRoundState || !this.#didMajorityPrecommit))) {
 			return;
 		}
@@ -725,7 +721,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				await proposal.deserializePayload();
 
 				if (!(await this.proposalProcessor.hasValidLockProof(proposal))) {
-					roundState.setProcessorResult(FAILED_PROCESSOR_RESULT);
+					roundState.setProcessorResult(this.#failedProcessorResult());
 					return;
 				}
 
@@ -737,7 +733,7 @@ export class Consensus implements Contracts.Consensus.Service {
 					"consensus",
 				);
 
-				roundState.setProcessorResult(FAILED_PROCESSOR_RESULT);
+				roundState.setProcessorResult(this.#failedProcessorResult());
 			}
 		}
 	}
@@ -747,9 +743,18 @@ export class Consensus implements Contracts.Consensus.Service {
 			try {
 				commitState.setProcessorResult(await this.processor.process(commitState));
 			} catch {
-				commitState.setProcessorResult(FAILED_PROCESSOR_RESULT);
+				commitState.setProcessorResult(this.#failedProcessorResult());
 			}
 		}
+	}
+
+	#failedProcessorResult(): Contracts.Processor.BlockProcessorResult {
+		return {
+			feeUsed: 0n,
+			gasUsed: 0,
+			receipts: new Map(),
+			success: false,
+		};
 	}
 
 	// Work nobody waits for: own votes go through the message processor like any peer's, and events fan out

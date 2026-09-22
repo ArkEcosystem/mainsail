@@ -79,7 +79,7 @@ describe<{
 		spyOnGetLastBlock.calledOnce();
 	});
 
-	it("#getNextBlockTimestamp - should return commitTime + blockPrepareTime when it is later", async ({
+	it("#getNextBlockTimestamp - should return roundStartTime + blockPrepareTime when it is later", async ({
 		scheduler,
 	}) => {
 		const spyOnGetLastBlock = stub(store, "getLastBlock").returnValue({

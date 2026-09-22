@@ -41,7 +41,10 @@ describe<{
 	const serializedPrevote = Buffer.from("serialized-prevote");
 	const lockProof = { signature: "cc".repeat(96), validators: [true, true, true, false] };
 
-	const makeProposal = (overrides: Record<string, unknown> = {}): Contracts.Crypto.Proposal => {
+	const makeProposal = (
+		overrides: Record<string, unknown> = {},
+		header: Record<string, unknown> = {},
+	): Contracts.Crypto.Proposal => {
 		const data = {
 			payloadSerialized: "payload",
 			round,
@@ -50,10 +53,12 @@ describe<{
 			validatorIndex: proposerIndex,
 			...overrides,
 		};
+		const blockHeader = { hash: blockHash, number: blockNumber, ...header };
 
 		return {
 			...data,
-			blockHeader: { hash: blockHash, number: blockNumber },
+			blockHeader,
+			serialized: Buffer.from(JSON.stringify({ ...data, blockHash: blockHeader.hash })),
 			toSerializableData: () => data,
 		} as unknown as Contracts.Crypto.Proposal;
 	};
@@ -75,7 +80,7 @@ describe<{
 		};
 		// Rounds are in bounds by default; individual tests move the minimal timestamp into the future.
 		context.timestampCalculator = { calculateMinimalTimestamp: () => Date.now() - 10_000 };
-		context.logger = { debug: () => {}, error: () => {} };
+		context.logger = { debug: () => {}, error: () => {}, warn: () => {} };
 		context.proposalSerializer = { serializeProposalUnsigned: async () => serializedUnsigned };
 		context.messageSerializer = { serializeMessageForSignature: async () => serializedPrevote };
 		context.consensusSignature = { verify: async () => true };
@@ -233,23 +238,32 @@ describe<{
 	it("#process - should reject a proposal with an invalid signature", async ({
 		processor,
 		consensusSignature,
-		roundStateRepository,
+		roundState,
+		storage,
 	}) => {
 		stub(consensusSignature, "verify").resolvedValue(false);
-		const getRoundState = spy(roundStateRepository, "getRoundState");
+		const addProposal = spy(roundState, "addProposal");
+		const saveProposal = spy(storage, "saveProposal");
 
 		assert.equal(await processor.process(makeProposal()), Invalid);
 
-		getRoundState.neverCalled();
+		addProposal.neverCalled();
+		saveProposal.neverCalled();
 	});
 
-	it("#process - should skip a proposal when the round state already has one", async ({
+	it("#process - should skip a proposal when the round state already has one, without verifying it", async ({
 		processor,
 		roundState,
 		broadcaster,
 		consensus,
+		consensusSignature,
+		logger,
 	}) => {
+		const proposal = makeProposal();
 		roundState.hasProposal = () => true;
+		roundState.getProposal = () => proposal;
+		const verify = spy(consensusSignature, "verify");
+		const warn = spy(logger, "warn");
 		const addProposal = spy(roundState, "addProposal");
 		const broadcastProposal = spy(broadcaster, "broadcastProposal");
 		const handle = spy(consensus, "handle");
@@ -257,9 +271,66 @@ describe<{
 		assert.equal(await processor.process(makeProposal()), Skipped);
 		await flushTimers();
 
+		verify.neverCalled();
+		warn.neverCalled();
 		addProposal.neverCalled();
 		broadcastProposal.neverCalled();
 		handle.neverCalled();
+	});
+
+	it("#process - should warn about a conflicting proposal of the same proposer and skip it", async ({
+		processor,
+		roundState,
+		logger,
+	}) => {
+		const existing = makeProposal();
+		const conflicting = makeProposal({}, { hash: "other-hash" });
+		roundState.hasProposal = () => true;
+		roundState.getProposal = () => existing;
+		const warn = spy(logger, "warn");
+		const addProposal = spy(roundState, "addProposal");
+
+		assert.equal(await processor.process(conflicting), Skipped);
+
+		warn.calledOnce();
+		const [text, channel] = warn.getCallArgs(0);
+		assert.equal(text, `Conflicting proposal for ${blockNumber}/${round}. Existing: ${blockHash}, New: other-hash`);
+		assert.equal(channel, "consensus");
+		addProposal.neverCalled();
+	});
+
+	it("#process - should skip a copy added while the signature was verified", async ({
+		processor,
+		roundState,
+		consensusSignature,
+		logger,
+	}) => {
+		const first = makeProposal();
+		const second = makeProposal();
+		let held: Contracts.Crypto.Proposal | undefined;
+		roundState.hasProposal = () => held !== undefined;
+		roundState.getProposal = () => held;
+		roundState.addProposal = (proposal: Contracts.Crypto.Proposal) => {
+			if (held) {
+				throw new Error("Proposal already exists.");
+			}
+			held = proposal;
+		};
+		const releases: ((value: boolean) => void)[] = [];
+		stub(consensusSignature, "verify").callsFake(() => new Promise((resolve) => releases.push(resolve)));
+		const warn = spy(logger, "warn");
+
+		// Both copies pass the duplicate check before either signature comes back.
+		const results = Promise.all([processor.process(first), processor.process(second)]);
+		await new Promise((resolve) => setImmediate(resolve));
+		releases[0](true);
+		await new Promise((resolve) => setImmediate(resolve));
+		releases[1](true);
+
+		assert.equal(await results, [Accepted, Skipped]);
+		assert.equal(held, first);
+		warn.neverCalled();
+		await flushTimers();
 	});
 
 	it("#process - should add, store and broadcast an accepted proposal and handle the round state deferred", async ({
