@@ -28,9 +28,12 @@ type Context = {
 	pendingCommits: any;
 	forger: any;
 	storage: any;
+	configuration: any;
 };
 
 describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each }) => {
+	const tolerance = 100;
+
 	beforeEach((context) => {
 		context.blockProcessor = {
 			commit: () => {},
@@ -139,6 +142,10 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			saveState: async () => {},
 		};
 
+		context.configuration = {
+			getMilestone: () => ({ timeouts: { tolerance } }),
+		};
+
 		context.app = new Application();
 
 		context.app.bind(Identifiers.Processor.BlockProcessor).toConstantValue(context.blockProcessor);
@@ -156,6 +163,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.app.bind(Identifiers.P2P.PendingCommits).toConstantValue(context.pendingCommits);
 		context.app.bind(Identifiers.Forger.Block).toConstantValue(context.forger);
 		context.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(context.storage);
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 
 		context.consensus = context.app.resolve(Consensus);
 	});
@@ -1045,6 +1053,71 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
 	});
 
+	it("#onProposal - broadcast prevote null, if the block timestamp is from the future", async ({
+		consensus,
+		storage,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		block,
+		logger,
+		proposer,
+	}) => {
+		const now = 1_000_000;
+		clock({ now });
+		block.timestamp = now + tolerance + 1;
+		stub(roundState, "getProcessorResult").returnValue({ success: true });
+		stub(roundState, "hasProcessorResult").returnValue(true);
+
+		const validator = {
+			prevote: () => {},
+		};
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue({ blockNumber: 1, round: 0 });
+
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+		const spyLoggerInfo = spy(logger, "info");
+		const spySaveState = spy(storage, "saveState");
+
+		await consensus.onProposal(roundState);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 0);
+		spyLoggerInfo.calledWith(`Prevoting nil for ${1}/${0}/${block.hash}, because its timestamp is from the future`);
+		assert.equal(consensus.getStep(), Enums.Consensus.Step.Prevote);
+		spySaveState.calledOnce();
+	});
+
+	it("#onProposal - broadcast prevote block hash, if the block timestamp is within the tolerance", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		block,
+		proposer,
+	}) => {
+		const now = 1_000_000;
+		clock({ now });
+		block.timestamp = now + tolerance;
+		stub(roundState, "getProcessorResult").returnValue({ success: true });
+		stub(roundState, "hasProcessorResult").returnValue(true);
+
+		const validator = {
+			prevote: () => {},
+		};
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue({ blockNumber: 1, round: 0 });
+
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		await consensus.onProposal(roundState);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 0, block.hash);
+	});
+
 	it("#onProposal - should skip prevote if already prevoted", async ({
 		consensus,
 		validatorSet,
@@ -1278,6 +1351,41 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			step: Enums.Consensus.Step.Prevote,
 			validRound: undefined,
 		});
+	});
+
+	it("#onProposalLocked - broadcast prevote block hash, even if the block timestamp is from the future", async ({
+		consensus,
+		validatorSet,
+		validatorsRepository,
+		roundState,
+		block,
+		proposal,
+		proposer,
+	}) => {
+		await startAt(consensus, { round: 1 });
+
+		// The lock proof shows +2/3 took the block as timely in its round; its timestamp is not judged again.
+		block.timestamp = Date.now() + 60_000;
+		stub(roundState, "getProcessorResult").returnValue({ success: true });
+		stub(roundState, "hasProcessorResult").returnValue(true);
+
+		const validator = {
+			prevote: () => {},
+		};
+		const spyValidatorPrevote = stub(validator, "prevote").resolvedValue({ blockNumber: 1, round: 1 });
+
+		stub(validatorSet, "getRoundValidators").returnValue([proposer]);
+		stub(validatorsRepository, "getValidator").returnValue(validator);
+		stub(validatorSet, "getValidatorIndexByWalletAddress").returnValue(1);
+
+		proposal.lockProof = { signature: "1234", validators: [] };
+		proposal.validRound = 0;
+		roundState = { ...roundState, round: 1 };
+
+		await consensus.onProposalLocked(roundState);
+
+		spyValidatorPrevote.calledOnce();
+		spyValidatorPrevote.calledWith(1, 1, 1, block.hash);
 	});
 
 	it("#onProposalLocked - broadcast prevote block hash, if block is valid and valid round is higher or equal than lockedRound", async ({

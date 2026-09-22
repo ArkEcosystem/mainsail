@@ -68,12 +68,6 @@ export class ExceededGasLimit extends ValidatorException {
 	}
 }
 
-export class FutureBlock extends ValidatorException {
-	public constructor(block: Contracts.Crypto.Block) {
-		super(`Block ${block.hash} timestamp is from future.`);
-	}
-}
-
 export class InvalidRandaoReveal extends ValidatorException {
 	public constructor(block: Contracts.Crypto.Block) {
 		super(`Block ${block.hash} has an invalid randao reveal for proposer ${block.proposer}.`);

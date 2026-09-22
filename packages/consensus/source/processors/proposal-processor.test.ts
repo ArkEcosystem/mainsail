@@ -183,7 +183,7 @@ describe<{
 		getRoundState.calledWith(blockNumber, round + 3);
 	});
 
-	it("#process - should skip a proposal whose round is not in time bounds yet", async ({
+	it("#process - should skip a proposal of a higher round that is not in time bounds yet", async ({
 		processor,
 		proposerCalculator,
 		stateStore,
@@ -194,10 +194,24 @@ describe<{
 		);
 		const getValidatorIndex = spy(proposerCalculator, "getValidatorIndex");
 
-		assert.equal(await processor.process(makeProposal()), Skipped);
+		assert.equal(await processor.process(makeProposal({ round: round + 1 })), Skipped);
 
-		calculateMinimalTimestamp.calledWith(stateStore.getLastBlock(), round);
+		calculateMinimalTimestamp.calledWith(stateStore.getLastBlock(), round + 1);
 		getValidatorIndex.neverCalled();
+	});
+
+	it("#process - should accept a proposal of the current round before its minimal timestamp", async ({
+		processor,
+		timestampCalculator,
+	}) => {
+		const calculateMinimalTimestamp = stub(timestampCalculator, "calculateMinimalTimestamp").returnValue(
+			Date.now() + 60_000,
+		);
+
+		assert.equal(await processor.process(makeProposal()), Accepted);
+		await flushTimers();
+
+		calculateMinimalTimestamp.neverCalled();
 	});
 
 	it("#process - should reject a proposal from the wrong proposer without verifying its signature", async ({

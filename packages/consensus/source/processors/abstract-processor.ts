@@ -37,6 +37,10 @@ export class AbstractProcessor {
 	}
 
 	protected isRoundAheadOfTime(message: { round: number }): boolean {
+		if (message.round <= this.getConsensus().getRound()) {
+			return false;
+		}
+
 		const { tolerance } = this.configuration.getMilestone().timeouts;
 		const earliestTime =
 			this.timestampCalculator.calculateMinimalTimestamp(this.stateStore.getLastBlock(), message.round) -
