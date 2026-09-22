@@ -10,12 +10,6 @@ export class BlockNotChained extends ValidatorException {
 	}
 }
 
-export class BlockNotVerified extends ValidatorException {
-	public constructor(block: Contracts.Crypto.Block, reason: string) {
-		super(`Block ${block.hash} is not verified, because: ${reason}.`);
-	}
-}
-
 export class InvalidTimestamp extends ValidatorException {
 	public constructor(block: Contracts.Crypto.Block) {
 		super(`Block ${block.hash} timestamp is too low.`);
@@ -31,12 +25,6 @@ export class InvalidReward extends ValidatorException {
 export class InvalidBlockVersion extends ValidatorException {
 	public constructor(block: Contracts.Crypto.Block) {
 		super(`Block ${block.hash} has invalid version.`);
-	}
-}
-
-export class MaxTransactionsExceeded extends ValidatorException {
-	public constructor(block: Contracts.Crypto.Block) {
-		super(`Block ${block.hash} has exceeded max transactions limit.`);
 	}
 }
 
@@ -77,18 +65,6 @@ export class InvalidRandaoReveal extends ValidatorException {
 export class InvalidGenerator extends ValidatorException {
 	public constructor(block: Contracts.Crypto.Block, expectedValidator: string) {
 		super(`Block ${block.hash} has invalid generator. Proposer is ${block.proposer} instead ${expectedValidator}.`);
-	}
-}
-
-export class IncompatibleTransactions extends ValidatorException {
-	public constructor(block: Contracts.Crypto.Block) {
-		super(`Block ${block.hash} contains incompatible transaction.`);
-	}
-}
-
-export class InvalidNonce extends ValidatorException {
-	public constructor(block: Contracts.Crypto.Block, sender: string) {
-		super(`Block ${block.hash} contains invalid nonce for sender ${sender}.`);
 	}
 }
 

@@ -1,14 +1,4 @@
-import type { Contracts } from "@mainsail/contracts";
-
 import { Exception } from "./base.js";
-
-export class TooManyTransactionsError extends Exception {
-	public constructor(block: Contracts.Crypto.BlockHeader) {
-		super(
-			`Received block ${block.hash} number ${block.number} contained too many transactions (${block.transactionsCount}).`,
-		);
-	}
-}
 
 export class UnchainedBlockError extends Exception {
 	public constructor(lastHeight: number, nextHeight: number) {
