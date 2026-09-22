@@ -451,9 +451,10 @@ export class Consensus implements Contracts.Consensus.Service {
 		isRoundState: boolean = true,
 	): Promise<void> {
 		// Tendermint line 49: upon ⟨PROPOSAL, h, r, v, ∗⟩ from proposer(h, r) and +2/3 ⟨PRECOMMIT, h, r, id(v)⟩
-		// while decision[h] = nil. Any round r of the height qualifies, not only the current one; run() replays
-		// the earlier rounds for this. The flag holds until startRound and keeps a round state whose block failed
-		// from being reported again on every further message of the round. A commit state carries no such flag.
+		// while decision[h] = nil. Any round r of the height qualifies, not only the current one: a round state
+		// queued behind the handler lock is handled after the round has moved on. The flag holds until startRound
+		// and keeps a round state whose block failed from being reported again on every further message of the
+		// round. A commit state carries no such flag.
 		if (!(processState.blockNumber === this.#blockNumber && (!isRoundState || !this.#didMajorityPrecommit))) {
 			return;
 		}
