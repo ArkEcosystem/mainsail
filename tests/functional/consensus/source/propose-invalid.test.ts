@@ -1,6 +1,6 @@
 import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import type { Contracts } from "@mainsail/contracts";
-import { Identifiers } from "@mainsail/constants";
+import { Enums, Events, Identifiers } from "@mainsail/constants";
 import * as Exceptions from "@mainsail/exceptions";
 import { describe } from "@mainsail/test-runner";
 import { EvmCalls } from "@mainsail/test-transaction-builders";
@@ -68,7 +68,7 @@ describe<{
 	nodes: Node[];
 	validators: Validator[];
 	p2p: P2PRegistry;
-}>("Propose Invalid Block", ({ beforeEach, afterEach, each, assert, stub }) => {
+}>("Propose Invalid Block", ({ beforeEach, afterEach, each, it, assert, stub }) => {
 	const totalNodes = 5;
 
 	beforeEach(async (context) => {
@@ -199,11 +199,6 @@ describe<{
 				Exceptions.InvalidTimestamp,
 			),
 			dataset(
-				"a timestamp in the future",
-				withTimestamp(() => Date.now() + 60_000),
-				Exceptions.FutureBlock,
-			),
-			dataset(
 				"a parent hash that is not the last block",
 				withHeader(() => ({ parentHash: "ff".repeat(32) })),
 				Exceptions.BlockNotChained,
@@ -240,4 +235,65 @@ describe<{
 			),
 		],
 	);
+
+	// A block stamped in the future passes block processing; its timestamp only decides the prevote. Every node
+	// prevotes nil for it in round 0, without reporting an invalid block, and confirms the next proposal.
+	it("should prevote nil for a block with a timestamp in the future, and confirm the next proposal", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
+		stubPropose.callsFake(async () => {
+			stubPropose.restore();
+		});
+
+		const invalidBlocks: unknown[] = [];
+		for (const node of nodes) {
+			node.get<Contracts.Kernel.EventDispatcher>(Identifiers.Services.EventDispatcher.Service).listen(
+				Events.BlockEvent.Invalid,
+				{
+					handle: async (payload) => {
+						invalidBlocks.push(payload);
+					},
+				},
+			);
+		}
+
+		await runMany(nodes);
+
+		const proposal = await makeProposal(node0, validators[0], 1, 0, Date.now() + 60_000);
+		await p2p.broadcastProposal(proposal);
+
+		// Accepted once by every node; the copies the nodes gossip to each other are skipped as duplicates.
+		const acceptedBy = () =>
+			p2p.results.get(proposal).filter((result) => result === Enums.Consensus.ProcessorResult.Accepted).length;
+		await snoozeUntil(() => acceptedBy() === totalNodes);
+		assert.equal(acceptedBy(), totalNodes);
+		assert.false(p2p.results.get(proposal).includes(Enums.Consensus.ProcessorResult.Invalid));
+
+		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === totalNodes);
+
+		assert.equal(p2p.proposals.getMessages(1, 0).length, 1);
+		assert.equal(
+			p2p.prevotes.getMessages(1, 0).map((prevote) => prevote.blockHash),
+			Array.from({ length: totalNodes }).fill(undefined),
+		);
+		assert.equal(
+			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockHash),
+			Array.from({ length: totalNodes }).fill(undefined),
+		);
+
+		await snoozeForBlock(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
+		assert.not.equal((await getLastCommit(nodes[0])).block.hash, proposal.blockHeader.hash);
+		assert.equal(invalidBlocks, []);
+
+		await snoozeForBlock(nodes, 2);
+		await assertBlockNumber(nodes, 2);
+		await assertBlockRound(nodes, 2, 0);
+	});
 });
