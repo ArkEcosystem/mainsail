@@ -58,12 +58,16 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 				return Enums.Consensus.ProcessorResult.Invalid;
 			}
 
+			const roundState = this.roundStateRepo.getRoundState(proposal.blockHeader.number, proposal.round);
+			if (this.#isDuplicateProposal(roundState, proposal)) {
+				return Enums.Consensus.ProcessorResult.Skipped;
+			}
+
 			if (!(await this.#hasValidSignature(proposal))) {
 				return Enums.Consensus.ProcessorResult.Invalid;
 			}
 
-			const roundState = this.roundStateRepo.getRoundState(proposal.blockHeader.number, proposal.round);
-			if (roundState.hasProposal()) {
+			if (this.#isDuplicateProposal(roundState, proposal)) {
 				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
@@ -143,6 +147,22 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		}
 
 		return verified;
+	}
+
+	#isDuplicateProposal(roundState: Contracts.Consensus.RoundState, proposal: Contracts.Crypto.Proposal): boolean {
+		if (!roundState.hasProposal()) {
+			return false;
+		}
+
+		const existingProposal = roundState.getProposal();
+		if (existingProposal && !existingProposal.serialized.equals(proposal.serialized)) {
+			this.logger.warn(
+				`Conflicting proposal for ${proposal.blockHeader.number}/${proposal.round}. Existing: ${existingProposal.blockHeader.hash}, New: ${proposal.blockHeader.hash}`,
+				"consensus",
+			);
+		}
+
+		return true;
 	}
 
 	#hasValidProposer(proposal: Contracts.Crypto.Proposal): boolean {
