@@ -158,7 +158,7 @@ describe<{
 		getRoundState.calledWith(blockNumber, round + 5);
 	});
 
-	it("#process - should skip a message whose round is not in bounds yet", async ({
+	it("#process - should skip a message of a higher round that is not in bounds yet", async ({
 		processor,
 		roundStateRepository,
 		stateStore,
@@ -171,20 +171,33 @@ describe<{
 		const getRoundState = spy(roundStateRepository, "getRoundState");
 		const consensusSignature = spy(worker, "consensusSignature");
 
-		assert.equal(await processor.process(makeMessage()), Skipped);
+		assert.equal(await processor.process(makeMessage({ round: round + 1 })), Skipped);
 
-		calculateMinimalTimestamp.calledWith(stateStore.getLastBlock(), round);
+		calculateMinimalTimestamp.calledWith(stateStore.getLastBlock(), round + 1);
 		getRoundState.neverCalled();
 		consensusSignature.neverCalled();
 	});
 
-	it("#process - should accept a message within the milestone tolerance of the round bounds", async ({
+	it("#process - should accept a message of a higher round within the milestone tolerance of its bounds", async ({
 		processor,
 		timestampCalculator,
 	}) => {
 		stub(timestampCalculator, "calculateMinimalTimestamp").returnValue(Date.now() + tolerance / 2);
 
+		assert.equal(await processor.process(makeMessage({ round: round + 1 })), Accepted);
+	});
+
+	it("#process - should accept a message of the current round before its minimal timestamp", async ({
+		processor,
+		timestampCalculator,
+	}) => {
+		const calculateMinimalTimestamp = stub(timestampCalculator, "calculateMinimalTimestamp").returnValue(
+			Date.now() + 60_000,
+		);
+
 		assert.equal(await processor.process(makeMessage()), Accepted);
+
+		calculateMinimalTimestamp.neverCalled();
 	});
 
 	it("#process - should skip a message the round state already holds", async ({

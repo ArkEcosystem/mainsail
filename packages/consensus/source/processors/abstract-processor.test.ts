@@ -101,7 +101,7 @@ describe<{
 		clock({ now });
 		stub(timestampCalculator, "calculateMinimalTimestamp").returnValue(now - 1);
 
-		assert.false(processor.isAheadOfTime({ round: 1 }));
+		assert.false(processor.isAheadOfTime({ round: 3 }));
 	});
 
 	it("#isRoundAheadOfTime - should tolerate a time drift of just under the milestone tolerance", ({
@@ -113,13 +113,13 @@ describe<{
 		const calculateMinimalTimestamp = stub(timestampCalculator, "calculateMinimalTimestamp");
 
 		// The bound is exclusive: now must be strictly after (minimal timestamp - tolerance). A block stamped at
-		// the minimal timestamp is then never more than the tolerance ahead, which is what the timestamp verifier
-		// allows, so an accepted proposal cannot carry a block the verifier rejects as a future block.
+		// the minimal timestamp is then never more than the tolerance ahead, which is what consensus still takes
+		// as timely, so an accepted proposal of a higher round never carries a block that only earns a nil prevote.
 		calculateMinimalTimestamp.returnValue(now + tolerance - 1);
-		assert.false(processor.isAheadOfTime({ round: 1 }));
+		assert.false(processor.isAheadOfTime({ round: 3 }));
 
 		calculateMinimalTimestamp.returnValue(now + tolerance);
-		assert.true(processor.isAheadOfTime({ round: 1 }));
+		assert.true(processor.isAheadOfTime({ round: 3 }));
 	});
 
 	it("#isRoundAheadOfTime - should take the tolerance from the current milestone", ({
@@ -132,7 +132,7 @@ describe<{
 		const getMilestone = stub(configuration, "getMilestone").returnValue({ timeouts: { tolerance: 5000 } });
 		stub(timestampCalculator, "calculateMinimalTimestamp").returnValue(now + 4999);
 
-		assert.false(processor.isAheadOfTime({ round: 1 }));
+		assert.false(processor.isAheadOfTime({ round: 3 }));
 		getMilestone.calledOnce();
 		getMilestone.calledWith();
 	});
@@ -145,7 +145,24 @@ describe<{
 		clock({ now });
 		stub(timestampCalculator, "calculateMinimalTimestamp").returnValue(now + 60_000);
 
-		assert.true(processor.isAheadOfTime({ round: 1 }));
+		assert.true(processor.isAheadOfTime({ round: 3 }));
+	});
+
+	it("#isRoundAheadOfTime - should never flag the current round, or one already left, whatever the clock says", ({
+		processor,
+		timestampCalculator,
+	}) => {
+		// Round 0 is entered on the commit, long before the earliest time its proposal may carry. A node whose
+		// clock lags would otherwise drop the first messages of the round it is in.
+		const now = 1_000_000;
+		clock({ now });
+		const calculateMinimalTimestamp = stub(timestampCalculator, "calculateMinimalTimestamp").returnValue(
+			now + 60_000,
+		);
+
+		assert.false(processor.isAheadOfTime({ round: 2 }));
+		assert.false(processor.isAheadOfTime({ round: 1 }));
+		calculateMinimalTimestamp.neverCalled();
 	});
 
 	it("#handleRoundState - should log a failing handler instead of letting the rejection escape", async ({
