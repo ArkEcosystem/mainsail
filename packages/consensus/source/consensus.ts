@@ -52,6 +52,9 @@ export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.ConsensusStorage.Service)
 	private readonly storage!: Contracts.ConsensusStorage.Service;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly configuration!: Contracts.Crypto.Configuration;
+
 	#blockNumber = 1;
 	#round = 0;
 	#step: Contracts.Consensus.Step = Enums.Consensus.Step.Propose;
@@ -332,6 +335,18 @@ export class Consensus implements Contracts.Consensus.Service {
 			return;
 		}
 
+		// A block from the future is valid but not timely, and timeliness is judged only here, on a fresh proposal,
+		// as in proposer-based timestamps. Once +2/3 prevote or precommit it, it was timely for at least f+1 correct
+		// validators, so the lock, valid and commit rules take it as it is.
+		if (this.#isFromFuture(proposal.blockHeader)) {
+			this.logger.info(
+				`Prevoting nil for ${this.#getBlockString(proposal.blockHeader)}, because its timestamp is from the future`,
+				"consensus",
+			);
+			await this.prevote();
+			return;
+		}
+
 		await this.prevote(roundState.getProcessorResult().success ? proposal.blockHeader.hash : undefined);
 	}
 
@@ -591,6 +606,10 @@ export class Consensus implements Contracts.Consensus.Service {
 
 	#isCurrentRoundState(roundState: Contracts.Processor.ProcessableUnit): boolean {
 		return roundState.blockNumber === this.#blockNumber && roundState.round === this.#round;
+	}
+
+	#isFromFuture(block: Contracts.Crypto.BlockHeader): boolean {
+		return block.timestamp > dayjs().valueOf() + this.configuration.getMilestone().timeouts.tolerance;
 	}
 
 	public async prepareProposal(roundState: Contracts.Consensus.RoundState): Promise<void> {
