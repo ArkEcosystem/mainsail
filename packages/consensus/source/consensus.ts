@@ -270,8 +270,8 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		// Building the block can outlast the round. startRound then drops the pending proposal or replaces it
 		// with the next round's, so a promise that is no longer the pending one is stale and must not be
-		// submitted, nor clear the one that superseded it.
-		if (this.#proposalPromise !== proposalPromise) {
+		// submitted, nor clear the one that superseded it. Once disposed, the store may already be closed.
+		if (this.#isDisposed || this.#proposalPromise !== proposalPromise) {
 			return;
 		}
 
