@@ -11,7 +11,7 @@ export class TransactionDuplicatesVerifier implements Contracts.Processor.Handle
 		const appliedTransactions: Set<string> = new Set();
 		for (const transaction of block.transactions) {
 			if (appliedTransactions.has(transaction.hash)) {
-				throw new DuplicatedTransaction(unit.getBlock(), transaction.hash);
+				throw new DuplicatedTransaction(block, transaction.hash);
 			}
 
 			appliedTransactions.add(transaction.hash);

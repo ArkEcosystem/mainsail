@@ -16,15 +16,16 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 	private readonly timestampCalculator!: Contracts.BlockchainUtils.TimestampCalculator;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (unit.getBlock().number === this.configuration.getGenesisHeight()) {
+		const block = unit.getBlock();
+
+		if (block.number === this.configuration.getGenesisHeight()) {
 			return;
 		}
 
 		if (
-			unit.getBlock().timestamp <
-			this.timestampCalculator.calculateMinimalTimestamp(this.store.getLastBlock(), unit.getBlock().round)
+			block.timestamp < this.timestampCalculator.calculateMinimalTimestamp(this.store.getLastBlock(), block.round)
 		) {
-			throw new InvalidTimestamp(unit.getBlock());
+			throw new InvalidTimestamp(block);
 		}
 	}
 }

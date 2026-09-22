@@ -24,10 +24,10 @@ export class ChainedVerifier implements Contracts.Processor.Handler {
 				: block.parentHash === "0000000000000000000000000000000000000000000000000000000000000000";
 
 			if (!validPreviousBlock) {
-				throw new BlockNotChained(unit.getBlock());
+				throw new BlockNotChained(block);
 			}
 		} else if (!isBlockChained(this.store.getLastBlock(), block)) {
-			throw new BlockNotChained(unit.getBlock());
+			throw new BlockNotChained(block);
 		}
 	}
 }
