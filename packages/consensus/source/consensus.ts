@@ -249,7 +249,7 @@ export class Consensus implements Contracts.Consensus.Service {
 
 		await this.eventDispatcher.dispatch(Events.ConsensusEvent.RoundStarted, this.getState());
 
-		// Past the propose step the round has its proposal, or its propose timeout, behind it. .
+		// Past the propose step the round has its proposal, or its propose timeout, behind it.
 		if (this.#step !== Enums.Consensus.Step.Propose) {
 			return;
 		}
