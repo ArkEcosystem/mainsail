@@ -2,8 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { FutureBlock, InvalidTimestamp } from "@mainsail/exceptions";
-import dayjs from "dayjs";
+import { InvalidTimestamp } from "@mainsail/exceptions";
 
 @injectable()
 export class TimestampVerifier implements Contracts.Processor.Handler {
@@ -19,10 +18,6 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (unit.getBlock().number === this.configuration.getGenesisHeight()) {
 			return;
-		}
-
-		if (unit.getBlock().timestamp > dayjs().valueOf() + this.configuration.getMilestone().timeouts.tolerance) {
-			throw new FutureBlock(unit.getBlock());
 		}
 
 		if (
