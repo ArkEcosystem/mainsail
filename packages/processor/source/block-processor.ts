@@ -149,7 +149,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 
 		for (const transaction of unit.getBlock().transactions) {
-			void this.#emitTransactionEvents(transaction);
+			void this.#emit(Events.TransactionEvent.Applied, transaction);
 		}
 
 		this.#logBlockCommitted(unit);
@@ -283,14 +283,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		if (block.logsBloom !== logsBloom) {
 			throw new Error(`Logs bloom mismatch! ${block.logsBloom} != ${logsBloom}`);
 		}
-	}
-
-	async #emitTransactionEvents(transaction: Contracts.Crypto.Transaction): Promise<void> {
-		if (this.state.isBootstrap()) {
-			return;
-		}
-
-		void this.#emit(Events.TransactionEvent.Applied, transaction);
 	}
 
 	async #updateRewardsAndVotes(unit: Contracts.Processor.ProcessableUnit) {
