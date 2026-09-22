@@ -99,8 +99,12 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			this.#verifyConsumedAllGas(block, processResult);
 			this.#verifyTotalFee(block, processResult);
 			await this.#updateRewardsAndVotes(unit);
-			await this.#updateValidatorRegistrationFee(unit);
-			await this.#calculateRoundValidators(unit);
+
+			if (this.roundCalculator.isNewRound(block.number + 1)) {
+				await this.#updateValidatorRegistrationFee(unit);
+				await this.#calculateRoundValidators(unit);
+			}
+
 			await this.#verifyStateRoot(block);
 			await this.#verifyLogsBloom(block);
 
@@ -115,8 +119,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	public async commit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (this.apiSync && unit.blockNumber > this.configuration.getGenesisHeight()) {
-			await this.apiSync.flush();
+		const apiSync = this.#shouldSyncApi(unit) ? this.apiSync : undefined;
+
+		if (apiSync) {
+			await apiSync.flush();
 		}
 
 		const commit = await unit.getCommit();
@@ -129,8 +135,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		// Run commit handlers concurrently and surface failures
 		const tasks = [this.txPoolWorker.onCommit(unit), this.evmWorker.onCommit(unit)];
 
-		if (this.apiSync && unit.blockNumber > this.configuration.getGenesisHeight()) {
-			tasks.push(this.apiSync.onCommit(unit));
+		if (apiSync) {
+			tasks.push(apiSync.onCommit(unit));
 		}
 
 		const results = await Promise.allSettled(tasks);
@@ -305,10 +311,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #updateValidatorRegistrationFee(unit: Contracts.Processor.ProcessableUnit) {
-		if (!this.roundCalculator.isNewRound(unit.blockNumber + 1)) {
-			return;
-		}
-
 		const { evmSpec, validatorRegistrationFee } = this.configuration.getMilestone(unit.blockNumber + 1);
 		const block = unit.getBlock();
 
@@ -326,10 +328,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #calculateRoundValidators(unit: Contracts.Processor.ProcessableUnit) {
-		if (!this.roundCalculator.isNewRound(unit.blockNumber + 1)) {
-			return;
-		}
-
 		const { evmSpec, roundValidators } = this.configuration.getMilestone(unit.blockNumber + 1);
 
 		const block = unit.getBlock();
@@ -345,6 +343,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			timestamp: BigInt(block.timestamp),
 			validatorAddress: block.proposer,
 		});
+	}
+
+	#shouldSyncApi(unit: Contracts.Processor.ProcessableUnit): boolean {
+		return this.apiSync !== undefined && unit.blockNumber > this.configuration.getGenesisHeight();
 	}
 
 	async #emit<T>(event: string, data?: T): Promise<void> {
