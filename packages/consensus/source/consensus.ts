@@ -303,7 +303,8 @@ export class Consensus implements Contracts.Consensus.Service {
 			this.#step === Enums.Consensus.Step.Propose &&
 			this.#isCurrentRoundState(roundState) &&
 			proposal !== undefined &&
-			proposal.validRound === undefined
+			proposal.validRound === undefined &&
+			roundState.hasProcessorResult()
 		)) {
 			return;
 		}
@@ -338,14 +339,15 @@ export class Consensus implements Contracts.Consensus.Service {
 		const proposal = roundState.getProposal();
 
 		// Tendermint line 28: upon ⟨PROPOSAL, h, r, v, vr⟩ from proposer(h, r) and +2/3 ⟨PREVOTE, h, vr, id(v)⟩
-		// while step = propose ∧ 0 ≤ vr < r. The +2/3 prevotes are the lock proof, verified in #processProposal.
+		// while step = propose ∧ 0 ≤ vr < r. The +2/3 prevotes are the lock proof, verified in #processProposal.,
 		if (!(
 			this.#step === Enums.Consensus.Step.Propose &&
 			this.#isCurrentRoundState(roundState) &&
 			proposal !== undefined &&
 			proposal.lockProof !== undefined &&
 			proposal.validRound !== undefined &&
-			proposal.validRound < this.#round
+			proposal.validRound < this.#round &&
+			roundState.hasProcessorResult()
 		)) {
 			return;
 		}
