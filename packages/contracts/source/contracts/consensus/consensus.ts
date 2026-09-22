@@ -44,10 +44,6 @@ export interface Aggregator {
 	verify(signature: AggregatedSignature, data: Buffer, roundValidators: number): Promise<boolean>;
 }
 
-export interface Verifier {
-	hasValidProposalLockProof(roundState: RoundState): Promise<boolean>;
-}
-
 export interface StateData {
 	readonly blockNumber: number;
 	readonly round: number;
