@@ -5,13 +5,6 @@ import { inject, injectable } from "@mainsail/container";
 import { ensureError, Lock } from "@mainsail/utils";
 import dayjs from "dayjs";
 
-const FAILED_PROCESSOR_RESULT: Contracts.Processor.BlockProcessorResult = {
-	feeUsed: 0n,
-	gasUsed: 0,
-	receipts: new Map(),
-	success: false,
-};
-
 @injectable()
 export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.Application.Instance)
@@ -725,7 +718,7 @@ export class Consensus implements Contracts.Consensus.Service {
 				await proposal.deserializePayload();
 
 				if (!(await this.proposalProcessor.hasValidLockProof(proposal))) {
-					roundState.setProcessorResult(FAILED_PROCESSOR_RESULT);
+					roundState.setProcessorResult(this.#failedProcessorResult());
 					return;
 				}
 
@@ -737,7 +730,7 @@ export class Consensus implements Contracts.Consensus.Service {
 					"consensus",
 				);
 
-				roundState.setProcessorResult(FAILED_PROCESSOR_RESULT);
+				roundState.setProcessorResult(this.#failedProcessorResult());
 			}
 		}
 	}
@@ -747,9 +740,18 @@ export class Consensus implements Contracts.Consensus.Service {
 			try {
 				commitState.setProcessorResult(await this.processor.process(commitState));
 			} catch {
-				commitState.setProcessorResult(FAILED_PROCESSOR_RESULT);
+				commitState.setProcessorResult(this.#failedProcessorResult());
 			}
 		}
+	}
+
+	#failedProcessorResult(): Contracts.Processor.BlockProcessorResult {
+		return {
+			feeUsed: 0n,
+			gasUsed: 0,
+			receipts: new Map(),
+			success: false,
+		};
 	}
 
 	// Work nobody waits for: own votes go through the message processor like any peer's, and events fan out
