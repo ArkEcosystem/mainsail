@@ -111,7 +111,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			processResult.success = true;
 		} catch (rawError) {
 			const error = ensureError(rawError);
-			void this.#emit(Events.BlockEvent.Invalid, { block: unit.getBlock().toData(), error });
+			this.#emit(Events.BlockEvent.Invalid, { block: unit.getBlock().toData(), error });
 			this.logger.error(`Cannot process block because: ${error.message}`, "consensus");
 		}
 
@@ -149,13 +149,13 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 
 		for (const transaction of unit.getBlock().transactions) {
-			void this.#emit(Events.TransactionEvent.Applied, transaction);
+			this.#emit(Events.TransactionEvent.Applied, transaction);
 		}
 
 		this.#logBlockCommitted(unit);
 		this.#logNewRound(unit);
 
-		void this.#emit(Events.BlockEvent.Applied, commit.block.toData());
+		this.#emit(Events.BlockEvent.Applied, commit.block.toData());
 	}
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {
@@ -341,11 +341,14 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		return this.apiSync !== undefined && unit.blockNumber > this.configuration.getGenesisHeight();
 	}
 
-	async #emit<T>(event: string, data?: T): Promise<void> {
+	#emit<T>(event: string, data?: T): void {
 		if (this.state.isBootstrap()) {
 			return;
 		}
 
-		return this.events.dispatch(event, data);
+		void this.events.dispatch(event, data).catch((rawError) => {
+			const error = ensureError(rawError);
+			this.logger.error(`Dispatching ${event} failed: ${error.stack ?? error.message}`, "consensus");
+		});
 	}
 }
