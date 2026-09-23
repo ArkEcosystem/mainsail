@@ -86,33 +86,7 @@ describe("", ({ assert, it, stub }) => {
 		);
 	});
 
-	it("isBlockChained should not chain when same timestamp", async () => {
-		const parentHash: Partial<Contracts.Crypto.BlockData> = {
-			number: 1,
-			hash: "1",
-			parentHash: undefined,
-			timestamp: 1,
-		};
-
-		const nextBlock: Partial<Contracts.Crypto.BlockData> = {
-			number: 2,
-			hash: "2",
-			parentHash: "1",
-			timestamp: 1,
-		};
-
-		stub(slots, "getSlotNumber").resolvedValueNth(0, 1).resolvedValueNth(1, 1);
-
-		assert.false(
-			await isBlockChained(
-				parentHash as Contracts.Crypto.BlockData,
-				nextBlock as Contracts.Crypto.BlockData,
-				slots as Contracts.Crypto.Slots,
-			),
-		);
-	});
-
-	it("isBlockChained should not chain when lower timestamp", async () => {
+	it("isBlockChained should chain whatever the timestamp, which the timestamp verifier judges", async () => {
 		const parentHash: Partial<Contracts.Crypto.BlockData> = {
 			number: 1,
 			hash: "1",
@@ -120,22 +94,18 @@ describe("", ({ assert, it, stub }) => {
 			timestamp: 2,
 		};
 
-		const nextBlock: Partial<Contracts.Crypto.BlockData> = {
-			number: 2,
-			hash: "2",
-			parentHash: "1",
-			timestamp: 1,
-		};
+		for (const timestamp of [1, 2]) {
+			const nextBlock: Partial<Contracts.Crypto.BlockData> = {
+				number: 2,
+				hash: "2",
+				parentHash: "1",
+				timestamp,
+			};
 
-		stub(slots, "getSlotNumber").resolvedValueNth(0, 2).resolvedValueNth(1, 1);
-
-		assert.false(
-			await isBlockChained(
-				parentHash as Contracts.Crypto.BlockData,
-				nextBlock as Contracts.Crypto.BlockData,
-				slots as Contracts.Crypto.Slots,
-			),
-		);
+			assert.true(
+				await isBlockChained(parentHash as Contracts.Crypto.BlockData, nextBlock as Contracts.Crypto.BlockData),
+			);
+		}
 	});
 
 	it("getBlockNotChainedErrorMessage should throw when blocks are chained", async () => {
@@ -217,60 +187,6 @@ describe("", ({ assert, it, stub }) => {
 				slots as Contracts.Crypto.Slots,
 			),
 			"Block { number: 3, hash: 2, parentHash: 1 } is not chained to the previous block { number: 1, hash: 1 }: number is not plus one",
-		);
-	});
-
-	it("getBlockNotChainedErrorMessage should not chain when same timestamp", async () => {
-		const parentHash = {
-			number: 1,
-			hash: "1",
-			parentHash: undefined,
-			timestamp: 1,
-		};
-
-		const nextBlock = {
-			number: 2,
-			hash: "2",
-			parentHash: "1",
-			timestamp: 1,
-		};
-
-		stub(slots, "getSlotNumber").resolvedValueNth(0, 1).resolvedValueNth(1, 1);
-
-		assert.is(
-			await getBlockNotChainedErrorMessage(
-				parentHash as Contracts.Crypto.BlockData,
-				nextBlock as Contracts.Crypto.BlockData,
-				slots as Contracts.Crypto.Slots,
-			),
-			"Block { number: 2, hash: 2, parentHash: 1 } is not chained to the previous block { number: 1, hash: 1 }: previous timestamp is after current timestamp: 1 VS 1",
-		);
-	});
-
-	it("getBlockNotChainedErrorMessage should not chain when lower timestamp", async () => {
-		const parentHash = {
-			number: 1,
-			hash: "1",
-			parentHash: undefined,
-			timestamp: 2,
-		};
-
-		const nextBlock = {
-			number: 2,
-			hash: "2",
-			parentHash: "1",
-			timestamp: 1,
-		};
-
-		stub(slots, "getSlotNumber").resolvedValueNth(0, 2).resolvedValueNth(1, 1);
-
-		assert.is(
-			await getBlockNotChainedErrorMessage(
-				parentHash as Contracts.Crypto.BlockData,
-				nextBlock as Contracts.Crypto.BlockData,
-				slots as Contracts.Crypto.Slots,
-			),
-			"Block { number: 2, hash: 2, parentHash: 1 } is not chained to the previous block { number: 1, hash: 1 }: previous timestamp is after current timestamp: 2 VS 1",
 		);
 	});
 });

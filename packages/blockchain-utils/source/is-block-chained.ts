@@ -3,7 +3,6 @@ import type { Contracts } from "@mainsail/contracts";
 type BlockChainedDetails = {
 	followsPrevious: boolean;
 	isPlusOne: boolean;
-	isAfterPrevious: boolean;
 	isChained: boolean;
 };
 
@@ -14,11 +13,9 @@ const getBlockChainedDetails = (
 	const followsPrevious: boolean = nextBlock.parentHash === previousBlock.hash;
 	const isPlusOne: boolean = nextBlock.number === previousBlock.number + 1;
 
-	const isAfterPrevious: boolean = previousBlock.timestamp < nextBlock.timestamp;
+	const isChained: boolean = followsPrevious && isPlusOne;
 
-	const isChained: boolean = followsPrevious && isPlusOne && isAfterPrevious;
-
-	return { followsPrevious, isAfterPrevious, isChained, isPlusOne };
+	return { followsPrevious, isChained, isPlusOne };
 };
 
 export const isBlockChained = (
@@ -47,8 +44,6 @@ export const getBlockNotChainedErrorMessage = (
 		messageDetail = `previous block hash mismatch`;
 	} else if (!details.isPlusOne) {
 		messageDetail = `number is not plus one`;
-	} else if (!details.isAfterPrevious) {
-		messageDetail = `previous timestamp is after current timestamp: ${previousBlock.timestamp} VS ${nextBlock.timestamp}`;
 	}
 
 	return `${messagePrefix}: ${messageDetail}`;
