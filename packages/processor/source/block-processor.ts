@@ -69,11 +69,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			await this.evm.prepareNextCommit({
 				blockContext: {
-					commitKey: {
-						blockHash: block.hash,
-						blockNumber: BigInt(block.number),
-						round: BigInt(block.round),
-					},
+					commitKey: this.#commitKey(block),
 					gasLimit: BigInt(milestone.block.maxGasLimit),
 					prevrandao: this.#getPrevrandao(block),
 					timestamp: BigInt(block.timestamp),
@@ -232,6 +228,14 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 	}
 
+	#commitKey(block: Contracts.Crypto.Block): Contracts.Evm.CommitKey {
+		return {
+			blockHash: block.hash,
+			blockNumber: BigInt(block.number),
+			round: BigInt(block.round),
+		};
+	}
+
 	#getPrevrandao(block: Contracts.Crypto.Block): Buffer {
 		if (block.number === this.configuration.getGenesisHeight()) {
 			return Buffer.alloc(32);
@@ -241,14 +245,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #verifyStateRoot(block: Contracts.Crypto.Block): Promise<void> {
-		const stateRoot = await this.evm.stateRoot(
-			{
-				blockHash: block.hash,
-				blockNumber: BigInt(block.number),
-				round: BigInt(block.round),
-			},
-			this.#getPreviousStateRoot(block),
-		);
+		const stateRoot = await this.evm.stateRoot(this.#commitKey(block), this.#getPreviousStateRoot(block));
 
 		if (block.stateRoot !== stateRoot) {
 			throw new InvalidStateRoot(block, stateRoot);
@@ -266,11 +263,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #verifyLogsBloom(block: Contracts.Crypto.Block): Promise<void> {
-		const logsBloom = await this.evm.logsBloom({
-			blockHash: block.hash,
-			blockNumber: BigInt(block.number),
-			round: BigInt(block.round),
-		});
+		const logsBloom = await this.evm.logsBloom(this.#commitKey(block));
 
 		if (block.logsBloom !== logsBloom) {
 			throw new InvalidLogsBloom(block, logsBloom);
@@ -283,11 +276,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		await this.evm.updateRewardsAndVotes({
 			blockReward: BigInt(milestone.reward),
-			commitKey: {
-				blockHash: block.hash,
-				blockNumber: BigInt(block.number),
-				round: BigInt(block.round),
-			},
+			commitKey: this.#commitKey(block),
 			specId: milestone.evmSpec,
 			timestamp: BigInt(block.timestamp),
 			validatorAddress: block.proposer,
@@ -299,11 +288,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const block = unit.getBlock();
 
 		await this.evm.updateValidatorRegistrationFee({
-			commitKey: {
-				blockHash: block.hash,
-				blockNumber: BigInt(block.number),
-				round: BigInt(block.round),
-			},
+			commitKey: this.#commitKey(block),
 			fee: BigInt(validatorRegistrationFee),
 			specId: evmSpec,
 			timestamp: BigInt(block.timestamp),
@@ -317,11 +302,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const block = unit.getBlock();
 
 		await this.evm.calculateRoundValidators({
-			commitKey: {
-				blockHash: block.hash,
-				blockNumber: BigInt(block.number),
-				round: BigInt(block.round),
-			},
+			commitKey: this.#commitKey(block),
 			roundValidators: BigInt(roundValidators),
 			specId: evmSpec,
 			timestamp: BigInt(block.timestamp),
