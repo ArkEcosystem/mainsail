@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { formatCurrency } from "@mainsail/blockchain-utils";
-import { Identifiers, Events } from "@mainsail/constants";
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
@@ -12,7 +12,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	private readonly evm!: Contracts.Evm.Instance;
 
 	@inject(Identifiers.Services.Log.Service)
-	protected readonly logger!: Contracts.Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;

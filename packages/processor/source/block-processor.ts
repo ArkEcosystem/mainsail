@@ -53,7 +53,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
-	protected readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
+	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
