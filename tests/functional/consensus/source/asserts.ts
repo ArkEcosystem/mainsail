@@ -70,8 +70,8 @@ export const assertBlockHash = async (app: Nodes, blockNumber: number, hash?: st
 };
 
 // `invalidBlocks` are the BlockEvent.Invalid payloads collected with snoozeForInvalidBlock, one per node.
-// `expected` is either the exception class a block verifier throws, or a pattern for the message of the plain
-// Error raised deeper in block processing (transaction execution, gas and fee totals, state root).
+// `expected` is either the exception class the block processor or one of its verifiers throws, or a pattern for
+// the message of an error raised deeper in block processing, such as one surfaced by the EVM.
 export const assertInvalidBlock = (
 	invalidBlocks: InvalidBlock[],
 	expected: Contracts.Kernel.Container.Newable<Error> | RegExp,

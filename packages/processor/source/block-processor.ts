@@ -3,6 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { getPrevrandao } from "@mainsail/blockchain-utils";
 import { Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
+import { InvalidFee, InvalidGasUsed, InvalidLogsBloom, InvalidStateRoot } from "@mainsail/exceptions";
 import { ensureError, sleep } from "@mainsail/utils";
 
 @injectable()
@@ -195,7 +196,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		gasUsed: number,
 	): void {
 		if (processorResult.gasUsed + gasUsed > block.gasUsed) {
-			throw new Error("Cannot consume more gas");
+			throw new InvalidGasUsed(block, processorResult.gasUsed + gasUsed);
 		}
 
 		processorResult.gasUsed += gasUsed;
@@ -210,7 +211,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const fee = this.feeCalculator.calculateConsumed(transaction.gasPrice, gasUsed);
 
 		if (processorResult.feeUsed + fee > block.fee) {
-			throw new Error("Cannot consume more fee");
+			throw new InvalidFee(block, processorResult.feeUsed + fee);
 		}
 
 		processorResult.feeUsed += fee;
@@ -221,13 +222,13 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		processorResult: Contracts.Processor.BlockProcessorResult,
 	): void {
 		if (block.gasUsed !== processorResult.gasUsed) {
-			throw new Error(`Block gas ${block.gasUsed} does not match consumed gas ${processorResult.gasUsed}`);
+			throw new InvalidGasUsed(block, processorResult.gasUsed);
 		}
 	}
 
 	#verifyTotalFee(block: Contracts.Crypto.Block, processorResult: Contracts.Processor.BlockProcessorResult): void {
 		if (processorResult.feeUsed !== block.fee) {
-			throw new Error(`Block fee ${block.fee} does not match consumed fee ${processorResult.feeUsed}`);
+			throw new InvalidFee(block, processorResult.feeUsed);
 		}
 	}
 
@@ -250,7 +251,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		);
 
 		if (block.stateRoot !== stateRoot) {
-			throw new Error(`State root mismatch! ${block.stateRoot} != ${stateRoot}`);
+			throw new InvalidStateRoot(block, stateRoot);
 		}
 	}
 
@@ -272,7 +273,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		});
 
 		if (block.logsBloom !== logsBloom) {
-			throw new Error(`Logs bloom mismatch! ${block.logsBloom} != ${logsBloom}`);
+			throw new InvalidLogsBloom(block, logsBloom);
 		}
 	}
 

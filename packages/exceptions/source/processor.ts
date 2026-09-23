@@ -36,6 +36,30 @@ export class InvalidTransactionsLength extends ValidatorException {
 	}
 }
 
+export class InvalidGasUsed extends ValidatorException {
+	public constructor(block: Contracts.Crypto.Block, consumedGas: number) {
+		super(`Block ${block.hash} has invalid gas used. Expected ${block.gasUsed}, but consumed ${consumedGas}.`);
+	}
+}
+
+export class InvalidFee extends ValidatorException {
+	public constructor(block: Contracts.Crypto.Block, consumedFee: bigint) {
+		super(`Block ${block.hash} has invalid fee. Expected ${block.fee}, but consumed ${consumedFee}.`);
+	}
+}
+
+export class InvalidStateRoot extends ValidatorException {
+	public constructor(block: Contracts.Crypto.Block, actualStateRoot: string) {
+		super(`Block ${block.hash} has invalid state root. Expected ${block.stateRoot}, but got ${actualStateRoot}.`);
+	}
+}
+
+export class InvalidLogsBloom extends ValidatorException {
+	public constructor(block: Contracts.Crypto.Block, actualLogsBloom: string) {
+		super(`Block ${block.hash} has invalid logs bloom. Expected ${block.logsBloom}, but got ${actualLogsBloom}.`);
+	}
+}
+
 export class InvalidTransactionsRoot extends ValidatorException {
 	public constructor(block: Contracts.Crypto.Block, actualTransactionRoot: string) {
 		super(
