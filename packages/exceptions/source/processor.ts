@@ -68,6 +68,12 @@ export class InvalidGenerator extends ValidatorException {
 	}
 }
 
+export class InvalidBlockRound extends ValidatorException {
+	public constructor(block: Contracts.Crypto.Block, round: number) {
+		super(`Block ${block.hash} has round ${block.round}, which is ahead of round ${round}.`);
+	}
+}
+
 export class MaxPayloadExceeded extends ValidatorException {
 	public constructor(block: Contracts.Crypto.Block, totalSize: number, maxPayload: number) {
 		super(`Block ${block.hash} payload is too large ${totalSize} > ${maxPayload}.`);

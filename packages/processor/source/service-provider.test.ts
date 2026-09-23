@@ -12,6 +12,7 @@ import {
 	LegacyAttributeVerifier,
 	RandaoVerifier,
 	RewardVerifier,
+	RoundVerifier,
 	SizeVerifier,
 	TimestampVerifier,
 	TransactionDuplicatesVerifier,
@@ -28,6 +29,7 @@ type Context = {
 
 const handlers = [
 	ChainedVerifier,
+	RoundVerifier,
 	SizeVerifier,
 	TimestampVerifier,
 	GeneratorVerifier,

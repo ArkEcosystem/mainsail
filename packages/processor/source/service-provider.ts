@@ -12,6 +12,7 @@ import {
 	LegacyAttributeVerifier,
 	RandaoVerifier,
 	RewardVerifier,
+	RoundVerifier,
 	SizeVerifier,
 	TimestampVerifier,
 	TransactionDuplicatesVerifier,
@@ -27,6 +28,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		for (const handler of [
 			ChainedVerifier,
+			RoundVerifier,
 			SizeVerifier,
 			TimestampVerifier,
 			GeneratorVerifier,
