@@ -93,7 +93,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 				processResult.receipts.set(transaction.hash, receipt);
 
 				this.#consumeGas(block, processResult, Number(receipt.gasUsed));
-				this.#consumeFee(block, processResult, transaction, Number(receipt.gasUsed));
+				this.#consumeFee(block, processResult, transaction, receipt.gasUsed);
 			}
 
 			this.#verifyConsumedAllGas(block, processResult);
@@ -209,9 +209,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		block: Contracts.Crypto.Block,
 		processorResult: Contracts.Processor.BlockProcessorResult,
 		transaction: Contracts.Crypto.BlockTransaction,
-		gasUsed: number,
+		gasUsed: bigint,
 	): void {
-		const fee = this.feeCalculator.calculateConsumed(gasUsed, BigInt(transaction.gasPrice));
+		const fee = this.feeCalculator.calculateConsumed(transaction.gasPrice, gasUsed);
 
 		if (processorResult.feeUsed + fee > block.fee) {
 			throw new Error("Cannot consume more fee");
