@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { getPrevrandao } from "@mainsail/blockchain-utils";
 import { Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import { assert, ensureError, sleep } from "@mainsail/utils";
+import { ensureError, sleep } from "@mainsail/utils";
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
@@ -50,10 +50,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.ApiSync.Service)
 	@optional()
 	private readonly apiSync?: Contracts.ApiSync.Service;
-
-	@inject(Identifiers.Snapshot.Legacy.Importer)
-	@optional()
-	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
 
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	protected readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
@@ -244,33 +240,28 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #verifyStateRoot(block: Contracts.Crypto.Block): Promise<void> {
-		let previousStateRoot;
-		if (block.number === this.configuration.getGenesisHeight()) {
-			// Assume snapshot is present if the previous block points to a non-zero hash
-			if (block.parentHash !== "0000000000000000000000000000000000000000000000000000000000000000") {
-				assert.defined(this.snapshotImporter);
-				assert.defined(this.snapshotImporter.result);
-				previousStateRoot = this.snapshotImporter.snapshotHash;
-			} else {
-				previousStateRoot = "0000000000000000000000000000000000000000000000000000000000000000";
-			}
-		} else {
-			const previousBlock = this.stateStore.getLastBlock();
-			previousStateRoot = previousBlock.stateRoot;
-		}
-
 		const stateRoot = await this.evm.stateRoot(
 			{
 				blockHash: block.hash,
 				blockNumber: BigInt(block.number),
 				round: BigInt(block.round),
 			},
-			previousStateRoot,
+			this.#getPreviousStateRoot(block),
 		);
 
 		if (block.stateRoot !== stateRoot) {
 			throw new Error(`State root mismatch! ${block.stateRoot} != ${stateRoot}`);
 		}
+	}
+
+	#getPreviousStateRoot(block: Contracts.Crypto.Block): string {
+		if (block.number !== this.configuration.getGenesisHeight()) {
+			return this.stateStore.getLastBlock().stateRoot;
+		}
+
+		const { snapshot } = this.configuration.getMilestone(block.number);
+
+		return snapshot?.snapshotHash ?? "0000000000000000000000000000000000000000000000000000000000000000";
 	}
 
 	async #verifyLogsBloom(block: Contracts.Crypto.Block): Promise<void> {
