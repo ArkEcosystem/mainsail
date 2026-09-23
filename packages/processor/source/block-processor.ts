@@ -59,11 +59,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<Contracts.Processor.BlockProcessorResult> {
 		const processResult = { feeUsed: 0n, gasUsed: 0, receipts: new Map(), success: false };
+		const block = unit.getBlock();
 
 		try {
 			await this.verifier.verify(unit);
 
-			const block = unit.getBlock();
 			const milestone = this.configuration.getMilestone(block.number);
 
 			await this.evm.prepareNextCommit({
@@ -107,7 +107,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			processResult.success = true;
 		} catch (rawError) {
 			const error = ensureError(rawError);
-			this.#emit(Events.BlockEvent.Invalid, { block: unit.getBlock().toData(), error });
+			this.#emit(Events.BlockEvent.Invalid, { block: block.toData(), error });
 			this.logger.error(`Cannot process block because: ${error.message}`, "consensus");
 		}
 
