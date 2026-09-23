@@ -13,8 +13,8 @@ export class SizeVerifier implements Contracts.Processor.Handler {
 	private readonly headerSize!: () => number;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const { maxPayload } = this.configuration.getMilestone().block;
 		const block = unit.getBlock();
+		const { maxPayload } = this.configuration.getMilestone(block.number).block;
 
 		const totalSize = this.headerSize() + block.payloadSize;
 		if (totalSize > maxPayload) {

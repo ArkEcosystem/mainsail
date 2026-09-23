@@ -11,7 +11,7 @@ export class RewardVerifier implements Contracts.Processor.Handler {
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const block = unit.getBlock();
-		const reward = this.configuration.getMilestone().reward;
+		const reward = this.configuration.getMilestone(block.number).reward;
 
 		if (block.reward !== BigInt(reward)) {
 			throw new InvalidReward(block, reward);

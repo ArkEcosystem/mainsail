@@ -277,8 +277,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #updateRewardsAndVotes(unit: Contracts.Processor.ProcessableUnit) {
-		const milestone = this.configuration.getMilestone();
 		const block = unit.getBlock();
+		const milestone = this.configuration.getMilestone(block.number);
 
 		await this.evm.updateRewardsAndVotes({
 			blockReward: BigInt(milestone.reward),

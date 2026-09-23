@@ -43,7 +43,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			gasPrice: BigInt(transaction.gasPrice),
 			legacyAddress: transaction.senderLegacyAddress,
 			nonce: transaction.nonce,
-			specId: this.configuration.getMilestone().evmSpec,
+			specId: this.configuration.getMilestone(block.number).evmSpec,
 			to: transaction.to,
 			txHash: transaction.hash,
 			value: transaction.value,

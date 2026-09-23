@@ -17,7 +17,7 @@ export class ChainedVerifier implements Contracts.Processor.Handler {
 		const block = unit.getBlock();
 
 		if (block.number === this.configuration.getGenesisHeight()) {
-			const milestone = this.configuration.getMilestone();
+			const milestone = this.configuration.getMilestone(block.number);
 
 			const validPreviousBlock = milestone.snapshot
 				? block.parentHash === milestone.snapshot.previousGenesisBlockHash
