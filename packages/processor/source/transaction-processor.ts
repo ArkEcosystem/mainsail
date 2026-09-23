@@ -65,15 +65,17 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			return;
 		}
 
+		const event = Events.EvmEvent.TransactionReceipt;
+
 		void this.eventDispatcher
-			.dispatch(Events.EvmEvent.TransactionReceipt, {
+			.dispatch(event, {
 				receipt,
 				sender: transaction.from,
 				transactionId: transaction.hash,
 			})
 			.catch((rawError) => {
 				const error = ensureError(rawError);
-				this.logger.error(error.stack ?? error.message);
+				this.logger.error(`Dispatching ${event} failed: ${error.stack ?? error.message}`, "consensus");
 			});
 	}
 }
