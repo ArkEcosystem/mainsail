@@ -59,7 +59,12 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<Contracts.Processor.BlockProcessorResult> {
-		const processResult = { feeUsed: 0n, gasUsed: 0, receipts: new Map(), success: false };
+		const processResult: Contracts.Processor.BlockProcessorResult = {
+			feeUsed: 0n,
+			gasUsed: 0,
+			receipts: new Map(),
+			success: false,
+		};
 		const block = unit.getBlock();
 
 		try {
