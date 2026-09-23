@@ -91,11 +91,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			this.#verifyConsumedAllGas(block, processResult);
 			this.#verifyTotalFee(block, processResult);
-			await this.#updateRewardsAndVotes(unit);
+			await this.#updateRewardsAndVotes(block);
 
 			if (this.roundCalculator.isNewRound(block.number + 1)) {
-				await this.#updateValidatorRegistrationFee(unit);
-				await this.#calculateRoundValidators(unit);
+				await this.#updateValidatorRegistrationFee(block);
+				await this.#calculateRoundValidators(block);
 			}
 
 			await this.#verifyStateRoot(block);
@@ -141,7 +141,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			throw new AggregateError(failures, "one or more commit handlers failed");
 		}
 
-		for (const transaction of unit.getBlock().transactions) {
+		for (const transaction of commit.block.transactions) {
 			this.#emit(Events.TransactionEvent.Applied, transaction);
 		}
 
@@ -270,8 +270,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 	}
 
-	async #updateRewardsAndVotes(unit: Contracts.Processor.ProcessableUnit) {
-		const block = unit.getBlock();
+	async #updateRewardsAndVotes(block: Contracts.Crypto.Block): Promise<void> {
 		const milestone = this.configuration.getMilestone(block.number);
 
 		await this.evm.updateRewardsAndVotes({
@@ -283,9 +282,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		});
 	}
 
-	async #updateValidatorRegistrationFee(unit: Contracts.Processor.ProcessableUnit) {
-		const { evmSpec, validatorRegistrationFee } = this.configuration.getMilestone(unit.blockNumber + 1);
-		const block = unit.getBlock();
+	async #updateValidatorRegistrationFee(block: Contracts.Crypto.Block): Promise<void> {
+		const { evmSpec, validatorRegistrationFee } = this.configuration.getMilestone(block.number + 1);
 
 		await this.evm.updateValidatorRegistrationFee({
 			commitKey: this.#commitKey(block),
@@ -296,10 +294,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		});
 	}
 
-	async #calculateRoundValidators(unit: Contracts.Processor.ProcessableUnit) {
-		const { evmSpec, roundValidators } = this.configuration.getMilestone(unit.blockNumber + 1);
-
-		const block = unit.getBlock();
+	async #calculateRoundValidators(block: Contracts.Crypto.Block): Promise<void> {
+		const { evmSpec, roundValidators } = this.configuration.getMilestone(block.number + 1);
 
 		await this.evm.calculateRoundValidators({
 			commitKey: this.#commitKey(block),
