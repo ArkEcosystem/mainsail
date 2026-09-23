@@ -4,7 +4,7 @@ import { injectable } from "@mainsail/container";
 import { DuplicatedTransaction } from "@mainsail/exceptions";
 
 @injectable()
-export class TransactionDuplicatesVerifier implements Contracts.Processor.Handler {
+export class TransactionsDuplicatesVerifier implements Contracts.Processor.Handler {
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		const block = unit.getBlock();
 
