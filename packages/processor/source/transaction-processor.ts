@@ -27,10 +27,9 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	async process(
-		unit: Contracts.Processor.ProcessableUnit,
+		block: Contracts.Crypto.Block,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Evm.TransactionReceipt> {
-		const block = unit.getBlock();
 		const { receipt } = await this.evm.process({
 			commitKey: {
 				blockHash: block.hash,
