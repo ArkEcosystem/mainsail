@@ -178,7 +178,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	#logNewRound(unit: Contracts.Processor.ProcessableUnit): void {
-		const blockNumber = unit.getBlock().number;
+		const blockNumber = unit.blockNumber;
 		if (this.roundCalculator.isNewRound(blockNumber + 1)) {
 			const roundInfo = this.roundCalculator.calculateRound(blockNumber + 1);
 
