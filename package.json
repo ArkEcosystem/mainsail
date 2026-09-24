@@ -35,7 +35,7 @@
 		"pg:up": "pnpm run container compose -f docker/local/docker-compose.yml up -d",
 		"prettier": "prettier --write \"./*.{ts,js,json,md}\" \"./packages/**/*.{ts,js,json,md}\"",
 		"prettier:dry": "prettier --check \"./*.{ts,js,json,md}\" \"./packages/**/*.{ts,js,json,md}\"",
-		"references": "node ./scripts/references/update-references.js",
+		"references": "node ./scripts/references/update-references.js && prettier --write \"packages/*/tsconfig.json\"",
 		"release": "lerna run release --concurrency=1",
 		"release:native": "bash ./scripts/publish-evm-native.sh",
 		"setup": "pnpm install && pnpm run build",

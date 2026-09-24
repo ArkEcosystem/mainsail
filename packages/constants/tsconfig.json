@@ -4,10 +4,5 @@
 		"rootDir": "source",
 		"outDir": "distribution"
 	},
-	"include": ["source/**/**.ts"],
-	"references": [
-		{
-			"path": "../utils"
-		}
-	]
+	"include": ["source/**/**.ts"]
 }
