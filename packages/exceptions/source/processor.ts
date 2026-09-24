@@ -5,8 +5,8 @@ import { Exception } from "./base.js";
 export class ValidatorException extends Exception {}
 
 export class BlockNotChained extends ValidatorException {
-	public constructor(block: Contracts.Crypto.Block) {
-		super(`Block ${block.hash} is not chained.`);
+	public constructor(block: Contracts.Crypto.Block, reason: string) {
+		super(`Block ${block.hash} is not chained: ${reason}`);
 	}
 }
 

@@ -1,4 +1,4 @@
-# Mainsail - Crypto wif
+# Mainsail - Blockchain Utils
 
 ![banner](https://raw.githubusercontent.com/ArkEcosystem/mainsail/main/banner.jpeg)
 

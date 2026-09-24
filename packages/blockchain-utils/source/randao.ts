@@ -16,5 +16,5 @@ export const randaoMessage = (genesisBlockHash: string, parentRandaoReveal: stri
 
 export const getPrevrandao = (
 	hashFactory: Contracts.Crypto.HashFactory,
-	previousBlock: Contracts.Crypto.Block,
+	previousBlock: Contracts.Crypto.BlockHeader,
 ): Buffer => hashFactory.keccak256(Buffer.from(previousBlock.randaoReveal, "hex"));

@@ -1,24 +1,20 @@
 import type { Contracts } from "@mainsail/contracts";
 
-type FractionDigit = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20;
-
-function isFractionDigit(n: number): n is FractionDigit {
-	return n >= 0 && n <= 20 && Number.isInteger(n);
-}
-
 export const formatCurrency = (configuration: Contracts.Crypto.Configuration, amount: bigint): string => {
 	const { decimals, denomination } = configuration.getMilestone().satoshi;
+	const { symbol } = configuration.getNetwork().client;
 
-	if (!isFractionDigit(decimals)) {
-		throw new Error("Invalid decimals");
+	if (denomination <= 0) {
+		throw new Error("Invalid denomination");
 	}
 
-	const localeString = (Number(amount) / denomination).toLocaleString("en", {
-		maximumFractionDigits: decimals,
-		minimumFractionDigits: 0,
-	});
+	const scale = BigInt(denomination);
+	const absolute = amount < 0n ? -amount : amount;
+	const whole = (absolute / scale).toLocaleString("en");
+	const fraction = (absolute % scale).toString().padStart(decimals, "0").replace(/0+$/, "");
 
-	return `${localeString} ${configuration.getNetwork().client.symbol}`;
+	const sign = amount < 0n ? "-" : "";
+	const decimalPart = fraction === "" ? "" : `.${fraction}`;
+
+	return `${sign}${whole}${decimalPart} ${symbol}`;
 };
-
-export const formatNumber = (value: number): string => value.toLocaleString("en");
