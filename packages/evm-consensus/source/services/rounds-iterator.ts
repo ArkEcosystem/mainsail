@@ -17,9 +17,6 @@ interface ConsensusContractValidatorRound {
 
 @injectable()
 export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm.ValidatorRound> {
-	@inject(Identifiers.BlockchainUtils.RoundCalculator)
-	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
-
 	@inject(Identifiers.EvmConsensus.ConsensusContractCaller)
 	private readonly contractCaller!: ConsensusContractCaller;
 
@@ -56,11 +53,8 @@ export class AsyncValidatorRoundsIterator implements AsyncIterable<Contracts.Evm
 		for (const validatorRound of rounds) {
 			const { round, validators } = validatorRound;
 
-			const roundNumber = Number(round);
-
 			validatorRounds.push({
-				round: roundNumber,
-				roundHeight: this.roundCalculator.calculateRoundInfoByRound(roundNumber).roundHeight,
+				round: Number(round),
 				validators: validators.map((validator) => {
 					const { addr: address, voteBalance } = validator;
 
