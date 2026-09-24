@@ -15,6 +15,10 @@ describe("percentile", ({ assert, it }) => {
 			[[5, 1, 9, 3, 7], 90, 7], // unsorted, 90th via floor index -> 7 (not max)
 			[[5, 1, 9, 3, 7], 20, 1], // low percentile -> min after sort
 			[[], 50, 0], // empty array edge case (per implementation)
+			[[1, 2, 3], 100, 3], // upper bound -> max
+			[[1, 2, 3], 150, 3], // p above 100 is clamped -> max
+			[[1, 2, 3], 0, 1], // lower bound -> min
+			[[1, 2, 3], -5, 1], // p below 0 is clamped -> min
 		];
 
 		for (const [values, p, expected] of cases) {

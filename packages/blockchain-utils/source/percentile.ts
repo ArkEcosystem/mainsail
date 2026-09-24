@@ -3,6 +3,8 @@ export const percentile = (values: number[], p: number): number => {
 		return 0;
 	}
 
+	const clampedP = Math.min(100, Math.max(0, p));
+
 	values = [...values].sort((a, b) => a - b);
-	return values[Math.floor((p / 100) * (values.length - 1))];
+	return values[Math.floor((clampedP / 100) * (values.length - 1))];
 };
