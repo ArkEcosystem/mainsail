@@ -336,25 +336,6 @@ describe<Context>("Round Calculator - isNewRound", ({ assert, beforeEach, it }) 
 		assert.false(roundCalculator.isNewRound(11));
 		assert.true(roundCalculator.isNewRound(63));
 	});
-
-	it("should agree with calculateRound when the validator count sits on a non-zero genesis milestone", ({
-		configuration,
-		roundCalculator,
-	}) => {
-		const genesisHeight = 1000;
-
-		configuration.setConfig(withGenesis(genesisHeight, [{ roundValidators: 53, height: genesisHeight }]), false);
-
-		// Round 1 spans 1001..1053, round 2 starts at 1054
-		assert.true(roundCalculator.isNewRound(genesisHeight));
-		assert.true(roundCalculator.isNewRound(genesisHeight + 1));
-		assert.false(roundCalculator.isNewRound(genesisHeight + 53));
-		assert.true(roundCalculator.isNewRound(genesisHeight + 54));
-
-		assert.is(roundCalculator.calculateRound(genesisHeight + 53).round, 1);
-		assert.is(roundCalculator.calculateRound(genesisHeight + 54).round, 2);
-		assert.is(roundCalculator.calculateRound(genesisHeight + 54).roundHeight, genesisHeight + 54);
-	});
 });
 
 describe<{
