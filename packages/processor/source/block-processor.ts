@@ -3,7 +3,8 @@ import type { Contracts } from "@mainsail/contracts";
 import { getPrevrandao } from "@mainsail/blockchain-utils";
 import { Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
-import { assert, ensureError, sleep } from "@mainsail/utils";
+import { InvalidFee, InvalidGasUsed, InvalidLogsBloom, InvalidStateRoot } from "@mainsail/exceptions";
+import { ensureError, sleep } from "@mainsail/utils";
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
@@ -51,32 +52,29 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@optional()
 	private readonly apiSync?: Contracts.ApiSync.Service;
 
-	@inject(Identifiers.Snapshot.Legacy.Importer)
-	@optional()
-	private readonly snapshotImporter?: Contracts.Snapshot.LegacyImporter;
-
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
-	protected readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
+	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
 
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	public async process(unit: Contracts.Processor.ProcessableUnit): Promise<Contracts.Processor.BlockProcessorResult> {
-		const processResult = { feeUsed: 0n, gasUsed: 0, receipts: new Map(), success: false };
+		const processResult: Contracts.Processor.BlockProcessorResult = {
+			feeUsed: 0n,
+			gasUsed: 0,
+			receipts: new Map(),
+			success: false,
+		};
+		const block = unit.getBlock();
 
 		try {
 			await this.verifier.verify(unit);
 
-			const block = unit.getBlock();
 			const milestone = this.configuration.getMilestone(block.number);
 
 			await this.evm.prepareNextCommit({
 				blockContext: {
-					commitKey: {
-						blockHash: block.hash,
-						blockNumber: BigInt(block.number),
-						round: BigInt(block.round),
-					},
+					commitKey: this.#commitKey(block),
 					gasLimit: BigInt(milestone.block.maxGasLimit),
 					prevrandao: this.#getPrevrandao(block),
 					timestamp: BigInt(block.timestamp),
@@ -89,25 +87,29 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 					await sleep(0);
 				}
 
-				const receipt = await this.transactionProcessor.process(unit, transaction);
+				const receipt = await this.transactionProcessor.process(block, transaction);
 				processResult.receipts.set(transaction.hash, receipt);
 
 				this.#consumeGas(block, processResult, Number(receipt.gasUsed));
-				this.#consumeFee(block, processResult, transaction, Number(receipt.gasUsed));
+				this.#consumeFee(block, processResult, transaction, receipt.gasUsed);
 			}
 
 			this.#verifyConsumedAllGas(block, processResult);
 			this.#verifyTotalFee(block, processResult);
-			await this.#updateRewardsAndVotes(unit);
-			await this.#updateValidatorRegistrationFee(unit);
-			await this.#calculateRoundValidators(unit);
+			await this.#updateRewardsAndVotes(block);
+
+			if (this.roundCalculator.isNewRound(block.number + 1)) {
+				await this.#updateValidatorRegistrationFee(block);
+				await this.#calculateRoundValidators(block);
+			}
+
 			await this.#verifyStateRoot(block);
 			await this.#verifyLogsBloom(block);
 
 			processResult.success = true;
 		} catch (rawError) {
 			const error = ensureError(rawError);
-			void this.#emit(Events.BlockEvent.Invalid, { block: unit.getBlock().toData(), error });
+			this.#emit(Events.BlockEvent.Invalid, { block: block.toData(), error });
 			this.logger.error(`Cannot process block because: ${error.message}`, "consensus");
 		}
 
@@ -115,8 +117,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	public async commit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (this.apiSync && unit.blockNumber > this.configuration.getGenesisHeight()) {
-			await this.apiSync.flush();
+		const apiSync = this.#shouldSyncApi(unit) ? this.apiSync : undefined;
+
+		if (apiSync) {
+			await apiSync.flush();
 		}
 
 		const commit = await unit.getCommit();
@@ -129,8 +133,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		// Run commit handlers concurrently and surface failures
 		const tasks = [this.txPoolWorker.onCommit(unit), this.evmWorker.onCommit(unit)];
 
-		if (this.apiSync && unit.blockNumber > this.configuration.getGenesisHeight()) {
-			tasks.push(this.apiSync.onCommit(unit));
+		if (apiSync) {
+			tasks.push(apiSync.onCommit(unit));
 		}
 
 		const results = await Promise.allSettled(tasks);
@@ -142,14 +146,14 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			throw new AggregateError(failures, "one or more commit handlers failed");
 		}
 
-		for (const transaction of unit.getBlock().transactions) {
-			void this.#emitTransactionEvents(transaction);
+		for (const transaction of commit.block.transactions) {
+			this.#emit(Events.TransactionEvent.Applied, transaction);
 		}
 
 		this.#logBlockCommitted(unit);
 		this.#logNewRound(unit);
 
-		void this.#emit(Events.BlockEvent.Applied, commit.block.toData());
+		this.#emit(Events.BlockEvent.Applied, commit.block.toData());
 	}
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {
@@ -175,7 +179,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	#logNewRound(unit: Contracts.Processor.ProcessableUnit): void {
-		const blockNumber = unit.getBlock().number;
+		const blockNumber = unit.blockNumber;
 		if (this.roundCalculator.isNewRound(blockNumber + 1)) {
 			const roundInfo = this.roundCalculator.calculateRound(blockNumber + 1);
 
@@ -193,7 +197,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		gasUsed: number,
 	): void {
 		if (processorResult.gasUsed + gasUsed > block.gasUsed) {
-			throw new Error("Cannot consume more gas");
+			throw new InvalidGasUsed(block, processorResult.gasUsed + gasUsed);
 		}
 
 		processorResult.gasUsed += gasUsed;
@@ -203,12 +207,12 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		block: Contracts.Crypto.Block,
 		processorResult: Contracts.Processor.BlockProcessorResult,
 		transaction: Contracts.Crypto.BlockTransaction,
-		gasUsed: number,
+		gasUsed: bigint,
 	): void {
-		const fee = this.feeCalculator.calculateConsumed(gasUsed, BigInt(transaction.gasPrice));
+		const fee = this.feeCalculator.calculateConsumed(transaction.gasPrice, gasUsed);
 
 		if (processorResult.feeUsed + fee > block.fee) {
-			throw new Error("Cannot consume more fee");
+			throw new InvalidFee(block, processorResult.feeUsed + fee);
 		}
 
 		processorResult.feeUsed += fee;
@@ -219,14 +223,22 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		processorResult: Contracts.Processor.BlockProcessorResult,
 	): void {
 		if (block.gasUsed !== processorResult.gasUsed) {
-			throw new Error(`Block gas ${block.gasUsed} does not match consumed gas ${processorResult.gasUsed}`);
+			throw new InvalidGasUsed(block, processorResult.gasUsed);
 		}
 	}
 
 	#verifyTotalFee(block: Contracts.Crypto.Block, processorResult: Contracts.Processor.BlockProcessorResult): void {
 		if (processorResult.feeUsed !== block.fee) {
-			throw new Error(`Block fee ${block.fee} does not match consumed fee ${processorResult.feeUsed}`);
+			throw new InvalidFee(block, processorResult.feeUsed);
 		}
+	}
+
+	#commitKey(block: Contracts.Crypto.Block): Contracts.Evm.CommitKey {
+		return {
+			blockHash: block.hash,
+			blockNumber: BigInt(block.number),
+			round: BigInt(block.round),
+		};
 	}
 
 	#getPrevrandao(block: Contracts.Crypto.Block): Buffer {
@@ -238,86 +250,48 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	async #verifyStateRoot(block: Contracts.Crypto.Block): Promise<void> {
-		let previousStateRoot;
-		if (block.number === this.configuration.getGenesisHeight()) {
-			// Assume snapshot is present if the previous block points to a non-zero hash
-			if (block.parentHash !== "0000000000000000000000000000000000000000000000000000000000000000") {
-				assert.defined(this.snapshotImporter);
-				assert.defined(this.snapshotImporter.result);
-				previousStateRoot = this.snapshotImporter.snapshotHash;
-			} else {
-				previousStateRoot = "0000000000000000000000000000000000000000000000000000000000000000";
-			}
-		} else {
-			const previousBlock = this.stateStore.getLastBlock();
-			previousStateRoot = previousBlock.stateRoot;
-		}
-
-		const stateRoot = await this.evm.stateRoot(
-			{
-				blockHash: block.hash,
-				blockNumber: BigInt(block.number),
-				round: BigInt(block.round),
-			},
-			previousStateRoot,
-		);
+		const stateRoot = await this.evm.stateRoot(this.#commitKey(block), this.#getPreviousStateRoot(block));
 
 		if (block.stateRoot !== stateRoot) {
-			throw new Error(`State root mismatch! ${block.stateRoot} != ${stateRoot}`);
+			throw new InvalidStateRoot(block, stateRoot);
 		}
+	}
+
+	#getPreviousStateRoot(block: Contracts.Crypto.Block): string {
+		if (block.number !== this.configuration.getGenesisHeight()) {
+			return this.stateStore.getLastBlock().stateRoot;
+		}
+
+		const { snapshot } = this.configuration.getMilestone(block.number);
+
+		return snapshot?.snapshotHash ?? "0000000000000000000000000000000000000000000000000000000000000000";
 	}
 
 	async #verifyLogsBloom(block: Contracts.Crypto.Block): Promise<void> {
-		const logsBloom = await this.evm.logsBloom({
-			blockHash: block.hash,
-			blockNumber: BigInt(block.number),
-			round: BigInt(block.round),
-		});
+		const logsBloom = await this.evm.logsBloom(this.#commitKey(block));
 
 		if (block.logsBloom !== logsBloom) {
-			throw new Error(`Logs bloom mismatch! ${block.logsBloom} != ${logsBloom}`);
+			throw new InvalidLogsBloom(block, logsBloom);
 		}
 	}
 
-	async #emitTransactionEvents(transaction: Contracts.Crypto.Transaction): Promise<void> {
-		if (this.state.isBootstrap()) {
-			return;
-		}
-
-		void this.#emit(Events.TransactionEvent.Applied, transaction);
-	}
-
-	async #updateRewardsAndVotes(unit: Contracts.Processor.ProcessableUnit) {
-		const milestone = this.configuration.getMilestone();
-		const block = unit.getBlock();
+	async #updateRewardsAndVotes(block: Contracts.Crypto.Block): Promise<void> {
+		const milestone = this.configuration.getMilestone(block.number);
 
 		await this.evm.updateRewardsAndVotes({
 			blockReward: BigInt(milestone.reward),
-			commitKey: {
-				blockHash: block.hash,
-				blockNumber: BigInt(block.number),
-				round: BigInt(block.round),
-			},
+			commitKey: this.#commitKey(block),
 			specId: milestone.evmSpec,
 			timestamp: BigInt(block.timestamp),
 			validatorAddress: block.proposer,
 		});
 	}
 
-	async #updateValidatorRegistrationFee(unit: Contracts.Processor.ProcessableUnit) {
-		if (!this.roundCalculator.isNewRound(unit.blockNumber + 1)) {
-			return;
-		}
-
-		const { evmSpec, validatorRegistrationFee } = this.configuration.getMilestone(unit.blockNumber + 1);
-		const block = unit.getBlock();
+	async #updateValidatorRegistrationFee(block: Contracts.Crypto.Block): Promise<void> {
+		const { evmSpec, validatorRegistrationFee } = this.configuration.getMilestone(block.number + 1);
 
 		await this.evm.updateValidatorRegistrationFee({
-			commitKey: {
-				blockHash: block.hash,
-				blockNumber: BigInt(block.number),
-				round: BigInt(block.round),
-			},
+			commitKey: this.#commitKey(block),
 			fee: BigInt(validatorRegistrationFee),
 			specId: evmSpec,
 			timestamp: BigInt(block.timestamp),
@@ -325,21 +299,11 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		});
 	}
 
-	async #calculateRoundValidators(unit: Contracts.Processor.ProcessableUnit) {
-		if (!this.roundCalculator.isNewRound(unit.blockNumber + 1)) {
-			return;
-		}
-
-		const { evmSpec, roundValidators } = this.configuration.getMilestone(unit.blockNumber + 1);
-
-		const block = unit.getBlock();
+	async #calculateRoundValidators(block: Contracts.Crypto.Block): Promise<void> {
+		const { evmSpec, roundValidators } = this.configuration.getMilestone(block.number + 1);
 
 		await this.evm.calculateRoundValidators({
-			commitKey: {
-				blockHash: block.hash,
-				blockNumber: BigInt(block.number),
-				round: BigInt(block.round),
-			},
+			commitKey: this.#commitKey(block),
 			roundValidators: BigInt(roundValidators),
 			specId: evmSpec,
 			timestamp: BigInt(block.timestamp),
@@ -347,11 +311,18 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		});
 	}
 
-	async #emit<T>(event: string, data?: T): Promise<void> {
+	#shouldSyncApi(unit: Contracts.Processor.ProcessableUnit): boolean {
+		return this.apiSync !== undefined && unit.blockNumber > this.configuration.getGenesisHeight();
+	}
+
+	#emit<T>(event: string, data?: T): void {
 		if (this.state.isBootstrap()) {
 			return;
 		}
 
-		return this.events.dispatch(event, data);
+		void this.events.dispatch(event, data).catch((rawError) => {
+			const error = ensureError(rawError);
+			this.logger.error(`Dispatching ${event} failed: ${error.stack ?? error.message}`, "consensus");
+		});
 	}
 }

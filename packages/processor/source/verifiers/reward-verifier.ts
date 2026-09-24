@@ -10,10 +10,11 @@ export class RewardVerifier implements Contracts.Processor.Handler {
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const reward = this.configuration.getMilestone().reward;
+		const block = unit.getBlock();
+		const reward = this.configuration.getMilestone(block.number).reward;
 
-		if (unit.getBlock().reward !== BigInt(reward)) {
-			throw new InvalidReward(unit.getBlock(), reward);
+		if (block.reward !== BigInt(reward)) {
+			throw new InvalidReward(block, reward);
 		}
 	}
 }

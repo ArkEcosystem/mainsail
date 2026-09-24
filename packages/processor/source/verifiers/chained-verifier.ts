@@ -4,7 +4,6 @@ import { isBlockChained } from "@mainsail/blockchain-utils";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { BlockNotChained } from "@mainsail/exceptions";
-import { assert } from "@mainsail/utils";
 
 @injectable()
 export class ChainedVerifier implements Contracts.Processor.Handler {
@@ -18,22 +17,17 @@ export class ChainedVerifier implements Contracts.Processor.Handler {
 		const block = unit.getBlock();
 
 		if (block.number === this.configuration.getGenesisHeight()) {
-			const milestone = this.configuration.getMilestone();
+			const milestone = this.configuration.getMilestone(block.number);
 
-			let validPreviousBlock = false;
-			if (milestone.snapshot) {
-				assert.defined(milestone.snapshot);
-				validPreviousBlock = block.parentHash === milestone.snapshot.previousGenesisBlockHash;
-			} else {
-				validPreviousBlock =
-					block.parentHash === "0000000000000000000000000000000000000000000000000000000000000000";
-			}
+			const validPreviousBlock = milestone.snapshot
+				? block.parentHash === milestone.snapshot.previousGenesisBlockHash
+				: block.parentHash === "0000000000000000000000000000000000000000000000000000000000000000";
 
 			if (!validPreviousBlock) {
-				throw new BlockNotChained(unit.getBlock());
+				throw new BlockNotChained(block);
 			}
 		} else if (!isBlockChained(this.store.getLastBlock(), block)) {
-			throw new BlockNotChained(unit.getBlock());
+			throw new BlockNotChained(block);
 		}
 	}
 }
