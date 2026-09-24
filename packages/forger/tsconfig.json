@@ -10,13 +10,10 @@
 			"path": "../blockchain-utils"
 		},
 		{
+			"path": "../constants"
+		},
+		{
 			"path": "../container"
-		},
-		{
-			"path": "../contracts"
-		},
-		{
-			"path": "../evm-consensus"
 		},
 		{
 			"path": "../kernel"

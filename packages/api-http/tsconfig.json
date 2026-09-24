@@ -13,10 +13,10 @@
 			"path": "../api-database"
 		},
 		{
-			"path": "../container"
+			"path": "../constants"
 		},
 		{
-			"path": "../contracts"
+			"path": "../container"
 		},
 		{
 			"path": "../evm-contracts"
