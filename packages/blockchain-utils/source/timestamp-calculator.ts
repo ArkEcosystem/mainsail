@@ -20,11 +20,10 @@ export class TimestampCalculator implements Contracts.BlockchainUtils.TimestampC
 
 		const previousRounds = Math.max(0, round - 1);
 
-		return (
-			previousBlock.timestamp +
-			blockTime +
-			round * stageTimeout +
-			(stageTimeoutIncrease * previousRounds * (previousRounds + 1)) / 2
-		);
+		// r * (r + 1) is a product of two consecutive integers and therefore even, so with integer milestone
+		// timeouts the division by 2 is exact. Math.floor only guards the timestamp against a non-integer result.
+		const increases = Math.floor((stageTimeoutIncrease * previousRounds * (previousRounds + 1)) / 2);
+
+		return previousBlock.timestamp + blockTime + round * stageTimeout + increases;
 	}
 }
