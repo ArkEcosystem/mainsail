@@ -4,7 +4,6 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { InvalidMilestoneConfigurationError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
-
 type ValidatorSpan = {
 	startHeight: number;
 	endHeight?: number;
@@ -18,13 +17,7 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	public isNewRound(height: number): boolean {
-		if (height === this.configuration.getGenesisHeight()) {
-			return true;
-		}
-
-		const { roundValidators, startHeight } = this.#getValidatorSpan(height);
-
-		return (height - startHeight) % roundValidators === 0;
+		return this.calculateRound(height).roundHeight === height;
 	}
 
 	public calculateRound(height: number): Contracts.Shared.RoundInfo {
