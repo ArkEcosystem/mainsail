@@ -1,4 +1,4 @@
-name: Linting (Internal)
+name: References (Internal)
 
 on:
     workflow_call:
@@ -7,7 +7,7 @@ on:
                 required: true
         outputs:
             did_commit:
-                description: "Whether a lint fix commit was pushed"
+                description: "Whether a commit with regenerated tsconfig references was pushed"
                 value: ${{ jobs.source.outputs.did_commit }}
 
 permissions:
@@ -17,7 +17,7 @@ jobs:
     circuit-breaker:
         runs-on: ubuntu-latest
         outputs:
-            is_lint_fix: ${{ steps.detect.outputs.is_lint_fix }}
+            is_references_fix: ${{ steps.detect.outputs.is_references_fix }}
         steps:
             - uses: actions/checkout@v7.0.1
               with:
@@ -28,15 +28,15 @@ jobs:
               shell: bash
               run: |
                   msg="$(git log -1 --pretty=%B)"
-                  if grep -Fq '[ci-lint-fix]' <<<"$msg"; then
-                    echo "is_lint_fix=true" >> "$GITHUB_OUTPUT"
+                  if grep -Fq '[ci-references-fix]' <<<"$msg"; then
+                    echo "is_references_fix=true" >> "$GITHUB_OUTPUT"
                   else
-                    echo "is_lint_fix=false" >> "$GITHUB_OUTPUT"
+                    echo "is_references_fix=false" >> "$GITHUB_OUTPUT"
                   fi
 
     source:
         needs: circuit-breaker
-        if: ${{ needs.circuit-breaker.outputs.is_lint_fix != 'true' }}
+        if: ${{ needs.circuit-breaker.outputs.is_references_fix != 'true' }}
         runs-on: ubuntu-latest
         outputs:
             did_commit: ${{ steps.commit.outputs.changes_detected }}
@@ -76,29 +76,14 @@ jobs:
                   key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
                   restore-keys: ${{ runner.os }}-pnpm-
 
-            - name: Install Foundry
-              uses: foundry-rs/foundry-toolchain@v1.9.1
-              with:
-                  version: stable
-
             - name: Install dependencies
               run: pnpm install
 
-            - name: Sort
-              run: pnpm run sort
-
-            - name: Lint
-              run: pnpm run lint
-
-            - name: Prettier
-              run: pnpm run prettier
-
-            - name: Forge Format
-              working-directory: contracts
-              run: |
-                  forge fmt
+            - name: Update references
+              run: pnpm run references
 
             - id: commit
               uses: stefanzweifel/git-auto-commit-action@v7.2.0
               with:
-                  commit_message: "style: resolve style guide violations [ci-lint-fix]"
+                  commit_message: "chore: update tsconfig references [ci-references-fix]"
+                  file_pattern: "packages/*/tsconfig.json"
