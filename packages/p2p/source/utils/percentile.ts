@@ -4,7 +4,7 @@ export const percentile = (values: number[], p: number): number => {
 	}
 
 	const clampedP = Math.min(100, Math.max(0, p));
+	const sorted = [...values].sort((a, b) => a - b);
 
-	values = [...values].sort((a, b) => a - b);
-	return values[Math.floor((clampedP / 100) * (values.length - 1))];
+	return sorted[Math.floor((clampedP * (sorted.length - 1)) / 100)];
 };

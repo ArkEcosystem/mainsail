@@ -1,12 +1,12 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { percentile } from "@mainsail/blockchain-utils";
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { ensureError, groupBy, pluralize, randomNumber, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 import { constants } from "./constants.js";
+import { percentile } from "./utils/index.js";
 
 @injectable()
 export class Service implements Contracts.P2P.Service {
