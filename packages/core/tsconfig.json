@@ -46,10 +46,10 @@
 			"path": "../consensus-storage"
 		},
 		{
-			"path": "../container"
+			"path": "../constants"
 		},
 		{
-			"path": "../contracts"
+			"path": "../container"
 		},
 		{
 			"path": "../crypto-address-base58"
@@ -74,6 +74,12 @@
 		},
 		{
 			"path": "../crypto-messages"
+		},
+		{
+			"path": "../crypto-proposal"
+		},
+		{
+			"path": "../crypto-signature-bls12-381"
 		},
 		{
 			"path": "../crypto-transaction"
@@ -104,6 +110,12 @@
 		},
 		{
 			"path": "../evm-state"
+		},
+		{
+			"path": "../exceptions"
+		},
+		{
+			"path": "../forger"
 		},
 		{
 			"path": "../logger-pino"
