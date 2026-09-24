@@ -5,11 +5,12 @@ import { inject, injectable } from "@mainsail/container";
 import { InvalidMilestoneConfigurationError } from "@mainsail/exceptions";
 import { assert } from "@mainsail/utils";
 
-export interface MilestoneSearchResult {
-	found: boolean;
-	height: number;
-	data: number | null;
-}
+type ValidatorSpan = {
+	startHeight: number;
+	endHeight?: number;
+	startRound: number;
+	roundValidators: number;
+};
 
 @injectable()
 export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculator {
@@ -17,128 +18,78 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	public isNewRound(height: number): boolean {
-		const milestones = this.configuration.getMilestones();
-		const genesisHeight = this.configuration.getGenesisHeight();
-
-		// Since milestones are merged, find the first milestone to introduce the validator count.
-		let milestone;
-		for (let index = milestones.length - 1; index >= 0; index--) {
-			const temporary = milestones[index];
-			if (temporary.height > height) {
-				continue;
-			}
-
-			if (!milestone || temporary.roundValidators === milestone.roundValidators) {
-				milestone = temporary;
-			} else {
-				break;
-			}
+		if (height === this.configuration.getGenesisHeight()) {
+			return true;
 		}
 
-		return height === genesisHeight || (height - Math.max(milestone.height, 1)) % milestone.roundValidators === 0;
+		const { roundValidators, startHeight } = this.#getValidatorSpan(height);
+
+		return (height - startHeight) % roundValidators === 0;
 	}
 
 	public calculateRound(height: number): Contracts.Shared.RoundInfo {
 		const genesisHeight = this.configuration.getGenesisHeight();
-
-		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(genesisHeight, "roundValidators");
-		let roundValidators = this.configuration.getMilestone(genesisHeight).roundValidators;
 
 		// Genesis round requires special treatment
 		if (height === genesisHeight) {
 			return { maxValidators: 0, nextRound: 1, round: 0, roundHeight: genesisHeight };
 		}
 
-		const result: Contracts.Shared.RoundInfo = {
-			maxValidators: 0,
-			nextRound: 0,
-			round: 1,
-			roundHeight: genesisHeight + 1,
+		const { roundValidators, startHeight, startRound } = this.#getValidatorSpan(height);
+
+		const heightsIntoSpan = height - startHeight;
+		const roundsIntoSpan = Math.floor(heightsIntoSpan / roundValidators);
+		const round = startRound + roundsIntoSpan;
+
+		return {
+			maxValidators: roundValidators,
+			// The next block starts a new round when this one is the last block of its round
+			nextRound: (heightsIntoSpan + 1) % roundValidators === 0 ? round + 1 : round,
+			round,
+			roundHeight: startHeight + roundsIntoSpan * roundValidators,
 		};
+	}
 
-		let milestoneHeight = genesisHeight;
+	#getValidatorSpan(height: number): ValidatorSpan {
+		const genesisHeight = this.configuration.getGenesisHeight();
+		if (height < genesisHeight) {
+			throw new Error(`Height ${height} is below the genesis height ${genesisHeight}`);
+		}
 
-		const milestones = this.getMilestonesWhichAffectActiveValidatorCount(this.configuration);
-		for (let index = 0; index < milestones.length - 1; index++) {
-			if (height < nextMilestone.height) {
-				break;
-			}
+		const span = this.#getValidatorSpans().find((span) => span.endHeight === undefined || height <= span.endHeight);
+		assert.defined(span);
 
-			const spanHeight = nextMilestone.height - milestoneHeight - 1;
-			if (milestoneHeight > genesisHeight && spanHeight % roundValidators !== 0) {
+		return span;
+	}
+
+	#getValidatorSpans(): ValidatorSpan[] {
+		const spans: ValidatorSpan[] = [];
+
+		// Round 1 starts right after genesis, the genesis block alone forms round 0
+		let startHeight = this.configuration.getGenesisHeight() + 1;
+		let startRound = 1;
+		let roundValidators = Math.max(1, this.configuration.getMilestone(startHeight).roundValidators);
+		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(startHeight, "roundValidators");
+
+		while (nextMilestone.found) {
+			const spanHeights = nextMilestone.height - startHeight;
+			if (spanHeights % roundValidators !== 0) {
 				throw new InvalidMilestoneConfigurationError(
-					`Bad milestone at height: ${height}. The number of validators can only be changed at the beginning of a new round.`,
+					`Bad milestone at height: ${nextMilestone.height}. The number of validators can only be changed at the beginning of a new round.`,
 				);
 			}
 
-			result.round += spanHeight / Math.max(1, roundValidators);
-			result.roundHeight = nextMilestone.height;
+			spans.push({ endHeight: nextMilestone.height - 1, roundValidators, startHeight, startRound });
+
+			startHeight = nextMilestone.height;
+			startRound += spanHeights / roundValidators;
 			assert.number(nextMilestone.data);
-			result.maxValidators = nextMilestone.data;
-
-			roundValidators = nextMilestone.data;
-			milestoneHeight = nextMilestone.height - 1;
-
-			nextMilestone = this.configuration.getNextMilestoneWithNewKey(nextMilestone.height, "roundValidators");
+			roundValidators = Math.max(1, nextMilestone.data);
+			nextMilestone = this.configuration.getNextMilestoneWithNewKey(startHeight, "roundValidators");
 		}
 
-		const minRoundValidators = Math.max(1, roundValidators);
-		const heightFromLastSpan = height - milestoneHeight - 1;
-		const roundIncrease = Math.floor(heightFromLastSpan / minRoundValidators);
-		const nextRoundIncrease = (heightFromLastSpan + 1) % minRoundValidators === 0 ? 1 : 0;
+		spans.push({ roundValidators, startHeight, startRound });
 
-		result.round += roundIncrease;
-		result.roundHeight += roundIncrease * minRoundValidators;
-		result.nextRound = result.round + nextRoundIncrease;
-		result.maxValidators = minRoundValidators;
-
-		return result;
+		return spans;
 	}
-
-	public calculateRoundInfoByRound(round: number): Contracts.Shared.RoundInfo {
-		// Genesis round requires special treatment
-		if (round === 0) {
-			return { maxValidators: 0, nextRound: 1, round: 0, roundHeight: 0 };
-		}
-
-		const milestones = this.configuration.getMilestones();
-
-		let roundHeight = 1;
-		let maxValidators = 0;
-		for (let index = 1; index < milestones.length - 1; index++) {
-			const milestone = milestones[index];
-			maxValidators = milestone.roundValidators;
-			roundHeight += (round - 1) * milestone.roundValidators;
-		}
-
-		return {
-			maxValidators,
-			nextRound: round,
-			round,
-			roundHeight,
-		};
-	}
-
-	public getMilestonesWhichAffectActiveValidatorCount = (
-		configuration: Contracts.Crypto.Configuration,
-	): Array<MilestoneSearchResult> => {
-		const genesisHeight = this.configuration.getGenesisHeight();
-
-		const milestones: Array<MilestoneSearchResult> = [
-			{
-				data: configuration.getMilestone(genesisHeight).roundValidators,
-				found: true,
-				height: genesisHeight,
-			},
-		];
-
-		let nextMilestone = configuration.getNextMilestoneWithNewKey(genesisHeight, "roundValidators");
-
-		while (nextMilestone.found) {
-			milestones.push(nextMilestone);
-			nextMilestone = configuration.getNextMilestoneWithNewKey(nextMilestone.height, "roundValidators");
-		}
-
-		return milestones;
-	};
 }
