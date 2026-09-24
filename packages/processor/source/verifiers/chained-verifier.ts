@@ -1,9 +1,10 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { isBlockChained } from "@mainsail/blockchain-utils";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { BlockNotChained } from "@mainsail/exceptions";
+
+const ZERO_HASH = "0000000000000000000000000000000000000000000000000000000000000000";
 
 @injectable()
 export class ChainedVerifier implements Contracts.Processor.Handler {
@@ -17,17 +18,36 @@ export class ChainedVerifier implements Contracts.Processor.Handler {
 		const block = unit.getBlock();
 
 		if (block.number === this.configuration.getGenesisHeight()) {
-			const milestone = this.configuration.getMilestone(block.number);
+			this.#verifyGenesis(block);
+			return;
+		}
 
-			const validPreviousBlock = milestone.snapshot
-				? block.parentHash === milestone.snapshot.previousGenesisBlockHash
-				: block.parentHash === "0000000000000000000000000000000000000000000000000000000000000000";
+		const previousBlock = this.store.getLastBlock();
 
-			if (!validPreviousBlock) {
-				throw new BlockNotChained(block);
-			}
-		} else if (!isBlockChained(this.store.getLastBlock(), block)) {
-			throw new BlockNotChained(block);
+		if (block.parentHash !== previousBlock.hash) {
+			throw new BlockNotChained(
+				block,
+				`parent hash ${block.parentHash} does not match previous block hash ${previousBlock.hash}`,
+			);
+		}
+
+		if (block.number !== previousBlock.number + 1) {
+			throw new BlockNotChained(
+				block,
+				`number ${block.number} does not follow previous block number ${previousBlock.number}`,
+			);
+		}
+	}
+
+	#verifyGenesis(block: Contracts.Crypto.Block): void {
+		const { snapshot } = this.configuration.getMilestone(block.number);
+		const expectedParentHash = snapshot ? snapshot.previousGenesisBlockHash : ZERO_HASH;
+
+		if (block.parentHash !== expectedParentHash) {
+			throw new BlockNotChained(
+				block,
+				`genesis parent hash ${block.parentHash} does not match expected ${expectedParentHash}`,
+			);
 		}
 	}
 }
