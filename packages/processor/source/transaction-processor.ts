@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { formatCurrency } from "@mainsail/blockchain-utils";
-import { Identifiers, Events } from "@mainsail/constants";
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
@@ -12,7 +12,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	private readonly evm!: Contracts.Evm.Instance;
 
 	@inject(Identifiers.Services.Log.Service)
-	protected readonly logger!: Contracts.Kernel.Logger;
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
@@ -27,10 +27,9 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	async process(
-		unit: Contracts.Processor.ProcessableUnit,
+		block: Contracts.Crypto.Block,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Evm.TransactionReceipt> {
-		const block = unit.getBlock();
 		const { receipt } = await this.evm.process({
 			commitKey: {
 				blockHash: block.hash,
@@ -43,7 +42,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			gasPrice: BigInt(transaction.gasPrice),
 			legacyAddress: transaction.senderLegacyAddress,
 			nonce: transaction.nonce,
-			specId: this.configuration.getMilestone().evmSpec,
+			specId: this.configuration.getMilestone(block.number).evmSpec,
 			to: transaction.to,
 			txHash: transaction.hash,
 			value: transaction.value,
@@ -65,15 +64,17 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			return;
 		}
 
+		const event = Events.EvmEvent.TransactionReceipt;
+
 		void this.eventDispatcher
-			.dispatch(Events.EvmEvent.TransactionReceipt, {
+			.dispatch(event, {
 				receipt,
 				sender: transaction.from,
 				transactionId: transaction.hash,
 			})
 			.catch((rawError) => {
 				const error = ensureError(rawError);
-				this.logger.error(error.stack ?? error.message);
+				this.logger.error(`Dispatching ${event} failed: ${error.stack ?? error.message}`, "consensus");
 			});
 	}
 }

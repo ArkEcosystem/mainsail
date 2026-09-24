@@ -10,10 +10,11 @@ export class VersionVerifier implements Contracts.Processor.Handler {
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const version = this.configuration.getMilestone().block.version;
+		const block = unit.getBlock();
+		const version = this.configuration.getMilestone(block.number).block.version;
 
-		if (unit.getBlock().version !== version) {
-			throw new InvalidBlockVersion(unit.getBlock());
+		if (block.version !== version) {
+			throw new InvalidBlockVersion(block);
 		}
 	}
 }

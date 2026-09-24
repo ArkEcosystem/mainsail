@@ -13,8 +13,8 @@ export class SizeVerifier implements Contracts.Processor.Handler {
 	private readonly headerSize!: () => number;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		const { maxPayload } = this.configuration.getMilestone().block;
 		const block = unit.getBlock();
+		const { maxPayload } = this.configuration.getMilestone(block.number).block;
 
 		const totalSize = this.headerSize() + block.payloadSize;
 		if (totalSize > maxPayload) {
@@ -26,13 +26,13 @@ export class SizeVerifier implements Contracts.Processor.Handler {
 			throw new InvalidPayloadSize(block, totalSize, actualSize);
 		}
 
-		let totalPayloadLength = block.transactions.length * 4;
+		let totalPayloadSize = block.transactions.length * 4;
 		for (const transaction of block.transactions) {
-			totalPayloadLength += transaction.serialized.byteLength;
+			totalPayloadSize += transaction.serialized.byteLength;
 		}
 
-		if (totalPayloadLength !== block.payloadSize) {
-			throw new InvalidPayloadSize(block, totalSize, totalPayloadLength);
+		if (totalPayloadSize !== block.payloadSize) {
+			throw new InvalidPayloadSize(block, block.payloadSize, totalPayloadSize);
 		}
 	}
 }

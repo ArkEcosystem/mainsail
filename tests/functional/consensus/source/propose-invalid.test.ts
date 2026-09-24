@@ -221,17 +221,17 @@ describe<{
 			dataset(
 				"a gas total that does not match the execution",
 				withHeader(() => ({ gasUsed: 21_000 })),
-				/does not match consumed gas/,
+				Exceptions.InvalidGasUsed,
 			),
 			dataset(
 				"a fee total that does not match the execution",
 				withHeader(() => ({ fee: 1n })),
-				/does not match consumed fee/,
+				Exceptions.InvalidFee,
 			),
 			dataset(
 				"a state root that does not match the execution",
 				withHeader(() => ({ stateRoot: "ff".repeat(32) })),
-				/state root mismatch/i,
+				Exceptions.InvalidStateRoot,
 			),
 		],
 	);
