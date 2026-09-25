@@ -319,7 +319,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function unvote() external {
-        emit Unvoted(msg.sender, _unvote());
+        _unvote();
     }
 
     function updateVoters(address[] calldata voters) external onlyOwner {
@@ -633,7 +633,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         return _activeValidators[index] == addr;
     }
 
-    function _unvote() internal returns (address) {
+    function _unvote() internal {
         Vote storage voter = _voters[msg.sender];
         if (voter.validator == address(0)) {
             revert MissingVote();
@@ -664,7 +664,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
         _votersCount--;
 
-        return validatorAddr;
+        emit Unvoted(msg.sender, validatorAddr);
     }
 
     function _updateVoter(address addr) internal {
