@@ -815,6 +815,96 @@ mod tests {
     }
 
     #[test]
+    fn test_collect_events_counts_reverted_transactions_in_tx_index() {
+        let voter = address!("0000000000000000000000000000000000000001");
+        let validator = address!("0000000000000000000000000000000000000002");
+
+        let genesis_info = GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            deployer_account: address!("0000000000000000000000000000000000000002"),
+            validator_contract: address!("0000000000000000000000000000000000000003"),
+            username_contract: address!("0000000000000000000000000000000000000004"),
+            initial_block_number: 0,
+            initial_supply: U256::from(1_000_000),
+        };
+
+        let voted = Log {
+            address: genesis_info.validator_contract,
+            data: events::Voted { validator, voter }.encode_log_data(),
+        };
+
+        // Block order (= cumulative gas order): success, revert, success. The reverted
+        // transaction emits no event, but still takes its index, so the last one keeps
+        // index 2 like its receipt.
+        let mut results = BTreeMap::<B256, (ExecutionResult, u64)>::new();
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+            (
+                ExecutionResult::Success {
+                    reason: SuccessReason::Stop,
+                    gas: ResultGas::new_with_state_gas(30000, 30000, 0, 0),
+                    logs: vec![voted.clone()],
+                    output: Output::Call(alloy_primitives::Bytes(Bytes::new())),
+                },
+                21000,
+            ),
+        );
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000002"),
+            (
+                ExecutionResult::Revert {
+                    gas: ResultGas::new_with_state_gas(30000, 30000, 0, 0),
+                    logs: vec![voted.clone()],
+                    output: alloy_primitives::Bytes(Bytes::new()),
+                },
+                42000,
+            ),
+        );
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000003"),
+            (
+                ExecutionResult::Success {
+                    reason: SuccessReason::Stop,
+                    gas: ResultGas::new_with_state_gas(30000, 30000, 0, 0),
+                    logs: vec![Log {
+                        address: genesis_info.validator_contract,
+                        data: events::Unvoted { validator, voter }.encode_log_data(),
+                    }],
+                    output: Output::Call(alloy_primitives::Bytes(Bytes::new())),
+                },
+                63000,
+            ),
+        );
+
+        let state = StateCommit {
+            results,
+            ..Default::default()
+        };
+
+        let (_, events) = collect_dirty_accounts_and_events(state, &Some(genesis_info));
+
+        assert_eq!(
+            events,
+            vec![
+                ContractEvent {
+                    tx_hash: b256!(
+                        "0000000000000000000000000000000000000000000000000000000000000001"
+                    ),
+                    tx_index: 0,
+                    data: ContractEventData::Voted { voter, validator },
+                },
+                ContractEvent {
+                    tx_hash: b256!(
+                        "0000000000000000000000000000000000000000000000000000000000000003"
+                    ),
+                    tx_index: 2,
+                    data: ContractEventData::Unvoted { voter, validator },
+                },
+            ]
+        );
+    }
+
+    #[test]
     fn hash_independent_of_change_set_ordering() {
         use crate::{state_changes::StorageChangeset, state_root};
         use revm::{
