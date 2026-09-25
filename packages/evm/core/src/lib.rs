@@ -2,7 +2,7 @@ pub mod account;
 mod bytecode;
 mod compression;
 pub mod db;
-mod events;
+pub mod events;
 pub mod historical;
 pub mod legacy;
 pub mod logger;

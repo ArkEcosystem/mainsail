@@ -265,15 +265,29 @@ describe<{
 		receipt = await getTransactionReceipt(context, tx);
 		assert.defined(receipt);
 		assert.equal(receipt!.status, 1);
+		assert.length(receipt!.logs, 2);
 
-		const decoded = decodeEventLog({
+		// A swap logs the unvote of the previous validator before the vote for the new one.
+		const unvoted = decodeEventLog({
 			abi: ConsensusAbi.abi,
-			eventName: "Voted",
+			eventName: "Unvoted",
 			data: receipt?.logs[0].data as Hex,
 			topics: receipt?.logs[0].topics ?? [],
 		});
 
-		assert.equal(decoded.args, {
+		assert.equal(unvoted.args, {
+			voter: randomWallet.address,
+			validator: randomWallet.address,
+		});
+
+		const voted = decodeEventLog({
+			abi: ConsensusAbi.abi,
+			eventName: "Voted",
+			data: receipt?.logs[1].data as Hex,
+			topics: receipt?.logs[1].topics ?? [],
+		});
+
+		assert.equal(voted.args, {
 			voter: randomWallet.address,
 			validator: validatorAddress,
 		});

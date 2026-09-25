@@ -153,7 +153,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		this.#logBlockCommitted(unit);
 		this.#logNewRound(unit);
 
-		this.#emit(Events.BlockEvent.Applied, commit.block.toData());
+		void this.#emit(Events.BlockEvent.Applied, {
+			...commit.block.toData(),
+			contractEvents: unit.getContractEvents(),
+		});
 	}
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {

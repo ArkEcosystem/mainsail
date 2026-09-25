@@ -259,6 +259,8 @@ contract ConsensusTest is Base {
         // Swap Vote
         vm.startPrank(voterAddr);
         vm.expectEmit(address(consensus));
+        emit ConsensusV1.Unvoted(voterAddr, validatorAddr1);
+        vm.expectEmit(address(consensus));
         emit ConsensusV1.Voted(voterAddr, validatorAddr2);
         consensus.vote(validatorAddr2);
         vm.stopPrank();
