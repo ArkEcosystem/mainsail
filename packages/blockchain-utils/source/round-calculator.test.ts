@@ -1,12 +1,14 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
-import * as Exceptions from "@mainsail/exceptions";
-import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 import { ServiceProvider as CryptoConfigServiceProvider } from "@mainsail/crypto-config";
-import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
+import * as Exceptions from "@mainsail/exceptions";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
+
+import cryptoJson from "../../core/bin/config/devnet/core/crypto.json";
 import { RoundCalculator } from "./round-calculator";
-import { Contracts } from "@mainsail/contracts";
 
 type Context = {
 	app: Application;
@@ -25,45 +27,13 @@ const setup = async (context: Context) => {
 	context.roundCalculator = context.app.resolve<RoundCalculator>(RoundCalculator);
 };
 
-describe<Context>("Round Calculator - calculateRoundInfoByRound", ({ assert, beforeEach, it, stub }) => {
-	beforeEach(setup);
-
-	it("dynamic delegate count - should calculate the correct with dynamic delegate count", ({
-		configuration,
-		roundCalculator,
-	}) => {
-		const milestones = [
-			{ roundValidators: 0, height: 0 },
-			{ roundValidators: 53, height: 1 },
-			{ roundValidators: 53, height: 54 },
-		];
-
-		const config = { ...cryptoJson, milestones };
-		configuration.setConfig(config, false);
-
-		const testVector = [
-			// Round 0
-			{ roundValidators: 0, nextRound: 1, round: 0, roundHeight: 0 },
-			// Round 1
-			{ roundValidators: 53, nextRound: 1, round: 1, roundHeight: 1 },
-			// Round 2
-			{ roundValidators: 53, nextRound: 2, round: 2, roundHeight: 54 },
-			// Round 3
-			{ roundValidators: 53, nextRound: 3, round: 3, roundHeight: 107 },
-		];
-
-		for (const { round, roundHeight, nextRound, roundValidators } of testVector) {
-			const result = roundCalculator.calculateRoundInfoByRound(round);
-			assert.is(result.round, round);
-			assert.is(result.roundHeight, roundHeight);
-			assert.true(roundCalculator.isNewRound(result.roundHeight));
-			assert.is(result.nextRound, nextRound);
-			assert.is(result.maxValidators, roundValidators);
-		}
-	});
+const withGenesis = (genesisHeight: number, milestones: object[]) => ({
+	...cryptoJson,
+	genesisBlock: { ...cryptoJson.genesisBlock, block: { ...cryptoJson.genesisBlock.block, number: genesisHeight } },
+	milestones,
 });
 
-describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it, stub }) => {
+describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it }) => {
 	beforeEach(setup);
 
 	it("static delegate count - should calculate the round when nextRound is the same", ({
@@ -237,78 +207,83 @@ describe<Context>("Round Calculator - calculateRound", ({ assert, beforeEach, it
 		}
 	});
 
-	it("dynamic validator count - should throw if round delegates is not changed on new round", ({
+	it("should not depend on milestones that leave the validator count unchanged", ({
 		configuration,
 		roundCalculator,
 	}) => {
 		const milestones = [
 			{ roundValidators: 0, height: 0 },
-			{ roundValidators: 3, height: 1 },
-			{ roundValidators: 4, height: 4 },
+			{ roundValidators: 53, height: 1 },
+			{ height: 75_600, reward: "1" },
+			{ height: 100_000, reward: "2" },
 		];
 
-		const config = { ...cryptoJson, milestones };
-		configuration.setConfig(config, false);
+		configuration.setConfig({ ...cryptoJson, milestones }, false);
 
-		const stubGetNextMilestoneWithKey = stub(configuration, "getNextMilestoneWithNewKey")
-			// nextMilestone
-			.returnValueNth(0, {
-				data: 3,
-				found: true,
-				height: 1,
-			})
-			// getMilestones
-			.returnValueNth(1, {
-				data: 3,
-				found: true,
-				height: 1,
-			})
-			.returnValueNth(2, {
-				data: 4,
-				found: true,
-				height: 4,
-			})
-			.returnValueNth(3, {
-				data: 4,
-				found: true,
-				height: 4,
-			})
-			.returnValueNth(4, {
-				data: undefined,
-				found: false,
-				height: 8,
-			})
-			.returnValueNth(5, {
-				data: 4,
-				found: true,
-				height: 4,
-			})
-			.returnValueNth(6, {
-				data: undefined,
-				found: false,
-				height: 5,
-			});
+		for (const height of [1, 54, 75_600, 100_000, 100_001]) {
+			const result = roundCalculator.calculateRound(height);
+			assert.is(result.round, Math.floor((height - 1) / 53) + 1);
+			assert.is(result.roundHeight, 1 + (result.round - 1) * 53);
+			assert.is(result.maxValidators, 53);
+		}
+	});
 
-		roundCalculator.calculateRound(1);
+	it("should count rounds from the block after a non-zero genesis", ({ configuration, roundCalculator }) => {
+		const genesisHeight = 1000;
 
-		stubGetNextMilestoneWithKey.reset();
-		roundCalculator.calculateRound(2);
-
-		stubGetNextMilestoneWithKey.reset();
-
-		assert.throws(
-			() => roundCalculator.calculateRound(5),
-			new Exceptions.InvalidMilestoneConfigurationError(
-				"Bad milestone at height: 5. The number of validators can only be changed at the beginning of a new round.",
-			),
+		// Snapshot-like: the validator count is introduced right after genesis
+		configuration.setConfig(
+			withGenesis(genesisHeight, [
+				{ roundValidators: 0, height: genesisHeight },
+				{ roundValidators: 53, height: genesisHeight + 1 },
+			]),
+			false,
 		);
+
+		assert.equal(roundCalculator.calculateRound(genesisHeight), {
+			maxValidators: 0,
+			nextRound: 1,
+			round: 0,
+			roundHeight: genesisHeight,
+		});
+		assert.equal(roundCalculator.calculateRound(genesisHeight + 1), {
+			maxValidators: 53,
+			nextRound: 1,
+			round: 1,
+			roundHeight: genesisHeight + 1,
+		});
+		assert.equal(roundCalculator.calculateRound(genesisHeight + 53), {
+			maxValidators: 53,
+			nextRound: 2,
+			round: 1,
+			roundHeight: genesisHeight + 1,
+		});
+		assert.equal(roundCalculator.calculateRound(genesisHeight + 54), {
+			maxValidators: 53,
+			nextRound: 2,
+			round: 2,
+			roundHeight: genesisHeight + 54,
+		});
+	});
+
+	it("should reject heights below the genesis height", ({ configuration, roundCalculator }) => {
+		configuration.setConfig(
+			withGenesis(1000, [
+				{ roundValidators: 0, height: 1000 },
+				{ roundValidators: 53, height: 1001 },
+			]),
+			false,
+		);
+
+		assert.throws(() => roundCalculator.calculateRound(999), "Height 999 is below the genesis height 1000");
+		assert.throws(() => roundCalculator.isNewRound(999), "Height 999 is below the genesis height 1000");
 	});
 });
 
-describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
+describe<Context>("Round Calculator - isNewRound", ({ assert, beforeEach, it }) => {
 	beforeEach(setup);
 
-	it("should determine the beginning of a new round", ({ configuration, roundCalculator }) => {
+	it("should determine the beginning of a new round", ({ roundCalculator }) => {
 		assert.true(roundCalculator.isNewRound(0));
 		assert.true(roundCalculator.isNewRound(1));
 		assert.false(roundCalculator.isNewRound(2));
@@ -363,29 +338,43 @@ describe<Context>("Round Calculator", ({ assert, beforeEach, it }) => {
 	});
 });
 
-describe<Context>("RoundCalculator - getMilestonesWhichAffectActiveDelegateCount", ({ assert, beforeEach, it }) => {
-	beforeEach(setup);
-
-	it("should return milestones which changes delegate count", ({ configuration, roundCalculator }) => {
-		configuration.setConfig(
-			{
-				...cryptoJson,
-				milestones: [{ roundValidators: 4, height: 1 }],
-			},
-			false,
-		);
-
+describe<{
+	app: Application;
+	roundCalculator: RoundCalculator;
+}>("Round Calculator - misaligned milestones", ({ assert, beforeEach, it }) => {
+	beforeEach((context) => {
+		// A real Configuration rejects such milestones in setConfig, so a stub has to hand them over.
+		// Rounds of 3 start at 1, 4, 7: a change at height 5 falls in the middle of a round.
 		const milestones = [
-			{ roundValidators: 4, height: 0 },
-			{ roundValidators: 4, height: 1 },
-			{ roundValidators: 4, height: 5 },
-			{ roundValidators: 8, height: 9 },
-			{ roundValidators: 8, height: 15 },
+			{ height: 0, roundValidators: 0 },
+			{ height: 1, roundValidators: 3 },
+			{ height: 5, roundValidators: 4 },
 		];
 
-		const config = { ...cryptoJson, milestones };
-		configuration.setConfig({ ...cryptoJson, milestones: milestones }, false);
+		const configuration = {
+			getGenesisHeight: () => 0,
+			getMilestone: (height: number) => [...milestones].reverse().find((milestone) => milestone.height <= height),
+			getNextMilestoneWithNewKey: (previousHeight: number) => {
+				const next = milestones.find((milestone) => milestone.height > previousHeight);
 
-		assert.length(roundCalculator.getMilestonesWhichAffectActiveValidatorCount(configuration), 2);
+				return next
+					? { data: next.roundValidators, found: true, height: next.height }
+					: { data: null, found: false, height: previousHeight };
+			},
+		};
+
+		context.app = new Application();
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(configuration);
+
+		context.roundCalculator = context.app.resolve(RoundCalculator);
+	});
+
+	it("should throw if the validator count changes in the middle of a round", ({ roundCalculator }) => {
+		const expectedError = new Exceptions.InvalidMilestoneConfigurationError(
+			"Bad milestone at height: 5. The number of validators can only be changed at the beginning of a new round.",
+		);
+
+		assert.throws(() => roundCalculator.calculateRound(5), expectedError);
+		assert.throws(() => roundCalculator.isNewRound(5), expectedError);
 	});
 });
