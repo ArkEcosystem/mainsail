@@ -860,18 +860,20 @@ export class Restore {
 			validatorRoundsToIngest = [];
 		};
 
-		for await (const { round, roundHeight, validators } of this.consensusContractService.getValidatorRounds()) {
+		for await (const { round, validators } of this.consensusContractService.getValidatorRounds()) {
+			const validatorRound = validatorRounds[round];
+			assert.defined(validatorRound);
+
+			if (validatorRound.maxValidators !== validators.length) {
+				throw new Error(
+					`mismatch in expected (${validatorRound.maxValidators}) and actual (${validators.length}) validator count`,
+				);
+			}
+
 			const validatorAddresses: string[] = Array.from({ length: validators.length });
 			const votes: string[] = Array.from({ length: validators.length });
 
 			for (let index = 0; index < validators.length; index++) {
-				const validatorRound = validatorRounds[round];
-				if (validatorRound.maxValidators !== validators.length) {
-					throw new Error(
-						`mismatch in expected (${validatorRound.maxValidators}) and actual (${validators.length}) validator count`,
-					);
-				}
-
 				const proposerIndex = this.proposerCalculator.getValidatorIndexFrom(
 					validatorRound.maxValidators,
 					validatorRound.totalRound,
@@ -885,7 +887,7 @@ export class Restore {
 
 			validatorRoundsToIngest.push({
 				round,
-				roundHeight,
+				roundHeight: validatorRound.roundHeight,
 				validators: validatorAddresses,
 				votes,
 			});

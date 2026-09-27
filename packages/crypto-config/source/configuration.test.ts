@@ -333,6 +333,36 @@ describe<{
 		);
 	});
 
+	it("should count rounds from the block after a non-zero genesis when checking validator changes", ({
+		configManager,
+	}) => {
+		// Snapshot configurations start at the chain tip: the genesis milestone has no validators and the first
+		// validator set is introduced one block later, so rounds of 53 start at 1001, 1054, ...
+		const config = {
+			...cryptoJson,
+			genesisBlock: { ...cryptoJson.genesisBlock, block: { ...cryptoJson.genesisBlock.block, number: 1000 } },
+		};
+		const milestones = [
+			{ height: 1000, roundValidators: 0 },
+			{ height: 1001, roundValidators: 53 },
+		];
+
+		assert.throws(
+			() =>
+				configManager.setConfig(
+					{ ...config, milestones: [...milestones, { height: 1053, roundValidators: 54 }] },
+					false,
+				),
+			"Bad milestone at height: 1053. The number of validators can only be changed at the beginning of a new round.",
+		);
+
+		configManager.setConfig(
+			{ ...config, milestones: [...milestones, { height: 1054, roundValidators: 54 }] },
+			false,
+		);
+		assert.equal(configManager.getMilestone(1054).roundValidators, 54);
+	});
+
 	it("getMaxRoundValidators - should return maximum round validators from all milestones", ({ configManager }) => {
 		configManager.setConfig(
 			{

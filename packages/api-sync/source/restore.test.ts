@@ -290,9 +290,7 @@ describe<Ctx>("Restore", ({ it, beforeEach, assert, spy }) => {
 
 		context.logger = { debug: () => {}, debugExtra: () => {}, error: () => {}, info: () => {}, warn: () => {} };
 
-		context.validatorRounds = [
-			{ round: 1, roundHeight: 1, validators: [{ address: PROPOSER, voteBalance: 100n }] },
-		];
+		context.validatorRounds = [{ round: 1, validators: [{ address: PROPOSER, voteBalance: 100n }] }];
 
 		context.consensusContractService = {
 			getAllValidators: async () => [
@@ -640,7 +638,6 @@ describe<Ctx>("Restore", ({ it, beforeEach, assert, spy }) => {
 		context.validatorRounds = [
 			{
 				round: 1,
-				roundHeight: 1,
 				validators: [
 					{ address: PROPOSER, voteBalance: 100n },
 					{ address: "0xother", voteBalance: 50n },

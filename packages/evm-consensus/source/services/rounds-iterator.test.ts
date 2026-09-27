@@ -30,9 +30,6 @@ describe<{
 
 		context.app = new Application();
 		context.app.bind(Identifiers.EvmConsensus.ConsensusContractCaller).toConstantValue(context.caller);
-		context.app.bind(Identifiers.BlockchainUtils.RoundCalculator).toConstantValue({
-			calculateRoundInfoByRound: (round: number) => ({ roundHeight: round * 100 }),
-		});
 
 		context.iterator = context.app.resolve(AsyncValidatorRoundsIterator);
 	});
@@ -44,8 +41,8 @@ describe<{
 		}
 
 		assert.equal(collected, [
-			{ round: 1, roundHeight: 100, validators: [{ address: "0xval1", voteBalance: 5n }] },
-			{ round: 2, roundHeight: 200, validators: [] },
+			{ round: 1, validators: [{ address: "0xval1", voteBalance: 5n }] },
+			{ round: 2, validators: [] },
 		]);
 	});
 
