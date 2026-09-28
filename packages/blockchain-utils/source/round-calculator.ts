@@ -58,10 +58,11 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 	#getValidatorSpans(): ValidatorSpan[] {
 		const spans: ValidatorSpan[] = [];
 
-		// Round 1 starts right after genesis, the genesis block alone forms round 0
+		// The genesis block alone forms round 0. The configuration guarantees that the milestone right after
+		// genesis introduces a positive number of validators and that later changes land on round boundaries.
 		let startHeight = this.configuration.getGenesisHeight() + 1;
 		let startRound = 1;
-		let roundValidators = Math.max(1, this.configuration.getMilestone(startHeight).roundValidators);
+		let { roundValidators } = this.configuration.getMilestone(startHeight);
 		let nextMilestone = this.configuration.getNextMilestoneWithNewKey(startHeight, "roundValidators");
 
 		while (nextMilestone.found) {
@@ -77,7 +78,7 @@ export class RoundCalculator implements Contracts.BlockchainUtils.RoundCalculato
 			startHeight = nextMilestone.height;
 			startRound += spanHeights / roundValidators;
 			assert.number(nextMilestone.data);
-			roundValidators = Math.max(1, nextMilestone.data);
+			roundValidators = nextMilestone.data;
 			nextMilestone = this.configuration.getNextMilestoneWithNewKey(startHeight, "roundValidators");
 		}
 

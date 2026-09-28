@@ -63,9 +63,11 @@ describe<{
 
 						height: 0,
 						reward: "0",
+						roundValidators: 0,
 					},
 					{
 						height: 1,
+						roundValidators: 1,
 						validatorRegistrationFee: "250",
 					},
 				],

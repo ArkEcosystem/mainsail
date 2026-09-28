@@ -101,6 +101,7 @@ export const makeApplication = async (
 				{
 					evmSpec: Enums.Evm.SpecId.OSAKA,
 					height: 0,
+					roundValidators: 0,
 					timeouts: {
 						blockPrepareTime: 4000,
 						blockTime: 8000,
@@ -108,6 +109,10 @@ export const makeApplication = async (
 						stageTimeoutIncrease: 2000,
 						tolerance: 100,
 					},
+				},
+				{
+					height: 1,
+					roundValidators: 1,
 				},
 			],
 		},
