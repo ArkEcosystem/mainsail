@@ -179,16 +179,17 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	#logNewRound(unit: Contracts.Processor.ProcessableUnit): void {
-		const blockNumber = unit.blockNumber;
-		if (this.roundCalculator.isNewRound(blockNumber + 1)) {
-			const roundInfo = this.roundCalculator.calculateRound(blockNumber + 1);
+		const nextBlockNumber = unit.blockNumber + 1;
 
-			if (!this.state.isBootstrap()) {
-				this.logger.debug(
-					`Starting validator round ${roundInfo.round} at block number ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
-				);
-			}
+		if (this.state.isBootstrap() || !this.roundCalculator.isNewRound(nextBlockNumber)) {
+			return;
 		}
+
+		const { maxValidators, round, roundHeight } = this.roundCalculator.calculateRound(nextBlockNumber);
+
+		this.logger.debug(
+			`Starting validator round ${round} at block number ${roundHeight} with ${maxValidators} validators`,
+		);
 	}
 
 	#consumeGas(
