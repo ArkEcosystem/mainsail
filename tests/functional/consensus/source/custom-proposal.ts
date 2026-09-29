@@ -29,7 +29,6 @@ export const makeCustomProposal = async (
 
 	const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
 	const milestone = configuration.getMilestone(blockNumber);
-	const chainId = BigInt(configuration.getNetwork().chainId);
 	const hashFactory = app.get<Contracts.Crypto.HashFactory>(Identifiers.Cryptography.Hash.Factory);
 	const roundCalculator = app.get<Contracts.BlockchainUtils.RoundCalculator>(
 		Identifiers.BlockchainUtils.RoundCalculator,
@@ -65,7 +64,6 @@ export const makeCustomProposal = async (
 
 			try {
 				const { receipt } = await evm.process({
-					chainId,
 					commitKey,
 					data: Buffer.from(transaction.data.slice(2), "hex"),
 					from: transaction.from,
@@ -90,7 +88,6 @@ export const makeCustomProposal = async (
 
 		await evm.updateRewardsAndVotes({
 			blockReward: BigInt(milestone.reward),
-			chainId,
 			commitKey,
 			specId: milestone.evmSpec,
 			timestamp: BigInt(timestamp),
@@ -101,7 +98,6 @@ export const makeCustomProposal = async (
 			const nextMilestone = configuration.getMilestone(blockNumber + 1);
 
 			await evm.updateValidatorRegistrationFee({
-				chainId,
 				commitKey,
 				fee: BigInt(nextMilestone.validatorRegistrationFee),
 				specId: nextMilestone.evmSpec,
@@ -110,7 +106,6 @@ export const makeCustomProposal = async (
 			});
 
 			await evm.calculateRoundValidators({
-				chainId,
 				commitKey,
 				roundValidators: BigInt(nextMilestone.roundValidators),
 				specId: nextMilestone.evmSpec,

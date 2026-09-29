@@ -201,7 +201,6 @@ describe<{
 				gasLimit: BigInt(transaction.gasLimit),
 				gasPrice: BigInt(transaction.gasPrice),
 				nonce: transaction.nonce,
-				chainId: 10_000n,
 				specId: Enums.Evm.SpecId.OSAKA,
 				to: transaction.to,
 				txHash: transaction.hash,

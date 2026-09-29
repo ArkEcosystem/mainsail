@@ -150,7 +150,7 @@ describe<{
 
 	it("constructor throws on an unusable path instead of crashing", () => {
 		// /dev/null is a file, so create_dir_all fails with ENOTDIR — even when running as root.
-		assert.throws(() => new Evm({ path: "/dev/null/evm" }), "failed to open EVM database");
+		assert.throws(() => new Evm({ chainId: 10_000n, path: "/dev/null/evm" }), "failed to open EVM database");
 	});
 
 	it("process rejects negative or oversized BigInt fields instead of truncating", async ({ instance }) => {
@@ -166,7 +166,6 @@ describe<{
 			gasLimit: 21_000n,
 			gasPrice: 0n,
 			nonce: 0n,
-			chainId: 10_000n,
 			specId: Enums.Evm.SpecId.OSAKA,
 			to: wallets[1].address,
 			txHash: randomBytes(32).toString("hex"),
@@ -201,7 +200,6 @@ describe<{
 					gasLimit: 21_000n,
 					gasPrice: 0n,
 					nonce: 0n,
-					chainId: 10_000n,
 					specId: Enums.Evm.SpecId.OSAKA,
 					to: wallets[1].address,
 					txHash: randomBytes(32).toString("hex"),
@@ -226,7 +224,6 @@ describe<{
 		const updateContext = {
 			blockReward: 0n,
 			commitKey: unknownKey,
-			chainId: 10_000n,
 			specId: Enums.Evm.SpecId.OSAKA,
 			timestamp: 0n,
 			validatorAddress: zeroAddress,
@@ -239,7 +236,6 @@ describe<{
 				instance.calculateRoundValidators({
 					commitKey: unknownKey,
 					roundValidators: 1n,
-					chainId: 10_000n,
 					specId: Enums.Evm.SpecId.OSAKA,
 					timestamp: 0n,
 					validatorAddress: zeroAddress,
@@ -252,7 +248,6 @@ describe<{
 				instance.updateValidatorRegistrationFee({
 					commitKey: unknownKey,
 					fee: 0n,
-					chainId: 10_000n,
 					specId: Enums.Evm.SpecId.OSAKA,
 					timestamp: 0n,
 					validatorAddress: zeroAddress,
@@ -286,7 +281,6 @@ describe<{
 				instance.calculateRoundValidators({
 					commitKey: unknownKey,
 					roundValidators: 1n,
-					chainId: 10_000n,
 					specId: Enums.Evm.SpecId.OSAKA,
 					timestamp: 0n,
 					validatorAddress: zeroAddress,
@@ -299,7 +293,6 @@ describe<{
 				instance.updateValidatorRegistrationFee({
 					commitKey: unknownKey,
 					fee: 0n,
-					chainId: 10_000n,
 					specId: Enums.Evm.SpecId.OSAKA,
 					timestamp: 0n,
 					validatorAddress: zeroAddress,
@@ -337,7 +330,6 @@ describe<{
 				instance.calculateRoundValidators({
 					commitKey: unknownKey,
 					roundValidators: 300n,
-					chainId: 10_000n,
 					specId: Enums.Evm.SpecId.OSAKA,
 					timestamp: 0n,
 					validatorAddress: zeroAddress,
@@ -353,7 +345,6 @@ describe<{
 					instance.updateValidatorRegistrationFee({
 						commitKey: unknownKey,
 						fee,
-						chainId: 10_000n,
 						specId: Enums.Evm.SpecId.OSAKA,
 						timestamp: 0n,
 						validatorAddress: zeroAddress,
@@ -396,7 +387,6 @@ describe<{
 					gasLimit: 21_000n,
 					gasPrice: 0n,
 					nonce: 0n,
-					chainId: 10_000n,
 					specId: Enums.Evm.SpecId.OSAKA,
 					to: wallets[1].address,
 					txHash: transaction.hash,
@@ -435,7 +425,6 @@ describe<{
 			gasLimit: 1_000_000n,
 			gasPrice: 0n,
 			nonce: 0n,
-			chainId: 10_000n,
 			specId: Enums.Evm.SpecId.OSAKA,
 			txHash: randomBytes(32).toString("hex"),
 			value: 0n,
@@ -448,7 +437,6 @@ describe<{
 				instance.calculateRoundValidators({
 					commitKey,
 					roundValidators: 1n,
-					chainId: 10_000n,
 					specId: Enums.Evm.SpecId.OSAKA,
 					timestamp: 12_345n,
 					validatorAddress: wallets[1].address,
@@ -462,7 +450,6 @@ describe<{
 				instance.updateValidatorRegistrationFee({
 					commitKey,
 					fee: 250n,
-					chainId: 10_000n,
 					specId: Enums.Evm.SpecId.OSAKA,
 					timestamp: 12_345n,
 					validatorAddress: wallets[1].address,
@@ -476,7 +463,6 @@ describe<{
 				instance.updateRewardsAndVotes({
 					blockReward: reward,
 					commitKey,
-					chainId: 10_000n,
 					specId: Enums.Evm.SpecId.OSAKA,
 					timestamp: 12_345n,
 					validatorAddress: wallets[1].address,
@@ -500,7 +486,6 @@ describe<{
 					gasLimit: 21_000n,
 					gasPrice: 0n,
 					nonce: 0n,
-					chainId: 10_000n,
 					specId: Enums.Evm.SpecId.OSAKA,
 					to: wallets[0].address,
 					txHash: randomBytes(32).toString("hex"),
@@ -606,7 +591,6 @@ describe<{
 				gasPrice: 0n,
 				legacyAddress,
 				nonce: 0n,
-				chainId: 10_000n,
 				specId: Enums.Evm.SpecId.OSAKA,
 				to: recipient,
 				txHash: randomBytes(32).toString("hex"),
@@ -633,7 +617,6 @@ describe<{
 				gasPrice: 0n,
 				legacyAddress,
 				nonce,
-				chainId: 10_000n,
 				specId: Enums.Evm.SpecId.OSAKA,
 				to: recipient,
 				txHash: randomBytes(32).toString("hex"),
@@ -683,7 +666,6 @@ describe<{
 				gasLimit: 2_000_000n,
 				gasPrice: 0n,
 				nonce,
-				chainId: 10_000n,
 				specId: Enums.Evm.SpecId.OSAKA,
 				txHash: randomBytes(32).toString("hex"),
 				value: 0n,
@@ -739,7 +721,6 @@ describe<{
 			data: Buffer.alloc(0),
 			from: zeroAddress,
 			gasLimit: 1n,
-			chainId: 10_000n,
 			specId: Enums.Evm.SpecId.OSAKA,
 			to: zeroAddress,
 		});
@@ -803,7 +784,6 @@ describe<{
 			gasLimit: 2_000_000n,
 			gasPrice: 0n,
 			nonce: 0n,
-			chainId: 10_000n,
 			specId: Enums.Evm.SpecId.OSAKA,
 			value: 0n,
 		});
@@ -837,7 +817,6 @@ describe<{
 		// A spec id revm parses but mainsail does not support, and one revm cannot parse.
 		const viewWithSpec = (specId: string) =>
 			instance.view({
-				chainId: 10_000n,
 				data: Buffer.alloc(0),
 				from: zeroAddress,
 				specId: specId as Contracts.Evm.SpecId,

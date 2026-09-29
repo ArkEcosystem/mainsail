@@ -62,6 +62,8 @@ pub struct EvmInner {
     snapshot: Option<PendingCommit>,
 
     logger: JsLogger,
+
+    chain_id: u64,
 }
 
 impl EvmInner {
@@ -85,6 +87,7 @@ impl EvmInner {
             pending_commits: Default::default(),
             snapshot: None,
             logger,
+            chain_id: opts.chain_id,
         })
     }
 
@@ -229,7 +232,6 @@ impl EvmInner {
         timestamp: u64,
         validator_address: Address,
         spec_id: SpecId,
-        chain_id: u64,
         calldata: Bytes,
         label: &str,
     ) -> std::result::Result<(), EVMError<String>> {
@@ -262,7 +264,6 @@ impl EvmInner {
             gas_limit: Some(u64::MAX),
             gas_price: 0,
             spec_id,
-            chain_id,
             tx_hash: None,
         }) {
             Ok((receipt, _)) => {
@@ -300,7 +301,6 @@ impl EvmInner {
             ctx.timestamp,
             ctx.validator_address,
             ctx.spec_id,
-            ctx.chain_id,
             Bytes::from(calldata.0),
             "calculate_round_validators",
         )
@@ -322,7 +322,6 @@ impl EvmInner {
             ctx.timestamp,
             ctx.validator_address,
             ctx.spec_id,
-            ctx.chain_id,
             Bytes::from(calldata.0),
             "update_validator_registration_fee",
         )
@@ -387,7 +386,6 @@ impl EvmInner {
                     gas_limit: Some(u64::MAX),
                     gas_price: 0,
                     spec_id: ctx.spec_id,
-                    chain_id: ctx.chain_id,
                     tx_hash: None,
                 }) {
                     Ok((receipt, _)) => {
@@ -699,7 +697,7 @@ impl EvmInner {
             .with_database(WrapDatabaseRef(db_reader))
             .build();
 
-        let evm = new_context(state_db, ctx.spec_id, ctx.chain_id)
+        let evm = new_context(state_db, ctx.spec_id, self.chain_id)
             .modify_block_chained(|block_env: &mut BlockEnv| {
                 block_env.gas_limit = ctx.block_gas_limit;
             })
@@ -1189,7 +1187,7 @@ impl EvmInner {
             .with_database(WrapDatabaseRef(db_reader))
             .build();
 
-        let mut evm = new_context(state_db, ctx.spec_id, ctx.chain_id)
+        let mut evm = new_context(state_db, ctx.spec_id, self.chain_id)
             .modify_cfg_chained(|cfg| {
                 cfg.disable_nonce_check = ctx.nonce.is_none();
                 // Mainsail enforces its own gas policy based on milestone which is
@@ -1308,7 +1306,7 @@ impl EvmInner {
             .with_database(WrapDatabaseRef(db_reader))
             .build();
 
-        let mut evm = new_context(state_db, ctx.spec_id, ctx.chain_id)
+        let mut evm = new_context(state_db, ctx.spec_id, self.chain_id)
             .modify_cfg_chained(|cfg| {
                 cfg.disable_nonce_check = ctx.nonce.is_none();
                 // Mainsail enforces its own gas policy based on milestone which is

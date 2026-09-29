@@ -119,7 +119,6 @@ export class Deployer implements Contracts.EvmConsensus.Deployer {
 
 	async #deployContract(data: string, nonce: number, label: string): Promise<string> {
 		const receipt = await this.#processTransaction({
-			chainId: BigInt(this.configuration.getNetwork().chainId),
 			commitKey: this.#getCommitKey(),
 			data: Buffer.from(toBytes(data)),
 			from: this.deployerAddress,

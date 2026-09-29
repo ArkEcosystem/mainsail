@@ -50,7 +50,6 @@ describe<{
 		assert.equal(captured.from, DEPLOYER);
 		assert.equal(captured.to, CONSENSUS);
 		assert.equal(captured.specId, EVM_SPEC);
-		assert.equal(captured.chainId, 10_000n);
 		assert.equal(
 			Buffer.from(captured.data).toString("hex"),
 			encodeFunctionData({ abi: ConsensusAbi.abi, args: undefined, functionName: "getVotesCount" }).slice(2),

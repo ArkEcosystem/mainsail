@@ -115,6 +115,8 @@ export const makeApplication = async (
 					roundValidators: 1,
 				},
 			],
+			// @ts-ignore
+			network: { chainId: options.chainId ?? 10_000 },
 		},
 		false,
 	);

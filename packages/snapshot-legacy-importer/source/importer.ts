@@ -485,7 +485,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const nonce = this.#nonce;
 
 		return {
-			chainId: BigInt(this.configuration.getNetwork().chainId),
 			commitKey: options.commitKey,
 			data: Buffer.from(options.data, "hex"),
 			from: this.deployerAddress,

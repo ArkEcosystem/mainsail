@@ -166,7 +166,6 @@ describe<{
 			await instance.updateRewardsAndVotes({
 				blockReward: reward,
 				commitKey,
-				chainId: 10_000n,
 				specId: Enums.Evm.SpecId.OSAKA,
 				timestamp: 12_345n,
 				validatorAddress: proposer,
@@ -215,7 +214,6 @@ describe<{
 			await instance.updateRewardsAndVotes({
 				blockReward: 0n,
 				commitKey,
-				chainId: 10_000n,
 				specId: Enums.Evm.SpecId.OSAKA,
 				timestamp: 12_345n,
 				validatorAddress: proposer,
@@ -225,7 +223,6 @@ describe<{
 				instance.calculateRoundValidators({
 					commitKey,
 					roundValidators: 0n,
-					chainId: 10_000n,
 					specId: Enums.Evm.SpecId.OSAKA,
 					timestamp: 12_345n,
 					validatorAddress: proposer,

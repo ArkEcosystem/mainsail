@@ -60,7 +60,6 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 		try {
 			const { receipt } = await this.evm.simulate({
 				blockContext: this.#getBlockContext(milestone),
-				chainId: BigInt(this.configuration.getNetwork().chainId),
 				data: data.data ? Buffer.from(data.data.slice(2), "hex") : Buffer.alloc(0),
 				from: data.from ?? zeroAddress,
 				gasLimit: this.#getGasLimit(data, milestone),

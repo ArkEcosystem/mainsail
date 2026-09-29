@@ -53,7 +53,6 @@ describe<{
 			gasLimit: GAS,
 			gasPrice: 0n,
 			nonce: 0n,
-			chainId: 10_000n,
 			specId: Enums.Evm.SpecId.OSAKA,
 			value: 0n,
 		});

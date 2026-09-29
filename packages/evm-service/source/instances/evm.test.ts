@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
-import { Enums } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { Evm } from "@mainsail/evm";
 import {
 	concat,
@@ -26,7 +26,7 @@ import * as MainsailGlobals from "../../test/fixtures/MainsailGlobals.json";
 import { wallets } from "../../test/fixtures/wallets";
 import { prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { EvmInstance } from "./evm";
-import { setGracefulCleanup } from "tmp";
+import { dirSync, setGracefulCleanup } from "tmp";
 
 describe<{
 	app: Application;
@@ -47,14 +47,12 @@ describe<{
 	const deployConfig = {
 		gasLimit: BigInt(1_000_000),
 		gasPrice: BigInt(0),
-		chainId: 10_000n,
 		specId: Enums.Evm.SpecId.OSAKA,
 	};
 
 	const transferConfig = {
 		gasLimit: BigInt(60_000),
 		gasPrice: BigInt(0),
-		chainId: 10_000n,
 		specId: Enums.Evm.SpecId.OSAKA,
 	};
 
@@ -90,6 +88,7 @@ describe<{
 		let hookCalled = 0;
 
 		const evm = new Evm({
+			chainId: 10_000n,
 			path: app.dataPath("loghook"),
 			logger: ({ level, message }) => {
 				//console.log("CALLED HOOK", { level, message, hookCalled });
@@ -200,9 +199,16 @@ describe<{
 	});
 
 	each(
-		"should return chain id %s from CHAINID",
-		async ({ context: { instance }, dataset: chainId }) => {
+		"should return the configured chain id %s from CHAINID",
+		async ({ context: { app }, dataset: chainId }) => {
 			const [sender] = wallets;
+
+			app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).set(
+				"network.chainId",
+				Number(chainId),
+			);
+			app.useDataPath(dirSync().name);
+			const instance = app.resolve(EvmInstance);
 
 			const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
 			await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
@@ -216,7 +222,6 @@ describe<{
 				commitKey,
 				txHash: getRandomTxHash(),
 				...deployConfig,
-				chainId,
 			});
 
 			assert.equal(deployReceipt.status, 1);
@@ -231,7 +236,6 @@ describe<{
 				commitKey,
 				txHash: getRandomTxHash(),
 				...transferConfig,
-				chainId,
 			});
 
 			assert.equal(receipt.status, 1);
@@ -255,7 +259,6 @@ describe<{
 				nonce: 2n,
 				data: Buffer.alloc(0),
 				...transferConfig,
-				chainId,
 			});
 
 			assert.equal(simulated.status, 1);
@@ -265,11 +268,12 @@ describe<{
 				from: zeroAddress,
 				to: contractAddress,
 				data: Buffer.alloc(0),
-				chainId,
 				specId: Enums.Evm.SpecId.OSAKA,
 			});
 
 			assert.equal(hexToBigInt(toHex(output!)), chainId);
+
+			await instance.dispose();
 		},
 		[10_000n, 4_294_967_296n],
 	);
@@ -836,7 +840,6 @@ describe<{
 					txHash: getRandomTxHash(),
 					gasLimit: 30_000n,
 					gasPrice: 5n,
-					chainId: 10_000n,
 					specId: Enums.Evm.SpecId.OSAKA,
 				}),
 			"transaction validation error: call gas cost (137330) exceeds the gas limit (30000)",
@@ -857,7 +860,6 @@ describe<{
 					txHash: getRandomTxHash(),
 					gasLimit: 30_000n,
 					gasPrice: 5n,
-					chainId: 10_000n,
 					specId: "asdf" as unknown as Contracts.Evm.SpecId,
 				}),
 			"invalid spec_id",
@@ -1068,7 +1070,6 @@ describe<{
 			data: Buffer.alloc(0),
 			txHash: getRandomTxHash(),
 			blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(0), round: BigInt(0) } },
-			chainId: 10_000n,
 			specId: Enums.Evm.SpecId.OSAKA,
 		};
 
@@ -1239,7 +1240,6 @@ describe<{
 			gasLimit: 21_000n,
 			gasPrice: 0n,
 			nonce: 0n,
-			chainId: 10_000n,
 			specId: Enums.Evm.SpecId.OSAKA,
 			to: recipient.address,
 			value: parseEther("1"),
@@ -1287,7 +1287,6 @@ const getBalance = async (
 		from: zeroAddress,
 		data: Buffer.from(toBytes(balanceOf)),
 		to: contractAddress!,
-		chainId: 10_000n,
 		specId: Enums.Evm.SpecId.OSAKA,
 	});
 

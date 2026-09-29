@@ -102,7 +102,6 @@ export interface PreverifyTransactionContext {
 	readonly data: Buffer;
 	readonly txHash: string;
 	readonly specId: SpecId;
-	readonly chainId: bigint;
 	readonly blockGasLimit: bigint;
 }
 
@@ -119,7 +118,6 @@ export interface TransactionContext {
 	readonly commitKey: CommitKey;
 	readonly txHash: string;
 	readonly specId: SpecId;
-	readonly chainId: bigint;
 }
 
 export interface TransactionSimulateContext {
@@ -133,7 +131,6 @@ export interface TransactionSimulateContext {
 	readonly data: Buffer;
 	readonly blockContext: BlockContext;
 	readonly specId: SpecId;
-	readonly chainId: bigint;
 }
 
 export interface TransactionViewContext {
@@ -141,7 +138,6 @@ export interface TransactionViewContext {
 	readonly to: string;
 	readonly data: Buffer;
 	readonly specId: SpecId;
-	readonly chainId: bigint;
 	readonly gasLimit?: bigint;
 }
 
@@ -178,7 +174,6 @@ export interface CalculateRoundValidatorsContext {
 	readonly validatorAddress: string;
 	readonly roundValidators: bigint;
 	readonly specId: SpecId;
-	readonly chainId: bigint;
 }
 
 export interface UpdateValidatorRegistrationFeeContext {
@@ -187,7 +182,6 @@ export interface UpdateValidatorRegistrationFeeContext {
 	readonly validatorAddress: string;
 	readonly fee: bigint;
 	readonly specId: SpecId;
-	readonly chainId: bigint;
 }
 
 export interface UpdateRewardsAndVotesContext {
@@ -196,7 +190,6 @@ export interface UpdateRewardsAndVotesContext {
 	readonly validatorAddress: string;
 	readonly blockReward: bigint;
 	readonly specId: SpecId;
-	readonly chainId: bigint;
 }
 
 export interface CommitKey {

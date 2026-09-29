@@ -130,7 +130,6 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 		const preverified = await this.evm.preverifyTransaction({
 			blockGasLimit: BigInt(milestone.block.maxGasLimit),
-			chainId: BigInt(this.cryptoConfiguration.getNetwork().chainId),
 			data: Buffer.from(transaction.data.slice(2), "hex"),
 			from: transaction.from,
 			gasLimit: BigInt(transaction.gasLimit),
