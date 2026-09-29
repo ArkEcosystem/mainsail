@@ -152,7 +152,7 @@ describe<{
 
 	it("constructor throws on an unusable path instead of crashing", () => {
 		// /dev/null is a file, so create_dir_all fails with ENOTDIR — even when running as root.
-		assert.throws(() => new Evm({ path: "/dev/null/evm" }), "failed to open EVM database");
+		assert.throws(() => new Evm({ chainId: 10_000n, path: "/dev/null/evm" }), "failed to open EVM database");
 	});
 
 	it("process rejects negative or oversized BigInt fields instead of truncating", async ({ instance }) => {

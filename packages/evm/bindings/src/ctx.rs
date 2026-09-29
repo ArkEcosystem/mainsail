@@ -13,6 +13,7 @@ use crate::{logger::JsLogMessage, utils};
 #[napi(object)]
 pub struct JsEvmOptions {
     pub path: String,
+    pub chain_id: BigInt,
     pub logger: Option<Function<'static, JsLogMessage, ()>>,
     pub history_size: Option<BigInt>,
     /// Max concurrent EVM ops for this instance. Omit to leave unbounded (consensus/forger).
@@ -284,6 +285,7 @@ pub struct UpdateRewardsAndVotesContext {
 
 pub struct EvmOptions {
     pub path: PathBuf,
+    pub chain_id: u64,
     pub logger_callback: Option<Function<'static, JsLogMessage, ()>>,
     pub history_size: Option<u64>,
     pub concurrency: Option<u32>,
@@ -640,6 +642,7 @@ impl TryFrom<JsEvmOptions> for EvmOptions {
 
         Ok(EvmOptions {
             path: value.path.into(),
+            chain_id: utils::convert_bigint_to_u64(value.chain_id, "chainId")?,
             logger_callback: value.logger,
             history_size,
             concurrency: value.concurrency,

@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
-import { Enums } from "@mainsail/constants";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { Evm } from "@mainsail/evm";
 import {
 	concat,
@@ -26,12 +26,12 @@ import * as MainsailGlobals from "../../test/fixtures/MainsailGlobals.json";
 import { wallets } from "../../test/fixtures/wallets";
 import { prepareSandbox } from "../../test/helpers/prepare-sandbox";
 import { EvmInstance } from "./evm";
-import { setGracefulCleanup } from "tmp";
+import { dirSync, setGracefulCleanup } from "tmp";
 
 describe<{
 	app: Application;
 	instance: Contracts.Evm.Instance & Contracts.Evm.Storage;
-}>("Instance", ({ it, assert, afterAll, afterEach, beforeEach }) => {
+}>("Instance", ({ it, assert, afterAll, afterEach, beforeEach, each }) => {
 	afterAll(() => setGracefulCleanup());
 
 	afterEach(async (context) => {
@@ -88,6 +88,7 @@ describe<{
 		let hookCalled = 0;
 
 		const evm = new Evm({
+			chainId: 10_000n,
 			path: app.dataPath("loghook"),
 			logger: ({ level, message }) => {
 				//console.log("CALLED HOOK", { level, message, hookCalled });
@@ -197,6 +198,86 @@ describe<{
 		assert.equal(data.txGasPrice, 0n); // gas price always 0
 		assert.equal(data.txOrigin, sender.address);
 	});
+
+	each(
+		"should return the configured chain id %s from CHAINID",
+		async ({ context: { app }, dataset: chainId }) => {
+			const [sender] = wallets;
+
+			app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).set(
+				"network.chainId",
+				Number(chainId),
+			);
+			app.useDataPath(dirSync().name);
+			const instance = app.resolve(EvmInstance);
+
+			const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
+			await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+
+			const { receipt: deployReceipt } = await instance.process({
+				from: sender.address,
+				value: 0n,
+				nonce: 0n,
+				// Deploys a contract that returns CHAINID.
+				data: Buffer.from("66465f5260205ff35f5260076019f3", "hex"),
+				commitKey,
+				txHash: getRandomTxHash(),
+				...deployConfig,
+			});
+
+			assert.equal(deployReceipt.status, 1);
+			const contractAddress = deployReceipt.contractAddress!;
+
+			const { receipt } = await instance.process({
+				from: sender.address,
+				to: contractAddress,
+				value: 0n,
+				nonce: 1n,
+				data: Buffer.alloc(0),
+				commitKey,
+				txHash: getRandomTxHash(),
+				...transferConfig,
+			});
+
+			assert.equal(receipt.status, 1);
+			assert.equal(hexToBigInt(toHex(receipt.output!)), chainId);
+
+			await instance.onCommit({
+				blockNumber: BigInt(0),
+				round: BigInt(0),
+				getBlock: () => ({
+					number: BigInt(0),
+					round: BigInt(0),
+				}),
+				setAccountUpdates: () => {},
+			} as any);
+
+			const { receipt: simulated } = await instance.simulate({
+				blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(1), round: BigInt(0) } },
+				from: sender.address,
+				to: contractAddress,
+				value: 0n,
+				nonce: 2n,
+				data: Buffer.alloc(0),
+				...transferConfig,
+			});
+
+			assert.equal(simulated.status, 1);
+			assert.equal(hexToBigInt(toHex(simulated.output!)), chainId);
+
+			const { output } = await instance.view({
+				from: zeroAddress,
+				to: contractAddress,
+				data: Buffer.alloc(0),
+				specId: Enums.Evm.SpecId.OSAKA,
+			});
+
+			assert.equal(hexToBigInt(toHex(output!)), chainId);
+
+			await instance.dispose();
+		},
+		[10_000n, 4_294_967_296n],
+	);
 
 	it("should deploy, transfer and and update balance correctly", async ({ instance }) => {
 		const [sender, recipient] = wallets;

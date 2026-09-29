@@ -44,6 +44,9 @@ describe<{
 		// only needs dataPath() for initialize().
 		context.app.rebind(Identifiers.Application.Instance).toConstantValue({ dataPath: () => "/tmp/evm-logger" });
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
+		context.app
+			.bind(Identifiers.Cryptography.Configuration)
+			.toConstantValue({ getNetwork: () => ({ chainId: 10_000 }) });
 
 		// Resolve to trigger @postConstruct initialize(), which constructs the (fake) Evm.
 		context.app.resolve(EvmInstance);

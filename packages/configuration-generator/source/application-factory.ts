@@ -101,6 +101,7 @@ export const makeApplication = async (
 				{
 					evmSpec: Enums.Evm.SpecId.OSAKA,
 					height: 0,
+					roundValidators: 0,
 					timeouts: {
 						blockPrepareTime: 4000,
 						blockTime: 8000,
@@ -109,7 +110,13 @@ export const makeApplication = async (
 						tolerance: 100,
 					},
 				},
+				{
+					height: 1,
+					roundValidators: 1,
+				},
 			],
+			// @ts-ignore
+			network: { chainId: options.chainId ?? 10_000 },
 		},
 		false,
 	);

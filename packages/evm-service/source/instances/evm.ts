@@ -13,6 +13,9 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	protected readonly configuration!: Contracts.Crypto.Configuration;
+
 	protected readonly concurrency?: number;
 
 	#evm!: Evm;
@@ -20,6 +23,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 	@postConstruct()
 	public initialize(): void {
 		this.#evm = new Evm({
+			chainId: BigInt(this.configuration.getNetwork().chainId),
 			concurrency: this.concurrency,
 			historySize: 256n,
 			logger: (record) => {

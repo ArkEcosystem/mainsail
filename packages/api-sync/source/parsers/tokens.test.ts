@@ -86,7 +86,7 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 		context.app.bind(Identifiers.ApiSync.Logger).toConstantValue(context.logger);
 		context.app
 			.bind(Identifiers.Cryptography.Configuration)
-			.toConstantValue({ getMilestone: () => ({ evmSpec: "Osaka" }) });
+			.toConstantValue({ getMilestone: () => ({ evmSpec: "Osaka" }), getNetwork: () => ({ chainId: 10_000 }) });
 		context.app
 			.bind(ApiDatabaseIdentifiers.TokenRepositoryFactory)
 			.toConstantValue(() => ({ createQueryBuilder: () => queryBuilder }));
