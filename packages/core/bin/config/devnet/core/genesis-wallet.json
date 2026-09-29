@@ -1,14 +1,14 @@
 {
-	"address": "0xEC7a42bFCDaDA29f50d3648fB62344632130661a",
-	"consensusKeys": {
-		"compressed": true,
-		"privateKey": "73a3ab4ec3130b310c1b7d34e033298d21dab2a384c3ba00adb460fd812335f0",
-		"publicKey": "ac5baade70e89acc136053a2dd9ad86a1890b1262097f72dc506ac83c133073f1fab05b61188aeb17c875fefd7d00ce7"
-	},
-	"keys": {
-		"compressed": true,
-		"privateKey": "58dba5e3955d9937a80a61c1e3daf345d4e87524e436ed741fdf9f2eebe17ec1",
-		"publicKey": "03bb78ebc3f42e998f428f2062d1178e84f3dd86ca397917896bf8fb272ae6cf50"
-	},
-	"passphrase": "original flock sausage direct accuse worth chalk betray hover amateur daring live banana disease sword snake industry flower fetch spend tag episode program mammal"
+    "address": "0xEC7a42bFCDaDA29f50d3648fB62344632130661a",
+    "consensusKeys": {
+        "compressed": true,
+        "privateKey": "73a3ab4ec3130b310c1b7d34e033298d21dab2a384c3ba00adb460fd812335f0",
+        "publicKey": "ac5baade70e89acc136053a2dd9ad86a1890b1262097f72dc506ac83c133073f1fab05b61188aeb17c875fefd7d00ce7"
+    },
+    "keys": {
+        "compressed": true,
+        "privateKey": "58dba5e3955d9937a80a61c1e3daf345d4e87524e436ed741fdf9f2eebe17ec1",
+        "publicKey": "03bb78ebc3f42e998f428f2062d1178e84f3dd86ca397917896bf8fb272ae6cf50"
+    },
+    "passphrase": "original flock sausage direct accuse worth chalk betray hover amateur daring live banana disease sword snake industry flower fetch spend tag episode program mammal"
 }
