@@ -32,11 +32,11 @@ use result::{
 use revm::{
     Database, DatabaseCommit, DatabaseRef, ExecuteEvm, MainBuilder, MainContext,
     context::{
-        BlockEnv, ContextTr, TxEnv,
+        BlockEnv, CfgEnv, ContextTr, TxEnv,
         result::{EVMError, ExecutionResult, ResultAndState},
     },
     database::{State, WrapDatabaseRef, bal::EvmDatabaseError},
-    handler::EvmTr,
+    handler::{EvmTr, MainnetContext},
     primitives::{
         Address, B256, Bytes, TxKind, U256, hardfork::SpecId, hex::ToHexExt, map::HashMap,
     },
@@ -62,6 +62,8 @@ pub struct EvmInner {
     snapshot: Option<PendingCommit>,
 
     logger: JsLogger,
+
+    chain_id: u64,
 }
 
 impl EvmInner {
@@ -85,6 +87,7 @@ impl EvmInner {
             pending_commits: Default::default(),
             snapshot: None,
             logger,
+            chain_id: opts.chain_id,
         })
     }
 
@@ -694,11 +697,7 @@ impl EvmInner {
             .with_database(WrapDatabaseRef(db_reader))
             .build();
 
-        let evm = revm::Context::mainnet()
-            .with_db(state_db)
-            .modify_cfg_chained(|cfg| {
-                cfg.spec = ctx.spec_id;
-            })
+        let evm = new_context(state_db, ctx.spec_id, self.chain_id)
             .modify_block_chained(|block_env: &mut BlockEnv| {
                 block_env.gas_limit = ctx.block_gas_limit;
             })
@@ -1188,10 +1187,8 @@ impl EvmInner {
             .with_database(WrapDatabaseRef(db_reader))
             .build();
 
-        let mut evm = revm::Context::mainnet()
-            .with_db(state_db)
+        let mut evm = new_context(state_db, ctx.spec_id, self.chain_id)
             .modify_cfg_chained(|cfg| {
-                cfg.spec = ctx.spec_id;
                 cfg.disable_nonce_check = ctx.nonce.is_none();
                 // Mainsail enforces its own gas policy based on milestone which is
                 // passed via `block_ctx.gas_limit`.
@@ -1309,10 +1306,8 @@ impl EvmInner {
             .with_database(WrapDatabaseRef(db_reader))
             .build();
 
-        let mut evm = revm::Context::mainnet()
-            .with_db(state_db)
+        let mut evm = new_context(state_db, ctx.spec_id, self.chain_id)
             .modify_cfg_chained(|cfg| {
-                cfg.spec = ctx.spec_id;
                 cfg.disable_nonce_check = ctx.nonce.is_none();
                 // Mainsail enforces its own gas policy based on milestone which is
                 // passed via `block_ctx.gas_limit`.
@@ -1410,6 +1405,15 @@ impl EvmInner {
             .cloned()
             .ok_or_else(|| EVMError::Custom("genesis not initialized".into()))
     }
+}
+
+fn new_context<DB: Database>(db: DB, spec_id: SpecId, chain_id: u64) -> MainnetContext<DB> {
+    revm::Context::mainnet()
+        .with_db(db)
+        .with_cfg(CfgEnv::new_with_spec(spec_id).with_chain_id(chain_id))
+        .modify_tx_chained(|tx_env: &mut TxEnv| {
+            tx_env.chain_id = Some(chain_id);
+        })
 }
 
 // The EVM wrapper is exposed to JavaScript.

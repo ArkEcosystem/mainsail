@@ -61,6 +61,12 @@ describe<{
 		context.app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 		context.app.useDataPath(context.dataPath);
 
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
+			getHeight: () => 0,
+			getMilestone: () => milestone,
+			getNetwork: () => ({ chainId: 10_000 }),
+		});
+
 		await context.app.resolve(ValidationServiceProvider).register();
 		await context.app.resolve(EvmServiceProvider).register();
 
@@ -72,11 +78,6 @@ describe<{
 			initialSupply: 100_000_000_000_000_000_000n,
 			usernameContract: zero,
 			validatorContract: zero,
-		});
-
-		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
-			getHeight: () => 0,
-			getMilestone: () => milestone,
 		});
 
 		context.action = context.app.resolve(EthEstimateGasAction);

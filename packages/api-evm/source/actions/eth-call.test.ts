@@ -36,6 +36,7 @@ describe<{
 		context.configuration = {
 			getHeight: () => 100,
 			getMilestone: () => context.milestone,
+			getNetwork: () => ({ chainId: 10_000 }),
 		};
 
 		context.app = new Application();

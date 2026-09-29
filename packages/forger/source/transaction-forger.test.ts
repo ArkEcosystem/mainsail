@@ -73,7 +73,10 @@ describe<{
 		};
 		context.logger = { info: () => {}, warn: () => {} };
 		context.roundCalculator = { isNewRound: () => false };
-		context.cryptoConfiguration = { getMilestone: () => context.milestone };
+		context.cryptoConfiguration = {
+			getMilestone: () => context.milestone,
+			getNetwork: () => ({ chainId: 10_000 }),
+		};
 
 		const app = new Application();
 		app.bind(Identifiers.ServiceProvider.Configuration)

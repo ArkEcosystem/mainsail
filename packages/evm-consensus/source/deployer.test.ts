@@ -50,6 +50,7 @@ describe<{
 				evmSpec: "Osaka",
 				validatorRegistrationFee: 100n,
 			}),
+			getNetwork: () => ({ chainId: 10_000 }),
 		};
 		context.hashFactory = { sha256: () => Buffer.from("00", "hex") };
 		context.genesisInfo = {
