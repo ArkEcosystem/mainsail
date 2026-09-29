@@ -117,6 +117,13 @@ describe("buildProofOfPossession", ({ assert, it }) => {
 
 	it("throws on an invalid registrant address", () => {
 		assert.throws(() => buildProofOfPossession(SK_A, { ...BINDING, registrantAddress: "0x1234" }));
+		// A mistyped checksum must not silently bind the PoP to a different address.
+		assert.throws(() =>
+			buildProofOfPossession(SK_A, {
+				...BINDING,
+				registrantAddress: "0x75545540230d5c3bEf023202d23CB74cFA723376",
+			}),
+		);
 	});
 
 	it("throws on a secret key of wrong length", () => {
