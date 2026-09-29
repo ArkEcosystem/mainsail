@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { getPrevrandao } from "@mainsail/blockchain-utils";
-import { Events, Identifiers, Locale } from "@mainsail/constants";
+import { Events, Identifiers, Locale, ZeroHash } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { InvalidFee, InvalidGasUsed, InvalidLogsBloom, InvalidStateRoot } from "@mainsail/exceptions";
 import { ensureError, sleep } from "@mainsail/utils";
@@ -264,7 +264,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		const { snapshot } = this.configuration.getMilestone(block.number);
 
-		return snapshot?.snapshotHash ?? "0000000000000000000000000000000000000000000000000000000000000000";
+		return snapshot?.snapshotHash ?? ZeroHash;
 	}
 
 	async #verifyLogsBloom(block: Contracts.Crypto.Block): Promise<void> {
