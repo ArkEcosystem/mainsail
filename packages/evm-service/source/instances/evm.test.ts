@@ -31,7 +31,7 @@ import { setGracefulCleanup } from "tmp";
 describe<{
 	app: Application;
 	instance: Contracts.Evm.Instance & Contracts.Evm.Storage;
-}>("Instance", ({ it, assert, afterAll, afterEach, beforeEach }) => {
+}>("Instance", ({ it, assert, afterAll, afterEach, beforeEach, each }) => {
 	afterAll(() => setGracefulCleanup());
 
 	afterEach(async (context) => {
@@ -47,12 +47,14 @@ describe<{
 	const deployConfig = {
 		gasLimit: BigInt(1_000_000),
 		gasPrice: BigInt(0),
+		chainId: 10_000n,
 		specId: Enums.Evm.SpecId.OSAKA,
 	};
 
 	const transferConfig = {
 		gasLimit: BigInt(60_000),
 		gasPrice: BigInt(0),
+		chainId: 10_000n,
 		specId: Enums.Evm.SpecId.OSAKA,
 	};
 
@@ -196,6 +198,81 @@ describe<{
 		assert.equal(data.txGasPrice, 0n); // gas price always 0
 		assert.equal(data.txOrigin, sender.address);
 	});
+
+	each(
+		"should return chain id %s from CHAINID",
+		async ({ context: { instance }, dataset: chainId }) => {
+			const [sender] = wallets;
+
+			const commitKey = { blockNumber: BigInt(0), round: BigInt(0) };
+			await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+
+			const { receipt: deployReceipt } = await instance.process({
+				from: sender.address,
+				value: 0n,
+				nonce: 0n,
+				// Deploys a contract that returns CHAINID.
+				data: Buffer.from("66465f5260205ff35f5260076019f3", "hex"),
+				commitKey,
+				txHash: getRandomTxHash(),
+				...deployConfig,
+				chainId,
+			});
+
+			assert.equal(deployReceipt.status, 1);
+			const contractAddress = deployReceipt.contractAddress!;
+
+			const { receipt } = await instance.process({
+				from: sender.address,
+				to: contractAddress,
+				value: 0n,
+				nonce: 1n,
+				data: Buffer.alloc(0),
+				commitKey,
+				txHash: getRandomTxHash(),
+				...transferConfig,
+				chainId,
+			});
+
+			assert.equal(receipt.status, 1);
+			assert.equal(hexToBigInt(toHex(receipt.output!)), chainId);
+
+			await instance.onCommit({
+				blockNumber: BigInt(0),
+				round: BigInt(0),
+				getBlock: () => ({
+					number: BigInt(0),
+					round: BigInt(0),
+				}),
+				setAccountUpdates: () => {},
+			} as any);
+
+			const { receipt: simulated } = await instance.simulate({
+				blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(1), round: BigInt(0) } },
+				from: sender.address,
+				to: contractAddress,
+				value: 0n,
+				nonce: 2n,
+				data: Buffer.alloc(0),
+				...transferConfig,
+				chainId,
+			});
+
+			assert.equal(simulated.status, 1);
+			assert.equal(hexToBigInt(toHex(simulated.output!)), chainId);
+
+			const { output } = await instance.view({
+				from: zeroAddress,
+				to: contractAddress,
+				data: Buffer.alloc(0),
+				chainId,
+				specId: Enums.Evm.SpecId.OSAKA,
+			});
+
+			assert.equal(hexToBigInt(toHex(output!)), chainId);
+		},
+		[10_000n, 4_294_967_296n],
+	);
 
 	it("should deploy, transfer and and update balance correctly", async ({ instance }) => {
 		const [sender, recipient] = wallets;
@@ -759,6 +836,7 @@ describe<{
 					txHash: getRandomTxHash(),
 					gasLimit: 30_000n,
 					gasPrice: 5n,
+					chainId: 10_000n,
 					specId: Enums.Evm.SpecId.OSAKA,
 				}),
 			"transaction validation error: call gas cost (137330) exceeds the gas limit (30000)",
@@ -779,6 +857,7 @@ describe<{
 					txHash: getRandomTxHash(),
 					gasLimit: 30_000n,
 					gasPrice: 5n,
+					chainId: 10_000n,
 					specId: "asdf" as unknown as Contracts.Evm.SpecId,
 				}),
 			"invalid spec_id",
@@ -989,6 +1068,7 @@ describe<{
 			data: Buffer.alloc(0),
 			txHash: getRandomTxHash(),
 			blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(0), round: BigInt(0) } },
+			chainId: 10_000n,
 			specId: Enums.Evm.SpecId.OSAKA,
 		};
 
@@ -1159,6 +1239,7 @@ describe<{
 			gasLimit: 21_000n,
 			gasPrice: 0n,
 			nonce: 0n,
+			chainId: 10_000n,
 			specId: Enums.Evm.SpecId.OSAKA,
 			to: recipient.address,
 			value: parseEther("1"),
@@ -1206,6 +1287,7 @@ const getBalance = async (
 		from: zeroAddress,
 		data: Buffer.from(toBytes(balanceOf)),
 		to: contractAddress!,
+		chainId: 10_000n,
 		specId: Enums.Evm.SpecId.OSAKA,
 	});
 

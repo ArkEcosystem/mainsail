@@ -37,6 +37,7 @@ describe<{
 			validatorAddress: zero,
 			prevrandao: Buffer.alloc(32),
 		},
+		chainId: 10_000n,
 		data: Buffer.alloc(0),
 		from: sender,
 		gasLimit: 100_000n,
@@ -77,6 +78,7 @@ describe<{
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
 			getHeight: () => 0,
 			getMilestone: () => milestone,
+			getNetwork: () => ({ chainId: 10_000 }),
 		});
 
 		context.action = context.app.resolve(EthEstimateGasAction);

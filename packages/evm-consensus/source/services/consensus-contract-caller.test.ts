@@ -20,7 +20,10 @@ describe<{
 	caller: ConsensusContractCaller;
 }>("ConsensusContractCaller", ({ it, beforeEach, assert, stub }) => {
 	beforeEach((context) => {
-		context.configuration = { getMilestone: () => ({ evmSpec: EVM_SPEC }) };
+		context.configuration = {
+			getMilestone: () => ({ evmSpec: EVM_SPEC }),
+			getNetwork: () => ({ chainId: 10_000 }),
+		};
 		context.evm = {
 			view: async () => ({ output: encodeOutput("getVotesCount", 0n), success: true }),
 		};
@@ -47,6 +50,7 @@ describe<{
 		assert.equal(captured.from, DEPLOYER);
 		assert.equal(captured.to, CONSENSUS);
 		assert.equal(captured.specId, EVM_SPEC);
+		assert.equal(captured.chainId, 10_000n);
 		assert.equal(
 			Buffer.from(captured.data).toString("hex"),
 			encodeFunctionData({ abi: ConsensusAbi.abi, args: undefined, functionName: "getVotesCount" }).slice(2),

@@ -73,7 +73,10 @@ describe<{
 		};
 		context.logger = { info: () => {}, warn: () => {} };
 		context.roundCalculator = { isNewRound: () => false };
-		context.cryptoConfiguration = { getMilestone: () => context.milestone };
+		context.cryptoConfiguration = {
+			getMilestone: () => context.milestone,
+			getNetwork: () => ({ chainId: 10_000 }),
+		};
 
 		const app = new Application();
 		app.bind(Identifiers.ServiceProvider.Configuration)
@@ -136,6 +139,7 @@ describe<{
 		});
 		updateRewardsAndVotes.calledWith({
 			blockReward: 2_000_000_000n,
+			chainId: 10_000n,
 			commitKey,
 			specId: "Latest",
 			timestamp: BigInt(timestamp),
@@ -168,6 +172,7 @@ describe<{
 
 		process.calledTimes(2);
 		process.calledNthWith(0, {
+			chainId: 10_000n,
 			commitKey,
 			data: Buffer.from("abcdef", "hex"),
 			from: "sender-1",
@@ -470,6 +475,7 @@ describe<{
 
 		isNewRound.calledWith(previousBlock.number + 2);
 		updateValidatorRegistrationFee.calledWith({
+			chainId: 10_000n,
 			commitKey,
 			fee: 500_000_000_000_000_000_000n,
 			specId: "Shanghai",
@@ -477,6 +483,7 @@ describe<{
 			validatorAddress: generatorAddress,
 		});
 		calculateRoundValidators.calledWith({
+			chainId: 10_000n,
 			commitKey,
 			roundValidators: 60n,
 			specId: "Shanghai",
