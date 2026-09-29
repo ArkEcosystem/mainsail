@@ -1502,6 +1502,9 @@ importers:
       bls12-381-keygen:
         specifier: 0.2.4
         version: 0.2.4
+      viem:
+        specifier: 2.55.19
+        version: 2.55.19(typescript@7.0.2)(zod@4.4.3)
     devDependencies:
       '@mainsail/contracts':
         specifier: workspace:*
