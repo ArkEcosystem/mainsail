@@ -212,4 +212,64 @@ describe<{
 		const error = parseTransactionError(tx, receipt!);
 		assert.equal(error, "InvalidProofOfPossession");
 	});
+
+	it("should reject a registration replayed by another sender", async (context) => {
+		const registrant = await Utils.getRandomColdWallet(context);
+		const otherWallet = await Utils.getRandomColdWallet(context);
+
+		const fundRegistrant = await EvmCalls.makeEvmCall(context, {
+			recipient: registrant.address,
+			value: parseEther("1000"),
+		});
+		const fundOther = await EvmCalls.makeEvmCall(context, {
+			nonceOffset: 1,
+			recipient: otherWallet.address,
+			value: parseEther("1000"),
+		});
+		await addTransactionsToPool(context, [fundRegistrant, fundOther]);
+		await Utils.waitBlock(context);
+
+		const validatorKeyPair = await getRandomConsensusKeyPair(context);
+		const { chainId } = context.app
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.getNetwork();
+		const { pop } = buildProofOfPossession(Buffer.from(validatorKeyPair.privateKey, "hex"), {
+			chainId,
+			registrantAddress: registrant.address,
+		});
+		const payload = EvmCalls.encodeValidatorRegistration(validatorKeyPair.publicKey, pop);
+
+		// A different sender submits the same (key, pop) pair first.
+		const replayed = await EvmCalls.makeValidatorRegistration(context, {
+			payload,
+			sender: otherWallet.keyPair,
+			validatorKeyPair,
+		});
+
+		let { accept } = await addTransactionsToPool(context, [replayed]);
+		assert.equal(accept, [0]);
+
+		await Utils.waitBlock(context);
+		assert.true(await isTransactionCommitted(context, replayed));
+		let receipt = await getTransactionReceipt(context, replayed);
+		assert.defined(receipt);
+		assert.equal(receipt!.status, 0);
+		assert.equal(parseTransactionError(replayed, receipt!), "InvalidProofOfPossession");
+
+		// The key was never burned, so the bound sender can still register it.
+		const owned = await EvmCalls.makeValidatorRegistration(context, {
+			payload,
+			sender: registrant.keyPair,
+			validatorKeyPair,
+		});
+
+		({ accept } = await addTransactionsToPool(context, [owned]));
+		assert.equal(accept, [0]);
+
+		await Utils.waitBlock(context);
+		assert.true(await isTransactionCommitted(context, owned));
+		receipt = await getTransactionReceipt(context, owned);
+		assert.defined(receipt);
+		assert.equal(receipt!.status, 1);
+	});
 });
