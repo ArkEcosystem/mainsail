@@ -7,7 +7,7 @@ pragma solidity ^0.8.13;
 contract MockBlsPopVerify {
     fallback(bytes calldata input) external returns (bytes memory) {
         // Real precompile halts on bad length; we revert so tests can detect it.
-        if (input.length != 48 + 96) {
+        if (input.length != 32 + 20 + 48 + 96) {
             assembly { revert(0, 0) }
         }
 

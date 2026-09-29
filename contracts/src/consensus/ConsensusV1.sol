@@ -209,7 +209,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             revert ValidatorAlreadyRegistered();
         }
 
-        if (!BLSPoP.verify(blsPublicKey, proofOfPossession)) {
+        if (!BLSPoP.verify(msg.sender, blsPublicKey, proofOfPossession)) {
             revert InvalidProofOfPossession();
         }
 
@@ -232,7 +232,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             revert ValidatorNotRegistered();
         }
 
-        if (!BLSPoP.verify(blsPublicKey, proofOfPossession)) {
+        if (!BLSPoP.verify(msg.sender, blsPublicKey, proofOfPossession)) {
             revert InvalidProofOfPossession();
         }
 
