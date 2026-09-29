@@ -1,4 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
 import { ConsensusAbi, parseTransactionError } from "@mainsail/evm-contracts";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
@@ -184,7 +185,13 @@ describe<{
 		const validatorKeyPair = await getRandomConsensusKeyPair(context);
 		const validatorKeyPairFake = await getRandomConsensusKeyPair(context);
 
-		const { pop: fakePop } = buildProofOfPossession(Buffer.from(validatorKeyPairFake.privateKey, "hex"));
+		const { chainId } = context.app
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.getNetwork();
+		const { pop: fakePop } = buildProofOfPossession(Buffer.from(validatorKeyPairFake.privateKey, "hex"), {
+			chainId,
+			registrantAddress: randomWallet.address,
+		});
 		const payload = EvmCalls.encodeValidatorRegistration(validatorKeyPair.publicKey, fakePop);
 
 		let tx = await EvmCalls.makeValidatorRegistration(context, {
