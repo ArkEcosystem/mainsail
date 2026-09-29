@@ -33,6 +33,7 @@ pub struct JsTransactionContext {
     pub tx_hash: String,
     pub commit_key: JsCommitKey,
     pub spec_id: String,
+    pub chain_id: BigInt,
 }
 
 #[napi(object)]
@@ -47,6 +48,7 @@ pub struct JsTransactionSimulateContext {
     pub data: Buffer,
     pub block_context: JsBlockContext,
     pub spec_id: String,
+    pub chain_id: BigInt,
 }
 
 #[napi(object)]
@@ -62,6 +64,7 @@ pub struct JsPreverifyTransactionContext {
     pub data: Buffer,
     pub tx_hash: String,
     pub spec_id: String,
+    pub chain_id: BigInt,
     pub block_gas_limit: BigInt,
 }
 
@@ -71,6 +74,7 @@ pub struct JsTransactionViewContext {
     pub to: String,
     pub data: Buffer,
     pub spec_id: String,
+    pub chain_id: BigInt,
     pub gas_limit: Option<BigInt>,
 }
 
@@ -100,6 +104,7 @@ pub struct JsCalculateRoundValidatorsContext {
     pub round_validators: BigInt,
     pub validator_address: String,
     pub spec_id: String,
+    pub chain_id: BigInt,
 }
 
 #[napi(object)]
@@ -109,6 +114,7 @@ pub struct JsUpdateValidatorRegistrationFeeContext {
     pub fee: BigInt,
     pub validator_address: String,
     pub spec_id: String,
+    pub chain_id: BigInt,
 }
 
 #[napi(object)]
@@ -118,6 +124,7 @@ pub struct JsUpdateRewardsAndVotesContext {
     pub block_reward: BigInt,
     pub validator_address: String,
     pub spec_id: String,
+    pub chain_id: BigInt,
 }
 
 #[napi(object)]
@@ -204,6 +211,7 @@ pub struct PreverifyTxContext {
     pub data: Bytes,
     pub tx_hash: B256,
     pub spec_id: SpecId,
+    pub chain_id: u64,
     pub block_gas_limit: u64,
 }
 
@@ -221,6 +229,7 @@ pub struct TxContext {
     pub tx_hash: B256,
     pub commit_key: CommitKey,
     pub spec_id: SpecId,
+    pub chain_id: u64,
 }
 
 #[derive(Debug)]
@@ -229,6 +238,7 @@ pub struct TxViewContext {
     pub to: Address,
     pub data: Bytes,
     pub spec_id: SpecId,
+    pub chain_id: u64,
     pub gas_limit: Option<u64>,
 }
 
@@ -243,6 +253,7 @@ pub struct TxSimulateContext {
     pub data: Bytes,
     pub block_context: BlockContext,
     pub spec_id: SpecId,
+    pub chain_id: u64,
 }
 
 #[derive(Debug)]
@@ -262,6 +273,7 @@ pub struct CalculateRoundValidatorsContext {
     pub round_validators: u8,
     pub validator_address: Address,
     pub spec_id: SpecId,
+    pub chain_id: u64,
 }
 
 #[derive(Debug)]
@@ -271,6 +283,7 @@ pub struct UpdateValidatorRegistrationFeeContext {
     pub fee: u128,
     pub validator_address: Address,
     pub spec_id: SpecId,
+    pub chain_id: u64,
 }
 
 #[derive(Debug)]
@@ -280,6 +293,7 @@ pub struct UpdateRewardsAndVotesContext {
     pub block_reward: u128,
     pub validator_address: Address,
     pub spec_id: SpecId,
+    pub chain_id: u64,
 }
 
 pub struct EvmOptions {
@@ -301,6 +315,7 @@ pub struct ExecutionContext {
     pub tx_hash: Option<B256>,
     pub block_context: Option<BlockContext>,
     pub spec_id: SpecId,
+    pub chain_id: u64,
 }
 
 impl ExecutionContext {
@@ -316,6 +331,7 @@ impl ExecutionContext {
             tx_hash: None,
             block_context,
             spec_id: tx_context.spec_id,
+            chain_id: tx_context.chain_id,
         }
     }
 
@@ -331,6 +347,7 @@ impl ExecutionContext {
             tx_hash: Some(tx_context.tx_hash),
             block_context,
             spec_id: tx_context.spec_id,
+            chain_id: tx_context.chain_id,
         }
     }
 }
@@ -348,6 +365,7 @@ impl From<TxSimulateContext> for ExecutionContext {
             tx_hash: None,
             block_context: Some(value.block_context),
             spec_id: value.spec_id,
+            chain_id: value.chain_id,
         }
     }
 }
@@ -525,6 +543,7 @@ impl TryFrom<JsTransactionContext> for TxContext {
             data: utils::convert_js_buffer_to_bytes(value.data),
             tx_hash: utils::convert_string_to_b256(value.tx_hash)?,
             spec_id: parse_spec_id(value.spec_id)?,
+            chain_id: utils::convert_bigint_to_u64(value.chain_id, "chainId")?,
             commit_key: value.commit_key.try_into()?,
         };
 
@@ -552,6 +571,7 @@ impl TryFrom<JsTransactionSimulateContext> for TxSimulateContext {
             data: utils::convert_js_buffer_to_bytes(value.data),
             block_context: value.block_context.try_into()?,
             spec_id: parse_spec_id(value.spec_id)?,
+            chain_id: utils::convert_bigint_to_u64(value.chain_id, "chainId")?,
         })
     }
 }
@@ -584,6 +604,7 @@ impl TryFrom<JsPreverifyTransactionContext> for PreverifyTxContext {
             tx_hash: utils::convert_string_to_b256(value.tx_hash)?,
             block_gas_limit: utils::convert_bigint_to_u64(value.block_gas_limit, "blockGasLimit")?,
             spec_id: parse_spec_id(value.spec_id)?,
+            chain_id: utils::convert_bigint_to_u64(value.chain_id, "chainId")?,
         };
 
         Ok(tx_ctx)
@@ -604,6 +625,7 @@ impl TryFrom<JsTransactionViewContext> for TxViewContext {
             to: utils::create_address_from_string(&value.to)?,
             data: utils::convert_js_buffer_to_bytes(value.data),
             spec_id: parse_spec_id(value.spec_id)?,
+            chain_id: utils::convert_bigint_to_u64(value.chain_id, "chainId")?,
             gas_limit,
         };
 
@@ -660,6 +682,7 @@ impl TryFrom<JsCalculateRoundValidatorsContext> for CalculateRoundValidatorsCont
                 "roundValidators",
             )?)?,
             spec_id: parse_spec_id(value.spec_id)?,
+            chain_id: utils::convert_bigint_to_u64(value.chain_id, "chainId")?,
         })
     }
 }
@@ -674,6 +697,7 @@ impl TryFrom<JsUpdateValidatorRegistrationFeeContext> for UpdateValidatorRegistr
             validator_address: utils::create_address_from_string(&value.validator_address)?,
             fee: utils::convert_bigint_to_u128(value.fee, "fee")?,
             spec_id: parse_spec_id(value.spec_id)?,
+            chain_id: utils::convert_bigint_to_u64(value.chain_id, "chainId")?,
         })
     }
 }
@@ -688,6 +712,7 @@ impl TryFrom<JsUpdateRewardsAndVotesContext> for UpdateRewardsAndVotesContext {
             validator_address: utils::create_address_from_string(&value.validator_address)?,
             block_reward: utils::convert_bigint_to_u128(value.block_reward, "blockReward")?,
             spec_id: parse_spec_id(value.spec_id)?,
+            chain_id: utils::convert_bigint_to_u64(value.chain_id, "chainId")?,
         })
     }
 }

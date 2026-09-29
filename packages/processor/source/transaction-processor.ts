@@ -31,6 +31,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Evm.TransactionReceipt> {
 		const { receipt } = await this.evm.process({
+			chainId: BigInt(this.configuration.getNetwork().chainId),
 			commitKey: {
 				blockHash: block.hash,
 				blockNumber: BigInt(block.number),

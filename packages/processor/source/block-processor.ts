@@ -280,6 +280,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		await this.evm.updateRewardsAndVotes({
 			blockReward: BigInt(milestone.reward),
+			chainId: BigInt(this.configuration.getNetwork().chainId),
 			commitKey: this.#commitKey(block),
 			specId: milestone.evmSpec,
 			timestamp: BigInt(block.timestamp),
@@ -291,6 +292,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const { evmSpec, validatorRegistrationFee } = this.configuration.getMilestone(block.number + 1);
 
 		await this.evm.updateValidatorRegistrationFee({
+			chainId: BigInt(this.configuration.getNetwork().chainId),
 			commitKey: this.#commitKey(block),
 			fee: BigInt(validatorRegistrationFee),
 			specId: evmSpec,
@@ -303,6 +305,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const { evmSpec, roundValidators } = this.configuration.getMilestone(block.number + 1);
 
 		await this.evm.calculateRoundValidators({
+			chainId: BigInt(this.configuration.getNetwork().chainId),
 			commitKey: this.#commitKey(block),
 			roundValidators: BigInt(roundValidators),
 			specId: evmSpec,

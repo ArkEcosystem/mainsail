@@ -362,10 +362,11 @@ export const getErc20BalanceOf = async (
 
 export const callViewFunction = async (
 	{ app }: Context,
-	viewContext: Omit<Contracts.Evm.TransactionViewContext, "specId">,
+	viewContext: Omit<Contracts.Evm.TransactionViewContext, "specId" | "chainId">,
 ): Promise<Contracts.Evm.ViewResult> => {
 	const instance = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
-	return instance.view({ ...viewContext, specId: Enums.Evm.SpecId.OSAKA });
+	const { chainId } = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).getNetwork();
+	return instance.view({ ...viewContext, chainId: BigInt(chainId), specId: Enums.Evm.SpecId.OSAKA });
 };
 
 export * as ContractAbis from "@mainsail/evm-contracts";

@@ -328,6 +328,7 @@ export class GenesisBlockGenerator {
 			assert.string(transaction.hash);
 
 			const { receipt } = await this.evm.process({
+				chainId: BigInt(options.chainId),
 				commitKey: blockContext.commitKey,
 				data: Buffer.from(transaction.data.slice(2), "hex"),
 				from: transaction.from,
@@ -356,6 +357,7 @@ export class GenesisBlockGenerator {
 
 		await this.evm.updateRewardsAndVotes({
 			blockReward: 0n,
+			chainId: BigInt(options.chainId),
 			commitKey: blockContext.commitKey,
 			specId: Enums.Evm.SpecId.OSAKA,
 			timestamp: blockContext.timestamp,
@@ -363,6 +365,7 @@ export class GenesisBlockGenerator {
 		});
 
 		await this.evm.updateValidatorRegistrationFee({
+			chainId: BigInt(options.chainId),
 			commitKey: blockContext.commitKey,
 			fee: BigInt(options.validatorRegistrationFee),
 			specId: Enums.Evm.SpecId.OSAKA,
@@ -371,6 +374,7 @@ export class GenesisBlockGenerator {
 		});
 
 		await this.evm.calculateRoundValidators({
+			chainId: BigInt(options.chainId),
 			commitKey: blockContext.commitKey,
 			roundValidators: BigInt(options.validators),
 			specId: Enums.Evm.SpecId.OSAKA,

@@ -33,6 +33,7 @@ export class ConsensusContractCaller {
 		}).slice(2);
 
 		const result = await this.evm.view({
+			chainId: BigInt(this.configuration.getNetwork().chainId),
 			data: Buffer.from(data, "hex"),
 			from: this.deployerAddress,
 			specId: evmSpec,

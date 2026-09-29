@@ -329,6 +329,7 @@ export class TokenParserService implements TokenParser {
 		for (const { call, data } of this.#preparedFunctionCalls) {
 			try {
 				const result = await this.evm.view({
+					chainId: BigInt(this.configuration.getNetwork().chainId),
 					data: Buffer.from(data, "hex"),
 					from: zeroAddress,
 					specId: evmSpec,
@@ -380,6 +381,7 @@ export class TokenParserService implements TokenParser {
 
 		try {
 			const result = await this.evm.view({
+				chainId: BigInt(this.configuration.getNetwork().chainId),
 				data: Buffer.from(data, "hex"),
 				from: zeroAddress,
 				specId: evmSpec,

@@ -216,6 +216,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 
 	async #validateTransaction(transaction: Contracts.Crypto.Transaction): Promise<Contracts.Evm.TransactionReceipt> {
 		const { receipt } = await this.evm.process({
+			chainId: BigInt(this.cryptoConfiguration.getNetwork().chainId),
 			commitKey: this.#commitKey,
 			data: Buffer.from(transaction.data.slice(2), "hex"),
 			from: transaction.from,
@@ -242,6 +243,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 	async #updateRewardsAndVotes(): Promise<void> {
 		await this.evm.updateRewardsAndVotes({
 			blockReward: BigInt(this.#milestone.reward),
+			chainId: BigInt(this.cryptoConfiguration.getNetwork().chainId),
 			commitKey: this.#commitKey,
 			specId: this.#milestone.evmSpec,
 			timestamp: BigInt(this.#timestamp),
@@ -256,6 +258,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 			);
 
 			await this.evm.updateValidatorRegistrationFee({
+				chainId: BigInt(this.cryptoConfiguration.getNetwork().chainId),
 				commitKey: this.#commitKey,
 				fee: BigInt(validatorRegistrationFee),
 				specId: evmSpec,
@@ -270,6 +273,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 			const { evmSpec, roundValidators } = this.cryptoConfiguration.getMilestone(this.#previousBlock.number + 2);
 
 			await this.evm.calculateRoundValidators({
+				chainId: BigInt(this.cryptoConfiguration.getNetwork().chainId),
 				commitKey: this.#commitKey,
 				roundValidators: BigInt(roundValidators),
 				specId: evmSpec,
