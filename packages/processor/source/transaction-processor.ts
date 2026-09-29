@@ -26,7 +26,7 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
-	async process(
+	public async process(
 		block: Contracts.Crypto.Block,
 		transaction: Contracts.Crypto.Transaction,
 	): Promise<Contracts.Evm.TransactionReceipt> {
