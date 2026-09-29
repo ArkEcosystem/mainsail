@@ -72,6 +72,14 @@ impl<CTX: ContextTr> PrecompileProvider<CTX> for MainsailPrecompiles {
     }
 }
 
+const POP_DST: &[u8] = b"MAINSAIL_BLS_POP_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_";
+const POP_VERIFY_GAS: u64 = 150_000;
+const BINDING_LEN: usize = 32 + 20;
+const PK_LEN: usize = 48;
+const POP_LEN: usize = 96;
+const MESSAGE_LEN: usize = BINDING_LEN + PK_LEN;
+const INPUT_LEN: usize = MESSAGE_LEN + POP_LEN;
+
 /// BLS12-381 proof-of-possession verifier under the POP scheme of
 /// draft-irtf-cfrg-bls-signature-05 §4.2.3.
 ///
@@ -84,14 +92,6 @@ impl<CTX: ContextTr> PrecompileProvider<CTX> for MainsailPrecompiles {
 /// discourage spam with junk inputs and matches how the EIP-2537 precompiles
 /// signal the same conditions. A *well-formed* but cryptographically invalid
 /// PoP returns 0x00..00 at the flat `POP_VERIFY_GAS` cost.
-const POP_DST: &[u8] = b"MAINSAIL_BLS_POP_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_";
-const POP_VERIFY_GAS: u64 = 150_000;
-const BINDING_LEN: usize = 32 + 20;
-const PK_LEN: usize = 48;
-const POP_LEN: usize = 96;
-const MESSAGE_LEN: usize = BINDING_LEN + PK_LEN;
-const INPUT_LEN: usize = MESSAGE_LEN + POP_LEN;
-
 fn bls_pop_verify(input: &[u8], gas_limit: u64, reservoir: u64) -> PrecompileResult {
     if gas_limit < POP_VERIFY_GAS {
         return Ok(PrecompileOutput::halt(PrecompileHalt::OutOfGas, reservoir));
@@ -143,7 +143,7 @@ fn bls_pop_verify(input: &[u8], gas_limit: u64, reservoir: u64) -> PrecompileRes
 
     Ok(PrecompileOutput::new(
         POP_VERIFY_GAS,
-        Bytes::from(out.to_vec()),
+        Bytes::copy_from_slice(&out),
         reservoir,
     ))
 }
@@ -152,6 +152,7 @@ fn bls_pop_verify(input: &[u8], gas_limit: u64, reservoir: u64) -> PrecompileRes
 mod tests {
     use blst::min_pk::SecretKey;
     use revm::precompile::{PrecompileHalt, PrecompileOutput, PrecompileStatus};
+    use revm::primitives::U256;
 
     use crate::precompiles::{POP_DST, POP_VERIFY_GAS, bls_pop_verify};
 
@@ -219,8 +220,7 @@ mod tests {
     const REGISTRANT_ADDRESS: [u8; 20] = [0x22; 20];
 
     fn binding(chain_id: u64, registrant_address: &[u8]) -> Vec<u8> {
-        let mut v = vec![0u8; 24];
-        v.extend_from_slice(&chain_id.to_be_bytes());
+        let mut v = U256::from(chain_id).to_be_bytes::<32>().to_vec();
         v.extend_from_slice(registrant_address);
         v
     }
