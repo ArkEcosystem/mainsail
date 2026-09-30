@@ -12,7 +12,7 @@ on:
     push:
         branches:
             - "evm"
-    # Pull requests against `evm` run the whole pipeline, but publish with `--dry-run` (see PUBLISH_FLAGS).
+    # Pull requests against `evm` run the whole pipeline, including publishing to npm.
     pull_request:
         branches:
             - "evm"
@@ -86,9 +86,6 @@ jobs:
         runs-on: ubuntu-latest
         needs:
             - build
-        env:
-            # On pull requests do everything a publish does except uploading to npm.
-            PUBLISH_FLAGS: ${{ github.event_name == 'pull_request' && '--dry-run' || '' }}
         steps:
             - uses: actions/checkout@v7.0.1
 
@@ -140,13 +137,13 @@ jobs:
               shell: bash
 
             - name: Publish native to NPM
-              run: pnpm run release:native -- --publish-branch=evm --tag=evm --no-git-checks $PUBLISH_FLAGS
+              run: pnpm run release:native -- --publish-branch=evm --tag=evm --no-git-checks
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
             - name: Publish to NPM
               run: |
-                  pnpm run release -- --publish-branch=evm --tag=evm --no-git-checks $PUBLISH_FLAGS
+                  pnpm run release -- --publish-branch=evm --tag=evm --no-git-checks
               env:
                   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
