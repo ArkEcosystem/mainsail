@@ -504,6 +504,15 @@ mod tests {
                         },
                         Log {
                             address: genesis_info.username_contract,
+                            data: events::UsernameRegistered {
+                                addr: address!("0000000000000000000000000000000000000001"),
+                                username: "renamed".into(),
+                                previousUsername: "test".into(),
+                            }
+                            .encode_log_data(),
+                        },
+                        Log {
+                            address: genesis_info.username_contract,
                             data: events::UsernameResigned {
                                 addr: address!("0000000000000000000000000000000000000002"),
                                 username: "resigned".into(),
@@ -563,7 +572,7 @@ mod tests {
                     nonce: 0,
                     vote: Some(address!("0000000000000000000000000000000000000002")),
                     unvote: None,
-                    username: Some("test".into()),
+                    username: Some("renamed".into()),
                     username_resigned: false,
                     merge_info: Some(AccountMergeInfo {
                         legacy_address: "DJmvhhiQFSrEQCq9FUxvcLcpcBjx7K3yLt".try_into().unwrap(),
@@ -618,6 +627,11 @@ mod tests {
                     addr: address!("0000000000000000000000000000000000000001"),
                     username: "test".into(),
                     previous_username: None,
+                }),
+                event(ContractEventData::UsernameRegistered {
+                    addr: address!("0000000000000000000000000000000000000001"),
+                    username: "renamed".into(),
+                    previous_username: Some("test".into()),
                 }),
                 event(ContractEventData::UsernameResigned {
                     addr: address!("0000000000000000000000000000000000000002"),
