@@ -140,6 +140,7 @@ describe<{
 				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
+			setContractEvents: () => {},
 		} as any);
 
 		const encodedCall = encodeFunctionData({
@@ -249,6 +250,7 @@ describe<{
 					round: BigInt(0),
 				}),
 				setAccountUpdates: () => {},
+				setContractEvents: () => {},
 			} as any);
 
 			const { receipt: simulated } = await instance.simulate({
@@ -303,6 +305,7 @@ describe<{
 				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
+			setContractEvents: () => {},
 		} as any);
 
 		assert.equal(receipt.status, 1);
@@ -346,6 +349,7 @@ describe<{
 				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
+			setContractEvents: () => {},
 		} as any);
 
 		assert.equal(receipt.status, 1);
@@ -370,6 +374,7 @@ describe<{
 					round: commitKey.round,
 				}),
 				setAccountUpdates: () => {},
+				setContractEvents: () => {},
 			} as any);
 
 		// No legacy balance present yet
@@ -483,6 +488,7 @@ describe<{
 					round: commitKey.round,
 				}),
 				setAccountUpdates: () => {},
+				setContractEvents: () => {},
 			} as any);
 
 		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
@@ -570,6 +576,7 @@ describe<{
 				round: commitKey.round,
 			}),
 			setAccountUpdates: () => {},
+			setContractEvents: () => {},
 		} as any);
 
 		//
@@ -632,6 +639,7 @@ describe<{
 					round: commitKey1.round,
 				}),
 				setAccountUpdates: () => {},
+				setContractEvents: () => {},
 			} as any),
 		);
 
@@ -644,6 +652,7 @@ describe<{
 					round: commitKey2.round,
 				}),
 				setAccountUpdates: () => {},
+				setContractEvents: () => {},
 			} as any);
 		}, "commit is missing commit key");
 
@@ -666,6 +675,7 @@ describe<{
 						round: 0,
 					}),
 					setAccountUpdates: () => {},
+					setContractEvents: () => {},
 				} as any),
 		);
 	});
@@ -710,6 +720,7 @@ describe<{
 				round: commitKey.round,
 			}),
 			setAccountUpdates: () => {},
+			setContractEvents: () => {},
 		} as any);
 
 		const randomTxHash = getRandomTxHash();
@@ -751,6 +762,7 @@ describe<{
 				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
+			setContractEvents: () => {},
 		} as any);
 
 		assert.equal(receipt.status, 1);
@@ -816,6 +828,7 @@ describe<{
 				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
+			setContractEvents: () => {},
 		} as any);
 
 		// Balance updated correctly
@@ -930,6 +943,7 @@ describe<{
 				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
+			setContractEvents: () => {},
 		} as any);
 
 		code = await instance.codeAt(receipt.contractAddress!);
@@ -984,6 +998,7 @@ describe<{
 				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
+			setContractEvents: () => {},
 		} as any);
 
 		const nextCommitKey = { blockNumber: BigInt(1), round: BigInt(0) };
@@ -1033,6 +1048,7 @@ describe<{
 				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
+			setContractEvents: () => {},
 		} as any);
 
 		// look up slot containing user balance
@@ -1140,6 +1156,7 @@ describe<{
 				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
+			setContractEvents: () => {},
 		} as any);
 
 		const contractAddress = receipt.contractAddress;
@@ -1207,6 +1224,7 @@ describe<{
 				round: BigInt(0),
 			}),
 			setAccountUpdates: () => {},
+			setContractEvents: () => {},
 		} as any);
 
 		//
@@ -1264,6 +1282,7 @@ describe<{
 			getBlock: () => ({ number: BigInt(0), round: BigInt(0) }),
 			round: BigInt(0),
 			setAccountUpdates: () => {},
+			setContractEvents: () => {},
 		} as any);
 
 		assert.equal((await instance.getAccountInfo(sender.address)).balance, 1234n);

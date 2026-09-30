@@ -107,4 +107,18 @@ describe<{
 
 		assert.is(commitState.getAccountUpdates(), accountUpdates);
 	});
+
+	it("#getContractEvents - should be empty by default", ({ commitState }) => {
+		assert.equal(commitState.getContractEvents(), []);
+	});
+
+	it("#setContractEvents - should store the contract events", ({ commitState }) => {
+		const contractEvents = [
+			{ event: "Voted", txHash: "hash-0", txIndex: 0, validator: "address-1", voter: "address-0" },
+		] as unknown as Contracts.Evm.ContractEvent[];
+
+		commitState.setContractEvents(contractEvents);
+
+		assert.is(commitState.getContractEvents(), contractEvents);
+	});
 });
