@@ -1,6 +1,6 @@
 import type { Block } from "../crypto/block.js";
 import type { Commit } from "../crypto/commit.js";
-import type { AccountUpdate } from "../evm/evm.js";
+import type { AccountUpdate, ContractEvent } from "../evm/evm.js";
 import type { BlockProcessorResult } from "./block-processor-result.js";
 
 export interface ProcessableUnit {
@@ -11,6 +11,8 @@ export interface ProcessableUnit {
 	setProcessorResult(processorResult: BlockProcessorResult): void;
 	setAccountUpdates(accounts: Array<AccountUpdate>): void;
 	getAccountUpdates(): Array<AccountUpdate>;
+	setContractEvents(events: Array<ContractEvent>): void;
+	getContractEvents(): Array<ContractEvent>;
 	getBlock(): Block;
 	getCommit(): Promise<Commit>;
 }

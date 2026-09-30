@@ -98,6 +98,7 @@ export class Deployer implements Contracts.EvmConsensus.Deployer {
 				commitKey,
 				getBlock: () => ({ ...commitKey, number: commitKey.blockNumber }),
 				setAccountUpdates: () => ({}),
+				setContractEvents: () => ({}),
 			} as unknown as Contracts.Processor.ProcessableUnit);
 		}
 	}
