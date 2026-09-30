@@ -8,10 +8,10 @@
 	"include": ["source/**/**.ts"],
 	"references": [
 		{
-			"path": "../container"
+			"path": "../constants"
 		},
 		{
-			"path": "../contracts"
+			"path": "../container"
 		},
 		{
 			"path": "../crypto-address-base58"
@@ -32,10 +32,16 @@
 			"path": "../crypto-hash-bcrypto"
 		},
 		{
+			"path": "../crypto-key-pair-bls12-381"
+		},
+		{
 			"path": "../crypto-key-pair-ecdsa"
 		},
 		{
 			"path": "../crypto-messages"
+		},
+		{
+			"path": "../crypto-signature-bls12-381"
 		},
 		{
 			"path": "../crypto-signature-ecdsa"
@@ -63,9 +69,6 @@
 		},
 		{
 			"path": "../serializer"
-		},
-		{
-			"path": "../snapshot-legacy-exporter"
 		},
 		{
 			"path": "../snapshot-legacy-importer"

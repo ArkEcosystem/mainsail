@@ -173,6 +173,18 @@ export const Identifiers = {
 			Factory: Symbol("Evm<WorkerSubprocess.Factory>"),
 		},
 	},
+	EvmConsensus: {
+		ConsensusContractCaller: Symbol("EvmConsensus<ConsensusContractCaller>"),
+		Contracts: {
+			Consensus: Symbol("EvmConsensus<Contracts.Consensus>"),
+			MultiPayment: Symbol("<EvmConsensus.MultiPayment>"),
+			Usernames: Symbol("EvmConsensus<Contracts.Usernames>"),
+		},
+		Deployer: Symbol("EvmConsensus<Deployer>"),
+		DeployerAddress: Symbol("EvmConsensus<DeployerAddress>"),
+		GenesisInfo: Symbol("EvmConsensus<GenesisInfo>"),
+		ValidatorSet: Symbol("EvmConsensus<ValidatorSet>"),
+	},
 	Forger: {
 		Block: Symbol("Forger<Block>"),
 	},
@@ -205,6 +217,7 @@ export const Identifiers = {
 			Repository: Symbol("P2P<Peer.Repository>"),
 			Verifier: Symbol("P2P<Peer.Verifier>"),
 		},
+		PendingCommits: Symbol("P2P<PendingCommits>"),
 		Routes: Symbol("P2P<Routes>"),
 		Server: Symbol("P2P<Server>"),
 		Service: Symbol("P2P<Service>"),
@@ -278,9 +291,6 @@ export const Identifiers = {
 		State: Symbol("State<State>"),
 		Store: Symbol("State<Store>"),
 	},
-	Transaction: {
-		Handler: Symbol("Transaction<Handler>"),
-	},
 	TransactionPool: {
 		API: {
 			HTTP: Symbol.for("TransactionPool<API.HTTP>"),
@@ -294,7 +304,6 @@ export const Identifiers = {
 			Repository: Symbol("TransactionPoolBroadcaster<Peer.Repository>"),
 		},
 		Processor: Symbol("TransactionPool<Processor>"),
-		ProcessorExtension: Symbol("TransactionPool<ProcessorExtension>"),
 		Query: Symbol("TransactionPool<Query>"),
 		Selector: Symbol("TransactionPool<Selector>"),
 		SenderMempool: {
@@ -309,6 +318,7 @@ export const Identifiers = {
 		},
 	},
 	Validator: {
+		Reporter: Symbol("Validator<Reporter>"),
 		Repository: Symbol("Validator<Repository>"),
 	},
 	ValidatorSet: {

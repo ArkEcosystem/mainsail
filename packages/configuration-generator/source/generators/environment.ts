@@ -27,7 +27,7 @@ export class EnvironmentGenerator {
 
 	addRecords(data: EnvironmentData): EnvironmentGenerator {
 		for (const [key, value] of Object.entries(data)) {
-			if (value) {
+			if (value !== undefined && value !== null) {
 				this.addRecord(key, value);
 			}
 		}

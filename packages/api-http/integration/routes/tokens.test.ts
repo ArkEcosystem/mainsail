@@ -276,7 +276,8 @@ describe<{
 			} else {
 				const { statusCode, data } = await request(endpoint, options);
 				assert.equal(statusCode, result.statusCode);
-				assert.equal(data.results, result.data);
+				assert.equal(data.data, result.data);
+				assert.equal(data.meta.totalCount, result.data.length);
 			}
 		}
 	});

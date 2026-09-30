@@ -18,6 +18,9 @@ jobs:
     circular:
         uses: ./.github/workflows/_circular.yml
 
+    dead-injects:
+        uses: ./.github/workflows/_dead-injects.yml
+
     check-commit-count:
         uses: ./.github/workflows/_check-commit-count.yml
         permissions:
@@ -42,6 +45,14 @@ jobs:
             contents: read
             issues: write
 
+    # Runs after lint-internal so the two autofix jobs never push to the branch at the same time.
+    references-internal:
+        needs: lint-internal
+        if: github.event.pull_request.head.repo.full_name == github.repository && needs.lint-internal.outputs.did_commit != 'true'
+        uses: ./.github/workflows/_references-internal.yml
+        secrets:
+            GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
     prechecks-gate:
         runs-on: ubuntu-latest
         needs:
@@ -49,8 +60,10 @@ jobs:
             - circular
             - check-commit-count
             - contracts
+            - dead-injects
             - lint-internal
             - lint-external
+            - references-internal
         if: ${{ !cancelled() }}
         outputs:
             run_tests: ${{ steps.decide.outputs.run_tests }}
@@ -62,7 +75,10 @@ jobs:
                   LINT_INTERNAL_RESULT: ${{ needs.lint-internal.result }}
                   LINT_INTERNAL_DID_COMMIT: ${{ needs.lint-internal.outputs.did_commit }}
                   LINT_EXTERNAL_RESULT: ${{ needs.lint-external.result }}
+                  REFERENCES_INTERNAL_RESULT: ${{ needs.references-internal.result }}
+                  REFERENCES_INTERNAL_DID_COMMIT: ${{ needs.references-internal.outputs.did_commit }}
                   DEPENDENCIES_RESULT: ${{ needs.dependencies.result }}
+                  DEAD_INJECTS_RESULT: ${{ needs.dead-injects.result }}
                   CIRCULAR_RESULT: ${{ needs.circular.result }}
                   COMMIT_COUNT_RESULT: ${{ needs.check-commit-count.result }}
                   CONTRACTS_RESULT: ${{ needs.contracts.result }}
@@ -77,21 +93,33 @@ jobs:
                     lint_ok=true
                   fi
 
+                  references_ok=false
+
+                  if [[ "$REFERENCES_INTERNAL_RESULT" == "success" && "$REFERENCES_INTERNAL_DID_COMMIT" != "true" ]]; then
+                    references_ok=true
+                  fi
+
+                  # External PRs have no references job (it needs the push token), so a skipped job is not a failure.
+                  # If it was skipped because lint-internal failed, lint_ok already makes the gate red.
+                  if [[ "$REFERENCES_INTERNAL_RESULT" == "skipped" ]]; then
+                    references_ok=true
+                  fi
+
                   other_checks_ok=true
-                  for result in "$DEPENDENCIES_RESULT" "$CIRCULAR_RESULT" "$COMMIT_COUNT_RESULT" "$CONTRACTS_RESULT"; do
+                  for result in "$DEPENDENCIES_RESULT" "$DEAD_INJECTS_RESULT" "$CIRCULAR_RESULT" "$COMMIT_COUNT_RESULT" "$CONTRACTS_RESULT"; do
                     if [[ "$result" != "success" ]]; then
                       other_checks_ok=false
                     fi
                   done
 
                   # Internal autofix commit happened, so stop gracefully and let the new run take over.
-                  if [[ "$LINT_INTERNAL_DID_COMMIT" == "true" ]]; then
+                  if [[ "$LINT_INTERNAL_DID_COMMIT" == "true" || "$REFERENCES_INTERNAL_DID_COMMIT" == "true" ]]; then
                     echo "run_tests=false" >> "$GITHUB_OUTPUT"
                     exit 0
                   fi
 
                   # Any required precheck failed, so make the gate red.
-                  if [[ "$lint_ok" != "true" || "$other_checks_ok" != "true" ]]; then
+                  if [[ "$lint_ok" != "true" || "$references_ok" != "true" || "$other_checks_ok" != "true" ]]; then
                     echo "run_tests=false" >> "$GITHUB_OUTPUT"
                     exit 1
                   fi

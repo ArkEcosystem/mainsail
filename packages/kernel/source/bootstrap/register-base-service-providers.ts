@@ -12,19 +12,12 @@ export class RegisterBaseServiceProviders implements Contracts.Kernel.Bootstrapp
 
 	public async bootstrap(): Promise<void> {
 		await this.app.resolve(Log.ServiceProvider).register();
-
 		await this.app.resolve(Triggers.ServiceProvider).register();
-
 		await this.app.resolve(Filesystem.ServiceProvider).register();
-
 		await this.app.resolve(Cache.ServiceProvider).register();
-
 		await this.app.resolve(Pipeline.ServiceProvider).register();
-
 		await this.app.resolve(Queue.ServiceProvider).register();
-
 		await this.app.resolve(Validation.ServiceProvider).register();
-
 		await this.app.resolve(Schedule.ServiceProvider).register();
 	}
 }

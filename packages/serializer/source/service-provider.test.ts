@@ -20,8 +20,4 @@ describe<{
 
 		assert.true(app.isBound(Identifiers.Cryptography.Serializer));
 	});
-
-	it("should be required", async ({ serviceProvider }) => {
-		assert.true(await serviceProvider.required());
-	});
 });

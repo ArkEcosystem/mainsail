@@ -21,11 +21,11 @@ describe<{
 	});
 
 	it("#size - should return size", ({ serializer }) => {
-		assert.equal(serializer.totalSize(blockData), 461);
+		assert.equal(serializer.totalSize(blockData), 557);
 	});
 
 	it("#size - should return size with transactions", async ({ serializer }) => {
-		assert.equal(serializer.totalSize(blockDataWithTransactions), 679);
+		assert.equal(serializer.totalSize(blockDataWithTransactions), 775);
 	});
 
 	it("#serialize - should serialize and deserialize block", async ({ serializer, deserializer }) => {

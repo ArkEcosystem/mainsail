@@ -21,7 +21,7 @@ describe<{
 }>("WorkerPool", ({ assert, beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		context.flags = { network: "testnet" };
-		context.logger = { info: () => {} };
+		context.logger = { info: () => {}, warn: () => {} };
 		context.pool = [makeWorker(), makeWorker(), makeWorker()];
 		context.options = { workerCount: context.pool.length, workerLoggingEnabled: false };
 
@@ -40,7 +40,7 @@ describe<{
 		context.workerPool = context.app.resolve(WorkerPool);
 	});
 
-	it("boot creates the configured number of workers and boots each with the merged flags", async ({
+	it("boots every configured worker with the merged flags (eager + background)", async ({
 		workerPool,
 		pool,
 		flags,
@@ -48,6 +48,7 @@ describe<{
 		const boots = pool.map((worker) => spy(worker, "boot"));
 
 		await workerPool.boot();
+		await workerPool.whenReady();
 
 		for (const boot of boots) {
 			boot.calledOnce();
@@ -55,12 +56,38 @@ describe<{
 		}
 	});
 
-	it("boot logs how many workers it starts", async ({ workerPool, logger, pool }) => {
+	it("boots only the eager subset before returning, then grows the rest in the background", async ({
+		workerPool,
+		pool,
+	}) => {
+		// Gate the third (background) worker's boot so it stays out of the pool until released.
+		let releaseThird = () => {};
+		pool[2].boot = () => new Promise<void>((resolve) => (releaseThird = resolve));
+
+		await workerPool.boot();
+
+		// The eager workers are usable immediately; getWorker never hands out the still-booting one.
+		const handedOut = new Set([workerPool.getWorker(), workerPool.getWorker(), workerPool.getWorker()]);
+		assert.equal(handedOut.has(pool[2]), false);
+		assert.equal(handedOut.has(pool[0]), true);
+		assert.equal(handedOut.has(pool[1]), true);
+
+		// Once it finishes booting in the background it joins the pool.
+		releaseThird();
+		await workerPool.whenReady();
+
+		stub(pool[0], "getQueueSize").returnValue(5);
+		stub(pool[1], "getQueueSize").returnValue(5);
+		stub(pool[2], "getQueueSize").returnValue(0);
+		assert.equal(workerPool.getWorker(), pool[2]);
+	});
+
+	it("boot logs the eager/total split", async ({ workerPool, logger, pool }) => {
 		const info = spy(logger, "info");
 
 		await workerPool.boot();
 
-		info.calledWith(`Booting up ${pool.length} crypto workers`);
+		info.calledWith(`Booting up 2/${pool.length} crypto workers (remaining in background)`);
 	});
 
 	it("boot forwards the workerLoggingEnabled flag from configuration", async ({ workerPool, pool, options }) => {
@@ -68,14 +95,16 @@ describe<{
 		const boot = spy(pool[0], "boot");
 
 		await workerPool.boot();
+		await workerPool.whenReady();
 
 		boot.calledWith({ network: "testnet", thread: "crypto-worker", workerLoggingEnabled: true });
 	});
 
-	it("dispose disposes every worker and empties the pool", async ({ workerPool, pool }) => {
+	it("dispose disposes every worker (incl. background) and empties the pool", async ({ workerPool, pool }) => {
 		const disposes = pool.map((worker) => spy(worker, "dispose"));
 
 		await workerPool.boot();
+		await workerPool.whenReady();
 		await workerPool.dispose();
 
 		for (const dispose of disposes) {
@@ -94,6 +123,7 @@ describe<{
 		}
 
 		await workerPool.boot();
+		await workerPool.whenReady();
 
 		assert.throws(() => workerPool.getWorker(), "No crypto workers available");
 	});
@@ -104,6 +134,7 @@ describe<{
 		stub(pool[2], "getQueueSize").returnValue(3);
 
 		await workerPool.boot();
+		await workerPool.whenReady();
 
 		assert.equal(workerPool.getWorker(), pool[1]);
 		assert.equal(workerPool.getWorker(), pool[1]);
@@ -111,6 +142,7 @@ describe<{
 
 	it("getWorker round-robins when the queues are tied", async ({ workerPool, pool }) => {
 		await workerPool.boot();
+		await workerPool.whenReady();
 
 		assert.equal(workerPool.getWorker(), pool[0]);
 		assert.equal(workerPool.getWorker(), pool[1]);
@@ -122,6 +154,7 @@ describe<{
 		stub(pool[0], "isStopped").returnValue(true);
 
 		await workerPool.boot();
+		await workerPool.whenReady();
 
 		assert.not.equal(workerPool.getWorker(), pool[0]);
 	});

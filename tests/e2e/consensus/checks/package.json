@@ -2,9 +2,9 @@
 	"name": "consensus-checks",
 	"type": "module",
 	"dependencies": {
-		"express": "4.19.2",
-		"got": "14.2.1",
-		"viem": "2.33.1"
+		"express": "5.2.1",
+		"got": "15.1.0",
+		"viem": "2.55.19"
 	},
 	"engines": {
 		"node": ">=20"

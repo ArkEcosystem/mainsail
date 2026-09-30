@@ -5,13 +5,7 @@ import type { FakeLike } from "./fake.js";
 
 import { Fake } from "./fake.js";
 
-type SinonStubLike<TArguments extends unknown[], TResult> = FakeLike<TArguments, TResult> &
-	SinonStub & {
-		returns(value: TResult): SinonStubLike<TArguments, TResult>;
-		onCall(nth: number): SinonStubLike<TArguments, TResult>;
-		resolves(value: unknown): SinonStubLike<TArguments, TResult>;
-		rejects(value: unknown): SinonStubLike<TArguments, TResult>;
-	};
+type SinonStubLike<TArguments extends unknown[], TResult> = FakeLike<TArguments, TResult> & SinonStub;
 
 export class Stub<TArguments extends unknown[] = unknown[], TResult = unknown>
 	extends Fake<TArguments, TResult>
@@ -55,13 +49,13 @@ export class Stub<TArguments extends unknown[] = unknown[], TResult = unknown>
 		return this;
 	}
 
-	public resolvedValueNth(nth: number, value: TResult): this {
+	public resolvedValueNth(nth: number, value: unknown): this {
 		this.subject.onCall(nth).resolves(value);
 
 		return this;
 	}
 
-	public resolvedValueSequence(sequence: TResult[]): this {
+	public resolvedValueSequence(sequence: unknown[]): this {
 		for (const [nth, value] of sequence.entries()) {
 			this.resolvedValueNth(nth, value);
 		}

@@ -5,7 +5,7 @@ import { inject, injectable } from "@mainsail/container";
 import { RpcError } from "@mainsail/exceptions";
 
 @injectable()
-export class EthGetUncleByBlockHashAndIndex implements Contracts.Api.RPC.Action<[string]> {
+export class EthGetUncleByBlockHashAndIndex implements Contracts.Api.RPC.Action<[string, string]> {
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
 
@@ -20,7 +20,7 @@ export class EthGetUncleByBlockHashAndIndex implements Contracts.Api.RPC.Action<
 		type: "array",
 	};
 
-	public async handle(parameters: [string]): Promise<null> {
+	public async handle(parameters: [string, string]): Promise<null> {
 		if (!(await this.databaseService.hasCommitByHash(parameters[0].slice(2)))) {
 			throw new RpcError("Block not found");
 		}

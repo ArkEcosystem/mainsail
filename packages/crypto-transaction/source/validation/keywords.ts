@@ -116,26 +116,32 @@ export const makeKeywords = (
 	const bytecode: FuncKeywordDefinition = {
 		// @ts-ignore
 		compile() {
-			return (data, parentSchema: AnySchemaObject) => {
-				const {
-					gas: { maximumGasLimit },
-				} = configuration.getMilestone();
+			// Cache the compiled regex per `maximumGasLimit` so it is built once per milestone
+			// value instead of on every transaction's `data` validation. The bound is the only
+			// input to the pattern, so this is keyed by it.
+			const regexByMaxGasLimit = new Map<number, RegExp>();
 
+			return (data, parentSchema: AnySchemaObject) => {
 				if (typeof data !== "string") {
 					return false;
 				}
 
-				// The allowed bytecode length is relative to the maximum transaction gas limit
-				// and cost of non-zero calldata per gas (16 byte).
-				const maxBytecodeLength = maximumGasLimit / 16;
-				const minBytecodeLength = 0;
+				const {
+					gas: { maximumGasLimit },
+				} = configuration.getMilestone();
 
-				const regex = new RegExp(`^(0x)[0-9a-fA-F]{${minBytecodeLength},${maxBytecodeLength}}$`);
-				if (!regex.test(data)) {
-					return false;
+				let regex = regexByMaxGasLimit.get(maximumGasLimit);
+				if (regex === undefined) {
+					// The allowed bytecode length is relative to the maximum transaction gas limit
+					// and cost of non-zero calldata per gas (16 byte).
+					const maxBytecodeLength = maximumGasLimit / 16;
+					const minBytecodeLength = 0;
+
+					regex = new RegExp(`^(0x)[0-9a-fA-F]{${minBytecodeLength},${maxBytecodeLength}}$`);
+					regexByMaxGasLimit.set(maximumGasLimit, regex);
 				}
 
-				return true;
+				return regex.test(data);
 			};
 		},
 		errors: false,

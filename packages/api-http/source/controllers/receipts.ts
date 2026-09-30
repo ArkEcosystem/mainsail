@@ -115,9 +115,11 @@ export class ReceiptsController extends Controller {
 	#getReceiptColumns(fullReceipt?: boolean): string[] {
 		let columns = [
 			"Transaction.hash",
+			"Transaction.blockNumber",
 			"Transaction.status",
 			"Transaction.gasUsed",
 			"Transaction.gasRefunded",
+			"Transaction.cumulativeGasUsed",
 			"Transaction.deployedContractAddress",
 			"Transaction.decodedError",
 		];

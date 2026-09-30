@@ -13,6 +13,9 @@
 	"include": ["source/**/**.ts"],
 	"references": [
 		{
+			"path": "../constants"
+		},
+		{
 			"path": "../utils"
 		}
 	]

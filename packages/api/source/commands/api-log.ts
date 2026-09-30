@@ -14,7 +14,7 @@ export class Command extends Commands.Command {
 	@postConstruct()
 	public configure(): void {
 		this.definition
-			.setFlag("error", "Only display the error output.", Joi.boolean())
+			.setFlag("error", "Only display the error output.", Joi.boolean().default(false))
 			.setFlag("lines", "The number of lines to output.", Joi.number().default(15));
 	}
 

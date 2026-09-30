@@ -334,12 +334,6 @@ export class NotEnoughValidatorsError extends Exception {
 	}
 }
 
-export class InvalidSignatureError extends Exception {
-	public constructor() {
-		super(`Failed to apply transaction, because signature is invalid.`);
-	}
-}
-
 export class MultiPaymentAmountMismatchError extends Exception {
 	public constructor() {
 		super(`Payment amounts mismatch.`);

@@ -25,10 +25,13 @@ export class ConfigRepository implements Contracts.Kernel.Repository {
 		return this.has(key);
 	}
 
+	// Returns true if the key existed and was removed, false if it did not exist.
 	public unset(key: string): boolean {
+		const exists: boolean = this.has(key);
+
 		unset(this.#items, key);
 
-		return this.has(key);
+		return exists;
 	}
 
 	public has(key: string): boolean {

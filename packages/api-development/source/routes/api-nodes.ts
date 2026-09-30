@@ -1,6 +1,8 @@
 import type { Types } from "@mainsail/api-common";
 import type { Contracts } from "@mainsail/contracts";
 
+import { Schemas } from "@mainsail/api-common";
+
 import { ApiNodesController } from "../controllers/api-nodes.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
@@ -15,6 +17,9 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				pagination: {
 					enabled: true,
 				},
+			},
+			validate: {
+				query: Schemas.pagination,
 			},
 		},
 		path: "/api-nodes",

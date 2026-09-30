@@ -4,7 +4,6 @@ import { Events, Identifiers } from "@mainsail/constants";
 import { Application as BaseApplication } from "@mainsail/container";
 import { DirectoryCannotBeFound } from "@mainsail/exceptions";
 import { ensureError } from "@mainsail/utils";
-import { exit } from "node:process";
 import { join } from "path";
 import { isMainThread } from "worker_threads";
 
@@ -62,7 +61,7 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 	public config<T = unknown>(key: string, value?: T, defaultValue?: T): T | undefined {
 		const config: ConfigRepository = this.get<ConfigRepository>(Identifiers.Config.Repository);
 
-		if (value) {
+		if (value !== undefined) {
 			config.set(key, value);
 		}
 
@@ -141,6 +140,14 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 		return !isMainThread;
 	}
 
+	// Terminates from inside an operation that holds a lock a disposing service provider waits for. Termination
+	// runs detached and the error unwinds the caller, which releases the lock.
+	public fail(reason: string, error: Error): never {
+		void this.terminate(reason, error);
+
+		throw error;
+	}
+
 	public async terminate(reason?: string, error?: Error): Promise<never> {
 		this.#booted = false;
 
@@ -149,45 +156,46 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 		}
 		this.#terminating = true;
 
-		if (reason) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service)[error ? "error" : "warn"](
-				`${this.isWorker() ? "Worker " + this.thread() : "Application"} shutdown: ${reason}`,
-			);
-		}
+		let timeout: ReturnType<typeof setTimeout> | undefined;
 
-		if (error) {
-			let errors: Error[] = [error];
-
-			// Check for AggregateError
-			if ("errors" in error) {
-				errors = [...errors, ...(error as unknown as { errors: Error[] }).errors];
+		try {
+			if (reason) {
+				this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service)[error ? "error" : "warn"](
+					`${this.isWorker() ? "Worker " + this.thread() : "Application"} shutdown: ${reason}`,
+				);
 			}
 
-			for (const error of errors) {
-				this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).error(error.stack ?? error.message);
+			if (error) {
+				this.#logTerminationErrors(error);
 			}
-		}
 
-		const timeout = setTimeout(() => {
-			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warn(
-				`Force ${this.isWorker() ? "worker " + this.thread() : "application"} termination. Service providers did not dispose in time.`,
+			timeout = setTimeout(() => {
+				this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).warn(
+					`Force ${this.isWorker() ? "worker " + this.thread() : "application"} termination. Service providers did not dispose in time.`,
+				);
+				process.exit(1);
+			}, 3000);
+
+			await this.#disposeServiceProviders();
+			clearTimeout(timeout);
+
+			// Await all async operations to finish
+			await new Promise((resolve) => setTimeout(resolve, 0));
+
+			this.#logOpenHandlers();
+
+			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice(
+				`${this.isWorker() ? "Worker " + this.thread() : "Application"} is gracefully terminated.`,
 			);
-			exit(1);
-		}, 3000);
 
-		await this.#disposeServiceProviders();
-		clearTimeout(timeout);
+			process.exit(error ? 1 : 0);
+		} catch {
+			if (timeout) {
+				clearTimeout(timeout);
+			}
 
-		// Await all async operations to finish
-		await new Promise((resolve) => setTimeout(resolve, 0));
-
-		this.#logOpenHandlers();
-
-		this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).notice(
-			`${this.isWorker() ? "Worker " + this.thread() : "Application"} is gracefully terminated.`,
-		);
-
-		exit(0);
+			process.exit(1);
+		}
 	}
 
 	async #bootstrapWith(type: string): Promise<void> {
@@ -209,19 +217,37 @@ export class Application extends BaseApplication implements Contracts.Kernel.App
 		await this.resolve(EventServiceProvider).register();
 	}
 
+	#logTerminationErrors(error: Error): void {
+		const logger = this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service);
+
+		let errors: Error[] = [error];
+
+		// Unwrap AggregateError so each underlying error is logged individually.
+		if ("errors" in error && Array.isArray((error as unknown as { errors: unknown }).errors)) {
+			errors = [...errors, ...(error as unknown as { errors: Error[] }).errors];
+		}
+
+		for (const item of errors) {
+			logger.error(item.stack ?? item.message);
+		}
+	}
+
 	async #disposeServiceProviders(): Promise<void> {
 		const serviceProviders: ServiceProvider[] = this.get<ServiceProviderRepository>(
 			Identifiers.ServiceProvider.Repository,
 		).allLoadedProviders();
 
+		const logger = this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service);
+
 		for (const serviceProvider of serviceProviders.reverse()) {
-			this.get<Contracts.Kernel.Logger>(Identifiers.Services.Log.Service).debug(
-				`Disposing ${serviceProvider.name()}...`,
-			);
+			logger.debug(`Disposing ${serviceProvider.name()}...`);
 
 			try {
 				await serviceProvider.dispose();
-			} catch {}
+			} catch (rawError) {
+				const error = ensureError(rawError);
+				logger.error(`Failed to dispose ${serviceProvider.name()}: ${error.stack ?? error.message}`);
+			}
 		}
 	}
 

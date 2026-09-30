@@ -20,6 +20,7 @@ export interface BlockHeaderStorageData {
 	readonly payloadSize: number;
 	readonly transactionsRoot: string;
 	readonly proposer: string;
+	readonly randaoReveal: string;
 }
 
 export interface TransactionStorageData {

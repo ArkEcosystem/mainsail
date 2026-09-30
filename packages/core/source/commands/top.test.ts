@@ -8,8 +8,11 @@ import { Command } from "./top";
 describe<{
 	cli: Console;
 	processManager: Services.ProcessManager;
-}>("TopCommand", ({ beforeEach, it, stub, assert }) => {
+}>("TopCommand", ({ beforeEach, it, stub, assert, clock }) => {
 	beforeEach((context) => {
+		// 1d 1h 1m 1s after pm_uptime, so the uptime cells are deterministic.
+		clock({ now: 1_387_045_673_686 + 90_061_000 });
+
 		context.cli = new Console();
 		context.processManager = context.cli.app.get(Identifiers.Cli.Service.ProcessManager);
 	});
@@ -47,16 +50,13 @@ describe<{
 			["ID", "Name", "Version", "Status", "Uptime", "CPU", "RAM"].every((column) => message.includes(column)),
 		);
 		assert.true(
-			[
-				"1",
-				"mainsail",
-				"1.0.0",
-				"online",
-				// "5y 267d 19h 31m 28.1s",
-				"2%",
-				"2.05 kB",
-			].every((column) => message.includes(column)),
+			["1", "mainsail", "1.0.0", "online", "1d 1h 1m 1s", "2%", "2.05 kB"].every((column) =>
+				message.includes(column),
+			),
 		);
+
+		// Processes that do not start with "mainsail" are filtered out.
+		assert.false(message.includes("some-process"));
 	});
 
 	it("should throw if no processes are running", async ({ processManager, cli }) => {

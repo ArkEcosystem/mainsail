@@ -22,10 +22,6 @@ describe<{
 		assert.true(app.isBound(Identifiers.Database.Service));
 	});
 
-	it("#required - should be true", async ({ serviceProvider }) => {
-		assert.true(await serviceProvider.required());
-	});
-
 	it("#boot - should initialize database service", async ({ app, serviceProvider }) => {
 		const databaseService = {
 			initialize: () => {},

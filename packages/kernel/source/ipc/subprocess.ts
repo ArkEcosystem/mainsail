@@ -119,7 +119,20 @@ export class Subprocess implements Contracts.Kernel.IPC.Subprocess {
 			// own result type), so it stores `unknown`; this is the boundary where the request's
 			// `T` is erased. `sendRequest<T>` keeps the promise typed for the caller.
 			this.callbacks.set(id, { reject, resolve: resolve as (result: unknown) => void });
-			this.subprocess.postMessage({ args: arguments_, id, method });
+
+			try {
+				this.subprocess.postMessage({ args: arguments_, id, method });
+			} catch (error) {
+				// postMessage throws synchronously for non-serializable arguments (DataCloneError).
+				// Drop the orphaned callback so it doesn't inflate getQueueSize() or hang drain().
+				this.callbacks.delete(id);
+
+				if (this.callbacks.size === 0) {
+					this.#notifyDrained();
+				}
+
+				reject(error as Error);
+			}
 		});
 	}
 

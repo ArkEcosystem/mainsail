@@ -42,6 +42,21 @@ describe<{
 		);
 	});
 
+	const withRoundValidators = (value: number) => ({
+		...cryptoJson,
+		milestones: cryptoJson.milestones.map((milestone, index) =>
+			index === 1 ? { ...milestone, roundValidators: value } : milestone,
+		),
+	});
+
+	it("should reject a milestone with roundValidators above the 64 wire-format cap", ({ configManager }) => {
+		assert.throws(() => configManager.setConfig(withRoundValidators(65)));
+	});
+
+	it("should accept a milestone with roundValidators at the 64 cap", ({ configManager }) => {
+		assert.not.throws(() => configManager.setConfig(withRoundValidators(64)));
+	});
+
 	it("should throw on set before config is initialized", () => {
 		const fresh = new Configuration();
 
@@ -66,7 +81,7 @@ describe<{
 					stageTimeoutIncrease: 2000,
 					tolerance: 100,
 				},
-				validatorRegistrationFee: "250000000000000000000",
+				validatorRegistrationFee: "0",
 			},
 			{
 				roundValidators: 53,
@@ -154,7 +169,8 @@ describe<{
 			{
 				...cryptoJson,
 				milestones: [
-					{ height: 0, roundValidators: 53, reward: "0" },
+					{ height: 0, roundValidators: 0, reward: "0" },
+					{ height: 1, roundValidators: 53 },
 					{ height: 10, roundValidators: 53, reward: "1" },
 					{ height: 20, roundValidators: 53, reward: "2" },
 				],
@@ -171,22 +187,51 @@ describe<{
 		assert.throws(() => configManager.getNextMilestoneWithNewKey(1, "evmSpec"));
 	});
 
-	it("getNextMilestoneByKey - should throw an error if roundValidators is 0", ({ configManager }) => {
-		assert.not.throws(() =>
-			configManager.setConfig(
-				{
-					...cryptoJson,
-					milestones: [
-						{
-							roundValidators: 0,
-							height: 0,
-						},
-					],
-				},
-				false,
-			),
+	it("should require the genesis milestone to have no validators", ({ configManager }) => {
+		assert.throws(
+			() =>
+				configManager.setConfig(
+					{
+						...cryptoJson,
+						milestones: [
+							{ height: 0, roundValidators: 53 },
+							{ height: 1, roundValidators: 53 },
+						],
+					},
+					false,
+				),
+			"Bad milestones. The genesis milestone at height 0 must set the number of validators to 0.",
 		);
 
+		assert.throws(
+			() => configManager.setConfig({ ...cryptoJson, milestones: [{ height: 1, roundValidators: 53 }] }, false),
+			"Bad milestones. The genesis milestone at height 0 must set the number of validators to 0.",
+		);
+	});
+
+	it("should require the milestone after genesis to introduce the validators", ({ configManager }) => {
+		assert.throws(
+			() => configManager.setConfig({ ...cryptoJson, milestones: [{ height: 0, roundValidators: 0 }] }, false),
+			"Bad milestones. The milestone at height 1 must introduce the number of validators.",
+		);
+
+		assert.throws(
+			() =>
+				configManager.setConfig(
+					{
+						...cryptoJson,
+						milestones: [
+							{ height: 0, roundValidators: 0 },
+							{ height: 5, roundValidators: 53 },
+						],
+					},
+					false,
+				),
+			"Bad milestones. The milestone at height 1 must introduce the number of validators.",
+		);
+	});
+
+	it("getNextMilestoneByKey - should throw an error if roundValidators is 0", ({ configManager }) => {
 		assert.throws(
 			() =>
 				configManager.setConfig({
@@ -207,8 +252,12 @@ describe<{
 					...cryptoJson,
 					milestones: [
 						{
-							roundValidators: 1,
+							roundValidators: 0,
 							height: 0,
+						},
+						{
+							roundValidators: 1,
+							height: 1,
 						},
 						{
 							roundValidators: 0,
@@ -261,7 +310,8 @@ describe<{
 
 	it("getNextMilestoneByKey - should get all milestones", ({ configManager }) => {
 		const milestones = [
-			{ height: 1, reward: "8" },
+			{ height: 0, roundValidators: 0 },
+			{ height: 1, roundValidators: 53, reward: "8" },
 			{ height: 3, reward: "9" },
 			{ height: 6, reward: "10" },
 			{ height: 8, reward: "8" },
@@ -310,6 +360,7 @@ describe<{
 				configManager.setConfig({
 					...cryptoJson,
 					milestones: [
+						{ height: 0, roundValidators: 0 },
 						{ height: 1, roundValidators: 53 },
 						{ height: 2, roundValidators: 54 },
 					],
@@ -318,11 +369,44 @@ describe<{
 		);
 	});
 
+	it("should count rounds from the block after a non-zero genesis when checking validator changes", ({
+		configManager,
+	}) => {
+		// Snapshot configurations start at the chain tip: the genesis milestone has no validators and the first
+		// validator set is introduced one block later, so rounds of 53 start at 1001, 1054, ...
+		const config = {
+			...cryptoJson,
+			genesisBlock: { ...cryptoJson.genesisBlock, block: { ...cryptoJson.genesisBlock.block, number: 1000 } },
+		};
+		const milestones = [
+			{ height: 1000, roundValidators: 0 },
+			{ height: 1001, roundValidators: 53 },
+		];
+
+		assert.throws(
+			() =>
+				configManager.setConfig(
+					{ ...config, milestones: [...milestones, { height: 1053, roundValidators: 54 }] },
+					false,
+				),
+			"Bad milestone at height: 1053. The number of validators can only be changed at the beginning of a new round.",
+		);
+
+		configManager.setConfig(
+			{ ...config, milestones: [...milestones, { height: 1054, roundValidators: 54 }] },
+			false,
+		);
+		assert.equal(configManager.getMilestone(1054).roundValidators, 54);
+	});
+
 	it("getMaxRoundValidators - should return maximum round validators from all milestones", ({ configManager }) => {
 		configManager.setConfig(
 			{
 				...cryptoJson,
-				milestones: [{ roundValidators: 1, height: 1 }],
+				milestones: [
+					{ roundValidators: 0, height: 0 },
+					{ roundValidators: 1, height: 1 },
+				],
 			},
 			false,
 		);
@@ -333,6 +417,7 @@ describe<{
 			{
 				...cryptoJson,
 				milestones: [
+					{ roundValidators: 0, height: 0 },
 					{ roundValidators: 1, height: 1 },
 					{ roundValidators: 5, height: 3 },
 					{ roundValidators: 2, height: 8 },
@@ -347,6 +432,7 @@ describe<{
 			{
 				...cryptoJson,
 				milestones: [
+					{ roundValidators: 0, height: 0 },
 					{ roundValidators: 5, height: 1 },
 					{ roundValidators: 1, height: 6 },
 					{ roundValidators: 10, height: 7 },
@@ -361,6 +447,7 @@ describe<{
 			{
 				...cryptoJson,
 				milestones: [
+					{ roundValidators: 0, height: 0 },
 					{ roundValidators: 5, height: 1 },
 					{ roundValidators: 1, height: 6 },
 					{ roundValidators: 1, height: 7 },
@@ -374,7 +461,11 @@ describe<{
 		configManager.setConfig(
 			{
 				...cryptoJson,
-				milestones: [{ roundValidators: 1, height: 7 }],
+				milestones: [
+					{ roundValidators: 0, height: 0 },
+					{ roundValidators: 1, height: 1 },
+					{ roundValidators: 1, height: 7 },
+				],
 			},
 			false,
 		);

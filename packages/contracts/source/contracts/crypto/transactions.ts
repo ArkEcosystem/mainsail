@@ -76,7 +76,6 @@ export interface SerializeOptions {
 }
 
 export interface TransactionVerifier {
-	verifyHash(data: TransactionData): Promise<boolean>;
 	verifySchemaUnsigned(
 		data: TransactionUnsignedSerializable,
 	): Promise<SchemaValidationResult<TransactionUnsignedSerializable>>;
@@ -112,6 +111,7 @@ export interface TransactionFactory {
 	fromBytes(buff: Buffer, strict?: boolean): Promise<Transaction>;
 	fromJson(json: TransactionJson): Promise<Transaction>;
 	fromData(data: TransactionSerializable, strict?: boolean): Promise<Transaction>;
+	fromPoolData(data: TransactionData): Promise<Transaction>;
 	fromStorage(data: TransactionStorageDataExtended): Promise<BlockTransaction>;
 	computeCryptoData(data: TransactionSerializable): Promise<TransactionCryptoData>;
 }

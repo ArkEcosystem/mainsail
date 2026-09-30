@@ -4,6 +4,12 @@ import type { Enums } from "@mainsail/constants";
 import type { Application } from "../kernel/application.js";
 import type { Processor } from "./rpc.js";
 
+declare module "@hapi/hapi" {
+	interface RequestApplicationState {
+		errorLogged?: boolean;
+	}
+}
+
 export type ApiServer = HapiServer<ServerState>;
 
 export interface Server {

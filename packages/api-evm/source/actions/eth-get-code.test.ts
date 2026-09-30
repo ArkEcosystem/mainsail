@@ -12,7 +12,7 @@ describe<{
 	action: EthGetCodeAction;
 	validator: Contracts.Crypto.Validator;
 	evm: any;
-}>("EthGetCodeAction", ({ beforeEach, it, assert }) => {
+}>("EthGetCodeAction", ({ beforeEach, it, assert, spy }) => {
 	beforeEach(async (context) => {
 		context.evm = {
 			codeAt: () => "0x0",
@@ -31,7 +31,7 @@ describe<{
 		assert.equal(action.name, "eth_getCode");
 	});
 
-	it("schema should be ok", ({ action, validator }) => {
+	it("schema should validate address and blockTag", ({ action, validator }) => {
 		validator.addSchema(keccak256Schemas.address);
 		validator.addSchema(schemas.blockTag);
 		validator.addSchema(action.schema);
@@ -45,5 +45,23 @@ describe<{
 
 	it("should return code", async ({ action }) => {
 		assert.equal(await action.handle(["0x0000000000", "latest"]), "0x0");
+	});
+
+	it("should not use history for the 'latest' tag", async ({ action, evm }) => {
+		const codeAt = spy(evm, "codeAt");
+
+		await action.handle(["0x0000000000", "latest"]);
+
+		codeAt.calledOnce();
+		codeAt.calledWith("0x0000000000", undefined);
+	});
+
+	it("should query historical code for a hex blockTag", async ({ action, evm }) => {
+		const codeAt = spy(evm, "codeAt");
+
+		await action.handle(["0x0000000000", "0x7b"]);
+
+		codeAt.calledOnce();
+		codeAt.calledWith("0x0000000000", 123n);
 	});
 });

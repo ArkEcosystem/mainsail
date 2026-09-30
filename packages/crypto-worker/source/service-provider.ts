@@ -41,10 +41,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		await this.app.get<Contracts.Crypto.WorkerPool>(Identifiers.CryptoWorker.WorkerPool).dispose();
 	}
 
-	public async required(): Promise<boolean> {
-		return true;
-	}
-
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
 			workerCount: Joi.number().integer().min(1).max(cpus().length).required(),

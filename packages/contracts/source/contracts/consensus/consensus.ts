@@ -21,6 +21,7 @@ export interface RoundState extends ProcessableUnit {
 	hasMajorityPrevotesNull(): boolean;
 	hasMajorityPrecommits(): boolean;
 	hasMajorityPrecommitsAny(): boolean;
+	hasMajorityPrecommitsWithoutProposal(): boolean;
 	hasMinorityPrevotesOrPrecommits(): boolean;
 	getPrevote(validatorIndex: number): Message | undefined;
 	getPrecommit(validatorIndex: number): Message | undefined;
@@ -43,10 +44,6 @@ export interface Aggregator {
 	verify(signature: AggregatedSignature, data: Buffer, roundValidators: number): Promise<boolean>;
 }
 
-export interface Verifier {
-	hasValidProposalLockProof(roundState: RoundState): Promise<boolean>;
-}
-
 export interface StateData {
 	readonly blockNumber: number;
 	readonly round: number;
@@ -62,18 +59,19 @@ export interface RoundStateRepository {
 }
 
 export interface Service {
-	run(): Promise<void>;
+	run(state: State): Promise<void>;
 	getBlockNumber(): number;
 	getRound(): number;
 	getStep(): Step;
 	getState(): State;
 	handle(roundState: RoundState): Promise<void>;
 	handleCommitState(commitState: ProcessableUnit): Promise<void>;
-	onTimeoutStartRound(): Promise<void>;
+	onTimeoutBlockPrepare(): Promise<void>;
 	onTimeoutPropose(blockNumber: number, round: number): Promise<void>;
 	onTimeoutPrevote(blockNumber: number, round: number): Promise<void>;
 	onTimeoutPrecommit(blockNumber: number, round: number): Promise<void>;
 	dispose(): Promise<void>;
+	isDisposed(): boolean;
 }
 
 export interface State extends StateData {
@@ -82,11 +80,11 @@ export interface State extends StateData {
 }
 
 export interface Bootstrapper {
-	run(): Promise<State | undefined>;
+	bootstrap(): Promise<State>;
 }
 
 export interface Scheduler {
-	getNextBlockTimestamp(commitTime: number): number;
+	getNextBlockTimestamp(roundStartTime: number, round: number): number;
 	scheduleTimeoutBlockPrepare(timestamp: number): boolean;
 	scheduleTimeoutPropose(blockNumber: number, round: number): boolean;
 	scheduleTimeoutPrevote(blockNumber: number, round: number): boolean;

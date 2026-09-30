@@ -7,16 +7,10 @@
 	"include": ["source/**/**.ts", "source/**/**.json"],
 	"references": [
 		{
-			"path": "../cli"
-		},
-		{
 			"path": "../configuration-generator"
 		},
 		{
-			"path": "../container"
-		},
-		{
-			"path": "../contracts"
+			"path": "../constants"
 		},
 		{
 			"path": "../crypto-address-base58"
@@ -37,10 +31,16 @@
 			"path": "../crypto-hash-bcrypto"
 		},
 		{
+			"path": "../crypto-key-pair-bls12-381"
+		},
+		{
 			"path": "../crypto-key-pair-ecdsa"
 		},
 		{
 			"path": "../crypto-messages"
+		},
+		{
+			"path": "../crypto-signature-bls12-381"
 		},
 		{
 			"path": "../crypto-signature-ecdsa"
@@ -58,13 +58,7 @@
 			"path": "../kernel"
 		},
 		{
-			"path": "../p2p"
-		},
-		{
 			"path": "../serializer"
-		},
-		{
-			"path": "../test-runner"
 		},
 		{
 			"path": "../utils"

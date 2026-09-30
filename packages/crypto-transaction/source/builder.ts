@@ -83,7 +83,7 @@ export class TransactionBuilder {
 		return this;
 	}
 
-	public value(value: string): TransactionBuilder {
+	public value(value: string | bigint): TransactionBuilder {
 		this.data.value = BigInt(value);
 		return this;
 	}
@@ -120,10 +120,6 @@ export class TransactionBuilder {
 
 	public async legacySecondSignWithWif(wif: string): Promise<TransactionBuilder> {
 		return this.#legacySecondSignWithKeyPair(await this.keyPairFactory.fromWIF(wif));
-	}
-
-	public async verify(): Promise<boolean> {
-		return this.verifier.verifyHash(this.data);
 	}
 
 	public async getStruct(): Promise<Contracts.Crypto.TransactionData> {

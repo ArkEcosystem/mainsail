@@ -18,10 +18,22 @@ export class AppGenerator {
 		const appJson = this.generateDefault(options.packageName);
 
 		if (options.snapshot) {
-			// @ts-ignore
-			const index = appJson.main.findIndex((p) => p.package === "@mainsail/state");
-			// @ts-ignore
-			appJson.main.splice(index, 0, { package: "@mainsail/snapshot-legacy-importer" });
+			const main = appJson.main as { package: string }[];
+			const importerPackage = "@mainsail/snapshot-legacy-importer";
+			const statePackage = "@mainsail/state";
+
+			// Only register the importer if the template does not already include it
+			if (!main.some((plugin) => plugin.package === importerPackage)) {
+				const index = main.findIndex((plugin) => plugin.package === statePackage);
+
+				if (index === -1) {
+					throw new Error(
+						`cannot register "${importerPackage}": "${statePackage}" not found in app.json "main" plugins`,
+					);
+				}
+
+				main.splice(index, 0, { package: importerPackage });
+			}
 		}
 
 		return appJson;

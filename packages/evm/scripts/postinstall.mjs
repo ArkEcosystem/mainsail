@@ -7,7 +7,7 @@
 // tarball using the bundled @napi-rs/cli (so the package works on macOS, musl, etc.).
 
 import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join, sep } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -71,3 +71,26 @@ if (result.status !== 0) {
 }
 
 log("native addon built successfully.");
+
+// The from-source build leaves cargo's `target/` directory (hundreds of MB of intermediate
+// artifacts) inside the installed package. napi has already copied the compiled `.node` into the
+// package dir, so the target dir is no longer needed — remove it to reclaim disk space.
+try {
+	const metadata = spawnSync(
+		"cargo",
+		["metadata", "--no-deps", "--format-version", "1", "--manifest-path", "bindings/Cargo.toml"],
+		{ cwd: packageDir, encoding: "utf8" },
+	);
+
+	const targetDir =
+		metadata.status === 0 && metadata.stdout
+			? JSON.parse(metadata.stdout).target_directory
+			: join(packageDir, "target");
+
+	if (targetDir && existsSync(targetDir)) {
+		rmSync(targetDir, { recursive: true, force: true });
+		log(`removed cargo build directory ${targetDir}.`);
+	}
+} catch (error) {
+	warn(`could not remove cargo build directory: ${error.message}`);
+}

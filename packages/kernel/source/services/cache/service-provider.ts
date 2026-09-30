@@ -12,9 +12,9 @@ export class ServiceProvider extends BaseServiceProvider {
 		this.app.bind<CacheManager>(Identifiers.Services.Cache.Manager).to(CacheManager).inSingletonScope();
 
 		this.app
-			.bind<
-				<K, T>(name?: string) => Promise<Contracts.Kernel.CacheStore<K, T>>
-			>(Identifiers.Services.Cache.Factory)
+			.bind<<K, T>(name?: string) => Promise<Contracts.Kernel.CacheStore<K, T>>>(
+				Identifiers.Services.Cache.Factory,
+			)
 			.toFactory(
 				(context: Contracts.Kernel.Container.ResolutionContext) =>
 					async <K, T>(name?: string): Promise<Contracts.Kernel.CacheStore<K, T>> => {

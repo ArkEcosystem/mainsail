@@ -10,10 +10,10 @@
 			"path": "../blockchain-utils"
 		},
 		{
-			"path": "../container"
+			"path": "../constants"
 		},
 		{
-			"path": "../contracts"
+			"path": "../container"
 		},
 		{
 			"path": "../kernel"

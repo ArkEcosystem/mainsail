@@ -49,4 +49,9 @@ describe("NullLogger", ({ assert, it }) => {
 		const result = driver.suppressConsoleOutput(true);
 		assert.undefined(result);
 	});
+
+	it("should dispose without error", async () => {
+		const driver = new NullLogger();
+		assert.undefined(await driver.dispose());
+	});
 });

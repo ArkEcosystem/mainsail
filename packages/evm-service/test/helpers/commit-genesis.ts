@@ -36,22 +36,25 @@ export const processGenesis = async (
 		validatorContract: "0x0000000000000000000000000000000000000001",
 	});
 
-	await instance.prepareNextCommit({ commitKey });
+	await instance.prepareNextCommit({
+		blockContext: {
+			commitKey,
+			gasLimit: BigInt(10_000_000),
+			timestamp: BigInt(block.timestamp),
+			validatorAddress: block.proposer,
+			prevrandao: Buffer.alloc(32),
+		},
+	});
 
 	for (const transaction of block.transactions) {
 		const { receipt } = await instance.process({
-			blockContext: {
-				commitKey,
-				gasLimit: BigInt(10_000_000),
-				timestamp: BigInt(block.timestamp),
-				validatorAddress: block.proposer,
-			},
+			commitKey,
 			data: Buffer.from(transaction.data.slice(2), "hex"),
 			from: transaction.from,
 			gasLimit: BigInt(transaction.gasLimit),
 			gasPrice: BigInt(transaction.gasPrice),
 			nonce: transaction.nonce,
-			specId: Enums.Evm.SpecId.LATEST,
+			specId: Enums.Evm.SpecId.OSAKA,
 			to: transaction.to,
 			txHash: transaction.hash,
 			value: transaction.value,
@@ -77,6 +80,7 @@ export const commitGenesis = async (
 	await instance.onCommit({
 		blockNumber: block.number,
 		getAccountUpdates: () => [],
+		getContractEvents: () => [],
 		getBlock: () => block,
 		getCommit: async () => genesisCommit,
 		getProcessorResult: () => ({
@@ -88,6 +92,7 @@ export const commitGenesis = async (
 		hasProcessorResult: () => false,
 		round: block.round,
 		setAccountUpdates: () => {},
+		setContractEvents: () => {},
 		setProcessorResult: () => {},
 	});
 

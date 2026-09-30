@@ -30,7 +30,7 @@ describe<{
 		assert.equal(action.name, "eth_getBlockTransactionCountByNumber");
 	});
 
-	it("schema should be array with 0 parameters", ({ action, validator }) => {
+	it("schema should be array with 1 parameter", ({ action, validator }) => {
 		validator.addSchema(action.schema);
 
 		assert.undefined(validator.validate("jsonRpc_eth_getBlockTransactionCountByNumber", ["0x0"]).errors);
@@ -43,7 +43,7 @@ describe<{
 		assert.null(await action.handle(["0x10"]));
 	});
 
-	it("should return 0x0", async ({ action, database }) => {
+	it("should return 0x0 for a block with no transactions", async ({ action, database }) => {
 		const spyGetBlockHeader = stub(database, "getBlockHeader").returnValue({ transactionsCount: 0 });
 
 		assert.equal(await action.handle(["0x0"]), "0x0");
@@ -52,7 +52,7 @@ describe<{
 		spyGetBlockHeader.calledWith(0);
 	});
 
-	it("should return 0x14", async ({ action, database }) => {
+	it("should return 0x14 for a block with 20 transactions", async ({ action, database }) => {
 		const spyGetBlockHeader = stub(database, "getBlockHeader").returnValue({ transactionsCount: 20 });
 
 		assert.equal(await action.handle(["0x14"]), "0x14");

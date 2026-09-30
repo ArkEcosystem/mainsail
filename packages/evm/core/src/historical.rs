@@ -44,7 +44,11 @@ impl AccountHistory {
         block_number: u64,
         accounts: Vec<(Address, AccountInfo)>,
     ) -> Result<(), Error> {
-        assert!(database.get(txn, &block_number)?.is_none());
+        if database.get(txn, &block_number)?.is_some() {
+            return Err(Error::State(format!(
+                "history for block {block_number} already recorded"
+            )));
+        }
 
         let count = database.len(txn)?;
         if count >= self.capacity {
@@ -104,7 +108,7 @@ fn test_account_history() {
     let history = AccountHistory::new(10);
     let mut txn = db.env.write_txn().unwrap();
 
-    let history_db = &db.inner.borrow().accounts_history.unwrap();
+    let history_db = &db.inner.accounts_history.unwrap();
 
     // Block 1
     history
@@ -415,7 +419,7 @@ fn test_accounts_history_capacity() {
     let history = AccountHistory::new(3);
     let mut txn = db.env.write_txn().unwrap();
 
-    let history_db = &db.inner.borrow().accounts_history.unwrap();
+    let history_db = &db.inner.accounts_history.unwrap();
 
     for i in 0..5 {
         println!("writing i... {}", i);

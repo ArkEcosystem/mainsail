@@ -94,9 +94,9 @@ export class TransactionFilter {
 					);
 				}
 				case "deployedContractAddress": {
-					return handleOrCriteria(criteria.gasPrice, async (c) =>
+					return handleOrCriteria(criteria.deployedContractAddress, async (c) =>
 						// @ts-ignore
-						this.handleDeployedContractCriteria(criteria.deployedContractAddress, c),
+						this.handleDeployedContractCriteria(c),
 					);
 				}
 				default: {

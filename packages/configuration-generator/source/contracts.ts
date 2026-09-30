@@ -13,3 +13,8 @@ export type Wallet = {
 	consensusKeys: Contracts.Crypto.KeyPair;
 	username: string | undefined;
 };
+
+export type Task = {
+	task: () => Promise<void>;
+	title: string;
+};

@@ -53,14 +53,12 @@ describe<{
 		spyOnUpdate.neverCalled();
 	});
 
-	it("should should ask to restart processes if they are online", async ({ cli, installer, processManager }) => {
+	it("should ask to restart processes if they are online", async ({ cli, installer, processManager }) => {
 		const spyOnInstall = stub(installer, "install");
 		const spyOnUpdate = stub(processManager, "update");
 		const spyOnIsOnline = stub(processManager, "isOnline").returnValue(true);
 		const spyOnRestart = stub(processManager, "restart");
-		prompts.inject([true]); // restart core
-		prompts.inject([true]); // restart relay
-		prompts.inject([true]); // restart forger
+		prompts.inject([true]); // restart mainsail-api
 
 		await cli.withFlags({ force: true }).execute(Command);
 

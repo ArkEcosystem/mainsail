@@ -15,8 +15,7 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
-		"test:coverage": "c8 -r=text -r=lcov --all pnpm run test",
-		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:coverage": "c8 --experimental-monocart -r=text -r=lcov --all pnpm run test",
 		"test:file": "pnpm run uvu source",
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
@@ -27,17 +26,17 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/state": "workspace:*",
 		"@mainsail/utils": "workspace:*",
-		"better-sqlite3": "12.10.0",
-		"fs-extra": "11.3.5",
-		"joi": "18.2.1"
+		"better-sqlite3": "12.11.1",
+		"fs-extra": "11.4.0",
+		"joi": "18.2.5"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/crypto-config": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
-		"@types/better-sqlite3": "7.6.13",
+		"@types/better-sqlite3": "9.6.0",
 		"@types/fs-extra": "11.0.4",
-		"tmp": "0.2.5",
+		"tmp": "0.2.7",
 		"uvu": "0.5.6"
 	},
 	"engines": {

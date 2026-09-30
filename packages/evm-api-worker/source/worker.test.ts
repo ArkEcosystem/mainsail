@@ -108,6 +108,7 @@ describe<{
 	it("start requests start with the block number", async ({ worker, ipc }) => {
 		const sendRequest = spy(ipc, "sendRequest");
 
+		await worker.boot({});
 		await worker.start(42);
 
 		sendRequest.calledWith("start", 42);
@@ -116,6 +117,7 @@ describe<{
 	it("onCommit requests commit with the unit block number", async ({ worker, ipc }) => {
 		const sendRequest = spy(ipc, "sendRequest");
 
+		await worker.boot({});
 		await worker.onCommit({ blockNumber: 99 } as any);
 
 		sendRequest.calledWith("commit", 99);
@@ -124,6 +126,7 @@ describe<{
 	it("setPeerCount requests setPeerCount with the count", async ({ worker, ipc }) => {
 		const sendRequest = spy(ipc, "sendRequest");
 
+		await worker.boot({});
 		await worker.setPeerCount(5);
 
 		sendRequest.calledWith("setPeerCount", 5);
@@ -133,6 +136,7 @@ describe<{
 		p2pRepository.getPeers = () => [{}, {}, {}];
 		const sendRequest = spy(ipc, "sendRequest");
 
+		await worker.boot({});
 		await worker.handle({ data: {}, name: "peer.added" });
 
 		sendRequest.calledWith("setPeerCount", 3);

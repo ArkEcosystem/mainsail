@@ -11,6 +11,7 @@ import {
 } from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { DatabaseException } from "@mainsail/exceptions";
 import { ensureError, merge } from "@mainsail/utils";
 import { readFileSync } from "fs";
 
@@ -57,8 +58,17 @@ export abstract class AbstractServer {
 
 		this.server.ext("onPreResponse", (request, h) => {
 			if ("isBoom" in request.response && request.response.isBoom && request.response.isServer) {
-				if (request.response.name === "QueryFailedError") {
-					const message = `${request.response.name} ${request.response.message}`;
+				request.app.errorLogged = true;
+
+				// Database-layer errors caused by bad request data — our own DatabaseException and
+				// TypeORM's QueryFailedError — are client faults: respond 400 (not 500) and log at warn
+				// without the stack. QueryFailedError is external so it can't extend DatabaseException;
+				// match it by name.
+				const isQueryFailedError = request.response.name === "QueryFailedError";
+				if (isQueryFailedError || request.response instanceof DatabaseException) {
+					const message = isQueryFailedError
+						? `${request.response.name} ${request.response.message}`
+						: request.response.message;
 					this.logger.warn(`${request.path} - ${message}`);
 					request.response = Boom.badRequest(message);
 				} else {
@@ -66,6 +76,17 @@ export abstract class AbstractServer {
 				}
 			}
 			return h.continue;
+		});
+
+		// Errors raised after onPreResponse (e.g. while serializing the response body) would
+		// otherwise produce a 500 without any log entry.
+		this.server.events.on({ channels: ["error"], name: "request" }, (request, event) => {
+			if (request.app.errorLogged) {
+				return;
+			}
+
+			const error = event.error instanceof Error ? (event.error.stack ?? event.error.message) : event.error;
+			this.logger.error(`${request.path} - ${error}`);
 		});
 
 		const helloWorld = `Hello World from ${this.baseName()}!`;
@@ -96,8 +117,7 @@ export abstract class AbstractServer {
 
 			this.logger.info(`${this.prettyName} Server stopped at ${this.server.info.uri}`);
 		} catch (rawError) {
-			const error = ensureError(rawError);
-			await this.app.terminate(`Failed to stop ${this.prettyName} Server!`, error);
+			this.app.fail(`Failed to stop ${this.prettyName} Server!`, ensureError(rawError));
 		}
 	}
 

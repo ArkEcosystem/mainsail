@@ -4,11 +4,8 @@ import { Environment } from "@mainsail/kernel";
 export const defaults = {
 	database: {
 		applicationName: "mainsail/api-http",
-		database:
-			Environment.get(EnvironmentVariables.MAINSAIL_DB_DATABASE) ??
-			`${Environment.get(EnvironmentVariables.MAINSAIL_TOKEN)}_${Environment.get(EnvironmentVariables.MAINSAIL_NETWORK_NAME)}`,
+		database: Environment.get(EnvironmentVariables.MAINSAIL_DB_DATABASE),
 		entityPrefix: "public.",
-		// TODO
 		extra: {
 			options: "-c statement_timeout=3000ms",
 		},
@@ -24,9 +21,7 @@ export const defaults = {
 		port: Environment.get(EnvironmentVariables.MAINSAIL_DB_PORT, 5432),
 
 		type: "postgres",
-		username:
-			Environment.get(EnvironmentVariables.MAINSAIL_DB_USERNAME) ??
-			Environment.get(EnvironmentVariables.MAINSAIL_TOKEN),
+		username: Environment.get(EnvironmentVariables.MAINSAIL_DB_USERNAME),
 	},
 	enabled: Environment.isTrue(EnvironmentVariables.MAINSAIL_API_SYNC_ENABLED),
 };

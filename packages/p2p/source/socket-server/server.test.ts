@@ -120,14 +120,14 @@ describeSkip<{ app: Application; server: ServerProxy }>("Server", ({ it, assert,
 		spyAppTerminate.neverCalled();
 	});
 
-	it("#dispose -should terminate app if server.stop() failed", async ({ server, app }) => {
+	it("#dispose - should terminate app and rethrow if server.stop() failed", async ({ server, app }) => {
 		const spyHapiServerStop = stub(HapiServerMock.prototype, "stop").rejectedValue(
 			new Error("failed stopping hapi server"),
 		);
 		const spyAppTerminate = stub(app, "terminate").callsFake(() => {});
 
 		await server.initialize(name, options);
-		await server.dispose();
+		await assert.rejects(() => server.dispose(), "failed stopping hapi server");
 
 		spyHapiServerStop.calledOnce();
 		spyAppTerminate.calledOnce();

@@ -8,7 +8,7 @@ export class TransactionResource {
 		/* eslint-disable perfectionist/sort-objects */
 		return {
 			blockHash: `0x${transaction.blockHash}`,
-			blockNumber: `0x${transaction.blockNumber?.toString(16)}`,
+			blockNumber: `0x${transaction.blockNumber.toString(16)}`,
 			chainId: `0x${transaction.network.toString(16)}`,
 			from: transaction.from,
 			gas: `0x${transaction.gasLimit.toString(16)}`,
@@ -18,10 +18,12 @@ export class TransactionResource {
 			nonce: `0x${transaction.nonce.toString(16)}`,
 			// eslint-disable-next-line unicorn/no-null
 			to: transaction.to || null,
-			transactionIndex: `0x${transaction.transactionIndex?.toString(16)}`,
+			transactionIndex: `0x${transaction.transactionIndex.toString(16)}`,
 			value: `0x${transaction.value.toString(16)}`,
 			type: `0x0`,
-			v: `0x${transaction.v}`,
+			// v is stored as the parity bit; legacy transactions must report the
+			// EIP-155 value that was actually signed (chainId * 2 + 35 + parity)
+			v: `0x${(transaction.network * 2 + 35 + transaction.v).toString(16)}`,
 			r: `0x${transaction.r}`,
 			s: `0x${transaction.s}`,
 		};

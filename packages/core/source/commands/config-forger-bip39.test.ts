@@ -24,6 +24,10 @@ describe<{
 
 	afterAll(() => setGracefulCleanup());
 
+	it("should declare the bip39 flag", ({ cli }) => {
+		assert.true(cli.app.resolve(Command).definition.hasFlag("bip39"));
+	});
+
 	it("should configure from flags", async ({ cli }) => {
 		await cli.withFlags({ bip39: bip39Flags }).execute(Command);
 

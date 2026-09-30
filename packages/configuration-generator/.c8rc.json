@@ -1,0 +1,7 @@
+{
+	"all": true,
+	"include": ["source/**/*.ts"],
+	"exclude": ["source/**/*.test.ts"],
+	"reporter": ["text", "lcov"],
+	"check-coverage": false
+}

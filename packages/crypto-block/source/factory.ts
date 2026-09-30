@@ -89,6 +89,7 @@ export class BlockFactory implements Contracts.Crypto.BlockFactory {
 			parentHash: header.parentHash,
 			payloadSize: header.payloadSize,
 			proposer: header.proposer,
+			randaoReveal: header.randaoReveal,
 			reward: header.reward,
 			round: header.round,
 			stateRoot: header.stateRoot,

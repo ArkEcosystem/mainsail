@@ -9,7 +9,7 @@ import { Flags } from "../utils/index.js";
 export class Console {
 	public app: Contracts.Cli.Application;
 
-	public pkg = {
+	public pkg: Contracts.Types.PackageJson = {
 		bin: {
 			mainsail: "./bin/run.js",
 		},
@@ -24,8 +24,13 @@ export class Console {
 
 	#useDefaultFlags: boolean;
 
-	public constructor(useDefaultFlags: boolean = true) {
+	public constructor(useDefaultFlags: boolean = true, package_?: Contracts.Types.PackageJson) {
 		this.#useDefaultFlags = useDefaultFlags;
+
+		if (package_) {
+			this.pkg = package_;
+		}
+
 		this.app = this.#createApplication();
 	}
 

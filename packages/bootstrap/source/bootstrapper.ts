@@ -1,12 +1,18 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { Identifiers } from "@mainsail/constants";
+import { Identifiers, ZeroHash } from "@mainsail/constants";
 import { inject, injectable, optional } from "@mainsail/container";
 
 @injectable()
 export class Bootstrapper {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.Consensus.Service)
 	private readonly consensus!: Contracts.Consensus.Service;
+
+	@inject(Identifiers.Consensus.Bootstrapper)
+	private readonly consensusBootstrapper!: Contracts.Consensus.Bootstrapper;
 
 	@inject(Identifiers.State.Store)
 	private stateStore!: Contracts.State.Store;
@@ -73,11 +79,16 @@ export class Bootstrapper {
 		this.state.setBootstrap(false);
 
 		this.validatorRepository.printLoadedValidators();
-		await this.txPoolWorker.start(this.stateStore.getBlockNumber());
-		await this.evmWorker.start(this.stateStore.getBlockNumber());
 
-		// TODO: Check if we can extract bootstrap
-		void this.consensus.run();
+		void this.txPoolWorker
+			.start(this.stateStore.getBlockNumber())
+			.catch((error) => this.app.terminate("tx-pool worker failed to start", error));
+
+		void this.evmWorker
+			.start(this.stateStore.getBlockNumber())
+			.catch((error) => this.app.terminate("evm-api worker failed to start", error));
+
+		await this.consensus.run(await this.consensusBootstrapper.bootstrap());
 
 		await this.p2pServer.boot();
 		await this.p2pService.boot();
@@ -140,7 +151,7 @@ export class Bootstrapper {
 		const milestone = this.configuration.getMilestone();
 
 		// assume snapshot is present if the previous block points to a non-zero hash
-		if (genesisBlock.block.parentHash === "0000000000000000000000000000000000000000000000000000000000000000") {
+		if (genesisBlock.block.parentHash === ZeroHash) {
 			if (milestone.snapshot) {
 				throw new Error("Previous block is set to snapshot, but there is no snapshot defined in milestones");
 			}

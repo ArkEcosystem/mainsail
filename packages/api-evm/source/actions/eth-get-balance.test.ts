@@ -12,7 +12,7 @@ describe<{
 	action: EthGetBalanceAction;
 	validator: Contracts.Crypto.Validator;
 	evm: any;
-}>("EthGetBalanceAction", ({ beforeEach, it, assert }) => {
+}>("EthGetBalanceAction", ({ beforeEach, it, assert, spy }) => {
 	let balance = BigInt(0);
 	const nonce = BigInt(0);
 
@@ -37,7 +37,7 @@ describe<{
 		assert.equal(action.name, "eth_getBalance");
 	});
 
-	it("schema should be array with 0 parameters", ({ action, validator }) => {
+	it("schema should be array with 2 parameters", ({ action, validator }) => {
 		validator.addSchema(keccak256Schemas.address);
 		validator.addSchema(schemas.blockTag);
 		validator.addSchema(action.schema);
@@ -50,10 +50,28 @@ describe<{
 		assert.defined(validator.validate("jsonRpc_eth_getBalance", {}).errors);
 	});
 
-	it("should return true", async ({ action }) => {
+	it("should return the balance as hex", async ({ action }) => {
 		assert.equal(await action.handle(["0x0000000000", "latest"]), "0x0");
 
 		balance = BigInt(20);
 		assert.equal(await action.handle(["0x0000000000", "latest"]), "0x14");
+	});
+
+	it("should not use history for the 'latest' tag", async ({ action, evm }) => {
+		const getAccountInfo = spy(evm, "getAccountInfo");
+
+		await action.handle(["0x0000000000", "latest"]);
+
+		getAccountInfo.calledOnce();
+		getAccountInfo.calledWith("0x0000000000", undefined);
+	});
+
+	it("should query historical state for a hex blockTag", async ({ action, evm }) => {
+		const getAccountInfo = spy(evm, "getAccountInfo");
+
+		await action.handle(["0x0000000000", "0x7b"]);
+
+		getAccountInfo.calledOnce();
+		getAccountInfo.calledWith("0x0000000000", 123n);
 	});
 });

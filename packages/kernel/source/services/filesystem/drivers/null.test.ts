@@ -79,4 +79,14 @@ describe("NullFilesystem", ({ assert, it }) => {
 		const result = await driver.deleteDirectory("dirname");
 		assert.false(result);
 	});
+
+	it("should expose no-op synchronous helpers", () => {
+		const driver = new NullFilesystem();
+
+		assert.undefined(driver.writeFileSync("filename", "contents", {}));
+		assert.false(driver.existsSync("filename"));
+		assert.undefined(driver.removeSync("filename"));
+		assert.undefined(driver.readJSONSync("filename"));
+		assert.undefined(driver.ensureDirSync("dirname"));
+	});
 });

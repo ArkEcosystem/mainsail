@@ -7,13 +7,16 @@
 	"include": ["source/**/**.ts", "source/**/**.json"],
 	"references": [
 		{
+			"path": "../constants"
+		},
+		{
 			"path": "../container"
 		},
 		{
-			"path": "../contracts"
+			"path": "../crypto-transaction"
 		},
 		{
-			"path": "../crypto-transaction"
+			"path": "../exceptions"
 		},
 		{
 			"path": "../kernel"

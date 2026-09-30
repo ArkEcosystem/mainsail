@@ -12,10 +12,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.Database.Service).to(DatabaseService).inSingletonScope();
 	}
 
-	public async required(): Promise<boolean> {
-		return true;
-	}
-
 	public async boot(): Promise<void> {
 		await this.app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service).initialize();
 	}

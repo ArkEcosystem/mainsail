@@ -2,7 +2,8 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { CronCommand, CronJob as Cron } from "cron";
+import { ensureError } from "@mainsail/utils";
+import { CronJob as Cron } from "cron";
 import { performance } from "perf_hooks";
 
 import { Job } from "./interfaces.js";
@@ -12,21 +13,45 @@ export class CronJob implements Job {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	protected expression = "* * * * *";
 
-	public execute(callback: CronCommand<CronJob>): void {
-		const onCallback = () => {
+	public execute(callback: () => void | Promise<void>): void {
+		const onCallback = async () => {
 			const start = performance.now();
-			// @ts-ignore
-			callback();
 
-			void this.events.dispatch(Events.ScheduleEvent.CronJobFinished, {
-				executionTime: performance.now() - start,
-				expression: this.expression,
-			});
+			// Dispatch synchronously for synchronous callbacks; await (and swallow rejections from)
+			// asynchronous ones so a failing job can never crash the cron timer tick.
+			try {
+				const result = callback();
+
+				if (result instanceof Promise) {
+					await result;
+				}
+
+				this.#dispatch(Events.ScheduleEvent.CronJobFinished, {
+					executionTime: performance.now() - start,
+					expression: this.expression,
+				});
+			} catch {
+				this.#dispatch(Events.ScheduleEvent.CronJobFailed, {
+					executionTime: performance.now() - start,
+					expression: this.expression,
+				});
+			}
 		};
 
 		new Cron(this.expression, onCallback).start();
+	}
+
+	// Fire-and-forget: a failing event listener must never crash the cron timer tick, so log and
+	// swallow any rejection. Wrapped in Promise.resolve because dispatch may return a non-Promise.
+	#dispatch(event: string, data: object): void {
+		void Promise.resolve(this.events.dispatch(event, data)).catch((error) => {
+			this.logger.warn(`Failed to dispatch scheduled cron job event [${event}]: ${ensureError(error).message}`);
+		});
 	}
 
 	public cron(expression: string): this {

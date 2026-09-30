@@ -55,6 +55,46 @@ describe<{
 		assert.equal(data.data, sorted);
 	});
 
+	it("/validators?attributes filters by a jsonb attribute (escapeLiteral path)", async () => {
+		await apiContext.walletRepository.save(validators);
+
+		// Exercises WalletFilter.handleAttributesCriteria -> QueryHelper.getColumnName -> escapeLiteral
+		// with a legitimate user-supplied key, to guard against the escaping breaking real queries.
+		const { statusCode, data } = await request("/validators?attributes.validatorRank=5", options);
+		assert.equal(statusCode, 200);
+		assert.equal(
+			data.data,
+			validators.filter((v) => v.attributes.validatorRank === 5),
+		);
+	});
+
+	it("/validators?attributes rejects SQL injection in attribute keys", async () => {
+		await apiContext.walletRepository.save(validators);
+
+		// Same injectable position as /wallets (attributes route through the shared filter), so the
+		// validators endpoint must reject it identically.
+		const injectionPaths = [
+			`/validators?attributes.${encodeURIComponent("a'||pg_sleep(3)||'b")}=1`, // timing / boolean-blind
+			`/validators?attributes.${encodeURIComponent("x'; DROP TABLE wallets; --")}=1`, // stacked statement
+			`/validators?attributes.validatorLastBlock.${encodeURIComponent("n')::bigint--")}=1`, // nested key
+		];
+
+		for (const path of injectionPaths) {
+			let statusCode;
+			try {
+				statusCode = (await request(path, options)).statusCode; // must never be a 2xx
+			} catch (ex) {
+				statusCode = ex.response?.statusCode;
+			}
+
+			assert.equal(statusCode, 400);
+		}
+
+		// Intact and still queryable afterwards.
+		const after = await request("/validators", options);
+		assert.equal(after.statusCode, 200);
+	});
+
 	it("/validators/{id}", async () => {
 		await apiContext.walletRepository.save(validators);
 

@@ -5,6 +5,7 @@ import { dirSync, setGracefulCleanup } from "tmp";
 
 import { Console } from "@mainsail/cli";
 import { describe } from "@mainsail/test-runner";
+import { apiPackageJson } from "../../test/fixtures";
 import { Command } from "./env-list";
 
 describe<{
@@ -13,7 +14,7 @@ describe<{
 	beforeEach((context) => {
 		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
-		context.cli = new Console();
+		context.cli = new Console(true, apiPackageJson);
 	});
 
 	afterAll(() => setGracefulCleanup());
@@ -21,7 +22,7 @@ describe<{
 	it("should fail if the environment configuration doesn't exist", async ({ cli }) => {
 		await assert.rejects(
 			() => cli.execute(Command),
-			`No environment file found at ${process.env.MAINSAIL_PATH_CONFIG}/core/.env`,
+			`No environment file found at ${process.env.MAINSAIL_PATH_CONFIG}/api/.env`,
 		);
 	});
 
@@ -29,9 +30,9 @@ describe<{
 		let message: string;
 		stub(console, "log").callsFake((m) => (message = m));
 
-		ensureDirSync(`${process.env.MAINSAIL_PATH_CONFIG}/core`);
+		ensureDirSync(`${process.env.MAINSAIL_PATH_CONFIG}/api`);
 
-		const environmentFile = `${process.env.MAINSAIL_PATH_CONFIG}/core/.env`;
+		const environmentFile = `${process.env.MAINSAIL_PATH_CONFIG}/api/.env`;
 		removeSync(environmentFile);
 		writeFileSync(environmentFile, "someKey=someValue", { flag: "w" });
 

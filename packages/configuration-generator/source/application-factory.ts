@@ -83,7 +83,6 @@ export const makeApplication = async (
 	await app.resolve(CoreCryptoKeyPairBls).register();
 	await app.resolve(CoreCryptoWif).register();
 	await app.resolve(CoreCryptoBlock).register();
-	await app.resolve(CoreEvmConsensus).register();
 	await app.resolve(CoreCryptoTransaction).register();
 	await app.resolve(CoreSnapshotLegacyImporter).register();
 	await app.resolve(EvmService).register();
@@ -94,12 +93,15 @@ export const makeApplication = async (
 				// @ts-ignore
 				block: {
 					number: 0,
+					timestamp: 0,
+					transactions: [],
 				},
 			},
 			milestones: [
 				{
-					evmSpec: Enums.Evm.SpecId.SHANGHAI,
+					evmSpec: Enums.Evm.SpecId.OSAKA,
 					height: 0,
+					roundValidators: 0,
 					timeouts: {
 						blockPrepareTime: 4000,
 						blockTime: 8000,
@@ -108,10 +110,18 @@ export const makeApplication = async (
 						tolerance: 100,
 					},
 				},
+				{
+					height: 1,
+					roundValidators: 1,
+				},
 			],
+			// @ts-ignore
+			network: { chainId: options.chainId ?? 10_000 },
 		},
 		false,
 	);
+
+	await app.resolve(CoreEvmConsensus).register();
 
 	app.bind(InternalIdentifiers.Application).toConstantValue(app);
 	app.bind(InternalIdentifiers.ConfigurationGenerator).to(ConfigurationGenerator);

@@ -76,14 +76,24 @@ export class Worker implements Contracts.Evm.Worker {
 	}
 
 	public async start(blockNumber: number): Promise<void> {
-		await this.ipcSubprocess.sendRequest("start", blockNumber);
+		await this.#send("start", blockNumber);
 	}
 
 	async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		await this.ipcSubprocess.sendRequest("commit", unit.blockNumber);
+		await this.#send("commit", unit.blockNumber);
 	}
 
 	public async setPeerCount(peerCount: number): Promise<void> {
-		await this.ipcSubprocess.sendRequest("setPeerCount", peerCount);
+		await this.#send("setPeerCount", peerCount);
+	}
+
+	async #send<T>(method: string, ...arguments_: unknown[]): Promise<T> {
+		if (!this.#bootPromise) {
+			throw new Error("worker request issued before boot()");
+		}
+
+		await this.#bootPromise;
+
+		return this.ipcSubprocess.sendRequest<T>(method, ...arguments_);
 	}
 }

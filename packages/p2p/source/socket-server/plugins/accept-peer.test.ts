@@ -56,6 +56,9 @@ describe<{
 		};
 
 		const server = new Server({ port: 4100 });
+		// Mirror Server.initialize(): routes pass their controller to server.bind(), which is
+		// what hapi hands to non-arrow extensions as `this`.
+		server.bind({ handle: routeByPath["/p2p/peer/mockroute"].handler });
 		server.route(route);
 
 		const spyExtension = spy(server, "ext");

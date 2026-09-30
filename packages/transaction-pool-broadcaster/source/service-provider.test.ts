@@ -43,10 +43,6 @@ describe<{
 		assert.equal(peer.port, 1234);
 		assert.equal(peer.url, "http://1.2.3.4:1234");
 	});
-
-	it("#required - should be required", async ({ serviceProvider }) => {
-		assert.true(await serviceProvider.required());
-	});
 });
 
 describe<{

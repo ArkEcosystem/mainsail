@@ -21,34 +21,30 @@ export class Server extends AbstractServer {
 	}
 
 	protected defaultOptions(): Record<string, unknown> {
-		const validateContext = {
-			configuration: {
-				plugins: {
-					pagination: {
-						limit: this.configuration.getRequired<number>("plugins.pagination.limit"),
-					},
-				},
-			},
-		};
-
 		return {
 			router: {
 				stripTrailingSlash: true,
 			},
 			routes: {
 				payload: {
-					/* istanbul ignore next */
 					async failAction(request: Hapi.Request, h: Hapi.ResponseToolkit, error: Error) {
 						return badData(error.message);
 					},
 				},
 				validate: {
-					/* istanbul ignore next */
 					async failAction(request: Hapi.Request, h: Hapi.ResponseToolkit, error: Error) {
 						return badData(error.message);
 					},
 					options: {
-						context: validateContext,
+						context: {
+							configuration: {
+								plugins: {
+									pagination: {
+										limit: this.configuration.getRequired<number>("plugins.pagination.limit"),
+									},
+								},
+							},
+						},
 					},
 				},
 			},

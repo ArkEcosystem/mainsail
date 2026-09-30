@@ -23,6 +23,7 @@ export class Block implements Contracts.Crypto.Block {
 	public readonly payloadSize: number;
 	public readonly transactionsRoot: string;
 	public readonly proposer: string;
+	public readonly randaoReveal: string;
 	public readonly hash: string;
 	public readonly serialized: string;
 	public readonly transactions: Contracts.Crypto.BlockTransaction[];
@@ -42,6 +43,7 @@ export class Block implements Contracts.Crypto.Block {
 		this.payloadSize = data.payloadSize;
 		this.transactionsRoot = data.transactionsRoot;
 		this.proposer = data.proposer;
+		this.randaoReveal = data.randaoReveal;
 
 		this.hash = data.hash;
 		this.serialized = serialized;
@@ -73,6 +75,7 @@ export class Block implements Contracts.Crypto.Block {
 			payloadSize: this.payloadSize,
 			transactionsRoot: this.transactionsRoot,
 			proposer: this.proposer,
+			randaoReveal: this.randaoReveal,
 			hash: this.hash,
 			transactions: this.transactions.map((transaction) => transaction.toData()),
 			/* eslint-enable perfectionist/sort-objects */

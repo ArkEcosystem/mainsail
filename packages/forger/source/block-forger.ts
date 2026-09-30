@@ -23,13 +23,11 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
-	@inject(Identifiers.BlockchainUtils.FeeCalculator)
-	protected readonly gasFeeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
-
 	public async forgeBlock(
 		generatorAddress: string,
 		round: number,
 		timestamp: number,
+		randaoReveal: string,
 	): Promise<Contracts.Crypto.Block> {
 		const previousBlock = this.stateStore.getLastBlock();
 		const blockNumber = previousBlock.number + 1;
@@ -40,7 +38,18 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 		});
 
 		const { fee, gasUsed, logsBloom, stateRoot, transactions } = await transactionForger.getTransactions();
-		return this.#makeBlock(round, generatorAddress, logsBloom, stateRoot, transactions, timestamp, gasUsed, fee);
+		return this.#makeBlock(
+			round,
+			generatorAddress,
+			logsBloom,
+			stateRoot,
+			transactions,
+			timestamp,
+			gasUsed,
+			fee,
+			randaoReveal,
+			previousBlock,
+		);
 	}
 
 	async #makeBlock(
@@ -52,13 +61,13 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 		timestamp: number,
 		gasUsed: number,
 		fee: bigint,
+		randaoReveal: string,
+		previousBlock: Contracts.Crypto.Block,
 	): Promise<Contracts.Crypto.Block> {
-		const previousBlock = this.stateStore.getLastBlock();
 		const number = previousBlock.number + 1;
 		const milestone = this.cryptoConfiguration.getMilestone(number);
 
 		const payloadBuffers: Buffer[] = [];
-		const transactionData: Contracts.Crypto.TransactionData[] = [];
 
 		// The payload length needs to account for the overhead of each serialized transaction
 		// which is a uint32 per transaction to store the individual length.
@@ -68,7 +77,6 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 			assert.string(transaction.hash);
 
 			payloadBuffers.push(Buffer.from(transaction.hash, "hex"));
-			transactionData.push(transaction.toData());
 			payloadSize += transaction.serialized.length;
 		}
 
@@ -81,11 +89,12 @@ export class BlockForger implements Contracts.Forger.BlockForger {
 				parentHash: previousBlock.hash,
 				payloadSize,
 				proposer,
+				randaoReveal,
 				reward: BigInt(milestone.reward),
 				round,
 				stateRoot,
 				timestamp,
-				transactionsCount: transactionData.length,
+				transactionsCount: transactions.length,
 				transactionsRoot: this.hashFactory.sha256(payloadBuffers).toString("hex"),
 				version: 1,
 			},

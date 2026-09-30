@@ -7,6 +7,18 @@ import {Base} from "./Base.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract ConsensusTest is Base {
+    function test_validator_registration_binds_pop_to_chain_and_sender() public {
+        bytes memory pop = createValidPop();
+        address addr = address(1);
+        bytes memory blsKey = prepareBLSKey(addr);
+
+        vm.chainId(10000);
+        vm.expectCall(BLS_POP_PRECOMPILE, abi.encodePacked(uint256(10000), addr, blsKey, pop));
+
+        vm.prank(addr);
+        consensus.registerValidator(blsKey, pop);
+    }
+
     function test_validator_registration_pass_with_default_fee() public {
         bytes memory pop = createValidPop();
 

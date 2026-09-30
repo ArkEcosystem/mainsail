@@ -81,6 +81,21 @@ describe<{
 		);
 	});
 
+	it("should skip optional peers and validators files when they are allowed to be missing", async (context) => {
+		// The fixture has only app.json; with allowMissingConfigFiles the loader must skip the rest.
+		context.app.rebind(Identifiers.Config.Flags).toConstantValue({ allowMissingConfigFiles: true });
+		context.app
+			.rebind("path.config")
+			.toConstantValue(join(import.meta.dirname, "../../../../test/stubs/config-app-only"));
+
+		const configLoader = context.app.resolve<LocalConfigLoader>(LocalConfigLoader);
+
+		await assert.resolves(() => configLoader.loadConfiguration());
+
+		await assert.rejects(() => context.app.get<ConfigRepository>(Identifiers.Config.Repository).get("peers"));
+		await assert.rejects(() => context.app.get<ConfigRepository>(Identifiers.Config.Repository).get("validators"));
+	});
+
 	it("should load the application configuration without cryptography", async (context) => {
 		context.app
 			.rebind("path.config")

@@ -2,12 +2,15 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Commands } from "@mainsail/cli";
 import { Identifiers } from "@mainsail/constants";
-import { injectable } from "@mainsail/container";
+import { injectable, inject } from "@mainsail/container";
 import boxen from "boxen";
 import { blue, bold, cyan } from "kleur/colors";
 
 @injectable()
 export class Command extends Commands.Command {
+	@inject(Identifiers.Cli.Service.Logger)
+	private readonly logger!: Contracts.Cli.Logger;
+
 	public signature = "help";
 
 	public description = "Displays detailed information on all commands available via CLI.";
@@ -43,7 +46,7 @@ export class Command extends Commands.Command {
 			}
 		}
 
-		console.log(
+		this.logger.info(
 			boxen(
 				this.components.appHeader() +
 					`

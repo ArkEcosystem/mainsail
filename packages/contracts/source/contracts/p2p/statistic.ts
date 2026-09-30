@@ -47,10 +47,12 @@ export type GeneralStatistic = {
 		peersTotal: number;
 		peersBanned: number;
 		peersRound: number;
+		peersDropped: number;
 		emitsSuccess: number;
 		emitsFailed: number;
 		pingsSuccess: number;
 		pingsFailed: number;
+		recordsUnattributed: number;
 	};
 	response: {
 		average: number;

@@ -110,7 +110,7 @@ describe<{
 	});
 
 	it("should throw if an unknown factory is tried to be accessed", ({ factoryBuilder }) => {
-		assert.throws(() => factoryBuilder.get("Transaction"), "The \\[Transaction\\] factory is unknown.");
+		assert.throws(() => factoryBuilder.get("Transaction"), "The [Transaction] factory is unknown.");
 	});
 
 	it("should throw if a hook is tried to be set for an unknown state", async ({ factoryBuilder }) => {
@@ -118,7 +118,7 @@ describe<{
 
 		assert.throws(
 			() => factoryBuilder.get("Transaction").afterMakingState("invalid", () => ({})),
-			"The \\[invalid\\] state is unknown.",
+			"The [invalid] state is unknown.",
 		);
 	});
 });

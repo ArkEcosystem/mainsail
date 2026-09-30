@@ -95,6 +95,31 @@ describe<{
 		});
 	});
 
+	it("#Prompts - should validate the port range", async ({ cli }) => {
+		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Cli.Service.Environment), "updateVariables");
+
+		// Injected prompt values bypass validation, so capture the questions and
+		// exercise the port validator directly.
+		let questions;
+		stub(cli.app.get(Identifiers.Cli.Component.Prompt), "render").callsFake(async (options) => {
+			questions = options;
+
+			return { confirm: true };
+		});
+
+		await cli.execute(Command);
+
+		spyOnUpdateVariables.calledOnce();
+
+		const { validate } = questions.find((question) => question.name === "port");
+
+		assert.equal(validate(0), "The port must be in the range of 1-65535.");
+		assert.equal(validate(65_536), "The port must be in the range of 1-65535.");
+		assert.true(validate(1));
+		assert.true(validate(5432));
+		assert.true(validate(65_535));
+	});
+
 	it("#Prompts - should set the database name", async ({ cli, envFile }) => {
 		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Cli.Service.Environment), "updateVariables");
 
@@ -143,7 +168,7 @@ describe<{
 		});
 	});
 
-	it("#Prompts - should not update without a confirmation", async ({ cli, envFile }) => {
+	it("#Prompts - should not update without a confirmation", async ({ cli }) => {
 		const spyOnUpdateVariables = stub(cli.app.get(Identifiers.Cli.Service.Environment), "updateVariables");
 
 		prompts.inject([undefined, undefined, undefined, undefined, "dummy", false]);

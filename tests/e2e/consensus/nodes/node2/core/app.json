@@ -73,9 +73,6 @@
 			"package": "@mainsail/api-sync"
 		},
 		{
-			"package": "@mainsail/transactions"
-		},
-		{
 			"package": "@mainsail/transaction-pool-worker"
 		},
 		{
@@ -218,9 +215,6 @@
 			"package": "@mainsail/crypto-transaction"
 		},
 		{
-			"package": "@mainsail/transactions"
-		},
-		{
 			"package": "@mainsail/state"
 		},
 		{
@@ -287,9 +281,6 @@
 		},
 		{
 			"package": "@mainsail/crypto-transaction"
-		},
-		{
-			"package": "@mainsail/transactions"
 		},
 		{
 			"package": "@mainsail/state"

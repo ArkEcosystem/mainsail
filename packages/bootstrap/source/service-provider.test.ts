@@ -29,10 +29,6 @@ describe<{
 		context.app = app;
 	});
 
-	it("should be required", async (context) => {
-		assert.true(await context.serviceProvider.required());
-	});
-
 	it("should register", async (context) => {
 		await assert.resolves(() => context.serviceProvider.register());
 	});

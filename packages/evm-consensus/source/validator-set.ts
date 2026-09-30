@@ -61,7 +61,13 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	}
 
 	public getValidator(index: number): Contracts.State.ValidatorWallet {
-		return this.#topValidators[index];
+		const validator = this.#topValidators[index];
+
+		if (validator === undefined) {
+			throw new Error(`Validator at index ${index} not found.`);
+		}
+
+		return validator;
 	}
 
 	public getValidatorIndexByWalletAddress(walletAddress: string): number {
@@ -78,7 +84,7 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 		const { roundValidators } = this.configuration.getMilestone();
 		const validators = await this.consensusContractService.getRoundValidators();
 		if (validators.length < roundValidators) {
-			throw new NotEnoughRoundValidatorsError(this.#topValidators.length, roundValidators);
+			throw new NotEnoughRoundValidatorsError(validators.length, roundValidators);
 		}
 
 		this.#topValidators = validators.slice(0, roundValidators);

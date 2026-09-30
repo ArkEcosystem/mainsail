@@ -77,7 +77,10 @@ const milestone: AnySchemaObject = {
 		height: { minimum: 0, type: "integer" },
 		p2p: milestoneP2p,
 		reward: { type: "string" },
-		roundValidators: { minimum: 0, type: "integer" },
+		// Hard ceiling: the consensus wire format packs the signer bitmap into a fixed uint64
+		// (serializer.ts / validatorSetPack), so index 64 (the 65th validator) overflows on
+		// serialize. Guard it here until the wire format is redesigned as a variable bitset.
+		roundValidators: { maximum: 64, minimum: 0, type: "integer" },
 		satoshi: milestoneSatoshi,
 		snapshot: milestoneSnapshot,
 		timeouts: milestoneTimeouts,

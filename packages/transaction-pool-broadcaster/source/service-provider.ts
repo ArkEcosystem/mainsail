@@ -22,10 +22,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			);
 	}
 
-	public async required(): Promise<boolean> {
-		return true;
-	}
-
 	public configSchema(): object {
 		return Joi.object({
 			maxPeersBroadcast: Joi.number().min(0).required(),

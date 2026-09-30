@@ -1,16 +1,12 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable, multiInject, optional } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { InvalidTransactionDataError, PoolError } from "@mainsail/exceptions";
 import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class Processor implements Contracts.TransactionPool.Processor {
-	@multiInject(Identifiers.TransactionPool.ProcessorExtension)
-	@optional()
-	private readonly extensions: Contracts.TransactionPool.ProcessorExtension[] = [];
-
 	@inject(Identifiers.TransactionPool.Service)
 	private readonly pool!: Contracts.TransactionPool.Service;
 
@@ -41,7 +37,6 @@ export class Processor implements Contracts.TransactionPool.Processor {
 					accept.push(index);
 
 					try {
-						await Promise.all(this.extensions.map((e) => e.throwIfCannotBroadcast(transaction)));
 						broadcastTransactions.push(transaction);
 						broadcast.push(index);
 					} catch {}

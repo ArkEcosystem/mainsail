@@ -2,8 +2,55 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { Evm, JsCommitData, JsTransactionData, LogLevel } from "@mainsail/evm";
+import { Evm, JsCommitData, JsContractEvent, JsTransactionData, LogLevel } from "@mainsail/evm";
 import { assert, validatorSetPack } from "@mainsail/utils";
+
+const toContractEvent = (raw: JsContractEvent): Contracts.Evm.ContractEvent => {
+	const base = { txHash: raw.txHash, txIndex: raw.txIndex };
+
+	switch (raw.event) {
+		case "Voted":
+		case "Unvoted": {
+			assert.defined(raw.validator);
+			assert.defined(raw.voter);
+
+			return { ...base, event: raw.event, validator: raw.validator, voter: raw.voter };
+		}
+		case "ValidatorRegistered":
+		case "ValidatorUpdated": {
+			assert.defined(raw.addr);
+			assert.defined(raw.blsPublicKey);
+
+			return { ...base, addr: raw.addr, blsPublicKey: raw.blsPublicKey, event: raw.event };
+		}
+		case "ValidatorResigned": {
+			assert.defined(raw.addr);
+
+			return { ...base, addr: raw.addr, event: raw.event };
+		}
+		case "UsernameRegistered": {
+			assert.defined(raw.addr);
+			assert.defined(raw.username);
+
+			return {
+				...base,
+				addr: raw.addr,
+				event: raw.event,
+				previousUsername: raw.previousUsername,
+				username: raw.username,
+			};
+		}
+		case "UsernameResigned": {
+			assert.defined(raw.addr);
+			assert.defined(raw.username);
+
+			return { ...base, addr: raw.addr, event: raw.event, username: raw.username };
+		}
+		default: {
+			throw new Error(`unknown contract event: ${raw.event}`);
+		}
+	}
+};
 
 @injectable()
 export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storage {
@@ -13,11 +60,18 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 	@inject(Identifiers.Services.Log.Service)
 	protected readonly logger!: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.Cryptography.Configuration)
+	protected readonly configuration!: Contracts.Crypto.Configuration;
+
+	protected readonly concurrency?: number;
+
 	#evm!: Evm;
 
 	@postConstruct()
 	public initialize(): void {
 		this.#evm = new Evm({
+			chainId: BigInt(this.configuration.getNetwork().chainId),
+			concurrency: this.concurrency,
 			historySize: 256n,
 			logger: (record) => {
 				try {
@@ -152,6 +206,12 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		return this.#evm.updateRewardsAndVotes(context);
 	}
 
+	public async updateValidatorRegistrationFee(
+		context: Contracts.Evm.UpdateValidatorRegistrationFeeContext,
+	): Promise<void> {
+		return this.#evm.updateValidatorRegistrationFee(context);
+	}
+
 	public async calculateRoundValidators(context: Contracts.Evm.CalculateRoundValidatorsContext): Promise<void> {
 		return this.#evm.calculateRoundValidators(context);
 	}
@@ -166,6 +226,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 			commitData,
 		);
 		unit.setAccountUpdates(result.dirtyAccounts);
+		unit.setContractEvents(result.events.map((event) => toContractEvent(event)));
 	}
 
 	public async codeAt(address: string, blockNumber?: bigint): Promise<string> {
@@ -296,6 +357,7 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 				parentHash: block.parentHash,
 				payloadSize: block.payloadSize,
 				proposer: block.proposer,
+				randaoReveal: block.randaoReveal,
 				reward: block.reward,
 				round: block.round,
 				stateRoot: block.stateRoot,

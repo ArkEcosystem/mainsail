@@ -4,14 +4,10 @@ import * as Exceptions from "@mainsail/exceptions";
 import { describe } from "@mainsail/test-runner";
 import {
 	InvalidConfigurationServiceProvider,
-	OptionalDependencyCannotBeFoundServiceProvider,
-	OptionalDependencyVersionCannotBeSatisfiedServiceProvider,
 	RequiredDependencyCanBeFoundServiceProvider,
-	RequiredDependencyCannotBeFoundAsyncServiceProvider,
 	RequiredDependencyCannotBeFoundServiceProvider,
 	RequiredDependencyVersionCanBeSatisfiedServiceProvider,
 	RequiredDependencyVersionCannotBeSatisfiedServiceProvider,
-	RequiredInvalidConfigurationServiceProvider,
 	StubServiceProvider,
 	ValidConfigurationServiceProvider,
 } from "../../test/stubs/bootstrap/service-providers";
@@ -72,23 +68,8 @@ describe<{
 		assert.equal(serviceProvider.config().getRequired("username"), "johndoe");
 	});
 
-	it("should mark the service provider as failed if the configuration validation fails", async (context) => {
+	it("should throw if the configuration validation fails", async (context) => {
 		const serviceProvider: ServiceProvider = new InvalidConfigurationServiceProvider();
-		serviceProvider.setManifest(context.app.resolve(PluginManifest));
-		serviceProvider.setConfig(context.app.resolve(PluginConfiguration));
-
-		const spyRegister = spy(serviceProvider, "register");
-		context.serviceProviderRepository.set("stub", serviceProvider);
-
-		await context.app.resolve<ValidationServiceProvider>(ValidationServiceProvider).register();
-		await context.app.resolve<RegisterServiceProviders>(RegisterServiceProviders).bootstrap();
-
-		spyRegister.neverCalled();
-		assert.true(context.serviceProviderRepository.failed("stub"));
-	});
-
-	it("should throw if the service provider is required and the configuration validation fails", async (context) => {
-		const serviceProvider: ServiceProvider = new RequiredInvalidConfigurationServiceProvider();
 		serviceProvider.setManifest(context.app.resolve(PluginManifest));
 		serviceProvider.setConfig(context.app.resolve(PluginConfiguration));
 		context.serviceProviderRepository.set("stub", serviceProvider);
@@ -106,20 +87,19 @@ describe<{
 		);
 	});
 
-	it.skip("should terminate if a required (boolean) dependency cannot be found", async (context) => {
+	it("should terminate if a required dependency cannot be found", async (context) => {
 		const serviceProvider: ServiceProvider = new RequiredDependencyCannotBeFoundServiceProvider();
 		serviceProvider.setManifest(context.app.resolve(PluginManifest));
 		serviceProvider.setConfig(context.app.resolve(PluginConfiguration));
 		context.serviceProviderRepository.set("stub", serviceProvider);
 
-		const spyExit = stub(process, "exit");
-		const spyError = spy(context.logger, "error");
+		const spyTerminate = stub(context.app, "terminate");
 		await context.app.resolve<RegisterServiceProviders>(RegisterServiceProviders).bootstrap();
 
-		spyError.calledWith(
-			'The "deps-required" package is required but missing. Please, make sure to install this library to take advantage of stub.',
+		spyTerminate.calledOnce();
+		spyTerminate.calledWith(
+			'The "deps-required" package is missing. Please, make sure to install this library to take advantage of stub.',
 		);
-		spyExit.calledOnce();
 	});
 
 	it("should bootstrap if a required dependency can be found", async (context) => {
@@ -138,39 +118,6 @@ describe<{
 		spyTerminate.neverCalled();
 	});
 
-	it.skip("should terminate if a required (async) dependency cannot be found", async (context) => {
-		const serviceProvider: ServiceProvider = new RequiredDependencyCannotBeFoundAsyncServiceProvider();
-		serviceProvider.setManifest(context.app.resolve(PluginManifest));
-		serviceProvider.setConfig(context.app.resolve(PluginConfiguration));
-		context.serviceProviderRepository.set("stub", serviceProvider);
-
-		const spyExit = stub(process, "exit");
-		const spyError = spy(context.logger, "error");
-		const spyTerminate = spy(context.app, "terminate");
-		await context.app.resolve<RegisterServiceProviders>(RegisterServiceProviders).bootstrap();
-
-		spyError.calledWith(
-			'The "deps-required" package is required but missing. Please, make sure to install this library to take advantage of stub.',
-		);
-		spyTerminate.calledOnce();
-		spyExit.calledOnce();
-	});
-
-	it("should mark the service provider as failed and log a warning if an optional dependency cannot be found", async (context) => {
-		const serviceProvider: ServiceProvider = new OptionalDependencyCannotBeFoundServiceProvider();
-		serviceProvider.setManifest(context.app.resolve(PluginManifest));
-		serviceProvider.setConfig(context.app.resolve(PluginConfiguration));
-		context.serviceProviderRepository.set("stub", serviceProvider);
-
-		const spyWarn = spy(context.logger, "warn");
-		await context.app.resolve<RegisterServiceProviders>(RegisterServiceProviders).bootstrap();
-
-		spyWarn.calledWith(
-			'The "deps-optional" package is missing. Please, make sure to install this library to take advantage of stub.',
-		);
-		assert.true(context.serviceProviderRepository.failed("stub"));
-	});
-
 	it("should bootstrap if a required dependency can satisfy the version", async (context) => {
 		const serviceProvider: ServiceProvider = new RequiredDependencyVersionCanBeSatisfiedServiceProvider();
 		serviceProvider.setManifest(context.app.resolve(PluginManifest));
@@ -187,34 +134,17 @@ describe<{
 		spyTerminate.neverCalled();
 	});
 
-	it.skip("should terminate if a required dependency cannot satisfy the version", async (context) => {
+	it("should terminate if a required dependency cannot satisfy the version", async (context) => {
 		const serviceProvider: ServiceProvider = new RequiredDependencyVersionCannotBeSatisfiedServiceProvider();
 		serviceProvider.setManifest(context.app.resolve(PluginManifest));
 		serviceProvider.setConfig(context.app.resolve(PluginConfiguration));
 		context.serviceProviderRepository.set("stub", serviceProvider);
 		context.serviceProviderRepository.set("dep", new StubServiceProvider());
 
-		const spyExit = stub(process, "exit");
-		const spyError = spy(context.logger, "error");
-		const spyTerminate = spy(context.app, "terminate");
+		const spyTerminate = stub(context.app, "terminate");
 		await context.app.resolve<RegisterServiceProviders>(RegisterServiceProviders).bootstrap();
 
-		spyError.calledWith('Expected "dep" to satisfy ">=2.0.0" but received "1.0.0".');
 		spyTerminate.calledOnce();
-		spyExit.calledOnce();
-	});
-
-	it("should mark the service provider as failed and log a warning if an optional dependency cannot satisfy the version", async (context) => {
-		const serviceProvider: ServiceProvider = new OptionalDependencyVersionCannotBeSatisfiedServiceProvider();
-		serviceProvider.setManifest(context.app.resolve(PluginManifest));
-		serviceProvider.setConfig(context.app.resolve(PluginConfiguration));
-		context.serviceProviderRepository.set("stub", serviceProvider);
-		context.serviceProviderRepository.set("dep", new StubServiceProvider());
-
-		const spyWarn = spy(context.logger, "warn");
-		await context.app.resolve<RegisterServiceProviders>(RegisterServiceProviders).bootstrap();
-
-		spyWarn.calledWith('Expected "dep" to satisfy ">=2.0.0" but received "1.0.0".');
-		assert.true(context.serviceProviderRepository.failed("stub"));
+		spyTerminate.calledWith('Expected "dep" to satisfy ">=2.0.0" but received "1.0.0".');
 	});
 });

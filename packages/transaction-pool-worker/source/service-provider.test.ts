@@ -100,8 +100,4 @@ describe<{
 
 		dispose.calledOnce();
 	});
-
-	it("is required", async (context) => {
-		assert.true(await context.serviceProvider.required());
-	});
 });

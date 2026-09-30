@@ -31,6 +31,7 @@ import { PeerProcessor } from "./peer-processor.js";
 import { PeerRepository } from "./peer-repository.js";
 import { PeerVerifier } from "./peer-verifier.js";
 import { Peer } from "./peer.js";
+import { PendingCommits } from "./pending-commits.js";
 import { Service } from "./service.js";
 import {
 	GetApiNodesRoute,
@@ -75,10 +76,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		await this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).disposePeers();
 	}
 
-	public async required(): Promise<boolean> {
-		return true;
-	}
-
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
 			apiNodes: Joi.array().items(Joi.string()).default([]),
@@ -109,6 +106,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			skipDiscovery: Joi.bool(),
 			skipPeerStateVerification: Joi.bool(),
 			statistic: Joi.object({
+				maxTrackedPeers: Joi.number().integer().min(1).required(),
 				verbosity: Joi.number().integer().min(0).max(3).required(),
 			}).required(),
 			txPoolPort: Joi.number().integer().min(0).required(),
@@ -190,6 +188,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.Server).to(Server).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.State).to(State).inSingletonScope();
+
+		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
 
 		for (const route of [
 			GetApiNodesRoute,

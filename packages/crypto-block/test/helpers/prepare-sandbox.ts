@@ -42,7 +42,8 @@ export const prepareSandbox = async (context) => {
 			32 + // reward
 			4 + // payloadLength
 			hashByteLength + // payloadHash
-			generatorAddressByteLength
+			generatorAddressByteLength +
+			96 // randaoReveal (consensusSignature)
 		);
 	});
 

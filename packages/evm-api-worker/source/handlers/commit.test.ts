@@ -8,15 +8,12 @@ describe<{
 	app: Application;
 	handler: CommitHandler;
 	stateStore: any;
-	logger: any;
 }>("CommitHandler", ({ assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.stateStore = { setBlockNumber: () => {} };
-		context.logger = { error: () => {} };
 
 		context.app = new Application();
 		context.app.bind(Identifiers.State.Store).toConstantValue(context.stateStore);
-		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
 		context.handler = context.app.resolve(CommitHandler);
 	});

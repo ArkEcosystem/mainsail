@@ -13,7 +13,7 @@ describe<{
 
 	it("should render a table with process information", async ({ cli }) => {
 		let message: string;
-		stub(console, "log").callsFake((m) => (message = m));
+		stub(cli.app.get(Identifiers.Cli.Service.Logger), "info").callsFake((m) => (message = m));
 
 		const mockCommands = {
 			command1: { description: "test" },

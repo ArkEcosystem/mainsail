@@ -4,13 +4,7 @@ import { parseTransactionError, UsernamesAbi } from "@mainsail/evm-contracts";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
-import {
-	addTransactionsToPool,
-	getTransactionReceipt,
-	getWallets,
-	isTransactionCommitted,
-	waitBlock,
-} from "./utilities.js";
+import { addTransactionsToPool, getTransactionReceipt, getWallets, isTransactionCommitted } from "./utilities.js";
 import { decodeEventLog, Hex, parseEther } from "viem";
 
 describe<{
@@ -42,7 +36,7 @@ describe<{
 			value: parseEther("300"),
 		});
 		await addTransactionsToPool(context, [fundTx]);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 
 		const tx = await EvmCalls.makeUsernameRegistration(context, {
 			sender: randomWallet.keyPair,
@@ -52,7 +46,7 @@ describe<{
 		const { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 
 		const receipt = await getTransactionReceipt(context, tx);
@@ -81,7 +75,7 @@ describe<{
 			value: parseEther("300"),
 		});
 		await addTransactionsToPool(context, [fundTx]);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 
 		let tx = await EvmCalls.makeUsernameRegistration(context, {
 			sender: randomWallet.keyPair,
@@ -91,7 +85,7 @@ describe<{
 		let { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 
 		let receipt = await getTransactionReceipt(context, tx);
@@ -106,7 +100,7 @@ describe<{
 		({ accept } = await addTransactionsToPool(context, [tx]));
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 
 		receipt = await getTransactionReceipt(context, tx);
@@ -134,7 +128,7 @@ describe<{
 			value: parseEther("300"),
 		});
 		await addTransactionsToPool(context, [fundTx]);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 
 		let tx = await EvmCalls.makeUsernameRegistration(context, {
 			sender: randomWallet.keyPair,
@@ -144,7 +138,7 @@ describe<{
 		let { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 
 		let receipt = await getTransactionReceipt(context, tx);
@@ -160,7 +154,7 @@ describe<{
 		({ accept } = await addTransactionsToPool(context, [tx]));
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 
 		receipt = await getTransactionReceipt(context, tx);

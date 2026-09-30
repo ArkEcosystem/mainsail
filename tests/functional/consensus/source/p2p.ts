@@ -42,12 +42,34 @@ export class Messages<T extends Message> {
 	}
 }
 
+// Per-node processor outcomes of a broadcast message, so tests can tell a skipped message from an invalid one.
+export class ProcessorResults {
+	#results = new Map<string, Enums.Consensus.ProcessorResult[]>();
+
+	public add(message: Message, result: Enums.Consensus.ProcessorResult): void {
+		this.get(message).push(result);
+	}
+
+	public get(message: Message): Enums.Consensus.ProcessorResult[] {
+		const key = message.serialized.toString("hex");
+
+		let results = this.#results.get(key);
+		if (!results) {
+			results = [];
+			this.#results.set(key, results);
+		}
+
+		return results;
+	}
+}
+
 export class P2PRegistry {
 	#nodes = new Map<number, Contracts.Kernel.Application>();
 
 	public proposals = new Messages<Contracts.Crypto.Proposal>();
 	public prevotes = new Messages<Contracts.Crypto.Message>();
 	public precommits = new Messages<Contracts.Crypto.Message>();
+	public results = new ProcessorResults();
 
 	public registerNode(id: number, node: Contracts.Kernel.Application): void {
 		if (this.#nodes.has(id)) {
@@ -55,6 +77,12 @@ export class P2PRegistry {
 		}
 
 		this.#nodes.set(id, node);
+	}
+
+	public unregisterNode(id: number): void {
+		if (!this.#nodes.delete(id)) {
+			throw new Error(`Node with id ${id} does not exist.`);
+		}
 	}
 
 	public getOtherNodes(id: number): Contracts.Kernel.Application[] {
@@ -89,6 +117,7 @@ export class P2PRegistry {
 			const result = await node
 				.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
 				.process(deserializedProposal);
+			this.results.add(proposal, result);
 
 			if (result === Enums.Consensus.ProcessorResult.Invalid) {
 				console.log("postProposal process failed");
@@ -107,10 +136,15 @@ export class P2PRegistry {
 			this.precommits.set(message);
 		}
 
-		setTimeout(() => {
-			void node
+		const handle = async () => {
+			const result = await node
 				.get<Contracts.Consensus.MessageProcessor>(Identifiers.Consensus.Processor.Message)
 				.process(message);
+			this.results.add(message, result);
+		};
+
+		setTimeout(() => {
+			void handle();
 		}, 0);
 	}
 

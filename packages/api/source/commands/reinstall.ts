@@ -16,20 +16,19 @@ export class Command extends Commands.Command {
 
 	public signature = "reinstall";
 
-	public description = "Reinstall the Core installation";
+	public description = "Reinstall the API installation.";
 
 	@postConstruct()
 	public configure(): void {
-		this.definition.setFlag("force", "Force a reinstall.", Joi.boolean());
+		this.definition.setFlag("force", "Force a reinstall.", Joi.boolean().default(false));
 	}
 
 	public async execute(): Promise<void> {
-		if (this.getFlag("force")) {
+		if (this.getFlag<boolean>("force")) {
 			return this.#performInstall();
 		}
 
 		if (await this.components.confirm("Are you sure you want to reinstall?")) {
-			//Come back to this
 			return this.#performInstall();
 		}
 

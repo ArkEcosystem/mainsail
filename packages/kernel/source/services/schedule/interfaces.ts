@@ -1,3 +1,3 @@
 export interface Job {
-	execute(callback: () => void): void;
+	execute(callback: () => void | Promise<void>): void;
 }

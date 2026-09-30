@@ -1,3 +1,4 @@
+import { symlinkSync } from "fs";
 import { dirSync, fileSync, setGracefulCleanup } from "tmp";
 
 import { describe } from "@mainsail/test-runner";
@@ -6,8 +7,9 @@ import { LocalFilesystem } from "./local";
 describe<{
 	fs: LocalFilesystem;
 }>("LocalFilesystem", ({ afterEach, beforeEach, assert, it }) => {
-	beforeEach((context) => {
+	beforeEach(async (context) => {
 		context.fs = new LocalFilesystem();
+		await context.fs.make();
 	});
 
 	afterEach(() => setGracefulCleanup());
@@ -16,8 +18,7 @@ describe<{
 		assert.instance(await context.fs.make(), LocalFilesystem);
 	});
 
-	// TODO: fix
-	it.skip("should write and read the given value", async (context) => {
+	it("should write and read the given value", async (context) => {
 		const file: string = fileSync().name;
 
 		assert.true(await context.fs.put(file, "Hello World"));
@@ -28,8 +29,7 @@ describe<{
 		assert.false(await context.fs.put(undefined, "Hello World"));
 	});
 
-	// TODO: fix
-	it.skip("should delete the given file", async (context) => {
+	it("should delete the given file", async (context) => {
 		const file: string = fileSync().name;
 
 		assert.true(await context.fs.exists(file));
@@ -43,8 +43,7 @@ describe<{
 		assert.false(await context.fs.delete());
 	});
 
-	// TODO: fix
-	it.skip("should copy the given file", async (context) => {
+	it("should copy the given file", async (context) => {
 		const fileSource: string = fileSync().name;
 		const fileDestination = `${fileSource}.copy`;
 
@@ -61,8 +60,7 @@ describe<{
 		assert.false(await context.fs.copy());
 	});
 
-	// TODO: fix
-	it.skip("should move the given file", async (context) => {
+	it("should move the given file", async (context) => {
 		const fileSource: string = fileSync().name;
 		const fileDestination = `${fileSource}.move`;
 
@@ -79,8 +77,7 @@ describe<{
 		assert.false(await context.fs.move());
 	});
 
-	// TODO: fix
-	it.skip("should return the size of the given file", async (context) => {
+	it("should return the size of the given file", async (context) => {
 		const file: string = fileSync().name;
 
 		await context.fs.put(file, "Hello World");
@@ -88,8 +85,7 @@ describe<{
 		assert.is(await context.fs.size(file), 11);
 	});
 
-	// TODO: fix
-	it.skip("should return the last time the file was modified", async (context) => {
+	it("should return the last time the file was modified", async (context) => {
 		const file: string = fileSync().name;
 
 		await context.fs.put(file, "Hello World");
@@ -97,8 +93,7 @@ describe<{
 		assert.number(await context.fs.lastModified(file));
 	});
 
-	// TODO: fix
-	it.skip(".files", async (context) => {
+	it(".files", async (context) => {
 		const dir: string = dirSync().name;
 		const file = `${dir}/files.txt`;
 
@@ -107,8 +102,7 @@ describe<{
 		assert.equal(await context.fs.files(dir), [file]);
 	});
 
-	// TODO: fix
-	it.skip(".directories", async (context) => {
+	it(".directories", async (context) => {
 		const dir: string = dirSync().name;
 		const subdir = `${dir}/sub`;
 
@@ -117,8 +111,21 @@ describe<{
 		assert.equal(await context.fs.directories(dir), [subdir]);
 	});
 
-	// TODO: fix
-	it.skip("should create the given directory", async (context) => {
+	it(".files and .directories should exclude symlinks (incl. dangling ones) without throwing", async (context) => {
+		const dir: string = dirSync().name;
+		const file = `${dir}/real.txt`;
+		const subdir = `${dir}/sub`;
+
+		await context.fs.put(file, "Hello World");
+		await context.fs.makeDirectory(subdir);
+		// Dangling symlink: neither a file nor a directory, and must not crash the scan.
+		symlinkSync(`${dir}/missing-target`, `${dir}/dangling`);
+
+		assert.equal(await context.fs.files(dir), [file]);
+		assert.equal(await context.fs.directories(dir), [subdir]);
+	});
+
+	it("should create the given directory", async (context) => {
 		const dir = `${dirSync().name}/sub`;
 
 		assert.false(await context.fs.exists(dir));
@@ -132,8 +139,25 @@ describe<{
 		assert.false(await context.fs.makeDirectory());
 	});
 
-	// TODO: fix
-	it.skip("should delete the given directory", async (context) => {
+	it("should write the given contents synchronously", async (context) => {
+		const file: string = fileSync().name;
+
+		context.fs.writeFileSync(file, "sync contents", "utf8");
+
+		assert.equal(await context.fs.get(file), Buffer.from("sync contents"));
+	});
+
+	it("should delete the given path synchronously", (context) => {
+		const file: string = fileSync().name;
+
+		assert.true(context.fs.existsSync(file));
+
+		context.fs.removeSync(file);
+
+		assert.false(context.fs.existsSync(file));
+	});
+
+	it("should delete the given directory", async (context) => {
 		const dir: string = dirSync().name;
 
 		assert.true(await context.fs.exists(dir));

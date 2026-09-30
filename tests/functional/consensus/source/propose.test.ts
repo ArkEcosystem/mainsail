@@ -1,4 +1,4 @@
-import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
+import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
@@ -6,22 +6,24 @@ import { describe } from "@mainsail/test-runner";
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertBlockRound } from "./asserts.js";
-import { Validator } from "./contracts.js";
+import type { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import {
 	getLastCommit,
-	getValidators,
+	getNodeForValidator,
+	getValidatorsInSlotOrder,
 	makeProposal,
 	prepareNodeValidators,
 	snoozeForBlock,
 	snoozeForRound,
+	snoozeUntil,
 } from "./utilities.js";
 import { makeCustomProposal, makeTransactionBuilderContext } from "./custom-proposal.js";
 import { EvmCalls } from "@mainsail/test-transaction-builders";
 
 describe<{
-	nodes: Contracts.Kernel.Application[],
+	nodes: Contracts.Kernel.Application[];
 	validators: Validator[];
 	p2p: P2PRegistry;
 }>("Propose", ({ beforeEach, afterEach, it, assert, stub }) => {
@@ -40,41 +42,41 @@ describe<{
 		await bootMany(context.nodes);
 		await bootstrapMany(context.nodes);
 
-		context.validators = await getValidators(context.nodes[0], validators);
+		context.validators = await getValidatorsInSlotOrder(context.nodes[0], validators);
 	});
 
 	afterEach(async ({ nodes }) => {
 		await stopMany(nodes);
 	});
 
-	it("#single propose - should forge 3 blocks with all validators signing", async ({ nodes, validators }) => {
+	it("should confirm 3 blocks in round 0 with every validator signing", async ({ nodes, validators }) => {
 		await runMany(nodes);
 
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 		assert.equal((await getLastCommit(nodes[0])).block.proposer, validators[0].address);
 
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 		assert.equal((await getLastCommit(nodes[0])).block.proposer, validators[0].address);
 
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 3);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 3, 0);
+		await assertBlockHash(nodes, 3);
 		assert.equal((await getLastCommit(nodes[0])).block.proposer, validators[0].address);
 	});
 
-	it("#missing propose - should not accept block", async ({ nodes }) => {
-		const node0 = nodes[0];
-		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
+	it("should confirm the block in round 1, if the proposer misses round 0", async ({ nodes, validators }) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
@@ -85,21 +87,21 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
-	it("#missing propose - should not accept block for 3 rounds", async ({ nodes }) => {
+	it("should confirm the block in round 4, if the proposer misses 3 rounds", async ({ nodes, validators }) => {
 		const rounds = 3;
-		const node0 = nodes[0];
-		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const node0 = getNodeForValidator(nodes, validators[0]);
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 
-		stubPropose.callsFake(async () => { });
+		stubPropose.callsFake(async () => {});
 
 		await runMany(nodes);
 
@@ -109,18 +111,22 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, rounds + 1); // +1 for accepted block
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, rounds + 1); // +1 for accepted block
+		await assertBlockHash(nodes, 1);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
-	it("#invalid proposer - should not accept block", async ({ nodes, validators, p2p }) => {
-		const node0 = nodes[0];
-		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
+	it("should prevote null for a proposal from the wrong proposer, and confirm a block in round 1", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
@@ -128,14 +134,26 @@ describe<{
 
 		await runMany(nodes);
 
-		const proposal0 = await makeProposal(nodes[1], validators[1], 1, 0, Date.now());
+		const proposal0 = await makeProposal(
+			getNodeForValidator(nodes, validators[1]),
+			validators[1],
+			1,
+			0,
+			Date.now(),
+		);
 		await p2p.broadcastProposal(proposal0);
 
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
+
+		await snoozeUntil(
+			() =>
+				p2p.prevotes.getMessages(1, 0).length === totalNodes &&
+				p2p.precommits.getMessages(1, 0).length === totalNodes,
+		);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -156,12 +174,12 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
-	it("#double propose - one by one - should take the first proposal", async ({ nodes, validators, p2p }) => {
-		const node0 = nodes[0];
-		const stubPropose = stub(nodes[0].get<Consensus>(Identifiers.Consensus.Service), "propose");
+	it("should take the first of two proposals from the proposer", async ({ nodes, validators, p2p }) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
 		});
@@ -177,8 +195,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes, proposal0.getPayload().block.hash);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1, proposal0.getPayload().block.hash);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -208,12 +226,16 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
-	it("#double propose - 50 : 50 split - should not accept block", async ({ nodes, validators, p2p }) => {
-		const node0 = nodes[0];
-		const stubPropose = stub(nodes[0].get<Consensus>(Identifiers.Consensus.Service), "propose");
+	it("should confirm a block only in round 1, if two proposals split the nodes 3 : 2", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
 		});
@@ -229,8 +251,10 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
+
+		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === totalNodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -260,15 +284,19 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
-	it("#double propose - 50 : 50 split - should not accept block for 3 rounds", async ({ nodes, validators, p2p }) => {
+	it("should confirm a block only in round 4, if two proposals split the nodes 3 : 2 for 3 rounds", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
 		const rounds = 3;
 
-		const node0 = nodes[0];
-		const stubPropose = stub(nodes[0].get<Consensus>(Identifiers.Consensus.Service), "propose");
-		stubPropose.callsFake(async () => { });
+		const node0 = getNodeForValidator(nodes, validators[0]);
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
+		stubPropose.callsFake(async () => {});
 
 		await runMany(nodes);
 
@@ -280,6 +308,8 @@ describe<{
 			await p2p.broadcastProposal(proposal1, [3, 4]);
 
 			await snoozeForRound(nodes, round);
+
+			await snoozeUntil(() => p2p.precommits.getMessages(1, round).length === totalNodes);
 
 			assert.equal(p2p.proposals.getMessages(1, round).length, 2); // Assert number of proposals
 			assert.equal(p2p.prevotes.getMessages(1, round).length, totalNodes); // Assert number of prevotes
@@ -311,22 +341,22 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, rounds + 1); // +1 for accepted block
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, rounds + 1); // +1 for accepted block
+		await assertBlockHash(nodes, 1);
 
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
-	it("#double propose - majority : minority split - should accept block broadcasted to majority", async ({
+	it("should confirm the proposal that reached +2/3 of the nodes, if two proposals split them 4 : 1", async ({
 		nodes,
 		validators,
 		p2p,
 	}) => {
-		const node0 = nodes[0];
-		const stubPropose = stub(nodes[0].get<Consensus>(Identifiers.Consensus.Service), "propose");
+		const node0 = getNodeForValidator(nodes, validators[0]);
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
 		});
@@ -343,12 +373,14 @@ describe<{
 		await snoozeForBlock(nodesSubset);
 
 		await assertBlockNumber(nodesSubset, 1);
-		await assertBlockRound(nodesSubset, 0);
-		await assertBlockHash(nodesSubset);
+		await assertBlockRound(nodesSubset, 1, 0);
+		await assertBlockHash(nodesSubset, 1);
+
+		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === totalNodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 2); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
-		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes - 1); // Assert number of precommits
+		assert.equal(p2p.precommits.getMessages(1, 0).length, totalNodes); // Assert number of precommits
 
 		// Assert all nodes prevote
 		assert.equal(
@@ -365,10 +397,19 @@ describe<{
 			].sort(),
 		);
 
-		// // Assert all nodes precommit (null)
+		// The majority precommits the block; the partitioned node precommits nil.
 		assert.equal(
-			p2p.precommits.getMessages(1, 0).map((precommit) => precommit.blockHash),
-			Array.from({ length: totalNodes - 1 }).fill(proposal0.getPayload().block.hash),
+			p2p.precommits
+				.getMessages(1, 0)
+				.map((precommit) => precommit.blockHash)
+				.sort(),
+			[
+				proposal0.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
+				proposal0.getPayload().block.hash,
+				undefined,
+			].sort(),
 		);
 
 		// Download blocks
@@ -378,12 +419,16 @@ describe<{
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
-	it("#multi propose - propose per node - should not accept block", async ({ nodes, validators, p2p }) => {
-		const node0 = nodes[0];
-		const stubPropose = stub(nodes[0].get<Consensus>(Identifiers.Consensus.Service), "propose");
+	it("should confirm a block only in round 1, if every node receives a different proposal", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 		stubPropose.callsFake(async () => {
 			stubPropose.restore();
 		});
@@ -405,8 +450,10 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
+
+		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === totalNodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 5); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -436,37 +483,41 @@ describe<{
 		// // Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 
-	it("should propose block with evm calls", async ({ nodes, validators }) => {
-		const node0 = nodes[0];
-
-		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "propose");
+	it("should confirm a block carrying an EVM call", async ({ nodes, validators, p2p }) => {
+		// The proposer builds no block of its own for round 0; the custom one below takes its place.
+		const node0 = getNodeForValidator(nodes, validators[0]);
+		const stubPropose = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prepareProposal");
 		stubPropose.callsFake(async () => {
-			const context = makeTransactionBuilderContext(node0, nodes, validators);
-
-			const transactions: Contracts.Crypto.Transaction[] = [];
-			for (let i = 0; i < 1; i++) {
-				transactions.push(
-					await EvmCalls.makeEvmCall(context, { nonceOffset: i, recipient: validators[0].address }),
-				);
-			}
-
-			const proposal = await makeCustomProposal({ app: node0, validators }, transactions);
-
-			void node0
-				.get<Contracts.Consensus.ProposalProcessor>(Identifiers.Consensus.Processor.Proposal)
-				.process(proposal);
-
 			stubPropose.restore();
 		});
 
 		await runMany(nodes);
 
+		// Built for block 1, round 0, once every node is up and reachable, and sent to all of them, the proposer
+		// included, the way its own proposal would go out.
+		const context = makeTransactionBuilderContext(node0, nodes, validators);
+		const transactions: Contracts.Crypto.Transaction[] = [];
+		for (let i = 0; i < 1; i++) {
+			transactions.push(
+				await EvmCalls.makeEvmCall(context, { nonceOffset: i, recipient: validators[0].address }),
+			);
+		}
+		await p2p.broadcastProposal(await makeCustomProposal({ app: node0, validators }, transactions));
+
+		// The custom block itself is confirmed in round 0, with its transaction. Checking block 2 alone would
+		// not tell a rejected block 1 (re-proposed empty in round 1) from an accepted one.
+		await snoozeForBlock(nodes);
+		await assertBlockNumber(nodes, 1);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
+		assert.equal((await getLastCommit(nodes[0])).block.transactionsCount, 1);
+
 		// Next block
 		await snoozeForBlock(nodes, 2);
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
+		await assertBlockRound(nodes, 2, 0);
 	});
 });

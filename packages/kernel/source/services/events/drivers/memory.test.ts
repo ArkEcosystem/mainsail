@@ -91,6 +91,41 @@ describe<{
 		context.dummyCallerSpy.calledOnce();
 	});
 
+	it("should not leak the once-wrapper after firing", async (context) => {
+		context.emitter.listenOnce("firstEvent", context.dummyListener);
+
+		// A single once-wrapper is registered (it delegates to the real listener).
+		assert.is(context.emitter.countListeners("firstEvent"), 1);
+
+		await context.emitter.dispatch("firstEvent");
+
+		context.dummyCallerSpy.calledOnce();
+
+		// The wrapper unsubscribes itself - nothing is left behind.
+		assert.is(context.emitter.countListeners("firstEvent"), 0);
+		assert.false(context.emitter.hasListeners("firstEvent"));
+	});
+
+	it("should forward the event name and data to a once listener", async (context) => {
+		context.emitter.listenOnce("firstEvent", context.dummyListener);
+
+		await context.emitter.dispatch("firstEvent", { hello: "world" });
+
+		context.dummyCallerSpy.calledOnce();
+		context.dummyCallerSpy.calledWith("firstEvent", { hello: "world" });
+	});
+
+	it("should not double-count wildcard listeners", (context) => {
+		const wildcardListener = new DummyClass(context.dummyCaller);
+
+		context.emitter.listen("firstEvent", context.dummyListener);
+		context.emitter.listen("*", wildcardListener);
+
+		// firstEvent listener + wildcard listener, each counted exactly once.
+		assert.is(context.emitter.getListeners().length, 2);
+		assert.is(context.emitter.countListeners("*"), 2);
+	});
+
 	it("should remove an event listener", async (context) => {
 		context.emitter.listen("firstEvent", context.dummyListener);
 

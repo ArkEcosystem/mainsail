@@ -1,7 +1,17 @@
 {
 	"namedInputs": {
-		"typescript": ["{projectRoot}/source/**/!(*.test).ts", "{projectRoot}/source/**/*.json"],
-		"evm": ["{projectRoot}/core/**/*.rs", "{projectRoot}/bindings/**/*.rs", "{projectRoot}/**/Cargo.toml"],
+		"typescript": [
+			"{projectRoot}/source/**/!(*.test).ts",
+			"{projectRoot}/source/**/*.json",
+			"{projectRoot}/tsconfig.json",
+			"{workspaceRoot}/tsconfig.json"
+		],
+		"evm": [
+			"{projectRoot}/core/**/*.rs",
+			"{projectRoot}/bindings/**/*.rs",
+			"{projectRoot}/**/Cargo.toml",
+			"{projectRoot}/Cargo.lock"
+		],
 		"tsToken": ["{workspaceRoot}/.build-ts"],
 		"rsToken": ["{workspaceRoot}/.build-rs"],
 		"production": ["default"]
@@ -9,7 +19,7 @@
 	"targetDefaults": {
 		"build": {
 			"dependsOn": ["^build"],
-			"inputs": ["tsToken", "typescript"],
+			"inputs": ["tsToken", "typescript", "^typescript"],
 			"outputs": ["{projectRoot}/distribution", "{projectRoot}/tsconfig.tsbuildinfo"],
 			"cache": true
 		},

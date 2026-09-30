@@ -1,5 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
+import { randaoMessage } from "@mainsail/blockchain-utils";
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
@@ -15,13 +16,10 @@ export class Validator implements Contracts.Validator.Validator {
 	private readonly proposalFactory!: Contracts.Crypto.ProposalFactory;
 
 	@inject(Identifiers.State.Store)
-	protected readonly stateStore!: Contracts.State.Store;
+	private readonly stateStore!: Contracts.State.Store;
 
-	@inject(Identifiers.BlockchainUtils.FeeCalculator)
-	protected readonly gasFeeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
-
-	@inject(Identifiers.Forger.Block)
-	protected readonly blockForger!: Contracts.Forger.BlockForger;
+	@inject(Identifiers.CryptoWorker.WorkerPool)
+	private readonly workerPool!: Contracts.Crypto.WorkerPool;
 
 	#keyPair!: Contracts.Validator.ValidatorKeyPair;
 
@@ -33,6 +31,21 @@ export class Validator implements Contracts.Validator.Validator {
 
 	public getConsensusPublicKey(): string {
 		return this.#keyPair.publicKey;
+	}
+
+	public async getRandaoReveal(blockNumber: number): Promise<string> {
+		const worker = this.workerPool.getWorker();
+		const { privateKey } = await this.#keyPair.getKeyPair();
+
+		return worker.consensusSignature(
+			"sign",
+			randaoMessage(
+				this.stateStore.getGenesisCommit().block.hash,
+				this.stateStore.getLastBlock().randaoReveal,
+				blockNumber,
+			),
+			Buffer.from(privateKey, "hex"),
+		);
 	}
 
 	public async propose(

@@ -13,14 +13,14 @@ export class Command extends Commands.Command {
 
 	public signature = "top";
 
-	public description = "List all Core daemons.";
+	public description = "List all Mainsail daemons.";
 
 	public async execute(): Promise<void> {
 		const processes: Contracts.Cli.ProcessDescription[] = (this.processManager.list() || []).filter(
 			(p: Contracts.Cli.ProcessDescription) => p.name.startsWith("mainsail"),
 		);
 
-		if (!processes || Object.keys(processes).length === 0) {
+		if (processes.length === 0) {
 			this.components.fatal("No processes are running.");
 		}
 

@@ -10,11 +10,13 @@ import {
 	GasLimitVerifier,
 	GeneratorVerifier,
 	LegacyAttributeVerifier,
+	RandaoVerifier,
 	RewardVerifier,
+	RoundVerifier,
 	SizeVerifier,
 	TimestampVerifier,
-	TransactionDuplicatesVerifier,
-	TransactionLengthVerifier,
+	TransactionsDuplicatesVerifier,
+	TransactionsLengthVerifier,
 	TransactionsRootVerifier,
 	VersionVerifier,
 } from "./verifiers/index.js";
@@ -26,25 +28,23 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		for (const handler of [
 			ChainedVerifier,
+			RoundVerifier,
 			SizeVerifier,
 			TimestampVerifier,
 			GeneratorVerifier,
 			VersionVerifier,
 			RewardVerifier,
-			TransactionLengthVerifier,
-			TransactionDuplicatesVerifier,
+			TransactionsLengthVerifier,
+			TransactionsDuplicatesVerifier,
 			TransactionsRootVerifier,
 			GasLimitVerifier,
 			LegacyAttributeVerifier,
+			RandaoVerifier,
 		]) {
 			this.app.bind(Identifiers.Processor.BlockVerifierHandlers).to(handler);
 		}
 
 		this.app.bind(Identifiers.Processor.BlockProcessor).to(BlockProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Processor.TransactionProcessor).to(TransactionProcessor).inSingletonScope();
-	}
-
-	public async required(): Promise<boolean> {
-		return true;
 	}
 }

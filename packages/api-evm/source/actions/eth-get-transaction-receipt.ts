@@ -7,7 +7,7 @@ import { assert } from "@mainsail/utils";
 import { ReceiptResource } from "../resources/index.js";
 
 @injectable()
-export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action<[string, boolean]> {
+export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action<[string]> {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -31,7 +31,7 @@ export class EthGetTransactionReceipt implements Contracts.Api.RPC.Action<[strin
 	};
 
 	// https://ethereum.org/en/developers/docs/apis/json-rpc/#eth_gettransactionreceipt
-	public async handle(parameters: [string, boolean]): Promise<object | null> {
+	public async handle(parameters: [string]): Promise<object | null> {
 		const transaction = await this.databaseService.getTransactionByHash(parameters[0].slice(2));
 
 		if (!transaction) {

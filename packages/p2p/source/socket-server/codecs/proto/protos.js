@@ -1,24 +1,21 @@
-// @ts-nocheck
-/*eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars, default-case, jsdoc/require-param*/
-"use strict";
-
-import * as _$protobuf from "protobufjs";
-const $protobuf = _$protobuf.default;
+/*eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-mixed-operators, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars, default-case, jsdoc/require-param*/
+import $protobuf from "protobufjs/minimal.js";
 
 // Common aliases
-var $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;
+const $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;
+const $Object = $util.global.Object, $undefined = $util.global.undefined, $Error = $util.global.Error, $TypeError = $util.global.TypeError, $String = $util.global.String, $Array = $util.global.Array, $Number = $util.global.Number, $Boolean = $util.global.Boolean;
 
 // Exported root namespace
-var $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
+const $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
 
-$root.getApiNodes = (function() {
+export const getApiNodes = $root.getApiNodes = (() => {
 
     /**
      * Namespace getApiNodes.
      * @exports getApiNodes
      * @namespace
      */
-    var getApiNodes = {};
+    const getApiNodes = {};
 
     getApiNodes.ApiNode = (function() {
 
@@ -26,7 +23,7 @@ $root.getApiNodes = (function() {
          * Properties of an ApiNode.
          * @typedef {Object} getApiNodes.ApiNode.$Properties
          * @property {string|null} [url] ApiNode url
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -48,14 +45,14 @@ $root.getApiNodes = (function() {
          * @classdesc Represents an ApiNode.
          * @constructor
          * @param {getApiNodes.ApiNode.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function ApiNode(properties) {
+        const ApiNode = function (properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * ApiNode url.
@@ -77,7 +74,7 @@ $root.getApiNodes = (function() {
          *   (properties?: getApiNodes.ApiNode.$Properties): getApiNodes.ApiNode;
          * }}
          */
-        ApiNode.create = function create(properties) {
+        ApiNode.create = function(properties) {
             return new ApiNode(properties);
         };
 
@@ -90,13 +87,17 @@ $root.getApiNodes = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        ApiNode.encode = function encode(message, writer) {
+        ApiNode.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.url != null && Object.hasOwnProperty.call(message, "url"))
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.url != null && $Object.hasOwnProperty.call(message, "url"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.url);
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -110,8 +111,8 @@ $root.getApiNodes = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        ApiNode.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        ApiNode.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -125,27 +126,27 @@ $root.getApiNodes = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        ApiNode.decode = function decode(reader, length, _end, _depth, _target) {
+        ApiNode.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getApiNodes.ApiNode(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getApiNodes.ApiNode(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        if ((value = reader.string()).length)
+                        if ((value = reader.stringVerify()).length)
                             message.url = value;
                         else
                             delete message.url;
@@ -153,11 +154,13 @@ $root.getApiNodes = (function() {
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -171,7 +174,7 @@ $root.getApiNodes = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        ApiNode.decodeDelimited = function decodeDelimited(reader) {
+        ApiNode.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -185,14 +188,14 @@ $root.getApiNodes = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        ApiNode.verify = function verify(message, _depth) {
+        ApiNode.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.url != null && message.hasOwnProperty("url"))
+            if (message.url != null && $Object.hasOwnProperty.call(message, "url"))
                 if (!$util.isString(message.url))
                     return "url: string expected";
             return null;
@@ -206,17 +209,19 @@ $root.getApiNodes = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {getApiNodes.ApiNode} ApiNode
          */
-        ApiNode.fromObject = function fromObject(object, _depth) {
+        ApiNode.fromObject = function (object, _depth) {
             if (object instanceof $root.getApiNodes.ApiNode)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".getApiNodes.ApiNode: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.getApiNodes.ApiNode();
+                throw $Error("max depth exceeded");
+            let message = new $root.getApiNodes.ApiNode();
             if (object.url != null)
                 if (typeof object.url !== "string" || object.url.length)
-                    message.url = String(object.url);
+                    message.url = $String(object.url);
             return message;
         };
 
@@ -229,13 +234,17 @@ $root.getApiNodes = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        ApiNode.toObject = function toObject(message, options) {
+        ApiNode.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.defaults)
                 object.url = "";
-            if (message.url != null && message.hasOwnProperty("url"))
+            if (message.url != null && $Object.hasOwnProperty.call(message, "url"))
                 object.url = message.url;
             return object;
         };
@@ -247,8 +256,8 @@ $root.getApiNodes = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        ApiNode.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        ApiNode.prototype.toJSON = function() {
+            return ApiNode.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -259,8 +268,8 @@ $root.getApiNodes = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        ApiNode.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        ApiNode.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/getApiNodes.ApiNode";
         };
@@ -274,7 +283,7 @@ $root.getApiNodes = (function() {
          * Properties of a GetApiNodesRequest.
          * @typedef {Object} getApiNodes.GetApiNodesRequest.$Properties
          * @property {shared.Headers.$Properties|null} [headers] GetApiNodesRequest headers
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -296,14 +305,14 @@ $root.getApiNodes = (function() {
          * @classdesc Represents a GetApiNodesRequest.
          * @constructor
          * @param {getApiNodes.GetApiNodesRequest.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function GetApiNodesRequest(properties) {
+        const GetApiNodesRequest = function (properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * GetApiNodesRequest headers.
@@ -325,7 +334,7 @@ $root.getApiNodes = (function() {
          *   (properties?: getApiNodes.GetApiNodesRequest.$Properties): getApiNodes.GetApiNodesRequest;
          * }}
          */
-        GetApiNodesRequest.create = function create(properties) {
+        GetApiNodesRequest.create = function(properties) {
             return new GetApiNodesRequest(properties);
         };
 
@@ -338,13 +347,17 @@ $root.getApiNodes = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetApiNodesRequest.encode = function encode(message, writer) {
+        GetApiNodesRequest.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -358,8 +371,8 @@ $root.getApiNodes = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetApiNodesRequest.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        GetApiNodesRequest.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -373,36 +386,38 @@ $root.getApiNodes = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetApiNodesRequest.decode = function decode(reader, length, _end, _depth, _target) {
+        GetApiNodesRequest.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getApiNodes.GetApiNodesRequest(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getApiNodes.GetApiNodesRequest(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -416,7 +431,7 @@ $root.getApiNodes = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetApiNodesRequest.decodeDelimited = function decodeDelimited(reader) {
+        GetApiNodesRequest.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -430,15 +445,15 @@ $root.getApiNodes = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GetApiNodesRequest.verify = function verify(message, _depth) {
+        GetApiNodesRequest.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
@@ -453,17 +468,19 @@ $root.getApiNodes = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {getApiNodes.GetApiNodesRequest} GetApiNodesRequest
          */
-        GetApiNodesRequest.fromObject = function fromObject(object, _depth) {
+        GetApiNodesRequest.fromObject = function (object, _depth) {
             if (object instanceof $root.getApiNodes.GetApiNodesRequest)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".getApiNodes.GetApiNodesRequest: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.getApiNodes.GetApiNodesRequest();
+                throw $Error("max depth exceeded");
+            let message = new $root.getApiNodes.GetApiNodesRequest();
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".getApiNodes.GetApiNodesRequest.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".getApiNodes.GetApiNodesRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             return message;
@@ -478,14 +495,18 @@ $root.getApiNodes = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GetApiNodesRequest.toObject = function toObject(message, options) {
+        GetApiNodesRequest.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.defaults)
                 object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
             return object;
         };
 
@@ -496,8 +517,8 @@ $root.getApiNodes = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GetApiNodesRequest.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        GetApiNodesRequest.prototype.toJSON = function() {
+            return GetApiNodesRequest.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -508,8 +529,8 @@ $root.getApiNodes = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        GetApiNodesRequest.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        GetApiNodesRequest.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/getApiNodes.GetApiNodesRequest";
         };
@@ -524,7 +545,7 @@ $root.getApiNodes = (function() {
          * @typedef {Object} getApiNodes.GetApiNodesResponse.$Properties
          * @property {shared.Headers.$Properties|null} [headers] GetApiNodesResponse headers
          * @property {Array.<getApiNodes.ApiNode.$Properties>|null} [apiNodes] GetApiNodesResponse apiNodes
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -546,15 +567,15 @@ $root.getApiNodes = (function() {
          * @classdesc Represents a GetApiNodesResponse.
          * @constructor
          * @param {getApiNodes.GetApiNodesResponse.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function GetApiNodesResponse(properties) {
+        const GetApiNodesResponse = function (properties) {
             this.apiNodes = [];
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * GetApiNodesResponse headers.
@@ -584,7 +605,7 @@ $root.getApiNodes = (function() {
          *   (properties?: getApiNodes.GetApiNodesResponse.$Properties): getApiNodes.GetApiNodesResponse;
          * }}
          */
-        GetApiNodesResponse.create = function create(properties) {
+        GetApiNodesResponse.create = function(properties) {
             return new GetApiNodesResponse(properties);
         };
 
@@ -597,16 +618,20 @@ $root.getApiNodes = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetApiNodesResponse.encode = function encode(message, writer) {
+        GetApiNodesResponse.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
             if (message.apiNodes != null && message.apiNodes.length)
-                for (var i = 0; i < message.apiNodes.length; ++i)
-                    $root.getApiNodes.ApiNode.encode(message.apiNodes[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+                for (let i = 0; i < message.apiNodes.length; ++i)
+                    $root.getApiNodes.ApiNode.encode(message.apiNodes[i], writer.uint32(/* id 2, wireType 2 =*/18).fork(), _depth + 1).ldelim();
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -620,8 +645,8 @@ $root.getApiNodes = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetApiNodesResponse.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        GetApiNodesResponse.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -635,27 +660,27 @@ $root.getApiNodes = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetApiNodesResponse.decode = function decode(reader, length, _end, _depth, _target) {
+        GetApiNodesResponse.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getApiNodes.GetApiNodesResponse(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getApiNodes.GetApiNodesResponse(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 case 2: {
@@ -663,16 +688,18 @@ $root.getApiNodes = (function() {
                             break;
                         if (!(message.apiNodes && message.apiNodes.length))
                             message.apiNodes = [];
-                        message.apiNodes.push($root.getApiNodes.ApiNode.decode(reader, reader.uint32(), undefined, _depth + 1));
+                        message.apiNodes.push($root.getApiNodes.ApiNode.decode(reader, reader.uint32(), $undefined, _depth + 1));
                         continue;
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -686,7 +713,7 @@ $root.getApiNodes = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetApiNodesResponse.decodeDelimited = function decodeDelimited(reader) {
+        GetApiNodesResponse.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -700,23 +727,23 @@ $root.getApiNodes = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GetApiNodesResponse.verify = function verify(message, _depth) {
+        GetApiNodesResponse.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
-            if (message.apiNodes != null && message.hasOwnProperty("apiNodes")) {
-                if (!Array.isArray(message.apiNodes))
+            if (message.apiNodes != null && $Object.hasOwnProperty.call(message, "apiNodes")) {
+                if (!$Array.isArray(message.apiNodes))
                     return "apiNodes: array expected";
-                for (var i = 0; i < message.apiNodes.length; ++i) {
-                    var error = $root.getApiNodes.ApiNode.verify(message.apiNodes[i], _depth + 1);
+                for (let i = 0; i < message.apiNodes.length; ++i) {
+                    let error = $root.getApiNodes.ApiNode.verify(message.apiNodes[i], _depth + 1);
                     if (error)
                         return "apiNodes." + error;
                 }
@@ -732,26 +759,28 @@ $root.getApiNodes = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {getApiNodes.GetApiNodesResponse} GetApiNodesResponse
          */
-        GetApiNodesResponse.fromObject = function fromObject(object, _depth) {
+        GetApiNodesResponse.fromObject = function (object, _depth) {
             if (object instanceof $root.getApiNodes.GetApiNodesResponse)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".getApiNodes.GetApiNodesResponse: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.getApiNodes.GetApiNodesResponse();
+                throw $Error("max depth exceeded");
+            let message = new $root.getApiNodes.GetApiNodesResponse();
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".getApiNodes.GetApiNodesResponse.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".getApiNodes.GetApiNodesResponse.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             if (object.apiNodes) {
-                if (!Array.isArray(object.apiNodes))
-                    throw TypeError(".getApiNodes.GetApiNodesResponse.apiNodes: array expected");
-                message.apiNodes = Array(object.apiNodes.length);
-                for (var i = 0; i < object.apiNodes.length; ++i) {
-                    if (typeof object.apiNodes[i] !== "object")
-                        throw TypeError(".getApiNodes.GetApiNodesResponse.apiNodes: object expected");
+                if (!$Array.isArray(object.apiNodes))
+                    throw $TypeError(".getApiNodes.GetApiNodesResponse.apiNodes: array expected");
+                message.apiNodes = $Array(object.apiNodes.length);
+                for (let i = 0; i < object.apiNodes.length; ++i) {
+                    if (!$util.isObject(object.apiNodes[i]))
+                        throw $TypeError(".getApiNodes.GetApiNodesResponse.apiNodes: object expected");
                     message.apiNodes[i] = $root.getApiNodes.ApiNode.fromObject(object.apiNodes[i], _depth + 1);
                 }
             }
@@ -767,20 +796,24 @@ $root.getApiNodes = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GetApiNodesResponse.toObject = function toObject(message, options) {
+        GetApiNodesResponse.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.arrays || options.defaults)
                 object.apiNodes = [];
             if (options.defaults)
                 object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
             if (message.apiNodes && message.apiNodes.length) {
-                object.apiNodes = Array(message.apiNodes.length);
-                for (var j = 0; j < message.apiNodes.length; ++j)
-                    object.apiNodes[j] = $root.getApiNodes.ApiNode.toObject(message.apiNodes[j], options);
+                object.apiNodes = $Array(message.apiNodes.length);
+                for (let j = 0; j < message.apiNodes.length; ++j)
+                    object.apiNodes[j] = $root.getApiNodes.ApiNode.toObject(message.apiNodes[j], options, _depth + 1);
             }
             return object;
         };
@@ -792,8 +825,8 @@ $root.getApiNodes = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GetApiNodesResponse.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        GetApiNodesResponse.prototype.toJSON = function() {
+            return GetApiNodesResponse.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -804,8 +837,8 @@ $root.getApiNodes = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        GetApiNodesResponse.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        GetApiNodesResponse.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/getApiNodes.GetApiNodesResponse";
         };
@@ -816,14 +849,14 @@ $root.getApiNodes = (function() {
     return getApiNodes;
 })();
 
-$root.shared = (function() {
+export const shared = $root.shared = (() => {
 
     /**
      * Namespace shared.
      * @exports shared
      * @namespace
      */
-    var shared = {};
+    const shared = {};
 
     shared.Headers = (function() {
 
@@ -837,7 +870,7 @@ $root.shared = (function() {
          * @property {string|null} [proposedBlockHash] Headers proposedBlockHash
          * @property {Array.<boolean>|null} [validatorsSignedPrevote] Headers validatorsSignedPrevote
          * @property {Array.<boolean>|null} [validatorsSignedPrecommit] Headers validatorsSignedPrecommit
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -859,16 +892,16 @@ $root.shared = (function() {
          * @classdesc Represents a Headers.
          * @constructor
          * @param {shared.Headers.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function Headers(properties) {
+        const Headers = function (properties) {
             this.validatorsSignedPrevote = [];
             this.validatorsSignedPrecommit = [];
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * Headers version.
@@ -927,10 +960,10 @@ $root.shared = (function() {
         Headers.prototype.validatorsSignedPrecommit = $util.emptyArray;
 
         // OneOf field names bound to virtual getters and setters
-        var $oneOfFields;
+        let $oneOfFields;
 
         // Virtual OneOf for proto3 optional field
-        Object.defineProperty(Headers.prototype, "_proposedBlockHash", {
+        $Object.defineProperty(Headers.prototype, "_proposedBlockHash", {
             get: $util.oneOfGetter($oneOfFields = ["proposedBlockHash"]),
             set: $util.oneOfSetter($oneOfFields)
         });
@@ -947,7 +980,7 @@ $root.shared = (function() {
          *   (properties?: shared.Headers.$Properties): shared.Headers;
          * }}
          */
-        Headers.create = function create(properties) {
+        Headers.create = function(properties) {
             return new Headers(properties);
         };
 
@@ -960,33 +993,37 @@ $root.shared = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        Headers.encode = function encode(message, writer) {
+        Headers.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.version != null && Object.hasOwnProperty.call(message, "version"))
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.version != null && $Object.hasOwnProperty.call(message, "version"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);
-            if (message.blockNumber != null && Object.hasOwnProperty.call(message, "blockNumber"))
+            if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
                 writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.blockNumber);
-            if (message.round != null && Object.hasOwnProperty.call(message, "round"))
+            if (message.round != null && $Object.hasOwnProperty.call(message, "round"))
                 writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.round);
-            if (message.step != null && Object.hasOwnProperty.call(message, "step"))
+            if (message.step != null && $Object.hasOwnProperty.call(message, "step"))
                 writer.uint32(/* id 4, wireType 0 =*/32).uint32(message.step);
-            if (message.proposedBlockHash != null && Object.hasOwnProperty.call(message, "proposedBlockHash"))
+            if (message.proposedBlockHash != null && $Object.hasOwnProperty.call(message, "proposedBlockHash"))
                 writer.uint32(/* id 5, wireType 2 =*/42).string(message.proposedBlockHash);
             if (message.validatorsSignedPrevote != null && message.validatorsSignedPrevote.length) {
                 writer.uint32(/* id 6, wireType 2 =*/50).fork();
-                for (var i = 0; i < message.validatorsSignedPrevote.length; ++i)
+                for (let i = 0; i < message.validatorsSignedPrevote.length; ++i)
                     writer.bool(message.validatorsSignedPrevote[i]);
                 writer.ldelim();
             }
             if (message.validatorsSignedPrecommit != null && message.validatorsSignedPrecommit.length) {
                 writer.uint32(/* id 7, wireType 2 =*/58).fork();
-                for (var i = 0; i < message.validatorsSignedPrecommit.length; ++i)
+                for (let i = 0; i < message.validatorsSignedPrecommit.length; ++i)
                     writer.bool(message.validatorsSignedPrecommit[i]);
                 writer.ldelim();
             }
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -1000,8 +1037,8 @@ $root.shared = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        Headers.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        Headers.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -1015,27 +1052,27 @@ $root.shared = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        Headers.decode = function decode(reader, length, _end, _depth, _target) {
+        Headers.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.shared.Headers(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.shared.Headers(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        if ((value = reader.string()).length)
+                        if ((value = reader.stringVerify()).length)
                             message.version = value;
                         else
                             delete message.version;
@@ -1071,7 +1108,7 @@ $root.shared = (function() {
                 case 5: {
                         if (wireType !== 2)
                             break;
-                        message.proposedBlockHash = reader.string();
+                        message.proposedBlockHash = reader.stringVerify();
                         message._proposedBlockHash = "proposedBlockHash";
                         continue;
                     }
@@ -1079,7 +1116,7 @@ $root.shared = (function() {
                         if (wireType === 2) {
                             if (!(message.validatorsSignedPrevote && message.validatorsSignedPrevote.length))
                                 message.validatorsSignedPrevote = [];
-                            var end2 = reader.uint32() + reader.pos;
+                            let end2 = reader.uint32() + reader.pos;
                             while (reader.pos < end2)
                                 message.validatorsSignedPrevote.push(reader.bool());
                             continue;
@@ -1095,7 +1132,7 @@ $root.shared = (function() {
                         if (wireType === 2) {
                             if (!(message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length))
                                 message.validatorsSignedPrecommit = [];
-                            var end2 = reader.uint32() + reader.pos;
+                            let end2 = reader.uint32() + reader.pos;
                             while (reader.pos < end2)
                                 message.validatorsSignedPrecommit.push(reader.bool());
                             continue;
@@ -1109,11 +1146,13 @@ $root.shared = (function() {
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -1127,7 +1166,7 @@ $root.shared = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        Headers.decodeDelimited = function decodeDelimited(reader) {
+        Headers.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -1141,42 +1180,42 @@ $root.shared = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        Headers.verify = function verify(message, _depth) {
+        Headers.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            var properties = {};
-            if (message.version != null && message.hasOwnProperty("version"))
+            let properties = {};
+            if (message.version != null && $Object.hasOwnProperty.call(message, "version"))
                 if (!$util.isString(message.version))
                     return "version: string expected";
-            if (message.blockNumber != null && message.hasOwnProperty("blockNumber"))
+            if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
                 if (!$util.isInteger(message.blockNumber))
                     return "blockNumber: integer expected";
-            if (message.round != null && message.hasOwnProperty("round"))
+            if (message.round != null && $Object.hasOwnProperty.call(message, "round"))
                 if (!$util.isInteger(message.round))
                     return "round: integer expected";
-            if (message.step != null && message.hasOwnProperty("step"))
+            if (message.step != null && $Object.hasOwnProperty.call(message, "step"))
                 if (!$util.isInteger(message.step))
                     return "step: integer expected";
-            if (message.proposedBlockHash != null && message.hasOwnProperty("proposedBlockHash")) {
+            if (message.proposedBlockHash != null && $Object.hasOwnProperty.call(message, "proposedBlockHash")) {
                 properties._proposedBlockHash = 1;
                 if (!$util.isString(message.proposedBlockHash))
                     return "proposedBlockHash: string expected";
             }
-            if (message.validatorsSignedPrevote != null && message.hasOwnProperty("validatorsSignedPrevote")) {
-                if (!Array.isArray(message.validatorsSignedPrevote))
+            if (message.validatorsSignedPrevote != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrevote")) {
+                if (!$Array.isArray(message.validatorsSignedPrevote))
                     return "validatorsSignedPrevote: array expected";
-                for (var i = 0; i < message.validatorsSignedPrevote.length; ++i)
+                for (let i = 0; i < message.validatorsSignedPrevote.length; ++i)
                     if (typeof message.validatorsSignedPrevote[i] !== "boolean")
                         return "validatorsSignedPrevote: boolean[] expected";
             }
-            if (message.validatorsSignedPrecommit != null && message.hasOwnProperty("validatorsSignedPrecommit")) {
-                if (!Array.isArray(message.validatorsSignedPrecommit))
+            if (message.validatorsSignedPrecommit != null && $Object.hasOwnProperty.call(message, "validatorsSignedPrecommit")) {
+                if (!$Array.isArray(message.validatorsSignedPrecommit))
                     return "validatorsSignedPrecommit: array expected";
-                for (var i = 0; i < message.validatorsSignedPrecommit.length; ++i)
+                for (let i = 0; i < message.validatorsSignedPrecommit.length; ++i)
                     if (typeof message.validatorsSignedPrecommit[i] !== "boolean")
                         return "validatorsSignedPrecommit: boolean[] expected";
             }
@@ -1191,41 +1230,43 @@ $root.shared = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {shared.Headers} Headers
          */
-        Headers.fromObject = function fromObject(object, _depth) {
+        Headers.fromObject = function (object, _depth) {
             if (object instanceof $root.shared.Headers)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".shared.Headers: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.shared.Headers();
+                throw $Error("max depth exceeded");
+            let message = new $root.shared.Headers();
             if (object.version != null)
                 if (typeof object.version !== "string" || object.version.length)
-                    message.version = String(object.version);
+                    message.version = $String(object.version);
             if (object.blockNumber != null)
-                if (Number(object.blockNumber) !== 0)
+                if ($Number(object.blockNumber) !== 0)
                     message.blockNumber = object.blockNumber >>> 0;
             if (object.round != null)
-                if (Number(object.round) !== 0)
+                if ($Number(object.round) !== 0)
                     message.round = object.round >>> 0;
             if (object.step != null)
-                if (Number(object.step) !== 0)
+                if ($Number(object.step) !== 0)
                     message.step = object.step >>> 0;
             if (object.proposedBlockHash != null)
-                message.proposedBlockHash = String(object.proposedBlockHash);
+                message.proposedBlockHash = $String(object.proposedBlockHash);
             if (object.validatorsSignedPrevote) {
-                if (!Array.isArray(object.validatorsSignedPrevote))
-                    throw TypeError(".shared.Headers.validatorsSignedPrevote: array expected");
-                message.validatorsSignedPrevote = Array(object.validatorsSignedPrevote.length);
-                for (var i = 0; i < object.validatorsSignedPrevote.length; ++i)
-                    message.validatorsSignedPrevote[i] = Boolean(object.validatorsSignedPrevote[i]);
+                if (!$Array.isArray(object.validatorsSignedPrevote))
+                    throw $TypeError(".shared.Headers.validatorsSignedPrevote: array expected");
+                message.validatorsSignedPrevote = $Array(object.validatorsSignedPrevote.length);
+                for (let i = 0; i < object.validatorsSignedPrevote.length; ++i)
+                    message.validatorsSignedPrevote[i] = $Boolean(object.validatorsSignedPrevote[i]);
             }
             if (object.validatorsSignedPrecommit) {
-                if (!Array.isArray(object.validatorsSignedPrecommit))
-                    throw TypeError(".shared.Headers.validatorsSignedPrecommit: array expected");
-                message.validatorsSignedPrecommit = Array(object.validatorsSignedPrecommit.length);
-                for (var i = 0; i < object.validatorsSignedPrecommit.length; ++i)
-                    message.validatorsSignedPrecommit[i] = Boolean(object.validatorsSignedPrecommit[i]);
+                if (!$Array.isArray(object.validatorsSignedPrecommit))
+                    throw $TypeError(".shared.Headers.validatorsSignedPrecommit: array expected");
+                message.validatorsSignedPrecommit = $Array(object.validatorsSignedPrecommit.length);
+                for (let i = 0; i < object.validatorsSignedPrecommit.length; ++i)
+                    message.validatorsSignedPrecommit[i] = $Boolean(object.validatorsSignedPrecommit[i]);
             }
             return message;
         };
@@ -1239,10 +1280,14 @@ $root.shared = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        Headers.toObject = function toObject(message, options) {
+        Headers.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.arrays || options.defaults) {
                 object.validatorsSignedPrevote = [];
                 object.validatorsSignedPrecommit = [];
@@ -1253,27 +1298,24 @@ $root.shared = (function() {
                 object.round = 0;
                 object.step = 0;
             }
-            if (message.version != null && message.hasOwnProperty("version"))
+            if (message.version != null && $Object.hasOwnProperty.call(message, "version"))
                 object.version = message.version;
-            if (message.blockNumber != null && message.hasOwnProperty("blockNumber"))
+            if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
                 object.blockNumber = message.blockNumber;
-            if (message.round != null && message.hasOwnProperty("round"))
+            if (message.round != null && $Object.hasOwnProperty.call(message, "round"))
                 object.round = message.round;
-            if (message.step != null && message.hasOwnProperty("step"))
+            if (message.step != null && $Object.hasOwnProperty.call(message, "step"))
                 object.step = message.step;
-            if (message.proposedBlockHash != null && message.hasOwnProperty("proposedBlockHash")) {
+            if (message.proposedBlockHash != null && $Object.hasOwnProperty.call(message, "proposedBlockHash"))
                 object.proposedBlockHash = message.proposedBlockHash;
-                if (options.oneofs)
-                    object._proposedBlockHash = "proposedBlockHash";
-            }
             if (message.validatorsSignedPrevote && message.validatorsSignedPrevote.length) {
-                object.validatorsSignedPrevote = Array(message.validatorsSignedPrevote.length);
-                for (var j = 0; j < message.validatorsSignedPrevote.length; ++j)
+                object.validatorsSignedPrevote = $Array(message.validatorsSignedPrevote.length);
+                for (let j = 0; j < message.validatorsSignedPrevote.length; ++j)
                     object.validatorsSignedPrevote[j] = message.validatorsSignedPrevote[j];
             }
             if (message.validatorsSignedPrecommit && message.validatorsSignedPrecommit.length) {
-                object.validatorsSignedPrecommit = Array(message.validatorsSignedPrecommit.length);
-                for (var j = 0; j < message.validatorsSignedPrecommit.length; ++j)
+                object.validatorsSignedPrecommit = $Array(message.validatorsSignedPrecommit.length);
+                for (let j = 0; j < message.validatorsSignedPrecommit.length; ++j)
                     object.validatorsSignedPrecommit[j] = message.validatorsSignedPrecommit[j];
             }
             return object;
@@ -1286,8 +1328,8 @@ $root.shared = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        Headers.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        Headers.prototype.toJSON = function() {
+            return Headers.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -1298,8 +1340,8 @@ $root.shared = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        Headers.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        Headers.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/shared.Headers";
         };
@@ -1315,7 +1357,7 @@ $root.shared = (function() {
          * @property {string|null} [ip] PeerLike ip
          * @property {number|null} [port] PeerLike port
          * @property {number|null} [protocol] PeerLike protocol
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -1337,14 +1379,14 @@ $root.shared = (function() {
          * @classdesc Represents a PeerLike.
          * @constructor
          * @param {shared.PeerLike.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function PeerLike(properties) {
+        const PeerLike = function (properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * PeerLike ip.
@@ -1382,7 +1424,7 @@ $root.shared = (function() {
          *   (properties?: shared.PeerLike.$Properties): shared.PeerLike;
          * }}
          */
-        PeerLike.create = function create(properties) {
+        PeerLike.create = function(properties) {
             return new PeerLike(properties);
         };
 
@@ -1395,17 +1437,21 @@ $root.shared = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        PeerLike.encode = function encode(message, writer) {
+        PeerLike.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.ip != null && Object.hasOwnProperty.call(message, "ip"))
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.ip != null && $Object.hasOwnProperty.call(message, "ip"))
                 writer.uint32(/* id 1, wireType 2 =*/10).string(message.ip);
-            if (message.port != null && Object.hasOwnProperty.call(message, "port"))
+            if (message.port != null && $Object.hasOwnProperty.call(message, "port"))
                 writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.port);
-            if (message.protocol != null && Object.hasOwnProperty.call(message, "protocol"))
+            if (message.protocol != null && $Object.hasOwnProperty.call(message, "protocol"))
                 writer.uint32(/* id 3, wireType 0 =*/24).uint32(message.protocol);
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -1419,8 +1465,8 @@ $root.shared = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        PeerLike.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        PeerLike.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -1434,27 +1480,27 @@ $root.shared = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        PeerLike.decode = function decode(reader, length, _end, _depth, _target) {
+        PeerLike.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.shared.PeerLike(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.shared.PeerLike(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        if ((value = reader.string()).length)
+                        if ((value = reader.stringVerify()).length)
                             message.ip = value;
                         else
                             delete message.ip;
@@ -1480,11 +1526,13 @@ $root.shared = (function() {
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -1498,7 +1546,7 @@ $root.shared = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        PeerLike.decodeDelimited = function decodeDelimited(reader) {
+        PeerLike.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -1512,20 +1560,20 @@ $root.shared = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        PeerLike.verify = function verify(message, _depth) {
+        PeerLike.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.ip != null && message.hasOwnProperty("ip"))
+            if (message.ip != null && $Object.hasOwnProperty.call(message, "ip"))
                 if (!$util.isString(message.ip))
                     return "ip: string expected";
-            if (message.port != null && message.hasOwnProperty("port"))
+            if (message.port != null && $Object.hasOwnProperty.call(message, "port"))
                 if (!$util.isInteger(message.port))
                     return "port: integer expected";
-            if (message.protocol != null && message.hasOwnProperty("protocol"))
+            if (message.protocol != null && $Object.hasOwnProperty.call(message, "protocol"))
                 if (!$util.isInteger(message.protocol))
                     return "protocol: integer expected";
             return null;
@@ -1539,22 +1587,24 @@ $root.shared = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {shared.PeerLike} PeerLike
          */
-        PeerLike.fromObject = function fromObject(object, _depth) {
+        PeerLike.fromObject = function (object, _depth) {
             if (object instanceof $root.shared.PeerLike)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".shared.PeerLike: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.shared.PeerLike();
+                throw $Error("max depth exceeded");
+            let message = new $root.shared.PeerLike();
             if (object.ip != null)
                 if (typeof object.ip !== "string" || object.ip.length)
-                    message.ip = String(object.ip);
+                    message.ip = $String(object.ip);
             if (object.port != null)
-                if (Number(object.port) !== 0)
+                if ($Number(object.port) !== 0)
                     message.port = object.port >>> 0;
             if (object.protocol != null)
-                if (Number(object.protocol) !== 0)
+                if ($Number(object.protocol) !== 0)
                     message.protocol = object.protocol >>> 0;
             return message;
         };
@@ -1568,20 +1618,24 @@ $root.shared = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        PeerLike.toObject = function toObject(message, options) {
+        PeerLike.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.defaults) {
                 object.ip = "";
                 object.port = 0;
                 object.protocol = 0;
             }
-            if (message.ip != null && message.hasOwnProperty("ip"))
+            if (message.ip != null && $Object.hasOwnProperty.call(message, "ip"))
                 object.ip = message.ip;
-            if (message.port != null && message.hasOwnProperty("port"))
+            if (message.port != null && $Object.hasOwnProperty.call(message, "port"))
                 object.port = message.port;
-            if (message.protocol != null && message.hasOwnProperty("protocol"))
+            if (message.protocol != null && $Object.hasOwnProperty.call(message, "protocol"))
                 object.protocol = message.protocol;
             return object;
         };
@@ -1593,8 +1647,8 @@ $root.shared = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        PeerLike.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        PeerLike.prototype.toJSON = function() {
+            return PeerLike.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -1605,8 +1659,8 @@ $root.shared = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        PeerLike.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        PeerLike.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/shared.PeerLike";
         };
@@ -1617,14 +1671,14 @@ $root.shared = (function() {
     return shared;
 })();
 
-$root.getBlocks = (function() {
+export const getBlocks = $root.getBlocks = (() => {
 
     /**
      * Namespace getBlocks.
      * @exports getBlocks
      * @namespace
      */
-    var getBlocks = {};
+    const getBlocks = {};
 
     getBlocks.GetBlocksRequest = (function() {
 
@@ -1634,7 +1688,7 @@ $root.getBlocks = (function() {
          * @property {number|null} [fromBlockNumber] GetBlocksRequest fromBlockNumber
          * @property {number|null} [limit] GetBlocksRequest limit
          * @property {shared.Headers.$Properties|null} [headers] GetBlocksRequest headers
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -1656,14 +1710,14 @@ $root.getBlocks = (function() {
          * @classdesc Represents a GetBlocksRequest.
          * @constructor
          * @param {getBlocks.GetBlocksRequest.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function GetBlocksRequest(properties) {
+        const GetBlocksRequest = function (properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * GetBlocksRequest fromBlockNumber.
@@ -1701,7 +1755,7 @@ $root.getBlocks = (function() {
          *   (properties?: getBlocks.GetBlocksRequest.$Properties): getBlocks.GetBlocksRequest;
          * }}
          */
-        GetBlocksRequest.create = function create(properties) {
+        GetBlocksRequest.create = function(properties) {
             return new GetBlocksRequest(properties);
         };
 
@@ -1714,17 +1768,21 @@ $root.getBlocks = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetBlocksRequest.encode = function encode(message, writer) {
+        GetBlocksRequest.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.fromBlockNumber != null && Object.hasOwnProperty.call(message, "fromBlockNumber"))
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.fromBlockNumber != null && $Object.hasOwnProperty.call(message, "fromBlockNumber"))
                 writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.fromBlockNumber);
-            if (message.limit != null && Object.hasOwnProperty.call(message, "limit"))
+            if (message.limit != null && $Object.hasOwnProperty.call(message, "limit"))
                 writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.limit);
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 3, wireType 2 =*/26).fork(), _depth + 1).ldelim();
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -1738,8 +1796,8 @@ $root.getBlocks = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetBlocksRequest.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        GetBlocksRequest.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -1753,22 +1811,22 @@ $root.getBlocks = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetBlocksRequest.decode = function decode(reader, length, _end, _depth, _target) {
+        GetBlocksRequest.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getBlocks.GetBlocksRequest(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getBlocks.GetBlocksRequest(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 0)
@@ -1791,16 +1849,18 @@ $root.getBlocks = (function() {
                 case 3: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -1814,7 +1874,7 @@ $root.getBlocks = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetBlocksRequest.decodeDelimited = function decodeDelimited(reader) {
+        GetBlocksRequest.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -1828,21 +1888,21 @@ $root.getBlocks = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GetBlocksRequest.verify = function verify(message, _depth) {
+        GetBlocksRequest.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.fromBlockNumber != null && message.hasOwnProperty("fromBlockNumber"))
+            if (message.fromBlockNumber != null && $Object.hasOwnProperty.call(message, "fromBlockNumber"))
                 if (!$util.isInteger(message.fromBlockNumber))
                     return "fromBlockNumber: integer expected";
-            if (message.limit != null && message.hasOwnProperty("limit"))
+            if (message.limit != null && $Object.hasOwnProperty.call(message, "limit"))
                 if (!$util.isInteger(message.limit))
                     return "limit: integer expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
@@ -1857,23 +1917,25 @@ $root.getBlocks = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {getBlocks.GetBlocksRequest} GetBlocksRequest
          */
-        GetBlocksRequest.fromObject = function fromObject(object, _depth) {
+        GetBlocksRequest.fromObject = function (object, _depth) {
             if (object instanceof $root.getBlocks.GetBlocksRequest)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".getBlocks.GetBlocksRequest: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.getBlocks.GetBlocksRequest();
+                throw $Error("max depth exceeded");
+            let message = new $root.getBlocks.GetBlocksRequest();
             if (object.fromBlockNumber != null)
-                if (Number(object.fromBlockNumber) !== 0)
+                if ($Number(object.fromBlockNumber) !== 0)
                     message.fromBlockNumber = object.fromBlockNumber >>> 0;
             if (object.limit != null)
-                if (Number(object.limit) !== 0)
+                if ($Number(object.limit) !== 0)
                     message.limit = object.limit >>> 0;
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".getBlocks.GetBlocksRequest.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".getBlocks.GetBlocksRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             return message;
@@ -1888,21 +1950,25 @@ $root.getBlocks = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GetBlocksRequest.toObject = function toObject(message, options) {
+        GetBlocksRequest.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.defaults) {
                 object.fromBlockNumber = 0;
                 object.limit = 0;
                 object.headers = null;
             }
-            if (message.fromBlockNumber != null && message.hasOwnProperty("fromBlockNumber"))
+            if (message.fromBlockNumber != null && $Object.hasOwnProperty.call(message, "fromBlockNumber"))
                 object.fromBlockNumber = message.fromBlockNumber;
-            if (message.limit != null && message.hasOwnProperty("limit"))
+            if (message.limit != null && $Object.hasOwnProperty.call(message, "limit"))
                 object.limit = message.limit;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
             return object;
         };
 
@@ -1913,8 +1979,8 @@ $root.getBlocks = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GetBlocksRequest.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        GetBlocksRequest.prototype.toJSON = function() {
+            return GetBlocksRequest.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -1925,8 +1991,8 @@ $root.getBlocks = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        GetBlocksRequest.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        GetBlocksRequest.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/getBlocks.GetBlocksRequest";
         };
@@ -1941,7 +2007,7 @@ $root.getBlocks = (function() {
          * @typedef {Object} getBlocks.GetBlocksResponse.$Properties
          * @property {shared.Headers.$Properties|null} [headers] GetBlocksResponse headers
          * @property {Array.<Uint8Array>|null} [blocks] GetBlocksResponse blocks
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -1963,15 +2029,15 @@ $root.getBlocks = (function() {
          * @classdesc Represents a GetBlocksResponse.
          * @constructor
          * @param {getBlocks.GetBlocksResponse.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function GetBlocksResponse(properties) {
+        const GetBlocksResponse = function (properties) {
             this.blocks = [];
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * GetBlocksResponse headers.
@@ -2001,7 +2067,7 @@ $root.getBlocks = (function() {
          *   (properties?: getBlocks.GetBlocksResponse.$Properties): getBlocks.GetBlocksResponse;
          * }}
          */
-        GetBlocksResponse.create = function create(properties) {
+        GetBlocksResponse.create = function(properties) {
             return new GetBlocksResponse(properties);
         };
 
@@ -2014,16 +2080,20 @@ $root.getBlocks = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetBlocksResponse.encode = function encode(message, writer) {
+        GetBlocksResponse.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
             if (message.blocks != null && message.blocks.length)
-                for (var i = 0; i < message.blocks.length; ++i)
+                for (let i = 0; i < message.blocks.length; ++i)
                     writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.blocks[i]);
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -2037,8 +2107,8 @@ $root.getBlocks = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetBlocksResponse.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        GetBlocksResponse.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -2052,27 +2122,27 @@ $root.getBlocks = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetBlocksResponse.decode = function decode(reader, length, _end, _depth, _target) {
+        GetBlocksResponse.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getBlocks.GetBlocksResponse(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getBlocks.GetBlocksResponse(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 case 2: {
@@ -2085,11 +2155,13 @@ $root.getBlocks = (function() {
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -2103,7 +2175,7 @@ $root.getBlocks = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetBlocksResponse.decodeDelimited = function decodeDelimited(reader) {
+        GetBlocksResponse.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -2117,22 +2189,22 @@ $root.getBlocks = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GetBlocksResponse.verify = function verify(message, _depth) {
+        GetBlocksResponse.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
-            if (message.blocks != null && message.hasOwnProperty("blocks")) {
-                if (!Array.isArray(message.blocks))
+            if (message.blocks != null && $Object.hasOwnProperty.call(message, "blocks")) {
+                if (!$Array.isArray(message.blocks))
                     return "blocks: array expected";
-                for (var i = 0; i < message.blocks.length; ++i)
+                for (let i = 0; i < message.blocks.length; ++i)
                     if (!(message.blocks[i] && typeof message.blocks[i].length === "number" || $util.isString(message.blocks[i])))
                         return "blocks: buffer[] expected";
             }
@@ -2147,24 +2219,26 @@ $root.getBlocks = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {getBlocks.GetBlocksResponse} GetBlocksResponse
          */
-        GetBlocksResponse.fromObject = function fromObject(object, _depth) {
+        GetBlocksResponse.fromObject = function (object, _depth) {
             if (object instanceof $root.getBlocks.GetBlocksResponse)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".getBlocks.GetBlocksResponse: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.getBlocks.GetBlocksResponse();
+                throw $Error("max depth exceeded");
+            let message = new $root.getBlocks.GetBlocksResponse();
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".getBlocks.GetBlocksResponse.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".getBlocks.GetBlocksResponse.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             if (object.blocks) {
-                if (!Array.isArray(object.blocks))
-                    throw TypeError(".getBlocks.GetBlocksResponse.blocks: array expected");
-                message.blocks = Array(object.blocks.length);
-                for (var i = 0; i < object.blocks.length; ++i)
+                if (!$Array.isArray(object.blocks))
+                    throw $TypeError(".getBlocks.GetBlocksResponse.blocks: array expected");
+                message.blocks = $Array(object.blocks.length);
+                for (let i = 0; i < object.blocks.length; ++i)
                     if (typeof object.blocks[i] === "string")
                         $util.base64.decode(object.blocks[i], message.blocks[i] = $util.newBuffer($util.base64.length(object.blocks[i])), 0);
                     else if (object.blocks[i].length >= 0)
@@ -2182,20 +2256,24 @@ $root.getBlocks = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GetBlocksResponse.toObject = function toObject(message, options) {
+        GetBlocksResponse.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.arrays || options.defaults)
                 object.blocks = [];
             if (options.defaults)
                 object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
             if (message.blocks && message.blocks.length) {
-                object.blocks = Array(message.blocks.length);
-                for (var j = 0; j < message.blocks.length; ++j)
-                    object.blocks[j] = options.bytes === String ? $util.base64.encode(message.blocks[j], 0, message.blocks[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.blocks[j]) : message.blocks[j];
+                object.blocks = $Array(message.blocks.length);
+                for (let j = 0; j < message.blocks.length; ++j)
+                    object.blocks[j] = options.bytes === $String ? $util.base64.encode(message.blocks[j], 0, message.blocks[j].length) : options.bytes === $Array ? $Array.prototype.slice.call(message.blocks[j]) : message.blocks[j];
             }
             return object;
         };
@@ -2207,8 +2285,8 @@ $root.getBlocks = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GetBlocksResponse.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        GetBlocksResponse.prototype.toJSON = function() {
+            return GetBlocksResponse.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -2219,8 +2297,8 @@ $root.getBlocks = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        GetBlocksResponse.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        GetBlocksResponse.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/getBlocks.GetBlocksResponse";
         };
@@ -2231,14 +2309,14 @@ $root.getBlocks = (function() {
     return getBlocks;
 })();
 
-$root.getMessages = (function() {
+export const getMessages = $root.getMessages = (() => {
 
     /**
      * Namespace getMessages.
      * @exports getMessages
      * @namespace
      */
-    var getMessages = {};
+    const getMessages = {};
 
     getMessages.GetMessagesRequest = (function() {
 
@@ -2246,7 +2324,7 @@ $root.getMessages = (function() {
          * Properties of a GetMessagesRequest.
          * @typedef {Object} getMessages.GetMessagesRequest.$Properties
          * @property {shared.Headers.$Properties|null} [headers] GetMessagesRequest headers
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -2268,14 +2346,14 @@ $root.getMessages = (function() {
          * @classdesc Represents a GetMessagesRequest.
          * @constructor
          * @param {getMessages.GetMessagesRequest.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function GetMessagesRequest(properties) {
+        const GetMessagesRequest = function (properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * GetMessagesRequest headers.
@@ -2297,7 +2375,7 @@ $root.getMessages = (function() {
          *   (properties?: getMessages.GetMessagesRequest.$Properties): getMessages.GetMessagesRequest;
          * }}
          */
-        GetMessagesRequest.create = function create(properties) {
+        GetMessagesRequest.create = function(properties) {
             return new GetMessagesRequest(properties);
         };
 
@@ -2310,13 +2388,17 @@ $root.getMessages = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetMessagesRequest.encode = function encode(message, writer) {
+        GetMessagesRequest.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -2330,8 +2412,8 @@ $root.getMessages = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetMessagesRequest.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        GetMessagesRequest.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -2345,36 +2427,38 @@ $root.getMessages = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetMessagesRequest.decode = function decode(reader, length, _end, _depth, _target) {
+        GetMessagesRequest.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getMessages.GetMessagesRequest(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getMessages.GetMessagesRequest(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -2388,7 +2472,7 @@ $root.getMessages = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetMessagesRequest.decodeDelimited = function decodeDelimited(reader) {
+        GetMessagesRequest.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -2402,15 +2486,15 @@ $root.getMessages = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GetMessagesRequest.verify = function verify(message, _depth) {
+        GetMessagesRequest.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
@@ -2425,17 +2509,19 @@ $root.getMessages = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {getMessages.GetMessagesRequest} GetMessagesRequest
          */
-        GetMessagesRequest.fromObject = function fromObject(object, _depth) {
+        GetMessagesRequest.fromObject = function (object, _depth) {
             if (object instanceof $root.getMessages.GetMessagesRequest)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".getMessages.GetMessagesRequest: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.getMessages.GetMessagesRequest();
+                throw $Error("max depth exceeded");
+            let message = new $root.getMessages.GetMessagesRequest();
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".getMessages.GetMessagesRequest.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".getMessages.GetMessagesRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             return message;
@@ -2450,14 +2536,18 @@ $root.getMessages = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GetMessagesRequest.toObject = function toObject(message, options) {
+        GetMessagesRequest.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.defaults)
                 object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
             return object;
         };
 
@@ -2468,8 +2558,8 @@ $root.getMessages = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GetMessagesRequest.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        GetMessagesRequest.prototype.toJSON = function() {
+            return GetMessagesRequest.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -2480,8 +2570,8 @@ $root.getMessages = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        GetMessagesRequest.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        GetMessagesRequest.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/getMessages.GetMessagesRequest";
         };
@@ -2497,7 +2587,7 @@ $root.getMessages = (function() {
          * @property {shared.Headers.$Properties|null} [headers] GetMessagesResponse headers
          * @property {Array.<Uint8Array>|null} [prevotes] GetMessagesResponse prevotes
          * @property {Array.<Uint8Array>|null} [precommits] GetMessagesResponse precommits
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -2519,16 +2609,16 @@ $root.getMessages = (function() {
          * @classdesc Represents a GetMessagesResponse.
          * @constructor
          * @param {getMessages.GetMessagesResponse.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function GetMessagesResponse(properties) {
+        const GetMessagesResponse = function (properties) {
             this.prevotes = [];
             this.precommits = [];
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * GetMessagesResponse headers.
@@ -2566,7 +2656,7 @@ $root.getMessages = (function() {
          *   (properties?: getMessages.GetMessagesResponse.$Properties): getMessages.GetMessagesResponse;
          * }}
          */
-        GetMessagesResponse.create = function create(properties) {
+        GetMessagesResponse.create = function(properties) {
             return new GetMessagesResponse(properties);
         };
 
@@ -2579,19 +2669,23 @@ $root.getMessages = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetMessagesResponse.encode = function encode(message, writer) {
+        GetMessagesResponse.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
             if (message.prevotes != null && message.prevotes.length)
-                for (var i = 0; i < message.prevotes.length; ++i)
+                for (let i = 0; i < message.prevotes.length; ++i)
                     writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.prevotes[i]);
             if (message.precommits != null && message.precommits.length)
-                for (var i = 0; i < message.precommits.length; ++i)
+                for (let i = 0; i < message.precommits.length; ++i)
                     writer.uint32(/* id 3, wireType 2 =*/26).bytes(message.precommits[i]);
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -2605,8 +2699,8 @@ $root.getMessages = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetMessagesResponse.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        GetMessagesResponse.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -2620,27 +2714,27 @@ $root.getMessages = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetMessagesResponse.decode = function decode(reader, length, _end, _depth, _target) {
+        GetMessagesResponse.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getMessages.GetMessagesResponse(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getMessages.GetMessagesResponse(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 case 2: {
@@ -2661,11 +2755,13 @@ $root.getMessages = (function() {
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -2679,7 +2775,7 @@ $root.getMessages = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetMessagesResponse.decodeDelimited = function decodeDelimited(reader) {
+        GetMessagesResponse.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -2693,29 +2789,29 @@ $root.getMessages = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GetMessagesResponse.verify = function verify(message, _depth) {
+        GetMessagesResponse.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
-            if (message.prevotes != null && message.hasOwnProperty("prevotes")) {
-                if (!Array.isArray(message.prevotes))
+            if (message.prevotes != null && $Object.hasOwnProperty.call(message, "prevotes")) {
+                if (!$Array.isArray(message.prevotes))
                     return "prevotes: array expected";
-                for (var i = 0; i < message.prevotes.length; ++i)
+                for (let i = 0; i < message.prevotes.length; ++i)
                     if (!(message.prevotes[i] && typeof message.prevotes[i].length === "number" || $util.isString(message.prevotes[i])))
                         return "prevotes: buffer[] expected";
             }
-            if (message.precommits != null && message.hasOwnProperty("precommits")) {
-                if (!Array.isArray(message.precommits))
+            if (message.precommits != null && $Object.hasOwnProperty.call(message, "precommits")) {
+                if (!$Array.isArray(message.precommits))
                     return "precommits: array expected";
-                for (var i = 0; i < message.precommits.length; ++i)
+                for (let i = 0; i < message.precommits.length; ++i)
                     if (!(message.precommits[i] && typeof message.precommits[i].length === "number" || $util.isString(message.precommits[i])))
                         return "precommits: buffer[] expected";
             }
@@ -2730,34 +2826,36 @@ $root.getMessages = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {getMessages.GetMessagesResponse} GetMessagesResponse
          */
-        GetMessagesResponse.fromObject = function fromObject(object, _depth) {
+        GetMessagesResponse.fromObject = function (object, _depth) {
             if (object instanceof $root.getMessages.GetMessagesResponse)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".getMessages.GetMessagesResponse: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.getMessages.GetMessagesResponse();
+                throw $Error("max depth exceeded");
+            let message = new $root.getMessages.GetMessagesResponse();
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".getMessages.GetMessagesResponse.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".getMessages.GetMessagesResponse.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             if (object.prevotes) {
-                if (!Array.isArray(object.prevotes))
-                    throw TypeError(".getMessages.GetMessagesResponse.prevotes: array expected");
-                message.prevotes = Array(object.prevotes.length);
-                for (var i = 0; i < object.prevotes.length; ++i)
+                if (!$Array.isArray(object.prevotes))
+                    throw $TypeError(".getMessages.GetMessagesResponse.prevotes: array expected");
+                message.prevotes = $Array(object.prevotes.length);
+                for (let i = 0; i < object.prevotes.length; ++i)
                     if (typeof object.prevotes[i] === "string")
                         $util.base64.decode(object.prevotes[i], message.prevotes[i] = $util.newBuffer($util.base64.length(object.prevotes[i])), 0);
                     else if (object.prevotes[i].length >= 0)
                         message.prevotes[i] = object.prevotes[i];
             }
             if (object.precommits) {
-                if (!Array.isArray(object.precommits))
-                    throw TypeError(".getMessages.GetMessagesResponse.precommits: array expected");
-                message.precommits = Array(object.precommits.length);
-                for (var i = 0; i < object.precommits.length; ++i)
+                if (!$Array.isArray(object.precommits))
+                    throw $TypeError(".getMessages.GetMessagesResponse.precommits: array expected");
+                message.precommits = $Array(object.precommits.length);
+                for (let i = 0; i < object.precommits.length; ++i)
                     if (typeof object.precommits[i] === "string")
                         $util.base64.decode(object.precommits[i], message.precommits[i] = $util.newBuffer($util.base64.length(object.precommits[i])), 0);
                     else if (object.precommits[i].length >= 0)
@@ -2775,27 +2873,31 @@ $root.getMessages = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GetMessagesResponse.toObject = function toObject(message, options) {
+        GetMessagesResponse.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.arrays || options.defaults) {
                 object.prevotes = [];
                 object.precommits = [];
             }
             if (options.defaults)
                 object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
             if (message.prevotes && message.prevotes.length) {
-                object.prevotes = Array(message.prevotes.length);
-                for (var j = 0; j < message.prevotes.length; ++j)
-                    object.prevotes[j] = options.bytes === String ? $util.base64.encode(message.prevotes[j], 0, message.prevotes[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.prevotes[j]) : message.prevotes[j];
+                object.prevotes = $Array(message.prevotes.length);
+                for (let j = 0; j < message.prevotes.length; ++j)
+                    object.prevotes[j] = options.bytes === $String ? $util.base64.encode(message.prevotes[j], 0, message.prevotes[j].length) : options.bytes === $Array ? $Array.prototype.slice.call(message.prevotes[j]) : message.prevotes[j];
             }
             if (message.precommits && message.precommits.length) {
-                object.precommits = Array(message.precommits.length);
-                for (var j = 0; j < message.precommits.length; ++j)
-                    object.precommits[j] = options.bytes === String ? $util.base64.encode(message.precommits[j], 0, message.precommits[j].length) : options.bytes === Array ? Array.prototype.slice.call(message.precommits[j]) : message.precommits[j];
+                object.precommits = $Array(message.precommits.length);
+                for (let j = 0; j < message.precommits.length; ++j)
+                    object.precommits[j] = options.bytes === $String ? $util.base64.encode(message.precommits[j], 0, message.precommits[j].length) : options.bytes === $Array ? $Array.prototype.slice.call(message.precommits[j]) : message.precommits[j];
             }
             return object;
         };
@@ -2807,8 +2909,8 @@ $root.getMessages = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GetMessagesResponse.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        GetMessagesResponse.prototype.toJSON = function() {
+            return GetMessagesResponse.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -2819,8 +2921,8 @@ $root.getMessages = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        GetMessagesResponse.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        GetMessagesResponse.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/getMessages.GetMessagesResponse";
         };
@@ -2831,14 +2933,14 @@ $root.getMessages = (function() {
     return getMessages;
 })();
 
-$root.getPeers = (function() {
+export const getPeers = $root.getPeers = (() => {
 
     /**
      * Namespace getPeers.
      * @exports getPeers
      * @namespace
      */
-    var getPeers = {};
+    const getPeers = {};
 
     getPeers.GetPeersRequest = (function() {
 
@@ -2846,7 +2948,7 @@ $root.getPeers = (function() {
          * Properties of a GetPeersRequest.
          * @typedef {Object} getPeers.GetPeersRequest.$Properties
          * @property {shared.Headers.$Properties|null} [headers] GetPeersRequest headers
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -2868,14 +2970,14 @@ $root.getPeers = (function() {
          * @classdesc Represents a GetPeersRequest.
          * @constructor
          * @param {getPeers.GetPeersRequest.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function GetPeersRequest(properties) {
+        const GetPeersRequest = function (properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * GetPeersRequest headers.
@@ -2897,7 +2999,7 @@ $root.getPeers = (function() {
          *   (properties?: getPeers.GetPeersRequest.$Properties): getPeers.GetPeersRequest;
          * }}
          */
-        GetPeersRequest.create = function create(properties) {
+        GetPeersRequest.create = function(properties) {
             return new GetPeersRequest(properties);
         };
 
@@ -2910,13 +3012,17 @@ $root.getPeers = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetPeersRequest.encode = function encode(message, writer) {
+        GetPeersRequest.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -2930,8 +3036,8 @@ $root.getPeers = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetPeersRequest.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        GetPeersRequest.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -2945,36 +3051,38 @@ $root.getPeers = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetPeersRequest.decode = function decode(reader, length, _end, _depth, _target) {
+        GetPeersRequest.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getPeers.GetPeersRequest(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getPeers.GetPeersRequest(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -2988,7 +3096,7 @@ $root.getPeers = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetPeersRequest.decodeDelimited = function decodeDelimited(reader) {
+        GetPeersRequest.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -3002,15 +3110,15 @@ $root.getPeers = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GetPeersRequest.verify = function verify(message, _depth) {
+        GetPeersRequest.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
@@ -3025,17 +3133,19 @@ $root.getPeers = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {getPeers.GetPeersRequest} GetPeersRequest
          */
-        GetPeersRequest.fromObject = function fromObject(object, _depth) {
+        GetPeersRequest.fromObject = function (object, _depth) {
             if (object instanceof $root.getPeers.GetPeersRequest)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".getPeers.GetPeersRequest: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.getPeers.GetPeersRequest();
+                throw $Error("max depth exceeded");
+            let message = new $root.getPeers.GetPeersRequest();
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".getPeers.GetPeersRequest.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".getPeers.GetPeersRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             return message;
@@ -3050,14 +3160,18 @@ $root.getPeers = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GetPeersRequest.toObject = function toObject(message, options) {
+        GetPeersRequest.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.defaults)
                 object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
             return object;
         };
 
@@ -3068,8 +3182,8 @@ $root.getPeers = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GetPeersRequest.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        GetPeersRequest.prototype.toJSON = function() {
+            return GetPeersRequest.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -3080,8 +3194,8 @@ $root.getPeers = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        GetPeersRequest.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        GetPeersRequest.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/getPeers.GetPeersRequest";
         };
@@ -3096,7 +3210,7 @@ $root.getPeers = (function() {
          * @typedef {Object} getPeers.GetPeersResponse.$Properties
          * @property {shared.Headers.$Properties|null} [headers] GetPeersResponse headers
          * @property {Array.<shared.PeerLike.$Properties>|null} [peers] GetPeersResponse peers
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -3118,15 +3232,15 @@ $root.getPeers = (function() {
          * @classdesc Represents a GetPeersResponse.
          * @constructor
          * @param {getPeers.GetPeersResponse.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function GetPeersResponse(properties) {
+        const GetPeersResponse = function (properties) {
             this.peers = [];
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * GetPeersResponse headers.
@@ -3156,7 +3270,7 @@ $root.getPeers = (function() {
          *   (properties?: getPeers.GetPeersResponse.$Properties): getPeers.GetPeersResponse;
          * }}
          */
-        GetPeersResponse.create = function create(properties) {
+        GetPeersResponse.create = function(properties) {
             return new GetPeersResponse(properties);
         };
 
@@ -3169,16 +3283,20 @@ $root.getPeers = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetPeersResponse.encode = function encode(message, writer) {
+        GetPeersResponse.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
             if (message.peers != null && message.peers.length)
-                for (var i = 0; i < message.peers.length; ++i)
-                    $root.shared.PeerLike.encode(message.peers[i], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+                for (let i = 0; i < message.peers.length; ++i)
+                    $root.shared.PeerLike.encode(message.peers[i], writer.uint32(/* id 2, wireType 2 =*/18).fork(), _depth + 1).ldelim();
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -3192,8 +3310,8 @@ $root.getPeers = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetPeersResponse.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        GetPeersResponse.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -3207,27 +3325,27 @@ $root.getPeers = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetPeersResponse.decode = function decode(reader, length, _end, _depth, _target) {
+        GetPeersResponse.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getPeers.GetPeersResponse(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getPeers.GetPeersResponse(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 case 2: {
@@ -3235,16 +3353,18 @@ $root.getPeers = (function() {
                             break;
                         if (!(message.peers && message.peers.length))
                             message.peers = [];
-                        message.peers.push($root.shared.PeerLike.decode(reader, reader.uint32(), undefined, _depth + 1));
+                        message.peers.push($root.shared.PeerLike.decode(reader, reader.uint32(), $undefined, _depth + 1));
                         continue;
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -3258,7 +3378,7 @@ $root.getPeers = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetPeersResponse.decodeDelimited = function decodeDelimited(reader) {
+        GetPeersResponse.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -3272,23 +3392,23 @@ $root.getPeers = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GetPeersResponse.verify = function verify(message, _depth) {
+        GetPeersResponse.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
-            if (message.peers != null && message.hasOwnProperty("peers")) {
-                if (!Array.isArray(message.peers))
+            if (message.peers != null && $Object.hasOwnProperty.call(message, "peers")) {
+                if (!$Array.isArray(message.peers))
                     return "peers: array expected";
-                for (var i = 0; i < message.peers.length; ++i) {
-                    var error = $root.shared.PeerLike.verify(message.peers[i], _depth + 1);
+                for (let i = 0; i < message.peers.length; ++i) {
+                    let error = $root.shared.PeerLike.verify(message.peers[i], _depth + 1);
                     if (error)
                         return "peers." + error;
                 }
@@ -3304,26 +3424,28 @@ $root.getPeers = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {getPeers.GetPeersResponse} GetPeersResponse
          */
-        GetPeersResponse.fromObject = function fromObject(object, _depth) {
+        GetPeersResponse.fromObject = function (object, _depth) {
             if (object instanceof $root.getPeers.GetPeersResponse)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".getPeers.GetPeersResponse: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.getPeers.GetPeersResponse();
+                throw $Error("max depth exceeded");
+            let message = new $root.getPeers.GetPeersResponse();
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".getPeers.GetPeersResponse.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".getPeers.GetPeersResponse.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             if (object.peers) {
-                if (!Array.isArray(object.peers))
-                    throw TypeError(".getPeers.GetPeersResponse.peers: array expected");
-                message.peers = Array(object.peers.length);
-                for (var i = 0; i < object.peers.length; ++i) {
-                    if (typeof object.peers[i] !== "object")
-                        throw TypeError(".getPeers.GetPeersResponse.peers: object expected");
+                if (!$Array.isArray(object.peers))
+                    throw $TypeError(".getPeers.GetPeersResponse.peers: array expected");
+                message.peers = $Array(object.peers.length);
+                for (let i = 0; i < object.peers.length; ++i) {
+                    if (!$util.isObject(object.peers[i]))
+                        throw $TypeError(".getPeers.GetPeersResponse.peers: object expected");
                     message.peers[i] = $root.shared.PeerLike.fromObject(object.peers[i], _depth + 1);
                 }
             }
@@ -3339,20 +3461,24 @@ $root.getPeers = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GetPeersResponse.toObject = function toObject(message, options) {
+        GetPeersResponse.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.arrays || options.defaults)
                 object.peers = [];
             if (options.defaults)
                 object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
             if (message.peers && message.peers.length) {
-                object.peers = Array(message.peers.length);
-                for (var j = 0; j < message.peers.length; ++j)
-                    object.peers[j] = $root.shared.PeerLike.toObject(message.peers[j], options);
+                object.peers = $Array(message.peers.length);
+                for (let j = 0; j < message.peers.length; ++j)
+                    object.peers[j] = $root.shared.PeerLike.toObject(message.peers[j], options, _depth + 1);
             }
             return object;
         };
@@ -3364,8 +3490,8 @@ $root.getPeers = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GetPeersResponse.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        GetPeersResponse.prototype.toJSON = function() {
+            return GetPeersResponse.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -3376,8 +3502,8 @@ $root.getPeers = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        GetPeersResponse.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        GetPeersResponse.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/getPeers.GetPeersResponse";
         };
@@ -3388,14 +3514,14 @@ $root.getPeers = (function() {
     return getPeers;
 })();
 
-$root.getProposal = (function() {
+export const getProposal = $root.getProposal = (() => {
 
     /**
      * Namespace getProposal.
      * @exports getProposal
      * @namespace
      */
-    var getProposal = {};
+    const getProposal = {};
 
     getProposal.GetProposalRequest = (function() {
 
@@ -3403,7 +3529,7 @@ $root.getProposal = (function() {
          * Properties of a GetProposalRequest.
          * @typedef {Object} getProposal.GetProposalRequest.$Properties
          * @property {shared.Headers.$Properties|null} [headers] GetProposalRequest headers
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -3425,14 +3551,14 @@ $root.getProposal = (function() {
          * @classdesc Represents a GetProposalRequest.
          * @constructor
          * @param {getProposal.GetProposalRequest.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function GetProposalRequest(properties) {
+        const GetProposalRequest = function (properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * GetProposalRequest headers.
@@ -3454,7 +3580,7 @@ $root.getProposal = (function() {
          *   (properties?: getProposal.GetProposalRequest.$Properties): getProposal.GetProposalRequest;
          * }}
          */
-        GetProposalRequest.create = function create(properties) {
+        GetProposalRequest.create = function(properties) {
             return new GetProposalRequest(properties);
         };
 
@@ -3467,13 +3593,17 @@ $root.getProposal = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetProposalRequest.encode = function encode(message, writer) {
+        GetProposalRequest.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -3487,8 +3617,8 @@ $root.getProposal = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetProposalRequest.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        GetProposalRequest.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -3502,36 +3632,38 @@ $root.getProposal = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetProposalRequest.decode = function decode(reader, length, _end, _depth, _target) {
+        GetProposalRequest.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getProposal.GetProposalRequest(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getProposal.GetProposalRequest(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -3545,7 +3677,7 @@ $root.getProposal = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetProposalRequest.decodeDelimited = function decodeDelimited(reader) {
+        GetProposalRequest.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -3559,15 +3691,15 @@ $root.getProposal = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GetProposalRequest.verify = function verify(message, _depth) {
+        GetProposalRequest.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
@@ -3582,17 +3714,19 @@ $root.getProposal = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {getProposal.GetProposalRequest} GetProposalRequest
          */
-        GetProposalRequest.fromObject = function fromObject(object, _depth) {
+        GetProposalRequest.fromObject = function (object, _depth) {
             if (object instanceof $root.getProposal.GetProposalRequest)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".getProposal.GetProposalRequest: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.getProposal.GetProposalRequest();
+                throw $Error("max depth exceeded");
+            let message = new $root.getProposal.GetProposalRequest();
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".getProposal.GetProposalRequest.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".getProposal.GetProposalRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             return message;
@@ -3607,14 +3741,18 @@ $root.getProposal = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GetProposalRequest.toObject = function toObject(message, options) {
+        GetProposalRequest.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.defaults)
                 object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
             return object;
         };
 
@@ -3625,8 +3763,8 @@ $root.getProposal = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GetProposalRequest.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        GetProposalRequest.prototype.toJSON = function() {
+            return GetProposalRequest.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -3637,8 +3775,8 @@ $root.getProposal = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        GetProposalRequest.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        GetProposalRequest.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/getProposal.GetProposalRequest";
         };
@@ -3653,7 +3791,7 @@ $root.getProposal = (function() {
          * @typedef {Object} getProposal.GetProposalResponse.$Properties
          * @property {shared.Headers.$Properties|null} [headers] GetProposalResponse headers
          * @property {Uint8Array|null} [proposal] GetProposalResponse proposal
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -3675,14 +3813,14 @@ $root.getProposal = (function() {
          * @classdesc Represents a GetProposalResponse.
          * @constructor
          * @param {getProposal.GetProposalResponse.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function GetProposalResponse(properties) {
+        const GetProposalResponse = function (properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * GetProposalResponse headers.
@@ -3712,7 +3850,7 @@ $root.getProposal = (function() {
          *   (properties?: getProposal.GetProposalResponse.$Properties): getProposal.GetProposalResponse;
          * }}
          */
-        GetProposalResponse.create = function create(properties) {
+        GetProposalResponse.create = function(properties) {
             return new GetProposalResponse(properties);
         };
 
@@ -3725,15 +3863,19 @@ $root.getProposal = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetProposalResponse.encode = function encode(message, writer) {
+        GetProposalResponse.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.proposal != null && Object.hasOwnProperty.call(message, "proposal"))
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
+            if (message.proposal != null && $Object.hasOwnProperty.call(message, "proposal"))
                 writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.proposal);
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -3747,8 +3889,8 @@ $root.getProposal = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetProposalResponse.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        GetProposalResponse.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -3762,27 +3904,27 @@ $root.getProposal = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetProposalResponse.decode = function decode(reader, length, _end, _depth, _target) {
+        GetProposalResponse.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getProposal.GetProposalResponse(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getProposal.GetProposalResponse(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 case 2: {
@@ -3796,11 +3938,13 @@ $root.getProposal = (function() {
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -3814,7 +3958,7 @@ $root.getProposal = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetProposalResponse.decodeDelimited = function decodeDelimited(reader) {
+        GetProposalResponse.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -3828,19 +3972,19 @@ $root.getProposal = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GetProposalResponse.verify = function verify(message, _depth) {
+        GetProposalResponse.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
-            if (message.proposal != null && message.hasOwnProperty("proposal"))
+            if (message.proposal != null && $Object.hasOwnProperty.call(message, "proposal"))
                 if (!(message.proposal && typeof message.proposal.length === "number" || $util.isString(message.proposal)))
                     return "proposal: buffer expected";
             return null;
@@ -3854,17 +3998,19 @@ $root.getProposal = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {getProposal.GetProposalResponse} GetProposalResponse
          */
-        GetProposalResponse.fromObject = function fromObject(object, _depth) {
+        GetProposalResponse.fromObject = function (object, _depth) {
             if (object instanceof $root.getProposal.GetProposalResponse)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".getProposal.GetProposalResponse: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.getProposal.GetProposalResponse();
+                throw $Error("max depth exceeded");
+            let message = new $root.getProposal.GetProposalResponse();
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".getProposal.GetProposalResponse.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".getProposal.GetProposalResponse.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             if (object.proposal != null)
@@ -3885,24 +4031,28 @@ $root.getProposal = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GetProposalResponse.toObject = function toObject(message, options) {
+        GetProposalResponse.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.defaults) {
                 object.headers = null;
-                if (options.bytes === String)
+                if (options.bytes === $String)
                     object.proposal = "";
                 else {
                     object.proposal = [];
-                    if (options.bytes !== Array)
+                    if (options.bytes !== $Array)
                         object.proposal = $util.newBuffer(object.proposal);
                 }
             }
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
-            if (message.proposal != null && message.hasOwnProperty("proposal"))
-                object.proposal = options.bytes === String ? $util.base64.encode(message.proposal, 0, message.proposal.length) : options.bytes === Array ? Array.prototype.slice.call(message.proposal) : message.proposal;
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
+            if (message.proposal != null && $Object.hasOwnProperty.call(message, "proposal"))
+                object.proposal = options.bytes === $String ? $util.base64.encode(message.proposal, 0, message.proposal.length) : options.bytes === $Array ? $Array.prototype.slice.call(message.proposal) : message.proposal;
             return object;
         };
 
@@ -3913,8 +4063,8 @@ $root.getProposal = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GetProposalResponse.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        GetProposalResponse.prototype.toJSON = function() {
+            return GetProposalResponse.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -3925,8 +4075,8 @@ $root.getProposal = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        GetProposalResponse.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        GetProposalResponse.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/getProposal.GetProposalResponse";
         };
@@ -3937,14 +4087,14 @@ $root.getProposal = (function() {
     return getProposal;
 })();
 
-$root.getStatus = (function() {
+export const getStatus = $root.getStatus = (() => {
 
     /**
      * Namespace getStatus.
      * @exports getStatus
      * @namespace
      */
-    var getStatus = {};
+    const getStatus = {};
 
     getStatus.GetStatusRequest = (function() {
 
@@ -3952,7 +4102,7 @@ $root.getStatus = (function() {
          * Properties of a GetStatusRequest.
          * @typedef {Object} getStatus.GetStatusRequest.$Properties
          * @property {shared.Headers.$Properties|null} [headers] GetStatusRequest headers
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -3974,14 +4124,14 @@ $root.getStatus = (function() {
          * @classdesc Represents a GetStatusRequest.
          * @constructor
          * @param {getStatus.GetStatusRequest.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function GetStatusRequest(properties) {
+        const GetStatusRequest = function (properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * GetStatusRequest headers.
@@ -4003,7 +4153,7 @@ $root.getStatus = (function() {
          *   (properties?: getStatus.GetStatusRequest.$Properties): getStatus.GetStatusRequest;
          * }}
          */
-        GetStatusRequest.create = function create(properties) {
+        GetStatusRequest.create = function(properties) {
             return new GetStatusRequest(properties);
         };
 
@@ -4016,13 +4166,17 @@ $root.getStatus = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetStatusRequest.encode = function encode(message, writer) {
+        GetStatusRequest.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -4036,8 +4190,8 @@ $root.getStatus = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetStatusRequest.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        GetStatusRequest.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -4051,36 +4205,38 @@ $root.getStatus = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetStatusRequest.decode = function decode(reader, length, _end, _depth, _target) {
+        GetStatusRequest.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getStatus.GetStatusRequest(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getStatus.GetStatusRequest(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -4094,7 +4250,7 @@ $root.getStatus = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetStatusRequest.decodeDelimited = function decodeDelimited(reader) {
+        GetStatusRequest.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -4108,15 +4264,15 @@ $root.getStatus = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GetStatusRequest.verify = function verify(message, _depth) {
+        GetStatusRequest.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
@@ -4131,17 +4287,19 @@ $root.getStatus = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {getStatus.GetStatusRequest} GetStatusRequest
          */
-        GetStatusRequest.fromObject = function fromObject(object, _depth) {
+        GetStatusRequest.fromObject = function (object, _depth) {
             if (object instanceof $root.getStatus.GetStatusRequest)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".getStatus.GetStatusRequest: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.getStatus.GetStatusRequest();
+                throw $Error("max depth exceeded");
+            let message = new $root.getStatus.GetStatusRequest();
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".getStatus.GetStatusRequest.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".getStatus.GetStatusRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             return message;
@@ -4156,14 +4314,18 @@ $root.getStatus = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GetStatusRequest.toObject = function toObject(message, options) {
+        GetStatusRequest.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.defaults)
                 object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
             return object;
         };
 
@@ -4174,8 +4336,8 @@ $root.getStatus = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GetStatusRequest.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        GetStatusRequest.prototype.toJSON = function() {
+            return GetStatusRequest.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -4186,8 +4348,8 @@ $root.getStatus = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        GetStatusRequest.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        GetStatusRequest.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/getStatus.GetStatusRequest";
         };
@@ -4203,7 +4365,7 @@ $root.getStatus = (function() {
          * @property {shared.Headers.$Properties|null} [headers] GetStatusResponse headers
          * @property {getStatus.GetStatusResponse.State.$Properties|null} [state] GetStatusResponse state
          * @property {getStatus.GetStatusResponse.Config.$Properties|null} [config] GetStatusResponse config
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -4225,14 +4387,14 @@ $root.getStatus = (function() {
          * @classdesc Represents a GetStatusResponse.
          * @constructor
          * @param {getStatus.GetStatusResponse.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function GetStatusResponse(properties) {
+        const GetStatusResponse = function (properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * GetStatusResponse headers.
@@ -4270,7 +4432,7 @@ $root.getStatus = (function() {
          *   (properties?: getStatus.GetStatusResponse.$Properties): getStatus.GetStatusResponse;
          * }}
          */
-        GetStatusResponse.create = function create(properties) {
+        GetStatusResponse.create = function(properties) {
             return new GetStatusResponse(properties);
         };
 
@@ -4283,17 +4445,21 @@ $root.getStatus = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetStatusResponse.encode = function encode(message, writer) {
+        GetStatusResponse.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.state != null && Object.hasOwnProperty.call(message, "state"))
-                $root.getStatus.GetStatusResponse.State.encode(message.state, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.config != null && Object.hasOwnProperty.call(message, "config"))
-                $root.getStatus.GetStatusResponse.Config.encode(message.config, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
+            if (message.state != null && $Object.hasOwnProperty.call(message, "state"))
+                $root.getStatus.GetStatusResponse.State.encode(message.state, writer.uint32(/* id 2, wireType 2 =*/18).fork(), _depth + 1).ldelim();
+            if (message.config != null && $Object.hasOwnProperty.call(message, "config"))
+                $root.getStatus.GetStatusResponse.Config.encode(message.config, writer.uint32(/* id 3, wireType 2 =*/26).fork(), _depth + 1).ldelim();
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -4307,8 +4473,8 @@ $root.getStatus = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        GetStatusResponse.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        GetStatusResponse.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -4322,48 +4488,50 @@ $root.getStatus = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetStatusResponse.decode = function decode(reader, length, _end, _depth, _target) {
+        GetStatusResponse.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getStatus.GetStatusResponse(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getStatus.GetStatusResponse(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 case 2: {
                         if (wireType !== 2)
                             break;
-                        message.state = $root.getStatus.GetStatusResponse.State.decode(reader, reader.uint32(), undefined, _depth + 1, message.state);
+                        message.state = $root.getStatus.GetStatusResponse.State.decode(reader, reader.uint32(), $undefined, _depth + 1, message.state);
                         continue;
                     }
                 case 3: {
                         if (wireType !== 2)
                             break;
-                        message.config = $root.getStatus.GetStatusResponse.Config.decode(reader, reader.uint32(), undefined, _depth + 1, message.config);
+                        message.config = $root.getStatus.GetStatusResponse.Config.decode(reader, reader.uint32(), $undefined, _depth + 1, message.config);
                         continue;
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -4377,7 +4545,7 @@ $root.getStatus = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        GetStatusResponse.decodeDelimited = function decodeDelimited(reader) {
+        GetStatusResponse.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -4391,25 +4559,25 @@ $root.getStatus = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        GetStatusResponse.verify = function verify(message, _depth) {
+        GetStatusResponse.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
-            if (message.state != null && message.hasOwnProperty("state")) {
-                var error = $root.getStatus.GetStatusResponse.State.verify(message.state, _depth + 1);
+            if (message.state != null && $Object.hasOwnProperty.call(message, "state")) {
+                let error = $root.getStatus.GetStatusResponse.State.verify(message.state, _depth + 1);
                 if (error)
                     return "state." + error;
             }
-            if (message.config != null && message.hasOwnProperty("config")) {
-                var error = $root.getStatus.GetStatusResponse.Config.verify(message.config, _depth + 1);
+            if (message.config != null && $Object.hasOwnProperty.call(message, "config")) {
+                let error = $root.getStatus.GetStatusResponse.Config.verify(message.config, _depth + 1);
                 if (error)
                     return "config." + error;
             }
@@ -4424,27 +4592,29 @@ $root.getStatus = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {getStatus.GetStatusResponse} GetStatusResponse
          */
-        GetStatusResponse.fromObject = function fromObject(object, _depth) {
+        GetStatusResponse.fromObject = function (object, _depth) {
             if (object instanceof $root.getStatus.GetStatusResponse)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".getStatus.GetStatusResponse: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.getStatus.GetStatusResponse();
+                throw $Error("max depth exceeded");
+            let message = new $root.getStatus.GetStatusResponse();
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".getStatus.GetStatusResponse.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".getStatus.GetStatusResponse.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             if (object.state != null) {
-                if (typeof object.state !== "object")
-                    throw TypeError(".getStatus.GetStatusResponse.state: object expected");
+                if (!$util.isObject(object.state))
+                    throw $TypeError(".getStatus.GetStatusResponse.state: object expected");
                 message.state = $root.getStatus.GetStatusResponse.State.fromObject(object.state, _depth + 1);
             }
             if (object.config != null) {
-                if (typeof object.config !== "object")
-                    throw TypeError(".getStatus.GetStatusResponse.config: object expected");
+                if (!$util.isObject(object.config))
+                    throw $TypeError(".getStatus.GetStatusResponse.config: object expected");
                 message.config = $root.getStatus.GetStatusResponse.Config.fromObject(object.config, _depth + 1);
             }
             return message;
@@ -4459,21 +4629,25 @@ $root.getStatus = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        GetStatusResponse.toObject = function toObject(message, options) {
+        GetStatusResponse.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.defaults) {
                 object.headers = null;
                 object.state = null;
                 object.config = null;
             }
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
-            if (message.state != null && message.hasOwnProperty("state"))
-                object.state = $root.getStatus.GetStatusResponse.State.toObject(message.state, options);
-            if (message.config != null && message.hasOwnProperty("config"))
-                object.config = $root.getStatus.GetStatusResponse.Config.toObject(message.config, options);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
+            if (message.state != null && $Object.hasOwnProperty.call(message, "state"))
+                object.state = $root.getStatus.GetStatusResponse.State.toObject(message.state, options, _depth + 1);
+            if (message.config != null && $Object.hasOwnProperty.call(message, "config"))
+                object.config = $root.getStatus.GetStatusResponse.Config.toObject(message.config, options, _depth + 1);
             return object;
         };
 
@@ -4484,8 +4658,8 @@ $root.getStatus = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        GetStatusResponse.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        GetStatusResponse.prototype.toJSON = function() {
+            return GetStatusResponse.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -4496,8 +4670,8 @@ $root.getStatus = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        GetStatusResponse.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        GetStatusResponse.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/getStatus.GetStatusResponse";
         };
@@ -4509,7 +4683,7 @@ $root.getStatus = (function() {
              * @typedef {Object} getStatus.GetStatusResponse.State.$Properties
              * @property {number|null} [blockNumber] State blockNumber
              * @property {string|null} [blockHash] State blockHash
-             * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+             * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
              */
 
             /**
@@ -4531,14 +4705,14 @@ $root.getStatus = (function() {
              * @classdesc Represents a State.
              * @constructor
              * @param {getStatus.GetStatusResponse.State.$Properties=} [properties] Properties to set
-             * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+             * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
              */
-            function State(properties) {
+            const State = function (properties) {
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
-            }
+            };
 
             /**
              * State blockNumber.
@@ -4568,7 +4742,7 @@ $root.getStatus = (function() {
              *   (properties?: getStatus.GetStatusResponse.State.$Properties): getStatus.GetStatusResponse.State;
              * }}
              */
-            State.create = function create(properties) {
+            State.create = function(properties) {
                 return new State(properties);
             };
 
@@ -4581,15 +4755,19 @@ $root.getStatus = (function() {
              * @param {$protobuf.Writer} [writer] Writer to encode to
              * @returns {$protobuf.Writer} Writer
              */
-            State.encode = function encode(message, writer) {
+            State.encode = function (message, writer, _depth) {
                 if (!writer)
                     writer = $Writer.create();
-                if (message.blockNumber != null && Object.hasOwnProperty.call(message, "blockNumber"))
+                if (_depth === $undefined)
+                    _depth = 0;
+                if (_depth > $util.recursionLimit)
+                    throw $Error("max depth exceeded");
+                if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
                     writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.blockNumber);
-                if (message.blockHash != null && Object.hasOwnProperty.call(message, "blockHash"))
+                if (message.blockHash != null && $Object.hasOwnProperty.call(message, "blockHash"))
                     writer.uint32(/* id 2, wireType 2 =*/18).string(message.blockHash);
-                if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                    for (var i = 0; i < message.$unknowns.length; ++i)
+                if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                    for (let i = 0; i < message.$unknowns.length; ++i)
                         writer.raw(message.$unknowns[i]);
                 return writer;
             };
@@ -4603,8 +4781,8 @@ $root.getStatus = (function() {
              * @param {$protobuf.Writer} [writer] Writer to encode to
              * @returns {$protobuf.Writer} Writer
              */
-            State.encodeDelimited = function encodeDelimited(message, writer) {
-                return this.encode(message, writer).ldelim();
+            State.encodeDelimited = function(message, writer) {
+                return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
             };
 
             /**
@@ -4618,22 +4796,22 @@ $root.getStatus = (function() {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            State.decode = function decode(reader, length, _end, _depth, _target) {
+            State.decode = function (reader, length, _end, _depth, _target) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                if (_depth === undefined)
+                if (_depth === $undefined)
                     _depth = 0;
                 if (_depth > $Reader.recursionLimit)
-                    throw Error("max depth exceeded");
-                var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getStatus.GetStatusResponse.State(), value;
+                    throw $Error("max depth exceeded");
+                let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getStatus.GetStatusResponse.State(), value;
                 while (reader.pos < end) {
-                    var start = reader.pos;
-                    var tag = reader.tag();
+                    let start = reader.pos;
+                    let tag = reader.tag();
                     if (tag === _end) {
-                        _end = undefined;
+                        _end = $undefined;
                         break;
                     }
-                    var wireType = tag & 7;
+                    let wireType = tag & 7;
                     switch (tag >>>= 3) {
                     case 1: {
                             if (wireType !== 0)
@@ -4647,7 +4825,7 @@ $root.getStatus = (function() {
                     case 2: {
                             if (wireType !== 2)
                                 break;
-                            if ((value = reader.string()).length)
+                            if ((value = reader.stringVerify()).length)
                                 message.blockHash = value;
                             else
                                 delete message.blockHash;
@@ -4655,11 +4833,13 @@ $root.getStatus = (function() {
                         }
                     }
                     reader.skipType(wireType, _depth, tag);
-                    $util.makeProp(message, "$unknowns", false);
-                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                    if (!reader.discardUnknown) {
+                        $util.makeProp(message, "$unknowns", false);
+                        (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                    }
                 }
-                if (_end !== undefined)
-                    throw Error("missing end group");
+                if (_end !== $undefined)
+                    throw $Error("missing end group");
                 return message;
             };
 
@@ -4673,7 +4853,7 @@ $root.getStatus = (function() {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            State.decodeDelimited = function decodeDelimited(reader) {
+            State.decodeDelimited = function(reader) {
                 if (!(reader instanceof $Reader))
                     reader = new $Reader(reader);
                 return this.decode(reader, reader.uint32());
@@ -4687,17 +4867,17 @@ $root.getStatus = (function() {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            State.verify = function verify(message, _depth) {
+            State.verify = function (message, _depth) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
-                if (_depth === undefined)
+                if (_depth === $undefined)
                     _depth = 0;
                 if (_depth > $util.recursionLimit)
                     return "max depth exceeded";
-                if (message.blockNumber != null && message.hasOwnProperty("blockNumber"))
+                if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
                     if (!$util.isInteger(message.blockNumber))
                         return "blockNumber: integer expected";
-                if (message.blockHash != null && message.hasOwnProperty("blockHash"))
+                if (message.blockHash != null && $Object.hasOwnProperty.call(message, "blockHash"))
                     if (!$util.isString(message.blockHash))
                         return "blockHash: string expected";
                 return null;
@@ -4711,20 +4891,22 @@ $root.getStatus = (function() {
              * @param {Object.<string,*>} object Plain object
              * @returns {getStatus.GetStatusResponse.State} State
              */
-            State.fromObject = function fromObject(object, _depth) {
+            State.fromObject = function (object, _depth) {
                 if (object instanceof $root.getStatus.GetStatusResponse.State)
                     return object;
-                if (_depth === undefined)
+                if (!$util.isObject(object))
+                    throw $TypeError(".getStatus.GetStatusResponse.State: object expected");
+                if (_depth === $undefined)
                     _depth = 0;
                 if (_depth > $util.recursionLimit)
-                    throw Error("max depth exceeded");
-                var message = new $root.getStatus.GetStatusResponse.State();
+                    throw $Error("max depth exceeded");
+                let message = new $root.getStatus.GetStatusResponse.State();
                 if (object.blockNumber != null)
-                    if (Number(object.blockNumber) !== 0)
+                    if ($Number(object.blockNumber) !== 0)
                         message.blockNumber = object.blockNumber >>> 0;
                 if (object.blockHash != null)
                     if (typeof object.blockHash !== "string" || object.blockHash.length)
-                        message.blockHash = String(object.blockHash);
+                        message.blockHash = $String(object.blockHash);
                 return message;
             };
 
@@ -4737,17 +4919,21 @@ $root.getStatus = (function() {
              * @param {$protobuf.IConversionOptions} [options] Conversion options
              * @returns {Object.<string,*>} Plain object
              */
-            State.toObject = function toObject(message, options) {
+            State.toObject = function (message, options, _depth) {
                 if (!options)
                     options = {};
-                var object = {};
+                if (_depth === $undefined)
+                    _depth = 0;
+                if (_depth > $util.recursionLimit)
+                    throw $Error("max depth exceeded");
+                let object = {};
                 if (options.defaults) {
                     object.blockNumber = 0;
                     object.blockHash = "";
                 }
-                if (message.blockNumber != null && message.hasOwnProperty("blockNumber"))
+                if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
                     object.blockNumber = message.blockNumber;
-                if (message.blockHash != null && message.hasOwnProperty("blockHash"))
+                if (message.blockHash != null && $Object.hasOwnProperty.call(message, "blockHash"))
                     object.blockHash = message.blockHash;
                 return object;
             };
@@ -4759,8 +4945,8 @@ $root.getStatus = (function() {
              * @instance
              * @returns {Object.<string,*>} JSON object
              */
-            State.prototype.toJSON = function toJSON() {
-                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            State.prototype.toJSON = function() {
+                return State.toObject(this, $protobuf.util.toJSONOptions);
             };
 
             /**
@@ -4771,8 +4957,8 @@ $root.getStatus = (function() {
              * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
              * @returns {string} The type url
              */
-            State.getTypeUrl = function getTypeUrl(prefix) {
-                if (prefix === undefined)
+            State.getTypeUrl = function(prefix) {
+                if (prefix === $undefined)
                     prefix = "type.googleapis.com";
                 return prefix + "/getStatus.GetStatusResponse.State";
             };
@@ -4788,7 +4974,7 @@ $root.getStatus = (function() {
              * @property {string|null} [version] Config version
              * @property {getStatus.GetStatusResponse.Config.Network.$Properties|null} [network] Config network
              * @property {Object.<string,getStatus.GetStatusResponse.Config.Plugin.$Properties>|null} [plugins] Config plugins
-             * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+             * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
              */
 
             /**
@@ -4810,15 +4996,15 @@ $root.getStatus = (function() {
              * @classdesc Represents a Config.
              * @constructor
              * @param {getStatus.GetStatusResponse.Config.$Properties=} [properties] Properties to set
-             * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+             * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
              */
-            function Config(properties) {
+            const Config = function (properties) {
                 this.plugins = {};
                 if (properties)
-                    for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                         if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
-            }
+            };
 
             /**
              * Config version.
@@ -4856,7 +5042,7 @@ $root.getStatus = (function() {
              *   (properties?: getStatus.GetStatusResponse.Config.$Properties): getStatus.GetStatusResponse.Config;
              * }}
              */
-            Config.create = function create(properties) {
+            Config.create = function(properties) {
                 return new Config(properties);
             };
 
@@ -4869,20 +5055,24 @@ $root.getStatus = (function() {
              * @param {$protobuf.Writer} [writer] Writer to encode to
              * @returns {$protobuf.Writer} Writer
              */
-            Config.encode = function encode(message, writer) {
+            Config.encode = function (message, writer, _depth) {
                 if (!writer)
                     writer = $Writer.create();
-                if (message.version != null && Object.hasOwnProperty.call(message, "version"))
+                if (_depth === $undefined)
+                    _depth = 0;
+                if (_depth > $util.recursionLimit)
+                    throw $Error("max depth exceeded");
+                if (message.version != null && $Object.hasOwnProperty.call(message, "version"))
                     writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);
-                if (message.network != null && Object.hasOwnProperty.call(message, "network"))
-                    $root.getStatus.GetStatusResponse.Config.Network.encode(message.network, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-                if (message.plugins != null && Object.hasOwnProperty.call(message, "plugins"))
-                    for (var keys = Object.keys(message.plugins), i = 0; i < keys.length; ++i) {
+                if (message.network != null && $Object.hasOwnProperty.call(message, "network"))
+                    $root.getStatus.GetStatusResponse.Config.Network.encode(message.network, writer.uint32(/* id 2, wireType 2 =*/18).fork(), _depth + 1).ldelim();
+                if (message.plugins != null && $Object.hasOwnProperty.call(message, "plugins"))
+                    for (let keys = $Object.keys(message.plugins), i = 0; i < keys.length; ++i) {
                         writer.uint32(/* id 3, wireType 2 =*/26).fork().uint32(/* id 1, wireType 2 =*/10).string(keys[i]);
-                        $root.getStatus.GetStatusResponse.Config.Plugin.encode(message.plugins[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim().ldelim();
+                        $root.getStatus.GetStatusResponse.Config.Plugin.encode(message.plugins[keys[i]], writer.uint32(/* id 2, wireType 2 =*/18).fork(), _depth + 1).ldelim().ldelim();
                     }
-                if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                    for (var i = 0; i < message.$unknowns.length; ++i)
+                if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                    for (let i = 0; i < message.$unknowns.length; ++i)
                         writer.raw(message.$unknowns[i]);
                 return writer;
             };
@@ -4896,8 +5086,8 @@ $root.getStatus = (function() {
              * @param {$protobuf.Writer} [writer] Writer to encode to
              * @returns {$protobuf.Writer} Writer
              */
-            Config.encodeDelimited = function encodeDelimited(message, writer) {
-                return this.encode(message, writer).ldelim();
+            Config.encodeDelimited = function(message, writer) {
+                return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
             };
 
             /**
@@ -4911,27 +5101,27 @@ $root.getStatus = (function() {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Config.decode = function decode(reader, length, _end, _depth, _target) {
+            Config.decode = function (reader, length, _end, _depth, _target) {
                 if (!(reader instanceof $Reader))
                     reader = $Reader.create(reader);
-                if (_depth === undefined)
+                if (_depth === $undefined)
                     _depth = 0;
                 if (_depth > $Reader.recursionLimit)
-                    throw Error("max depth exceeded");
-                var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getStatus.GetStatusResponse.Config(), key, value;
+                    throw $Error("max depth exceeded");
+                let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getStatus.GetStatusResponse.Config(), key, value;
                 while (reader.pos < end) {
-                    var start = reader.pos;
-                    var tag = reader.tag();
+                    let start = reader.pos;
+                    let tag = reader.tag();
                     if (tag === _end) {
-                        _end = undefined;
+                        _end = $undefined;
                         break;
                     }
-                    var wireType = tag & 7;
+                    let wireType = tag & 7;
                     switch (tag >>>= 3) {
                     case 1: {
                             if (wireType !== 2)
                                 break;
-                            if ((value = reader.string()).length)
+                            if ((value = reader.stringVerify()).length)
                                 message.version = value;
                             else
                                 delete message.version;
@@ -4940,7 +5130,7 @@ $root.getStatus = (function() {
                     case 2: {
                             if (wireType !== 2)
                                 break;
-                            message.network = $root.getStatus.GetStatusResponse.Config.Network.decode(reader, reader.uint32(), undefined, _depth + 1, message.network);
+                            message.network = $root.getStatus.GetStatusResponse.Config.Network.decode(reader, reader.uint32(), $undefined, _depth + 1, message.network);
                             continue;
                         }
                     case 3: {
@@ -4948,22 +5138,22 @@ $root.getStatus = (function() {
                                 break;
                             if (message.plugins === $util.emptyObject)
                                 message.plugins = {};
-                            var end2 = reader.uint32() + reader.pos;
+                            let end2 = reader.uint32() + reader.pos;
                             key = "";
                             value = null;
                             while (reader.pos < end2) {
-                                var tag2 = reader.tag();
+                                let tag2 = reader.tag();
                                 wireType = tag2 & 7;
                                 switch (tag2 >>>= 3) {
                                 case 1:
                                     if (wireType !== 2)
                                         break;
-                                    key = reader.string();
+                                    key = reader.stringVerify();
                                     continue;
                                 case 2:
                                     if (wireType !== 2)
                                         break;
-                                    value = $root.getStatus.GetStatusResponse.Config.Plugin.decode(reader, reader.uint32(), undefined, _depth + 1);
+                                    value = $root.getStatus.GetStatusResponse.Config.Plugin.decode(reader, reader.uint32(), $undefined, _depth + 1);
                                     continue;
                                 }
                                 reader.skipType(wireType, _depth, tag2);
@@ -4975,11 +5165,13 @@ $root.getStatus = (function() {
                         }
                     }
                     reader.skipType(wireType, _depth, tag);
-                    $util.makeProp(message, "$unknowns", false);
-                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                    if (!reader.discardUnknown) {
+                        $util.makeProp(message, "$unknowns", false);
+                        (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                    }
                 }
-                if (_end !== undefined)
-                    throw Error("missing end group");
+                if (_end !== $undefined)
+                    throw $Error("missing end group");
                 return message;
             };
 
@@ -4993,7 +5185,7 @@ $root.getStatus = (function() {
              * @throws {Error} If the payload is not a reader or valid buffer
              * @throws {$protobuf.util.ProtocolError} If required fields are missing
              */
-            Config.decodeDelimited = function decodeDelimited(reader) {
+            Config.decodeDelimited = function(reader) {
                 if (!(reader instanceof $Reader))
                     reader = new $Reader(reader);
                 return this.decode(reader, reader.uint32());
@@ -5007,27 +5199,27 @@ $root.getStatus = (function() {
              * @param {Object.<string,*>} message Plain object to verify
              * @returns {string|null} `null` if valid, otherwise the reason why it is not
              */
-            Config.verify = function verify(message, _depth) {
+            Config.verify = function (message, _depth) {
                 if (typeof message !== "object" || message === null)
                     return "object expected";
-                if (_depth === undefined)
+                if (_depth === $undefined)
                     _depth = 0;
                 if (_depth > $util.recursionLimit)
                     return "max depth exceeded";
-                if (message.version != null && message.hasOwnProperty("version"))
+                if (message.version != null && $Object.hasOwnProperty.call(message, "version"))
                     if (!$util.isString(message.version))
                         return "version: string expected";
-                if (message.network != null && message.hasOwnProperty("network")) {
-                    var error = $root.getStatus.GetStatusResponse.Config.Network.verify(message.network, _depth + 1);
+                if (message.network != null && $Object.hasOwnProperty.call(message, "network")) {
+                    let error = $root.getStatus.GetStatusResponse.Config.Network.verify(message.network, _depth + 1);
                     if (error)
                         return "network." + error;
                 }
-                if (message.plugins != null && message.hasOwnProperty("plugins")) {
+                if (message.plugins != null && $Object.hasOwnProperty.call(message, "plugins")) {
                     if (!$util.isObject(message.plugins))
                         return "plugins: object expected";
-                    var key = Object.keys(message.plugins);
-                    for (var i = 0; i < key.length; ++i) {
-                        var error = $root.getStatus.GetStatusResponse.Config.Plugin.verify(message.plugins[key[i]], _depth + 1);
+                    let key = $Object.keys(message.plugins);
+                    for (let i = 0; i < key.length; ++i) {
+                        let error = $root.getStatus.GetStatusResponse.Config.Plugin.verify(message.plugins[key[i]], _depth + 1);
                         if (error)
                             return "plugins." + error;
                     }
@@ -5043,31 +5235,33 @@ $root.getStatus = (function() {
              * @param {Object.<string,*>} object Plain object
              * @returns {getStatus.GetStatusResponse.Config} Config
              */
-            Config.fromObject = function fromObject(object, _depth) {
+            Config.fromObject = function (object, _depth) {
                 if (object instanceof $root.getStatus.GetStatusResponse.Config)
                     return object;
-                if (_depth === undefined)
+                if (!$util.isObject(object))
+                    throw $TypeError(".getStatus.GetStatusResponse.Config: object expected");
+                if (_depth === $undefined)
                     _depth = 0;
                 if (_depth > $util.recursionLimit)
-                    throw Error("max depth exceeded");
-                var message = new $root.getStatus.GetStatusResponse.Config();
+                    throw $Error("max depth exceeded");
+                let message = new $root.getStatus.GetStatusResponse.Config();
                 if (object.version != null)
                     if (typeof object.version !== "string" || object.version.length)
-                        message.version = String(object.version);
+                        message.version = $String(object.version);
                 if (object.network != null) {
-                    if (typeof object.network !== "object")
-                        throw TypeError(".getStatus.GetStatusResponse.Config.network: object expected");
+                    if (!$util.isObject(object.network))
+                        throw $TypeError(".getStatus.GetStatusResponse.Config.network: object expected");
                     message.network = $root.getStatus.GetStatusResponse.Config.Network.fromObject(object.network, _depth + 1);
                 }
                 if (object.plugins) {
-                    if (typeof object.plugins !== "object")
-                        throw TypeError(".getStatus.GetStatusResponse.Config.plugins: object expected");
+                    if (!$util.isObject(object.plugins))
+                        throw $TypeError(".getStatus.GetStatusResponse.Config.plugins: object expected");
                     message.plugins = {};
-                    for (var keys = Object.keys(object.plugins), i = 0; i < keys.length; ++i) {
+                    for (let keys = $Object.keys(object.plugins), i = 0; i < keys.length; ++i) {
                         if (keys[i] === "__proto__")
                             $util.makeProp(message.plugins, keys[i]);
-                        if (typeof object.plugins[keys[i]] !== "object")
-                            throw TypeError(".getStatus.GetStatusResponse.Config.plugins: object expected");
+                        if (!$util.isObject(object.plugins[keys[i]]))
+                            throw $TypeError(".getStatus.GetStatusResponse.Config.plugins: object expected");
                         message.plugins[keys[i]] = $root.getStatus.GetStatusResponse.Config.Plugin.fromObject(object.plugins[keys[i]], _depth + 1);
                     }
                 }
@@ -5083,27 +5277,31 @@ $root.getStatus = (function() {
              * @param {$protobuf.IConversionOptions} [options] Conversion options
              * @returns {Object.<string,*>} Plain object
              */
-            Config.toObject = function toObject(message, options) {
+            Config.toObject = function (message, options, _depth) {
                 if (!options)
                     options = {};
-                var object = {};
+                if (_depth === $undefined)
+                    _depth = 0;
+                if (_depth > $util.recursionLimit)
+                    throw $Error("max depth exceeded");
+                let object = {};
                 if (options.objects || options.defaults)
                     object.plugins = {};
                 if (options.defaults) {
                     object.version = "";
                     object.network = null;
                 }
-                if (message.version != null && message.hasOwnProperty("version"))
+                if (message.version != null && $Object.hasOwnProperty.call(message, "version"))
                     object.version = message.version;
-                if (message.network != null && message.hasOwnProperty("network"))
-                    object.network = $root.getStatus.GetStatusResponse.Config.Network.toObject(message.network, options);
-                var keys2;
-                if (message.plugins && (keys2 = Object.keys(message.plugins)).length) {
+                if (message.network != null && $Object.hasOwnProperty.call(message, "network"))
+                    object.network = $root.getStatus.GetStatusResponse.Config.Network.toObject(message.network, options, _depth + 1);
+                let keys2;
+                if (message.plugins && (keys2 = $Object.keys(message.plugins)).length) {
                     object.plugins = {};
-                    for (var j = 0; j < keys2.length; ++j) {
+                    for (let j = 0; j < keys2.length; ++j) {
                         if (keys2[j] === "__proto__")
                             $util.makeProp(object.plugins, keys2[j]);
-                        object.plugins[keys2[j]] = $root.getStatus.GetStatusResponse.Config.Plugin.toObject(message.plugins[keys2[j]], options);
+                        object.plugins[keys2[j]] = $root.getStatus.GetStatusResponse.Config.Plugin.toObject(message.plugins[keys2[j]], options, _depth + 1);
                     }
                 }
                 return object;
@@ -5116,8 +5314,8 @@ $root.getStatus = (function() {
              * @instance
              * @returns {Object.<string,*>} JSON object
              */
-            Config.prototype.toJSON = function toJSON() {
-                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            Config.prototype.toJSON = function() {
+                return Config.toObject(this, $protobuf.util.toJSONOptions);
             };
 
             /**
@@ -5128,8 +5326,8 @@ $root.getStatus = (function() {
              * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
              * @returns {string} The type url
              */
-            Config.getTypeUrl = function getTypeUrl(prefix) {
-                if (prefix === undefined)
+            Config.getTypeUrl = function(prefix) {
+                if (prefix === $undefined)
                     prefix = "type.googleapis.com";
                 return prefix + "/getStatus.GetStatusResponse.Config";
             };
@@ -5144,7 +5342,7 @@ $root.getStatus = (function() {
                  * @property {string|null} [explorer] Network explorer
                  * @property {getStatus.GetStatusResponse.Config.Network.Token.$Properties|null} [token] Network token
                  * @property {number|null} [version] Network version
-                 * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+                 * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
                  */
 
                 /**
@@ -5166,14 +5364,14 @@ $root.getStatus = (function() {
                  * @classdesc Represents a Network.
                  * @constructor
                  * @param {getStatus.GetStatusResponse.Config.Network.$Properties=} [properties] Properties to set
-                 * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+                 * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
                  */
-                function Network(properties) {
+                const Network = function (properties) {
                     if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                 this[keys[i]] = properties[keys[i]];
-                }
+                };
 
                 /**
                  * Network name.
@@ -5227,7 +5425,7 @@ $root.getStatus = (function() {
                  *   (properties?: getStatus.GetStatusResponse.Config.Network.$Properties): getStatus.GetStatusResponse.Config.Network;
                  * }}
                  */
-                Network.create = function create(properties) {
+                Network.create = function(properties) {
                     return new Network(properties);
                 };
 
@@ -5240,21 +5438,25 @@ $root.getStatus = (function() {
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                Network.encode = function encode(message, writer) {
+                Network.encode = function (message, writer, _depth) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.name != null && Object.hasOwnProperty.call(message, "name"))
+                    if (_depth === $undefined)
+                        _depth = 0;
+                    if (_depth > $util.recursionLimit)
+                        throw $Error("max depth exceeded");
+                    if (message.name != null && $Object.hasOwnProperty.call(message, "name"))
                         writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
-                    if (message.nethash != null && Object.hasOwnProperty.call(message, "nethash"))
+                    if (message.nethash != null && $Object.hasOwnProperty.call(message, "nethash"))
                         writer.uint32(/* id 2, wireType 2 =*/18).string(message.nethash);
-                    if (message.explorer != null && Object.hasOwnProperty.call(message, "explorer"))
+                    if (message.explorer != null && $Object.hasOwnProperty.call(message, "explorer"))
                         writer.uint32(/* id 3, wireType 2 =*/26).string(message.explorer);
-                    if (message.token != null && Object.hasOwnProperty.call(message, "token"))
-                        $root.getStatus.GetStatusResponse.Config.Network.Token.encode(message.token, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
-                    if (message.version != null && Object.hasOwnProperty.call(message, "version"))
+                    if (message.token != null && $Object.hasOwnProperty.call(message, "token"))
+                        $root.getStatus.GetStatusResponse.Config.Network.Token.encode(message.token, writer.uint32(/* id 4, wireType 2 =*/34).fork(), _depth + 1).ldelim();
+                    if (message.version != null && $Object.hasOwnProperty.call(message, "version"))
                         writer.uint32(/* id 5, wireType 0 =*/40).uint32(message.version);
-                    if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                        for (var i = 0; i < message.$unknowns.length; ++i)
+                    if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                        for (let i = 0; i < message.$unknowns.length; ++i)
                             writer.raw(message.$unknowns[i]);
                     return writer;
                 };
@@ -5268,8 +5470,8 @@ $root.getStatus = (function() {
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                Network.encodeDelimited = function encodeDelimited(message, writer) {
-                    return this.encode(message, writer).ldelim();
+                Network.encodeDelimited = function(message, writer) {
+                    return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
                 };
 
                 /**
@@ -5283,27 +5485,27 @@ $root.getStatus = (function() {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                Network.decode = function decode(reader, length, _end, _depth, _target) {
+                Network.decode = function (reader, length, _end, _depth, _target) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    if (_depth === undefined)
+                    if (_depth === $undefined)
                         _depth = 0;
                     if (_depth > $Reader.recursionLimit)
-                        throw Error("max depth exceeded");
-                    var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getStatus.GetStatusResponse.Config.Network(), value;
+                        throw $Error("max depth exceeded");
+                    let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getStatus.GetStatusResponse.Config.Network(), value;
                     while (reader.pos < end) {
-                        var start = reader.pos;
-                        var tag = reader.tag();
+                        let start = reader.pos;
+                        let tag = reader.tag();
                         if (tag === _end) {
-                            _end = undefined;
+                            _end = $undefined;
                             break;
                         }
-                        var wireType = tag & 7;
+                        let wireType = tag & 7;
                         switch (tag >>>= 3) {
                         case 1: {
                                 if (wireType !== 2)
                                     break;
-                                if ((value = reader.string()).length)
+                                if ((value = reader.stringVerify()).length)
                                     message.name = value;
                                 else
                                     delete message.name;
@@ -5312,7 +5514,7 @@ $root.getStatus = (function() {
                         case 2: {
                                 if (wireType !== 2)
                                     break;
-                                if ((value = reader.string()).length)
+                                if ((value = reader.stringVerify()).length)
                                     message.nethash = value;
                                 else
                                     delete message.nethash;
@@ -5321,7 +5523,7 @@ $root.getStatus = (function() {
                         case 3: {
                                 if (wireType !== 2)
                                     break;
-                                if ((value = reader.string()).length)
+                                if ((value = reader.stringVerify()).length)
                                     message.explorer = value;
                                 else
                                     delete message.explorer;
@@ -5330,7 +5532,7 @@ $root.getStatus = (function() {
                         case 4: {
                                 if (wireType !== 2)
                                     break;
-                                message.token = $root.getStatus.GetStatusResponse.Config.Network.Token.decode(reader, reader.uint32(), undefined, _depth + 1, message.token);
+                                message.token = $root.getStatus.GetStatusResponse.Config.Network.Token.decode(reader, reader.uint32(), $undefined, _depth + 1, message.token);
                                 continue;
                             }
                         case 5: {
@@ -5344,11 +5546,13 @@ $root.getStatus = (function() {
                             }
                         }
                         reader.skipType(wireType, _depth, tag);
-                        $util.makeProp(message, "$unknowns", false);
-                        (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                        if (!reader.discardUnknown) {
+                            $util.makeProp(message, "$unknowns", false);
+                            (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                        }
                     }
-                    if (_end !== undefined)
-                        throw Error("missing end group");
+                    if (_end !== $undefined)
+                        throw $Error("missing end group");
                     return message;
                 };
 
@@ -5362,7 +5566,7 @@ $root.getStatus = (function() {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                Network.decodeDelimited = function decodeDelimited(reader) {
+                Network.decodeDelimited = function(reader) {
                     if (!(reader instanceof $Reader))
                         reader = new $Reader(reader);
                     return this.decode(reader, reader.uint32());
@@ -5376,28 +5580,28 @@ $root.getStatus = (function() {
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                Network.verify = function verify(message, _depth) {
+                Network.verify = function (message, _depth) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (_depth === undefined)
+                    if (_depth === $undefined)
                         _depth = 0;
                     if (_depth > $util.recursionLimit)
                         return "max depth exceeded";
-                    if (message.name != null && message.hasOwnProperty("name"))
+                    if (message.name != null && $Object.hasOwnProperty.call(message, "name"))
                         if (!$util.isString(message.name))
                             return "name: string expected";
-                    if (message.nethash != null && message.hasOwnProperty("nethash"))
+                    if (message.nethash != null && $Object.hasOwnProperty.call(message, "nethash"))
                         if (!$util.isString(message.nethash))
                             return "nethash: string expected";
-                    if (message.explorer != null && message.hasOwnProperty("explorer"))
+                    if (message.explorer != null && $Object.hasOwnProperty.call(message, "explorer"))
                         if (!$util.isString(message.explorer))
                             return "explorer: string expected";
-                    if (message.token != null && message.hasOwnProperty("token")) {
-                        var error = $root.getStatus.GetStatusResponse.Config.Network.Token.verify(message.token, _depth + 1);
+                    if (message.token != null && $Object.hasOwnProperty.call(message, "token")) {
+                        let error = $root.getStatus.GetStatusResponse.Config.Network.Token.verify(message.token, _depth + 1);
                         if (error)
                             return "token." + error;
                     }
-                    if (message.version != null && message.hasOwnProperty("version"))
+                    if (message.version != null && $Object.hasOwnProperty.call(message, "version"))
                         if (!$util.isInteger(message.version))
                             return "version: integer expected";
                     return null;
@@ -5411,30 +5615,32 @@ $root.getStatus = (function() {
                  * @param {Object.<string,*>} object Plain object
                  * @returns {getStatus.GetStatusResponse.Config.Network} Network
                  */
-                Network.fromObject = function fromObject(object, _depth) {
+                Network.fromObject = function (object, _depth) {
                     if (object instanceof $root.getStatus.GetStatusResponse.Config.Network)
                         return object;
-                    if (_depth === undefined)
+                    if (!$util.isObject(object))
+                        throw $TypeError(".getStatus.GetStatusResponse.Config.Network: object expected");
+                    if (_depth === $undefined)
                         _depth = 0;
                     if (_depth > $util.recursionLimit)
-                        throw Error("max depth exceeded");
-                    var message = new $root.getStatus.GetStatusResponse.Config.Network();
+                        throw $Error("max depth exceeded");
+                    let message = new $root.getStatus.GetStatusResponse.Config.Network();
                     if (object.name != null)
                         if (typeof object.name !== "string" || object.name.length)
-                            message.name = String(object.name);
+                            message.name = $String(object.name);
                     if (object.nethash != null)
                         if (typeof object.nethash !== "string" || object.nethash.length)
-                            message.nethash = String(object.nethash);
+                            message.nethash = $String(object.nethash);
                     if (object.explorer != null)
                         if (typeof object.explorer !== "string" || object.explorer.length)
-                            message.explorer = String(object.explorer);
+                            message.explorer = $String(object.explorer);
                     if (object.token != null) {
-                        if (typeof object.token !== "object")
-                            throw TypeError(".getStatus.GetStatusResponse.Config.Network.token: object expected");
+                        if (!$util.isObject(object.token))
+                            throw $TypeError(".getStatus.GetStatusResponse.Config.Network.token: object expected");
                         message.token = $root.getStatus.GetStatusResponse.Config.Network.Token.fromObject(object.token, _depth + 1);
                     }
                     if (object.version != null)
-                        if (Number(object.version) !== 0)
+                        if ($Number(object.version) !== 0)
                             message.version = object.version >>> 0;
                     return message;
                 };
@@ -5448,10 +5654,14 @@ $root.getStatus = (function() {
                  * @param {$protobuf.IConversionOptions} [options] Conversion options
                  * @returns {Object.<string,*>} Plain object
                  */
-                Network.toObject = function toObject(message, options) {
+                Network.toObject = function (message, options, _depth) {
                     if (!options)
                         options = {};
-                    var object = {};
+                    if (_depth === $undefined)
+                        _depth = 0;
+                    if (_depth > $util.recursionLimit)
+                        throw $Error("max depth exceeded");
+                    let object = {};
                     if (options.defaults) {
                         object.name = "";
                         object.nethash = "";
@@ -5459,15 +5669,15 @@ $root.getStatus = (function() {
                         object.token = null;
                         object.version = 0;
                     }
-                    if (message.name != null && message.hasOwnProperty("name"))
+                    if (message.name != null && $Object.hasOwnProperty.call(message, "name"))
                         object.name = message.name;
-                    if (message.nethash != null && message.hasOwnProperty("nethash"))
+                    if (message.nethash != null && $Object.hasOwnProperty.call(message, "nethash"))
                         object.nethash = message.nethash;
-                    if (message.explorer != null && message.hasOwnProperty("explorer"))
+                    if (message.explorer != null && $Object.hasOwnProperty.call(message, "explorer"))
                         object.explorer = message.explorer;
-                    if (message.token != null && message.hasOwnProperty("token"))
-                        object.token = $root.getStatus.GetStatusResponse.Config.Network.Token.toObject(message.token, options);
-                    if (message.version != null && message.hasOwnProperty("version"))
+                    if (message.token != null && $Object.hasOwnProperty.call(message, "token"))
+                        object.token = $root.getStatus.GetStatusResponse.Config.Network.Token.toObject(message.token, options, _depth + 1);
+                    if (message.version != null && $Object.hasOwnProperty.call(message, "version"))
                         object.version = message.version;
                     return object;
                 };
@@ -5479,8 +5689,8 @@ $root.getStatus = (function() {
                  * @instance
                  * @returns {Object.<string,*>} JSON object
                  */
-                Network.prototype.toJSON = function toJSON() {
-                    return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                Network.prototype.toJSON = function() {
+                    return Network.toObject(this, $protobuf.util.toJSONOptions);
                 };
 
                 /**
@@ -5491,8 +5701,8 @@ $root.getStatus = (function() {
                  * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
                  * @returns {string} The type url
                  */
-                Network.getTypeUrl = function getTypeUrl(prefix) {
-                    if (prefix === undefined)
+                Network.getTypeUrl = function(prefix) {
+                    if (prefix === $undefined)
                         prefix = "type.googleapis.com";
                     return prefix + "/getStatus.GetStatusResponse.Config.Network";
                 };
@@ -5504,7 +5714,7 @@ $root.getStatus = (function() {
                      * @typedef {Object} getStatus.GetStatusResponse.Config.Network.Token.$Properties
                      * @property {string|null} [name] Token name
                      * @property {string|null} [symbol] Token symbol
-                     * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+                     * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
                      */
 
                     /**
@@ -5526,14 +5736,14 @@ $root.getStatus = (function() {
                      * @classdesc Represents a Token.
                      * @constructor
                      * @param {getStatus.GetStatusResponse.Config.Network.Token.$Properties=} [properties] Properties to set
-                     * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+                     * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
                      */
-                    function Token(properties) {
+                    const Token = function (properties) {
                         if (properties)
-                            for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                            for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                                 if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                     this[keys[i]] = properties[keys[i]];
-                    }
+                    };
 
                     /**
                      * Token name.
@@ -5563,7 +5773,7 @@ $root.getStatus = (function() {
                      *   (properties?: getStatus.GetStatusResponse.Config.Network.Token.$Properties): getStatus.GetStatusResponse.Config.Network.Token;
                      * }}
                      */
-                    Token.create = function create(properties) {
+                    Token.create = function(properties) {
                         return new Token(properties);
                     };
 
@@ -5576,15 +5786,19 @@ $root.getStatus = (function() {
                      * @param {$protobuf.Writer} [writer] Writer to encode to
                      * @returns {$protobuf.Writer} Writer
                      */
-                    Token.encode = function encode(message, writer) {
+                    Token.encode = function (message, writer, _depth) {
                         if (!writer)
                             writer = $Writer.create();
-                        if (message.name != null && Object.hasOwnProperty.call(message, "name"))
+                        if (_depth === $undefined)
+                            _depth = 0;
+                        if (_depth > $util.recursionLimit)
+                            throw $Error("max depth exceeded");
+                        if (message.name != null && $Object.hasOwnProperty.call(message, "name"))
                             writer.uint32(/* id 1, wireType 2 =*/10).string(message.name);
-                        if (message.symbol != null && Object.hasOwnProperty.call(message, "symbol"))
+                        if (message.symbol != null && $Object.hasOwnProperty.call(message, "symbol"))
                             writer.uint32(/* id 2, wireType 2 =*/18).string(message.symbol);
-                        if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                            for (var i = 0; i < message.$unknowns.length; ++i)
+                        if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                            for (let i = 0; i < message.$unknowns.length; ++i)
                                 writer.raw(message.$unknowns[i]);
                         return writer;
                     };
@@ -5598,8 +5812,8 @@ $root.getStatus = (function() {
                      * @param {$protobuf.Writer} [writer] Writer to encode to
                      * @returns {$protobuf.Writer} Writer
                      */
-                    Token.encodeDelimited = function encodeDelimited(message, writer) {
-                        return this.encode(message, writer).ldelim();
+                    Token.encodeDelimited = function(message, writer) {
+                        return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
                     };
 
                     /**
@@ -5613,27 +5827,27 @@ $root.getStatus = (function() {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    Token.decode = function decode(reader, length, _end, _depth, _target) {
+                    Token.decode = function (reader, length, _end, _depth, _target) {
                         if (!(reader instanceof $Reader))
                             reader = $Reader.create(reader);
-                        if (_depth === undefined)
+                        if (_depth === $undefined)
                             _depth = 0;
                         if (_depth > $Reader.recursionLimit)
-                            throw Error("max depth exceeded");
-                        var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getStatus.GetStatusResponse.Config.Network.Token(), value;
+                            throw $Error("max depth exceeded");
+                        let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getStatus.GetStatusResponse.Config.Network.Token(), value;
                         while (reader.pos < end) {
-                            var start = reader.pos;
-                            var tag = reader.tag();
+                            let start = reader.pos;
+                            let tag = reader.tag();
                             if (tag === _end) {
-                                _end = undefined;
+                                _end = $undefined;
                                 break;
                             }
-                            var wireType = tag & 7;
+                            let wireType = tag & 7;
                             switch (tag >>>= 3) {
                             case 1: {
                                     if (wireType !== 2)
                                         break;
-                                    if ((value = reader.string()).length)
+                                    if ((value = reader.stringVerify()).length)
                                         message.name = value;
                                     else
                                         delete message.name;
@@ -5642,7 +5856,7 @@ $root.getStatus = (function() {
                             case 2: {
                                     if (wireType !== 2)
                                         break;
-                                    if ((value = reader.string()).length)
+                                    if ((value = reader.stringVerify()).length)
                                         message.symbol = value;
                                     else
                                         delete message.symbol;
@@ -5650,11 +5864,13 @@ $root.getStatus = (function() {
                                 }
                             }
                             reader.skipType(wireType, _depth, tag);
-                            $util.makeProp(message, "$unknowns", false);
-                            (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                            if (!reader.discardUnknown) {
+                                $util.makeProp(message, "$unknowns", false);
+                                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                            }
                         }
-                        if (_end !== undefined)
-                            throw Error("missing end group");
+                        if (_end !== $undefined)
+                            throw $Error("missing end group");
                         return message;
                     };
 
@@ -5668,7 +5884,7 @@ $root.getStatus = (function() {
                      * @throws {Error} If the payload is not a reader or valid buffer
                      * @throws {$protobuf.util.ProtocolError} If required fields are missing
                      */
-                    Token.decodeDelimited = function decodeDelimited(reader) {
+                    Token.decodeDelimited = function(reader) {
                         if (!(reader instanceof $Reader))
                             reader = new $Reader(reader);
                         return this.decode(reader, reader.uint32());
@@ -5682,17 +5898,17 @@ $root.getStatus = (function() {
                      * @param {Object.<string,*>} message Plain object to verify
                      * @returns {string|null} `null` if valid, otherwise the reason why it is not
                      */
-                    Token.verify = function verify(message, _depth) {
+                    Token.verify = function (message, _depth) {
                         if (typeof message !== "object" || message === null)
                             return "object expected";
-                        if (_depth === undefined)
+                        if (_depth === $undefined)
                             _depth = 0;
                         if (_depth > $util.recursionLimit)
                             return "max depth exceeded";
-                        if (message.name != null && message.hasOwnProperty("name"))
+                        if (message.name != null && $Object.hasOwnProperty.call(message, "name"))
                             if (!$util.isString(message.name))
                                 return "name: string expected";
-                        if (message.symbol != null && message.hasOwnProperty("symbol"))
+                        if (message.symbol != null && $Object.hasOwnProperty.call(message, "symbol"))
                             if (!$util.isString(message.symbol))
                                 return "symbol: string expected";
                         return null;
@@ -5706,20 +5922,22 @@ $root.getStatus = (function() {
                      * @param {Object.<string,*>} object Plain object
                      * @returns {getStatus.GetStatusResponse.Config.Network.Token} Token
                      */
-                    Token.fromObject = function fromObject(object, _depth) {
+                    Token.fromObject = function (object, _depth) {
                         if (object instanceof $root.getStatus.GetStatusResponse.Config.Network.Token)
                             return object;
-                        if (_depth === undefined)
+                        if (!$util.isObject(object))
+                            throw $TypeError(".getStatus.GetStatusResponse.Config.Network.Token: object expected");
+                        if (_depth === $undefined)
                             _depth = 0;
                         if (_depth > $util.recursionLimit)
-                            throw Error("max depth exceeded");
-                        var message = new $root.getStatus.GetStatusResponse.Config.Network.Token();
+                            throw $Error("max depth exceeded");
+                        let message = new $root.getStatus.GetStatusResponse.Config.Network.Token();
                         if (object.name != null)
                             if (typeof object.name !== "string" || object.name.length)
-                                message.name = String(object.name);
+                                message.name = $String(object.name);
                         if (object.symbol != null)
                             if (typeof object.symbol !== "string" || object.symbol.length)
-                                message.symbol = String(object.symbol);
+                                message.symbol = $String(object.symbol);
                         return message;
                     };
 
@@ -5732,17 +5950,21 @@ $root.getStatus = (function() {
                      * @param {$protobuf.IConversionOptions} [options] Conversion options
                      * @returns {Object.<string,*>} Plain object
                      */
-                    Token.toObject = function toObject(message, options) {
+                    Token.toObject = function (message, options, _depth) {
                         if (!options)
                             options = {};
-                        var object = {};
+                        if (_depth === $undefined)
+                            _depth = 0;
+                        if (_depth > $util.recursionLimit)
+                            throw $Error("max depth exceeded");
+                        let object = {};
                         if (options.defaults) {
                             object.name = "";
                             object.symbol = "";
                         }
-                        if (message.name != null && message.hasOwnProperty("name"))
+                        if (message.name != null && $Object.hasOwnProperty.call(message, "name"))
                             object.name = message.name;
-                        if (message.symbol != null && message.hasOwnProperty("symbol"))
+                        if (message.symbol != null && $Object.hasOwnProperty.call(message, "symbol"))
                             object.symbol = message.symbol;
                         return object;
                     };
@@ -5754,8 +5976,8 @@ $root.getStatus = (function() {
                      * @instance
                      * @returns {Object.<string,*>} JSON object
                      */
-                    Token.prototype.toJSON = function toJSON() {
-                        return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                    Token.prototype.toJSON = function() {
+                        return Token.toObject(this, $protobuf.util.toJSONOptions);
                     };
 
                     /**
@@ -5766,8 +5988,8 @@ $root.getStatus = (function() {
                      * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
                      * @returns {string} The type url
                      */
-                    Token.getTypeUrl = function getTypeUrl(prefix) {
-                        if (prefix === undefined)
+                    Token.getTypeUrl = function(prefix) {
+                        if (prefix === $undefined)
                             prefix = "type.googleapis.com";
                         return prefix + "/getStatus.GetStatusResponse.Config.Network.Token";
                     };
@@ -5786,7 +6008,7 @@ $root.getStatus = (function() {
                  * @property {number|null} [port] Plugin port
                  * @property {boolean|null} [enabled] Plugin enabled
                  * @property {boolean|null} [estimateTotalCount] Plugin estimateTotalCount
-                 * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+                 * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
                  */
 
                 /**
@@ -5808,14 +6030,14 @@ $root.getStatus = (function() {
                  * @classdesc Represents a Plugin.
                  * @constructor
                  * @param {getStatus.GetStatusResponse.Config.Plugin.$Properties=} [properties] Properties to set
-                 * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+                 * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
                  */
-                function Plugin(properties) {
+                const Plugin = function (properties) {
                     if (properties)
-                        for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                        for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                             if (properties[keys[i]] != null && keys[i] !== "__proto__")
                                 this[keys[i]] = properties[keys[i]];
-                }
+                };
 
                 /**
                  * Plugin port.
@@ -5853,7 +6075,7 @@ $root.getStatus = (function() {
                  *   (properties?: getStatus.GetStatusResponse.Config.Plugin.$Properties): getStatus.GetStatusResponse.Config.Plugin;
                  * }}
                  */
-                Plugin.create = function create(properties) {
+                Plugin.create = function(properties) {
                     return new Plugin(properties);
                 };
 
@@ -5866,17 +6088,21 @@ $root.getStatus = (function() {
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                Plugin.encode = function encode(message, writer) {
+                Plugin.encode = function (message, writer, _depth) {
                     if (!writer)
                         writer = $Writer.create();
-                    if (message.port != null && Object.hasOwnProperty.call(message, "port"))
+                    if (_depth === $undefined)
+                        _depth = 0;
+                    if (_depth > $util.recursionLimit)
+                        throw $Error("max depth exceeded");
+                    if (message.port != null && $Object.hasOwnProperty.call(message, "port"))
                         writer.uint32(/* id 1, wireType 0 =*/8).uint32(message.port);
-                    if (message.enabled != null && Object.hasOwnProperty.call(message, "enabled"))
+                    if (message.enabled != null && $Object.hasOwnProperty.call(message, "enabled"))
                         writer.uint32(/* id 2, wireType 0 =*/16).bool(message.enabled);
-                    if (message.estimateTotalCount != null && Object.hasOwnProperty.call(message, "estimateTotalCount"))
+                    if (message.estimateTotalCount != null && $Object.hasOwnProperty.call(message, "estimateTotalCount"))
                         writer.uint32(/* id 3, wireType 0 =*/24).bool(message.estimateTotalCount);
-                    if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                        for (var i = 0; i < message.$unknowns.length; ++i)
+                    if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                        for (let i = 0; i < message.$unknowns.length; ++i)
                             writer.raw(message.$unknowns[i]);
                     return writer;
                 };
@@ -5890,8 +6116,8 @@ $root.getStatus = (function() {
                  * @param {$protobuf.Writer} [writer] Writer to encode to
                  * @returns {$protobuf.Writer} Writer
                  */
-                Plugin.encodeDelimited = function encodeDelimited(message, writer) {
-                    return this.encode(message, writer).ldelim();
+                Plugin.encodeDelimited = function(message, writer) {
+                    return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
                 };
 
                 /**
@@ -5905,22 +6131,22 @@ $root.getStatus = (function() {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                Plugin.decode = function decode(reader, length, _end, _depth, _target) {
+                Plugin.decode = function (reader, length, _end, _depth, _target) {
                     if (!(reader instanceof $Reader))
                         reader = $Reader.create(reader);
-                    if (_depth === undefined)
+                    if (_depth === $undefined)
                         _depth = 0;
                     if (_depth > $Reader.recursionLimit)
-                        throw Error("max depth exceeded");
-                    var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.getStatus.GetStatusResponse.Config.Plugin(), value;
+                        throw $Error("max depth exceeded");
+                    let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.getStatus.GetStatusResponse.Config.Plugin(), value;
                     while (reader.pos < end) {
-                        var start = reader.pos;
-                        var tag = reader.tag();
+                        let start = reader.pos;
+                        let tag = reader.tag();
                         if (tag === _end) {
-                            _end = undefined;
+                            _end = $undefined;
                             break;
                         }
-                        var wireType = tag & 7;
+                        let wireType = tag & 7;
                         switch (tag >>>= 3) {
                         case 1: {
                                 if (wireType !== 0)
@@ -5951,11 +6177,13 @@ $root.getStatus = (function() {
                             }
                         }
                         reader.skipType(wireType, _depth, tag);
-                        $util.makeProp(message, "$unknowns", false);
-                        (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                        if (!reader.discardUnknown) {
+                            $util.makeProp(message, "$unknowns", false);
+                            (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                        }
                     }
-                    if (_end !== undefined)
-                        throw Error("missing end group");
+                    if (_end !== $undefined)
+                        throw $Error("missing end group");
                     return message;
                 };
 
@@ -5969,7 +6197,7 @@ $root.getStatus = (function() {
                  * @throws {Error} If the payload is not a reader or valid buffer
                  * @throws {$protobuf.util.ProtocolError} If required fields are missing
                  */
-                Plugin.decodeDelimited = function decodeDelimited(reader) {
+                Plugin.decodeDelimited = function(reader) {
                     if (!(reader instanceof $Reader))
                         reader = new $Reader(reader);
                     return this.decode(reader, reader.uint32());
@@ -5983,20 +6211,20 @@ $root.getStatus = (function() {
                  * @param {Object.<string,*>} message Plain object to verify
                  * @returns {string|null} `null` if valid, otherwise the reason why it is not
                  */
-                Plugin.verify = function verify(message, _depth) {
+                Plugin.verify = function (message, _depth) {
                     if (typeof message !== "object" || message === null)
                         return "object expected";
-                    if (_depth === undefined)
+                    if (_depth === $undefined)
                         _depth = 0;
                     if (_depth > $util.recursionLimit)
                         return "max depth exceeded";
-                    if (message.port != null && message.hasOwnProperty("port"))
+                    if (message.port != null && $Object.hasOwnProperty.call(message, "port"))
                         if (!$util.isInteger(message.port))
                             return "port: integer expected";
-                    if (message.enabled != null && message.hasOwnProperty("enabled"))
+                    if (message.enabled != null && $Object.hasOwnProperty.call(message, "enabled"))
                         if (typeof message.enabled !== "boolean")
                             return "enabled: boolean expected";
-                    if (message.estimateTotalCount != null && message.hasOwnProperty("estimateTotalCount"))
+                    if (message.estimateTotalCount != null && $Object.hasOwnProperty.call(message, "estimateTotalCount"))
                         if (typeof message.estimateTotalCount !== "boolean")
                             return "estimateTotalCount: boolean expected";
                     return null;
@@ -6010,23 +6238,25 @@ $root.getStatus = (function() {
                  * @param {Object.<string,*>} object Plain object
                  * @returns {getStatus.GetStatusResponse.Config.Plugin} Plugin
                  */
-                Plugin.fromObject = function fromObject(object, _depth) {
+                Plugin.fromObject = function (object, _depth) {
                     if (object instanceof $root.getStatus.GetStatusResponse.Config.Plugin)
                         return object;
-                    if (_depth === undefined)
+                    if (!$util.isObject(object))
+                        throw $TypeError(".getStatus.GetStatusResponse.Config.Plugin: object expected");
+                    if (_depth === $undefined)
                         _depth = 0;
                     if (_depth > $util.recursionLimit)
-                        throw Error("max depth exceeded");
-                    var message = new $root.getStatus.GetStatusResponse.Config.Plugin();
+                        throw $Error("max depth exceeded");
+                    let message = new $root.getStatus.GetStatusResponse.Config.Plugin();
                     if (object.port != null)
-                        if (Number(object.port) !== 0)
+                        if ($Number(object.port) !== 0)
                             message.port = object.port >>> 0;
                     if (object.enabled != null)
                         if (object.enabled)
-                            message.enabled = Boolean(object.enabled);
+                            message.enabled = $Boolean(object.enabled);
                     if (object.estimateTotalCount != null)
                         if (object.estimateTotalCount)
-                            message.estimateTotalCount = Boolean(object.estimateTotalCount);
+                            message.estimateTotalCount = $Boolean(object.estimateTotalCount);
                     return message;
                 };
 
@@ -6039,20 +6269,24 @@ $root.getStatus = (function() {
                  * @param {$protobuf.IConversionOptions} [options] Conversion options
                  * @returns {Object.<string,*>} Plain object
                  */
-                Plugin.toObject = function toObject(message, options) {
+                Plugin.toObject = function (message, options, _depth) {
                     if (!options)
                         options = {};
-                    var object = {};
+                    if (_depth === $undefined)
+                        _depth = 0;
+                    if (_depth > $util.recursionLimit)
+                        throw $Error("max depth exceeded");
+                    let object = {};
                     if (options.defaults) {
                         object.port = 0;
                         object.enabled = false;
                         object.estimateTotalCount = false;
                     }
-                    if (message.port != null && message.hasOwnProperty("port"))
+                    if (message.port != null && $Object.hasOwnProperty.call(message, "port"))
                         object.port = message.port;
-                    if (message.enabled != null && message.hasOwnProperty("enabled"))
+                    if (message.enabled != null && $Object.hasOwnProperty.call(message, "enabled"))
                         object.enabled = message.enabled;
-                    if (message.estimateTotalCount != null && message.hasOwnProperty("estimateTotalCount"))
+                    if (message.estimateTotalCount != null && $Object.hasOwnProperty.call(message, "estimateTotalCount"))
                         object.estimateTotalCount = message.estimateTotalCount;
                     return object;
                 };
@@ -6064,8 +6298,8 @@ $root.getStatus = (function() {
                  * @instance
                  * @returns {Object.<string,*>} JSON object
                  */
-                Plugin.prototype.toJSON = function toJSON() {
-                    return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+                Plugin.prototype.toJSON = function() {
+                    return Plugin.toObject(this, $protobuf.util.toJSONOptions);
                 };
 
                 /**
@@ -6076,8 +6310,8 @@ $root.getStatus = (function() {
                  * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
                  * @returns {string} The type url
                  */
-                Plugin.getTypeUrl = function getTypeUrl(prefix) {
-                    if (prefix === undefined)
+                Plugin.getTypeUrl = function(prefix) {
+                    if (prefix === $undefined)
                         prefix = "type.googleapis.com";
                     return prefix + "/getStatus.GetStatusResponse.Config.Plugin";
                 };
@@ -6094,14 +6328,14 @@ $root.getStatus = (function() {
     return getStatus;
 })();
 
-$root.postMessage = (function() {
+export const postMessage = $root.postMessage = (() => {
 
     /**
      * Namespace postMessage.
      * @exports postMessage
      * @namespace
      */
-    var postMessage = {};
+    const postMessage = {};
 
     postMessage.PostMessageRequest = (function() {
 
@@ -6110,7 +6344,7 @@ $root.postMessage = (function() {
          * @typedef {Object} postMessage.PostMessageRequest.$Properties
          * @property {Uint8Array|null} [message] PostMessageRequest message
          * @property {shared.Headers.$Properties|null} [headers] PostMessageRequest headers
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -6132,14 +6366,14 @@ $root.postMessage = (function() {
          * @classdesc Represents a PostMessageRequest.
          * @constructor
          * @param {postMessage.PostMessageRequest.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function PostMessageRequest(properties) {
+        const PostMessageRequest = function (properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * PostMessageRequest message.
@@ -6169,7 +6403,7 @@ $root.postMessage = (function() {
          *   (properties?: postMessage.PostMessageRequest.$Properties): postMessage.PostMessageRequest;
          * }}
          */
-        PostMessageRequest.create = function create(properties) {
+        PostMessageRequest.create = function(properties) {
             return new PostMessageRequest(properties);
         };
 
@@ -6182,15 +6416,19 @@ $root.postMessage = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        PostMessageRequest.encode = function encode(message, writer) {
+        PostMessageRequest.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.message != null && Object.hasOwnProperty.call(message, "message"))
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.message != null && $Object.hasOwnProperty.call(message, "message"))
                 writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.message);
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork(), _depth + 1).ldelim();
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -6204,8 +6442,8 @@ $root.postMessage = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        PostMessageRequest.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        PostMessageRequest.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -6219,22 +6457,22 @@ $root.postMessage = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        PostMessageRequest.decode = function decode(reader, length, _end, _depth, _target) {
+        PostMessageRequest.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.postMessage.PostMessageRequest(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.postMessage.PostMessageRequest(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
@@ -6248,16 +6486,18 @@ $root.postMessage = (function() {
                 case 2: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -6271,7 +6511,7 @@ $root.postMessage = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        PostMessageRequest.decodeDelimited = function decodeDelimited(reader) {
+        PostMessageRequest.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -6285,18 +6525,18 @@ $root.postMessage = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        PostMessageRequest.verify = function verify(message, _depth) {
+        PostMessageRequest.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.message != null && message.hasOwnProperty("message"))
+            if (message.message != null && $Object.hasOwnProperty.call(message, "message"))
                 if (!(message.message && typeof message.message.length === "number" || $util.isString(message.message)))
                     return "message: buffer expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
@@ -6311,14 +6551,16 @@ $root.postMessage = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {postMessage.PostMessageRequest} PostMessageRequest
          */
-        PostMessageRequest.fromObject = function fromObject(object, _depth) {
+        PostMessageRequest.fromObject = function (object, _depth) {
             if (object instanceof $root.postMessage.PostMessageRequest)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".postMessage.PostMessageRequest: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.postMessage.PostMessageRequest();
+                throw $Error("max depth exceeded");
+            let message = new $root.postMessage.PostMessageRequest();
             if (object.message != null)
                 if (object.message.length)
                     if (typeof object.message === "string")
@@ -6326,8 +6568,8 @@ $root.postMessage = (function() {
                     else if (object.message.length >= 0)
                         message.message = object.message;
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".postMessage.PostMessageRequest.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".postMessage.PostMessageRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             return message;
@@ -6342,24 +6584,28 @@ $root.postMessage = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        PostMessageRequest.toObject = function toObject(message, options) {
+        PostMessageRequest.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.defaults) {
-                if (options.bytes === String)
+                if (options.bytes === $String)
                     object.message = "";
                 else {
                     object.message = [];
-                    if (options.bytes !== Array)
+                    if (options.bytes !== $Array)
                         object.message = $util.newBuffer(object.message);
                 }
                 object.headers = null;
             }
-            if (message.message != null && message.hasOwnProperty("message"))
-                object.message = options.bytes === String ? $util.base64.encode(message.message, 0, message.message.length) : options.bytes === Array ? Array.prototype.slice.call(message.message) : message.message;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.message != null && $Object.hasOwnProperty.call(message, "message"))
+                object.message = options.bytes === $String ? $util.base64.encode(message.message, 0, message.message.length) : options.bytes === $Array ? $Array.prototype.slice.call(message.message) : message.message;
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
             return object;
         };
 
@@ -6370,8 +6616,8 @@ $root.postMessage = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        PostMessageRequest.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        PostMessageRequest.prototype.toJSON = function() {
+            return PostMessageRequest.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -6382,8 +6628,8 @@ $root.postMessage = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        PostMessageRequest.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        PostMessageRequest.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/postMessage.PostMessageRequest";
         };
@@ -6397,7 +6643,7 @@ $root.postMessage = (function() {
          * Properties of a PostMessageResponse.
          * @typedef {Object} postMessage.PostMessageResponse.$Properties
          * @property {shared.Headers.$Properties|null} [headers] PostMessageResponse headers
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -6419,14 +6665,14 @@ $root.postMessage = (function() {
          * @classdesc Represents a PostMessageResponse.
          * @constructor
          * @param {postMessage.PostMessageResponse.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function PostMessageResponse(properties) {
+        const PostMessageResponse = function (properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * PostMessageResponse headers.
@@ -6448,7 +6694,7 @@ $root.postMessage = (function() {
          *   (properties?: postMessage.PostMessageResponse.$Properties): postMessage.PostMessageResponse;
          * }}
          */
-        PostMessageResponse.create = function create(properties) {
+        PostMessageResponse.create = function(properties) {
             return new PostMessageResponse(properties);
         };
 
@@ -6461,13 +6707,17 @@ $root.postMessage = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        PostMessageResponse.encode = function encode(message, writer) {
+        PostMessageResponse.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -6481,8 +6731,8 @@ $root.postMessage = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        PostMessageResponse.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        PostMessageResponse.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -6496,36 +6746,38 @@ $root.postMessage = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        PostMessageResponse.decode = function decode(reader, length, _end, _depth, _target) {
+        PostMessageResponse.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.postMessage.PostMessageResponse(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.postMessage.PostMessageResponse(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -6539,7 +6791,7 @@ $root.postMessage = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        PostMessageResponse.decodeDelimited = function decodeDelimited(reader) {
+        PostMessageResponse.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -6553,15 +6805,15 @@ $root.postMessage = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        PostMessageResponse.verify = function verify(message, _depth) {
+        PostMessageResponse.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
@@ -6576,17 +6828,19 @@ $root.postMessage = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {postMessage.PostMessageResponse} PostMessageResponse
          */
-        PostMessageResponse.fromObject = function fromObject(object, _depth) {
+        PostMessageResponse.fromObject = function (object, _depth) {
             if (object instanceof $root.postMessage.PostMessageResponse)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".postMessage.PostMessageResponse: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.postMessage.PostMessageResponse();
+                throw $Error("max depth exceeded");
+            let message = new $root.postMessage.PostMessageResponse();
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".postMessage.PostMessageResponse.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".postMessage.PostMessageResponse.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             return message;
@@ -6601,14 +6855,18 @@ $root.postMessage = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        PostMessageResponse.toObject = function toObject(message, options) {
+        PostMessageResponse.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.defaults)
                 object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
             return object;
         };
 
@@ -6619,8 +6877,8 @@ $root.postMessage = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        PostMessageResponse.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        PostMessageResponse.prototype.toJSON = function() {
+            return PostMessageResponse.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -6631,8 +6889,8 @@ $root.postMessage = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        PostMessageResponse.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        PostMessageResponse.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/postMessage.PostMessageResponse";
         };
@@ -6643,14 +6901,14 @@ $root.postMessage = (function() {
     return postMessage;
 })();
 
-$root.postProposal = (function() {
+export const postProposal = $root.postProposal = (() => {
 
     /**
      * Namespace postProposal.
      * @exports postProposal
      * @namespace
      */
-    var postProposal = {};
+    const postProposal = {};
 
     postProposal.PostProposalRequest = (function() {
 
@@ -6659,7 +6917,7 @@ $root.postProposal = (function() {
          * @typedef {Object} postProposal.PostProposalRequest.$Properties
          * @property {Uint8Array|null} [proposal] PostProposalRequest proposal
          * @property {shared.Headers.$Properties|null} [headers] PostProposalRequest headers
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -6681,14 +6939,14 @@ $root.postProposal = (function() {
          * @classdesc Represents a PostProposalRequest.
          * @constructor
          * @param {postProposal.PostProposalRequest.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function PostProposalRequest(properties) {
+        const PostProposalRequest = function (properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * PostProposalRequest proposal.
@@ -6718,7 +6976,7 @@ $root.postProposal = (function() {
          *   (properties?: postProposal.PostProposalRequest.$Properties): postProposal.PostProposalRequest;
          * }}
          */
-        PostProposalRequest.create = function create(properties) {
+        PostProposalRequest.create = function(properties) {
             return new PostProposalRequest(properties);
         };
 
@@ -6731,15 +6989,19 @@ $root.postProposal = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        PostProposalRequest.encode = function encode(message, writer) {
+        PostProposalRequest.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.proposal != null && Object.hasOwnProperty.call(message, "proposal"))
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.proposal != null && $Object.hasOwnProperty.call(message, "proposal"))
                 writer.uint32(/* id 1, wireType 2 =*/10).bytes(message.proposal);
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork()).ldelim();
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 2, wireType 2 =*/18).fork(), _depth + 1).ldelim();
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -6753,8 +7015,8 @@ $root.postProposal = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        PostProposalRequest.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        PostProposalRequest.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -6768,22 +7030,22 @@ $root.postProposal = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        PostProposalRequest.decode = function decode(reader, length, _end, _depth, _target) {
+        PostProposalRequest.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.postProposal.PostProposalRequest(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.postProposal.PostProposalRequest(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
@@ -6797,16 +7059,18 @@ $root.postProposal = (function() {
                 case 2: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -6820,7 +7084,7 @@ $root.postProposal = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        PostProposalRequest.decodeDelimited = function decodeDelimited(reader) {
+        PostProposalRequest.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -6834,18 +7098,18 @@ $root.postProposal = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        PostProposalRequest.verify = function verify(message, _depth) {
+        PostProposalRequest.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.proposal != null && message.hasOwnProperty("proposal"))
+            if (message.proposal != null && $Object.hasOwnProperty.call(message, "proposal"))
                 if (!(message.proposal && typeof message.proposal.length === "number" || $util.isString(message.proposal)))
                     return "proposal: buffer expected";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
@@ -6860,14 +7124,16 @@ $root.postProposal = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {postProposal.PostProposalRequest} PostProposalRequest
          */
-        PostProposalRequest.fromObject = function fromObject(object, _depth) {
+        PostProposalRequest.fromObject = function (object, _depth) {
             if (object instanceof $root.postProposal.PostProposalRequest)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".postProposal.PostProposalRequest: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.postProposal.PostProposalRequest();
+                throw $Error("max depth exceeded");
+            let message = new $root.postProposal.PostProposalRequest();
             if (object.proposal != null)
                 if (object.proposal.length)
                     if (typeof object.proposal === "string")
@@ -6875,8 +7141,8 @@ $root.postProposal = (function() {
                     else if (object.proposal.length >= 0)
                         message.proposal = object.proposal;
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".postProposal.PostProposalRequest.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".postProposal.PostProposalRequest.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             return message;
@@ -6891,24 +7157,28 @@ $root.postProposal = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        PostProposalRequest.toObject = function toObject(message, options) {
+        PostProposalRequest.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.defaults) {
-                if (options.bytes === String)
+                if (options.bytes === $String)
                     object.proposal = "";
                 else {
                     object.proposal = [];
-                    if (options.bytes !== Array)
+                    if (options.bytes !== $Array)
                         object.proposal = $util.newBuffer(object.proposal);
                 }
                 object.headers = null;
             }
-            if (message.proposal != null && message.hasOwnProperty("proposal"))
-                object.proposal = options.bytes === String ? $util.base64.encode(message.proposal, 0, message.proposal.length) : options.bytes === Array ? Array.prototype.slice.call(message.proposal) : message.proposal;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.proposal != null && $Object.hasOwnProperty.call(message, "proposal"))
+                object.proposal = options.bytes === $String ? $util.base64.encode(message.proposal, 0, message.proposal.length) : options.bytes === $Array ? $Array.prototype.slice.call(message.proposal) : message.proposal;
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
             return object;
         };
 
@@ -6919,8 +7189,8 @@ $root.postProposal = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        PostProposalRequest.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        PostProposalRequest.prototype.toJSON = function() {
+            return PostProposalRequest.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -6931,8 +7201,8 @@ $root.postProposal = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        PostProposalRequest.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        PostProposalRequest.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/postProposal.PostProposalRequest";
         };
@@ -6946,7 +7216,7 @@ $root.postProposal = (function() {
          * Properties of a PostProposalResponse.
          * @typedef {Object} postProposal.PostProposalResponse.$Properties
          * @property {shared.Headers.$Properties|null} [headers] PostProposalResponse headers
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
 
         /**
@@ -6968,14 +7238,14 @@ $root.postProposal = (function() {
          * @classdesc Represents a PostProposalResponse.
          * @constructor
          * @param {postProposal.PostProposalResponse.$Properties=} [properties] Properties to set
-         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding
+         * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
          */
-        function PostProposalResponse(properties) {
+        const PostProposalResponse = function (properties) {
             if (properties)
-                for (var keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                for (let keys = $Object.keys(properties), i = 0; i < keys.length; ++i)
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
-        }
+        };
 
         /**
          * PostProposalResponse headers.
@@ -6997,7 +7267,7 @@ $root.postProposal = (function() {
          *   (properties?: postProposal.PostProposalResponse.$Properties): postProposal.PostProposalResponse;
          * }}
          */
-        PostProposalResponse.create = function create(properties) {
+        PostProposalResponse.create = function(properties) {
             return new PostProposalResponse(properties);
         };
 
@@ -7010,13 +7280,17 @@ $root.postProposal = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        PostProposalResponse.encode = function encode(message, writer) {
+        PostProposalResponse.encode = function (message, writer, _depth) {
             if (!writer)
                 writer = $Writer.create();
-            if (message.headers != null && Object.hasOwnProperty.call(message, "headers"))
-                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork()).ldelim();
-            if (message.$unknowns != null && Object.hasOwnProperty.call(message, "$unknowns"))
-                for (var i = 0; i < message.$unknowns.length; ++i)
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                $root.shared.Headers.encode(message.headers, writer.uint32(/* id 1, wireType 2 =*/10).fork(), _depth + 1).ldelim();
+            if (message.$unknowns != null && $Object.hasOwnProperty.call(message, "$unknowns"))
+                for (let i = 0; i < message.$unknowns.length; ++i)
                     writer.raw(message.$unknowns[i]);
             return writer;
         };
@@ -7030,8 +7304,8 @@ $root.postProposal = (function() {
          * @param {$protobuf.Writer} [writer] Writer to encode to
          * @returns {$protobuf.Writer} Writer
          */
-        PostProposalResponse.encodeDelimited = function encodeDelimited(message, writer) {
-            return this.encode(message, writer).ldelim();
+        PostProposalResponse.encodeDelimited = function(message, writer) {
+            return this.encode(message, writer && writer.len ? writer.fork() : writer).ldelim();
         };
 
         /**
@@ -7045,36 +7319,38 @@ $root.postProposal = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        PostProposalResponse.decode = function decode(reader, length, _end, _depth, _target) {
+        PostProposalResponse.decode = function (reader, length, _end, _depth, _target) {
             if (!(reader instanceof $Reader))
                 reader = $Reader.create(reader);
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $Reader.recursionLimit)
-                throw Error("max depth exceeded");
-            var end = length === undefined ? reader.len : reader.pos + length, message = _target || new $root.postProposal.PostProposalResponse(), value;
+                throw $Error("max depth exceeded");
+            let end = length === $undefined ? reader.len : reader.pos + length, message = _target || new $root.postProposal.PostProposalResponse(), value;
             while (reader.pos < end) {
-                var start = reader.pos;
-                var tag = reader.tag();
+                let start = reader.pos;
+                let tag = reader.tag();
                 if (tag === _end) {
-                    _end = undefined;
+                    _end = $undefined;
                     break;
                 }
-                var wireType = tag & 7;
+                let wireType = tag & 7;
                 switch (tag >>>= 3) {
                 case 1: {
                         if (wireType !== 2)
                             break;
-                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), undefined, _depth + 1, message.headers);
+                        message.headers = $root.shared.Headers.decode(reader, reader.uint32(), $undefined, _depth + 1, message.headers);
                         continue;
                     }
                 }
                 reader.skipType(wireType, _depth, tag);
-                $util.makeProp(message, "$unknowns", false);
-                (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                if (!reader.discardUnknown) {
+                    $util.makeProp(message, "$unknowns", false);
+                    (message.$unknowns || (message.$unknowns = [])).push(reader.raw(start, reader.pos));
+                }
             }
-            if (_end !== undefined)
-                throw Error("missing end group");
+            if (_end !== $undefined)
+                throw $Error("missing end group");
             return message;
         };
 
@@ -7088,7 +7364,7 @@ $root.postProposal = (function() {
          * @throws {Error} If the payload is not a reader or valid buffer
          * @throws {$protobuf.util.ProtocolError} If required fields are missing
          */
-        PostProposalResponse.decodeDelimited = function decodeDelimited(reader) {
+        PostProposalResponse.decodeDelimited = function(reader) {
             if (!(reader instanceof $Reader))
                 reader = new $Reader(reader);
             return this.decode(reader, reader.uint32());
@@ -7102,15 +7378,15 @@ $root.postProposal = (function() {
          * @param {Object.<string,*>} message Plain object to verify
          * @returns {string|null} `null` if valid, otherwise the reason why it is not
          */
-        PostProposalResponse.verify = function verify(message, _depth) {
+        PostProposalResponse.verify = function (message, _depth) {
             if (typeof message !== "object" || message === null)
                 return "object expected";
-            if (_depth === undefined)
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
-            if (message.headers != null && message.hasOwnProperty("headers")) {
-                var error = $root.shared.Headers.verify(message.headers, _depth + 1);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers")) {
+                let error = $root.shared.Headers.verify(message.headers, _depth + 1);
                 if (error)
                     return "headers." + error;
             }
@@ -7125,17 +7401,19 @@ $root.postProposal = (function() {
          * @param {Object.<string,*>} object Plain object
          * @returns {postProposal.PostProposalResponse} PostProposalResponse
          */
-        PostProposalResponse.fromObject = function fromObject(object, _depth) {
+        PostProposalResponse.fromObject = function (object, _depth) {
             if (object instanceof $root.postProposal.PostProposalResponse)
                 return object;
-            if (_depth === undefined)
+            if (!$util.isObject(object))
+                throw $TypeError(".postProposal.PostProposalResponse: object expected");
+            if (_depth === $undefined)
                 _depth = 0;
             if (_depth > $util.recursionLimit)
-                throw Error("max depth exceeded");
-            var message = new $root.postProposal.PostProposalResponse();
+                throw $Error("max depth exceeded");
+            let message = new $root.postProposal.PostProposalResponse();
             if (object.headers != null) {
-                if (typeof object.headers !== "object")
-                    throw TypeError(".postProposal.PostProposalResponse.headers: object expected");
+                if (!$util.isObject(object.headers))
+                    throw $TypeError(".postProposal.PostProposalResponse.headers: object expected");
                 message.headers = $root.shared.Headers.fromObject(object.headers, _depth + 1);
             }
             return message;
@@ -7150,14 +7428,18 @@ $root.postProposal = (function() {
          * @param {$protobuf.IConversionOptions} [options] Conversion options
          * @returns {Object.<string,*>} Plain object
          */
-        PostProposalResponse.toObject = function toObject(message, options) {
+        PostProposalResponse.toObject = function (message, options, _depth) {
             if (!options)
                 options = {};
-            var object = {};
+            if (_depth === $undefined)
+                _depth = 0;
+            if (_depth > $util.recursionLimit)
+                throw $Error("max depth exceeded");
+            let object = {};
             if (options.defaults)
                 object.headers = null;
-            if (message.headers != null && message.hasOwnProperty("headers"))
-                object.headers = $root.shared.Headers.toObject(message.headers, options);
+            if (message.headers != null && $Object.hasOwnProperty.call(message, "headers"))
+                object.headers = $root.shared.Headers.toObject(message.headers, options, _depth + 1);
             return object;
         };
 
@@ -7168,8 +7450,8 @@ $root.postProposal = (function() {
          * @instance
          * @returns {Object.<string,*>} JSON object
          */
-        PostProposalResponse.prototype.toJSON = function toJSON() {
-            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        PostProposalResponse.prototype.toJSON = function() {
+            return PostProposalResponse.toObject(this, $protobuf.util.toJSONOptions);
         };
 
         /**
@@ -7180,8 +7462,8 @@ $root.postProposal = (function() {
          * @param {string} [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
          * @returns {string} The type url
          */
-        PostProposalResponse.getTypeUrl = function getTypeUrl(prefix) {
-            if (prefix === undefined)
+        PostProposalResponse.getTypeUrl = function(prefix) {
+            if (prefix === $undefined)
                 prefix = "type.googleapis.com";
             return prefix + "/postProposal.PostProposalResponse";
         };
@@ -7192,12 +7474,6 @@ $root.postProposal = (function() {
     return postProposal;
 })();
 
-export const getApiNodes = $root.getApiNodes;
-export const getBlocks = $root.getBlocks;
-export const getMessages = $root.getMessages;
-export const getPeers = $root.getPeers;
-export const getProposal = $root.getProposal;
-export const getStatus = $root.getStatus;
-export const postMessage = $root.postMessage;
-export const postProposal = $root.postProposal;
-export const shared = $root.shared;
+export {
+  $root as default
+};

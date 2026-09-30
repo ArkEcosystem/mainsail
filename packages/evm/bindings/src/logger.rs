@@ -1,4 +1,4 @@
-use mainsail_evm_core::logger::{LogLevel, Logger};
+use mainsail_evm_core::logger::{LogLevel, Logger, LoggerCommand};
 use napi::bindgen_prelude::*;
 use napi::threadsafe_function::{ThreadsafeCallContext, ThreadsafeFunctionCallMode};
 use napi_derive::napi;
@@ -38,15 +38,12 @@ pub struct JsLogger {
 }
 
 impl JsLogger {
-    const DROP_MESSAGE: &'static str = "DROP";
-
     pub fn new(logger_callback: Option<Function<'static, JsLogMessage, ()>>) -> Result<Self> {
-        let mut logger_sender: Option<Sender<(LogLevel, String)>> = None;
+        let mut logger_sender: Option<Sender<LoggerCommand>> = None;
         let mut logger_handle: Option<JoinHandle<()>> = None;
 
         if let Some(logger_callback) = logger_callback {
-            let (sender, receiver): (Sender<(LogLevel, String)>, Receiver<(LogLevel, String)>) =
-                channel();
+            let (sender, receiver): (Sender<LoggerCommand>, Receiver<LoggerCommand>) = channel();
 
             let tsfn = logger_callback.build_threadsafe_function().build_callback(
                 |ctx: ThreadsafeCallContext<JsLogMessage>| -> Result<JsLogMessage> {
@@ -54,25 +51,23 @@ impl JsLogger {
                 },
             )?;
 
-            // Spawn a thread to listen for log messages and invoke the JS callback
-            let handle = thread::spawn({
-                //   let tsfn = tsfn.clone();
-                move || {
-                    for (level, message) in receiver {
-                        if level == LogLevel::Notice && message == Self::DROP_MESSAGE {
-                            break;
+            // Spawn a thread to listen for log messages and invoke the JS callback.
+            // `Shutdown` arrives in FIFO order behind pending entries, so everything
+            // queued before dispose is flushed first.
+            let handle = thread::spawn(move || {
+                for command in receiver {
+                    match command {
+                        LoggerCommand::Log(level, message) => {
+                            tsfn.call(
+                                JsLogMessage {
+                                    level: level.into(),
+                                    message,
+                                },
+                                ThreadsafeFunctionCallMode::NonBlocking,
+                            );
                         }
-
-                        tsfn.call(
-                            JsLogMessage {
-                                level: level.into(),
-                                message,
-                            },
-                            ThreadsafeFunctionCallMode::NonBlocking,
-                        );
+                        LoggerCommand::Shutdown => break,
                     }
-
-                    ()
                 }
             });
 
@@ -101,10 +96,14 @@ impl Drop for JsLogger {
     fn drop(&mut self) {
         if let Some(handle) = self.logger_handle.take() {
             if let Some(sender) = self.internal_logger.sender.as_ref() {
-                let _ = sender.send((LogLevel::Notice, Self::DROP_MESSAGE.into()));
+                let _ = sender.send(LoggerCommand::Shutdown);
             }
 
-            handle.join().expect("failed to join logger thread");
+            // Never panic in Drop (a panicked logger thread would otherwise abort the
+            // process during teardown via double panic).
+            if handle.join().is_err() {
+                eprintln!("evm logger thread panicked during teardown");
+            }
         }
     }
 }

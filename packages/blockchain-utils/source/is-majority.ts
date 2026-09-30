@@ -1,1 +1,1 @@
-export const isMajority = (size: number, roundValidators: number): boolean => size > (roundValidators / 3) * 2;
+export const isMajority = (size: number, roundValidators: number): boolean => size * 3 > roundValidators * 2;

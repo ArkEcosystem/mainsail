@@ -7,6 +7,7 @@ import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 
 import { BIP38, BIP39 } from "./keys/index.js";
+import { ProposerReporter } from "./proposer-reporter.js";
 import { ValidatorRepository } from "./validator-repository.js";
 import { Validator } from "./validator.js";
 
@@ -14,6 +15,7 @@ import { Validator } from "./validator.js";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.Validator.Repository).to(ValidatorRepository).inSingletonScope();
+		this.app.bind(Identifiers.Validator.Reporter).to(ProposerReporter).inSingletonScope();
 	}
 
 	public async boot(): Promise<void> {
@@ -58,6 +60,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		}
 
 		this.app.get<ValidatorRepository>(Identifiers.Validator.Repository).configure(validators);
+
+		if (validators.length > 0) {
+			this.app.get<Contracts.Validator.ProposerReporter>(Identifiers.Validator.Reporter).boot();
+		}
+	}
+
+	public async dispose(): Promise<void> {
+		this.app.get<Contracts.Validator.ProposerReporter>(Identifiers.Validator.Reporter).dispose();
 	}
 
 	#getConsensusKeyPairFromSecret(secret: string): Promise<Contracts.Crypto.KeyPair> {
@@ -79,8 +89,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	#isMnemonic(secret: string): boolean {
-		const words = secret.split(/\s+/);
-		return words.length >= 12 && words.length <= 24;
+		const words = secret.trim().split(/\s+/);
+		return [12, 15, 18, 21, 24].includes(words.length);
 	}
 
 	#isHexPrivateKey(secret: string): boolean {

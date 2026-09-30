@@ -10,10 +10,13 @@
 			"path": "../api-database"
 		},
 		{
+			"path": "../constants"
+		},
+		{
 			"path": "../container"
 		},
 		{
-			"path": "../contracts"
+			"path": "../exceptions"
 		},
 		{
 			"path": "../kernel"

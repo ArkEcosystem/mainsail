@@ -86,12 +86,16 @@ export class TokensController extends Controller {
 			return Boom.notFound("Token not found");
 		}
 
+		const pagination = this.getQueryPagination(request.query);
+
 		const [tokenHolders, totalCount] = await this.tokenHolderRepositoryFactory()
 			.createQueryBuilder()
 			.select()
 			.where("token_address = :address", { address: request.params.address })
 			.orderBy("balance", "DESC")
 			.addOrderBy("address", "ASC")
+			.offset(pagination.offset)
+			.limit(pagination.limit)
 			.getManyAndCount();
 
 		return this.toPagination(

@@ -3,16 +3,12 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
-import { Application } from "../application.js";
 import { InputDefinition } from "./definition.js";
 import { InputParser } from "./parser.js";
 import { InputValidator } from "./validator.js";
 
 @injectable()
 export class Input {
-	@inject(Identifiers.Cli.Application.Instance)
-	protected readonly app!: Application;
-
 	@inject(Identifiers.Cli.Input.Validator)
 	protected readonly validator!: InputValidator;
 

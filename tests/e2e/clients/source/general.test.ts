@@ -67,6 +67,11 @@ describe<{
 		for (const client of clients) {
 			const b = await client.getBlock(0);
 			compareBlocks(assert, genesisBlock, b);
+
+			// hash-only form (fullTransactions=false) must return 0x-prefixed 32-byte hashes per the JSON-RPC spec
+			for (const txHash of b.transactions) {
+				assert.true(typeof txHash === "string" && txHash.startsWith("0x"));
+			}
 		}
 	});
 

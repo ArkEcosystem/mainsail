@@ -1,18 +1,20 @@
-use std::collections::BTreeMap;
+use std::{borrow::Cow, collections::BTreeMap};
 
-use alloy_sol_types::SolEvent;
+use alloy_sol_types::SolEventInterface;
 use rayon::{
     iter::{IntoParallelRefMutIterator, ParallelIterator},
     slice::ParallelSliceMut,
 };
 use revm::{
     context::result::ExecutionResult,
-    database::{DatabaseCommitExt, WrapDatabaseRef},
+    database::{DatabaseCommitExt, TransitionAccount, WrapDatabaseRef},
     primitives::{Address, B256, map::HashMap},
+    state::{EvmStorage, EvmStorageSlot, TransactionId},
 };
 
 use crate::{
     db::{CommitData, CommitKey, Error, GenesisInfo, PendingCommit, PersistentDB},
+    events::{self, ConsensusV1Events, ContractEvent, ContractEventData, UsernamesV1Events},
     state_changes::{self, AccountMergeInfo, AccountUpdate},
 };
 
@@ -56,7 +58,7 @@ pub fn build_commit(pending_commit: &mut PendingCommit) -> Result<StateCommit, c
 }
 
 pub fn apply_rewards(
-    db: &mut PersistentDB,
+    db: &PersistentDB,
     pending: &mut PendingCommit,
     rewards: HashMap<Address, u128>,
 ) -> Result<(), crate::db::Error> {
@@ -66,28 +68,59 @@ pub fn apply_rewards(
         .with_database(WrapDatabaseRef(&db))
         .build();
 
-    state
+    let result = state
         .increment_balances(rewards)
-        .map_err(|err| crate::db::Error::State(format!("increment balances err={}", err)))?;
+        .map_err(|err| crate::db::Error::State(format!("increment balances err={}", err)));
 
-    if let Some(transition_state) = state.transition_state.take() {
-        // println!("transition state {:#?}", transition_state);
-        pending
-            .transitions
-            .add_transitions(transition_state.transitions.into_iter());
+    // `increment_balances` short-circuits before committing any transition, so on error
+    // the state carries no reward changes. Only fold transitions in on success; always
+    // return the prestate cache so a recoverable failure never leaves `pending` empty.
+    if result.is_ok() {
+        if let Some(transition_state) = state.transition_state.take() {
+            pending.transitions.add_transitions(
+                transition_state
+                    .transitions
+                    .into_iter()
+                    .map(|(address, account)| (address, into_evm_transition(account))),
+            );
+        }
     }
 
     pending.cache = std::mem::take(&mut state.cache);
     // println!("cache {:#?}", pending.cache.accounts);
 
-    Ok(())
+    result
+}
+
+/// `TransitionState::add_transitions` expects the EVM-side storage representation;
+/// convert an already-flattened transition back into it.
+pub fn into_evm_transition(
+    account: TransitionAccount,
+) -> TransitionAccount<Option<Cow<'static, EvmStorage>>> {
+    account.map_storage(|storage| {
+        Some(Cow::Owned(
+            storage
+                .into_iter()
+                .map(|(key, slot)| {
+                    (
+                        key,
+                        EvmStorageSlot::new_changed(
+                            slot.previous_or_original_value,
+                            slot.present_value,
+                            TransactionId::default(),
+                        ),
+                    )
+                })
+                .collect(),
+        ))
+    })
 }
 
 pub fn commit_to_db(
     db: &mut PersistentDB,
     mut pending_commit: PendingCommit,
     commit_data: Option<CommitData>,
-) -> Result<Vec<AccountUpdate>, crate::db::Error> {
+) -> Result<(Vec<AccountUpdate>, Vec<ContractEvent>), crate::db::Error> {
     let genesis_info = db.genesis_info.clone();
     let mut commit = match pending_commit.built_commit {
         Some(commit) => commit,
@@ -96,7 +129,7 @@ pub fn commit_to_db(
 
     commit_with_resize_retry(|| db.commit(&mut commit, &commit_data), || db.resize())?;
 
-    Ok(collect_dirty_accounts(commit, &genesis_info))
+    Ok(collect_dirty_accounts_and_events(commit, &genesis_info))
 }
 
 /// Maximum number of resize-and-retry attempts after an initial `DbFull` on commit.
@@ -132,112 +165,186 @@ fn finalize(state: &mut StateCommit) {
         .par_sort_unstable_by_key(|a| a.address);
 }
 
-fn collect_dirty_accounts(
+fn collect_dirty_accounts_and_events(
     commit: StateCommit,
     genesis_info: &Option<GenesisInfo>,
-) -> Vec<AccountUpdate> {
+) -> (Vec<AccountUpdate>, Vec<ContractEvent>) {
     let mut dirty_accounts = HashMap::with_capacity(commit.change_set.accounts.len());
+    let mut events: Vec<ContractEvent> = Vec::new();
 
     for (address, account) in commit.change_set.accounts {
-        if let Some(account) = account {
-            dirty_accounts.insert(
+        // A destroyed (selfdestructed) account comes through as `None`; surface it as a
+        // zeroed update so consumers drop the stale balance — mirroring the history
+        // table, which records deletions as a default account.
+        let account = account.unwrap_or_default();
+
+        dirty_accounts.insert(
+            address,
+            AccountUpdate {
                 address,
-                AccountUpdate {
-                    address,
-                    balance: account.balance,
-                    nonce: account.nonce,
-                    vote: None,
-                    unvote: None,
-                    username: None,
-                    username_resigned: false,
-                    merge_info: commit
-                        .change_set
-                        .merged_legacy_cold_wallets
-                        .get(&address)
-                        .map(|value| AccountMergeInfo {
-                            legacy_address: value.1,
-                            transaction_hash: value.0,
-                        }),
-                },
-            );
-        }
+                balance: account.balance,
+                nonce: account.nonce,
+                vote: None,
+                unvote: None,
+                username: None,
+                username_resigned: false,
+                merge_info: commit
+                    .change_set
+                    .merged_legacy_cold_wallets
+                    .get(&address)
+                    .map(|value| AccountMergeInfo {
+                        legacy_address: value.1,
+                        transaction_hash: value.0,
+                    }),
+            },
+        );
     }
 
     if let Some(info) = genesis_info {
-        for (receipt, _) in commit.results.values() {
+        // `results` is keyed by tx hash, but the "last event wins" folds below must see
+        // events in execution order. Cumulative gas is strictly increasing per executed
+        // transaction, so it recovers that order: every executed transaction consumes at
+        // least the 21000-gas intrinsic cost, so each entry's cumulative total is strictly
+        // greater than the previous one's — the key is guaranteed unique and monotonic,
+        // never tied.
+        let mut results: Vec<(&B256, &(ExecutionResult, u64))> = commit.results.iter().collect();
+        results.sort_by_key(|(_, (_, cumulative_gas_used))| *cumulative_gas_used);
+
+        for (tx_index, (tx_hash, (receipt, _))) in results.into_iter().enumerate() {
+            let make_event = |data: ContractEventData| ContractEvent {
+                tx_hash: *tx_hash,
+                tx_index: tx_index as u32,
+                data,
+            };
+
             match receipt {
                 ExecutionResult::Success { logs, .. } => {
                     for log in logs {
                         match log.address {
                             _ if log.address == info.validator_contract => {
-                                // Attempt to decode the log as a Voted event
-                                if let Ok(event) = crate::events::Voted::decode_log(&log) {
-                                    // println!(
-                                    //     "Voted event (from={:?} to={:?})",
-                                    //     event.data.voter, event.data.validator,
-                                    // );
-
-                                    dirty_accounts.get_mut(&event.voter).and_then(|account| {
-                                        account.vote = Some(event.validator);
-                                        account.unvote = None; // cancel out any previous unvote if one happened in same commit
-                                        Some(account)
-                                    });
-
+                                let Ok(decoded) = ConsensusV1Events::decode_log(log) else {
                                     continue;
-                                }
+                                };
 
-                                // Attempt to decode the log as a Unvoted event
-                                if let Ok(event) = crate::events::Unvoted::decode_log(&log) {
-                                    // println!(
-                                    //     "Unvoted event (from={:?} removed vote={:?})",
-                                    //     event.data.voter, event.data.validator,
-                                    // );
+                                match decoded.data {
+                                    ConsensusV1Events::Voted(events::Voted {
+                                        voter,
+                                        validator,
+                                    }) => {
+                                        dirty_accounts.get_mut(&voter).and_then(|account| {
+                                            account.vote = Some(validator);
+                                            account.unvote = None; // cancel out any previous unvote if one happened in same commit
+                                            Some(account)
+                                        });
 
-                                    dirty_accounts.get_mut(&event.voter).and_then(|account| {
-                                        account.unvote = Some(event.validator);
-                                        account.vote = None; // cancel out any previous vote if one happened in same commit
-                                        Some(account)
-                                    });
+                                        events.push(make_event(ContractEventData::Voted {
+                                            voter,
+                                            validator,
+                                        }));
+                                    }
+                                    ConsensusV1Events::Unvoted(events::Unvoted {
+                                        voter,
+                                        validator,
+                                    }) => {
+                                        dirty_accounts.get_mut(&voter).and_then(|account| {
+                                            account.unvote = Some(validator);
+                                            account.vote = None; // cancel out any previous vote if one happened in same commit
+                                            Some(account)
+                                        });
 
-                                    continue;
+                                        events.push(make_event(ContractEventData::Unvoted {
+                                            voter,
+                                            validator,
+                                        }));
+                                    }
+                                    ConsensusV1Events::ValidatorRegistered(
+                                        events::ValidatorRegistered {
+                                            addr,
+                                            blsPublicKey: bls_public_key,
+                                        },
+                                    ) => {
+                                        events.push(make_event(
+                                            ContractEventData::ValidatorRegistered {
+                                                addr,
+                                                bls_public_key,
+                                            },
+                                        ));
+                                    }
+                                    ConsensusV1Events::ValidatorResigned(
+                                        events::ValidatorResigned { addr },
+                                    ) => {
+                                        events.push(make_event(
+                                            ContractEventData::ValidatorResigned { addr },
+                                        ));
+                                    }
+                                    ConsensusV1Events::ValidatorUpdated(
+                                        events::ValidatorUpdated {
+                                            addr,
+                                            blsPublicKey: bls_public_key,
+                                        },
+                                    ) => {
+                                        events.push(make_event(
+                                            ContractEventData::ValidatorUpdated {
+                                                addr,
+                                                bls_public_key,
+                                            },
+                                        ));
+                                    }
                                 }
                             }
                             _ if log.address == info.username_contract => {
-                                // Attempt to decode log as a UsernameRegistered event
-                                if let Ok(event) =
-                                    crate::events::UsernameRegistered::decode_log(&log)
-                                {
-                                    dirty_accounts.get_mut(&event.addr).and_then(|account| {
-                                        account.username = Some(event.username.clone());
-                                        account.username_resigned = false; // cancel out any previous resignation if one happened in same commit
-                                        Some(account)
-                                    });
+                                let Ok(decoded) = UsernamesV1Events::decode_log(log) else {
                                     continue;
-                                }
+                                };
 
-                                // Attempt to decode log as a UsernameResigned event
-                                if let Ok(event) = crate::events::UsernameResigned::decode_log(&log)
-                                {
-                                    dirty_accounts.get_mut(&event.addr).and_then(|account| {
-                                        account.username = None; // cancel out any previous registration if one happened in same commit
-                                        account.username_resigned = true;
-                                        Some(account)
-                                    });
-                                    continue;
+                                match decoded.data {
+                                    UsernamesV1Events::UsernameRegistered(
+                                        events::UsernameRegistered {
+                                            addr,
+                                            username,
+                                            previousUsername: previous_username,
+                                        },
+                                    ) => {
+                                        dirty_accounts.get_mut(&addr).and_then(|account| {
+                                            account.username = Some(username.clone());
+                                            account.username_resigned = false; // cancel out any previous resignation if one happened in same commit
+                                            Some(account)
+                                        });
+
+                                        events.push(make_event(
+                                            ContractEventData::UsernameRegistered {
+                                                addr,
+                                                username,
+                                                previous_username: (!previous_username.is_empty())
+                                                    .then_some(previous_username),
+                                            },
+                                        ));
+                                    }
+                                    UsernamesV1Events::UsernameResigned(
+                                        events::UsernameResigned { addr, username },
+                                    ) => {
+                                        dirty_accounts.get_mut(&addr).and_then(|account| {
+                                            account.username = None; // cancel out any previous registration if one happened in same commit
+                                            account.username_resigned = true;
+                                            Some(account)
+                                        });
+
+                                        events.push(make_event(
+                                            ContractEventData::UsernameResigned { addr, username },
+                                        ));
+                                    }
                                 }
                             }
                             _ => (), // ignore
                         }
                     }
-
-                    //
                 }
                 ExecutionResult::Revert { .. } | ExecutionResult::Halt { .. } => (), // ignore
             }
         }
     }
 
-    dirty_accounts.into_values().collect()
+    (dirty_accounts.into_values().collect(), events)
 }
 
 #[cfg(test)]
@@ -248,8 +355,11 @@ mod tests {
     use crate::{
         db::{Error, GenesisInfo, PendingCommit, PersistentDB},
         events,
+        events::{ContractEvent, ContractEventData},
         state_changes::{AccountMergeInfo, AccountUpdate, StateChangeset},
-        state_commit::{StateCommit, apply_rewards, collect_dirty_accounts},
+        state_commit::{
+            StateCommit, apply_rewards, build_commit, collect_dirty_accounts_and_events,
+        },
     };
     use crate::{
         legacy::{LegacyAccountAttributes, LegacyAddress},
@@ -361,11 +471,43 @@ mod tests {
                             .encode_log_data(),
                         },
                         Log {
+                            address: genesis_info.validator_contract,
+                            data: events::ValidatorRegistered {
+                                addr: address!("0000000000000000000000000000000000000001"),
+                                blsPublicKey: alloy_primitives::Bytes::from_static(&[0xaa; 48]),
+                            }
+                            .encode_log_data(),
+                        },
+                        Log {
+                            address: genesis_info.validator_contract,
+                            data: events::ValidatorResigned {
+                                addr: address!("0000000000000000000000000000000000000002"),
+                            }
+                            .encode_log_data(),
+                        },
+                        Log {
+                            address: genesis_info.validator_contract,
+                            data: events::ValidatorUpdated {
+                                addr: address!("0000000000000000000000000000000000000001"),
+                                blsPublicKey: alloy_primitives::Bytes::from_static(&[0xbb; 48]),
+                            }
+                            .encode_log_data(),
+                        },
+                        Log {
                             address: genesis_info.username_contract,
                             data: events::UsernameRegistered {
                                 addr: address!("0000000000000000000000000000000000000001"),
                                 username: "test".into(),
                                 previousUsername: "".into(),
+                            }
+                            .encode_log_data(),
+                        },
+                        Log {
+                            address: genesis_info.username_contract,
+                            data: events::UsernameRegistered {
+                                addr: address!("0000000000000000000000000000000000000001"),
+                                username: "renamed".into(),
+                                previousUsername: "test".into(),
                             }
                             .encode_log_data(),
                         },
@@ -417,7 +559,8 @@ mod tests {
             ..Default::default()
         };
 
-        let mut account_updates = collect_dirty_accounts(state, &Some(genesis_info));
+        let (mut account_updates, events) =
+            collect_dirty_accounts_and_events(state, &Some(genesis_info));
         account_updates.sort_by_key(|k| k.address);
 
         assert_eq!(
@@ -429,7 +572,7 @@ mod tests {
                     nonce: 0,
                     vote: Some(address!("0000000000000000000000000000000000000002")),
                     unvote: None,
-                    username: Some("test".into()),
+                    username: Some("renamed".into()),
                     username_resigned: false,
                     merge_info: Some(AccountMergeInfo {
                         legacy_address: "DJmvhhiQFSrEQCq9FUxvcLcpcBjx7K3yLt".try_into().unwrap(),
@@ -449,6 +592,414 @@ mod tests {
                     merge_info: None
                 }
             ]
+        );
+
+        let tx_hash = b256!("0000000000000000000000000000000000000000000000000000000000000001");
+        let event = |data: ContractEventData| ContractEvent {
+            tx_hash,
+            tx_index: 0,
+            data,
+        };
+
+        assert_eq!(
+            events,
+            vec![
+                event(ContractEventData::Voted {
+                    voter: address!("0000000000000000000000000000000000000001"),
+                    validator: address!("0000000000000000000000000000000000000002"),
+                }),
+                event(ContractEventData::Unvoted {
+                    voter: address!("0000000000000000000000000000000000000002"),
+                    validator: address!("0000000000000000000000000000000000000004"),
+                }),
+                event(ContractEventData::ValidatorRegistered {
+                    addr: address!("0000000000000000000000000000000000000001"),
+                    bls_public_key: alloy_primitives::Bytes::from_static(&[0xaa; 48]),
+                }),
+                event(ContractEventData::ValidatorResigned {
+                    addr: address!("0000000000000000000000000000000000000002"),
+                }),
+                event(ContractEventData::ValidatorUpdated {
+                    addr: address!("0000000000000000000000000000000000000001"),
+                    bls_public_key: alloy_primitives::Bytes::from_static(&[0xbb; 48]),
+                }),
+                event(ContractEventData::UsernameRegistered {
+                    addr: address!("0000000000000000000000000000000000000001"),
+                    username: "test".into(),
+                    previous_username: None,
+                }),
+                event(ContractEventData::UsernameRegistered {
+                    addr: address!("0000000000000000000000000000000000000001"),
+                    username: "renamed".into(),
+                    previous_username: Some("test".into()),
+                }),
+                event(ContractEventData::UsernameResigned {
+                    addr: address!("0000000000000000000000000000000000000002"),
+                    username: "resigned".into(),
+                }),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_collect_dirty_accounts_includes_destroyed_accounts() {
+        let destroyed = address!("0000000000000000000000000000000000000001");
+        let alive = address!("0000000000000000000000000000000000000002");
+
+        let mut change_set = StateChangeset::default();
+        change_set.accounts.push((destroyed, None));
+        change_set
+            .accounts
+            .push((alive, Some(AccountInfo::from_balance(U256::from(7)))));
+
+        let state = StateCommit {
+            change_set,
+            ..Default::default()
+        };
+
+        let (mut account_updates, events) = collect_dirty_accounts_and_events(state, &None);
+        account_updates.sort_by_key(|u| u.address);
+
+        assert!(events.is_empty());
+
+        // A selfdestructed account must surface as a zeroed update — consumers (api-sync
+        // wallet table) would otherwise keep the stale pre-destruction balance forever.
+        assert_eq!(
+            account_updates,
+            vec![
+                AccountUpdate {
+                    address: destroyed,
+                    balance: U256::ZERO,
+                    nonce: 0,
+                    ..Default::default()
+                },
+                AccountUpdate {
+                    address: alive,
+                    balance: U256::from(7),
+                    nonce: 0,
+                    ..Default::default()
+                }
+            ]
+        );
+    }
+
+    #[test]
+    fn test_collect_dirty_accounts_folds_events_in_execution_order() {
+        let voter = address!("0000000000000000000000000000000000000001");
+        let validator = address!("0000000000000000000000000000000000000002");
+
+        let genesis_info = GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            deployer_account: address!("0000000000000000000000000000000000000002"),
+            validator_contract: address!("0000000000000000000000000000000000000003"),
+            username_contract: address!("0000000000000000000000000000000000000004"),
+            initial_block_number: 0,
+            initial_supply: U256::from(1_000_000),
+        };
+
+        let mut change_set = StateChangeset::default();
+        change_set
+            .accounts
+            .push((voter, Some(AccountInfo::from_balance(U256::ONE))));
+
+        let success = |log: Log| ExecutionResult::Success {
+            reason: SuccessReason::Stop,
+            gas: ResultGas::new_with_state_gas(30000, 30000, 0, 0),
+            logs: vec![log],
+            output: Output::Call(alloy_primitives::Bytes(Bytes::new())),
+        };
+
+        // Execution order (= cumulative gas order): vote, unvote, register, resign.
+        // The tx hashes sort in exactly the reverse order, so a fold iterating the
+        // hash-keyed BTreeMap directly would end up with vote + username instead.
+        let mut results = BTreeMap::<B256, (ExecutionResult, u64)>::new();
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000004"),
+            (
+                success(Log {
+                    address: genesis_info.validator_contract,
+                    data: events::Voted { validator, voter }.encode_log_data(),
+                }),
+                21000,
+            ),
+        );
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000003"),
+            (
+                success(Log {
+                    address: genesis_info.validator_contract,
+                    data: events::Unvoted { validator, voter }.encode_log_data(),
+                }),
+                42000,
+            ),
+        );
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000002"),
+            (
+                success(Log {
+                    address: genesis_info.username_contract,
+                    data: events::UsernameRegistered {
+                        addr: voter,
+                        username: "test".into(),
+                        previousUsername: "".into(),
+                    }
+                    .encode_log_data(),
+                }),
+                63000,
+            ),
+        );
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+            (
+                success(Log {
+                    address: genesis_info.username_contract,
+                    data: events::UsernameResigned {
+                        addr: voter,
+                        username: "test".into(),
+                    }
+                    .encode_log_data(),
+                }),
+                84000,
+            ),
+        );
+
+        let state = StateCommit {
+            change_set,
+            results,
+            ..Default::default()
+        };
+
+        let (account_updates, events) =
+            collect_dirty_accounts_and_events(state, &Some(genesis_info));
+
+        assert_eq!(
+            account_updates,
+            vec![AccountUpdate {
+                address: voter,
+                balance: U256::ONE,
+                nonce: 0,
+                vote: None,
+                unvote: Some(validator),
+                username: None,
+                username_resigned: true,
+                merge_info: None
+            }]
+        );
+
+        assert_eq!(
+            events,
+            vec![
+                ContractEvent {
+                    tx_hash: b256!(
+                        "0000000000000000000000000000000000000000000000000000000000000004"
+                    ),
+                    tx_index: 0,
+                    data: ContractEventData::Voted { voter, validator },
+                },
+                ContractEvent {
+                    tx_hash: b256!(
+                        "0000000000000000000000000000000000000000000000000000000000000003"
+                    ),
+                    tx_index: 1,
+                    data: ContractEventData::Unvoted { voter, validator },
+                },
+                ContractEvent {
+                    tx_hash: b256!(
+                        "0000000000000000000000000000000000000000000000000000000000000002"
+                    ),
+                    tx_index: 2,
+                    data: ContractEventData::UsernameRegistered {
+                        addr: voter,
+                        username: "test".into(),
+                        previous_username: None,
+                    },
+                },
+                ContractEvent {
+                    tx_hash: b256!(
+                        "0000000000000000000000000000000000000000000000000000000000000001"
+                    ),
+                    tx_index: 3,
+                    data: ContractEventData::UsernameResigned {
+                        addr: voter,
+                        username: "test".into(),
+                    },
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn test_collect_events_counts_reverted_transactions_in_tx_index() {
+        let voter = address!("0000000000000000000000000000000000000001");
+        let validator = address!("0000000000000000000000000000000000000002");
+
+        let genesis_info = GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            deployer_account: address!("0000000000000000000000000000000000000002"),
+            validator_contract: address!("0000000000000000000000000000000000000003"),
+            username_contract: address!("0000000000000000000000000000000000000004"),
+            initial_block_number: 0,
+            initial_supply: U256::from(1_000_000),
+        };
+
+        let voted = Log {
+            address: genesis_info.validator_contract,
+            data: events::Voted { validator, voter }.encode_log_data(),
+        };
+
+        // Block order (= cumulative gas order): success, revert, success. The reverted
+        // transaction emits no event, but still takes its index, so the last one keeps
+        // index 2 like its receipt.
+        let mut results = BTreeMap::<B256, (ExecutionResult, u64)>::new();
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+            (
+                ExecutionResult::Success {
+                    reason: SuccessReason::Stop,
+                    gas: ResultGas::new_with_state_gas(30000, 30000, 0, 0),
+                    logs: vec![voted.clone()],
+                    output: Output::Call(alloy_primitives::Bytes(Bytes::new())),
+                },
+                21000,
+            ),
+        );
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000002"),
+            (
+                ExecutionResult::Revert {
+                    gas: ResultGas::new_with_state_gas(30000, 30000, 0, 0),
+                    logs: vec![voted.clone()],
+                    output: alloy_primitives::Bytes(Bytes::new()),
+                },
+                42000,
+            ),
+        );
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000003"),
+            (
+                ExecutionResult::Success {
+                    reason: SuccessReason::Stop,
+                    gas: ResultGas::new_with_state_gas(30000, 30000, 0, 0),
+                    logs: vec![Log {
+                        address: genesis_info.validator_contract,
+                        data: events::Unvoted { validator, voter }.encode_log_data(),
+                    }],
+                    output: Output::Call(alloy_primitives::Bytes(Bytes::new())),
+                },
+                63000,
+            ),
+        );
+
+        let state = StateCommit {
+            results,
+            ..Default::default()
+        };
+
+        let (_, events) = collect_dirty_accounts_and_events(state, &Some(genesis_info));
+
+        assert_eq!(
+            events,
+            vec![
+                ContractEvent {
+                    tx_hash: b256!(
+                        "0000000000000000000000000000000000000000000000000000000000000001"
+                    ),
+                    tx_index: 0,
+                    data: ContractEventData::Voted { voter, validator },
+                },
+                ContractEvent {
+                    tx_hash: b256!(
+                        "0000000000000000000000000000000000000000000000000000000000000003"
+                    ),
+                    tx_index: 2,
+                    data: ContractEventData::Unvoted { voter, validator },
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn hash_independent_of_change_set_ordering() {
+        use crate::{state_changes::StorageChangeset, state_root};
+        use revm::{
+            database::states::StorageSlot, primitives::Bytes, state::AccountInfo, state::Bytecode,
+        };
+
+        let code = [
+            Bytecode::new_legacy(Bytes::from_static(&[0x60, 0x04, 0x56, 0x00, 0x5b])),
+            Bytecode::new_eip7702(address!("0000000000000000000000000000000000000009")),
+            Bytecode::new_legacy(Bytes::from_static(&[0x00])),
+        ];
+
+        let slots = vec![
+            (
+                U256::from(3),
+                StorageSlot::new_changed(U256::ZERO, U256::from(30)),
+            ),
+            (
+                U256::from(1),
+                StorageSlot::new_changed(U256::ZERO, U256::from(10)),
+            ),
+            (
+                U256::from(2),
+                StorageSlot::new_changed(U256::ZERO, U256::from(20)),
+            ),
+        ];
+
+        let change_set = StateChangeset {
+            accounts: vec![
+                (
+                    address!("0000000000000000000000000000000000000003"),
+                    Some(AccountInfo::from_balance(U256::from(3))),
+                ),
+                (address!("0000000000000000000000000000000000000001"), None),
+                (
+                    address!("0000000000000000000000000000000000000002"),
+                    Some(AccountInfo::from_balance(U256::from(2))),
+                ),
+            ],
+            contracts: code.iter().map(|c| (c.hash_slow(), c.clone())).collect(),
+            storage: vec![
+                StorageChangeset {
+                    address: address!("0000000000000000000000000000000000000005"),
+                    wipe_storage: false,
+                    storage: slots.clone(),
+                },
+                StorageChangeset {
+                    address: address!("0000000000000000000000000000000000000004"),
+                    wipe_storage: true,
+                    storage: slots,
+                },
+            ],
+            ..Default::default()
+        };
+
+        let root_of = |change_set: StateChangeset| {
+            let mut state = StateCommit {
+                change_set,
+                ..Default::default()
+            };
+            super::finalize(&mut state);
+
+            let mut pending = PendingCommit {
+                built_commit: Some(state),
+                ..Default::default()
+            };
+            state_root::calculate(&Default::default(), &mut pending, B256::ZERO).expect("ok")
+        };
+
+        let mut reversed = change_set.clone();
+        reversed.accounts.reverse();
+        reversed.contracts.reverse();
+        reversed.storage.reverse();
+        for change in &mut reversed.storage {
+            change.storage.reverse();
+        }
+
+        assert_eq!(
+            root_of(change_set),
+            root_of(reversed),
+            "the root must be independent of changeset ordering"
         );
     }
 
@@ -611,5 +1162,205 @@ mod tests {
 
         assert!(matches!(result, Err(Error::Lock)));
         assert_eq!(resizes, 0); // non-DbFull errors return immediately
+    }
+
+    /// `build_commit` derives the committed change set from a pending commit's `transitions`,
+    /// not from its account `cache`. Emptying the cache before building must therefore produce
+    /// an identical change set.
+    #[test]
+    fn build_commit_is_independent_of_a_drained_cache() {
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+        let db = PersistentDB::new(crate::db::PersistentDBOptions::new(
+            path.path().to_path_buf(),
+        ))
+        .expect("database");
+
+        let account = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let mut rewards = HashMap::<Address, u128>::default();
+        rewards.insert(account, 1234);
+
+        let mut pending = PendingCommit::default();
+        apply_rewards(&db, &mut pending, rewards).expect("apply rewards");
+        assert!(pending.cache.accounts.contains_key(&account));
+        assert!(pending.transitions.transitions.contains_key(&account));
+
+        // Baseline: build with the cache intact.
+        let mut intact = pending.clone();
+        let intact_commit = build_commit(&mut intact).expect("build intact");
+
+        // Build again with the cache emptied but the transitions kept.
+        let mut drained = pending.clone();
+        drained.cache = Default::default();
+        assert!(drained.cache.accounts.is_empty());
+        assert!(drained.transitions.transitions.contains_key(&account));
+        let drained_commit = build_commit(&mut drained).expect("build drained");
+
+        assert_eq!(
+            format!("{:?}", intact_commit.change_set),
+            format!("{:?}", drained_commit.change_set),
+            "draining the cache must not change the committed change set"
+        );
+    }
+
+    /// A transaction executes against the pending commit's account cache as its prestate. An
+    /// account credited only in the cache (not yet committed to the database) is visible to a
+    /// transfer from it: the transfer succeeds against the populated cache, and fails with
+    /// insufficient funds against an empty cache.
+    #[test]
+    fn drained_cache_diverges_a_dependent_transaction() {
+        use revm::{
+            Context, ExecuteEvm, MainBuilder, MainContext,
+            context::{BlockEnv, TxEnv},
+            database::{CacheState, State, WrapDatabaseRef},
+            primitives::{TxKind, hardfork::SpecId},
+        };
+
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+        let db = PersistentDB::new(crate::db::PersistentDBOptions::new(
+            path.path().to_path_buf(),
+        ))
+        .expect("database");
+
+        let account = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let recipient = address!("ad6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let mut pending = PendingCommit::default();
+        let mut rewards = HashMap::<Address, u128>::default();
+        rewards.insert(account, 1_000_000);
+        apply_rewards(&db, &mut pending, rewards).expect("apply rewards");
+
+        let run_transfer = |prestate: CacheState| -> bool {
+            let state = State::builder()
+                .with_bundle_update()
+                .with_cached_prestate(prestate)
+                .with_database(WrapDatabaseRef(&db))
+                .build();
+
+            let mut evm = Context::mainnet()
+                .with_db(state)
+                .modify_cfg_chained(|cfg| {
+                    cfg.spec = SpecId::OSAKA;
+                    cfg.disable_nonce_check = true;
+                })
+                .modify_block_chained(|block: &mut BlockEnv| {
+                    block.gas_limit = 30_000_000;
+                })
+                .modify_tx_chained(|tx: &mut TxEnv| {
+                    tx.caller = account;
+                    tx.kind = TxKind::Call(recipient);
+                    tx.value = U256::from(1);
+                    tx.gas_limit = 21_000;
+                    tx.gas_price = 0;
+                    tx.gas_priority_fee = None;
+                    tx.nonce = 0;
+                })
+                .build_mainnet();
+
+            matches!(evm.replay(), Ok(result) if result.result.is_success())
+        };
+
+        assert!(
+            run_transfer(pending.cache.clone()),
+            "transfer should succeed against the populated cache"
+        );
+        assert!(
+            !run_transfer(CacheState::default()),
+            "transfer must NOT succeed against the empty cache"
+        );
+    }
+
+    /// A transaction that fails validation (here, spending more than its balance) leaves the
+    /// cached account state untouched: the sender's balance is unchanged and the recipient is
+    /// not credited.
+    #[test]
+    fn failed_replay_does_not_mutate_state_cache() {
+        use revm::{
+            Context, ExecuteEvm, MainBuilder, MainContext,
+            context::{BlockEnv, ContextTr, TxEnv},
+            database::{State, WrapDatabaseRef},
+            handler::EvmTr,
+            primitives::{TxKind, hardfork::SpecId},
+        };
+
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+        let db = PersistentDB::new(crate::db::PersistentDBOptions::new(
+            path.path().to_path_buf(),
+        ))
+        .expect("database");
+
+        // Prestate: `from` holds exactly `balance`.
+        let from = address!("bd6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let recipient = address!("ad6f65c58a46427af4b257cbe231d0ed69ed5508");
+        let balance: u128 = 1_000;
+        let mut pending = PendingCommit::default();
+        let mut rewards = HashMap::<Address, u128>::default();
+        rewards.insert(from, balance);
+        apply_rewards(&db, &mut pending, rewards).expect("seed prestate");
+
+        let state = State::builder()
+            .with_bundle_update()
+            .with_cached_prestate(pending.cache.clone())
+            .with_database(WrapDatabaseRef(&db))
+            .build();
+
+        // A transfer that fails validation (spends more than `balance`).
+        let mut evm = Context::mainnet()
+            .with_db(state)
+            .modify_cfg_chained(|cfg| {
+                cfg.spec = SpecId::OSAKA;
+                cfg.disable_nonce_check = true;
+            })
+            .modify_block_chained(|block: &mut BlockEnv| {
+                block.gas_limit = 30_000_000;
+            })
+            .modify_tx_chained(|tx: &mut TxEnv| {
+                tx.caller = from;
+                tx.kind = TxKind::Call(recipient);
+                tx.value = U256::from(balance + 1);
+                tx.gas_limit = 21_000;
+                tx.gas_price = 0;
+                tx.gas_priority_fee = None;
+                tx.nonce = 0;
+            })
+            .build_mainnet();
+
+        assert!(
+            evm.replay().is_err(),
+            "transfer must fail (insufficient funds)"
+        );
+
+        // The failed replay must not have mutated the cached prestate.
+        let ctx = evm.ctx_mut();
+        let cache = &ctx.db().cache;
+        let from_balance = cache
+            .accounts
+            .get(&from)
+            .and_then(|a| a.account.as_ref())
+            .map(|a| a.info.balance)
+            .expect("from cached");
+        assert_eq!(
+            from_balance,
+            U256::from(balance),
+            "from balance must be unchanged after a failed tx"
+        );
+        let recipient_balance = cache
+            .accounts
+            .get(&recipient)
+            .and_then(|a| a.account.as_ref())
+            .map(|a| a.info.balance)
+            .unwrap_or(U256::ZERO);
+        assert_eq!(
+            recipient_balance,
+            U256::ZERO,
+            "recipient must not be credited by a failed tx"
+        );
     }
 }

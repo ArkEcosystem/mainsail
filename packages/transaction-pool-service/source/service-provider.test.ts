@@ -60,16 +60,6 @@ describe<{
 		await assert.resolves(() => context.serviceProvider.dispose());
 	});
 
-	it("should be required", async (context) => {
-		const promise = context.serviceProvider.required();
-
-		await assert.resolves(() => promise);
-
-		promise.then((res) => {
-			assert.true(res);
-		});
-	});
-
 	it("should validate schema using defaults", async (context) => {
 		removeTransactionPoolEnvironmentVariables();
 

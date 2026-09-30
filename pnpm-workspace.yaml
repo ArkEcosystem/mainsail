@@ -13,6 +13,12 @@ allowBuilds:
   nsfw: true
   nx: true
   protobufjs: true
-minimumReleaseAgeExclude:
-  - '@mainsail/evm-linux-arm64-gnu@0.0.1-evm.51'
-  - '@mainsail/evm-linux-x64-gnu@0.0.1-evm.51'
+
+minimumReleaseAge: 1440
+minimumReleaseAgeStrict: true
+
+overrides:
+  "basic-ftp@<5.3.1": "^5.3.1"
+  "brace-expansion@>=4.0.0 <5.0.9": "^5.0.9"
+  "js-yaml@>=4.0.0 <4.3.1": "^4.3.1"
+  "@chainsafe/bls-keystore>uuid": "^11.1.1"

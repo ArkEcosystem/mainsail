@@ -1828,7 +1828,7 @@
 			},
 			"blockTime": 8000,
 			"epoch": "2022-03-10T00:00:00.000Z",
-			"evmSpec": "Shanghai",
+			"evmSpec": "Osaka",
 			"height": 1,
 			"reward": "0",
 			"satoshi": {
@@ -1847,7 +1847,7 @@
 			},
 			"blockTime": 8000,
 			"epoch": "2022-03-10T00:00:00.000Z",
-			"evmSpec": "Shanghai",
+			"evmSpec": "Osaka",
 			"height": 75600,
 			"reward": "200000000",
 			"satoshi": {

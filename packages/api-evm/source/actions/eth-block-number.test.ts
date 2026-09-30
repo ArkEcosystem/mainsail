@@ -44,7 +44,7 @@ describe<{
 		assert.defined(validator.validate("jsonRpc_eth_blockNumber", {}).errors);
 	});
 
-	it("should return true", async ({ action }) => {
+	it("should return the current block number as hex", async ({ action }) => {
 		assert.equal(await action.handle([]), "0x0");
 
 		height = 1;

@@ -8,6 +8,10 @@ import { inject, injectable } from "@mainsail/container";
 
 import { TransactionResource } from "../resources/index.js";
 
+// Pool addresses are EIP-55 checksummed while queries may use any casing.
+const matchesAddress = (value: string | undefined, parameter: string): boolean =>
+	value !== undefined && parameter.toLowerCase() === value.toLowerCase();
+
 @injectable()
 export class TransactionsController extends AbstractController {
 	@inject(Identifiers.TransactionPool.Processor)
@@ -38,10 +42,13 @@ export class TransactionsController extends AbstractController {
 		const poolQuery = this.poolQuery.getFromHighestPriority();
 
 		const makePredicate = async (
-			{ data }: Contracts.Crypto.Transaction,
+			transaction: Contracts.Crypto.Transaction,
 			key: Extract<keyof Contracts.Crypto.TransactionData, "to" | "from">,
 			parameter: string | string[],
-		): Promise<boolean> => (Array.isArray(parameter) ? parameter.includes(data[key]!) : parameter === data[key]);
+		): Promise<boolean> =>
+			Array.isArray(parameter)
+				? parameter.some((item) => matchesAddress(transaction[key], item))
+				: matchesAddress(transaction[key], parameter);
 
 		if (request.query.from) {
 			poolQuery.wherePredicate(async (t) => makePredicate(t, "from", request.query.from));
@@ -62,11 +69,8 @@ export class TransactionsController extends AbstractController {
 			});
 		}
 
-		const all: Contracts.Crypto.Transaction[] = await poolQuery.all();
-		const transactions: Contracts.Crypto.Transaction[] = all.slice(
-			pagination.offset,
-			pagination.offset + pagination.limit,
-		);
+		const all = await poolQuery.all();
+		const transactions = all.slice(pagination.offset, pagination.offset + pagination.limit);
 		const resultsPage = {
 			results: transactions,
 			totalCount: all.length,
@@ -76,15 +80,13 @@ export class TransactionsController extends AbstractController {
 	}
 
 	public async showUnconfirmed(request: Types.HapiRequest): Promise<object> {
-		const transactionQuery: Contracts.TransactionPool.QueryIterable = this.poolQuery
-			.getFromHighestPriority()
-			.whereHash(request.params.hash);
+		const transactionQuery = this.poolQuery.getFromHighestPriority().whereHash(request.params.hash);
 
 		if ((await transactionQuery.has()) === false) {
 			return notFound("Transaction not found");
 		}
 
-		const transaction: Contracts.Crypto.Transaction = await transactionQuery.first();
+		const transaction = await transactionQuery.first();
 
 		return super.respondWithResource(transaction, TransactionResource);
 	}

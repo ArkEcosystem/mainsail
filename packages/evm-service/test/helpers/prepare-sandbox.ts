@@ -13,10 +13,7 @@ import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-trans
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
 import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
 import { Application } from "@mainsail/kernel";
-import { ServiceProvider as CoreEvents } from "@mainsail/kernel/source/services/events";
-import { ServiceProvider as CoreTriggers } from "@mainsail/kernel/source/services/triggers";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
-import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 import { dirSync } from "tmp";
 
@@ -24,9 +21,6 @@ import crypto from "../../../core/bin/config/devnet/core/crypto.json";
 
 export const prepareSandbox = async (context: { app?: Application }) => {
 	context.app = new Application();
-
-	await context.app.resolve(CoreTriggers).register();
-	await context.app.resolve(CoreEvents).register();
 
 	await context.app.resolve(CoreSerializer).register();
 	await context.app.resolve(CoreValidation).register();
@@ -55,7 +49,6 @@ export const prepareSandbox = async (context: { app?: Application }) => {
 	context.app.useDataPath(dirSync().name);
 
 	await context.app.resolve(CoreCryptoTransaction).register();
-	await context.app.resolve(CoreTransactions).register();
 	await context.app.resolve(CoreCryptoBlock).register();
 	await context.app.resolve(CoreCryptoCommit).register();
 };

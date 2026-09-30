@@ -3,6 +3,12 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 
+// Boot this many workers synchronously before the pool is considered ready; the rest are
+// created and booted in the background after boot() returns, so they don't block the node
+// from reaching P2P/consensus. Kept > 1 so genesis deserialization (which fans the genesis
+// transactions across the pool) isn't funneled through a single worker on cold start.
+const EAGER_WORKER_COUNT = 2;
+
 @injectable()
 export class WorkerPool implements Contracts.Crypto.WorkerPool {
 	@inject(Identifiers.ServiceProvider.Configuration)
@@ -18,38 +24,50 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 	@inject(Identifiers.Config.Flags)
 	private readonly flags!: Contracts.Types.KeyValuePair;
 
+	// Booted workers handed out by getWorker(). A worker only lands here once its boot() has
+	// resolved, so getWorker() never returns a worker whose in-worker app isn't ready yet.
 	#workers: Contracts.Crypto.Worker[] = [];
+	// Every worker spawned (booted or still booting in the background), so dispose() can tear
+	// them all down even if the background growth hasn't finished.
+	#allWorkers: Contracts.Crypto.Worker[] = [];
 	#currentWorkerIndex = 0;
+	#growth?: Promise<void>;
+	#disposed = false;
 
 	public async boot(): Promise<void> {
 		const workerCount = this.configuration.getRequired<number>("workerCount");
+		const eagerCount = Math.min(EAGER_WORKER_COUNT, workerCount);
 
-		this.logger.info(`Booting up ${workerCount} crypto workers`);
+		this.logger.info(`Booting up ${eagerCount}/${workerCount} crypto workers (remaining in background)`);
 
-		const workers: Contracts.Crypto.Worker[] = [];
+		// Boot the eager subset on the critical path so the pool is usable immediately.
+		await Promise.all(Array.from({ length: eagerCount }, () => this.#spawnWorker()));
 
-		for (let index = 0; index < workerCount; index++) {
-			const worker = this.createWorker();
-			workers.push(worker);
+		// Bring the rest online in the background; they join the pool as they finish booting.
+		if (workerCount > eagerCount && !this.#disposed) {
+			this.#growth = this.#growPool(workerCount - eagerCount);
 		}
-
-		await Promise.all(
-			workers.map((worker) =>
-				worker.boot({
-					...this.flags,
-					thread: "crypto-worker",
-					workerLoggingEnabled: this.configuration.getRequired("workerLoggingEnabled"),
-				}),
-			),
-		);
-
-		this.#workers = workers;
 	}
 
 	public async dispose(): Promise<void> {
-		const workers = this.#workers;
+		this.#disposed = true;
+
+		// Let any in-flight background boots settle so they don't spawn threads after teardown.
+		await this.whenReady().catch(() => {});
+
+		const workers = this.#allWorkers;
+		this.#allWorkers = [];
 		this.#workers = [];
 		await Promise.all(workers.map(async (worker) => await worker.dispose()));
+	}
+
+	// Resolves once the background-grown workers have all booted (or failed to). Awaited by
+	// dispose() so teardown waits out in-flight boots, and by tests; never awaited on the
+	// startup critical path.
+	public async whenReady(): Promise<void> {
+		if (this.#growth) {
+			await this.#growth;
+		}
 	}
 
 	public getWorker(): Contracts.Crypto.Worker {
@@ -81,5 +99,35 @@ export class WorkerPool implements Contracts.Crypto.WorkerPool {
 		this.#currentWorkerIndex = (this.#currentWorkerIndex + 1) % workers.length;
 
 		return selected;
+	}
+
+	async #growPool(count: number): Promise<void> {
+		// Sequentially, so the background boots don't all contend for cores at once
+		for (let index = 0; index < count; index++) {
+			if (this.#disposed) {
+				return;
+			}
+
+			try {
+				await this.#spawnWorker();
+			} catch (error) {
+				this.logger.warn(`Failed to boot background crypto worker: ${(error as Error).message}`);
+			}
+		}
+	}
+
+	async #spawnWorker(): Promise<void> {
+		const worker = this.createWorker();
+		this.#allWorkers.push(worker);
+
+		await worker.boot({
+			...this.flags,
+			thread: "crypto-worker",
+			workerLoggingEnabled: this.configuration.getRequired("workerLoggingEnabled"),
+		});
+
+		if (!this.#disposed) {
+			this.#workers.push(worker);
+		}
 	}
 }

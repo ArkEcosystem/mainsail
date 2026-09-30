@@ -18,6 +18,14 @@ export class ByteBuffer {
 	}
 
 	public writeUint8(value: number): void {
+		if (!Number.isSafeInteger(value)) {
+			throw new Error("value must be a safe integer");
+		}
+
+		if (value < 0 || value > 255) {
+			throw new Error(`The value of "value" is out of range. It must be >= 0 and <= 255. Received ${value}`);
+		}
+
 		this.#offset = this.#buffer.writeUInt8(value, this.#offset);
 	}
 
@@ -28,6 +36,14 @@ export class ByteBuffer {
 	}
 
 	public writeUint16(value: number): void {
+		if (!Number.isSafeInteger(value)) {
+			throw new Error("value must be a safe integer");
+		}
+
+		if (value < 0 || value > 2 ** 16 - 1) {
+			throw new Error(`The value of "value" is out of range. It must be >= 0 and < 2 ** 16. Received ${value}`);
+		}
+
 		this.#offset = this.#buffer.writeUInt16LE(value, this.#offset);
 	}
 
@@ -38,6 +54,14 @@ export class ByteBuffer {
 	}
 
 	public writeUint32(value: number): void {
+		if (!Number.isSafeInteger(value)) {
+			throw new Error("value must be a safe integer");
+		}
+
+		if (value < 0 || value > 2 ** 32 - 1) {
+			throw new Error(`The value of "value" is out of range. It must be >= 0 and < 2 ** 32. Received ${value}`);
+		}
+
 		this.#offset = this.#buffer.writeUInt32LE(value, this.#offset);
 	}
 
@@ -48,10 +72,12 @@ export class ByteBuffer {
 	}
 
 	public writeUint48(value: number): void {
+		if (!Number.isSafeInteger(value)) {
+			throw new Error("value must be a safe integer");
+		}
+
 		if (value < 0 || value > 2 ** 48 - 1) {
-			throw new Error(
-				`The value of "value" is out of range. It must be >= 0 and <= ${2 ** 48 - 1}. Received ${value}`,
-			);
+			throw new Error(`The value of "value" is out of range. It must be >= 0 and < 2 ** 48. Received ${value}`);
 		}
 
 		this.#offset = this.#buffer.writeUIntLE(value, this.#offset, 6);
@@ -65,15 +91,31 @@ export class ByteBuffer {
 
 	public writeUint64(value: bigint): void {
 		if (typeof value !== "bigint") {
-			value = BigInt(value);
+			throw new Error("value must be a bigint");
+		}
+
+		if (value < 0n || value > 2n ** 64n - 1n) {
+			throw new Error(
+				`The value of "value" is out of range. It must be >= 0n and < 2n ** 64n. Received ${value}`,
+			);
 		}
 
 		this.#offset = this.#buffer.writeBigUInt64LE(value, this.#offset);
 	}
 
+	public readUint64(): bigint {
+		const value = this.#buffer.readBigUInt64LE(this.#offset);
+		this.#offset += 8;
+		return value;
+	}
+
 	public writeUint256(value: bigint): void {
 		if (typeof value !== "bigint") {
-			value = BigInt(value);
+			throw new Error("value must be a bigint");
+		}
+
+		if (value < 0n) {
+			throw new Error("value must be non-negative");
 		}
 
 		const bytes = toBytes(value);
@@ -85,12 +127,6 @@ export class ByteBuffer {
 		this.writeBytes(Buffer.from(padded));
 	}
 
-	public readUint64(): bigint {
-		const value = this.#buffer.readBigUInt64LE(this.#offset);
-		this.#offset += 8;
-		return value;
-	}
-
 	public readUint256(): bigint {
 		const bytes = this.readBytes(32);
 		const parsed = trim(bytes, { dir: "left" });
@@ -98,6 +134,10 @@ export class ByteBuffer {
 	}
 
 	public writeBytes(value: Buffer): void {
+		if (!Buffer.isBuffer(value)) {
+			throw new Error("value must be a buffer");
+		}
+
 		if (value.length > this.getRemainderLength()) {
 			throw new Error(
 				"Write over buffer boundary. (length: " +
@@ -156,7 +196,7 @@ export class ByteBuffer {
 	}
 
 	public reset(): void {
-		this.#offset = this.#marker ?? 0;
+		this.#offset = this.#marker;
 	}
 
 	public skip(length: number): void {
@@ -168,6 +208,6 @@ export class ByteBuffer {
 	}
 
 	public toBuffer(): Buffer {
-		return Buffer.from(this.#buffer.buffer);
+		return Buffer.from(this.#buffer);
 	}
 }

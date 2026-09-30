@@ -2,19 +2,21 @@
 	"extends": "../../tsconfig.json",
 	"compilerOptions": {
 		"rootDir": "source",
-		"outDir": "distribution",
-		"allowJs": true
+		"outDir": "distribution"
 	},
-	"include": ["source/**/**.ts", "source/socket-server/codecs/proto/*.js"],
+	"include": ["source/**/**.ts"],
 	"references": [
 		{
 			"path": "../blockchain-utils"
 		},
 		{
+			"path": "../constants"
+		},
+		{
 			"path": "../container"
 		},
 		{
-			"path": "../contracts"
+			"path": "../exceptions"
 		},
 		{
 			"path": "../kernel"

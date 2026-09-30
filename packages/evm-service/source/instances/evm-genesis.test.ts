@@ -2,7 +2,7 @@ import { Enums } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 import { setGracefulCleanup } from "tmp";
-import { zeroHash } from "viem";
+import { zeroAddress, zeroHash } from "viem";
 
 import { describe } from "@mainsail/test-runner";
 import { commitGenesis, processGenesis } from "../../test/helpers/commit-genesis";
@@ -27,6 +27,13 @@ describe<{
 		await context.instance.dispose();
 		setGracefulCleanup();
 	});
+
+	const blockContext: Omit<Contracts.Evm.BlockContext, "commitKey"> = {
+		gasLimit: 10_000_000n,
+		timestamp: 12_345n,
+		prevrandao: Buffer.alloc(32),
+		validatorAddress: zeroAddress,
+	};
 
 	it("isEmpty is false", async ({ instance }) => {
 		assert.false(await instance.isEmpty());
@@ -90,7 +97,7 @@ describe<{
 	it("getAccounts returns the committed accounts", async ({ instance }) => {
 		const { accounts } = await instance.getAccounts(0n, 1000n);
 
-		assert.equal(accounts.length, 55); // initial wallet, validators 0x1;
+		assert.equal(accounts.length, 54); // initial wallet, validators 0x1;
 	});
 
 	it("getLegacyColdWallets is empty", async ({ instance }) => {
@@ -137,6 +144,7 @@ describe<{
 
 			// genesis sets the deployer/validator contract addresses updateRewardsAndVotes needs.
 			await instance.initializeGenesis({
+				timestamp: 0n,
 				account: proposer,
 				deployerAccount: "0x0000000000000000000000000000000000000001",
 				initialBlockNumber: 0n,
@@ -148,11 +156,17 @@ describe<{
 			// Before: the proposer is unfunded.
 			assert.equal((await instance.getAccountInfo(proposer)).balance, 0n);
 
-			await instance.prepareNextCommit({ commitKey });
+			await instance.prepareNextCommit({
+				blockContext: {
+					...blockContext,
+					validatorAddress: proposer,
+					commitKey,
+				},
+			});
 			await instance.updateRewardsAndVotes({
 				blockReward: reward,
 				commitKey,
-				specId: Enums.Evm.SpecId.SHANGHAI,
+				specId: Enums.Evm.SpecId.OSAKA,
 				timestamp: 12_345n,
 				validatorAddress: proposer,
 			});
@@ -161,6 +175,7 @@ describe<{
 				getBlock: () => ({ number: 0n, round: 0n }),
 				round: 0n,
 				setAccountUpdates: () => {},
+				setContractEvents: () => {},
 			} as any);
 
 			// After: the block reward has been credited to the proposer.
@@ -180,6 +195,7 @@ describe<{
 			const commitKey = { blockNumber: 0n, round: 0n };
 
 			await instance.initializeGenesis({
+				timestamp: 0n,
 				account: proposer,
 				deployerAccount: "0x0000000000000000000000000000000000000001",
 				initialBlockNumber: 0n,
@@ -188,11 +204,18 @@ describe<{
 				validatorContract: "0x0000000000000000000000000000000000000001",
 			});
 
-			await instance.prepareNextCommit({ commitKey });
+			await instance.prepareNextCommit({
+				blockContext: {
+					...blockContext,
+					validatorAddress: proposer,
+					commitKey,
+				},
+			});
+
 			await instance.updateRewardsAndVotes({
 				blockReward: 0n,
 				commitKey,
-				specId: Enums.Evm.SpecId.SHANGHAI,
+				specId: Enums.Evm.SpecId.OSAKA,
 				timestamp: 12_345n,
 				validatorAddress: proposer,
 			});
@@ -201,7 +224,7 @@ describe<{
 				instance.calculateRoundValidators({
 					commitKey,
 					roundValidators: 0n,
-					specId: Enums.Evm.SpecId.SHANGHAI,
+					specId: Enums.Evm.SpecId.OSAKA,
 					timestamp: 12_345n,
 					validatorAddress: proposer,
 				}),

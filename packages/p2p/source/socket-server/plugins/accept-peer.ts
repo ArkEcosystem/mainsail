@@ -10,19 +10,14 @@ import { getPeerIp } from "../../utils/index.js";
 
 @injectable()
 export class AcceptPeerPlugin {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.P2P.Peer.Processor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 
 	public register(server: Hapi.Server) {
-		const peerProcessor = this.peerProcessor;
-
 		server.ext({
-			async method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+			method: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
 				const ip = getPeerIp(request as Contracts.P2P.Request);
-				void peerProcessor.validateAndAcceptPeer(ip);
+				void this.peerProcessor.validateAndAcceptPeer(ip);
 
 				return h.continue;
 			},

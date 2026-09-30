@@ -1,9 +1,10 @@
+import { Server as HapiServer } from "@hapi/hapi";
 import { Events } from "@mainsail/constants";
 
 import { describe } from "@mainsail/test-runner";
 import { Context, ServerHelper } from "../../test/helpers/server";
 
-describe<Context>("Server", ({ beforeEach, afterEach, afterAll, it, assert }) => {
+describe<Context>("Server", ({ beforeEach, afterEach, afterAll, it, assert, stub }) => {
 	const postData = {
 		conditions: [
 			{
@@ -104,5 +105,21 @@ describe<Context>("Server", ({ beforeEach, afterEach, afterAll, it, assert }) =>
 
 	it("should fail to DELETE a webhook by the given id", async ({ server }) => {
 		assert.equal((await ServerHelper.request(server, "DELETE", `webhooks/123`)).status, 404);
+	});
+
+	it("should terminate the application and rethrow when the server fails to stop", async ({ app, server }) => {
+		const error = new Error("stop failed");
+		// Hapi's Server is a factory; the methods live on the prototype of the instances it returns.
+		const stop = stub(Object.getPrototypeOf(new HapiServer()), "stop").rejectedValue(error);
+		const terminate = stub(app, "terminate").callsFake(() => new Promise(() => {}));
+
+		await assert.rejects(() => server.dispose(), "stop failed");
+
+		terminate.calledOnce();
+		terminate.calledWith("Failed to stop Webhook Server!", error);
+
+		// The suite's afterEach stops the real server.
+		stop.restore();
+		terminate.restore();
 	});
 });

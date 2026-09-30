@@ -136,11 +136,10 @@ export class Transaction {
 	public readonly deployedContractAddress: string | undefined;
 
 	@Column({
-		default: undefined,
-		nullable: true,
+		nullable: false,
 		type: "jsonb",
 	})
-	public readonly logs: string | undefined;
+	public readonly logs!: string;
 
 	@Column({
 		default: undefined,

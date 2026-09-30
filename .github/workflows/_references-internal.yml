@@ -1,0 +1,89 @@
+name: References (Internal)
+
+on:
+    workflow_call:
+        secrets:
+            GH_TOKEN:
+                required: true
+        outputs:
+            did_commit:
+                description: "Whether a commit with regenerated tsconfig references was pushed"
+                value: ${{ jobs.source.outputs.did_commit }}
+
+permissions:
+    contents: read
+
+jobs:
+    circuit-breaker:
+        runs-on: ubuntu-latest
+        outputs:
+            is_references_fix: ${{ steps.detect.outputs.is_references_fix }}
+        steps:
+            - uses: actions/checkout@v7.0.1
+              with:
+                  ref: ${{ github.event.pull_request.head.sha }}
+                  fetch-depth: 1
+
+            - id: detect
+              shell: bash
+              run: |
+                  msg="$(git log -1 --pretty=%B)"
+                  if grep -Fq '[ci-references-fix]' <<<"$msg"; then
+                    echo "is_references_fix=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "is_references_fix=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+    source:
+        needs: circuit-breaker
+        if: ${{ needs.circuit-breaker.outputs.is_references_fix != 'true' }}
+        runs-on: ubuntu-latest
+        outputs:
+            did_commit: ${{ steps.commit.outputs.changes_detected }}
+
+        strategy:
+            matrix:
+                node-version: [24.x]
+
+        steps:
+            - uses: actions/checkout@v7.0.1
+              with:
+                  ref: ${{ github.head_ref }}
+                  token: ${{ secrets.GH_TOKEN }}
+                  persist-credentials: true
+                  fetch-depth: 1
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v7.0.0
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - name: Setup pnpm
+              uses: pnpm/action-setup@v6.0.10
+              with:
+                  version: latest
+                  run_install: false
+
+            - name: Get pnpm store directory
+              id: pnpm-cache
+              shell: bash
+              run: echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+            - name: Cache pnpm modules
+              uses: actions/cache@v6.1.0
+              with:
+                  path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+                  key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+                  restore-keys: ${{ runner.os }}-pnpm-
+
+            - name: Install dependencies
+              run: pnpm install
+
+            - name: Update references
+              run: pnpm run references
+
+            - id: commit
+              uses: stefanzweifel/git-auto-commit-action@v7.2.0
+              with:
+                  commit_message: "chore: update tsconfig references [ci-references-fix]"
+                  file_pattern: "packages/*/tsconfig.json"

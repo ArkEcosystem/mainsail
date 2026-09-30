@@ -16,7 +16,6 @@
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 --check-coverage pnpm run test",
-		"test:coverage:html": "c8 -r html --all pnpm run test",
 		"test:file": "pnpm run uvu source",
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
@@ -26,8 +25,7 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/exceptions": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/utils": "workspace:*",
-		"dayjs": "1.11.20"
+		"@mainsail/utils": "workspace:*"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",

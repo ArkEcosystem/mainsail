@@ -35,7 +35,7 @@ export class ProcessManager implements Contracts.Cli.ProcessManager {
 	public describe(id: Contracts.Cli.ProcessIdentifier): Contracts.Cli.ProcessDescription | undefined {
 		const processes: Contracts.Cli.ProcessDescription[] | undefined = this.list();
 
-		if (processes.length <= 0) {
+		if (processes.length === 0) {
 			return undefined;
 		}
 

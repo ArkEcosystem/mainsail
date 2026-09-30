@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { Application, Bootstrap, Providers, Services } from "@mainsail/kernel";
+import { copyFileSync } from "fs";
 import { join } from "path";
 import { dirSync } from "tmp";
 
@@ -14,48 +15,69 @@ import { Worker } from "./worker.js";
 
 type PluginOptions = Record<string, any>;
 
-const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validators: ValidatorsJson): Promise<Contracts.Kernel.Application> => {
+// The id and P2P registry a node registers with in run(), once consensus runs, the way the P2P server boots after
+// consensus in production; until then no proposal or message reaches it.
+const nodeToRegister = new WeakMap<Contracts.Kernel.Application, { id: number; p2pRegistry: P2PRegistry }>();
+
+type SetupOptions = {
+	// Load the real consensus storage (LMDB under the data path) instead of the no-op stub. It persists the
+	// consensus state on dispose, which is what lets `restart` bring a node back mid-round.
+	consensusStorage?: boolean;
+	// Reuse this data directory instead of a fresh temporary one.
+	dataPath?: string;
+};
+
+const setup = async (
+	id: number,
+	p2pRegistry: P2PRegistry,
+	crypto: any,
+	validators: ValidatorsJson,
+	options: SetupOptions = {},
+): Promise<Contracts.Kernel.Application> => {
 	const app = new Application();
 
 	// Basic binds and mocks
 	app.bind(Identifiers.Application.Name).toConstantValue("mainsail");
 	app.bind(Identifiers.Config.Flags).toConstantValue({});
 	app.bind(Identifiers.Config.Plugins).toConstantValue({});
-	app
-		.bind(Identifiers.Services.EventDispatcher.Service)
-		.to(Services.Events.MemoryEventDispatcher)
-		.inSingletonScope();
+	app.bind(Identifiers.Services.EventDispatcher.Service).to(Services.Events.MemoryEventDispatcher).inSingletonScope();
 
-	p2pRegistry.registerNode(id, app);
+	nodeToRegister.set(app, { id, p2pRegistry });
 	app.bind(Identifiers.P2P.Broadcaster).toConstantValue(p2pRegistry.makeBroadcaster(id));
-	app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => { } });
+	app.bind(Identifiers.P2P.Statistic.Service).toConstantValue({ newRound: () => {} });
+	app.bind(Identifiers.P2P.PendingCommits).toConstantValue({ has: () => false });
 
-	app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
-		getMessages: async () => [],
-		getProposals: async () => [],
-		getState: async () => { },
-		persist: async () => { },
-	});
+	if (!options.consensusStorage) {
+		app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(<Contracts.ConsensusStorage.Service>{
+			clear: async () => {},
+			getMessages: async () => [],
+			getProposals: async () => [],
+			getState: async () => undefined,
+			saveMessage: async () => {},
+			saveProposal: async () => {},
+			saveState: async () => {},
+		});
+	}
 
 	app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
 		getTransactions: async () => ({ remaining: 0, transactions: [] }),
-		onCommit: async () => { },
+		onCommit: async () => {},
 	});
 	app.bind(Identifiers.Evm.Worker).toConstantValue({
-		onCommit: async () => { },
+		onCommit: async () => {},
 	});
 
 	app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
-	app
-		.bind(Identifiers.CryptoWorker.WorkerPool)
-		.toConstantValue({ getWorker: () => app.get<Worker>(Identifiers.CryptoWorker.Worker.Instance) });
+	app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue({
+		getWorker: () => app.get<Worker>(Identifiers.CryptoWorker.Worker.Instance),
+	});
 
 	// Bootstrap
 	await app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseServiceProviders).bootstrap();
 	await app.resolve<Contracts.Kernel.Bootstrapper>(Bootstrap.RegisterBaseConfiguration).bootstrap();
 
 	// RegisterBaseBindings
-	app.bind("path.data").toConstantValue(dirSync({ unsafeCleanup: true }).name);
+	app.bind("path.data").toConstantValue(options.dataPath ?? dirSync({ unsafeCleanup: true }).name);
 	app.bind("path.config").toConstantValue(join(import.meta.dirname, `../config`));
 	app.bind("path.cache").toConstantValue("");
 	app.bind("path.log").toConstantValue("");
@@ -69,9 +91,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	configRepository.set("crypto", crypto);
 
 	// Set logger
-	const logManager: Services.Log.LogManager = app.get<Services.Log.LogManager>(
-		Identifiers.Services.Log.Manager,
-	);
+	const logManager: Services.Log.LogManager = app.get<Services.Log.LogManager>(Identifiers.Services.Log.Manager);
 	await logManager.extend("test", async () => app.resolve<TestLogger>(TestLogger).make({ id }));
 	logManager.setDefaultDriver("test");
 
@@ -95,7 +115,6 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/crypto-transaction",
 		"@mainsail/state",
 		"@mainsail/database",
-		"@mainsail/transactions",
 		"@mainsail/crypto-proposal",
 		"@mainsail/crypto-messages",
 		"@mainsail/crypto-commit",
@@ -103,10 +122,11 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 		"@mainsail/evm-consensus",
 		"@mainsail/forger",
 		"@mainsail/validator",
+		...(options.consensusStorage ? ["@mainsail/consensus-storage"] : []),
 		"@mainsail/consensus",
 	];
 
-	const options = {
+	const pluginOptions = {
 		"@mainsail/state": {
 			snapshots: {
 				enabled: false,
@@ -115,7 +135,7 @@ const setup = async (id: number, p2pRegistry: P2PRegistry, crypto: any, validato
 	};
 
 	for (const packageId of packages) {
-		await loadPlugin(app, packageId, options);
+		await loadPlugin(app, packageId, pluginOptions);
 	}
 
 	// Rebinds
@@ -156,7 +176,7 @@ const getPluginConfiguration = async (
 			.resolve(Providers.PluginConfiguration)
 			.from(packageId, defaults)
 			.merge(options[packageId] || {});
-	} catch { }
+	} catch {}
 	return undefined;
 };
 
@@ -165,8 +185,8 @@ const boot = async (app: Contracts.Kernel.Application): Promise<void> => {
 		Identifiers.ServiceProvider.Repository,
 	);
 
-	for (const [name] of serviceProviderRepository.all()) {
-		await serviceProviderRepository.boot(name);
+	for (const serviceProvider of serviceProviderRepository.all()) {
+		await serviceProviderRepository.boot(serviceProvider.name());
 	}
 };
 
@@ -188,9 +208,9 @@ const bootstrap = async (app: Contracts.Kernel.Application) => {
 	// const validatorSet = app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service);
 	// await validatorSet.restore();
 
-	const commitState = app.get<Contracts.Consensus.CommitStateFactory>(
-		Identifiers.Consensus.CommitState.Factory,
-	)(genesisCommit);
+	const commitState = app.get<Contracts.Consensus.CommitStateFactory>(Identifiers.Consensus.CommitState.Factory)(
+		genesisCommit,
+	);
 
 	const blockProcessor = app.get<Contracts.Processor.BlockProcessor>(Identifiers.Processor.BlockProcessor);
 
@@ -212,8 +232,17 @@ const bootstrapMany = async (apps: Contracts.Kernel.Application[]) => {
 };
 
 const run = async (app: Contracts.Kernel.Application) => {
+	const bootstrapper = app.get<Contracts.Consensus.Bootstrapper>(Identifiers.Consensus.Bootstrapper);
 	const consensus = app.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
-	await consensus.run();
+	await consensus.run(await bootstrapper.bootstrap());
+
+	// Reachable from here on, as a node whose P2P server booted after consensus.
+	const node = nodeToRegister.get(app);
+	if (node === undefined) {
+		throw new Error("The node was not set up with a P2P registry.");
+	}
+
+	node.p2pRegistry.registerNode(node.id, app);
 };
 
 const runMany = async (apps: Contracts.Kernel.Application[]) => {
@@ -227,8 +256,12 @@ const stop = async (app: Contracts.Kernel.Application) => {
 		Identifiers.ServiceProvider.Repository,
 	);
 
-	for (const [name] of serviceProviderRepository.all()) {
-		await serviceProviderRepository.dispose(name);
+	for (const serviceProvider of serviceProviderRepository.allLoadedProviders().reverse()) {
+		try {
+			await serviceProviderRepository.dispose(serviceProvider.name());
+		} catch {
+			/* */
+		}
 	}
 };
 
@@ -238,4 +271,25 @@ const stopMany = async (apps: Contracts.Kernel.Application[]) => {
 	}
 };
 
-export { boot, bootMany, bootstrap, bootstrapMany, run, runMany, setup, stop, stopMany };
+const restart = async (
+	app: Contracts.Kernel.Application,
+	id: number,
+	p2pRegistry: P2PRegistry,
+	crypto: any,
+	validators: ValidatorsJson,
+): Promise<Contracts.Kernel.Application> => {
+	await stop(app);
+	p2pRegistry.unregisterNode(id);
+
+	const dataPath = dirSync({ unsafeCleanup: true }).name;
+	copyFileSync(join(app.dataPath(), "consensus.mdb"), join(dataPath, "consensus.mdb"));
+
+	const restarted = await setup(id, p2pRegistry, crypto, validators, { consensusStorage: true, dataPath });
+	await boot(restarted);
+	await bootstrap(restarted);
+	await run(restarted);
+
+	return restarted;
+};
+
+export { boot, bootMany, bootstrap, bootstrapMany, restart, run, runMany, setup, stop, stopMany };

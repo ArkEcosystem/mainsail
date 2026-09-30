@@ -49,12 +49,13 @@ export enum PeerEvent {
 export enum ConsensusEvent {
 	Bootstrapped = "consensus.bootstrapped",
 	RoundStarted = "consensus.round.started",
+	Proposed = "consensus.proposed",
 	ProposalAccepted = "consensus.proposal.accepted",
 	PrevotedProposal = "consensus.prevoted.proposal",
 	PrevotedAny = "consensus.prevoted.any",
 	PrevotedNull = "consensus.prevoted.null",
-	PrecommitedAny = "consensus.precommited.any",
-	PrecommitedProposal = "consensus.precommited.proposal",
+	PrecommittedAny = "consensus.precommitted.any",
+	PrecommittedProposal = "consensus.precommitted.proposal",
 }
 
 export enum DeployerEvent {
@@ -86,7 +87,9 @@ export enum EvmEvent {
 
 export enum ScheduleEvent {
 	BlockJobFinished = "schedule.blockJob.finished",
+	BlockJobFailed = "schedule.blockJob.failed",
 	CronJobFinished = "schedule.cronJob.finished",
+	CronJobFailed = "schedule.cronJob.failed",
 }
 
 export enum QueueEvent {

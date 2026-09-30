@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { Transactions, Serialized } from "../test/fixtures/index";
+import { Serialized } from "../test/fixtures/index";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { InvalidLegacySecondSignatureError, MissingLegacySecondSignatureError } from "@mainsail/exceptions";
 
@@ -36,58 +36,6 @@ describe<{
 		);
 		context.verifier = context.app.get<Contracts.Crypto.TransactionVerifier>(
 			Identifiers.Cryptography.Transaction.Verifier,
-		);
-	});
-
-	it("verifyHash - should be ok", async ({ factory, verifier }) => {
-		for (const transaction of [
-			Transactions.transactionTransfer,
-			Transactions.transactionContractCall,
-			Transactions.transactionContractCallWithSecondSignature,
-			Transactions.transactionDeploy,
-		]) {
-			assert.true(await verifier.verifyHash(transaction));
-		}
-	});
-
-	it("verifyHash - should be false if v, r, s or senderPublicKey are missing", async ({ factory, verifier }) => {
-		const fields = ["v", "r", "s", "senderPublicKey"] as const;
-		for (const field of fields) {
-			const transaction = await factory.fromHex(Serialized.transactionTransfer);
-
-			const txData = {
-				...transaction,
-				[field]: undefined,
-			};
-
-			const verified = await verifier.verifyHash(txData);
-			assert.false(verified);
-		}
-	});
-
-	it("verifyHash - should be false if v, r, s or senderPublicKey are modified", async ({ factory, verifier }) => {
-		assert.true(await verifier.verifyHash(txData));
-
-		// Changed last character
-		assert.false(
-			await verifier.verifyHash({
-				...txData,
-				r: "921101a4583fb153ec00e501f3c2e2636114e1c8c58d2df8a19426cc066a6769",
-			}),
-		);
-
-		assert.false(
-			await verifier.verifyHash({
-				...txData,
-				s: "22db4bce1e0ace485ce0838d178b4d5bcfa9f69b315a14c580d9b01e5c980bdc",
-			}),
-		);
-
-		assert.false(
-			await verifier.verifyHash({
-				...txData,
-				senderPublicKey: "03e0812731df97edc9990d55d919b33294f131b5fd44996266859cfd2514514122",
-			}),
 		);
 	});
 

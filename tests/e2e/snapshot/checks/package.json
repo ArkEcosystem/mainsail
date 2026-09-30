@@ -2,8 +2,8 @@
 	"name": "snapshot-checks",
 	"type": "module",
 	"dependencies": {
-		"express": "4.19.2",
-		"got": "14.2.1"
+		"express": "5.2.1",
+		"got": "15.1.0"
 	},
 	"engines": {
 		"node": ">=20"

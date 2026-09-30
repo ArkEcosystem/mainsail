@@ -2,14 +2,16 @@
 import { Console } from "@mainsail/cli";
 import { describe } from "@mainsail/test-runner";
 import envPaths, { Paths } from "env-paths";
+import { join } from "path";
 
+import { apiPackageJson } from "../../test/fixtures";
 import { Command } from "./env-paths";
 
 describe<{
 	cli: Console;
 }>("EnvPathsCommand", ({ beforeEach, it, stub, assert }) => {
 	beforeEach((context) => {
-		context.cli = new Console();
+		context.cli = new Console(true, apiPackageJson);
 		delete process.env.MAINSAIL_PATH_CONFIG;
 	});
 
@@ -19,12 +21,14 @@ describe<{
 
 		await cli.execute(Command);
 
-		const paths: Paths = envPaths("mainsail", { suffix: "" }); // In original code, the name is "mainsail-api", but we are using the name "mainsail" here
+		// Paths are <envPaths("mainsail")>/<app name>, where the app name is the
+		// package name after the scope ("@mainsail/api" -> "api").
+		const paths: Paths = envPaths("mainsail", { suffix: "" });
 
-		assert.true(message.includes(paths.cache));
-		assert.true(message.includes(paths.config));
-		assert.true(message.includes(paths.data));
-		assert.true(message.includes(paths.log));
-		assert.true(message.includes(paths.temp));
+		assert.true(message.includes(join(paths.cache, "api")));
+		assert.true(message.includes(join(paths.config, "api")));
+		assert.true(message.includes(join(paths.data, "api")));
+		assert.true(message.includes(join(paths.log, "api")));
+		assert.true(message.includes(join(paths.temp, "api")));
 	});
 });

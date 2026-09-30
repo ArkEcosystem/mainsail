@@ -20,13 +20,11 @@ export interface LegacyImporter {
 export interface LegacyImportOptions {
 	readonly timestamp: number;
 	readonly commitKey: CommitKey;
-	readonly mockFakeValidatorBlsKeys?: boolean;
 }
 
 export interface LegacyImportResult {
 	readonly initialTotalSupply: bigint;
-	readonly importedValidatorsWithBlsKey: number;
-	readonly importedValidatorsWithoutBlsKey: number;
+	readonly importedValidators: number;
 	readonly importedUsernames: number;
 	readonly importedVoters: number;
 }
@@ -66,5 +64,4 @@ export interface ImportedLegacyValidator {
 	readonly isResigned: boolean;
 
 	username: string;
-	blsPublicKey?: string;
 }
