@@ -250,6 +250,7 @@ describe<{
 					round: BigInt(0),
 				}),
 				setAccountUpdates: () => {},
+				setContractEvents: () => {},
 			} as any);
 
 			const { receipt: simulated } = await instance.simulate({

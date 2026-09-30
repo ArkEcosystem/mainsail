@@ -586,6 +586,20 @@ describe<{
 		assert.is(roundState.getAccountUpdates(), accountUpdates);
 	});
 
+	it("#getContractEvents - should be empty by default", ({ roundState }) => {
+		assert.equal(roundState.getContractEvents(), []);
+	});
+
+	it("#setContractEvents - should store the contract events", ({ roundState }) => {
+		const contractEvents = [
+			{ event: "Voted", txHash: "hash-0", txIndex: 0, validator: "address-1", voter: "address-0" },
+		] as unknown as Contracts.Evm.ContractEvent[];
+
+		roundState.setContractEvents(contractEvents);
+
+		assert.is(roundState.getContractEvents(), contractEvents);
+	});
+
 	it("#logPrevotes - should log the voters grouped by block hash", ({ roundState, logger, validatorSet }) => {
 		const debug = spy(logger, "debug");
 		const getValidator = spy(validatorSet, "getValidator");
