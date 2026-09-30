@@ -45,6 +45,7 @@ const makeUnit = (block: ReturnType<typeof makeBlock>, overrides: Record<string,
 		blockNumber: block.number,
 		getBlock: () => block,
 		getCommit: async () => ({ block }),
+		getContractEvents: () => [],
 		round: block.round,
 		...overrides,
 	}) as unknown as Contracts.Processor.ProcessableUnit;
@@ -598,10 +599,11 @@ describe<{
 		const transaction1 = makeTransaction(1);
 		const transaction2 = makeTransaction(2);
 		const block = makeBlock({ gasUsed: 51_000, transactions: [transaction1, transaction2], transactionsCount: 2 });
+		const contractEvents = [{ name: "Voted" }];
 		const dispatch = spy(events, "dispatch");
 		const info = spy(logger, "info");
 
-		await processor.commit(makeUnit(block));
+		await processor.commit(makeUnit(block, { getContractEvents: () => contractEvents }));
 
 		assert.equal(calls, [
 			"apiSync.flush",
@@ -616,7 +618,7 @@ describe<{
 		dispatch.calledTimes(3);
 		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, transaction1);
 		dispatch.calledNthWith(1, Events.TransactionEvent.Applied, transaction2);
-		dispatch.calledNthWith(2, Events.BlockEvent.Applied, blockData);
+		dispatch.calledNthWith(2, Events.BlockEvent.Applied, { ...blockData, contractEvents });
 		info.calledWith("Committed block 3/1/block-hash with 2 tx(s) (gasUsed=51,000)", "consensus");
 	});
 
@@ -672,7 +674,7 @@ describe<{
 		await processorWithoutApiSync.commit(makeUnit(makeBlock()));
 
 		onCommit.calledOnce();
-		dispatch.calledWith(Events.BlockEvent.Applied, blockData);
+		dispatch.calledWith(Events.BlockEvent.Applied, { ...blockData, contractEvents: [] });
 	});
 
 	it("#commit - should aggregate the failures of the concurrent commit handlers", async ({
