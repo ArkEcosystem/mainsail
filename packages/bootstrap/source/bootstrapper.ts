@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { Identifiers } from "@mainsail/constants";
+import { Identifiers, ZeroHash } from "@mainsail/constants";
 import { inject, injectable, optional } from "@mainsail/container";
 
 @injectable()
@@ -151,7 +151,7 @@ export class Bootstrapper {
 		const milestone = this.configuration.getMilestone();
 
 		// assume snapshot is present if the previous block points to a non-zero hash
-		if (genesisBlock.block.parentHash === "0000000000000000000000000000000000000000000000000000000000000000") {
+		if (genesisBlock.block.parentHash === ZeroHash) {
 			if (milestone.snapshot) {
 				throw new Error("Previous block is set to snapshot, but there is no snapshot defined in milestones");
 			}

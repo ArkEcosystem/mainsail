@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { getPrevrandao } from "@mainsail/blockchain-utils";
-import { Events, Identifiers, Locale } from "@mainsail/constants";
+import { Events, Identifiers, Locale, ZeroHash } from "@mainsail/constants";
 import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { InvalidFee, InvalidGasUsed, InvalidLogsBloom, InvalidStateRoot } from "@mainsail/exceptions";
 import { ensureError, sleep } from "@mainsail/utils";
@@ -96,11 +96,13 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			this.#verifyConsumedAllGas(block, processResult);
 			this.#verifyTotalFee(block, processResult);
-			await this.#updateRewardsAndVotes(block);
+			await this.#updateRewardsAndVotes(block, milestone);
 
 			if (this.roundCalculator.isNewRound(block.number + 1)) {
-				await this.#updateValidatorRegistrationFee(block);
-				await this.#calculateRoundValidators(block);
+				const nextMilestone = this.configuration.getMilestone(block.number + 1);
+
+				await this.#updateValidatorRegistrationFee(block, nextMilestone);
+				await this.#calculateRoundValidators(block, nextMilestone);
 			}
 
 			await this.#verifyStateRoot(block);
@@ -182,16 +184,17 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	}
 
 	#logNewRound(unit: Contracts.Processor.ProcessableUnit): void {
-		const blockNumber = unit.blockNumber;
-		if (this.roundCalculator.isNewRound(blockNumber + 1)) {
-			const roundInfo = this.roundCalculator.calculateRound(blockNumber + 1);
+		const nextBlockNumber = unit.blockNumber + 1;
 
-			if (!this.state.isBootstrap()) {
-				this.logger.debug(
-					`Starting validator round ${roundInfo.round} at block number ${roundInfo.roundHeight} with ${roundInfo.maxValidators} validators`,
-				);
-			}
+		if (this.state.isBootstrap() || !this.roundCalculator.isNewRound(nextBlockNumber)) {
+			return;
 		}
+
+		const { maxValidators, round, roundHeight } = this.roundCalculator.calculateRound(nextBlockNumber);
+
+		this.logger.debug(
+			`Starting validator round ${round} at block number ${roundHeight} with ${maxValidators} validators`,
+		);
 	}
 
 	#consumeGas(
@@ -267,7 +270,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 		const { snapshot } = this.configuration.getMilestone(block.number);
 
-		return snapshot?.snapshotHash ?? "0000000000000000000000000000000000000000000000000000000000000000";
+		return snapshot?.snapshotHash ?? ZeroHash;
 	}
 
 	async #verifyLogsBloom(block: Contracts.Crypto.Block): Promise<void> {
@@ -278,9 +281,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 	}
 
-	async #updateRewardsAndVotes(block: Contracts.Crypto.Block): Promise<void> {
-		const milestone = this.configuration.getMilestone(block.number);
-
+	async #updateRewardsAndVotes(block: Contracts.Crypto.Block, milestone: Contracts.Crypto.Milestone): Promise<void> {
 		await this.evm.updateRewardsAndVotes({
 			blockReward: BigInt(milestone.reward),
 			commitKey: this.#commitKey(block),
@@ -290,25 +291,27 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		});
 	}
 
-	async #updateValidatorRegistrationFee(block: Contracts.Crypto.Block): Promise<void> {
-		const { evmSpec, validatorRegistrationFee } = this.configuration.getMilestone(block.number + 1);
-
+	async #updateValidatorRegistrationFee(
+		block: Contracts.Crypto.Block,
+		milestone: Contracts.Crypto.Milestone,
+	): Promise<void> {
 		await this.evm.updateValidatorRegistrationFee({
 			commitKey: this.#commitKey(block),
-			fee: BigInt(validatorRegistrationFee),
-			specId: evmSpec,
+			fee: BigInt(milestone.validatorRegistrationFee),
+			specId: milestone.evmSpec,
 			timestamp: BigInt(block.timestamp),
 			validatorAddress: block.proposer,
 		});
 	}
 
-	async #calculateRoundValidators(block: Contracts.Crypto.Block): Promise<void> {
-		const { evmSpec, roundValidators } = this.configuration.getMilestone(block.number + 1);
-
+	async #calculateRoundValidators(
+		block: Contracts.Crypto.Block,
+		milestone: Contracts.Crypto.Milestone,
+	): Promise<void> {
 		await this.evm.calculateRoundValidators({
 			commitKey: this.#commitKey(block),
-			roundValidators: BigInt(roundValidators),
-			specId: evmSpec,
+			roundValidators: BigInt(milestone.roundValidators),
+			specId: milestone.evmSpec,
 			timestamp: BigInt(block.timestamp),
 			validatorAddress: block.proposer,
 		});

@@ -38,4 +38,8 @@ describe("Index", ({ assert, it }) => {
 	it("should export Units", () => {
 		assert.defined(index.Units);
 	});
+
+	it("should export ZeroHash", () => {
+		assert.equal(index.ZeroHash, "0".repeat(64));
+	});
 });

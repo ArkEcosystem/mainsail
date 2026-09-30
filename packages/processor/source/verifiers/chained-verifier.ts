@@ -1,10 +1,8 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { Identifiers } from "@mainsail/constants";
+import { Identifiers, ZeroHash } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { BlockNotChained } from "@mainsail/exceptions";
-
-const ZERO_HASH = "0000000000000000000000000000000000000000000000000000000000000000";
 
 @injectable()
 export class ChainedVerifier implements Contracts.Processor.Handler {
@@ -41,7 +39,7 @@ export class ChainedVerifier implements Contracts.Processor.Handler {
 
 	#verifyGenesis(block: Contracts.Crypto.Block): void {
 		const { snapshot } = this.configuration.getMilestone(block.number);
-		const expectedParentHash = snapshot ? snapshot.previousGenesisBlockHash : ZERO_HASH;
+		const expectedParentHash = snapshot ? snapshot.previousGenesisBlockHash : ZeroHash;
 
 		if (block.parentHash !== expectedParentHash) {
 			throw new BlockNotChained(
