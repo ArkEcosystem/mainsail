@@ -17,6 +17,7 @@ RUN apk add --no-cache --virtual .build-deps make gcc g++ python3 py3-setuptools
     && su node -c "npm config set allow-scripts=pnpm --location=user" \
     && su node -c "npm install --prefix=/home/node/.pnpm -g pnpm" \
     && su node -c "pnpm config set --global enable-global-virtual-store false" \
+    && su node -c "pnpm config set --global minimumReleaseAge 0" \
     && su node -c "pnpm add -g @mainsail/api@${mainsail_channel} --allow-build=nsfw" \
     && su node -c "export PNPM_HOME=/home/node/.pnpm" \
     && su node -c "pnpm store prune" \
