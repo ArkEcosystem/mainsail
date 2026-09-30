@@ -22,7 +22,7 @@ describe<{
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
-		context.evm = new Evm({ path: context.app.dataPath("contract-events") });
+		context.evm = new Evm({ chainId: 10_000n, path: context.app.dataPath("contract-events") });
 	});
 
 	afterEach(async (context) => {
