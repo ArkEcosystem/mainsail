@@ -72,10 +72,19 @@ impl<CTX: ContextTr> PrecompileProvider<CTX> for MainsailPrecompiles {
     }
 }
 
+const POP_DST: &[u8] = b"MAINSAIL_BLS_POP_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_";
+const POP_VERIFY_GAS: u64 = 150_000;
+const BINDING_LEN: usize = 32 + 20;
+const PK_LEN: usize = 48;
+const POP_LEN: usize = 96;
+const MESSAGE_LEN: usize = BINDING_LEN + PK_LEN;
+const INPUT_LEN: usize = MESSAGE_LEN + POP_LEN;
+
 /// BLS12-381 proof-of-possession verifier under the POP scheme of
 /// draft-irtf-cfrg-bls-signature-05 §4.2.3.
 ///
-/// Input  (144 B): 48-byte compressed G1 public key || 96-byte compressed G2 signature
+/// Input  (196 B): 32-byte chain id || 20-byte registrant address ||
+///                 48-byte compressed G1 public key || 96-byte compressed G2 signature
 /// Output (32 B):  0x00..01 if the PoP is valid, 0x00..00 otherwise.
 ///
 /// Structural failures (wrong length, malformed point encoding, subgroup-check
@@ -83,12 +92,6 @@ impl<CTX: ContextTr> PrecompileProvider<CTX> for MainsailPrecompiles {
 /// discourage spam with junk inputs and matches how the EIP-2537 precompiles
 /// signal the same conditions. A *well-formed* but cryptographically invalid
 /// PoP returns 0x00..00 at the flat `POP_VERIFY_GAS` cost.
-const POP_DST: &[u8] = b"BLS_POP_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_";
-const POP_VERIFY_GAS: u64 = 150_000;
-const PK_LEN: usize = 48;
-const POP_LEN: usize = 96;
-const INPUT_LEN: usize = PK_LEN + POP_LEN;
-
 fn bls_pop_verify(input: &[u8], gas_limit: u64, reservoir: u64) -> PrecompileResult {
     if gas_limit < POP_VERIFY_GAS {
         return Ok(PrecompileOutput::halt(PrecompileHalt::OutOfGas, reservoir));
@@ -100,8 +103,9 @@ fn bls_pop_verify(input: &[u8], gas_limit: u64, reservoir: u64) -> PrecompileRes
         ));
     }
 
-    let pk_bytes = &input[..PK_LEN];
-    let pop_bytes = &input[PK_LEN..];
+    let message = &input[..MESSAGE_LEN];
+    let pk_bytes = &input[BINDING_LEN..MESSAGE_LEN];
+    let pop_bytes = &input[MESSAGE_LEN..];
 
     let pk = match PublicKey::key_validate(pk_bytes) {
         Ok(p) => p,
@@ -124,8 +128,8 @@ fn bls_pop_verify(input: &[u8], gas_limit: u64, reservoir: u64) -> PrecompileRes
     };
 
     let res = sig.verify(
-        false,    // already subgroup/infinity checked via sig_validate(...)
-        pk_bytes, // PoP message is the compressed public key bytes
+        false,   // already subgroup/infinity checked via sig_validate(...)
+        message, // PoP message is chain id || registrant address || compressed public key bytes
         POP_DST,
         &[],
         &pk,
@@ -139,7 +143,7 @@ fn bls_pop_verify(input: &[u8], gas_limit: u64, reservoir: u64) -> PrecompileRes
 
     Ok(PrecompileOutput::new(
         POP_VERIFY_GAS,
-        Bytes::from(out.to_vec()),
+        Bytes::copy_from_slice(&out),
         reservoir,
     ))
 }
@@ -148,6 +152,7 @@ fn bls_pop_verify(input: &[u8], gas_limit: u64, reservoir: u64) -> PrecompileRes
 mod tests {
     use blst::min_pk::SecretKey;
     use revm::precompile::{PrecompileHalt, PrecompileOutput, PrecompileStatus};
+    use revm::primitives::U256;
 
     use crate::precompiles::{POP_DST, POP_VERIFY_GAS, bls_pop_verify};
 
@@ -211,17 +216,33 @@ mod tests {
         (sk, pk_bytes)
     }
 
-    /// Produce a valid PoP: sign pk_bytes under POP_DST, return the 96-byte
+    const CHAIN_ID: u64 = 10_000;
+    const REGISTRANT_ADDRESS: [u8; 20] = [0x22; 20];
+
+    fn binding(chain_id: u64, registrant_address: &[u8]) -> Vec<u8> {
+        let mut v = U256::from(chain_id).to_be_bytes::<32>().to_vec();
+        v.extend_from_slice(registrant_address);
+        v
+    }
+
+    fn message(pk_bytes: &[u8]) -> Vec<u8> {
+        [binding(CHAIN_ID, &REGISTRANT_ADDRESS), pk_bytes.to_vec()].concat()
+    }
+
+    /// Produce a valid PoP: sign the bound message under POP_DST, return the 96-byte
     /// compressed G2 signature.
     fn sign_pop(sk: &SecretKey, pk_bytes: &[u8]) -> Vec<u8> {
-        sk.sign(pk_bytes, POP_DST, &[]).compress().to_vec()
+        sk.sign(&message(pk_bytes), POP_DST, &[])
+            .compress()
+            .to_vec()
+    }
+
+    fn build_input_with(binding: &[u8], pk: &[u8], pop: &[u8]) -> Vec<u8> {
+        [binding, pk, pop].concat()
     }
 
     fn build_input(pk: &[u8], pop: &[u8]) -> Vec<u8> {
-        let mut v = Vec::with_capacity(pk.len() + pop.len());
-        v.extend_from_slice(pk);
-        v.extend_from_slice(pop);
-        v
+        build_input_with(&binding(CHAIN_ID, &REGISTRANT_ADDRESS), pk, pop)
     }
 
     /// Assert the precompile returned 32 bytes of 0x..01 (valid PoP).
@@ -247,7 +268,7 @@ mod tests {
         }
     }
 
-    const VALID_INPUT_LEN: usize = 48 + 96;
+    const VALID_INPUT_LEN: usize = 32 + 20 + 48 + 96;
 
     // ── Happy path ─────────────────────────────────────────────────────────
 
@@ -390,12 +411,12 @@ mod tests {
 
     #[test]
     fn wrong_dst_used_for_signing() {
-        // Sign pk_bytes under the SIG DST, then verify under POP DST.
+        // Sign the bound message under the SIG DST, then verify under POP DST.
         // This is the regression test you want if anyone ever copies the DST
         // constant from @chainsafe/bls (which uses SIG_DST).
         let (sk, pk) = keygen(1);
         let sig_dst: &[u8] = b"BLS_SIG_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_";
-        let pop = sk.sign(&pk, sig_dst, &[]).compress().to_vec();
+        let pop = sk.sign(&message(&pk), sig_dst, &[]).compress().to_vec();
         let input = build_input(&pk, &pop);
 
         let out = bls_pop_verify(&input, POP_VERIFY_GAS, 0).expect("Ok");
@@ -429,11 +450,11 @@ mod tests {
 
     #[test]
     fn pop_signed_by_different_key() {
-        // sk1 signs pk2_bytes under POP_DST; submit (pk2, sig). Verify against pk2
+        // sk1 signs pk2's bound message under POP_DST; submit (pk2, sig). Verify against pk2
         // must fail because the sig is from sk1.
         let (sk1, _pk1) = keygen(1);
         let (_sk2, pk2) = keygen(2);
-        let pop = sk1.sign(&pk2, POP_DST, &[]).compress().to_vec();
+        let pop = sk1.sign(&message(&pk2), POP_DST, &[]).compress().to_vec();
         let input = build_input(&pk2, &pop);
 
         let out = bls_pop_verify(&input, POP_VERIFY_GAS, 0).expect("Ok");
@@ -448,6 +469,53 @@ mod tests {
         let (_sk2, pk2) = keygen(2);
         let pop_for_pk1 = sign_pop(&sk1, &pk1);
         let input = build_input(&pk2, &pop_for_pk1);
+
+        let out = bls_pop_verify(&input, POP_VERIFY_GAS, 0).expect("Ok");
+        assert_invalid(&out);
+    }
+
+    // ── Binding ────────────────────────────────────────────────────────────
+
+    #[test]
+    fn pop_is_bound_to_the_registrant_address() {
+        let (sk, pk) = keygen(1);
+        let pop = sign_pop(&sk, &pk);
+        let input = build_input_with(&binding(CHAIN_ID, &[0x33; 20]), &pk, &pop);
+
+        let out = bls_pop_verify(&input, POP_VERIFY_GAS, 0).expect("Ok");
+        assert_invalid(&out);
+    }
+
+    #[test]
+    fn pop_is_bound_to_the_chain_id() {
+        let (sk, pk) = keygen(1);
+        let pop = sign_pop(&sk, &pk);
+        let input = build_input_with(&binding(CHAIN_ID + 1, &REGISTRANT_ADDRESS), &pk, &pop);
+
+        let out = bls_pop_verify(&input, POP_VERIFY_GAS, 0).expect("Ok");
+        assert_invalid(&out);
+    }
+
+    #[test]
+    fn verifies_the_pop_built_by_the_typescript_builder() {
+        // Pinned vector from build-proof-of-possession.test.ts.
+        use revm::primitives::hex;
+
+        let pk = hex::decode("a7e75af9dd4d868a41ad2f5a5b021d653e31084261724fb40ae2f1b1c31c778d3b9464502d599cf6720723ec5c68b59d").unwrap();
+        let pop = hex::decode("a892e94d8ed6d0fe8792dcb31b7c5116a7d138ad4bbbd044780a7c314e86673e783850121dc34d0edfa2a2560c2f30a402f4fa5106ff71d5c69bc3027210ef90b3d3ae0a19ffc9f554b37aca72f3bb25788c3177514d94e041441ba9d029b3ba").unwrap();
+        let registrant_address = hex::decode("75545540230d5c3BEf023202d23CB74cFA723376").unwrap();
+        let input = build_input_with(&binding(10_000, &registrant_address), &pk, &pop);
+
+        let out = bls_pop_verify(&input, POP_VERIFY_GAS, 0).expect("Ok");
+        assert_valid(&out);
+    }
+
+    #[test]
+    fn unbound_ietf_pop_is_rejected() {
+        let (sk, pk) = keygen(1);
+        let ietf_pop_dst: &[u8] = b"BLS_POP_BLS12381G2_XMD:SHA-256_SSWU_RO_POP_";
+        let pop = sk.sign(&pk, ietf_pop_dst, &[]).compress().to_vec();
+        let input = build_input(&pk, &pop);
 
         let out = bls_pop_verify(&input, POP_VERIFY_GAS, 0).expect("Ok");
         assert_invalid(&out);
@@ -493,7 +561,7 @@ mod tests {
         let (sk_attacker, _) = keygen(99);
         let (_, victim_pk) = keygen(2);
         let attempt = sk_attacker
-            .sign(&victim_pk, POP_DST, &[])
+            .sign(&message(&victim_pk), POP_DST, &[])
             .compress()
             .to_vec();
         let input = build_input(&victim_pk, &attempt);

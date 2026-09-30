@@ -84,7 +84,13 @@ export const makeValidatorRegistration = async (
 	gasPrice = gasPrice ?? 5 * 1e9;
 
 	if (!payload) {
-		const { pop } = buildProofOfPossession(Buffer.from(validatorKeyPair.privateKey, "hex"));
+		const { chainId } = app
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.getNetwork();
+		const { pop } = buildProofOfPossession(Buffer.from(validatorKeyPair.privateKey, "hex"), {
+			chainId,
+			registrantAddress: await getAddressByPublicKey({ app }, sender.publicKey),
+		});
 		payload = encodeValidatorRegistration(validatorKeyPair.publicKey, pop);
 	}
 

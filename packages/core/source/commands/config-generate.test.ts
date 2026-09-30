@@ -183,7 +183,10 @@ describe<{
 
 		for (let index = 0; index < validators; index++) {
 			const wallet = await walletGenerator.generate();
-			const { pop } = buildProofOfPossession(Buffer.from(wallet.consensusKeys.privateKey, "hex"));
+			const { pop } = buildProofOfPossession(Buffer.from(wallet.consensusKeys.privateKey, "hex"), {
+				chainId: 10_000,
+				registrantAddress: wallet.address,
+			});
 
 			// registerValidator(bytes blsPublicKey, bytes proofOfPossession)
 			const registrationData =

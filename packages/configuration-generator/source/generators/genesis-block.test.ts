@@ -141,7 +141,10 @@ describe<{
 	// would, so the generator itself never needs the validator secrets.
 	const presignRegistration = async (app: Application, wallet: Wallet): Promise<string> => {
 		const consensusContract = app.get<string>(AppIdentifiers.EvmConsensus.Contracts.Consensus);
-		const { pop } = buildProofOfPossession(Buffer.from(wallet.consensusKeys.privateKey, "hex"));
+		const { pop } = buildProofOfPossession(Buffer.from(wallet.consensusKeys.privateKey, "hex"), {
+			chainId: 123,
+			registrantAddress: wallet.address,
+		});
 
 		const registration = await (
 			await app

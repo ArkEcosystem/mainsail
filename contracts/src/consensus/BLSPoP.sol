@@ -7,7 +7,11 @@ library BLSPoP {
     error InvalidInputLength();
     error PrecompileCallFailed();
 
-    function verify(bytes calldata compressedPubkeyG1, bytes calldata compressedProofG2) internal view returns (bool) {
+    function verify(address registrantAddress, bytes calldata compressedPubkeyG1, bytes calldata compressedProofG2)
+        internal
+        view
+        returns (bool)
+    {
         if (compressedPubkeyG1.length != 48) {
             revert InvalidInputLength();
         }
@@ -15,13 +19,14 @@ library BLSPoP {
             revert InvalidInputLength();
         }
 
-        bytes memory input = bytes.concat(compressedPubkeyG1, compressedProofG2);
+        bytes memory input =
+            bytes.concat(bytes32(block.chainid), bytes20(registrantAddress), compressedPubkeyG1, compressedProofG2);
 
         (bool ok, bytes memory out) = POP_VERIFY.staticcall(input);
         if (!ok || out.length != 32) {
             revert PrecompileCallFailed();
         }
 
-        return uint256(bytes32(out)) == 1;
+        return abi.decode(out, (uint256)) == 1;
     }
 }

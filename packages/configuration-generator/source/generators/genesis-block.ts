@@ -231,7 +231,10 @@ export class GenesisBlockGenerator {
 		const result: Contracts.Crypto.Transaction[] = [];
 
 		for (const [index, sender] of senders.entries()) {
-			const { pop } = buildProofOfPossession(Buffer.from(sender.consensusKeys.privateKey, "hex"));
+			const { pop } = buildProofOfPossession(Buffer.from(sender.consensusKeys.privateKey, "hex"), {
+				chainId,
+				registrantAddress: sender.address,
+			});
 			const data = encodeFunctionData({
 				abi: ConsensusAbi.abi,
 				args: [`0x${sender.consensusKeys.publicKey}`, bytesToHex(pop)],
