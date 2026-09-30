@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { Enums, Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers, ZeroHash } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
@@ -385,9 +385,7 @@ export class GenesisBlockGenerator {
 					gasUsed: totals.gasUsed,
 					logsBloom: await this.evm.logsBloom(blockContext.commitKey),
 					number: options.initialBlockNumber ?? 0,
-					parentHash:
-						options.snapshot?.previousGenesisBlockHash ??
-						"0000000000000000000000000000000000000000000000000000000000000000",
+					parentHash: options.snapshot?.previousGenesisBlockHash ?? ZeroHash,
 					payloadSize,
 					proposer: blockContext.validatorAddress,
 					randaoReveal: "00".repeat(96),
@@ -395,8 +393,7 @@ export class GenesisBlockGenerator {
 					round: 0,
 					stateRoot: await this.evm.stateRoot(
 						blockContext.commitKey,
-						options.snapshot?.snapshotHash ??
-							"0000000000000000000000000000000000000000000000000000000000000000",
+						options.snapshot?.snapshotHash ?? ZeroHash,
 					),
 					timestamp: dayjs(options.epoch).valueOf(),
 					transactionsCount: transactions.length,
