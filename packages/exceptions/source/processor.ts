@@ -76,7 +76,7 @@ export class DuplicatedTransaction extends ValidatorException {
 
 export class ExceededGasLimit extends ValidatorException {
 	public constructor(block: Contracts.Crypto.Block, maxGasLimit: number) {
-		super(`Block ${block.hash} with  gas used ${block.gasUsed} exceeds max gas limit of ${maxGasLimit}.`);
+		super(`Block ${block.hash} with gas used ${block.gasUsed} exceeds max gas limit of ${maxGasLimit}.`);
 	}
 }
 
@@ -107,7 +107,7 @@ export class MaxPayloadExceeded extends ValidatorException {
 export class InvalidPayloadSize extends ValidatorException {
 	public constructor(block: Contracts.Crypto.Block, expectedSize: number, actualSize: number) {
 		super(
-			`Block ${block.hash} payload is invalid. Expected size is ${expectedSize}, but actual size is  ${actualSize}.`,
+			`Block ${block.hash} payload is invalid. Expected size is ${expectedSize}, but actual size is ${actualSize}.`,
 		);
 	}
 }

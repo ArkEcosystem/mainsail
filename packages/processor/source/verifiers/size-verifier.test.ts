@@ -71,8 +71,7 @@ describe<{
 		await assert.rejects(
 			() => verifier.execute(makeUnit(makeBlock({ serialized: "00".repeat(headerSize + 17) }))),
 			InvalidPayloadSize,
-			"Expected size is 26, but actual size is",
-			"27",
+			"Expected size is 26, but actual size is 27",
 		);
 	});
 
@@ -85,8 +84,7 @@ describe<{
 					),
 				),
 			InvalidPayloadSize,
-			"Expected size is 16, but actual size is",
-			"17",
+			"Expected size is 16, but actual size is 17",
 		);
 	});
 });
