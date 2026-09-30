@@ -67,7 +67,7 @@ impl JsCommitResult {
     }
 }
 
-#[napi(object)]
+#[napi(object, object_from_js = false)]
 #[derive(Default)]
 pub struct JsContractEvent {
     pub event: String,
