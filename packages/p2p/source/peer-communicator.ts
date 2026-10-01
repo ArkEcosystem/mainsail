@@ -197,8 +197,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 			const timeBeforeSocketCall = performance.now();
 
-			await this.connector.connect(peer);
-
 			const response = await this.connector.emit(
 				peer,
 				event,
