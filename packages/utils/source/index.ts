@@ -11,7 +11,7 @@ export * from "./get.js";
 export * from "./group-by.js";
 export * from "./has.js";
 export * from "./http.js";
-export * from "./internal/index.js";
+export * from "./types.js";
 export * as IpAddress from "./ip-address.js";
 export * from "./is-array.js";
 export * from "./is-blacklisted.js";

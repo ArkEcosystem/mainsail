@@ -2,7 +2,7 @@ import type { ISortByObjectSorter } from "fast-sort";
 
 import { sort } from "fast-sort";
 
-import type { Iteratee } from "./internal/index.js";
+import type { Iteratee } from "./types.js";
 
 import { map } from "./map.js";
 
