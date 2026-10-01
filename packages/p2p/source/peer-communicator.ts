@@ -41,7 +41,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.P2P.Statistic.Service)
 	private readonly statisticService!: Contracts.P2P.StatisticService;
 
-	#throttle?: Throttle;
+	#throttle?: Promise<Throttle>;
 
 	public async postProposal(peer: Contracts.P2P.Peer, proposal: Buffer): Promise<void> {
 		try {
@@ -250,10 +250,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).banPeer(peer.ip, error);
 	}
 
-	async #getThrottle(): Promise<Throttle> {
-		if (!this.#throttle) {
-			this.#throttle = await this.throttleFactory();
-		}
+	#getThrottle(): Promise<Throttle> {
+		this.#throttle ??= this.throttleFactory();
 
 		return this.#throttle;
 	}
