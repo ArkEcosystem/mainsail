@@ -16,7 +16,7 @@ RUN apk add --no-cache make gcc g++ python3 py3-setuptools git bash sudo git ope
     && su node -c "curl https://sh.rustup.rs -sSf | sh -s -- -y" \
     && su node -c "npm install --prefix=/home/node/.pnpm -g pnpm" \
     && su node -c "pnpm config set --global enable-global-virtual-store false" \
-    && su node -c "pnpm config set --global minimumReleaseAge 0" \
+    && su node -c "pnpm config set --global --json minimumReleaseAgeExclude '["@mainsail/*"]'" \
     && su node -c "export PNPM_HOME=/home/node/.pnpm/bin" \
     && su node -c "pnpm add -g lerna --allow-build=nx" \
     && su node -c "pnpm store prune" \
