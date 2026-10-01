@@ -21,21 +21,7 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	readonly #lastConnectionCreate = new Map<string, number>();
 
 	public async connect(peer: Contracts.P2P.Peer): Promise<Client> {
-		let connection = this.#connections.get(peer.ip);
-
-		if (!connection) {
-			connection = this.#create(peer);
-			this.#connections.set(peer.ip, connection);
-
-			connection.catch(() => {
-				// Only evict our own entry; disconnect() may already have replaced it.
-				if (this.#connections.get(peer.ip) === connection) {
-					this.#connections.delete(peer.ip);
-				}
-			});
-		}
-
-		return connection;
+		return this.#connections.get(peer.ip) ?? this.#create(peer);
 	}
 
 	public async disconnect(ip: string): Promise<void> {
@@ -46,8 +32,14 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 
 		this.#connections.delete(ip);
 
-		const client = await connection.catch(() => undefined);
-		await client?.terminate();
+		let client: Client;
+		try {
+			client = await connection;
+		} catch {
+			return; // the creation failed, so there is nothing to close
+		}
+
+		await client.terminate();
 	}
 
 	public async emit(
@@ -73,6 +65,22 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	}
 
 	async #create(peer: Contracts.P2P.Peer): Promise<Client> {
+		const connection = this.#open(peer);
+		this.#connections.set(peer.ip, connection);
+
+		try {
+			return await connection;
+		} catch (error) {
+			// Only evict our own entry; disconnect() may already have replaced it.
+			if (this.#connections.get(peer.ip) === connection) {
+				this.#connections.delete(peer.ip);
+			}
+
+			throw error;
+		}
+	}
+
+	async #open(peer: Contracts.P2P.Peer): Promise<Client> {
 		// delay a bit if last connection create was less than 10 sec ago to prevent possible abuse of reconnection
 		const timeSinceLastConnectionCreate = Date.now() - (this.#lastConnectionCreate.get(peer.ip) ?? 0);
 		await delay(Math.max(0, TEN_SECONDS - timeSinceLastConnectionCreate));
