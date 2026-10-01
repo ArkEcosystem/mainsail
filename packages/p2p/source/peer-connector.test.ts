@@ -1,228 +1,224 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 import esmock from "esmock";
 
-import { Application } from "@mainsail/kernel";
-import { describeSkip } from "@mainsail/test-runner";
-import { Peer } from "./peer";
 import { PeerConnector } from "./peer-connector";
 
-let onDelay = (timeout: number) => {};
+type Deferred = { promise: Promise<void>; resolve: () => void; reject: (error: Error) => void };
+
+const deferred = (): Deferred => {
+	let resolve!: () => void;
+	let reject!: (error: Error) => void;
+	const promise = new Promise<void>((res, rej) => {
+		resolve = res;
+		reject = rej;
+	});
+
+	return { promise, reject, resolve };
+};
 
 class ClientMock {
-	static onConstructor = (...arguments_) => {};
+	static instances: ClientMock[] = [];
+	static connectImpl: (client: ClientMock) => Promise<void> = async () => {};
 
-	constructor(...arguments_) {
-		ClientMock.onConstructor(...arguments_);
+	public onDisconnect: (...arguments_: unknown[]) => void = () => {};
+	public onError: (error: Error) => void = () => {};
+	public connectOptions: unknown;
+	public timeout: number | undefined;
+	public terminated = 0;
+
+	public constructor(
+		public readonly url: string,
+		public readonly options: unknown,
+	) {
+		ClientMock.instances.push(this);
 	}
-	async connect() {}
-	async request() {}
-	async terminate() {}
+
+	public connect(options: unknown): Promise<void> {
+		this.connectOptions = options;
+		return ClientMock.connectImpl(this);
+	}
+
+	public async request(): Promise<{ payload: Buffer }> {
+		return { payload: Buffer.from("response") };
+	}
+
+	public setTimeout(timeout: number): void {
+		this.timeout = timeout;
+	}
+
+	public async terminate(): Promise<void> {
+		this.terminated++;
+	}
 }
+
+let delayCalls: number[] = [];
 
 const { PeerConnector: PeerConnectorProxy } = await esmock("./peer-connector", {
 	"./hapi-nes": {
 		Client: ClientMock,
 	},
 	delay: async (timeout: number) => {
-		onDelay(timeout);
+		delayCalls.push(timeout);
 	},
 });
 
-describeSkip<{
+describe<{
 	app: Application;
 	peerConnector: PeerConnector;
-}>("PeerConnector", ({ it, assert, beforeEach, stub, spy, spyFn }) => {
+	peerDisposer: { banPeer: (ip: string, error: Error) => void; disposePeer: (ip: string) => void };
+}>("PeerConnector", ({ it, assert, beforeEach, spy }) => {
 	const logger = { debug: () => {}, error: () => {}, info: () => {}, warn: () => {} };
+	const peer = { ip: "178.165.55.11", port: 4000 } as Contracts.P2P.Peer;
+
 	beforeEach((context) => {
-		onDelay = () => {};
-		ClientMock.onConstructor = () => {};
+		ClientMock.instances = [];
+		ClientMock.connectImpl = async () => {};
+		delayCalls = [];
+
+		context.peerDisposer = { banPeer: () => {}, disposePeer: () => {} };
 
 		context.app = new Application();
-
-		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		context.app.bind(Identifiers.P2P.Logger).toConstantValue(logger);
+		context.app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue(context.peerDisposer);
 
 		context.peerConnector = context.app.resolve(PeerConnectorProxy);
 	});
 
-	it("#all - should return a empty array when there are no connections", ({ peerConnector }) => {
-		assert.length(peerConnector.all(), 0);
+	it("#connect - should create a client, connect it without reconnect and reuse it", async ({ peerConnector }) => {
+		const connection = await peerConnector.connect(peer);
+
+		assert.length(ClientMock.instances, 1);
+		assert.equal(ClientMock.instances[0].url, "ws://178.165.55.11:4000");
+		assert.equal(ClientMock.instances[0].options, { timeout: 10_000 });
+		assert.equal(ClientMock.instances[0].connectOptions, { reconnect: false });
+
+		assert.equal(await peerConnector.connect(peer), connection);
+		assert.length(ClientMock.instances, 1);
 	});
 
-	it("#all - should return the connections", async ({ peerConnector }) => {
-		const peers = [new Peer("178.165.55.44", 4000), new Peer("178.165.55.33", 4000)];
-		await peerConnector.connect(peers[0]);
-		await peerConnector.connect(peers[1]);
+	it("#connect - should bracket IPv6 addresses", async ({ peerConnector }) => {
+		await peerConnector.connect({ ip: "2001:3984:3989::104", port: 4000 } as Contracts.P2P.Peer);
 
-		assert.length(peerConnector.all(), 2);
+		assert.equal(ClientMock.instances[0].url, "ws://[2001:3984:3989::104]:4000");
 	});
 
-	it("#connection - should return the connection", async ({ peerConnector }) => {
-		const peers = [
-			new Peer("178.165.55.44", 4000),
-			new Peer("178.165.55.33", 4000),
-			new Peer("2001:3984:3989::104", 4000),
-		];
-		await peerConnector.connect(peers[0]);
-		await peerConnector.connect(peers[1]);
-		await peerConnector.connect(peers[2]);
+	it("#connect - should share one in-flight creation between concurrent callers", async ({ peerConnector }) => {
+		const connecting = deferred();
+		ClientMock.connectImpl = () => connecting.promise;
 
-		assert.instance(peerConnector.connection(peers[0]), ClientMock);
-		assert.instance(peerConnector.connection(peers[1]), ClientMock);
-		assert.instance(peerConnector.connection(peers[2]), ClientMock);
+		const first = peerConnector.connect(peer);
+		const second = peerConnector.connect(peer);
+
+		connecting.resolve();
+
+		assert.equal(await first, await second);
+		assert.length(ClientMock.instances, 1);
 	});
 
-	it("#connection - should return undefined if there is no connection", async ({ peerConnector }) => {
-		const peerNotAdded = new Peer("178.0.0.0", 4000);
-		assert.undefined(peerConnector.connection(peerNotAdded));
-	});
-
-	it("#connect - should set the connection in the connections and return it", async ({ peerConnector }) => {
-		const spyClientConstructor = spyFn();
-		ClientMock.onConstructor = (...arguments_) => spyClientConstructor.call(...arguments_);
-
-		const peer = new Peer("178.165.55.11", 4000);
-		const peerConnection = await peerConnector.connect(peer);
-
-		spyClientConstructor.calledOnce();
-		spyClientConstructor.calledWith("ws://178.165.55.11:4000", { timeout: 10_000 });
-		assert.instance(peerConnection, ClientMock);
-	});
-
-	it("#connect - should set the connection with brackets IPv6", async ({ peerConnector }) => {
-		const spyClientConstructor = spyFn();
-		ClientMock.onConstructor = (...arguments_) => spyClientConstructor.call(...arguments_);
-
-		const peer = new Peer("2001:3984:3989::104", 4000);
-		const peerConnection = await peerConnector.connect(peer);
-
-		spyClientConstructor.calledOnce();
-		spyClientConstructor.calledWith("ws://[2001:3984:3989::104]:4000", { timeout: 10_000 });
-		assert.instance(peerConnection, ClientMock);
-	});
-
-	it.skip("#connect - should log and remove if error on connection", async ({ peerConnector }) => {
-		const spyLoggerDebug = spy(logger, "debug");
-
-		const peer = new Peer("178.165.55.11", 4000);
-		const peerConnection = await peerConnector.connect(peer);
-
-		peerConnection.onError(new Error("dummy"));
-
-		spyLoggerDebug.calledOnce();
-		assert.instance(peerConnection, ClientMock);
-	});
-
-	it.skip("#connect - should delay connection create if re-connecting within 10 seconds", async ({
-		peerConnector,
-	}) => {
-		const spyDelay = spyFn();
-		onDelay = (timeout) => {
-			spyDelay.call(timeout);
+	it("#connect - should not keep a client whose connect failed", async ({ peerConnector }) => {
+		ClientMock.connectImpl = async () => {
+			throw new Error("refused");
 		};
 
-		const peer = new Peer("178.165.55.11", 4000);
+		await assert.rejects(() => peerConnector.connect(peer), "refused");
+
+		assert.length(ClientMock.instances, 1);
+
+		ClientMock.connectImpl = async () => {};
+		const connection = await peerConnector.connect(peer);
+
+		assert.length(ClientMock.instances, 2);
+		assert.equal(connection, ClientMock.instances[1]);
+	});
+
+	it("#connect - should delay re-creation within ten seconds of the previous one", async ({ peerConnector }) => {
 		await peerConnector.connect(peer);
-		peerConnector.disconnect(peer);
+		await peerConnector.disconnect(peer.ip);
 		await peerConnector.connect(peer);
 
-		spyDelay.calledOnce();
-		assert.gte(spyDelay.getCallArgs(0)[0], 9000);
+		assert.length(delayCalls, 2);
+		assert.equal(delayCalls[0], 0);
+		assert.gte(delayCalls[1], 9000);
+		assert.length(ClientMock.instances, 2);
 	});
 
-	it.skip("#disconnect - should call terminate on the connection and forget it", async ({ peerConnector }) => {
-		const peer = new Peer("178.165.55.11", 4000);
-		const peerConnection = await peerConnector.connect(peer);
-		const spyTerminate = spy(peerConnection, "terminate");
+	it("#disconnect - should terminate and forget the connection", async ({ peerConnector }) => {
+		const connection = await peerConnector.connect(peer);
 
-		assert.instance(peerConnector.connection(peer), ClientMock);
+		await peerConnector.disconnect(peer.ip);
 
-		peerConnector.disconnect(peer);
-		assert.undefined(peerConnector.connection(peer));
-		spyTerminate.calledOnce();
+		assert.equal(ClientMock.instances[0].terminated, 1);
+		assert.not.equal(await peerConnector.connect(peer), connection);
 	});
 
-	it("#disconnect - should not do anything if the peer is not defined", async ({ peerConnector }) => {
-		const peer = new Peer("178.165.0.0", 4000);
+	it("#disconnect - should terminate a connection that is still being created", async ({ peerConnector }) => {
+		const connecting = deferred();
+		ClientMock.connectImpl = () => connecting.promise;
 
-		assert.undefined(peerConnector.connection(peer));
+		const connectPromise = peerConnector.connect(peer);
+		const disconnectPromise = peerConnector.disconnect(peer.ip);
 
-		peerConnector.disconnect(peer);
-		assert.undefined(peerConnector.connection(peer));
+		connecting.resolve();
+		const connection = await connectPromise;
+		await disconnectPromise;
+
+		assert.equal(connection.terminated, 1);
+		assert.not.equal(await peerConnector.connect(peer), connection);
+		assert.length(ClientMock.instances, 2);
 	});
 
-	it("#emit - should connect to the peer and call connection.request", async ({ peerConnector }) => {
-		const peer = new Peer("178.165.11.12", 4000);
+	it("#disconnect - should ignore a creation that fails", async ({ peerConnector }) => {
+		const connecting = deferred();
+		ClientMock.connectImpl = () => connecting.promise;
 
-		const peerConnection = await peerConnector.connect(peer);
+		const connectPromise = peerConnector.connect(peer);
+		const disconnectPromise = peerConnector.disconnect(peer.ip);
 
-		const mockResponse = { payload: "mock payload" };
-		const spyRequest = stub(peerConnection, "request").returnValue(mockResponse);
+		connecting.reject(new Error("refused"));
 
-		const response = await peerConnector.emit(peer, "p2p.peer.getStatus", {});
-
-		spyRequest.calledOnce();
-		assert.equal(response, mockResponse);
+		await assert.rejects(() => connectPromise, "refused");
+		await assert.resolves(() => disconnectPromise);
 	});
 
-	it("#getError - should return the error set for the peer", ({ peerConnector }) => {
-		const peer = new Peer("178.165.11.12", 4000);
+	it("#disconnect - should do nothing for an unknown peer", async ({ peerConnector }) => {
+		await peerConnector.disconnect(peer.ip);
 
-		const peerError = `some random error for the peer ${peer.ip}`;
-		peerConnector.setError(peer, peerError);
-
-		assert.equal(peerConnector.getError(peer), peerError);
+		assert.length(ClientMock.instances, 0);
 	});
 
-	it("#getError - should return undefined when the peer has no error set", ({ peerConnector }) => {
-		const peer = new Peer("178.165.11.12", 4000);
+	it("#emit - should connect, set the timeout and send the request", async ({ peerConnector }) => {
+		const connection = await peerConnector.connect(peer);
+		const request = spy(connection, "request");
 
-		assert.undefined(peerConnector.getError(peer));
+		const payload = Buffer.from("payload");
+		const response = await peerConnector.emit(peer, "getStatus", payload, 5000);
+
+		request.calledOnce();
+		request.calledWith({ headers: {}, method: "POST", path: "getStatus", payload });
+		assert.equal(connection.timeout, 5000);
+		assert.equal(response.payload, Buffer.from("response"));
 	});
 
-	it("#setError - should set the error for the peer", ({ peerConnector }) => {
-		const peer = new Peer("178.165.11.12", 4000);
+	it("should dispose the peer when the client disconnects and ban it on client errors", async ({
+		peerConnector,
+		peerDisposer,
+	}) => {
+		const disposePeer = spy(peerDisposer, "disposePeer");
+		const banPeer = spy(peerDisposer, "banPeer");
 
-		const peerError = `some random error for the peer ${peer.ip}`;
-		peerConnector.setError(peer, peerError);
+		const connection = await peerConnector.connect(peer);
 
-		assert.equal(peerConnector.getError(peer), peerError);
-	});
+		connection.onDisconnect();
+		disposePeer.calledOnce();
+		disposePeer.calledWith(peer.ip);
 
-	it("#hasError - should return true if the peer has the error specified set", ({ peerConnector }) => {
-		const peer = new Peer("178.165.11.12", 4000);
-
-		const peerError = `some random error for the peer ${peer.ip}`;
-		peerConnector.setError(peer, peerError);
-
-		assert.true(peerConnector.hasError(peer, peerError));
-	});
-
-	it("#hasError - should return false if the peer has not the error specified set", ({ peerConnector }) => {
-		const peer = new Peer("178.165.11.12", 4000);
-
-		const peerError = `some random error for the peer ${peer.ip}`;
-		peerConnector.setError(peer, peerError);
-
-		assert.false(peerConnector.hasError(peer, "a different error"));
-	});
-
-	it("#hasError - should return false if the peer has no error", ({ peerConnector }) => {
-		const peer = new Peer("178.165.11.12", 4000);
-
-		const peerError = `some random error for the peer ${peer.ip}`;
-
-		assert.false(peerConnector.hasError(peer, peerError));
-	});
-
-	it("#forgetError - should forget the error set for the peer", ({ peerConnector }) => {
-		const peer = new Peer("178.165.11.12", 4000);
-
-		const peerError = `some random error for the peer ${peer.ip}`;
-		peerConnector.setError(peer, peerError);
-
-		assert.equal(peerConnector.getError(peer), peerError);
-
-		peerConnector.forgetError(peer);
-		assert.undefined(peerConnector.getError(peer));
+		const error = new Error("boom");
+		connection.onError(error);
+		banPeer.calledOnce();
+		banPeer.calledWith(peer.ip, error);
 	});
 });

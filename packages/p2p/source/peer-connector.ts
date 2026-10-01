@@ -71,7 +71,6 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		try {
 			return await connection;
 		} catch (error) {
-			// Only evict our own entry; disconnect() may already have replaced it.
 			if (this.#connections.get(peer.ip) === connection) {
 				this.#connections.delete(peer.ip);
 			}
