@@ -129,10 +129,10 @@ heading "Installing pnpm..."
     export PATH=$PATH:$PNPM_HOME/bin
     pnpm config set --global enable-global-virtual-store false
     info "(pnpm) Global Virtual Store: disabled"
-    pnpm config set --global minimumReleaseAge 0
-    info "(pnpm) Global Minimum Release Age: disabled"
+     pnpm config set --global --json minimumReleaseAgeExclude '["@mainsail/*"]' 
+    info "(pnpm) Global Minimum Release Age: exclude @mainsail/*"
 
-success "Installed pnpm!"
+succes "Installed pnpm!"
 
 heading "Installing pm2..."
 
