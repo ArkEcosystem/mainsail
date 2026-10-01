@@ -3,7 +3,7 @@ import { isEnumerable } from "./is-enumerable.js";
 import { isObject } from "./is-object.js";
 import { isString } from "./is-string.js";
 
-export const get = <T, V>(object: T, path: string | string[], defaultValue?: V): V | undefined => {
+export const get = <T, V>(object: T, path: string, defaultValue?: V): V | undefined => {
 	if (!isObject(object) || !isString(path)) {
 		return defaultValue;
 	}
