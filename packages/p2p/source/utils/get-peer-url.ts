@@ -1,9 +1,11 @@
 import { Enums } from "@mainsail/constants";
+import { IpAddress } from "@mainsail/utils";
 
 import { type shared } from "../socket-server/codecs/proto/protos.js";
 
 export const getPeerUrl = (peer: shared.IPeerLike): string => {
 	let protocol = peer.protocol;
+	const host = IpAddress.normalizeAddress(peer.ip ?? "");
 
 	// Heuristically check based on port first to match existing behavior.
 	switch (peer.port) {
@@ -22,14 +24,14 @@ export const getPeerUrl = (peer: shared.IPeerLike): string => {
 
 	switch (protocol) {
 		case Enums.Api.Protocol.Http: {
-			return `http://${peer.ip}:${peer.port}`;
+			return `http://${host}:${peer.port}`;
 		}
 		case Enums.Api.Protocol.Https: {
-			return `https://${peer.ip}:${peer.port}`;
+			return `https://${host}:${peer.port}`;
 		}
 		default: {
 			// fallback to HTTP just in case
-			return `http://${peer.ip}:${peer.port}`;
+			return `http://${host}:${peer.port}`;
 		}
 	}
 };

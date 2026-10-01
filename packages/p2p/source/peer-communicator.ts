@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { assert, ensureError, http } from "@mainsail/utils";
+import { assert, ensureError, http, IpAddress } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { constants } from "./constants.js";
@@ -66,7 +66,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			Object.entries(peer.plugins).map(async ([name, plugin]) => {
 				peer.ports[name] = -1;
 				try {
-					const { statusCode } = await http.head(`http://${peer.ip}:${plugin.port}/`);
+					const { statusCode } = await http.head(
+						`http://${IpAddress.normalizeAddress(peer.ip)}:${plugin.port}/`,
+					);
 
 					if (statusCode === 200) {
 						peer.ports[name] = plugin.port;
