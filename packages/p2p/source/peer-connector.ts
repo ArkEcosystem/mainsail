@@ -17,20 +17,37 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
 
-	private readonly connections: Map<string, Client> = new Map<string, Client>();
-	readonly #lastConnectionCreate: Map<string, number> = new Map<string, number>();
+	readonly #connections = new Map<string, Promise<Client>>();
+	readonly #lastConnectionCreate = new Map<string, number>();
 
 	public async connect(peer: Contracts.P2P.Peer): Promise<Client> {
-		return this.connections.get(peer.ip) || (await this.#create(peer));
+		let connection = this.#connections.get(peer.ip);
+
+		if (!connection) {
+			connection = this.#create(peer);
+			this.#connections.set(peer.ip, connection);
+
+			connection.catch(() => {
+				// Only evict our own entry; disconnect() may already have replaced it.
+				if (this.#connections.get(peer.ip) === connection) {
+					this.#connections.delete(peer.ip);
+				}
+			});
+		}
+
+		return connection;
 	}
 
 	public async disconnect(ip: string): Promise<void> {
-		const connection = this.connections.get(ip);
-
-		if (connection) {
-			await connection.terminate();
-			this.connections.delete(ip);
+		const connection = this.#connections.get(ip);
+		if (!connection) {
+			return;
 		}
+
+		this.#connections.delete(ip);
+
+		const client = await connection.catch(() => undefined);
+		await client?.terminate();
 	}
 
 	public async emit(
@@ -63,7 +80,6 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		const connection = new Client(`ws://${IpAddress.normalizeAddress(peer.ip)}:${peer.port}`, {
 			timeout: 10_000,
 		});
-		this.connections.set(peer.ip, connection);
 		this.#lastConnectionCreate.set(peer.ip, Date.now());
 
 		connection.onDisconnect = () => {
