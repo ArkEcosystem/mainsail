@@ -13,15 +13,15 @@ import { Throttle } from "./throttle.js";
 
 @injectable()
 export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.Peer.Connector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
+
+	@inject(Identifiers.P2P.Peer.Disposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.P2P.Header.Factory)
 	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
@@ -47,8 +47,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		try {
 			await this.#emit(peer, Routes.PostProposal, { proposal }, { timeout: 6000 });
 		} catch (rawError) {
-			const error = ensureError(rawError);
-			this.#handleSocketError(peer, error);
+			this.peerDisposer.banPeer(peer.ip, ensureError(rawError));
 		}
 	}
 
@@ -56,8 +55,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		try {
 			await this.#emit(peer, Routes.PostMessage, { message }, { timeout: 6000 });
 		} catch (rawError) {
-			const error = ensureError(rawError);
-			this.#handleSocketError(peer, error);
+			this.peerDisposer.banPeer(peer.ip, ensureError(rawError));
 		}
 	}
 
@@ -246,10 +244,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		} finally {
 			this.statisticService.getCurrentRoundStatistic().addEmit(peer.ip, event, statistic);
 		}
-	}
-
-	#handleSocketError(peer: Contracts.P2P.Peer, error: Error): void {
-		this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).banPeer(peer.ip, error);
 	}
 
 	#getThrottle(): Promise<Throttle> {
