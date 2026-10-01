@@ -76,6 +76,27 @@ describe<{
 		forgetPendingPeer.calledOnce();
 	});
 
+	it("#validateAndAcceptPeer - should forget the pending peer and dispose it when accepting throws", async ({
+		processor,
+		repository,
+		transactionPoolWorker,
+		peerDisposer,
+		logger,
+	}) => {
+		transactionPoolWorker.setPeer = async () => {
+			throw new Error("worker down");
+		};
+		const forgetPendingPeer = spy(repository, "forgetPendingPeer");
+		const disposePeer = spy(peerDisposer, "disposePeer");
+		const warn = spy(logger, "warn");
+
+		await processor.validateAndAcceptPeer("178.165.55.55");
+
+		forgetPendingPeer.calledOnce();
+		disposePeer.calledWith("178.165.55.55");
+		warn.calledOnce();
+	});
+
 	it("#validateAndAcceptPeer - should not accept a peer that got banned while its acceptance was being verified", async ({
 		processor,
 		repository,

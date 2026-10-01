@@ -115,13 +115,17 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 
 		this.repository.setPendingPeer(peer);
 
-		const txPoolNode = this.txPoolNodeFactory(ip);
+		try {
+			const txPoolNode = this.txPoolNodeFactory(ip);
 
-		if ((await this.peerVerifier.verify(peer)) && (await this.txPoolNodeVerifier.verify(txPoolNode))) {
-			// Re-check after the awaits: the peer may have been banned while its
+			// The ban is re-checked after the awaits: the peer may have been banned while its
 			// acceptance was being verified, and a banned peer must never enter the
 			// repository - nothing would remove it before the ban expires.
-			if (!this.peerDisposer.isBanned(peer.ip)) {
+			if (
+				(await this.peerVerifier.verify(peer)) &&
+				(await this.txPoolNodeVerifier.verify(txPoolNode)) &&
+				!this.peerDisposer.isBanned(peer.ip)
+			) {
 				this.repository.setPeer(peer);
 				this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
 
@@ -133,9 +137,11 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 				await this.peerDiscoverer.discoverPeers(peer);
 				await this.ApiNodeDiscoverer.discoverApiNodes(peer);
 			}
+		} catch (rawError) {
+			this.peerDisposer.disposePeer(ip);
+		} finally {
+			this.repository.forgetPendingPeer(peer);
 		}
-
-		this.repository.forgetPendingPeer(peer);
 	}
 
 	async #disconnectInvalidPeers(): Promise<void> {
