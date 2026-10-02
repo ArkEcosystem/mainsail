@@ -1,6 +1,5 @@
 import mm from "micromatch";
 
-// @TODO review the implementation
 export const isWhitelisted = (whitelist: string[], remoteAddress: string): boolean => {
 	if (!Array.isArray(whitelist) || whitelist.length === 0) {
 		return true;

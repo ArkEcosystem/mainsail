@@ -25,4 +25,19 @@ describe("unset", async ({ assert, it, nock, loader }) => {
 
 		assert.equal(object, { a: { b: {} } });
 	});
+
+	it("should return false if an intermediate segment is not an object", () => {
+		const object = { a: 1 };
+
+		assert.false(unset(object, "a.b"));
+		assert.equal(object, { a: 1 });
+	});
+
+	it("should return false if the path contains dangerous segments", () => {
+		const object = { a: { b: 1 } };
+
+		assert.false(unset(object, "__proto__.a"));
+		assert.false(unset(object, "a.constructor"));
+		assert.equal(object, { a: { b: 1 } });
+	});
 });
