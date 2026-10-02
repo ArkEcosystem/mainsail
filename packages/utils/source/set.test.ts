@@ -17,4 +17,15 @@ describe("set", async ({ assert, it, nock, loader }) => {
 
 		assert.is(object.x.y.z, 5);
 	});
+
+	it("should not write through dangerous path segments", () => {
+		const object = { a: {} };
+
+		set(object, "__proto__.polluted", true);
+		set(object, "constructor.prototype.polluted", true);
+		set(object, "a.prototype", true);
+
+		assert.undefined(({} as Record<string, unknown>).polluted);
+		assert.equal(object, { a: {} });
+	});
 });
