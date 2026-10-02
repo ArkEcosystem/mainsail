@@ -132,7 +132,7 @@ heading "Installing pnpm..."
     pnpm config set --global --json minimumReleaseAgeExclude '["@mainsail/*"]' 
     info "(pnpm) Global Minimum Release Age: exclude @mainsail/*"
 
-success "Installed pnpm!"
+succes "Installed pnpm!"
 
 heading "Installing pm2..."
 

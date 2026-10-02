@@ -1,5 +1,3 @@
-import { slice } from "./slice.js";
-
 export const chunk = <T>(iterable: T[], chunkSize: number): T[][] => {
 	const iterableLength: number = iterable.length;
 
@@ -12,7 +10,7 @@ export const chunk = <T>(iterable: T[], chunkSize: number): T[][] => {
 	const result: T[][] = Array.from({ length: Math.ceil(iterableLength / chunkSize) });
 
 	while (index < iterableLength) {
-		result[resIndex++] = slice<T>(iterable, index, (index += chunkSize));
+		result[resIndex++] = iterable.slice(index, (index += chunkSize));
 	}
 
 	return result;

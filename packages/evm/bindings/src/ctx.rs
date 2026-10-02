@@ -661,7 +661,10 @@ impl TryFrom<JsCalculateRoundValidatorsContext> for CalculateRoundValidatorsCont
             round_validators: u8::try_from(utils::convert_bigint_to_u64(
                 value.round_validators,
                 "roundValidators",
-            )?)?,
+            )?)
+            .map_err(|_| {
+                anyhow::anyhow!("roundValidators: expected an unsigned bigint fitting into 8 bits")
+            })?,
             spec_id: parse_spec_id(value.spec_id)?,
         })
     }
