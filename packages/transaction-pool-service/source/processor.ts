@@ -36,10 +36,8 @@ export class Processor implements Contracts.TransactionPool.Processor {
 					await this.pool.addTransaction(transaction);
 					accept.push(index);
 
-					try {
-						broadcastTransactions.push(transaction);
-						broadcast.push(index);
-					} catch {}
+					broadcastTransactions.push(transaction);
+					broadcast.push(index);
 				} catch (rawError) {
 					const error = ensureError(rawError);
 					invalid.push(index);

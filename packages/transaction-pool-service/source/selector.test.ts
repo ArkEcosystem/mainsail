@@ -28,7 +28,7 @@ describe<{
 		context.selector = context.app.resolve(Selector);
 	});
 
-	it("should return all transactions when below maxSize and maxBytes", async ({ selector, poolQuery }) => {
+	it("getBatch - should return all transactions when below maxSize and maxBytes", async ({ selector, poolQuery }) => {
 		stub(poolQuery, "getFromHighestPriority").returnValue({ all: async () => makeTransactions(5) });
 
 		const batch = await selector.getBatch({ blockRound: "1-0", maxBytes: 10_000, maxSize: 100 });
@@ -40,7 +40,25 @@ describe<{
 		assert.equal(batch.remaining, 0);
 	});
 
-	it("should return each transaction exactly once when the pool is an exact multiple of maxSize", async ({
+	it("getBatch - should return an empty batch for an empty pool", async ({ selector }) => {
+		const batch = await selector.getBatch({ blockRound: "1-0", maxBytes: 10_000, maxSize: 100 });
+
+		assert.equal(batch, { remaining: 0, transactions: [] });
+	});
+
+	it("getBatch - should return an empty batch when the first transaction exceeds maxBytes", async ({
+		selector,
+		poolQuery,
+	}) => {
+		stub(poolQuery, "getFromHighestPriority").returnValue({ all: async () => makeTransactions(3, 100) });
+
+		// The first transaction costs 4 + 100 bytes.
+		const batch = await selector.getBatch({ blockRound: "1-0", maxBytes: 103, maxSize: 100 });
+
+		assert.equal(batch, { remaining: 3, transactions: [] });
+	});
+
+	it("getBatch - should return each transaction exactly once when the pool is an exact multiple of maxSize", async ({
 		selector,
 		poolQuery,
 	}) => {
@@ -65,7 +83,7 @@ describe<{
 		assert.equal(hashes[100], "tx-100");
 	});
 
-	it("should not duplicate the boundary transaction across batches", async ({ selector, poolQuery }) => {
+	it("getBatch - should not duplicate the boundary transaction across batches", async ({ selector, poolQuery }) => {
 		stub(poolQuery, "getFromHighestPriority").returnValue({ all: async () => makeTransactions(250) });
 
 		const options = { blockRound: "1-0", maxBytes: 10_000_000, maxSize: 100 };
@@ -85,7 +103,10 @@ describe<{
 		);
 	});
 
-	it("should resume at the first transaction that did not fit maxBytes", async ({ selector, poolQuery }) => {
+	it("getBatch - should resume at the first transaction that did not fit maxBytes", async ({
+		selector,
+		poolQuery,
+	}) => {
 		stub(poolQuery, "getFromHighestPriority").returnValue({ all: async () => makeTransactions(4, 100) });
 
 		// Each transaction costs 4 + 100 bytes; 250 bytes fit exactly 2 of them.
@@ -106,7 +127,7 @@ describe<{
 		assert.equal(batch2.remaining, 0);
 	});
 
-	it("should not re-query the pool for the same blockRound", async ({ selector, poolQuery }) => {
+	it("getBatch - should not re-query the pool for the same blockRound", async ({ selector, poolQuery }) => {
 		const getFromHighestPriority = stub(poolQuery, "getFromHighestPriority").returnValue({
 			all: async () => makeTransactions(5),
 		});
@@ -117,7 +138,7 @@ describe<{
 		getFromHighestPriority.calledOnce();
 	});
 
-	it("should re-query the pool and restart on a new blockRound", async ({ selector, poolQuery }) => {
+	it("getBatch - should re-query the pool and restart on a new blockRound", async ({ selector, poolQuery }) => {
 		const getFromHighestPriority = stub(poolQuery, "getFromHighestPriority").returnValue({
 			all: async () => makeTransactions(5),
 		});
@@ -136,7 +157,7 @@ describe<{
 		);
 	});
 
-	it("should restart from the beginning after clear", async ({ selector, poolQuery }) => {
+	it("clear - should restart from the beginning", async ({ selector, poolQuery }) => {
 		stub(poolQuery, "getFromHighestPriority").returnValue({ all: async () => makeTransactions(5) });
 
 		const batch1 = await selector.getBatch({ blockRound: "1-0", maxBytes: 10_000, maxSize: 2 });

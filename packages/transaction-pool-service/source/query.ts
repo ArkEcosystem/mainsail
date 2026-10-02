@@ -90,12 +90,12 @@ export class Query implements Contracts.TransactionPool.Query {
 		);
 	}
 
-	public getAllBySender(senderPublicKey: string): QueryIterable {
-		if (!this.mempool.hasSenderMempool(senderPublicKey)) {
+	public getAllBySender(address: string): QueryIterable {
+		if (!this.mempool.hasSenderMempool(address)) {
 			return new QueryIterable([]);
 		}
 
-		return new QueryIterable([...this.mempool.getSenderMempool(senderPublicKey).getFromEarliest()]);
+		return new QueryIterable([...this.mempool.getSenderMempool(address).getFromEarliest()]);
 	}
 
 	public getFromLowestPriority(): QueryIterable {
