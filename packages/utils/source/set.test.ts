@@ -6,7 +6,7 @@ describe("set", async ({ assert, it, nock, loader }) => {
 		assert.false(set(undefined, "a.b.c", 4));
 	});
 
-	it("should work with a string or array as path", () => {
+	it("should set a nested path", () => {
 		const object = { a: { b: { c: 3 } } };
 
 		set(object, "a.b.c", 4);
