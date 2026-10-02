@@ -33,6 +33,14 @@ describe("unset", async ({ assert, it, nock, loader }) => {
 		assert.equal(object, { a: 1 });
 	});
 
+	it("should return false if an intermediate segment is null", () => {
+		const object = { a: null };
+
+		assert.false(unset(object, "a.b"));
+		assert.false(unset(null, "a"));
+		assert.equal(object, { a: null });
+	});
+
 	it("should return false if the path contains dangerous segments", () => {
 		const object = { a: { b: 1 } };
 

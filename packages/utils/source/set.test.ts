@@ -18,6 +18,14 @@ describe("set", async ({ assert, it, nock, loader }) => {
 		assert.is(object.x.y.z, 5);
 	});
 
+	it("should replace a null intermediate segment with an object", () => {
+		const object = { a: null };
+
+		assert.true(set(object, "a.b", 1));
+		assert.equal(object, { a: { b: 1 } });
+		assert.false(set(null, "a", 1));
+	});
+
 	it("should not write through dangerous path segments", () => {
 		const object = { a: {} };
 
