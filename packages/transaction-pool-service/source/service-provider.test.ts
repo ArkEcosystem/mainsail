@@ -1,5 +1,3 @@
-import type { AnySchema } from "joi";
-
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
@@ -12,9 +10,7 @@ const aliceLegacy = "DH8WhBj6ron2tQhdFPQzjDcrk2CCY997MP";
 const bob = "0xbbe7B35057F3431E001d2b96817e3061B59849c9";
 const bobLegacy = "DQogphvhHjJsqEhhR7befFiTzHQWLrQV3d";
 
-let bust = 0;
-const importDefaults = async (): Promise<Record<string, any>> =>
-	(await import(`./defaults.js?bust=${bust++}`)).defaults;
+const importFresh = (moduleName) => import(`${moduleName}?${Date.now()}`);
 
 const numericSettings: Record<string, string> = {
 	[EnvironmentVariables.MAINSAIL_MAX_TRANSACTIONS_IN_POOL]: "maxTransactionsInPool",
@@ -32,31 +28,12 @@ const environmentVariables = [
 
 describe<{
 	app: Application;
-	environment: Record<string, string | undefined>;
-	schema: AnySchema;
 	serviceProvider: ServiceProvider;
-}>("ServiceProvider", ({ it, assert, beforeEach, afterEach, each, spy }) => {
+}>("ServiceProvider", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
-		context.environment = {};
-		for (const name of environmentVariables) {
-			context.environment[name] = process.env[name];
-			delete process.env[name];
-		}
-
 		context.app = new Application();
 
 		context.serviceProvider = context.app.resolve(ServiceProvider);
-		context.schema = context.serviceProvider.configSchema() as AnySchema;
-	});
-
-	afterEach(({ environment }) => {
-		for (const name of environmentVariables) {
-			if (environment[name] === undefined) {
-				delete process.env[name];
-			} else {
-				process.env[name] = environment[name];
-			}
-		}
 	});
 
 	it("register - should bind the transaction pool services", async ({ app, serviceProvider }) => {
@@ -120,42 +97,71 @@ describe<{
 
 		assert.equal(calls, ["service", "storage"]);
 	});
+});
 
-	it("should validate schema using defaults", async ({ schema }) => {
-		process.env[EnvironmentVariables.MAINSAIL_PATH_DATA] = "/var/lib/mainsail";
+describe<{
+	app: Application;
+	environment: Record<string, string | undefined>;
+	serviceProvider: ServiceProvider;
+}>("ServiceProvider.configSchema", ({ it, assert, beforeEach, afterEach, each }) => {
+	const importDefaults = async () => (await importFresh("../distribution/defaults.js")).defaults;
 
-		const { error, value } = schema.validate(await importDefaults());
+	beforeEach((context) => {
+		context.app = new Application();
 
-		assert.undefined(error);
-		assert.equal(value, {
-			allowedSenders: [],
-			enabled: true,
-			maxTransactionAge: 2700,
-			maxTransactionBytes: 128_000,
-			maxTransactionsInPool: 15_000,
-			maxTransactionsPerRequest: 40,
-			maxTransactionsPerSender: 150,
-			rebroadcastCooldownBlocks: 3,
-			rebroadcastThreshold: 60,
-			storage: "/var/lib/mainsail/transaction-pool.sqlite",
-		});
+		context.serviceProvider = context.app.resolve(ServiceProvider);
+
+		context.environment = {};
+		for (const name of environmentVariables) {
+			context.environment[name] = process.env[name];
+			delete process.env[name];
+		}
 	});
 
-	it("should allow configuration extension", async ({ schema }) => {
+	afterEach(({ environment }) => {
+		for (const name of environmentVariables) {
+			if (environment[name] === undefined) {
+				delete process.env[name];
+			} else {
+				process.env[name] = environment[name];
+			}
+		}
+	});
+
+	it("should validate schema using defaults", async ({ serviceProvider }) => {
+		const { error, value } = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(error);
+
+		assert.array(value.allowedSenders);
+		assert.true(value.enabled);
+		assert.number(value.maxTransactionAge);
+		assert.number(value.maxTransactionBytes);
+		assert.number(value.maxTransactionsInPool);
+		assert.number(value.maxTransactionsPerRequest);
+		assert.number(value.maxTransactionsPerSender);
+		assert.number(value.rebroadcastCooldownBlocks);
+		assert.number(value.rebroadcastThreshold);
+		assert.string(value.storage);
+	});
+
+	it("should allow configuration extension", async ({ serviceProvider }) => {
 		const defaults = await importDefaults();
 
 		defaults.customField = "dummy";
 
-		const { error, value } = schema.validate(defaults);
+		const { error, value } = serviceProvider.configSchema().validate(defaults);
 
 		assert.undefined(error);
 		assert.equal(value.customField, "dummy");
 	});
 
-	it("should return false when process.env.MAINSAIL_TRANSACTION_POOL_DISABLED is present", async ({ schema }) => {
+	it("should return false when process.env.MAINSAIL_TRANSACTION_POOL_DISABLED is present", async ({
+		serviceProvider,
+	}) => {
 		process.env[EnvironmentVariables.MAINSAIL_TRANSACTION_POOL_DISABLED] = "true";
 
-		const { error, value } = schema.validate(await importDefaults());
+		const { error, value } = serviceProvider.configSchema().validate(await importDefaults());
 
 		assert.undefined(error);
 		assert.false(value.enabled);
@@ -163,10 +169,10 @@ describe<{
 
 	each(
 		"should parse process.env.%s",
-		async ({ context: { schema }, dataset: name }) => {
+		async ({ context: { serviceProvider }, dataset: name }) => {
 			process.env[name] = "42";
 
-			const { error, value } = schema.validate(await importDefaults());
+			const { error, value } = serviceProvider.configSchema().validate(await importDefaults());
 
 			assert.undefined(error);
 			assert.equal(value[numericSettings[name]], 42);
@@ -176,58 +182,67 @@ describe<{
 
 	each(
 		"should throw if process.env.%s is not number",
-		async ({ context: { schema }, dataset: name }) => {
+		async ({ context: { serviceProvider }, dataset: name }) => {
 			process.env[name] = "false";
 
-			const { error } = schema.validate(await importDefaults());
+			const { error } = serviceProvider.configSchema().validate(await importDefaults());
 
 			assert.equal(error?.message, `"${numericSettings[name]}" must be a number`);
 		},
 		Object.keys(numericSettings),
 	);
 
-	it("schema restrictions - enabled is required", async ({ schema }) => {
+	it("schema restrictions - enabled is required", async ({ serviceProvider }) => {
 		const defaults = await importDefaults();
 
 		delete defaults.enabled;
 
-		assert.equal(schema.validate(defaults).error?.message, '"enabled" is required');
+		assert.equal(serviceProvider.configSchema().validate(defaults).error?.message, '"enabled" is required');
 	});
 
-	it("schema restrictions - storage is required", async ({ schema }) => {
+	it("schema restrictions - storage is required", async ({ serviceProvider }) => {
 		const defaults = await importDefaults();
 
 		delete defaults.storage;
 
-		assert.equal(schema.validate(defaults).error?.message, '"storage" is required');
+		assert.equal(serviceProvider.configSchema().validate(defaults).error?.message, '"storage" is required');
 	});
 
-	it("schema restrictions - allowedSenders is required && must contain strings", async ({ schema }) => {
+	it("schema restrictions - allowedSenders is required && must contain strings", async ({ serviceProvider }) => {
 		const defaults = await importDefaults();
 
 		delete defaults.allowedSenders;
-		assert.equal(schema.validate(defaults).error?.message, '"allowedSenders" is required');
+		assert.equal(serviceProvider.configSchema().validate(defaults).error?.message, '"allowedSenders" is required');
 
 		defaults.allowedSenders = [1, 2];
-		assert.equal(schema.validate(defaults).error?.message, '"allowedSenders[0]" must be a string');
+		assert.equal(
+			serviceProvider.configSchema().validate(defaults).error?.message,
+			'"allowedSenders[0]" must be a string',
+		);
 	});
 
 	each(
 		"schema restrictions - %s is required && is integer && >= 1",
-		async ({ context: { schema }, dataset: key }) => {
+		async ({ context: { serviceProvider }, dataset: key }) => {
 			const defaults = await importDefaults();
 
 			defaults[key] = false;
-			assert.equal(schema.validate(defaults).error?.message, `"${key}" must be a number`);
+			assert.equal(serviceProvider.configSchema().validate(defaults).error?.message, `"${key}" must be a number`);
 
 			defaults[key] = 1.12;
-			assert.equal(schema.validate(defaults).error?.message, `"${key}" must be an integer`);
+			assert.equal(
+				serviceProvider.configSchema().validate(defaults).error?.message,
+				`"${key}" must be an integer`,
+			);
 
 			defaults[key] = 0;
-			assert.equal(schema.validate(defaults).error?.message, `"${key}" must be greater than or equal to 1`);
+			assert.equal(
+				serviceProvider.configSchema().validate(defaults).error?.message,
+				`"${key}" must be greater than or equal to 1`,
+			);
 
 			delete defaults[key];
-			assert.equal(schema.validate(defaults).error?.message, `"${key}" is required`);
+			assert.equal(serviceProvider.configSchema().validate(defaults).error?.message, `"${key}" is required`);
 		},
 		[
 			"maxTransactionAge",
@@ -238,58 +253,78 @@ describe<{
 		],
 	);
 
-	it("schema restrictions - rebroadcastCooldownBlocks is required && is integer && >= 0", async ({ schema }) => {
+	it("schema restrictions - rebroadcastCooldownBlocks is required && is integer && >= 0", async ({
+		serviceProvider,
+	}) => {
 		const defaults = await importDefaults();
 
 		defaults.rebroadcastCooldownBlocks = 0;
-		assert.undefined(schema.validate(defaults).error);
+		assert.undefined(serviceProvider.configSchema().validate(defaults).error);
 
 		defaults.rebroadcastCooldownBlocks = false;
-		assert.equal(schema.validate(defaults).error?.message, '"rebroadcastCooldownBlocks" must be a number');
+		assert.equal(
+			serviceProvider.configSchema().validate(defaults).error?.message,
+			'"rebroadcastCooldownBlocks" must be a number',
+		);
 
 		defaults.rebroadcastCooldownBlocks = 1.12;
-		assert.equal(schema.validate(defaults).error?.message, '"rebroadcastCooldownBlocks" must be an integer');
+		assert.equal(
+			serviceProvider.configSchema().validate(defaults).error?.message,
+			'"rebroadcastCooldownBlocks" must be an integer',
+		);
 
 		defaults.rebroadcastCooldownBlocks = -1;
 		assert.equal(
-			schema.validate(defaults).error?.message,
+			serviceProvider.configSchema().validate(defaults).error?.message,
 			'"rebroadcastCooldownBlocks" must be greater than or equal to 0',
 		);
 
 		delete defaults.rebroadcastCooldownBlocks;
-		assert.equal(schema.validate(defaults).error?.message, '"rebroadcastCooldownBlocks" is required');
+		assert.equal(
+			serviceProvider.configSchema().validate(defaults).error?.message,
+			'"rebroadcastCooldownBlocks" is required',
+		);
 	});
 
 	it("schema restrictions - rebroadcastThreshold is required && is integer && between 0 and 100", async ({
-		schema,
+		serviceProvider,
 	}) => {
 		const defaults = await importDefaults();
 
 		defaults.rebroadcastThreshold = 0;
-		assert.undefined(schema.validate(defaults).error);
+		assert.undefined(serviceProvider.configSchema().validate(defaults).error);
 
 		defaults.rebroadcastThreshold = 100;
-		assert.undefined(schema.validate(defaults).error);
+		assert.undefined(serviceProvider.configSchema().validate(defaults).error);
 
 		defaults.rebroadcastThreshold = false;
-		assert.equal(schema.validate(defaults).error?.message, '"rebroadcastThreshold" must be a number');
+		assert.equal(
+			serviceProvider.configSchema().validate(defaults).error?.message,
+			'"rebroadcastThreshold" must be a number',
+		);
 
 		defaults.rebroadcastThreshold = 1.12;
-		assert.equal(schema.validate(defaults).error?.message, '"rebroadcastThreshold" must be an integer');
+		assert.equal(
+			serviceProvider.configSchema().validate(defaults).error?.message,
+			'"rebroadcastThreshold" must be an integer',
+		);
 
 		defaults.rebroadcastThreshold = -1;
 		assert.equal(
-			schema.validate(defaults).error?.message,
+			serviceProvider.configSchema().validate(defaults).error?.message,
 			'"rebroadcastThreshold" must be greater than or equal to 0',
 		);
 
 		defaults.rebroadcastThreshold = 101;
 		assert.equal(
-			schema.validate(defaults).error?.message,
+			serviceProvider.configSchema().validate(defaults).error?.message,
 			'"rebroadcastThreshold" must be less than or equal to 100',
 		);
 
 		delete defaults.rebroadcastThreshold;
-		assert.equal(schema.validate(defaults).error?.message, '"rebroadcastThreshold" is required');
+		assert.equal(
+			serviceProvider.configSchema().validate(defaults).error?.message,
+			'"rebroadcastThreshold" is required',
+		);
 	});
 });
