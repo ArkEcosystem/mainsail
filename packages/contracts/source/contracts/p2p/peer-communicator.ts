@@ -4,6 +4,7 @@ import type {
 	GetMessagesQuery,
 	GetMessagesResponse,
 	GetPeersResponse,
+	GetProposalQuery,
 	GetProposalResponse,
 	GetStatusResponse,
 } from "./endpoints.js";
@@ -22,7 +23,7 @@ export interface PeerCommunicator {
 	getPeers(peer: Peer): Promise<GetPeersResponse>;
 	getApiNodes(peer: Peer): Promise<GetApiNodesResponse>;
 	getMessages(peer: Peer, query: GetMessagesQuery): Promise<GetMessagesResponse>;
-	getProposal(peer: Peer): Promise<GetProposalResponse>;
+	getProposal(peer: Peer, query: GetProposalQuery): Promise<GetProposalResponse>;
 	getBlocks(
 		peer: Peer,
 		{ fromBlockNumber, limit }: { fromBlockNumber: number; limit?: number },
