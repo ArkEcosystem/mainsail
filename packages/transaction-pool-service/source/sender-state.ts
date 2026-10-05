@@ -10,7 +10,8 @@ import {
 	TransactionFailedToPreverifyError,
 	UnexpectedLegacySecondSignatureError,
 } from "@mainsail/exceptions";
-import { Wallets } from "@mainsail/state";
+
+import { Wallet } from "./wallet.js";
 
 @injectable()
 export class SenderState implements Contracts.TransactionPool.SenderState {
@@ -37,7 +38,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	#wallet!: Contracts.State.Wallet;
 
 	public async configure(address: string, legacyAddress?: string): Promise<SenderState> {
-		this.#wallet = await this.app.resolve(Wallets.Wallet).init(address, legacyAddress);
+		this.#wallet = await this.app.resolve(Wallet).init(address, legacyAddress);
 		return this;
 	}
 
@@ -46,9 +47,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	}
 
 	public async reset(): Promise<void> {
-		this.#wallet = await this.app
-			.resolve(Wallets.Wallet)
-			.init(this.#wallet.getAddress(), this.#wallet.getLegacyAddress());
+		this.#wallet = await this.app.resolve(Wallet).init(this.#wallet.getAddress(), this.#wallet.getLegacyAddress());
 	}
 
 	public async apply(transaction: Contracts.Crypto.Transaction): Promise<void> {
