@@ -6,5 +6,3 @@ export * from "./sender-state.js";
 export * from "./service-provider.js";
 export * from "./service.js";
 export * from "./storage.js";
-export * from "./utilities.js";
-export * from "./wallet.js";

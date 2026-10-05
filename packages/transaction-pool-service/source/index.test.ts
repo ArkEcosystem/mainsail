@@ -18,6 +18,10 @@ describe("Index", ({ assert, it }) => {
 		assert.defined(index.Query);
 	});
 
+	it("should export QueryIterable", () => {
+		assert.defined(index.QueryIterable);
+	});
+
 	it("should export SenderMempool", () => {
 		assert.defined(index.SenderMempool);
 	});
