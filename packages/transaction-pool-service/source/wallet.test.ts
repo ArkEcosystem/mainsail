@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { Wallet } from ".";
+import { Wallet } from "./wallet.js";
 
 describe<{
 	app: Application;
