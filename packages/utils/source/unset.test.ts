@@ -3,18 +3,18 @@ import { unset } from "./unset";
 
 describe("unset", async ({ assert, it, nock, loader }) => {
 	it("should return false if the target is not an object", () => {
-		assert.false(unset([], "a.b.c"));
+		assert.false(unset(undefined, "a"));
 	});
 
 	it("should return false if the path is not a string", () => {
 		assert.false(unset({}, 123));
 	});
 
-	it("should not do anything if the object is not an object", () => {
+	it("should return false if the path does not exist", () => {
 		assert.false(unset([], "a.b.c"));
 	});
 
-	it("should work with a string or array as path", () => {
+	it("should unset a nested path", () => {
 		const object = { a: { b: { c: 7 } } };
 
 		unset(object, "a.b.c");
@@ -31,6 +31,14 @@ describe("unset", async ({ assert, it, nock, loader }) => {
 
 		assert.false(unset(object, "a.b"));
 		assert.equal(object, { a: 1 });
+	});
+
+	it("should return false if an intermediate segment is null", () => {
+		const object = { a: null };
+
+		assert.false(unset(object, "a.b"));
+		assert.false(unset(null, "a"));
+		assert.equal(object, { a: null });
 	});
 
 	it("should return false if the path contains dangerous segments", () => {

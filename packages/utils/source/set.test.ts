@@ -6,7 +6,7 @@ describe("set", async ({ assert, it, nock, loader }) => {
 		assert.false(set(undefined, "a.b.c", 4));
 	});
 
-	it("should work with a string or array as path", () => {
+	it("should set a nested path", () => {
 		const object = { a: { b: { c: 3 } } };
 
 		set(object, "a.b.c", 4);
@@ -16,5 +16,24 @@ describe("set", async ({ assert, it, nock, loader }) => {
 		set(object, "x.y.z", 5);
 
 		assert.is(object.x.y.z, 5);
+	});
+
+	it("should replace a null intermediate segment with an object", () => {
+		const object = { a: null };
+
+		assert.true(set(object, "a.b", 1));
+		assert.equal(object, { a: { b: 1 } });
+		assert.false(set(null, "a", 1));
+	});
+
+	it("should not write through dangerous path segments", () => {
+		const object = { a: {} };
+
+		set(object, "__proto__.polluted", true);
+		set(object, "constructor.prototype.polluted", true);
+		set(object, "a.prototype", true);
+
+		assert.undefined(({} as Record<string, unknown>).polluted);
+		assert.equal(object, { a: {} });
 	});
 });
