@@ -85,4 +85,41 @@ describe("Lock", ({ assert, it }) => {
 
 		assert.equal(await Promise.all(promises), [1, 3, 3]);
 	});
+
+	it("should let a non-exclusive execution run after a rejected exclusive one", async () => {
+		const lock = new Lock();
+		const error = new Error("boom");
+
+		const exclusive = lock.runExclusive(async () => {
+			throw error;
+		});
+		const nonExclusive = lock.runNonExclusive(async () => "ok");
+
+		await assert.rejects(() => exclusive, "boom");
+		assert.equal(await nonExclusive, "ok");
+	});
+
+	it("should let an exclusive execution run after a rejected exclusive one", async () => {
+		const lock = new Lock();
+
+		const first = lock.runExclusive(async () => {
+			throw new Error("boom");
+		});
+		const second = lock.runExclusive(async () => "ok");
+
+		await assert.rejects(() => first, "boom");
+		assert.equal(await second, "ok");
+	});
+
+	it("should let an exclusive execution run after a rejected non-exclusive one", async () => {
+		const lock = new Lock();
+
+		const nonExclusive = lock.runNonExclusive(async () => {
+			throw new Error("boom");
+		});
+		const exclusive = lock.runExclusive(async () => "ok");
+
+		await assert.rejects(() => nonExclusive, "boom");
+		assert.equal(await exclusive, "ok");
+	});
 });

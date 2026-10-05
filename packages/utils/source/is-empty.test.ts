@@ -33,4 +33,18 @@ describe("at", async ({ assert, it, nock, loader }) => {
 	it("should return false if the value contains something", () => {
 		assert.false(isEmpty([1]));
 	});
+
+	it("should return false for non-empty strings, maps and sets", () => {
+		assert.false(isEmpty("a"));
+		assert.false(isEmpty(new Map([["a", 1]])));
+		assert.false(isEmpty(new Set([1])));
+		assert.false(isEmpty({ a: 1 }));
+	});
+
+	it("should return false for truthy primitives and functions", () => {
+		assert.false(isEmpty(1));
+		assert.false(isEmpty(true));
+		assert.false(isEmpty(() => {}));
+		assert.false(isEmpty(Symbol("a")));
+	});
 });

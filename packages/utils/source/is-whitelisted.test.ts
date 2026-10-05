@@ -34,4 +34,9 @@ describe("isWhitelisted", ({ assert, it }) => {
 		assert.true(isWhitelisted(["*.127"], "1.1.1.127"));
 		assert.false(isWhitelisted(["*.127"], "1.1.1.128"));
 	});
+
+	it("should skip invalid patterns instead of throwing", () => {
+		assert.false(isWhitelisted([""], "127.0.0.1"));
+		assert.true(isWhitelisted(["", "127.*"], "127.0.0.1"));
+	});
 });

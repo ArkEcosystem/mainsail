@@ -39,4 +39,9 @@ describe("isBlacklisted", ({ assert, it }) => {
 		assert.true(isBlacklisted(["*:104"], "2001:3984:3989::104"));
 		assert.false(isBlacklisted(["*:104"], "2001:3984:3989::105"));
 	});
+
+	it("should skip invalid patterns instead of throwing", () => {
+		assert.false(isBlacklisted([""], "127.0.0.1"));
+		assert.true(isBlacklisted(["", "127.*"], "127.0.0.1"));
+	});
 });
