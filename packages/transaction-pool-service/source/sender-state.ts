@@ -47,9 +47,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	}
 
 	public async reset(): Promise<void> {
-		this.#wallet = await this.app
-			.resolve(Wallet)
-			.init(this.#wallet.getAddress(), this.#wallet.getLegacyAddress());
+		this.#wallet = await this.app.resolve(Wallet).init(this.#wallet.getAddress(), this.#wallet.getLegacyAddress());
 	}
 
 	public async apply(transaction: Contracts.Crypto.Transaction): Promise<void> {
