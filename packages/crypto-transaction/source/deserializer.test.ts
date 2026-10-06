@@ -6,6 +6,8 @@ import { parseTransaction } from "viem";
 import { Deserialized, Serialized } from "../test/fixtures/index.js";
 import {
 	encodeLegacy,
+	encodeList,
+	encodeRlp,
 	fixedWidth32,
 	legacyRlpFields,
 	signTransfer,
@@ -213,6 +215,29 @@ describe<{
 		await assert.rejects(
 			() => deserializer.deserialize(encodeLegacy([...fields, new Uint8Array()])),
 			"decoded RLP legacy second signature is empty",
+		);
+	});
+
+	it("should reject length prefixes that overflow 32 bits", async ({ app, deserializer }) => {
+		const items = [...legacyRlpFields(await signTransfer(app)), new Uint8Array(65)].map((item) => encodeRlp(item));
+		const payload = Buffer.concat(items);
+		assert.true(payload.length < 256);
+
+		await assert.resolves(() => deserializer.deserialize(encodeList(items)));
+		await assert.rejects(
+			() =>
+				deserializer.deserialize(Buffer.concat([Buffer.from([0xfc, 0x01, 0, 0, 0, payload.length]), payload])),
+			"decode RLP truncated long list",
+		);
+		await assert.rejects(
+			() =>
+				deserializer.deserialize(
+					encodeList([
+						...items.slice(0, 9),
+						Buffer.concat([Buffer.from([0xbc, 0x01, 0, 0, 0, 65]), new Uint8Array(65)]),
+					]),
+				),
+			"decode RLP truncated long str",
 		);
 	});
 });
