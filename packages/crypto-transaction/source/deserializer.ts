@@ -138,7 +138,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		const fields: Hex[] = [];
 		let offset = start;
 		while (offset < end) {
-			if (fields.length > 10) {
+			if (fields.length >= 10) {
 				throw new Error("decoded RLP contains too many fields");
 			}
 

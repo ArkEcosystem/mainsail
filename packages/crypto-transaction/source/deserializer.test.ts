@@ -195,4 +195,14 @@ describe<{
 			await assert.rejects(() => deserializer.deserialize(encodeLegacy(orderFields)), "out of range");
 		}
 	});
+
+	it("should reject a transaction with 11 fields", async ({ app, deserializer }) => {
+		const fields = legacyRlpFields(await signTransfer(app));
+
+		await assert.resolves(() => deserializer.deserialize(encodeLegacy([...fields, new Uint8Array(65)])));
+		await assert.rejects(
+			() => deserializer.deserialize(encodeLegacy([...fields, new Uint8Array(65), new Uint8Array()])),
+			"decoded RLP contains too many fields",
+		);
+	});
 });
