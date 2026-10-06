@@ -183,6 +183,10 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 		// Legacy second signature
 		if (fields.length === 10) {
+			if (fields[9] === "0x") {
+				throw new Error("decoded RLP legacy second signature is empty");
+			}
+
 			legacySecondSignature = fields[9].slice(2);
 		}
 
