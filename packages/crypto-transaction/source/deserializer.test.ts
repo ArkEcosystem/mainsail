@@ -205,4 +205,14 @@ describe<{
 			"decoded RLP contains too many fields",
 		);
 	});
+
+	it("should reject an empty legacy second signature field", async ({ app, deserializer }) => {
+		const fields = legacyRlpFields(await signTransfer(app));
+
+		await assert.resolves(() => deserializer.deserialize(encodeLegacy([...fields, new Uint8Array(65)])));
+		await assert.rejects(
+			() => deserializer.deserialize(encodeLegacy([...fields, new Uint8Array()])),
+			"decoded RLP legacy second signature is empty",
+		);
+	});
 });
