@@ -20,11 +20,18 @@ export class Signature implements Contracts.Crypto.SignatureEcdsa {
 		message: Buffer,
 		publicKey: Buffer,
 	): Promise<boolean> {
-		if (!this.isLowS(signature)) {
+		if (!this.isLowS(signature) || (signature.v !== 0 && signature.v !== 1)) {
 			return false;
 		}
 
-		return secp256k1.verify(message, Buffer.from(signature.r + signature.s, "hex"), publicKey);
+		const recovered = secp256k1.recover(
+			message,
+			Buffer.from(signature.r + signature.s, "hex"),
+			signature.v,
+			publicKey.length === 33,
+		);
+
+		return recovered !== null && recovered.equals(publicKey);
 	}
 
 	public isLowS(signature: Contracts.Crypto.EcdsaSignature): boolean {

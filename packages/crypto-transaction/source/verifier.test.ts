@@ -121,6 +121,23 @@ describe<{
 		);
 	});
 
+	it("verifyLegacySecondSignature - should throw if the recovery id is changed", async ({ factory, verifier }) => {
+		const serialized = Serialized.transactionTransferWithSecondSignature;
+
+		assert.true(
+			await verifier.verifyLegacySecondSignature((await factory.fromHex(serialized)).toData(), wallet.publicKey),
+		);
+
+		for (const recoveryId of ["01", "02", "1b", "ff"]) {
+			const transaction = await factory.fromHex(serialized.slice(0, -2) + recoveryId);
+
+			await assert.rejects(
+				() => verifier.verifyLegacySecondSignature(transaction.toData(), wallet.publicKey),
+				InvalidLegacySecondSignatureError,
+			);
+		}
+	});
+
 	it("verifyLegacySecondSignature - should throw if signed over the unsigned transaction", async ({
 		factory,
 		signer,
