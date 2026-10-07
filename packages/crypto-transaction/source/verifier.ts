@@ -35,7 +35,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 	}
 
 	public async verifyLegacySecondSignature(
-		data: Contracts.Crypto.TransactionSerializable,
+		data: Contracts.Crypto.TransactionData,
 		legacySecondPublicKey: string,
 	): Promise<boolean> {
 		const { legacySecondSignature } = data;
@@ -48,7 +48,7 @@ export class Verifier implements Contracts.Crypto.TransactionVerifier {
 		const s = legacySecondSignature.slice(64, 128);
 		const v = Number.parseInt(legacySecondSignature.slice(128, 130), 16);
 
-		const hash: Buffer = await this.hashFactory.toHashUnsigned(data);
+		const hash: Buffer = this.hashFactory.toLegacySecondSignatureHash(Buffer.from(data.hash, "hex"));
 
 		const verified = await this.signatureFactory.verifyRecoverable(
 			{ r, s, v },
