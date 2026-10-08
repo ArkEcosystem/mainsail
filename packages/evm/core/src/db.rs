@@ -2487,6 +2487,47 @@ mod tests {
     }
 
     #[test]
+    fn test_set_genesis_info_on_new_instance_after_genesis_commit() {
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+
+        let genesis_info = crate::db::GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            initial_block_number: 1000,
+            ..Default::default()
+        };
+
+        let mut db =
+            PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("db");
+        db.set_genesis_info(genesis_info.clone()).expect("ok");
+
+        let mut state_commit = StateCommit {
+            key: CommitKey(genesis_info.initial_block_number, 0, B256::ZERO),
+            change_set: StateChangeset {
+                accounts: vec![(genesis_info.account, None)],
+                ..Default::default()
+            },
+            results: Default::default(),
+        };
+        db.commit(&mut state_commit, &None).unwrap();
+        drop(db);
+
+        // Each boot and each proposal opens a new instance without genesis info.
+        let mut db =
+            PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("db");
+
+        assert_eq!(db.genesis_info, None);
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+
+        db.set_genesis_info(genesis_info.clone()).expect("ok");
+
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+        assert_eq!(db.genesis_info, Some(genesis_info));
+    }
+
+    #[test]
     fn test_get_commits_by_block_range() {
         let db = create_temp_database();
 
