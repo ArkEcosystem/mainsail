@@ -230,7 +230,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				validators.push({
 					arkAddress: wallet.arkAddress,
 					ethAddress,
-					isResigned: wallet.attributes?.["delegate"]["isResigned"] ?? false,
+					isResigned: wallet.attributes?.["delegate"]["resigned"] ?? false,
 					publicKey: wallet.publicKey,
 					username: wallet.attributes?.["delegate"]["username"],
 				});
@@ -253,6 +253,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			`snapshot stats: ${JSON.stringify({
 				coldWallets: foundColdWallets,
 				genesisBlockNumber: genesisBlockNumber.toString(),
+				resignedValidators: validators.filter(({ isResigned }) => isResigned).length,
 				totalSupply: totalSupply.toString(),
 				validators: validators.length,
 				voters: voters.length,
