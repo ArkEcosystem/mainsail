@@ -545,6 +545,10 @@ impl PersistentDB {
         self.with_write_txn(|wtxn| {
             let inner = &self.inner;
 
+            if self.is_block_committed(wtxn, genesis_info.initial_block_number)? {
+                return Ok(());
+            }
+
             if inner
                 .accounts
                 .get(wtxn, &AddressWrapper(genesis_info.account))?
@@ -2442,6 +2446,46 @@ mod tests {
 
         assert_eq!(db.genesis_info, Some(Default::default()));
     }
+
+    #[test]
+    fn test_set_genesis_info_seeds_account_until_genesis_commit() {
+        let mut db = create_temp_database();
+
+        let genesis_info = crate::db::GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            initial_block_number: 1000,
+            ..Default::default()
+        };
+
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+
+        db.set_genesis_info(genesis_info.clone()).expect("ok");
+
+        assert_eq!(
+            db.basic(genesis_info.account).unwrap(),
+            Some(AccountInfo::default())
+        );
+
+        // The genesis block deletes the empty genesis account.
+        let mut state_commit = StateCommit {
+            key: CommitKey(genesis_info.initial_block_number, 0, B256::ZERO),
+            change_set: StateChangeset {
+                accounts: vec![(genesis_info.account, None)],
+                ..Default::default()
+            },
+            results: Default::default(),
+        };
+        db.commit(&mut state_commit, &None).unwrap();
+
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+
+        // A restart or proposal initializes the genesis info again.
+        db.set_genesis_info(genesis_info.clone()).expect("ok");
+
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+        assert_eq!(db.genesis_info, Some(genesis_info));
+    }
+
     #[test]
     fn test_get_commits_by_block_range() {
         let db = create_temp_database();
