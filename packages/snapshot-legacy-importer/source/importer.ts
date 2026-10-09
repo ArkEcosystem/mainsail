@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
+import { ConsensusAbi, parseTransactionError, UsernamesAbi } from "@mainsail/evm-contracts";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, chunk, ensureError } from "@mainsail/utils";
 import { createHash } from "node:crypto";
@@ -10,6 +10,8 @@ import { promisify } from "node:util";
 import { brotliDecompress } from "node:zlib";
 import path from "path";
 import { encodeFunctionData } from "viem";
+
+const TRANSACTION_GAS_LIMIT = 200_000_000;
 
 @injectable()
 export class Importer implements Contracts.Snapshot.LegacyImporter {
@@ -378,7 +380,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			);
 
 			if (!result.receipt.status) {
-				throw new Error("failed to add validator");
+				throw new Error(`failed to add validator ${validator.ethAddress}: ${this.#getError(result.receipt)}`);
 			}
 
 			importedValidators++;
@@ -421,8 +423,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			);
 
 			if (!result.receipt.status) {
-				console.log(result.receipt, result.receipt.output?.toString("hex"));
-				throw new Error("failed to add votes");
+				throw new Error(
+					`failed to add ${voterAddresses.length} votes starting with ${voterAddresses[0]}: ${this.#getError(result.receipt)}`,
+				);
 			}
 
 			importedVoters += voterAddresses.length;
@@ -455,7 +458,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			);
 
 			if (!result.receipt.status) {
-				throw new Error("failed to add username");
+				throw new Error(
+					`failed to add username ${validator.username} for ${validator.ethAddress}: ${this.#getError(result.receipt)}`,
+				);
 			}
 
 			importedUsernames++;
@@ -477,7 +482,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			commitKey: options.commitKey,
 			data: Buffer.from(options.data, "hex"),
 			from: this.deployerAddress,
-			gasLimit: BigInt(200_000_000),
+			gasLimit: BigInt(TRANSACTION_GAS_LIMIT),
 			gasPrice: BigInt(0),
 			nonce,
 			specId: evmSpec,
@@ -485,6 +490,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			txHash: this.#generateTxHash(),
 			value: 0n,
 		} as Contracts.Evm.TransactionContext;
+	}
+
+	#getError(receipt: Contracts.Evm.TransactionReceipt): string | undefined {
+		return parseTransactionError({ gasLimit: TRANSACTION_GAS_LIMIT } as Contracts.Crypto.Transaction, receipt);
 	}
 
 	#generateTxHash = () =>
