@@ -233,4 +233,92 @@ describe<{
 			await instance.dispose();
 		}
 	});
+
+	it("initializeGenesis after the genesis commit keeps state roots in sync", async () => {
+		const genesisInfo: Contracts.Evm.GenesisInfo = {
+			account: "0x1111111111111111111111111111111111111111",
+			deployerAccount: "0x0000000000000000000000000000000000000001",
+			initialBlockNumber: 0n,
+			initialSupply: 0n,
+			usernameContract: "0x0000000000000000000000000000000000000001",
+			validatorContract: "0x0000000000000000000000000000000000000001",
+		};
+
+		const hasGenesisAccount = async (instance: Contracts.Evm.Instance & Contracts.Evm.Storage) => {
+			const { accounts } = await instance.getAccounts(0n, 1000n);
+			return accounts.some(({ address }) => address.toLowerCase() === genesisInfo.account.toLowerCase());
+		};
+
+		const commitGenesisBlock = async (instance: Contracts.Evm.Instance & Contracts.Evm.Storage) => {
+			const commitKey = { blockNumber: 0n, round: 0n };
+
+			await instance.initializeGenesis(genesisInfo);
+			assert.true(await hasGenesisAccount(instance));
+
+			await instance.prepareNextCommit({
+				blockContext: { ...blockContext, commitKey, validatorAddress: genesisInfo.account },
+			});
+			await instance.updateRewardsAndVotes({
+				blockReward: 0n,
+				commitKey,
+				specId: Enums.Evm.SpecId.OSAKA,
+				timestamp: 12_345n,
+				validatorAddress: genesisInfo.account,
+			});
+			await instance.onCommit({
+				blockNumber: 0n,
+				getBlock: () => ({ number: 0n, round: 0n }),
+				round: 0n,
+				setAccountUpdates: () => {},
+				setContractEvents: () => {},
+			} as any);
+		};
+
+		const touchGenesisAccount = async (instance: Contracts.Evm.Instance) => {
+			const commitKey = { blockNumber: 1n, round: 0n };
+
+			await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+			const { receipt } = await instance.process({
+				commitKey,
+				data: Buffer.alloc(0),
+				from: genesisInfo.deployerAccount,
+				gasLimit: 21_000n,
+				gasPrice: 0n,
+				nonce: (await instance.getAccountInfo(genesisInfo.deployerAccount)).nonce,
+				specId: Enums.Evm.SpecId.OSAKA,
+				to: genesisInfo.account,
+				txHash: "11".repeat(32),
+				value: 0n,
+			});
+			assert.equal(receipt.status, 1);
+
+			return instance.stateRoot(commitKey, zeroHash.slice(2));
+		};
+
+		const instances: (Contracts.Evm.Instance & Contracts.Evm.Storage)[] = [];
+
+		try {
+			for (let index = 0; index < 2; index++) {
+				const context = {} as { app: Application };
+				await prepareSandbox(context);
+				instances.push(context.app.resolve<Contracts.Evm.Instance & Contracts.Evm.Storage>(EvmInstance));
+			}
+
+			const [running, restarted] = instances;
+
+			for (const instance of instances) {
+				await commitGenesisBlock(instance);
+				assert.false(await hasGenesisAccount(instance));
+			}
+
+			await restarted.initializeGenesis(genesisInfo);
+
+			assert.false(await hasGenesisAccount(restarted));
+			assert.equal(await touchGenesisAccount(restarted), await touchGenesisAccount(running));
+		} finally {
+			for (const instance of instances) {
+				await instance.dispose();
+			}
+		}
+	});
 });

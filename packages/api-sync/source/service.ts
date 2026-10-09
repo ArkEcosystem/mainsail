@@ -90,10 +90,6 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(ApiDatabaseIdentifiers.LegacyColdWalletRepositoryFactory)
 	private readonly legacyColdWalletRepositoryFactory!: ApiDatabaseContracts.LegacyColdWalletRepositoryFactory;
 
-	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "evm")
-	private readonly evm!: Contracts.Evm.Instance;
-
 	@inject(Identifiers.EvmConsensus.Contracts.MultiPayment)
 	private readonly multiPaymentContractAddress!: string;
 
@@ -258,22 +254,6 @@ export class Sync implements Contracts.ApiSync.Service {
 				accumulator[current.address] = current;
 				return accumulator;
 			}, {});
-
-		// Add accountUpdate for genesisAccount on the very first non-genesis block to ensure
-		// the wallet is created in postgres.
-		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
-		assert.defined(genesisBlock);
-
-		if (unit.blockNumber - 1 === genesisBlock.block.number && !accountUpdates[genesisBlock.block.proposer]) {
-			const genesisAccount = await this.evm.getAccountInfo(genesisBlock.block.proposer);
-
-			accountUpdates[genesisBlock.block.proposer] = {
-				address: genesisBlock.block.proposer,
-				balance: genesisAccount.balance,
-				nonce: genesisAccount.nonce,
-				usernameResigned: false,
-			};
-		}
 
 		const validatorAttributes = (address: string) => {
 			const dirtyValidator = dirtyValidators[address];
