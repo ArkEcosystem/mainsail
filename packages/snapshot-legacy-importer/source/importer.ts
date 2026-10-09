@@ -42,24 +42,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	#prepared = false;
+	#imported = false;
 
-	#data: {
-		wallets: Contracts.Snapshot.ImportedLegacyWallet[];
-		voters: Contracts.Snapshot.ImportedLegacyVoter[];
-		validators: Contracts.Snapshot.ImportedLegacyValidator[];
-		snapshotHash: string;
-		genesisBlockNumber: bigint;
-		previousGenesisBlockHash: string;
-		totalSupply: bigint;
-	} = {
-		genesisBlockNumber: 0n,
-		previousGenesisBlockHash: "",
-		snapshotHash: "",
-		totalSupply: 0n,
-		validators: [],
-		voters: [],
-		wallets: [],
-	};
+	#data = this.#emptyData();
 
 	public get validators(): Contracts.Snapshot.ImportedLegacyValidator[] {
 		return this.#data.validators;
@@ -261,6 +246,16 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	public async import(
 		options: Contracts.Snapshot.LegacyImportOptions,
 	): Promise<Contracts.Snapshot.LegacyImportResult> {
+		if (!this.#prepared) {
+			throw new Error("snapshot is not prepared");
+		}
+
+		if (this.#imported) {
+			throw new Error("snapshot already imported");
+		}
+
+		this.#imported = true;
+
 		await this.evm.prepareNextCommit({
 			blockContext: {
 				commitKey: options.commitKey,
@@ -303,9 +298,29 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	}
 
 	public dispose(): void {
-		this.#data.wallets = [];
-		this.#data.validators = [];
-		this.#data.voters = [];
+		this.#data = this.#emptyData();
+		this.#prepared = false;
+		this.#imported = false;
+	}
+
+	#emptyData(): {
+		wallets: Contracts.Snapshot.ImportedLegacyWallet[];
+		voters: Contracts.Snapshot.ImportedLegacyVoter[];
+		validators: Contracts.Snapshot.ImportedLegacyValidator[];
+		snapshotHash: string;
+		genesisBlockNumber: bigint;
+		previousGenesisBlockHash: string;
+		totalSupply: bigint;
+	} {
+		return {
+			genesisBlockNumber: 0n,
+			previousGenesisBlockHash: "",
+			snapshotHash: "",
+			totalSupply: 0n,
+			validators: [],
+			voters: [],
+			wallets: [],
+		};
 	}
 
 	async #seedWallets(): Promise<void> {
