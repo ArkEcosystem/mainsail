@@ -21,9 +21,6 @@ describe<{
 			Identifiers.EvmConsensus.Contracts.Consensus,
 			Identifiers.EvmConsensus.Contracts.Usernames,
 			Identifiers.Cryptography.Hash.Factory,
-			Identifiers.Cryptography.Identity.Address.Factory,
-			Identifiers.Cryptography.Legacy.Identity.AddressFactory,
-			Identifiers.Cryptography.Identity.PublicKey.Factory,
 		]) {
 			context.app.bind(identifier).toConstantValue({});
 		}
