@@ -3,6 +3,8 @@ import type { Contracts } from "@mainsail/contracts";
 import { injectable } from "@mainsail/container";
 import { secp256k1 } from "bcrypto";
 
+const RECOVERY_IDS = new Set([0, 1]);
+
 @injectable()
 export class Signature implements Contracts.Crypto.SignatureEcdsa {
 	public async signRecoverable(message: Buffer, privateKey: Buffer): Promise<Contracts.Crypto.EcdsaSignature> {
@@ -20,7 +22,7 @@ export class Signature implements Contracts.Crypto.SignatureEcdsa {
 		message: Buffer,
 		publicKey: Buffer,
 	): Promise<boolean> {
-		if (!this.isLowS(signature) || (signature.v !== 0 && signature.v !== 1)) {
+		if (!this.isLowS(signature) || !RECOVERY_IDS.has(signature.v)) {
 			return false;
 		}
 
