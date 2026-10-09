@@ -292,7 +292,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		this.#nonce = deployerAccount.nonce;
 
 		// 1) Seed account balances
-		const totalSupply = await this.#seedWallets(options);
+		await this.#seedWallets();
 
 		// 2) Seed validators
 		const importedValidators = await this.#seedValidators(options);
@@ -303,15 +303,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		// 4) Seed usernames
 		const importedUsernames = await this.#seedUsernames(options);
 
-		if (totalSupply !== this.totalSupply) {
-			throw new Error("totalSupply mismatch");
-		}
-
 		return {
 			importedUsernames,
 			importedValidators,
 			importedVoters,
-			initialTotalSupply: totalSupply,
+			initialTotalSupply: this.#data.totalSupply,
 		};
 	}
 
@@ -329,9 +325,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		this.#data.voters = [];
 	}
 
-	async #seedWallets(options: Contracts.Snapshot.LegacyImportOptions): Promise<bigint> {
-		let totalSupply = 0n;
-
+	async #seedWallets(): Promise<void> {
 		this.logger.info(`seeding ${this.#data.wallets.length} wallets`);
 
 		const wallets: Contracts.Evm.AccountInfoExtended[] = [];
@@ -352,8 +346,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 					legacyAttributes: wallet.legacyAttributes,
 				});
 			}
-
-			totalSupply += wallet.balance;
 		}
 
 		for (const batch of chunk(wallets, 1000)) {
@@ -363,8 +355,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		for (const batch of chunk(coldWallets, 1000)) {
 			await this.evm.importLegacyColdWallets(batch);
 		}
-
-		return totalSupply;
 	}
 
 	async #seedValidators(options: Contracts.Snapshot.LegacyImportOptions): Promise<number> {
