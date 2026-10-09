@@ -51,11 +51,9 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		genesisBlockNumber: bigint;
 		previousGenesisBlockHash: string;
 		totalSupply: bigint;
-		result: Contracts.Snapshot.LegacyImportResult | undefined;
 	} = {
 		genesisBlockNumber: 0n,
 		previousGenesisBlockHash: "",
-		result: undefined,
 		snapshotHash: "",
 		totalSupply: 0n,
 		validators: [],
@@ -77,14 +75,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 	public get previousGenesisBlockHash(): string {
 		return this.#data.previousGenesisBlockHash;
-	}
-
-	public get totalSupply(): bigint {
-		return this.#data.totalSupply;
-	}
-
-	public get result(): Contracts.Snapshot.LegacyImportResult | undefined {
-		return this.#data.result;
 	}
 
 	#nonce = 0n;
@@ -109,8 +99,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			commitKey: { blockHash: block.hash, blockNumber: BigInt(block.number), round: BigInt(block.round) },
 			timestamp: block.timestamp,
 		});
-
-		this.#data.result = result;
 
 		this.logger.info(
 			`snapshot import result: ${JSON.stringify({ ...result, initialTotalSupply: result.initialTotalSupply.toString() })}`,
@@ -211,9 +199,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				assert.defined(votedWallet.ethAddress);
 
 				voters.push({
-					arkAddress: wallet.arkAddress,
 					ethAddress,
-					publicKey: wallet.publicKey,
 					vote: votedWallet.ethAddress,
 				});
 			}
@@ -228,10 +214,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				}
 
 				validators.push({
-					arkAddress: wallet.arkAddress,
 					ethAddress,
 					isResigned: wallet.attributes?.["delegate"]["resigned"] ?? false,
-					publicKey: wallet.publicKey,
 					username: wallet.attributes?.["delegate"]["username"],
 				});
 			}
@@ -264,7 +248,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		this.#data = {
 			genesisBlockNumber,
 			previousGenesisBlockHash: snapshot.chainTip.hash,
-			result: undefined,
 			snapshotHash: calculatedHash,
 			totalSupply,
 			validators,
