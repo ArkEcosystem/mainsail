@@ -87,35 +87,35 @@ describe<{
 			r: "8f0145edea568df2dd39db91be0bff4ebf5b1e54cae49bf2090bf84fa0dd45a2",
 			s: "273f828aaa99a54e31f8f3e316acc573c6f2490fb903052accddb979647fa5ce",
 			legacySecondSignature:
-				"8f0145edea568df2dd39db91be0bff4ebf5b1e54cae49bf2090bf84fa0dd45a2273f828aaa99a54e31f8f3e316acc573c6f2490fb903052accddb979647fa5ce01",
+				"73a17206c6ec232c8041de9241573c4cfe8bd629c32d02618ee1aec550af3b1e66798e7e356e1f11a60552646ffbee9df960ec847cdcc9e3e04d54c0fffdfcf900",
 		};
 
 		const serialized =
-			"f8968085012a05f200830f4240808080824e44a08f0145edea568df2dd39db91be0bff4ebf5b1e54cae49bf2090bf84fa0dd45a2a0273f828aaa99a54e31f8f3e316acc573c6f2490fb903052accddb979647fa5ceb8418f0145edea568df2dd39db91be0bff4ebf5b1e54cae49bf2090bf84fa0dd45a2273f828aaa99a54e31f8f3e316acc573c6f2490fb903052accddb979647fa5ce01";
+			"f8968085012a05f200830f4240808080824e44a08f0145edea568df2dd39db91be0bff4ebf5b1e54cae49bf2090bf84fa0dd45a2a0273f828aaa99a54e31f8f3e316acc573c6f2490fb903052accddb979647fa5ceb84173a17206c6ec232c8041de9241573c4cfe8bd629c32d02618ee1aec550af3b1e66798e7e356e1f11a60552646ffbee9df960ec847cdcc9e3e04d54c0fffdfcf900";
 
 		let builder = app.resolve(TransactionBuilder);
-		await builder.legacySecondSign(wallet.passphrase);
 		await builder.sign(wallet.passphrase);
+		await builder.legacySecondSign(wallet.passphrase);
 		const txSignedWithPassphrase = await builder.build();
 		assert.equal(txSignedWithPassphrase.toData(), transaction);
 		assert.equal(txSignedWithPassphrase.serialized.toString("hex"), serialized);
 		assert.equal(await builder.getStruct(), transaction);
 
 		builder = app.resolve(TransactionBuilder);
+		await builder.sign(wallet.passphrase);
 		await builder.legacySecondSignWithKeyPair({
 			publicKey: wallet.publicKey,
 			privateKey: wallet.privateKey,
 			compressed: false,
 		});
-		await builder.sign(wallet.passphrase);
 		const txSignedWithKeyPair = await builder.build();
 		assert.equal(txSignedWithKeyPair.toData(), transaction);
 		assert.equal(txSignedWithKeyPair.serialized.toString("hex"), serialized);
 		assert.equal(await builder.getStruct(), transaction);
 
 		builder = app.resolve(TransactionBuilder);
-		await builder.legacySecondSignWithWif(wallet.WIF);
 		await builder.sign(wallet.passphrase);
+		await builder.legacySecondSignWithWif(wallet.WIF);
 		const txSignedWithWif = await builder.build();
 		assert.equal(txSignedWithWif.toData(), transaction);
 		assert.equal(txSignedWithWif.serialized.toString("hex"), serialized);
@@ -130,6 +130,10 @@ describe<{
 	it("#legacySecondSign - should throw on schema error", async ({ app }) => {
 		let builder = app.resolve(TransactionBuilder);
 		await assert.rejects(() => builder.nonce("-1").legacySecondSign(wallet.passphrase), ValidationFailed);
+	});
+
+	it("#legacySecondSign - should throw if not signed", async ({ builder }) => {
+		await assert.rejects(() => builder.legacySecondSign(wallet.passphrase), MissingTransactionSignatureError);
 	});
 
 	it("#getStruct - should throw on missing data", async ({ app }) => {

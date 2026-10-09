@@ -3,6 +3,9 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
+// 0x8f cannot start a transaction or signed-message preimage (0x00-0x7f, 0xc0-0xff)
+const LEGACY_SECOND_SIGNATURE_DOMAIN = Buffer.concat([Buffer.from([0x8f]), Buffer.from("MAINSAIL_LSS_V1")]);
+
 @injectable()
 export class HashFactory implements Contracts.Crypto.TransactionHashFactory {
 	@inject(Identifiers.Cryptography.Transaction.Serializer)
@@ -14,7 +17,7 @@ export class HashFactory implements Contracts.Crypto.TransactionHashFactory {
 	public async toHash(transaction: Contracts.Crypto.TransactionSerializable): Promise<Buffer> {
 		const serialized = await this.serializer.serialize({
 			...transaction,
-			legacySecondSignature: undefined, // TODO: Decide if legacySecondSignature should be part of the hash or not. For now, we exclude it to maintain compatibility with existing hashes.
+			legacySecondSignature: undefined, // excluded, the legacy second signature signs this hash
 		});
 		return this.hashFactory.keccak256(serialized);
 	}
@@ -22,5 +25,9 @@ export class HashFactory implements Contracts.Crypto.TransactionHashFactory {
 	public async toHashUnsigned(transaction: Contracts.Crypto.TransactionUnsignedSerializable): Promise<Buffer> {
 		const serialized = await this.serializer.serializeUnsigned(transaction);
 		return this.hashFactory.keccak256(serialized);
+	}
+
+	public toLegacySecondSignatureHash(transactionHash: Buffer): Buffer {
+		return this.hashFactory.keccak256([LEGACY_SECOND_SIGNATURE_DOMAIN, transactionHash]);
 	}
 }

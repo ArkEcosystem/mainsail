@@ -81,7 +81,7 @@ export interface TransactionVerifier {
 	): Promise<SchemaValidationResult<TransactionUnsignedSerializable>>;
 	verifySchemaSigned(data: TransactionSerializable): Promise<SchemaValidationResult<TransactionSerializable>>;
 	verifySchemaStrict(data: TransactionData): Promise<SchemaValidationResult<TransactionData>>;
-	verifyLegacySecondSignature(data: TransactionSerializable, legacySecondPublicKey: string): Promise<boolean>;
+	verifyLegacySecondSignature(data: TransactionData, legacySecondPublicKey: string): Promise<boolean>;
 }
 
 export interface TransactionSigner {
@@ -90,11 +90,7 @@ export interface TransactionSigner {
 		keys: KeyPair,
 		options?: SerializeOptions,
 	): Promise<EcdsaSignature>;
-	legacySecondSign(
-		transaction: TransactionUnsignedSerializable,
-		keys: KeyPair,
-		options?: SerializeOptions,
-	): Promise<string>;
+	legacySecondSign(transaction: TransactionSerializable, keys: KeyPair, options?: SerializeOptions): Promise<string>;
 }
 
 export interface TransactionSerializer {
@@ -119,6 +115,7 @@ export interface TransactionFactory {
 export interface TransactionHashFactory {
 	toHashUnsigned(transaction: TransactionUnsignedSerializable): Promise<Buffer>;
 	toHash(transaction: TransactionSerializable): Promise<Buffer>;
+	toLegacySecondSignatureHash(transactionHash: Buffer): Buffer;
 }
 
 export type TransactionSchema = Record<string, unknown>;

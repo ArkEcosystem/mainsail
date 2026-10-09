@@ -22,10 +22,10 @@ export class Signer implements Contracts.Crypto.TransactionSigner {
 	}
 
 	public async legacySecondSign(
-		transaction: Contracts.Crypto.TransactionUnsignedSerializable,
+		transaction: Contracts.Crypto.TransactionSerializable,
 		keys: Contracts.Crypto.KeyPair,
 	): Promise<string> {
-		const hash: Buffer = await this.hashFactory.toHashUnsigned(transaction);
+		const hash: Buffer = this.hashFactory.toLegacySecondSignatureHash(await this.hashFactory.toHash(transaction));
 		const { r, s, v } = await this.signatureFactory.signRecoverable(hash, Buffer.from(keys.privateKey, "hex"));
 
 		return formatEcdsaSignature(r, s, v);
