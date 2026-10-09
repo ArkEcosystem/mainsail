@@ -4,6 +4,7 @@ import { Application } from "@mainsail/kernel";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { describe } from "@mainsail/test-runner";
 import { createHash } from "node:crypto";
+import { brotliCompressSync } from "node:zlib";
 import { decodeFunctionData } from "viem";
 
 import { Importer } from "./importer";
@@ -67,14 +68,17 @@ const makeSnapshot = (wallets: Interfaces.LegacyWallet[]): Interfaces.LegacySnap
 	return { chainTip, hash: hash.digest("hex"), wallets };
 };
 
+const compress = (snapshot: Interfaces.LegacySnapshot): Buffer =>
+	brotliCompressSync(Buffer.from(JSON.stringify(snapshot)));
+
 describe<{
 	app: Application;
 	importer: Importer;
 	evm: Record<string, (...arguments_: any[]) => Promise<unknown>>;
-	fileSystem: { readJSONSync: () => unknown };
+	fileSystem: { get: () => Promise<Buffer> };
 }>("Importer", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
-		context.fileSystem = { readJSONSync: () => undefined };
+		context.fileSystem = { get: async () => Buffer.alloc(0) };
 		context.evm = {
 			getAccountInfo: async () => ({ balance: 0n, nonce: 0n }),
 			importAccountInfos: async () => {},
@@ -105,9 +109,9 @@ describe<{
 	});
 
 	it("should read V3's resigned flag", async ({ importer, fileSystem }) => {
-		fileSystem.readJSONSync = () => makeSnapshot([resignedDelegate, activeDelegate, voter]);
+		fileSystem.get = async () => compress(makeSnapshot([resignedDelegate, activeDelegate, voter]));
 
-		await importer.prepare("snapshot.json");
+		await importer.prepare("snapshot.compressed");
 
 		assert.equal(
 			importer.validators.map(({ username, isResigned }) => ({ isResigned, username })),
@@ -119,10 +123,10 @@ describe<{
 	});
 
 	it("should import a resigned delegate as resigned and keep its votes", async ({ importer, evm, fileSystem }) => {
-		fileSystem.readJSONSync = () => makeSnapshot([resignedDelegate, activeDelegate, voter]);
+		fileSystem.get = async () => compress(makeSnapshot([resignedDelegate, activeDelegate, voter]));
 		const process = spy(evm, "process");
 
-		await importer.prepare("snapshot.json");
+		await importer.prepare("snapshot.compressed");
 		await importer.import({
 			commitKey: { blockHash: "0".repeat(64), blockNumber: 1001n, round: 0n },
 			timestamp: 0,

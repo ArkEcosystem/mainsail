@@ -503,22 +503,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		this.hashFactory.sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).toString("hex");
 
 	async #readSnapshot(snapshotPath: string): Promise<Interfaces.LegacySnapshot> {
-		if (snapshotPath.endsWith(".compressed")) {
-			return this.#decompressBrotli(snapshotPath);
-		}
-
-		return this.fileSystem.readJSONSync<Interfaces.LegacySnapshot>(snapshotPath);
-	}
-
-	async #decompressBrotli(inputPath: string): Promise<Interfaces.LegacySnapshot> {
 		try {
-			const compressedData = await this.fileSystem.get(inputPath);
-			const decompressed = await promisify(brotliDecompress)(compressedData);
+			const decompressed = await promisify(brotliDecompress)(await this.fileSystem.get(snapshotPath));
 			return JSON.parse(decompressed.toString()) as Interfaces.LegacySnapshot;
-		} catch (rawError) {
-			const error = ensureError(rawError);
-			console.error("Error decompressing snapshot", error);
-			throw error;
+		} catch (error) {
+			throw new Error(`failed to read snapshot ${snapshotPath}: ${ensureError(error).message}`);
 		}
 	}
 }
