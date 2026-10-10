@@ -36,7 +36,7 @@ function decodeListBounds(buffer: Uint8Array): { start: number; end: number } {
 				throw new Error("decode RLP leading zero in length");
 			}
 
-			length = (length << 8) | v;
+			length = length * 256 + v;
 		}
 		if (length < 56) {
 			throw new Error("decode RLP non-minimal long list");
@@ -118,7 +118,7 @@ function readLength(buffer: Uint8Array, offset: number, lengthOfLength: number) 
 		if (index === 0 && lengthOfLength > 1 && v === 0) {
 			throw new Error("decode RLP leading zero in length");
 		}
-		length = (length << 8) | v;
+		length = length * 256 + v;
 	}
 
 	return { len: length, next: offset + lengthOfLength };
@@ -138,7 +138,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		const fields: Hex[] = [];
 		let offset = start;
 		while (offset < end) {
-			if (fields.length > 10) {
+			if (fields.length >= 10) {
 				throw new Error("decoded RLP contains too many fields");
 			}
 
@@ -183,6 +183,10 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 		// Legacy second signature
 		if (fields.length === 10) {
+			if (fields[9] === "0x") {
+				throw new Error("decoded RLP legacy second signature is empty");
+			}
+
 			legacySecondSignature = fields[9].slice(2);
 		}
 

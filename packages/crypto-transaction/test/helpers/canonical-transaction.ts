@@ -57,7 +57,16 @@ export const legacyRlpFields = (transaction: Contracts.Crypto.TransactionData): 
 	];
 };
 
-export const encodeLegacy = (fields: Uint8Array[]): Buffer => Buffer.from(toRlp(fields).slice(2), "hex");
+export const encodeRlp = (value: Uint8Array | Uint8Array[]): Buffer => Buffer.from(toRlp(value).slice(2), "hex");
+
+export const encodeLegacy = (fields: Uint8Array[]): Buffer => encodeRlp(fields);
+
+export const encodeList = (items: Buffer[]): Buffer => {
+	const payload = Buffer.concat(items);
+	const lengthBytes = minimalInteger(BigInt(payload.length));
+	const header = payload.length < 56 ? [0xc0 + payload.length] : [0xf7 + lengthBytes.length, ...lengthBytes];
+	return Buffer.concat([Buffer.from(header), payload]);
+};
 
 // A 32-byte big-endian buffer for a hex string, preserving leading zero bytes (unlike minimalInteger).
 export const fixedWidth32 = (hex: string): Uint8Array => hexToBytes(`0x${hex.padStart(64, "0")}`);
