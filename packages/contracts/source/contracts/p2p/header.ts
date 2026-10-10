@@ -18,8 +18,6 @@ export interface Header {
 	validatorsSignedPrevote: readonly boolean[];
 
 	toData(): HeaderData;
-	getValidatorsSignedPrecommitCount(): number;
-	getValidatorsSignedPrevoteCount(): number;
 }
 
 export type HeaderFactory = () => Header;
