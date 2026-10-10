@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { assert, ensureError, http } from "@mainsail/utils";
+import { assert, ensureError, http, IpAddress } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
 import { constants } from "./constants.js";
@@ -13,15 +13,15 @@ import { Throttle } from "./throttle.js";
 
 @injectable()
 export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.Peer.Connector)
 	private readonly connector!: Contracts.P2P.PeerConnector;
+
+	@inject(Identifiers.P2P.Peer.Disposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
 	@inject(Identifiers.P2P.Header.Factory)
 	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
@@ -41,14 +41,13 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.P2P.Statistic.Service)
 	private readonly statisticService!: Contracts.P2P.StatisticService;
 
-	#throttle?: Throttle;
+	#throttle?: Promise<Throttle>;
 
 	public async postProposal(peer: Contracts.P2P.Peer, proposal: Buffer): Promise<void> {
 		try {
 			await this.#emit(peer, Routes.PostProposal, { proposal }, { timeout: 6000 });
 		} catch (rawError) {
-			const error = ensureError(rawError);
-			this.#handleSocketError(peer, error);
+			this.peerDisposer.banPeer(peer.ip, ensureError(rawError));
 		}
 	}
 
@@ -56,8 +55,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		try {
 			await this.#emit(peer, Routes.PostMessage, { message }, { timeout: 6000 });
 		} catch (rawError) {
-			const error = ensureError(rawError);
-			this.#handleSocketError(peer, error);
+			this.peerDisposer.banPeer(peer.ip, ensureError(rawError));
 		}
 	}
 
@@ -66,7 +64,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			Object.entries(peer.plugins).map(async ([name, plugin]) => {
 				peer.ports[name] = -1;
 				try {
-					const { statusCode } = await http.head(`http://${peer.ip}:${plugin.port}/`);
+					const { statusCode } = await http.head(
+						`http://${IpAddress.normalizeAddress(peer.ip)}:${plugin.port}/`,
+					);
 
 					if (statusCode === 200) {
 						peer.ports[name] = plugin.port;
@@ -157,24 +157,17 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return result.data;
 	}
 
-	#validateReply<T extends Contracts.P2P.Response>(peer: Contracts.P2P.Peer, reply: T, endpoint: string) {
+	#validateReply<T extends Contracts.P2P.Response>(reply: T, endpoint: string): string | undefined {
 		const schema = replySchemas[endpoint];
 		if (schema === undefined) {
 			this.logger.error(
 				`Can't validate reply from "${endpoint}": none of the predefined schemas matches.`,
 				"p2p",
 			);
-			return false;
+			return "no reply schema";
 		}
 
-		const { error } = this.validator.validate(schema, reply);
-		if (error) {
-			this.logger.debugExtra(`Got unexpected reply from ${peer.url}/${endpoint}: ${error}`, "p2p");
-
-			return false;
-		}
-
-		return true;
+		return this.validator.validate(schema, reply).error;
 	}
 
 	async #emit<T extends Contracts.P2P.Response>(
@@ -204,16 +197,16 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 			const timeBeforeSocketCall = performance.now();
 
-			await this.connector.connect(peer);
-
+			const headers = this.headerFactory().toData();
 			const response = await this.connector.emit(
 				peer,
 				event,
 				codec.request.serialize({
 					...payload,
-					// @ts-ignore
 					headers: {
-						...this.headerFactory().toData(),
+						...headers,
+						validatorsSignedPrecommit: [...headers.validatorsSignedPrecommit],
+						validatorsSignedPrevote: [...headers.validatorsSignedPrevote],
 					},
 				}),
 				options.timeout,
@@ -230,9 +223,10 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 			// Validate
 			peer.setPinged(Math.floor(statistic.responseTime + statistic.deserializeTime));
 
-			if (!this.#validateReply(peer, data, event)) {
+			const replyError = this.#validateReply(data, event);
+			if (replyError) {
 				const validationError = new Error(
-					`Response validation failed for ${event} from peer ${peer.ip}: ${JSON.stringify(data)}`,
+					`Response validation failed for ${event} from peer ${peer.ip}: ${replyError}`,
 				);
 
 				validationError.name = SocketErrors.Validation;
@@ -254,14 +248,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 	}
 
-	#handleSocketError(peer: Contracts.P2P.Peer, error: Error): void {
-		this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).banPeer(peer.ip, error);
-	}
-
-	async #getThrottle(): Promise<Throttle> {
-		if (!this.#throttle) {
-			this.#throttle = await this.throttleFactory();
-		}
+	#getThrottle(): Promise<Throttle> {
+		this.#throttle ??= this.throttleFactory();
 
 		return this.#throttle;
 	}

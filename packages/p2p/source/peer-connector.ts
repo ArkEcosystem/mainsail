@@ -17,20 +17,29 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
 
-	private readonly connections: Map<string, Client> = new Map<string, Client>();
-	readonly #lastConnectionCreate: Map<string, number> = new Map<string, number>();
+	readonly #connections = new Map<string, Promise<Client>>();
+	readonly #lastConnectionCreate = new Map<string, number>();
 
 	public async connect(peer: Contracts.P2P.Peer): Promise<Client> {
-		return this.connections.get(peer.ip) || (await this.#create(peer));
+		return this.#connections.get(peer.ip) ?? this.#create(peer);
 	}
 
 	public async disconnect(ip: string): Promise<void> {
-		const connection = this.connections.get(ip);
-
-		if (connection) {
-			await connection.terminate();
-			this.connections.delete(ip);
+		const connection = this.#connections.get(ip);
+		if (!connection) {
+			return;
 		}
+
+		this.#connections.delete(ip);
+
+		let client: Client;
+		try {
+			client = await connection;
+		} catch {
+			return; // the creation failed, so there is nothing to close
+		}
+
+		await client.terminate();
 	}
 
 	public async emit(
@@ -56,6 +65,21 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 	}
 
 	async #create(peer: Contracts.P2P.Peer): Promise<Client> {
+		const connection = this.#open(peer);
+		this.#connections.set(peer.ip, connection);
+
+		try {
+			return await connection;
+		} catch (error) {
+			if (this.#connections.get(peer.ip) === connection) {
+				this.#connections.delete(peer.ip);
+			}
+
+			throw error;
+		}
+	}
+
+	async #open(peer: Contracts.P2P.Peer): Promise<Client> {
 		// delay a bit if last connection create was less than 10 sec ago to prevent possible abuse of reconnection
 		const timeSinceLastConnectionCreate = Date.now() - (this.#lastConnectionCreate.get(peer.ip) ?? 0);
 		await delay(Math.max(0, TEN_SECONDS - timeSinceLastConnectionCreate));
@@ -63,7 +87,6 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 		const connection = new Client(`ws://${IpAddress.normalizeAddress(peer.ip)}:${peer.port}`, {
 			timeout: 10_000,
 		});
-		this.connections.set(peer.ip, connection);
 		this.#lastConnectionCreate.set(peer.ip, Date.now());
 
 		connection.onDisconnect = () => {
