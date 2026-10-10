@@ -400,10 +400,10 @@ export namespace shared {
         proposedBlockHash?: (string|null);
 
         /** Headers validatorsSignedPrevote. */
-        validatorsSignedPrevote: boolean[];
+        validatorsSignedPrevote: Uint8Array;
 
         /** Headers validatorsSignedPrecommit. */
-        validatorsSignedPrecommit: boolean[];
+        validatorsSignedPrecommit: Uint8Array;
 
         /**
          * Creates a new Headers instance using the specified properties.
@@ -505,10 +505,10 @@ export namespace shared {
             proposedBlockHash?: (string|null);
 
             /** Headers validatorsSignedPrevote */
-            validatorsSignedPrevote?: (boolean[]|null);
+            validatorsSignedPrevote?: (Uint8Array|null);
 
             /** Headers validatorsSignedPrecommit */
-            validatorsSignedPrecommit?: (boolean[]|null);
+            validatorsSignedPrecommit?: (Uint8Array|null);
 
             /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
@@ -933,10 +933,10 @@ export namespace getMessages {
         round: number;
 
         /** GetMessagesQuery validatorsSignedPrevote. */
-        validatorsSignedPrevote: boolean[];
+        validatorsSignedPrevote: Uint8Array;
 
         /** GetMessagesQuery validatorsSignedPrecommit. */
-        validatorsSignedPrecommit: boolean[];
+        validatorsSignedPrecommit: Uint8Array;
 
         /**
          * Creates a new GetMessagesQuery instance using the specified properties.
@@ -1029,10 +1029,10 @@ export namespace getMessages {
             round?: (number|null);
 
             /** GetMessagesQuery validatorsSignedPrevote */
-            validatorsSignedPrevote?: (boolean[]|null);
+            validatorsSignedPrevote?: (Uint8Array|null);
 
             /** GetMessagesQuery validatorsSignedPrecommit */
-            validatorsSignedPrecommit?: (boolean[]|null);
+            validatorsSignedPrecommit?: (Uint8Array|null);
 
             /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];
