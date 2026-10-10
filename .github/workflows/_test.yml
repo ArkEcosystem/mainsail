@@ -21,7 +21,7 @@ jobs:
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-unit
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
 
         steps:
             - uses: actions/checkout@v7.0.1
@@ -82,7 +82,7 @@ jobs:
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-unit
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         steps:
             - uses: actions/checkout@v7.0.1
               with:
@@ -154,7 +154,7 @@ jobs:
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-integration
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
 
         timeout-minutes: 15
 
@@ -212,7 +212,7 @@ jobs:
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-e2e-${{ matrix.name }}
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
 
         timeout-minutes: 15
 
@@ -298,7 +298,7 @@ jobs:
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-e2e-${{ matrix.name }}
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
 
         timeout-minutes: 10
 
@@ -357,7 +357,7 @@ jobs:
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-e2e-${{ matrix.name }}
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
 
         timeout-minutes: 15
 
@@ -437,7 +437,7 @@ jobs:
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-e2e-${{ matrix.name }}
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
 
         timeout-minutes: 15
 
@@ -512,7 +512,7 @@ jobs:
         concurrency:
             cancel-in-progress: true
             group: ${{ github.head_ref }}-functional-${{matrix.name}}
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
 
         timeout-minutes: 15
 
