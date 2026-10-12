@@ -908,6 +908,141 @@ export namespace getBlocks {
 export namespace getMessages {
 
     /**
+     * Properties of a GetMessagesQuery.
+     * @deprecated Use getMessages.GetMessagesQuery.$Properties instead.
+     */
+    interface IGetMessagesQuery extends getMessages.GetMessagesQuery.$Properties {
+    }
+
+    /** Represents a GetMessagesQuery. */
+    class GetMessagesQuery {
+
+        /**
+         * Constructs a new GetMessagesQuery.
+         * @param [properties] Properties to set
+         */
+        constructor(properties?: getMessages.GetMessagesQuery.$Properties);
+
+        /** Unknown fields preserved while decoding when enabled */
+        $unknowns?: Uint8Array[];
+
+        /** GetMessagesQuery blockNumber. */
+        blockNumber: number;
+
+        /** GetMessagesQuery round. */
+        round: number;
+
+        /** GetMessagesQuery validatorsSignedPrevote. */
+        validatorsSignedPrevote: boolean[];
+
+        /** GetMessagesQuery validatorsSignedPrecommit. */
+        validatorsSignedPrecommit: boolean[];
+
+        /**
+         * Creates a new GetMessagesQuery instance using the specified properties.
+         * @param [properties] Properties to set
+         * @returns GetMessagesQuery instance
+         */
+        static create(properties: getMessages.GetMessagesQuery.$Shape): getMessages.GetMessagesQuery & getMessages.GetMessagesQuery.$Shape;
+        static create(properties?: getMessages.GetMessagesQuery.$Properties): getMessages.GetMessagesQuery;
+
+        /**
+         * Encodes the specified GetMessagesQuery message. Does not implicitly {@link getMessages.GetMessagesQuery.verify|verify} messages.
+         * @param message GetMessagesQuery message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        static encode(message: getMessages.GetMessagesQuery.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Encodes the specified GetMessagesQuery message, length delimited. Does not implicitly {@link getMessages.GetMessagesQuery.verify|verify} messages.
+         * @param message GetMessagesQuery message or plain object to encode
+         * @param [writer] Writer to encode to
+         * @returns Writer
+         */
+        static encodeDelimited(message: getMessages.GetMessagesQuery.$Properties, writer?: $protobuf.Writer): $protobuf.Writer;
+
+        /**
+         * Decodes a GetMessagesQuery message from the specified reader or buffer.
+         * @param reader Reader or buffer to decode from
+         * @param [length] Message length if known beforehand
+         * @returns {getMessages.GetMessagesQuery & getMessages.GetMessagesQuery.$Shape} GetMessagesQuery
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        static decode(reader: ($protobuf.Reader|Uint8Array), length?: number): getMessages.GetMessagesQuery & getMessages.GetMessagesQuery.$Shape;
+
+        /**
+         * Decodes a GetMessagesQuery message from the specified reader or buffer, length delimited.
+         * @param reader Reader or buffer to decode from
+         * @returns {getMessages.GetMessagesQuery & getMessages.GetMessagesQuery.$Shape} GetMessagesQuery
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        static decodeDelimited(reader: ($protobuf.Reader|Uint8Array)): getMessages.GetMessagesQuery & getMessages.GetMessagesQuery.$Shape;
+
+        /**
+         * Verifies a GetMessagesQuery message.
+         * @param message Plain object to verify
+         * @returns `null` if valid, otherwise the reason why it is not
+         */
+        static verify(message: { [k: string]: any }): (string|null);
+
+        /**
+         * Creates a GetMessagesQuery message from a plain object. Also converts values to their respective internal types.
+         * @param object Plain object
+         * @returns GetMessagesQuery
+         */
+        static fromObject(object: { [k: string]: any }): getMessages.GetMessagesQuery;
+
+        /**
+         * Creates a plain object from a GetMessagesQuery message. Also converts values to other types if specified.
+         * @param message GetMessagesQuery
+         * @param [options] Conversion options
+         * @returns Plain object
+         */
+        static toObject(message: getMessages.GetMessagesQuery, options?: $protobuf.IConversionOptions): { [k: string]: any };
+
+        /**
+         * Converts this GetMessagesQuery to JSON.
+         * @returns JSON object
+         */
+        toJSON(): { [k: string]: any };
+
+        /**
+         * Gets the type url for GetMessagesQuery
+         * @param [prefix] Custom type url prefix, defaults to `"type.googleapis.com"`
+         * @returns The type url
+         */
+        static getTypeUrl(prefix?: string): string;
+    }
+
+    namespace GetMessagesQuery {
+
+        /** Properties of a GetMessagesQuery. */
+        interface $Properties {
+
+            /** GetMessagesQuery blockNumber */
+            blockNumber?: (number|null);
+
+            /** GetMessagesQuery round */
+            round?: (number|null);
+
+            /** GetMessagesQuery validatorsSignedPrevote */
+            validatorsSignedPrevote?: (boolean[]|null);
+
+            /** GetMessagesQuery validatorsSignedPrecommit */
+            validatorsSignedPrecommit?: (boolean[]|null);
+
+            /** Unknown fields preserved while decoding when enabled */
+            $unknowns?: Uint8Array[];
+        }
+
+        /** Shape of a GetMessagesQuery. */
+        type $Shape = getMessages.GetMessagesQuery.$Properties;
+    }
+
+    /**
      * Properties of a GetMessagesRequest.
      * @deprecated Use getMessages.GetMessagesRequest.$Properties instead.
      */
@@ -928,6 +1063,9 @@ export namespace getMessages {
 
         /** GetMessagesRequest headers. */
         headers?: (shared.Headers.$Properties|null);
+
+        /** GetMessagesRequest query. */
+        query?: (getMessages.GetMessagesQuery.$Properties|null);
 
         /**
          * Creates a new GetMessagesRequest instance using the specified properties.
@@ -1015,6 +1153,9 @@ export namespace getMessages {
 
             /** GetMessagesRequest headers */
             headers?: (shared.Headers.$Properties|null);
+
+            /** GetMessagesRequest query */
+            query?: (getMessages.GetMessagesQuery.$Properties|null);
 
             /** Unknown fields preserved while decoding when enabled */
             $unknowns?: Uint8Array[];

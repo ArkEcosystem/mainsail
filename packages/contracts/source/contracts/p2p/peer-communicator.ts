@@ -1,6 +1,7 @@
 import type {
 	GetApiNodesResponse,
 	GetBlocksResponse,
+	GetMessagesQuery,
 	GetMessagesResponse,
 	GetPeersResponse,
 	GetProposalResponse,
@@ -20,7 +21,7 @@ export interface PeerCommunicator {
 
 	getPeers(peer: Peer): Promise<GetPeersResponse>;
 	getApiNodes(peer: Peer): Promise<GetApiNodesResponse>;
-	getMessages(peer: Peer): Promise<GetMessagesResponse>;
+	getMessages(peer: Peer, query: GetMessagesQuery): Promise<GetMessagesResponse>;
 	getProposal(peer: Peer): Promise<GetProposalResponse>;
 	getBlocks(
 		peer: Peer,
