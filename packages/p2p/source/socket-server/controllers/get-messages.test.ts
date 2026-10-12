@@ -11,15 +11,10 @@ describe<{
 }>("GetMessagesController", ({ it, assert, beforeEach }) => {
 	const consensus = { getBlockNumber: () => 2, getRound: () => 5 };
 
-	// A round state holding serialized prevotes/precommits for validators 0 and 1.
+	// A round state holding serialized prevotes/precommits for the given validator indexes.
 	const makeRoundState = (round: number, indexes: number[]) => ({
-		getPrecommit: (index: number) =>
-			indexes.includes(index) ? { serialized: Buffer.from([20 + index]) } : undefined,
-		getPrecommits: () => indexes.map((index) => ({ serialized: Buffer.from([20 + index]) })),
-		getPrevote: (index: number) =>
-			indexes.includes(index) ? { serialized: Buffer.from([10 + index]) } : undefined,
-		getPrevotes: () => indexes.map((index) => ({ serialized: Buffer.from([10 + index]) })),
-		hasMinorityPrevotesOrPrecommits: () => true,
+		getPrecommits: () => indexes.map((index) => ({ serialized: Buffer.from([20 + index]), validatorIndex: index })),
+		getPrevotes: () => indexes.map((index) => ({ serialized: Buffer.from([10 + index]), validatorIndex: index })),
 		round,
 	});
 
@@ -79,6 +74,29 @@ describe<{
 
 		assert.equal(response.prevotes, [Buffer.from([10])]);
 		assert.equal(response.precommits, [Buffer.from([21])]);
+	});
+
+	it("should serve the whole round for empty bitmaps", async (context) => {
+		// A full download holds nothing of the round yet, so it sends no bitmap at all.
+		context.roundStates.set("2-3", makeRoundState(3, [0, 1]));
+
+		const response = await context.controller.handle(
+			{
+				payload: {
+					headers: { blockNumber: 2, round: 5, validatorsSignedPrecommit: [], validatorsSignedPrevote: [] },
+					query: {
+						blockNumber: 2,
+						round: 3,
+						validatorsSignedPrecommit: [],
+						validatorsSignedPrevote: [],
+					},
+				},
+			} as any,
+			{} as any,
+		);
+
+		assert.equal(response.prevotes, [Buffer.from([10]), Buffer.from([11])]);
+		assert.equal(response.precommits, [Buffer.from([20]), Buffer.from([21])]);
 	});
 
 	it("should answer empty for a block it is not deciding", async (context) => {

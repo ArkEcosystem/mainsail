@@ -292,18 +292,12 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		let error: Error | undefined;
 
 		try {
-			const { roundValidators } = this.cryptoConfiguration.getMilestone(job.blockNumber);
-			const nothingSigned = Array.from<boolean>({ length: roundValidators }).fill(false);
-
+			// A full download asks for the whole round; a partial one leaves out what we already hold.
 			const result = await this.communicator.getMessages(job.peer, {
 				blockNumber: job.blockNumber,
 				round: job.round,
-				validatorsSignedPrecommit: job.isFullDownload
-					? nothingSigned
-					: [...job.ourHeader.validatorsSignedPrecommit],
-				validatorsSignedPrevote: job.isFullDownload
-					? nothingSigned
-					: [...job.ourHeader.validatorsSignedPrevote],
+				validatorsSignedPrecommit: job.isFullDownload ? [] : [...job.ourHeader.validatorsSignedPrecommit],
+				validatorsSignedPrevote: job.isFullDownload ? [] : [...job.ourHeader.validatorsSignedPrevote],
 			});
 
 			const prevotes: Map<number, Contracts.Crypto.Message> = new Map();

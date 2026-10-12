@@ -113,12 +113,12 @@ describe<{
 
 		downloader.download(peer);
 
-		// All-false bitmaps: "we have nothing of that round, send everything".
+		// Empty bitmaps: "we have nothing of that round, send everything".
 		getMessages.calledWith(peer, {
 			blockNumber: 2,
 			round: 1,
-			validatorsSignedPrecommit: [false, false, false, false, false],
-			validatorsSignedPrevote: [false, false, false, false, false],
+			validatorsSignedPrecommit: [],
+			validatorsSignedPrevote: [],
 		});
 	});
 
@@ -195,8 +195,8 @@ describe<{
 		getMessages.calledWith(peer, {
 			blockNumber: 2,
 			round: 1,
-			validatorsSignedPrecommit: [false, false, false, false, false],
-			validatorsSignedPrevote: [false, false, false, false, false],
+			validatorsSignedPrecommit: [],
+			validatorsSignedPrevote: [],
 		});
 	});
 

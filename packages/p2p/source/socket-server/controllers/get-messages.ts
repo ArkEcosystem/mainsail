@@ -38,41 +38,19 @@ export class GetMessagesController implements Contracts.P2P.Controller {
 		validatorsSignedPrevote: readonly boolean[],
 		roundState: Contracts.Consensus.RoundState,
 	): Buffer[] {
-		const prevotes: Buffer[] = [];
-
-		for (const [index, voted] of validatorsSignedPrevote.entries()) {
-			if (voted) {
-				continue;
-			}
-
-			const prevote = roundState.getPrevote(index);
-
-			if (prevote) {
-				prevotes.push(prevote.serialized);
-			}
-		}
-
-		return prevotes;
+		return roundState
+			.getPrevotes()
+			.filter((prevote) => !validatorsSignedPrevote[prevote.validatorIndex])
+			.map((prevote) => prevote.serialized);
 	}
 
 	private getPrecommits(
 		validatorsSignedPrecommit: readonly boolean[],
 		roundState: Contracts.Consensus.RoundState,
 	): Buffer[] {
-		const precommits: Buffer[] = [];
-
-		for (const [index, voted] of validatorsSignedPrecommit.entries()) {
-			if (voted) {
-				continue;
-			}
-
-			const precommit = roundState.getPrecommit(index);
-
-			if (precommit) {
-				precommits.push(precommit.serialized);
-			}
-		}
-
-		return precommits;
+		return roundState
+			.getPrecommits()
+			.filter((precommit) => !validatorsSignedPrecommit[precommit.validatorIndex])
+			.map((precommit) => precommit.serialized);
 	}
 }
