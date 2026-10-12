@@ -12,8 +12,6 @@ type DownloadsByRound = {
 	prevotes: boolean[];
 };
 
-class IncompleteResponseError extends Error {}
-
 type DownloadJob = {
 	isFullDownload: boolean;
 	peer: Contracts.P2P.Peer;
@@ -61,9 +59,6 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 	@inject(Identifiers.P2P.State)
 	private readonly state!: Contracts.P2P.State;
-
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
 
 	#fullDownloadsByBlockNumber: Map<number, Set<number>> = new Map();
 	#downloadsByBlockNumber: Map<number, Map<number, DownloadsByRound>> = new Map();
@@ -271,7 +266,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		const { roundValidators } = this.cryptoConfiguration.getMilestone(job.blockNumber);
 
 		if (!isMinority(prevotes.size, roundValidators) && !isMinority(precommits.size, roundValidators)) {
-			throw new IncompleteResponseError(`Peer didn't return a blocking minority of prevotes or precommits`);
+			throw new Error(`Peer didn't return a blocking minority of prevotes or precommits`);
 		}
 	}
 
@@ -282,13 +277,13 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	) {
 		for (const index of job.prevoteIndexes) {
 			if (!prevotes.has(index)) {
-				throw new IncompleteResponseError(`Missing prevote for validator ${index}`);
+				throw new Error(`Missing prevote for validator ${index}`);
 			}
 		}
 
 		for (const index of job.precommitIndexes) {
 			if (!precommits.has(index)) {
-				throw new IncompleteResponseError(`Missing precommit for validator ${index}`);
+				throw new Error(`Missing precommit for validator ${index}`);
 			}
 		}
 	}
@@ -347,12 +342,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		this.#removeDownloadJob(job);
 
 		if (error) {
-			if (error instanceof IncompleteResponseError) {
-				this.logger.debug(`Incomplete response from ${job.peer.ip}: ${error.message}`, "p2p");
-			} else {
-				this.peerDisposer.banPeer(job.peer.ip, error);
-			}
-
+			this.peerDisposer.banPeer(job.peer.ip, error);
 			this.tryToDownload();
 		}
 	}
