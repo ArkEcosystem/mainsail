@@ -103,7 +103,6 @@ type Ctx = {
 	entityManager: any;
 	repos: Record<string, any>;
 	systemRepo: any;
-	evm: any;
 	state: any;
 	validatorSet: any;
 	proposerCalculator: any;
@@ -160,7 +159,6 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 
 		context.migrations = { runMigrations: async () => {}, synchronizeEntities: async () => {} };
 		context.systemRepo = { inMaintenance: async () => false };
-		context.evm = { getAccountInfo: async () => ({ balance: 1000n, nonce: 3n }) };
 		context.state = { isBootstrap: () => false };
 		context.validatorSet = { getDirtyValidators: () => [], getRoundValidators: () => [] };
 		context.proposerCalculator = { getValidatorIndex: (index: number) => index };
@@ -225,7 +223,6 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		context.app
 			.bind(ApiDatabaseIdentifiers.LegacyColdWalletRepositoryFactory)
 			.toConstantValue(() => context.repos.legacyColdWallet);
-		context.app.bind(Identifiers.Evm.Instance).toConstantValue(context.evm).whenTagged("instance", "evm");
 		context.app.bind(Identifiers.EvmConsensus.Contracts.MultiPayment).toConstantValue("0xmultipayment");
 		context.app.bind(Identifiers.State.State).toConstantValue(context.state);
 		context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
@@ -451,15 +448,13 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		assert.equal(transactionBatch[0].nonce, "1");
 		assert.undefined(transactionBatch[0].decodedError);
 
-		// The genesis proposer account is force-created on the first non-genesis block,
-		// and the block proposer (not part of any account update) is manually inserted.
+		// The block proposer (not part of any account update) is manually inserted.
 		assert.equal(repos.wallet.queries.length, 1);
 		const [sql, parameters] = repos.wallet.queries[0];
 		assert.true(sql.includes("INSERT INTO wallets"));
-		// genesis proposer row + no separate proposer row (same address)
 		assert.equal(parameters.length, 6);
 		assert.equal(parameters[0], PROPOSER);
-		assert.equal(parameters[2], "1000"); // balance from evm.getAccountInfo
+		assert.equal(parameters[2], "-1");
 
 		// Configuration version update without new milestones
 		assert.equal(repos.configuration.qb.calls.set[0][0].version, "0.0.1-test");
