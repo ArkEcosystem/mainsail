@@ -20,7 +20,6 @@ describe<{
 	const messageProcessor = { process: async () => Enums.Consensus.ProcessorResult.Accepted };
 	const cryptoConfiguration = { getMilestone: () => ({ roundValidators: 2 }) };
 	const state = { resetLastMessageTime: () => {} };
-	const logger = { debug: () => {} };
 	// By the time the async listener runs, the store may already be past the applied block;
 	// the purge must use the event payload, so this deliberately disagrees with it.
 	const stateStore = { getBlockNumber: () => 3 };
@@ -55,7 +54,6 @@ describe<{
 		context.app.bind(Identifiers.Consensus.Processor.Message).toConstantValue(messageProcessor);
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(cryptoConfiguration);
 		context.app.bind(Identifiers.P2P.State).toConstantValue(state);
-		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
 		context.app.bind(Identifiers.State.Store).toConstantValue(stateStore);
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({
 			listen: (event: string, listener: { handle: (payload: { data: { number: number } }) => Promise<void> }) => {
@@ -230,7 +228,7 @@ describe<{
 		assert.false(downloader.isDownloading());
 	});
 
-	it("#download - should not punish a reply below the advertised blocking minority of precommits", async ({
+	it("#download - should ban a peer that answers below the blocking minority of precommits it advertised", async ({
 		downloader,
 		peer,
 	}) => {
@@ -239,45 +237,38 @@ describe<{
 		peer.header.validatorsSignedPrevote = [false, false, false, false, false];
 		peer.header.validatorsSignedPrecommit = [true, true, false, false, false];
 
-		// It answers for the requested round, but below any blocking minority. A crash on the
-		// peer's side can explain the shortfall, so it is not provable misbehavior.
+		// The header is built from the same round state the peer serves, so a reply for the
+		// advertised round that falls short of what the header promised is misbehavior.
 		stub(communicator, "getMessages").resolvedValue({ precommits: [Buffer.alloc(1)], prevotes: [] });
 		stub(factory, "makeMessageFromBytes").resolvedValue({ blockNumber: 2, round: 1, validatorIndex: 0 });
 		const process = stub(messageProcessor, "process").resolvedValue(Enums.Consensus.ProcessorResult.Accepted);
 		const banPeer = stub(peerDisposer, "banPeer");
-		const debug = stub(logger, "debug");
 
 		downloader.download(peer);
 		await sleep(10);
 
-		banPeer.neverCalled();
-		debug.calledOnce();
+		banPeer.calledOnce();
 		process.calledOnce();
 		assert.false(downloader.isDownloading());
 	});
 
-	it("#download - should keep a reply that is missing a requested message and not punish it", async ({
-		downloader,
-		peer,
-	}) => {
-		// The peer's header promised these messages, but a crash on its side can explain the
-		// shortfall; what did arrive is kept.
+	it("#download - should ban a peer whose reply is missing a message it advertised", async ({ downloader, peer }) => {
+		// The peer's header promised prevotes 0 and 1 for our round and only prevote 0 arrived.
+		// What did arrive is still processed before the peer is banned.
 		stub(communicator, "getMessages").resolvedValue({ precommits: [], prevotes: [Buffer.alloc(1)] });
 		stub(factory, "makeMessageFromBytes").resolvedValue({ blockNumber: 2, round: 0, validatorIndex: 0 });
 		const process = stub(messageProcessor, "process").resolvedValue(Enums.Consensus.ProcessorResult.Accepted);
 		const banPeer = stub(peerDisposer, "banPeer");
-		const debug = stub(logger, "debug");
 
 		downloader.download(peer);
 		await sleep(10);
 
-		banPeer.neverCalled();
-		debug.calledOnce();
+		banPeer.calledOnce();
 		process.calledOnce();
 		assert.false(downloader.isDownloading());
 	});
 
-	it("#download - should not punish a reply below the advertised blocking minority of prevotes", async ({
+	it("#download - should ban a peer that answers below the blocking minority of prevotes it advertised", async ({
 		downloader,
 		peer,
 	}) => {
@@ -286,19 +277,16 @@ describe<{
 		peer.header.validatorsSignedPrevote = [true, true, false, false, false];
 		peer.header.validatorsSignedPrecommit = [false, false, false, false, false];
 
-		// It answers for the requested round, but without the promised prevotes. A crash on
-		// the peer's side can explain the shortfall, so it is not provable misbehavior.
+		// It answers for the advertised round, but without the prevotes its header promised.
 		stub(communicator, "getMessages").resolvedValue({ precommits: [Buffer.alloc(1)], prevotes: [] });
 		stub(factory, "makeMessageFromBytes").resolvedValue({ blockNumber: 2, round: 1, validatorIndex: 0 });
 		const process = stub(messageProcessor, "process").resolvedValue(Enums.Consensus.ProcessorResult.Accepted);
 		const banPeer = stub(peerDisposer, "banPeer");
-		const debug = stub(logger, "debug");
 
 		downloader.download(peer);
 		await sleep(10);
 
-		banPeer.neverCalled();
-		debug.calledOnce();
+		banPeer.calledOnce();
 		process.calledOnce();
 		assert.false(downloader.isDownloading());
 	});
