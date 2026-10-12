@@ -100,7 +100,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 
 		const round = this.#getHighestRoundToDownload(ourHeader, peer.header);
 		if (ourHeader.round === round) {
-			const downloads = this.#getDownloadsByRound(peer.header.blockNumber, round);
+			const downloads = this.#getDownloadsByRound(ourHeader.blockNumber, round);
 
 			const job: DownloadJob = {
 				blockNumber: ourHeader.blockNumber,
@@ -116,7 +116,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 			this.#setDownloadJob(job, downloads);
 			void this.#downloadMessagesFromPeer(job);
 		} else if (peer.header.round > ourHeader.round) {
-			this.#setFullDownload(peer.header.blockNumber, round);
+			this.#setFullDownload(ourHeader.blockNumber, round);
 
 			const job: DownloadJob = {
 				blockNumber: ourHeader.blockNumber,
