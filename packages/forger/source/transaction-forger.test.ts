@@ -62,6 +62,7 @@ describe<{
 			prepareNextCommit: async () => {},
 			process: async () => ({ receipt: { gasUsed: 21_000n } }),
 			rollback: async () => {},
+			seedGenesisAccount: async () => {},
 			snapshot: async () => {},
 			stateRoot: async () => "stateRoot",
 			updateRewardsAndVotes: async () => {},
@@ -117,6 +118,7 @@ describe<{
 		genesisInfo,
 	}) => {
 		const initializeGenesis = spy(evm, "initializeGenesis");
+		const seedGenesisAccount = spy(evm, "seedGenesisAccount");
 		const prepareNextCommit = spy(evm, "prepareNextCommit");
 		const updateRewardsAndVotes = spy(evm, "updateRewardsAndVotes");
 		const logsBloom = spy(evm, "logsBloom");
@@ -128,6 +130,7 @@ describe<{
 		assert.equal(result, { fee: 0n, gasUsed: 0, logsBloom: "logsBloom", stateRoot: "stateRoot", transactions: [] });
 
 		initializeGenesis.calledWith(genesisInfo);
+		seedGenesisAccount.neverCalled();
 		prepareNextCommit.calledWith({
 			blockContext: {
 				commitKey,
