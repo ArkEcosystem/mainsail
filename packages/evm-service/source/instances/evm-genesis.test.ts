@@ -234,7 +234,46 @@ describe<{
 		}
 	});
 
-	it("initializeGenesis after the genesis commit keeps state roots in sync", async () => {
+	it("seedGenesisAccount, not initializeGenesis, seeds the genesis account", async () => {
+		const context = {} as { app: Application };
+		await prepareSandbox(context);
+		const instance = context.app.resolve<Contracts.Evm.Instance & Contracts.Evm.Storage>(EvmInstance);
+
+		try {
+			const account = "0x1111111111111111111111111111111111111111";
+
+			await instance.initializeGenesis({
+				account,
+				deployerAccount: "0x0000000000000000000000000000000000000001",
+				initialBlockNumber: 0n,
+				initialSupply: 1_000n,
+				usernameContract: "0x0000000000000000000000000000000000000001",
+				validatorContract: "0x0000000000000000000000000000000000000001",
+			});
+
+			assert.equal((await instance.getAccountInfo(account)).balance, 0n);
+
+			await instance.seedGenesisAccount();
+
+			assert.equal((await instance.getAccountInfo(account)).balance, 1_000n);
+		} finally {
+			await instance.dispose();
+		}
+	});
+
+	it("seedGenesisAccount rejects before initializeGenesis", async () => {
+		const context = {} as { app: Application };
+		await prepareSandbox(context);
+		const instance = context.app.resolve<Contracts.Evm.Instance & Contracts.Evm.Storage>(EvmInstance);
+
+		try {
+			await assert.rejects(() => instance.seedGenesisAccount(), "genesis not initialized");
+		} finally {
+			await instance.dispose();
+		}
+	});
+
+	it("seedGenesisAccount after the genesis commit keeps state roots in sync", async () => {
 		const genesisInfo: Contracts.Evm.GenesisInfo = {
 			account: "0x1111111111111111111111111111111111111111",
 			deployerAccount: "0x0000000000000000000000000000000000000001",
@@ -253,6 +292,7 @@ describe<{
 			const commitKey = { blockNumber: 0n, round: 0n };
 
 			await instance.initializeGenesis(genesisInfo);
+			await instance.seedGenesisAccount();
 			assert.true(await hasGenesisAccount(instance));
 
 			await instance.prepareNextCommit({
@@ -311,7 +351,9 @@ describe<{
 				assert.false(await hasGenesisAccount(instance));
 			}
 
+			// A restart runs the deployer's genesis setup again.
 			await restarted.initializeGenesis(genesisInfo);
+			await restarted.seedGenesisAccount();
 
 			assert.false(await hasGenesisAccount(restarted));
 			assert.equal(await touchGenesisAccount(restarted), await touchGenesisAccount(running));

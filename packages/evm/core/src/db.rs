@@ -2310,7 +2310,7 @@ mod tests {
 
         let genesis = address!("0000000000000000000000000000000000000000");
         let account = address!("0000000000000000000000000000000000000001");
-        db.set_genesis_info(crate::db::GenesisInfo {
+        db.seed_genesis_account(&crate::db::GenesisInfo {
             account: genesis,
             initial_supply: U256::from(1_000_000),
             ..Default::default()
@@ -2441,15 +2441,22 @@ mod tests {
     fn test_set_genesis_info() {
         let mut db = create_temp_database();
 
+        let genesis_info = crate::db::GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            initial_supply: U256::from(1_000_000),
+            ..Default::default()
+        };
+
         assert_eq!(db.genesis_info, None);
 
-        db.set_genesis_info(Default::default()).expect("ok");
+        db.set_genesis_info(genesis_info.clone());
 
-        assert_eq!(db.genesis_info, Some(Default::default()));
+        assert_eq!(db.genesis_info, Some(genesis_info.clone()));
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
     }
 
     #[test]
-    fn test_set_genesis_info_seeds_account_until_genesis_commit() {
+    fn test_seed_genesis_account_until_genesis_commit() {
         let mut db = create_temp_database();
 
         let genesis_info = crate::db::GenesisInfo {
@@ -2460,7 +2467,7 @@ mod tests {
 
         assert_eq!(db.basic(genesis_info.account).unwrap(), None);
 
-        db.set_genesis_info(genesis_info.clone()).expect("ok");
+        db.seed_genesis_account(&genesis_info).expect("ok");
 
         assert_eq!(
             db.basic(genesis_info.account).unwrap(),
@@ -2480,15 +2487,14 @@ mod tests {
 
         assert_eq!(db.basic(genesis_info.account).unwrap(), None);
 
-        // A restart or proposal initializes the genesis info again.
-        db.set_genesis_info(genesis_info.clone()).expect("ok");
+        // Seeding again after the genesis commit is a no-op.
+        db.seed_genesis_account(&genesis_info).expect("ok");
 
         assert_eq!(db.basic(genesis_info.account).unwrap(), None);
-        assert_eq!(db.genesis_info, Some(genesis_info));
     }
 
     #[test]
-    fn test_set_genesis_info_on_new_instance_after_genesis_commit() {
+    fn test_seed_genesis_account_on_new_instance_after_genesis_commit() {
         let path = tempfile::Builder::new()
             .prefix("evm.mdb")
             .tempdir()
@@ -2500,9 +2506,9 @@ mod tests {
             ..Default::default()
         };
 
-        let mut db =
+        let db =
             PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("db");
-        db.set_genesis_info(genesis_info.clone()).expect("ok");
+        db.seed_genesis_account(&genesis_info).expect("ok");
 
         let mut state_commit = StateCommit {
             key: CommitKey(genesis_info.initial_block_number, 0, B256::ZERO),
@@ -2515,17 +2521,15 @@ mod tests {
         db.commit(&mut state_commit, &None).unwrap();
         drop(db);
 
-        // Each boot and each proposal opens a new instance without genesis info.
+        // Each boot opens a new instance and seeds again.
         let mut db =
             PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("db");
 
-        assert_eq!(db.genesis_info, None);
         assert_eq!(db.basic(genesis_info.account).unwrap(), None);
 
-        db.set_genesis_info(genesis_info.clone()).expect("ok");
+        db.seed_genesis_account(&genesis_info).expect("ok");
 
         assert_eq!(db.basic(genesis_info.account).unwrap(), None);
-        assert_eq!(db.genesis_info, Some(genesis_info));
     }
 
     #[test]
