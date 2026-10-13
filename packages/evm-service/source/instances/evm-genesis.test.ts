@@ -234,45 +234,6 @@ describe<{
 		}
 	});
 
-	it("seedGenesisAccount, not initializeGenesis, seeds the genesis account", async () => {
-		const context = {} as { app: Application };
-		await prepareSandbox(context);
-		const instance = context.app.resolve<Contracts.Evm.Instance & Contracts.Evm.Storage>(EvmInstance);
-
-		try {
-			const account = "0x1111111111111111111111111111111111111111";
-
-			await instance.initializeGenesis({
-				account,
-				deployerAccount: "0x0000000000000000000000000000000000000001",
-				initialBlockNumber: 0n,
-				initialSupply: 1_000n,
-				usernameContract: "0x0000000000000000000000000000000000000001",
-				validatorContract: "0x0000000000000000000000000000000000000001",
-			});
-
-			assert.equal((await instance.getAccountInfo(account)).balance, 0n);
-
-			await instance.seedGenesisAccount();
-
-			assert.equal((await instance.getAccountInfo(account)).balance, 1_000n);
-		} finally {
-			await instance.dispose();
-		}
-	});
-
-	it("seedGenesisAccount rejects before initializeGenesis", async () => {
-		const context = {} as { app: Application };
-		await prepareSandbox(context);
-		const instance = context.app.resolve<Contracts.Evm.Instance & Contracts.Evm.Storage>(EvmInstance);
-
-		try {
-			await assert.rejects(() => instance.seedGenesisAccount(), "genesis not initialized");
-		} finally {
-			await instance.dispose();
-		}
-	});
-
 	it("seedGenesisAccount after the genesis commit keeps state roots in sync", async () => {
 		const genesisInfo: Contracts.Evm.GenesisInfo = {
 			account: "0x1111111111111111111111111111111111111111",
@@ -362,5 +323,56 @@ describe<{
 				await instance.dispose();
 			}
 		}
+	});
+});
+
+// A fresh, uncommitted instance per test: genesis seeding mutates the database.
+describe<{
+	app: Application;
+	instance: Contracts.Evm.Instance & Contracts.Evm.Storage;
+}>("EvmInstance - genesis seeding", ({ assert, afterEach, beforeEach, it }) => {
+	const genesisInfo: Contracts.Evm.GenesisInfo = {
+		account: "0x1111111111111111111111111111111111111111",
+		deployerAccount: "0x0000000000000000000000000000000000000001",
+		initialBlockNumber: 0n,
+		initialSupply: 1_000n,
+		usernameContract: "0x0000000000000000000000000000000000000001",
+		validatorContract: "0x0000000000000000000000000000000000000001",
+	};
+
+	beforeEach(async (context) => {
+		await prepareSandbox(context);
+		context.instance = context.app.resolve(EvmInstance);
+	});
+
+	afterEach(async (context) => {
+		await context.instance.dispose();
+		setGracefulCleanup();
+	});
+
+	it("seedGenesisAccount, not initializeGenesis, seeds the genesis account", async ({ instance }) => {
+		await instance.initializeGenesis(genesisInfo);
+
+		assert.equal((await instance.getAccountInfo(genesisInfo.account)).balance, 0n);
+
+		await instance.seedGenesisAccount();
+
+		assert.equal((await instance.getAccountInfo(genesisInfo.account)).balance, 1_000n);
+	});
+
+	it("seedGenesisAccount rejects before initializeGenesis", async ({ instance }) => {
+		await assert.rejects(() => instance.seedGenesisAccount(), "genesis not initialized");
+	});
+
+	it("seedGenesisAccount overwrites a stale balance before the genesis commit", async ({ instance }) => {
+		await instance.initializeGenesis(genesisInfo);
+		await instance.seedGenesisAccount();
+
+		assert.equal((await instance.getAccountInfo(genesisInfo.account)).balance, 1_000n);
+
+		await instance.initializeGenesis({ ...genesisInfo, initialSupply: 2_000n });
+		await instance.seedGenesisAccount();
+
+		assert.equal((await instance.getAccountInfo(genesisInfo.account)).balance, 2_000n);
 	});
 });

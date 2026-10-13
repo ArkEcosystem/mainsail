@@ -2307,12 +2307,12 @@ mod tests {
 
         let genesis = address!("0000000000000000000000000000000000000000");
         let account = address!("0000000000000000000000000000000000000001");
-        db.seed_genesis_account(&crate::db::GenesisInfo {
+        db.set_genesis_info(crate::db::GenesisInfo {
             account: genesis,
             initial_supply: U256::from(1_000_000),
             ..Default::default()
-        })
-        .unwrap();
+        });
+        db.seed_genesis_account().unwrap();
 
         let info = db.basic(genesis).unwrap();
         assert_eq!(
@@ -2464,7 +2464,34 @@ mod tests {
 
         assert_eq!(db.basic(genesis_info.account).unwrap(), None);
 
-        db.seed_genesis_account(&genesis_info).expect("ok");
+        db.seed_genesis_account()
+            .expect_err("genesis not initialized");
+
+        db.set_genesis_info(genesis_info.clone());
+        db.seed_genesis_account().expect("ok");
+
+        assert_eq!(
+            db.basic(genesis_info.account).unwrap(),
+            Some(AccountInfo::default())
+        );
+
+        // A changed supply before the genesis commit overwrites the stale balance.
+        db.set_genesis_info(crate::db::GenesisInfo {
+            initial_supply: U256::from(1_000_000),
+            ..genesis_info.clone()
+        });
+        db.seed_genesis_account().expect("ok");
+
+        assert_eq!(
+            db.basic(genesis_info.account).unwrap(),
+            Some(AccountInfo {
+                balance: U256::from(1_000_000),
+                ..Default::default()
+            })
+        );
+
+        db.set_genesis_info(genesis_info.clone());
+        db.seed_genesis_account().expect("ok");
 
         assert_eq!(
             db.basic(genesis_info.account).unwrap(),
@@ -2485,7 +2512,7 @@ mod tests {
         assert_eq!(db.basic(genesis_info.account).unwrap(), None);
 
         // Seeding again after the genesis commit is a no-op.
-        db.seed_genesis_account(&genesis_info).expect("ok");
+        db.seed_genesis_account().expect("ok");
 
         assert_eq!(db.basic(genesis_info.account).unwrap(), None);
     }
@@ -2503,9 +2530,10 @@ mod tests {
             ..Default::default()
         };
 
-        let db =
+        let mut db =
             PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("db");
-        db.seed_genesis_account(&genesis_info).expect("ok");
+        db.set_genesis_info(genesis_info.clone());
+        db.seed_genesis_account().expect("ok");
 
         let mut state_commit = StateCommit {
             key: CommitKey(genesis_info.initial_block_number, 0, B256::ZERO),
@@ -2524,7 +2552,8 @@ mod tests {
 
         assert_eq!(db.basic(genesis_info.account).unwrap(), None);
 
-        db.seed_genesis_account(&genesis_info).expect("ok");
+        db.set_genesis_info(genesis_info.clone());
+        db.seed_genesis_account().expect("ok");
 
         assert_eq!(db.basic(genesis_info.account).unwrap(), None);
     }
