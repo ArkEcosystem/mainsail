@@ -541,7 +541,11 @@ impl PersistentDB {
         })
     }
 
-    pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) -> Result<(), Error> {
+    pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) {
+        self.genesis_info.replace(genesis_info);
+    }
+
+    pub fn seed_genesis_account(&self, genesis_info: &GenesisInfo) -> Result<(), Error> {
         self.with_write_txn(|wtxn| {
             let inner = &self.inner;
 
@@ -566,10 +570,7 @@ impl PersistentDB {
             }
 
             Ok(())
-        })?;
-
-        self.genesis_info.replace(genesis_info);
-        Ok(())
+        })
     }
 
     pub fn get_accounts(
@@ -1447,7 +1448,7 @@ impl PersistentDB {
     /// (mdb_env_set_mapsize) while the txn is live.
     ///
     /// Unlike [`Self::open_read_txn`], this deliberately has no `MDB_MAP_RESIZED` recovery. Every
-    /// write txn on this env — genesis bootstrap (`set_genesis_info`) and block commits
+    /// write txn on this env — genesis account seeding (`seed_genesis_account`) and block commits
     /// (`commit_to_db`) alike — is opened by the single consensus/core process, which is also the one
     /// that grows the map (via `resize()` on `DbFull`); it adopts its own new size under the resize
     /// write-guard and never observes a peer-induced `MapResized`. If a second writer process is ever
