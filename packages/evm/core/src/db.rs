@@ -545,29 +545,26 @@ impl PersistentDB {
         self.genesis_info.replace(genesis_info);
     }
 
-    pub fn seed_genesis_account(&self, genesis_info: &GenesisInfo) -> Result<(), Error> {
-        self.with_write_txn(|wtxn| {
-            let inner = &self.inner;
+    pub fn seed_genesis_account(&self) -> Result<(), Error> {
+        let genesis_info = self
+            .genesis_info
+            .as_ref()
+            .ok_or_else(|| Error::State("genesis not initialized".into()))?;
 
+        self.with_write_txn(|wtxn| {
             if self.is_block_committed(wtxn, genesis_info.initial_block_number)? {
                 return Ok(());
             }
 
-            if inner
-                .accounts
-                .get(wtxn, &AddressWrapper(genesis_info.account))?
-                .is_none()
-            {
-                inner.accounts.put(
-                    wtxn,
-                    &AddressWrapper(genesis_info.account),
-                    &CompactBincode(&StoredAccountInfo::new(
-                        genesis_info.initial_supply,
-                        0,
-                        KECCAK_EMPTY,
-                    )),
-                )?;
-            }
+            self.inner.accounts.put(
+                wtxn,
+                &AddressWrapper(genesis_info.account),
+                &CompactBincode(&StoredAccountInfo::new(
+                    genesis_info.initial_supply,
+                    0,
+                    KECCAK_EMPTY,
+                )),
+            )?;
 
             Ok(())
         })

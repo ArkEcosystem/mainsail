@@ -208,10 +208,7 @@ impl EvmInner {
         }
     }
 
-    pub fn initialize_genesis(
-        &mut self,
-        genesis_ctx: GenesisContext,
-    ) -> std::result::Result<(), EVMError<String>> {
+    pub fn initialize_genesis(&mut self, genesis_ctx: GenesisContext) {
         self.persistent_db.set_genesis_info(GenesisInfo {
             account: genesis_ctx.account,
             deployer_account: genesis_ctx.deployer_account,
@@ -220,18 +217,12 @@ impl EvmInner {
             initial_block_number: genesis_ctx.initial_block_number,
             initial_supply: genesis_ctx.initial_supply,
         });
-
-        Ok(())
     }
 
     pub fn seed_genesis_account(&self) -> std::result::Result<(), EVMError<String>> {
-        let genesis_info = self.genesis_info()?;
-
-        self.persistent_db
-            .seed_genesis_account(&genesis_info)
-            .map_err(|err| {
-                EVMError::Database(format!("seed_genesis_account failed: {}", err).into())
-            })
+        self.persistent_db.seed_genesis_account().map_err(|err| {
+            EVMError::Database(format!("seed_genesis_account failed: {}", err).into())
+        })
     }
 
     fn consensus_system_call(
@@ -1534,7 +1525,14 @@ impl JsEvmWrapper {
     ) -> Result<PromiseRaw<'env, ()>> {
         let ctx = GenesisContext::try_from(genesis_ctx)?;
 
-        self.write(env, move |evm| evm.initialize_genesis(ctx), |_, _| Ok(()))
+        self.write(
+            env,
+            move |evm| {
+                evm.initialize_genesis(ctx);
+                Ok::<(), EVMError<String>>(())
+            },
+            |_, _| Ok(()),
+        )
     }
 
     #[napi]
