@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
+import { InvalidAddressError } from "viem";
 
 import { wallet } from "../test/fixtures/index.js";
 import { encodeLegacy, encodeList, encodeRlp } from "../test/helpers/canonical-transaction.js";
@@ -58,13 +59,21 @@ describe<{
 			throw new Error("FUZZ_SEED and FUZZ_RUNS must be integers, FUZZ_RUNS at least 1");
 		}
 
+		// Only the deserializer's own errors (and viem's checksum error for a malformed `to`) count as
+		// rejections; anything else is a crash on malformed input and fails the run.
+		const isRejection = (error: unknown): boolean =>
+			error instanceof InvalidAddressError || (error instanceof Error && /^decoded? RLP /.test(error.message));
+
 		const accepts = async (input: Buffer, label: string): Promise<boolean> => {
 			let reserialized: Buffer;
 			try {
-				// fromBytes hashes a transaction with this serializer, so it rejects whatever the serializer throws on.
 				reserialized = await serializer.serialize((await deserializer.deserialize(input)).data);
-			} catch {
-				return false;
+			} catch (error) {
+				if (isRejection(error)) {
+					return false;
+				}
+
+				throw new Error(`${label}: crashed on input ${input.toString("hex")}`, { cause: error });
 			}
 
 			if (!reserialized.equals(input)) {

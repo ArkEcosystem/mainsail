@@ -221,6 +221,31 @@ describe<{
 		}
 	});
 
+	it("should reject number fields above the safe integer range", async ({ app, deserializer }) => {
+		const canonical = await signTransfer(app);
+		const maxSafe = Uint8Array.of(0x1f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff); // 2^53 - 1
+		const aboveSafe = Uint8Array.of(0x20, 0, 0, 0, 0, 0, 0); // 2^53
+
+		for (const [index, field] of [
+			[1, "gasPrice"],
+			[2, "gasLimit"],
+			[6, "v"],
+		] as const) {
+			const accepted = legacyRlpFields(canonical);
+			accepted[index] = maxSafe;
+			await assert.resolves(() => deserializer.deserialize(encodeLegacy(accepted)));
+
+			for (const value of [aboveSafe, new Uint8Array(200).fill(0xff)]) {
+				const rejected = legacyRlpFields(canonical);
+				rejected[index] = value;
+				await assert.rejects(
+					() => deserializer.deserialize(encodeLegacy(rejected)),
+					`decoded RLP ${field} exceeds the safe integer range`,
+				);
+			}
+		}
+	});
+
 	it("should reject a v below 35 (pre-EIP-155)", async ({ app, deserializer }) => {
 		const canonical = await signTransfer(app);
 

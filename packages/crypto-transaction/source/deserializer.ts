@@ -241,7 +241,17 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 	#parseNumber(value: Hex, field: string): number {
 		this.#assertCanonicalInteger(value, field);
-		return value === "0x" ? 0 : Number(value);
+		if (value === "0x") {
+			return 0;
+		}
+
+		// Number() silently loses precision above 2^53 and turns very long integers into Infinity.
+		const number = Number(value);
+		if (!Number.isSafeInteger(number)) {
+			throw new Error(`decoded RLP ${field} exceeds the safe integer range`);
+		}
+
+		return number;
 	}
 
 	#parseBigInt(value: Hex, field: string): bigint {
