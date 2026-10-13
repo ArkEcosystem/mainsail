@@ -78,21 +78,27 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		);
 	}
 
-	public async getMessages(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetMessagesResponse> {
+	public async getMessages(
+		peer: Contracts.P2P.Peer,
+		query: Contracts.P2P.GetMessagesQuery,
+	): Promise<Contracts.P2P.GetMessagesResponse> {
 		const response = await this.#emit<Contracts.P2P.GetMessagesResponse>(
 			peer,
 			Routes.GetMessages,
-			{},
+			{ query },
 			{ timeout: 5000 },
 		);
 		return response.data;
 	}
 
-	public async getProposal(peer: Contracts.P2P.Peer): Promise<Contracts.P2P.GetProposalResponse> {
+	public async getProposal(
+		peer: Contracts.P2P.Peer,
+		query: Contracts.P2P.GetProposalQuery,
+	): Promise<Contracts.P2P.GetProposalResponse> {
 		const response = await this.#emit<Contracts.P2P.GetProposalResponse>(
 			peer,
 			Routes.GetProposal,
-			{},
+			{ query },
 			{ timeout: 5000 },
 		);
 		return response.data;

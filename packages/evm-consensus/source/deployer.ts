@@ -62,6 +62,7 @@ export class Deployer implements Contracts.EvmConsensus.Deployer {
 		});
 
 		await this.evm.initializeGenesis(this.genesisBlockInfo);
+		await this.evm.seedGenesisAccount();
 
 		const consensusAddress = await this.#deployContract(ConsensusAbi.bytecode.object, 0, "Consensus");
 		await this.#deployProxy({

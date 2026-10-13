@@ -2,7 +2,8 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { Serialized } from "../test/fixtures/index";
+import { formatEcdsaSignature } from "@mainsail/utils";
+import { Serialized, wallet } from "../test/fixtures/index";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 import { InvalidLegacySecondSignatureError, MissingLegacySecondSignatureError } from "@mainsail/exceptions";
 
@@ -10,7 +11,11 @@ describe<{
 	app: Application;
 	verifier: Contracts.Crypto.TransactionVerifier;
 	factory: Contracts.Crypto.TransactionFactory;
+	signer: Contracts.Crypto.TransactionSigner;
+	keyPairFactory: Contracts.Crypto.KeyPairFactory;
 }>("Verifier", ({ it, beforeEach, assert }) => {
+	const secondKeyPair = { compressed: false, privateKey: wallet.privateKey, publicKey: wallet.publicKey };
+
 	const txData = {
 		hash: "3a5823fe8f498b2e509974b3939584bd1200ad32fa32bc8a1a778b608f79f780",
 		network: 10000,
@@ -36,6 +41,14 @@ describe<{
 		);
 		context.verifier = context.app.get<Contracts.Crypto.TransactionVerifier>(
 			Identifiers.Cryptography.Transaction.Verifier,
+		);
+		context.signer = context.app.get<Contracts.Crypto.TransactionSigner>(
+			Identifiers.Cryptography.Transaction.Signer,
+		);
+		context.keyPairFactory = context.app.getTagged<Contracts.Crypto.KeyPairFactory>(
+			Identifiers.Cryptography.Identity.KeyPair.Factory,
+			"type",
+			"wallet",
 		);
 	});
 
@@ -105,6 +118,68 @@ describe<{
 					"02f0f1217bace23ac2ac9438b65a8dcc693905bee511b49d5ade499a8c8da8a3e4",
 				),
 			MissingLegacySecondSignatureError,
+		);
+	});
+
+	it("verifyLegacySecondSignature - should throw if the recovery id is changed", async ({ factory, verifier }) => {
+		const serialized = Serialized.transactionTransferWithSecondSignature;
+
+		assert.true(
+			await verifier.verifyLegacySecondSignature((await factory.fromHex(serialized)).toData(), wallet.publicKey),
+		);
+
+		for (const recoveryId of ["01", "02", "1b", "ff"]) {
+			const transaction = await factory.fromHex(serialized.slice(0, -2) + recoveryId);
+
+			await assert.rejects(
+				() => verifier.verifyLegacySecondSignature(transaction.toData(), wallet.publicKey),
+				InvalidLegacySecondSignatureError,
+			);
+		}
+	});
+
+	it("verifyLegacySecondSignature - should throw if signed over the unsigned transaction", async ({
+		factory,
+		signer,
+		verifier,
+	}) => {
+		const transaction = (await factory.fromHex(Serialized.transactionTransfer)).toData();
+		const { r, s, v } = await signer.sign(transaction, secondKeyPair);
+
+		const signed = await factory.fromData({
+			...transaction,
+			legacySecondSignature: await signer.legacySecondSign(transaction, secondKeyPair),
+		});
+		const lifted = await factory.fromData({ ...transaction, legacySecondSignature: formatEcdsaSignature(r, s, v) });
+
+		assert.true(await verifier.verifyLegacySecondSignature(signed.toData(), wallet.publicKey));
+		await assert.rejects(
+			() => verifier.verifyLegacySecondSignature(lifted.toData(), wallet.publicKey),
+			InvalidLegacySecondSignatureError,
+		);
+	});
+
+	it("verifyLegacySecondSignature - should throw if lifted to another sender", async ({
+		factory,
+		keyPairFactory,
+		signer,
+		verifier,
+	}) => {
+		const transaction = (await factory.fromHex(Serialized.transactionTransfer)).toData();
+		const legacySecondSignature = await signer.legacySecondSign(transaction, secondKeyPair);
+		const otherSender = await keyPairFactory.fromMnemonic("secret");
+
+		const signed = await factory.fromData({ ...transaction, legacySecondSignature });
+		const lifted = await factory.fromData({
+			...transaction,
+			...(await signer.sign(transaction, otherSender)),
+			legacySecondSignature,
+		});
+
+		assert.true(await verifier.verifyLegacySecondSignature(signed.toData(), wallet.publicKey));
+		await assert.rejects(
+			() => verifier.verifyLegacySecondSignature(lifted.toData(), wallet.publicKey),
+			InvalidLegacySecondSignatureError,
 		);
 	});
 });

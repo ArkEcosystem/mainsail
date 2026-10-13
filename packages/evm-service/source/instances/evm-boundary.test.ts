@@ -336,7 +336,7 @@ describe<{
 					timestamp: 0n,
 					validatorAddress: zeroAddress,
 				}),
-			"out of range",
+			"roundValidators: expected an unsigned bigint fitting into 8 bits",
 		);
 
 		// The fee is a u128 on the wire; negative or wider values fail argument conversion

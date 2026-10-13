@@ -36,7 +36,7 @@ function decodeListBounds(buffer: Uint8Array): { start: number; end: number } {
 				throw new Error("decode RLP leading zero in length");
 			}
 
-			length = (length << 8) | v;
+			length = length * 256 + v;
 		}
 		if (length < 56) {
 			throw new Error("decode RLP non-minimal long list");
@@ -118,7 +118,7 @@ function readLength(buffer: Uint8Array, offset: number, lengthOfLength: number) 
 		if (index === 0 && lengthOfLength > 1 && v === 0) {
 			throw new Error("decode RLP leading zero in length");
 		}
-		length = (length << 8) | v;
+		length = length * 256 + v;
 	}
 
 	return { len: length, next: offset + lengthOfLength };
@@ -138,7 +138,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		const fields: Hex[] = [];
 		let offset = start;
 		while (offset < end) {
-			if (fields.length > 10) {
+			if (fields.length >= 10) {
 				throw new Error("decoded RLP contains too many fields");
 			}
 
@@ -167,6 +167,10 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 		// Signature
 		const v = this.#parseNumber(fields[6], "v");
+		if (v < 35) {
+			throw new Error("decoded RLP v is below 35 (not EIP-155)");
+		}
+
 		const chainId = Math.floor((v - 35) / 2);
 		const network = chainId;
 
@@ -183,6 +187,11 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 		// Legacy second signature
 		if (fields.length === 10) {
+			// r (32) + s (32) + v (1); the verifier slices exactly these offsets and the AJV schema pins 130 hex chars.
+			if (fields[9].length !== 2 + 65 * 2) {
+				throw new Error("decoded RLP legacy second signature is not 65 bytes");
+			}
+
 			legacySecondSignature = fields[9].slice(2);
 		}
 
@@ -232,7 +241,17 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 	#parseNumber(value: Hex, field: string): number {
 		this.#assertCanonicalInteger(value, field);
-		return value === "0x" ? 0 : Number(value);
+		if (value === "0x") {
+			return 0;
+		}
+
+		// Number() silently loses precision above 2^53 and turns very long integers into Infinity.
+		const number = Number(value);
+		if (!Number.isSafeInteger(number)) {
+			throw new Error(`decoded RLP ${field} exceeds the safe integer range`);
+		}
+
+		return number;
 	}
 
 	#parseBigInt(value: Hex, field: string): bigint {

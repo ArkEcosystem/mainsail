@@ -140,6 +140,10 @@ export class EvmInstance implements Contracts.Evm.Instance, Contracts.Evm.Storag
 		});
 	}
 
+	public async seedGenesisAccount(): Promise<void> {
+		return this.#evm.seedGenesisAccount();
+	}
+
 	public async getAccountInfo(address: string, blockNumber?: bigint): Promise<Contracts.Evm.AccountInfo> {
 		return this.#evm.getAccountInfo(address, blockNumber);
 	}

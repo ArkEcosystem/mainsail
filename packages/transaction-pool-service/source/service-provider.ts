@@ -54,6 +54,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			maxTransactionsInPool: Joi.number().integer().min(1).required(),
 			maxTransactionsPerRequest: Joi.number().integer().min(1).required(),
 			maxTransactionsPerSender: Joi.number().integer().min(1).required(),
+			rebroadcastCooldownBlocks: Joi.number().integer().min(0).required(),
+			rebroadcastThreshold: Joi.number().integer().min(0).max(100).required(),
 			storage: Joi.string().required(),
 		}).unknown(true);
 	}

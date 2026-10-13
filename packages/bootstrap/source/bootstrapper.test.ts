@@ -546,7 +546,7 @@ describe<{
 
 		await assert.rejects(
 			() => bootstrapper.bootstrap(),
-			"Previous block is set to snapshot, but there is no snapshot defined in milestones",
+			"Snapshot is defined in milestones, but the genesis block has no parent hash",
 		);
 
 		// #setGenesisCommit

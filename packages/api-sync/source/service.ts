@@ -27,6 +27,7 @@ interface DeferredSync {
 	tokenHolders: Models.TokenHolder[];
 	validatorRound?: Models.ValidatorRound;
 	wallets: Array<[string, string | null, string, string, object, string]>;
+	placeholderAddresses: string[];
 	mergedLegacyColdWallets: ({ legacyAddress: string } & Contracts.Evm.AccountMergeInfo)[];
 	newMilestones?: Contracts.Crypto.Milestone;
 }
@@ -89,10 +90,6 @@ export class Sync implements Contracts.ApiSync.Service {
 
 	@inject(ApiDatabaseIdentifiers.LegacyColdWalletRepositoryFactory)
 	private readonly legacyColdWalletRepositoryFactory!: ApiDatabaseContracts.LegacyColdWalletRepositoryFactory;
-
-	@inject(Identifiers.Evm.Instance)
-	@tagged("instance", "evm")
-	private readonly evm!: Contracts.Evm.Instance;
 
 	@inject(Identifiers.EvmConsensus.Contracts.MultiPayment)
 	private readonly multiPaymentContractAddress!: string;
@@ -259,22 +256,6 @@ export class Sync implements Contracts.ApiSync.Service {
 				return accumulator;
 			}, {});
 
-		// Add accountUpdate for genesisAccount on the very first non-genesis block to ensure
-		// the wallet is created in postgres.
-		const genesisBlock = this.app.config<Contracts.Crypto.CommitJson>("crypto.genesisBlock");
-		assert.defined(genesisBlock);
-
-		if (unit.blockNumber - 1 === genesisBlock.block.number && !accountUpdates[genesisBlock.block.proposer]) {
-			const genesisAccount = await this.evm.getAccountInfo(genesisBlock.block.proposer);
-
-			accountUpdates[genesisBlock.block.proposer] = {
-				address: genesisBlock.block.proposer,
-				balance: genesisAccount.balance,
-				nonce: genesisAccount.nonce,
-				usernameResigned: false,
-			};
-		}
-
 		const validatorAttributes = (address: string) => {
 			const dirtyValidator = dirtyValidators[address];
 			const isBlockValidator = header.proposer === address;
@@ -321,7 +302,6 @@ export class Sync implements Contracts.ApiSync.Service {
 			};
 
 			if (account.legacyMergeInfo) {
-				attributes["legacyMerge"] = account.legacyMergeInfo;
 				mergedLegacyColdWallets.push({
 					address: account.address, // mainsail address
 					legacyAddress: account.legacyMergeInfo.address,
@@ -341,6 +321,7 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		// The block validator/dirty validators might not be part of the account updates if no rewards have been distributed,
 		// thus ensure they are manually inserted.
+		const placeholderAddresses: string[] = [];
 		for (const validatorAddress of [
 			...new Set([
 				header.proposer,
@@ -358,6 +339,7 @@ export class Sync implements Contracts.ApiSync.Service {
 					},
 					header.number.toFixed(),
 				]);
+				placeholderAddresses.push(validatorAddress);
 			}
 		}
 
@@ -385,6 +367,7 @@ export class Sync implements Contracts.ApiSync.Service {
 
 			mergedLegacyColdWallets,
 			multiPayments,
+			placeholderAddresses,
 			tokenActions: [...tokenActions.values()],
 			tokenHolders: [...tokenHolders.values()],
 			tokens: [...tokens.values()],
@@ -564,16 +547,18 @@ export class Sync implements Contracts.ApiSync.Service {
 				.where("id = :id", { id: 1 })
 				.execute();
 
-			for (const merge of deferred.mergedLegacyColdWallets) {
-				await legacyColdwalletRepository
-					.createQueryBuilder()
-					.update()
-					.set({
-						mergeInfoTransactionHash: merge.txHash,
-						mergeInfoWalletAddress: merge.address,
-					})
-					.where("address = :legacyAddress", { legacyAddress: merge.legacyAddress })
-					.execute();
+			// The "-1" sentinel of placeholder wallets is only honoured on conflict, so make sure a row exists first.
+			// A missing row means the account does not exist in the EVM, i.e. balance and nonce are 0.
+			for (const batch of chunk(deferred.placeholderAddresses, 256)) {
+				const placeholders = batch.map((_, index) => `($${index + 2}, NULL, '0', '0', '{}', $1)`).join(", ");
+
+				await walletRepository.query(
+					`
+	INSERT INTO wallets (address, public_key, balance, nonce, attributes, updated_at)
+	VALUES ${placeholders}
+	ON CONFLICT ("address") DO NOTHING`,
+					[deferred.block.number, ...batch],
+				);
 			}
 
 			for (const batch of chunk(deferred.wallets, 256)) {
@@ -597,12 +582,12 @@ export class Sync implements Contracts.ApiSync.Service {
 		updated_at = COALESCE(EXCLUDED.updated_at, "Wallet".updated_at),
 		public_key = COALESCE(NULLIF(EXCLUDED.public_key, ''), "Wallet".public_key),
 		attributes = jsonb_strip_nulls(jsonb_build_object(
-			-- legacy attributes are kept indefinitely
-			'isLegacy', ("Wallet".attributes->>'isLegacy')::boolean,
-			'secondPublicKey', "Wallet".attributes->>'secondPublicKey',
-			'multiSignature', "Wallet".attributes->>'multiSignature',
-			'legacyMerge', "Wallet".attributes->>'legacyMerge',
-			'legacyNonce', "Wallet".attributes->>'legacyNonce',
+			-- legacy attributes are kept indefinitely, as jsonb so objects are not turned into strings
+			'isLegacy', "Wallet".attributes->'isLegacy',
+			'secondPublicKey', "Wallet".attributes->'secondPublicKey',
+			'multiSignature', "Wallet".attributes->'multiSignature',
+			'legacyMerge', "Wallet".attributes->'legacyMerge',
+			'legacyNonce', "Wallet".attributes->'legacyNonce',
 
 			-- if any unvote is present, it will overwrite the previous vote
 			'vote',
@@ -640,6 +625,29 @@ export class Sync implements Contracts.ApiSync.Service {
 			NULLIF((COALESCE(("Wallet".attributes->>'validatorProducedBlocks')::integer, 0)::integer + COALESCE((EXCLUDED.attributes->>'validatorProducedBlocks')::integer, 0)::integer)::integer, 0)
 					))`,
 					parameters,
+				);
+			}
+
+			// Runs after the wallet upsert so the merge also reaches wallets that already had a row.
+			// Like the restore, the merged wallet is marked as legacy and takes over the cold wallet attributes.
+			for (const merge of deferred.mergedLegacyColdWallets) {
+				await legacyColdwalletRepository
+					.createQueryBuilder()
+					.update()
+					.set({
+						mergeInfoTransactionHash: merge.txHash,
+						mergeInfoWalletAddress: merge.address,
+					})
+					.where("address = :legacyAddress", { legacyAddress: merge.legacyAddress })
+					.execute();
+
+				await walletRepository.query(
+					`
+	UPDATE wallets SET attributes = COALESCE(attributes, '{}'::jsonb)
+		|| COALESCE((SELECT attributes FROM legacy_cold_wallets WHERE address = $1), '{}'::jsonb)
+		|| jsonb_build_object('isLegacy', true, 'legacyMerge', jsonb_build_object('address', $1::text, 'txHash', $2::text))
+	WHERE address = $3`,
+					[merge.legacyAddress, merge.txHash, merge.address],
 				);
 			}
 

@@ -6,6 +6,8 @@ import { parseTransaction } from "viem";
 import { Deserialized, Serialized } from "../test/fixtures/index.js";
 import {
 	encodeLegacy,
+	encodeList,
+	encodeRlp,
 	fixedWidth32,
 	legacyRlpFields,
 	signTransfer,
@@ -194,5 +196,94 @@ describe<{
 			orderFields[component] = fixedWidth32(SECP256K1_ORDER);
 			await assert.rejects(() => deserializer.deserialize(encodeLegacy(orderFields)), "out of range");
 		}
+	});
+
+	it("should reject a transaction with 11 fields", async ({ app, deserializer }) => {
+		const fields = legacyRlpFields(await signTransfer(app));
+
+		await assert.resolves(() => deserializer.deserialize(encodeLegacy([...fields, new Uint8Array(65)])));
+		await assert.rejects(
+			() => deserializer.deserialize(encodeLegacy([...fields, new Uint8Array(65), new Uint8Array()])),
+			"decoded RLP contains too many fields",
+		);
+	});
+
+	it("should reject a legacy second signature that is not 65 bytes", async ({ app, deserializer }) => {
+		const fields = legacyRlpFields(await signTransfer(app));
+
+		await assert.resolves(() => deserializer.deserialize(encodeLegacy([...fields, new Uint8Array(65)])));
+
+		for (const length of [0, 1, 64, 66]) {
+			await assert.rejects(
+				() => deserializer.deserialize(encodeLegacy([...fields, new Uint8Array(length).fill(1)])),
+				"decoded RLP legacy second signature is not 65 bytes",
+			);
+		}
+	});
+
+	it("should reject number fields above the safe integer range", async ({ app, deserializer }) => {
+		const canonical = await signTransfer(app);
+		const maxSafe = Uint8Array.of(0x1f, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff); // 2^53 - 1
+		const aboveSafe = Uint8Array.of(0x20, 0, 0, 0, 0, 0, 0); // 2^53
+
+		for (const [index, field] of [
+			[1, "gasPrice"],
+			[2, "gasLimit"],
+			[6, "v"],
+		] as const) {
+			const accepted = legacyRlpFields(canonical);
+			accepted[index] = maxSafe;
+			await assert.resolves(() => deserializer.deserialize(encodeLegacy(accepted)));
+
+			for (const value of [aboveSafe, new Uint8Array(200).fill(0xff)]) {
+				const rejected = legacyRlpFields(canonical);
+				rejected[index] = value;
+				await assert.rejects(
+					() => deserializer.deserialize(encodeLegacy(rejected)),
+					`decoded RLP ${field} exceeds the safe integer range`,
+				);
+			}
+		}
+	});
+
+	it("should reject a v below 35 (pre-EIP-155)", async ({ app, deserializer }) => {
+		const canonical = await signTransfer(app);
+
+		const lowest = legacyRlpFields(canonical);
+		lowest[6] = Uint8Array.of(35);
+		await assert.resolves(() => deserializer.deserialize(encodeLegacy(lowest)));
+
+		for (const v of [new Uint8Array(), Uint8Array.of(27), Uint8Array.of(28), Uint8Array.of(34)]) {
+			const fields = legacyRlpFields(canonical);
+			fields[6] = v;
+
+			await assert.rejects(
+				() => deserializer.deserialize(encodeLegacy(fields)),
+				"decoded RLP v is below 35 (not EIP-155)",
+			);
+		}
+	});
+
+	it("should reject length prefixes that overflow 32 bits", async ({ app, deserializer }) => {
+		const items = [...legacyRlpFields(await signTransfer(app)), new Uint8Array(65)].map((item) => encodeRlp(item));
+		const payload = Buffer.concat(items);
+		assert.true(payload.length < 256);
+
+		await assert.resolves(() => deserializer.deserialize(encodeList(items)));
+		await assert.rejects(
+			() =>
+				deserializer.deserialize(Buffer.concat([Buffer.from([0xfc, 0x01, 0, 0, 0, payload.length]), payload])),
+			"decode RLP truncated long list",
+		);
+		await assert.rejects(
+			() =>
+				deserializer.deserialize(
+					encodeList([
+						...items.slice(0, 9),
+						Buffer.concat([Buffer.from([0xbc, 0x01, 0, 0, 0, 65]), new Uint8Array(65)]),
+					]),
+				),
+			"decode RLP truncated long str",
+		);
 	});
 });

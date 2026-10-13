@@ -2,7 +2,9 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { Utils } from "@mainsail/test-transaction-builders";
-import { assert } from "@mainsail/utils";
+import { assert, sleep } from "@mainsail/utils";
+
+import { runDatabaseQuery } from "./setup.js";
 
 export const forgeTransactions = async (
 	{ app }: { app: Contracts.Kernel.Application },
@@ -75,4 +77,27 @@ export const getRandomConsensusKeyPair = async ({
 			"consensus",
 		)
 		.fromMnemonic(seed);
+};
+
+export const getApiRow = async (
+	app: Contracts.Kernel.Application,
+	table: "wallets" | "legacy_cold_wallets",
+	address: string,
+): Promise<Record<string, any> | undefined> => {
+	const blockNumber = app.get<Contracts.State.Store>(Identifiers.State.Store).getBlockNumber();
+	const apiSync = app.get<Contracts.ApiSync.Service>(Identifiers.ApiSync.Service);
+	const deadline = Date.now() + 30_000;
+	while ((await apiSync.getLastSyncedBlockHeight()) < blockNumber) {
+		if (Date.now() > deadline) {
+			throw new Error(`api sync did not reach block ${blockNumber}`);
+		}
+
+		await sleep(50);
+	}
+
+	const [row] = await runDatabaseQuery(app.get<string>(Identifiers.Application.Name), async (dataSource) =>
+		dataSource.query(`SELECT * FROM ${table} WHERE address = $1`, [address]),
+	);
+
+	return row;
 };

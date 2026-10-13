@@ -541,31 +541,33 @@ impl PersistentDB {
         })
     }
 
-    pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) -> Result<(), Error> {
-        self.with_write_txn(|wtxn| {
-            let inner = &self.inner;
+    pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) {
+        self.genesis_info.replace(genesis_info);
+    }
 
-            if inner
-                .accounts
-                .get(wtxn, &AddressWrapper(genesis_info.account))?
-                .is_none()
-            {
-                inner.accounts.put(
-                    wtxn,
-                    &AddressWrapper(genesis_info.account),
-                    &CompactBincode(&StoredAccountInfo::new(
-                        genesis_info.initial_supply,
-                        0,
-                        KECCAK_EMPTY,
-                    )),
-                )?;
+    pub fn seed_genesis_account(&self) -> Result<(), Error> {
+        let genesis_info = self
+            .genesis_info
+            .as_ref()
+            .ok_or_else(|| Error::State("genesis not initialized".into()))?;
+
+        self.with_write_txn(|wtxn| {
+            if self.is_block_committed(wtxn, genesis_info.initial_block_number)? {
+                return Ok(());
             }
 
-            Ok(())
-        })?;
+            self.inner.accounts.put(
+                wtxn,
+                &AddressWrapper(genesis_info.account),
+                &CompactBincode(&StoredAccountInfo::new(
+                    genesis_info.initial_supply,
+                    0,
+                    KECCAK_EMPTY,
+                )),
+            )?;
 
-        self.genesis_info.replace(genesis_info);
-        Ok(())
+            Ok(())
+        })
     }
 
     pub fn get_accounts(
@@ -1443,7 +1445,7 @@ impl PersistentDB {
     /// (mdb_env_set_mapsize) while the txn is live.
     ///
     /// Unlike [`Self::open_read_txn`], this deliberately has no `MDB_MAP_RESIZED` recovery. Every
-    /// write txn on this env — genesis bootstrap (`set_genesis_info`) and block commits
+    /// write txn on this env — genesis account seeding (`seed_genesis_account`) and block commits
     /// (`commit_to_db`) alike — is opened by the single consensus/core process, which is also the one
     /// that grows the map (via `resize()` on `DbFull`); it adopts its own new size under the resize
     /// write-guard and never observes a peer-induced `MapResized`. If a second writer process is ever
@@ -2309,8 +2311,8 @@ mod tests {
             account: genesis,
             initial_supply: U256::from(1_000_000),
             ..Default::default()
-        })
-        .unwrap();
+        });
+        db.seed_genesis_account().unwrap();
 
         let info = db.basic(genesis).unwrap();
         assert_eq!(
@@ -2436,12 +2438,126 @@ mod tests {
     fn test_set_genesis_info() {
         let mut db = create_temp_database();
 
+        let genesis_info = crate::db::GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            initial_supply: U256::from(1_000_000),
+            ..Default::default()
+        };
+
         assert_eq!(db.genesis_info, None);
 
-        db.set_genesis_info(Default::default()).expect("ok");
+        db.set_genesis_info(genesis_info.clone());
 
-        assert_eq!(db.genesis_info, Some(Default::default()));
+        assert_eq!(db.genesis_info, Some(genesis_info.clone()));
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
     }
+
+    #[test]
+    fn test_seed_genesis_account_until_genesis_commit() {
+        let mut db = create_temp_database();
+
+        let genesis_info = crate::db::GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            initial_block_number: 1000,
+            ..Default::default()
+        };
+
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+
+        db.seed_genesis_account()
+            .expect_err("genesis not initialized");
+
+        db.set_genesis_info(genesis_info.clone());
+        db.seed_genesis_account().expect("ok");
+
+        assert_eq!(
+            db.basic(genesis_info.account).unwrap(),
+            Some(AccountInfo::default())
+        );
+
+        // A changed supply before the genesis commit overwrites the stale balance.
+        db.set_genesis_info(crate::db::GenesisInfo {
+            initial_supply: U256::from(1_000_000),
+            ..genesis_info.clone()
+        });
+        db.seed_genesis_account().expect("ok");
+
+        assert_eq!(
+            db.basic(genesis_info.account).unwrap(),
+            Some(AccountInfo {
+                balance: U256::from(1_000_000),
+                ..Default::default()
+            })
+        );
+
+        db.set_genesis_info(genesis_info.clone());
+        db.seed_genesis_account().expect("ok");
+
+        assert_eq!(
+            db.basic(genesis_info.account).unwrap(),
+            Some(AccountInfo::default())
+        );
+
+        // The genesis block deletes the empty genesis account.
+        let mut state_commit = StateCommit {
+            key: CommitKey(genesis_info.initial_block_number, 0, B256::ZERO),
+            change_set: StateChangeset {
+                accounts: vec![(genesis_info.account, None)],
+                ..Default::default()
+            },
+            results: Default::default(),
+        };
+        db.commit(&mut state_commit, &None).unwrap();
+
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+
+        // Seeding again after the genesis commit is a no-op.
+        db.seed_genesis_account().expect("ok");
+
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+    }
+
+    #[test]
+    fn test_seed_genesis_account_on_new_instance_after_genesis_commit() {
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+
+        let genesis_info = crate::db::GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            initial_block_number: 1000,
+            ..Default::default()
+        };
+
+        let mut db =
+            PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("db");
+        db.set_genesis_info(genesis_info.clone());
+        db.seed_genesis_account().expect("ok");
+
+        let mut state_commit = StateCommit {
+            key: CommitKey(genesis_info.initial_block_number, 0, B256::ZERO),
+            change_set: StateChangeset {
+                accounts: vec![(genesis_info.account, None)],
+                ..Default::default()
+            },
+            results: Default::default(),
+        };
+        db.commit(&mut state_commit, &None).unwrap();
+        drop(db);
+
+        // Each boot opens a new instance and seeds again.
+        let mut db =
+            PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("db");
+
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+
+        db.set_genesis_info(genesis_info.clone());
+        db.seed_genesis_account().expect("ok");
+
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+    }
+
     #[test]
     fn test_get_commits_by_block_range() {
         let db = create_temp_database();
