@@ -302,7 +302,6 @@ export class Sync implements Contracts.ApiSync.Service {
 			};
 
 			if (account.legacyMergeInfo) {
-				attributes["legacyMerge"] = account.legacyMergeInfo;
 				mergedLegacyColdWallets.push({
 					address: account.address, // mainsail address
 					legacyAddress: account.legacyMergeInfo.address,
@@ -548,18 +547,6 @@ export class Sync implements Contracts.ApiSync.Service {
 				.where("id = :id", { id: 1 })
 				.execute();
 
-			for (const merge of deferred.mergedLegacyColdWallets) {
-				await legacyColdwalletRepository
-					.createQueryBuilder()
-					.update()
-					.set({
-						mergeInfoTransactionHash: merge.txHash,
-						mergeInfoWalletAddress: merge.address,
-					})
-					.where("address = :legacyAddress", { legacyAddress: merge.legacyAddress })
-					.execute();
-			}
-
 			// The "-1" sentinel of placeholder wallets is only honoured on conflict, so make sure a row exists first.
 			// A missing row means the account does not exist in the EVM, i.e. balance and nonce are 0.
 			for (const batch of chunk(deferred.placeholderAddresses, 256)) {
@@ -638,6 +625,29 @@ export class Sync implements Contracts.ApiSync.Service {
 			NULLIF((COALESCE(("Wallet".attributes->>'validatorProducedBlocks')::integer, 0)::integer + COALESCE((EXCLUDED.attributes->>'validatorProducedBlocks')::integer, 0)::integer)::integer, 0)
 					))`,
 					parameters,
+				);
+			}
+
+			// Runs after the wallet upsert so the merge also reaches wallets that already had a row.
+			// Like the restore, the merged wallet is marked as legacy and takes over the cold wallet attributes.
+			for (const merge of deferred.mergedLegacyColdWallets) {
+				await legacyColdwalletRepository
+					.createQueryBuilder()
+					.update()
+					.set({
+						mergeInfoTransactionHash: merge.txHash,
+						mergeInfoWalletAddress: merge.address,
+					})
+					.where("address = :legacyAddress", { legacyAddress: merge.legacyAddress })
+					.execute();
+
+				await walletRepository.query(
+					`
+	UPDATE wallets SET attributes = COALESCE(attributes, '{}'::jsonb)
+		|| COALESCE((SELECT attributes FROM legacy_cold_wallets WHERE address = $1), '{}'::jsonb)
+		|| jsonb_build_object('isLegacy', true, 'legacyMerge', jsonb_build_object('address', $1::text, 'txHash', $2::text))
+	WHERE address = $3`,
+					[merge.legacyAddress, merge.txHash, merge.address],
 				);
 			}
 
