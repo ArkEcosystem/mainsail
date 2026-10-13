@@ -448,13 +448,22 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		assert.equal(transactionBatch[0].nonce, "1");
 		assert.undefined(transactionBatch[0].decodedError);
 
-		// The block proposer (not part of any account update) is manually inserted.
-		assert.equal(repos.wallet.queries.length, 1);
-		const [sql, parameters] = repos.wallet.queries[0];
+		// The block proposer (not part of any account update) is created with 0/0 if missing,
+		// then upserted with the "-1" sentinel so an existing balance and nonce are kept.
+		assert.equal(repos.wallet.queries.length, 2);
+		const [preInsertSql, preInsertParameters] = repos.wallet.queries[0];
+		assert.true(preInsertSql.includes("INSERT INTO wallets"));
+		assert.true(preInsertSql.includes("($2, NULL, '0', '0', '{}', $1)"));
+		assert.true(preInsertSql.includes('ON CONFLICT ("address") DO NOTHING'));
+		assert.equal(preInsertParameters, ["1", PROPOSER]);
+
+		const [sql, parameters] = repos.wallet.queries[1];
 		assert.true(sql.includes("INSERT INTO wallets"));
+		assert.true(sql.includes("NULLIF(EXCLUDED.balance, '-1')"));
 		assert.equal(parameters.length, 6);
 		assert.equal(parameters[0], PROPOSER);
 		assert.equal(parameters[2], "-1");
+		assert.equal(parameters[3], "-1");
 
 		// Configuration version update without new milestones
 		assert.equal(repos.configuration.qb.calls.set[0][0].version, "0.0.1-test");
@@ -526,7 +535,9 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		await sync.onCommit(context.makeUnit({ accountUpdates }));
 		await runQueuedJob(context);
 
-		const [, parameters] = repos.wallet.queries[0];
+		// The proposer is part of the account updates, so no placeholder row is pre-inserted.
+		const [upsertSql, parameters] = repos.wallet.queries[0];
+		assert.true(upsertSql.includes("DO UPDATE SET"));
 		const rows: any[][] = [];
 		for (let index = 0; index < parameters.length; index += 6) {
 			rows.push(parameters.slice(index, index + 6));
@@ -537,7 +548,13 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		assert.equal(byAddress.get("0xunvoter")![4].unvote, "0xvalidator");
 		assert.equal(byAddress.get("0xnamed")![4].username, "alice");
 		assert.true(byAddress.get("0xresigned")![4].usernameResigned);
-		assert.equal(byAddress.get("0xmerged")![4].legacyMerge, { address: "LEGACY_ADDR", txHash: "0xmerge" });
+
+		// The merge is applied after the wallet upsert, so it also reaches an already existing wallet row.
+		assert.equal(repos.wallet.queries.length, 2);
+		const [mergeSql, mergeParameters] = repos.wallet.queries[1];
+		assert.true(mergeSql.includes("UPDATE wallets"));
+		assert.true(mergeSql.includes("FROM legacy_cold_wallets"));
+		assert.equal(mergeParameters, ["LEGACY_ADDR", "0xmerge", "0xmerged"]);
 
 		// The proposer receives forged attributes because it produced the block.
 		assert.equal(byAddress.get(PROPOSER)![4].validatorForgedTotal, "300");
@@ -572,7 +589,12 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		await sync.onCommit(context.makeUnit());
 		await runQueuedJob(context);
 
-		const [, parameters] = repos.wallet.queries[0];
+		assert.equal(repos.wallet.queries.length, 2);
+		const [preInsertSql, preInsertParameters] = repos.wallet.queries[0];
+		assert.true(preInsertSql.includes("($2, NULL, '0', '0', '{}', $1), ($3, NULL, '0', '0', '{}', $1)"));
+		assert.equal(preInsertParameters, ["1", PROPOSER, "0xdirty"]);
+
+		const [, parameters] = repos.wallet.queries[1];
 		const rows: any[][] = [];
 		for (let index = 0; index < parameters.length; index += 6) {
 			rows.push(parameters.slice(index, index + 6));
