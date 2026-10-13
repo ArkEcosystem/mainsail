@@ -208,14 +208,17 @@ describe<{
 		);
 	});
 
-	it("should reject an empty legacy second signature field", async ({ app, deserializer }) => {
+	it("should reject a legacy second signature that is not 65 bytes", async ({ app, deserializer }) => {
 		const fields = legacyRlpFields(await signTransfer(app));
 
 		await assert.resolves(() => deserializer.deserialize(encodeLegacy([...fields, new Uint8Array(65)])));
-		await assert.rejects(
-			() => deserializer.deserialize(encodeLegacy([...fields, new Uint8Array()])),
-			"decoded RLP legacy second signature is empty",
-		);
+
+		for (const length of [0, 1, 64, 66]) {
+			await assert.rejects(
+				() => deserializer.deserialize(encodeLegacy([...fields, new Uint8Array(length).fill(1)])),
+				"decoded RLP legacy second signature is not 65 bytes",
+			);
+		}
 	});
 
 	it("should reject a v below 35 (pre-EIP-155)", async ({ app, deserializer }) => {

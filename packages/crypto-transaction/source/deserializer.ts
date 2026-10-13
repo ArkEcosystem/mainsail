@@ -187,8 +187,9 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 		// Legacy second signature
 		if (fields.length === 10) {
-			if (fields[9] === "0x") {
-				throw new Error("decoded RLP legacy second signature is empty");
+			// r (32) + s (32) + v (1); the verifier slices exactly these offsets and the AJV schema pins 130 hex chars.
+			if (fields[9].length !== 2 + 65 * 2) {
+				throw new Error("decoded RLP legacy second signature is not 65 bytes");
 			}
 
 			legacySecondSignature = fields[9].slice(2);
