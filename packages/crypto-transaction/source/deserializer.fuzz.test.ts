@@ -26,13 +26,13 @@ const payloadOf55 = Buffer.concat(
 	withField(5, new Uint8Array(55 - encodeLegacy(BASE).length + 1)).map((field) => encodeRlp(field)),
 );
 
-const REGRESSIONS: [name: string, input: Buffer, canonical: boolean][] = [
-	["zero address", encodeLegacy(withField(3, new Uint8Array(20))), true],
-	["64 KiB data", encodeLegacy(withField(5, new Uint8Array(65_536))), true],
-	["0x7f as 0x81 0x7f", withRawItem(5, [0x81, 0x7f]), false],
-	["55-byte string in long form", withRawItem(5, [0xb8, 55, ...new Uint8Array(55)]), false],
-	["55-byte list in long form", Buffer.concat([Buffer.from([0xf8, 55]), payloadOf55]), false],
-	["nested list as a field", withRawItem(5, [0xc0]), false],
+const REGRESSIONS: [name: string, input: Buffer, expected: "accept" | "reject"][] = [
+	["zero address", encodeLegacy(withField(3, new Uint8Array(20))), "accept"],
+	["64 KiB data", encodeLegacy(withField(5, new Uint8Array(65_536))), "accept"],
+	["0x7f as 0x81 0x7f", withRawItem(5, [0x81, 0x7f]), "reject"],
+	["55-byte string in long form", withRawItem(5, [0xb8, 55, ...new Uint8Array(55)]), "reject"],
+	["55-byte list in long form", Buffer.concat([Buffer.from([0xf8, 55]), payloadOf55]), "reject"],
+	["nested list as a field", withRawItem(5, [0xc0]), "reject"],
 ];
 
 describe<{
@@ -77,8 +77,13 @@ describe<{
 		};
 
 		// Boundary inputs the random generators rarely or never produce.
-		for (const [name, input, canonical] of REGRESSIONS) {
-			if (!(await accepts(input, name)) && canonical) {
+		for (const [name, input, expected] of REGRESSIONS) {
+			const accepted = await accepts(input, name);
+			if (accepted && expected === "reject") {
+				throw new Error(`${name}: accepted a non-canonical encoding\n  input: ${input.toString("hex")}`);
+			}
+
+			if (!accepted && expected === "accept") {
 				throw new Error(`${name}: rejected a canonical encoding\n  input: ${input.toString("hex")}`);
 			}
 		}
