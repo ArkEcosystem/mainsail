@@ -27,6 +27,7 @@ interface DeferredSync {
 	tokenHolders: Models.TokenHolder[];
 	validatorRound?: Models.ValidatorRound;
 	wallets: Array<[string, string | null, string, string, object, string]>;
+	placeholderAddresses: string[];
 	mergedLegacyColdWallets: ({ legacyAddress: string } & Contracts.Evm.AccountMergeInfo)[];
 	newMilestones?: Contracts.Crypto.Milestone;
 }
@@ -321,6 +322,7 @@ export class Sync implements Contracts.ApiSync.Service {
 
 		// The block validator/dirty validators might not be part of the account updates if no rewards have been distributed,
 		// thus ensure they are manually inserted.
+		const placeholderAddresses: string[] = [];
 		for (const validatorAddress of [
 			...new Set([
 				header.proposer,
@@ -338,6 +340,7 @@ export class Sync implements Contracts.ApiSync.Service {
 					},
 					header.number.toFixed(),
 				]);
+				placeholderAddresses.push(validatorAddress);
 			}
 		}
 
@@ -365,6 +368,7 @@ export class Sync implements Contracts.ApiSync.Service {
 
 			mergedLegacyColdWallets,
 			multiPayments,
+			placeholderAddresses,
 			tokenActions: [...tokenActions.values()],
 			tokenHolders: [...tokenHolders.values()],
 			tokens: [...tokens.values()],
@@ -554,6 +558,20 @@ export class Sync implements Contracts.ApiSync.Service {
 					})
 					.where("address = :legacyAddress", { legacyAddress: merge.legacyAddress })
 					.execute();
+			}
+
+			// The "-1" sentinel of placeholder wallets is only honoured on conflict, so make sure a row exists first.
+			// A missing row means the account does not exist in the EVM, i.e. balance and nonce are 0.
+			for (const batch of chunk(deferred.placeholderAddresses, 256)) {
+				const placeholders = batch.map((_, index) => `($${index + 2}, NULL, '0', '0', '{}', $1)`).join(", ");
+
+				await walletRepository.query(
+					`
+	INSERT INTO wallets (address, public_key, balance, nonce, attributes, updated_at)
+	VALUES ${placeholders}
+	ON CONFLICT ("address") DO NOTHING`,
+					[deferred.block.number, ...batch],
+				);
 			}
 
 			for (const batch of chunk(deferred.wallets, 256)) {
