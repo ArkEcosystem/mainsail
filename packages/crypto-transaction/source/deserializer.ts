@@ -167,6 +167,10 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 
 		// Signature
 		const v = this.#parseNumber(fields[6], "v");
+		if (v < 35) {
+			throw new Error("decoded RLP v is below 35 (not EIP-155)");
+		}
+
 		const chainId = Math.floor((v - 35) / 2);
 		const network = chainId;
 

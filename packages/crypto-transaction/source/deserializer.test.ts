@@ -218,6 +218,24 @@ describe<{
 		);
 	});
 
+	it("should reject a v below 35 (pre-EIP-155)", async ({ app, deserializer }) => {
+		const canonical = await signTransfer(app);
+
+		const lowest = legacyRlpFields(canonical);
+		lowest[6] = Uint8Array.of(35);
+		await assert.resolves(() => deserializer.deserialize(encodeLegacy(lowest)));
+
+		for (const v of [new Uint8Array(), Uint8Array.of(27), Uint8Array.of(28), Uint8Array.of(34)]) {
+			const fields = legacyRlpFields(canonical);
+			fields[6] = v;
+
+			await assert.rejects(
+				() => deserializer.deserialize(encodeLegacy(fields)),
+				"decoded RLP v is below 35 (not EIP-155)",
+			);
+		}
+	});
+
 	it("should reject length prefixes that overflow 32 bits", async ({ app, deserializer }) => {
 		const items = [...legacyRlpFields(await signTransfer(app)), new Uint8Array(65)].map((item) => encodeRlp(item));
 		const payload = Buffer.concat(items);

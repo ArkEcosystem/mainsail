@@ -4,9 +4,9 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 
 import { wallet } from "../test/fixtures/index.js";
-import { encodeLegacy, encodeList, encodeRlp } from "../test/helpers/canonical-transaction";
-import { prepareSandbox } from "../test/helpers/prepare-sandbox";
-import { createRandom, MUTATIONS, randomFields } from "../test/helpers/rlp-fuzz";
+import { encodeLegacy, encodeList, encodeRlp } from "../test/helpers/canonical-transaction.js";
+import { prepareSandbox } from "../test/helpers/prepare-sandbox.js";
+import { createRandom, MUTATIONS, randomFields } from "../test/helpers/rlp-fuzz.js";
 
 // Reproduce a failure with the FUZZ_SEED and FUZZ_RUNS it prints. Run longer with e.g. FUZZ_RUNS=100000.
 const SEED = Number(process.env.FUZZ_SEED ?? 1403);
@@ -29,7 +29,6 @@ const payloadOf55 = Buffer.concat(
 const REGRESSIONS: [name: string, input: Buffer, canonical: boolean][] = [
 	["zero address", encodeLegacy(withField(3, new Uint8Array(20))), true],
 	["64 KiB data", encodeLegacy(withField(5, new Uint8Array(65_536))), true],
-	["even v below 35", encodeLegacy(withField(6, Uint8Array.of(34))), false],
 	["0x7f as 0x81 0x7f", withRawItem(5, [0x81, 0x7f]), false],
 	["55-byte string in long form", withRawItem(5, [0xb8, 55, ...new Uint8Array(55)]), false],
 	["55-byte list in long form", Buffer.concat([Buffer.from([0xf8, 55]), payloadOf55]), false],
