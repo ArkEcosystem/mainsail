@@ -32,6 +32,7 @@ export interface Instance extends CommitHandler {
 	simulate(txContext: TransactionSimulateContext): Promise<SimulateResult>;
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
+	seedGenesisAccount(): Promise<void>;
 	getAccountInfo(address: string, height?: bigint): Promise<AccountInfo>;
 	getAccountInfoExtended(address: string, legacyAddress?: string): Promise<AccountInfoExtended>;
 	importAccountInfos(infos: AccountInfoExtended[]): Promise<void>;
