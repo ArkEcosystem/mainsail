@@ -100,7 +100,8 @@ export class PeerConnector implements Contracts.P2P.PeerConnector {
 			this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).banPeer(peer.ip, error);
 		};
 
-		await connection.connect({ reconnect: false });
+		// Without a timeout a black-holed address waits for the kernel TCP timeout (minutes).
+		await connection.connect({ reconnect: false, timeout: TEN_SECONDS });
 
 		return connection;
 	}
