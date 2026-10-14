@@ -2,7 +2,14 @@ import { Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { encodeAbiParameters, encodeEventTopics, encodeFunctionData, encodeFunctionResult, parseAbi } from "viem";
+import {
+	encodeAbiParameters,
+	encodeEventTopics,
+	encodeFunctionData,
+	encodeFunctionResult,
+	parseAbi,
+	zeroAddress,
+} from "viem";
 
 import { TokenParserService } from "./tokens.js";
 
@@ -12,6 +19,10 @@ const erc20Abi = parseAbi([
 	"function name() view returns (string)",
 	"function symbol() view returns (string)",
 	"function decimals() view returns (uint8)",
+	"function allowance(address owner, address spender) view returns (uint256)",
+	"function transfer(address recipient, uint256 amount) returns (bool)",
+	"function transferFrom(address sender, address recipient, uint256 amount) returns (bool)",
+	"function approve(address spender, uint256 amount) returns (bool)",
 	"event Transfer(address indexed from, address indexed to, uint256 value)",
 	"event Approval(address indexed owner, address indexed spender, uint256 value)",
 ] as const);
@@ -20,6 +31,9 @@ const TOKEN = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const OTHER_TOKEN = "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
 const HOLDER_ONE = "0x1111111111111111111111111111111111111111";
 const HOLDER_TWO = "0x2222222222222222222222222222222222222222";
+const PROBE_RECIPIENT = "0x000000000000000000000000000000000000dEaD";
+
+const contractAt = (index: number): string => `0x${(index + 1).toString(16).padStart(40, "c")}`;
 
 const transferLog = (token: string, from: string, to: string, value: bigint) => ({
 	address: token,
@@ -55,7 +69,7 @@ const erc20Responses = (): Map<string, { success: boolean; output: Buffer }> =>
 		[calldataOf("decimals"), ok(encodeFunctionResult({ abi: erc20Abi, functionName: "decimals", result: 8 }))],
 	]);
 
-type ViewResponse = { success: boolean; output: Buffer };
+type ViewResponse = { success: boolean; output?: Buffer };
 
 type Ctx = {
 	app: Application;
@@ -63,6 +77,7 @@ type Ctx = {
 	evm: { view: (options: { data: Buffer }) => Promise<ViewResponse> };
 	logger: any;
 	databaseToken: unknown;
+	queryBuilder: { getOne: () => Promise<unknown>; where: () => unknown };
 	respond: (impl: (calldata: string) => ViewResponse) => void;
 };
 
@@ -74,6 +89,7 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 			getOne: async () => context.databaseToken,
 			where: () => queryBuilder,
 		};
+		context.queryBuilder = queryBuilder;
 
 		context.evm = { view: async () => ({ output: Buffer.alloc(0), success: false }) };
 		context.respond = (impl) => {
@@ -100,6 +116,17 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 
 	const header = (number: number): any => ({ number });
 	const transaction = (to: string | undefined = HOLDER_ONE): any => ({ hash: "0xtransaction", to });
+
+	const respondWithOutput = (
+		respond: Ctx["respond"],
+		functionName: "name" | "symbol" | "decimals",
+		output: `0x${string}`,
+	) => {
+		const known = erc20Responses();
+		respond((calldata) =>
+			calldata === calldataOf(functionName) ? ok(output) : (known.get(calldata) ?? ok("0x01")),
+		);
+	};
 
 	// Responses for a valid token plus per-holder balances; every probe succeeds.
 	const respondAsErc20 = (context: Ctx, balances: Record<string, bigint> = {}) => {
@@ -218,6 +245,110 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 		);
 	});
 
+	it("does not treat a contract with a NUL byte in its name or symbol as a token", async ({ respond, service }) => {
+		const cases = [
+			["name", "Test\u0000Token"],
+			["name", "\u0000Test"],
+			["symbol", "T\u0000ST"],
+		] as const;
+
+		for (const [index, [functionName, result]] of cases.entries()) {
+			respondWithOutput(respond, functionName, encodeFunctionResult({ abi: erc20Abi, functionName, result }));
+
+			const { tokens } = await service.parseReceipt(header(5), transaction(), {
+				logs: [transferLog(contractAt(index), HOLDER_ONE, HOLDER_TWO, 1n)],
+			} as any);
+
+			assert.equal(tokens, []);
+		}
+	});
+
+	it("does not treat a contract whose name or symbol exceeds 64 characters as a token", async ({
+		respond,
+		service,
+	}) => {
+		for (const [index, functionName] of (["name", "symbol"] as const).entries()) {
+			respondWithOutput(
+				respond,
+				functionName,
+				encodeFunctionResult({ abi: erc20Abi, functionName, result: "S".repeat(64) }),
+			);
+			const accepted = await service.parseReceipt(header(5), transaction(), {
+				logs: [transferLog(contractAt(index * 2), HOLDER_ONE, HOLDER_TWO, 1n)],
+			} as any);
+
+			respondWithOutput(
+				respond,
+				functionName,
+				encodeFunctionResult({ abi: erc20Abi, functionName, result: "S".repeat(65) }),
+			);
+			const rejected = await service.parseReceipt(header(5), transaction(), {
+				logs: [transferLog(contractAt(index * 2 + 1), HOLDER_ONE, HOLDER_TWO, 1n)],
+			} as any);
+
+			assert.equal(
+				accepted.tokens.map((token) => token[functionName]),
+				["S".repeat(64)],
+			);
+			assert.equal(rejected.tokens, []);
+		}
+	});
+
+	it("does not treat a contract whose decimals exceed a uint8 as a token", async ({ respond, service }) => {
+		respondWithOutput(respond, "decimals", encodeAbiParameters([{ type: "uint256" }], [255n]));
+		const accepted = await service.parseReceipt(header(5), transaction(), {
+			logs: [transferLog(contractAt(0), HOLDER_ONE, HOLDER_TWO, 1n)],
+		} as any);
+
+		assert.equal(
+			accepted.tokens.map((token) => token.decimals),
+			[255],
+		);
+
+		for (const [index, decimals] of [256n, 2n ** 256n - 1n].entries()) {
+			respondWithOutput(respond, "decimals", encodeAbiParameters([{ type: "uint256" }], [decimals]));
+
+			const { tokens } = await service.parseReceipt(header(5), transaction(), {
+				logs: [transferLog(contractAt(index + 1), HOLDER_ONE, HOLDER_TWO, 1n)],
+			} as any);
+
+			assert.equal(tokens, []);
+		}
+	});
+
+	it("probes with zero-amount writes from the zero address and a 100k gas limit", async ({ evm, service }) => {
+		const known = erc20Responses();
+		const gasLimits: Record<string, bigint> = {};
+		const senders = new Set<string>();
+		evm.view = async (options: any) => {
+			gasLimits[options.data.toString("hex")] = options.gasLimit;
+			senders.add(options.from);
+			return known.get(options.data.toString("hex")) ?? ok("0x01");
+		};
+
+		await service.parseReceipt(header(5), transaction(), {
+			logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n)],
+		} as any);
+
+		const calldata = (parameters: Parameters<typeof encodeFunctionData<typeof erc20Abi>>[0]) =>
+			encodeFunctionData(parameters).slice(2);
+		assert.equal([...senders], [zeroAddress]);
+		assert.equal(gasLimits, {
+			[calldataOf("totalSupply")]: 100_000n,
+			[calldataOf("name")]: 100_000n,
+			[calldataOf("symbol")]: 100_000n,
+			[calldataOf("decimals")]: 100_000n,
+			[calldata({ abi: erc20Abi, args: [zeroAddress, zeroAddress], functionName: "allowance" })]: 100_000n,
+			[balanceOfCalldata(zeroAddress)]: 100_000n,
+			[calldata({ abi: erc20Abi, args: [PROBE_RECIPIENT, 0n], functionName: "transfer" })]: 100_000n,
+			[calldata({ abi: erc20Abi, args: [zeroAddress, PROBE_RECIPIENT, 0n], functionName: "transferFrom" })]:
+				100_000n,
+			[calldata({ abi: erc20Abi, args: [PROBE_RECIPIENT, 0n], functionName: "approve" })]: 100_000n,
+			[balanceOfCalldata(HOLDER_ONE)]: 100_000n,
+			[balanceOfCalldata(HOLDER_TWO)]: 100_000n,
+		});
+	});
+
 	it("links a deployment transaction to the token", async (context) => {
 		respondAsErc20(context);
 
@@ -229,6 +360,89 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 		assert.equal(tokens[0].deploymentHash, "0xtransaction");
 	});
 
+	it("does not probe a contract again once it is known not to be a token", async ({
+		evm,
+		queryBuilder,
+		respond,
+		service,
+	}) => {
+		respondWithOutput(respond, "name", "0x01");
+		const view = spy(evm, "view");
+		const lookup = spy(queryBuilder, "getOne");
+		const receipt = () => ({ logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n)] }) as any;
+
+		await service.parseReceipt(header(5), transaction(), receipt());
+		view.calledTimes(2);
+		lookup.calledOnce();
+		view.reset();
+		lookup.reset();
+
+		const { tokenHolders, tokens } = await service.parseReceipt(header(6), transaction(), receipt());
+
+		assert.equal(tokens, []);
+		assert.equal(tokenHolders, []);
+		view.neverCalled();
+		lookup.neverCalled();
+	});
+
+	it("probes a contract that is not a token again after 100 blocks", async ({ evm, service }) => {
+		const receipt = () => ({ logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n)] }) as any;
+		await service.parseReceipt(header(5), transaction(), receipt());
+		const view = spy(evm, "view");
+
+		await service.parseReceipt(header(104), transaction(), receipt());
+		view.neverCalled();
+
+		await service.parseReceipt(header(105), transaction(), receipt());
+		view.calledOnce();
+	});
+
+	it("keeps the most recently seen non-tokens cached, as many as the token cache holds", async ({ evm, service }) => {
+		const receiptOf = (contracts: string[]) =>
+			({ logs: contracts.map((contract) => transferLog(contract, HOLDER_ONE, HOLDER_TWO, 1n)) }) as any;
+		const others = Array.from({ length: 32 }, (_, index) => contractAt(index));
+
+		await service.parseReceipt(header(5), transaction(), receiptOf([TOKEN, ...others.slice(0, 31)]));
+		const view = spy(evm, "view");
+
+		await service.parseReceipt(header(6), transaction(), receiptOf([TOKEN, others[31]]));
+		await service.parseReceipt(header(7), transaction(), receiptOf([TOKEN, others[0]]));
+
+		view.calledTimes(2);
+	});
+
+	it("looks up a token evicted from the token cache in the database", async (context) => {
+		respondAsErc20(context, { [HOLDER_ONE]: 1n, [HOLDER_TWO]: 1n });
+		const receiptOf = (contracts: string[]) =>
+			({ logs: contracts.map((contract) => transferLog(contract, HOLDER_ONE, HOLDER_TWO, 1n)) }) as any;
+		await context.service.parseReceipt(header(5), transaction(), receiptOf([TOKEN]));
+
+		// Served from the database, 32 other tokens push TOKEN out of the token cache.
+		context.databaseToken = {
+			address: TOKEN,
+			decimals: 8,
+			name: "Test Token",
+			symbol: "TEST",
+			totalSupply: "5000",
+		};
+		await context.service.parseReceipt(
+			header(6),
+			transaction(),
+			receiptOf(Array.from({ length: 32 }, (_, index) => contractAt(index))),
+		);
+		const lookup = spy(context.queryBuilder, "getOne");
+
+		const { tokenHolders, tokens } = await context.service.parseReceipt(
+			header(7),
+			transaction(),
+			receiptOf([TOKEN]),
+		);
+
+		lookup.calledOnce();
+		assert.equal(tokens, []);
+		assert.equal(tokenHolders.length, 2);
+	});
+
 	it("does not treat a contract with empty call results as a token", async (context) => {
 		// Default view responds unsuccessful + empty, which means "function does not exist".
 		const { tokenHolders, tokens } = await context.service.parseReceipt(header(5), transaction(), {
@@ -237,6 +451,20 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 
 		assert.equal(tokens, []);
 		assert.equal(tokenHolders, []);
+	});
+
+	it("does not treat a contract as a token when a probe runs out of gas", async ({ respond, service }) => {
+		const known = erc20Responses();
+		const approve = encodeFunctionData({ abi: erc20Abi, args: [PROBE_RECIPIENT, 0n], functionName: "approve" });
+		respond((calldata) =>
+			calldata === approve.slice(2) ? { output: undefined, success: false } : (known.get(calldata) ?? ok("0x01")),
+		);
+
+		const { tokens } = await service.parseReceipt(header(5), transaction(), {
+			logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n)],
+		} as any);
+
+		assert.equal(tokens, []);
 	});
 
 	it("does not treat a contract with incomplete metadata as a token", async (context) => {
@@ -256,27 +484,53 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 		assert.equal(tokens, []);
 	});
 
-	it("swallows exceptions thrown while probing a contract", async (context) => {
+	it("probes a contract again after a view call throws", async ({ logger, respond, service }) => {
 		const known = erc20Responses();
-		context.respond((calldata) => {
+		respond((calldata) => {
 			if (calldata === calldataOf("name")) {
-				throw new Error("view blew up");
+				throw new Error("view call failed reading state");
 			}
 			return known.get(calldata) ?? ok("0x01");
 		});
+		const warn = spy(logger, "warn");
+		const receipt = () => ({ logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n)] }) as any;
 
-		const { tokenActions, tokens } = await context.service.parseReceipt(header(5), transaction(), {
-			logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n)],
-		} as any);
+		const failed = await service.parseReceipt(header(5), transaction(), receipt());
+		warn.calledOnce();
 
-		// The action is still recorded even though the metadata could not be resolved.
-		assert.equal(tokenActions.length, 1);
-		assert.equal(tokens, []);
+		respond((calldata) => known.get(calldata) ?? ok("0x01"));
+		const retried = await service.parseReceipt(header(6), transaction(), receipt());
+
+		assert.equal(failed.tokenActions.length, 1);
+		assert.equal(failed.tokens, []);
+		assert.equal(retried.tokens.length, 1);
 	});
 
-	it("falls back to a zero balance when balanceOf fails or throws", async (context) => {
+	it("still probes the other contracts of a receipt after a view call throws", async ({ evm, service }) => {
 		const known = erc20Responses();
-		context.respond((calldata) => {
+		evm.view = async (options: any) => {
+			if (options.to === TOKEN) {
+				throw new Error("view call failed reading state");
+			}
+			return known.get(options.data.toString("hex")) ?? ok("0x01");
+		};
+
+		const { tokens } = await service.parseReceipt(header(5), transaction(), {
+			logs: [
+				transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n),
+				transferLog(OTHER_TOKEN, HOLDER_ONE, HOLDER_TWO, 1n),
+			],
+		} as any);
+
+		assert.equal(
+			tokens.map((token) => token.address),
+			[OTHER_TOKEN],
+		);
+	});
+
+	it("skips the holder when balanceOf fails or throws", async ({ logger, respond, service }) => {
+		const known = erc20Responses();
+		respond((calldata) => {
 			if (calldata === balanceOfCalldata(HOLDER_ONE)) {
 				return { output: Buffer.alloc(0), success: false };
 			}
@@ -285,18 +539,95 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 			}
 			return known.get(calldata) ?? ok("0x01");
 		});
-		const warn = spy(context.logger, "warn");
+		const warn = spy(logger, "warn");
 
-		const { tokenHolders, tokens } = await context.service.parseReceipt(header(5), transaction(), {
+		const { tokenHolders, tokens } = await service.parseReceipt(header(5), transaction(), {
 			logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n)],
 		} as any);
 
 		assert.equal(tokens.length, 1);
-		assert.equal(
-			tokenHolders.map((holder) => holder.balance),
-			["0", "0"],
-		);
+		assert.equal(tokenHolders, []);
 		warn.calledTimes(2);
+	});
+
+	it("keeps a zero balance so the holder can be removed", async (context) => {
+		respondAsErc20(context, { [HOLDER_ONE]: 0n, [HOLDER_TWO]: 30n });
+
+		const { tokenHolders } = await context.service.parseReceipt(header(5), transaction(), {
+			logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 30n)],
+		} as any);
+
+		assert.equal(tokenHolders, [
+			{ address: HOLDER_ONE, balance: "0", tokenAddress: TOKEN },
+			{ address: HOLDER_TWO, balance: "30", tokenAddress: TOKEN },
+		]);
+	});
+
+	it("skips only the holder whose balance cannot be read", async ({ logger, respond, service }) => {
+		const known = erc20Responses();
+		respond((calldata) => {
+			if (calldata === balanceOfCalldata(HOLDER_ONE)) {
+				return { output: Buffer.alloc(0), success: false };
+			}
+			if (calldata === balanceOfCalldata(HOLDER_TWO)) {
+				return ok(encodeFunctionResult({ abi: erc20Abi, functionName: "balanceOf", result: 30n }));
+			}
+			return known.get(calldata) ?? ok("0x01");
+		});
+		const warn = spy(logger, "warn");
+
+		const { tokenHolders } = await service.parseReceipt(header(5), transaction(), {
+			logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 30n)],
+		} as any);
+
+		assert.equal(tokenHolders, [{ address: HOLDER_TWO, balance: "30", tokenAddress: TOKEN }]);
+		warn.calledOnce();
+	});
+
+	it("skips the holder when balanceOf succeeds with malformed output", async ({ logger, respond, service }) => {
+		const known = erc20Responses();
+		respond((calldata) => {
+			if (calldata === balanceOfCalldata(HOLDER_ONE)) {
+				return ok("0x01");
+			}
+			if (calldata === balanceOfCalldata(HOLDER_TWO)) {
+				return ok(encodeFunctionResult({ abi: erc20Abi, functionName: "balanceOf", result: 30n }));
+			}
+			return known.get(calldata) ?? ok("0x01");
+		});
+		const warn = spy(logger, "warn");
+
+		const { tokenHolders } = await service.parseReceipt(header(5), transaction(), {
+			logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 30n)],
+		} as any);
+
+		assert.equal(tokenHolders, [{ address: HOLDER_TWO, balance: "30", tokenAddress: TOKEN }]);
+		warn.calledOnce();
+	});
+
+	it("still reads the other tokens of an account after one balanceOf fails", async ({ evm, service }) => {
+		const known = erc20Responses();
+		evm.view = async (options: any) => {
+			const calldata = options.data.toString("hex");
+			if (calldata === balanceOfCalldata(HOLDER_ONE)) {
+				return options.to === TOKEN
+					? { output: Buffer.alloc(0), success: false }
+					: ok(encodeFunctionResult({ abi: erc20Abi, functionName: "balanceOf", result: 7n }));
+			}
+			return known.get(calldata) ?? ok("0x01");
+		};
+
+		const { tokenHolders } = await service.parseReceipt(header(5), transaction(), {
+			logs: [
+				transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n),
+				transferLog(OTHER_TOKEN, HOLDER_ONE, HOLDER_TWO, 1n),
+			],
+		} as any);
+
+		assert.equal(
+			tokenHolders.filter((holder) => holder.address === HOLDER_ONE),
+			[{ address: HOLDER_ONE, balance: "7", tokenAddress: OTHER_TOKEN }],
+		);
 	});
 
 	it("serves repeated contracts from the cache without re-emitting the token", async (context) => {

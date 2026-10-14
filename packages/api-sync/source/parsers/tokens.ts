@@ -46,6 +46,49 @@ type TokenMetadata = {
 
 type TokenMetadataOptional = Partial<TokenMetadata>;
 
+const MAX_TOKEN_METADATA_LENGTH = 64;
+const MAX_UINT8 = 255;
+
+// Enough gas for real tokens, including share-based (stETH ~61k) and reflection tokens (~75k); a contract that
+// needs more is not indexed.
+const VIEW_GAS_LIMIT = 100_000n;
+
+// In standard tokens a zero amount writes no new storage, and a non-zero recipient passes bare
+// `require(to != address(0))` checks that would otherwise revert without data.
+const PROBE_RECIPIENT = "0x000000000000000000000000000000000000dEaD";
+
+// Contracts not detected as tokens are checked again after this many blocks, in case they change.
+const NON_TOKEN_REPROBE_BLOCKS = 100;
+
+// Postgres text cannot hold NUL.
+function isIndexableTokenString(value: string): boolean {
+	return value.length <= MAX_TOKEN_METADATA_LENGTH && !value.includes("\u0000");
+}
+
+function decodeTokenMetadata(
+	functionName: Erc20MetadataCall["functionName"],
+	output: Buffer,
+): string | number | undefined {
+	let decoded: unknown;
+	try {
+		decoded = decodeFunctionResult({ abi: erc20MetadataFunctions, data: toHex(output), functionName });
+	} catch {
+		return undefined;
+	}
+
+	if (functionName === "name" || functionName === "symbol") {
+		return isIndexableTokenString(decoded as string) ? (decoded as string) : undefined;
+	}
+
+	if (functionName === "decimals") {
+		// viem does not range-check a uint8 below 2^53.
+		const decimals = decoded as number;
+		return decimals <= MAX_UINT8 ? decimals : undefined;
+	}
+
+	return (decoded as bigint).toString();
+}
+
 function isTokenMetadataCall(call: Erc20Call | Erc20MetadataCall): call is Erc20MetadataCall {
 	return erc20MetadataFunctions.some((m) => m.name === call.functionName);
 }
@@ -74,6 +117,7 @@ export class TokenParserService implements TokenParser {
 	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	#tokenCache!: LRUCache<string, Models.Token>;
+	#nonTokenCache!: LRUCache<string, number>;
 	#actionIndexes: Map<`0x${string}`, number> = new Map<`0x${string}`, number>();
 	#previousBlockNumber!: number;
 
@@ -81,9 +125,9 @@ export class TokenParserService implements TokenParser {
 
 	@postConstruct()
 	public initialize(): void {
-		this.#tokenCache = new LRUCache({
-			max: this.pluginConfiguration.getRequired<number>("tokenCacheSize"),
-		});
+		const tokenCacheSize = this.pluginConfiguration.getRequired<number>("tokenCacheSize");
+		this.#tokenCache = new LRUCache({ max: tokenCacheSize });
+		this.#nonTokenCache = new LRUCache({ max: tokenCacheSize });
 
 		const calls: (Erc20Call | Erc20MetadataCall)[] = [
 			{
@@ -118,17 +162,17 @@ export class TokenParserService implements TokenParser {
 			},
 			{
 				abi: erc20AbiFunctions,
-				args: [zeroAddress, 1n],
+				args: [PROBE_RECIPIENT, 0n],
 				functionName: "transfer",
 			},
 			{
 				abi: erc20AbiFunctions,
-				args: [zeroAddress, zeroAddress, 1n],
+				args: [zeroAddress, PROBE_RECIPIENT, 0n],
 				functionName: "transferFrom",
 			},
 			{
 				abi: erc20AbiFunctions,
-				args: [zeroAddress, 1n],
+				args: [PROBE_RECIPIENT, 0n],
 				functionName: "approve",
 			},
 		];
@@ -222,6 +266,7 @@ export class TokenParserService implements TokenParser {
 		if (dirtyAccounts.size > 0) {
 			// Get tokens for corresponding contracts. Not all contracts are guaranteed to be a ERC20 contract.
 			const foundTokens = await this.#getTokens(
+				header.number,
 				transaction,
 				[...dirtyContractAddresses.values()],
 				tokenRepository,
@@ -252,11 +297,10 @@ export class TokenParserService implements TokenParser {
 						}
 					}
 
-					tokenHolders.push({
-						address: account,
-						balance: await this.#getTokenBalance(contract, account),
-						tokenAddress: contract,
-					});
+					const balance = await this.#getTokenBalance(contract, account);
+					if (balance !== undefined) {
+						tokenHolders.push({ address: account, balance, tokenAddress: contract });
+					}
 				}
 			}
 		}
@@ -265,6 +309,7 @@ export class TokenParserService implements TokenParser {
 	}
 
 	async #getTokens(
+		blockNumber: number,
 		transaction: Contracts.Crypto.Transaction,
 		addresses: string[],
 		tokenRepository?: ApiDatabaseContracts.TokenRepository,
@@ -282,6 +327,11 @@ export class TokenParserService implements TokenParser {
 				continue;
 			}
 
+			const judgedAt = this.#nonTokenCache.get(address);
+			if (judgedAt !== undefined && blockNumber - judgedAt < NON_TOKEN_REPROBE_BLOCKS) {
+				continue;
+			}
+
 			// Postgres might already have the contract, load it and bail early.
 			const databaseToken = await tokenRepository
 				.createQueryBuilder()
@@ -296,8 +346,17 @@ export class TokenParserService implements TokenParser {
 
 			// Perform calls on the contract to check if it conform to the ERC20 ABI.
 			// This should work regardless of what kind of ERC20 contract it is (Vanilla, Proxy, etc.)
-			const parsed = await this.#parseErc20Contract(address);
+			let parsed: TokenMetadata | undefined;
+			try {
+				parsed = await this.#parseErc20Contract(address);
+			} catch (rawError) {
+				// A failed state read says nothing about the contract, so it is not cached.
+				this.logger.warn(`Failed to probe '${address}' for ERC20: ${ensureError(rawError).message}`);
+				continue;
+			}
+
 			if (!parsed) {
+				this.#nonTokenCache.set(address, blockNumber);
 				continue;
 			}
 
@@ -327,39 +386,33 @@ export class TokenParserService implements TokenParser {
 		};
 
 		for (const { call, data } of this.#preparedFunctionCalls) {
-			try {
-				const result = await this.evm.view({
-					data: Buffer.from(data, "hex"),
-					from: zeroAddress,
-					specId: evmSpec,
-					to: contract,
-				});
+			const result = await this.evm.view({
+				data: Buffer.from(data, "hex"),
+				from: zeroAddress,
+				gasLimit: VIEW_GAS_LIMIT,
+				specId: evmSpec,
+				to: contract,
+			});
 
-				if (result.success && result.output) {
-					if (isTokenMetadataCall(call)) {
-						const decoded = decodeFunctionResult({
-							abi: erc20MetadataFunctions,
-							data: toHex(result.output),
-							functionName: call.functionName,
-						});
-
-						// totalSupply decodes to a bigint; normalize to string to match the
-						// declared metadata/model contract (as balanceOf does below).
-						tokenMetadata[call.functionName] = (typeof decoded === "bigint"
-							? decoded.toString()
-							: decoded) as unknown as undefined;
+			if (result.success && result.output) {
+				if (isTokenMetadataCall(call)) {
+					const value = decodeTokenMetadata(call.functionName, result.output);
+					if (value === undefined) {
+						return undefined;
 					}
 
-					continue;
+					tokenMetadata[call.functionName] = value as unknown as undefined;
 				}
 
-				// The function does not exist if the output is 0x.
-				if (!result.output || result.output.byteLength === 0) {
-					return undefined;
-				}
+				continue;
+			}
 
-				// Anything else is malformed but not empty
-			} catch {}
+			// Empty output: a missing function, a revert without data or running out of gas.
+			if (!result.output || result.output.byteLength === 0) {
+				return undefined;
+			}
+
+			// Anything else is malformed but not empty
 		}
 
 		if (!hasRequiredTokenMetadata(tokenMetadata)) {
@@ -369,7 +422,7 @@ export class TokenParserService implements TokenParser {
 		return tokenMetadata;
 	}
 
-	async #getTokenBalance(contract: string, account: `0x${string}`): Promise<string> {
+	async #getTokenBalance(contract: string, account: `0x${string}`): Promise<string | undefined> {
 		const { evmSpec } = this.configuration.getMilestone();
 
 		const data = encodeFunctionData({
@@ -382,13 +435,14 @@ export class TokenParserService implements TokenParser {
 			const result = await this.evm.view({
 				data: Buffer.from(data, "hex"),
 				from: zeroAddress,
+				gasLimit: VIEW_GAS_LIMIT,
 				specId: evmSpec,
 				to: contract,
 			});
 
 			if (!result.success) {
 				this.logger.warn(`Failed to call balanceOf on '${contract}' for ${account}`);
-				return "0";
+				return undefined;
 			}
 
 			assert.defined(result.output);
@@ -405,7 +459,7 @@ export class TokenParserService implements TokenParser {
 			this.logger.warn(`Failed to call balanceOf on '${contract}' for ${account}: ${error.message}`);
 		}
 
-		return "0";
+		return undefined;
 	}
 
 	#resetTransferIndexes(blockNumber: number = -1): void {

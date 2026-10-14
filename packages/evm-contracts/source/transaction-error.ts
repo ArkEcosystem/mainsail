@@ -83,7 +83,12 @@ export function parseTransactionError(
 
 		try {
 			const decoded = decodeErrorResult({ abi: errorAbis, data });
-			return formatErrorArguments(decoded.errorName, decoded.args);
+			const reason = formatErrorArguments(decoded.errorName, decoded.args);
+
+			// Postgres text cannot hold NUL.
+			if (!reason.includes("\u0000")) {
+				return reason;
+			}
 		} catch {}
 	}
 
