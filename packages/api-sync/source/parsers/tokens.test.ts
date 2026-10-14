@@ -316,10 +316,7 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 		}
 	});
 
-	it("probes with zero-amount writes from the zero address and the gas a mainstream ERC20 needs", async ({
-		evm,
-		service,
-	}) => {
+	it("probes with zero-amount writes from the zero address and a 100k gas limit", async ({ evm, service }) => {
 		const known = erc20Responses();
 		const gasLimits: Record<string, bigint> = {};
 		const senders = new Set<string>();
@@ -337,18 +334,18 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 			encodeFunctionData(parameters).slice(2);
 		assert.equal([...senders], [zeroAddress]);
 		assert.equal(gasLimits, {
-			[calldataOf("totalSupply")]: 40_000n,
-			[calldataOf("name")]: 50_000n,
-			[calldataOf("symbol")]: 50_000n,
-			[calldataOf("decimals")]: 40_000n,
-			[calldata({ abi: erc20Abi, args: [zeroAddress, zeroAddress], functionName: "allowance" })]: 40_000n,
-			[balanceOfCalldata(zeroAddress)]: 40_000n,
-			[calldata({ abi: erc20Abi, args: [PROBE_RECIPIENT, 0n], functionName: "transfer" })]: 50_000n,
+			[calldataOf("totalSupply")]: 100_000n,
+			[calldataOf("name")]: 100_000n,
+			[calldataOf("symbol")]: 100_000n,
+			[calldataOf("decimals")]: 100_000n,
+			[calldata({ abi: erc20Abi, args: [zeroAddress, zeroAddress], functionName: "allowance" })]: 100_000n,
+			[balanceOfCalldata(zeroAddress)]: 100_000n,
+			[calldata({ abi: erc20Abi, args: [PROBE_RECIPIENT, 0n], functionName: "transfer" })]: 100_000n,
 			[calldata({ abi: erc20Abi, args: [zeroAddress, PROBE_RECIPIENT, 0n], functionName: "transferFrom" })]:
-				50_000n,
-			[calldata({ abi: erc20Abi, args: [PROBE_RECIPIENT, 0n], functionName: "approve" })]: 50_000n,
-			[balanceOfCalldata(HOLDER_ONE)]: 40_000n,
-			[balanceOfCalldata(HOLDER_TWO)]: 40_000n,
+				100_000n,
+			[calldata({ abi: erc20Abi, args: [PROBE_RECIPIENT, 0n], functionName: "approve" })]: 100_000n,
+			[balanceOfCalldata(HOLDER_ONE)]: 100_000n,
+			[balanceOfCalldata(HOLDER_TWO)]: 100_000n,
 		});
 	});
 
