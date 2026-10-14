@@ -10,6 +10,8 @@ export const constants = {
 	MAX_DOWNLOAD_BLOCKS_JOBS: 10, // maximum number of blocks jobs
 
 	MAX_PAYLOAD_CLIENT: 5 * Units.MEGABYTE, // max size of a complete serialized response frame the WS client accepts
+	// A serialized prevote/precommit is ~140 bytes and the request headers ~200 bytes; 1 KB leaves ample room.
+	MAX_PAYLOAD_POST_MESSAGE: Units.KILOBYTE,
 	MAX_PAYLOAD_SERVER: 3 * Units.MEGABYTE,
 
 	MAX_PEERS_GET_API_NODES: 100,
