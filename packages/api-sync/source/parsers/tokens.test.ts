@@ -2,7 +2,14 @@ import { Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
-import { encodeAbiParameters, encodeEventTopics, encodeFunctionData, encodeFunctionResult, parseAbi } from "viem";
+import {
+	encodeAbiParameters,
+	encodeEventTopics,
+	encodeFunctionData,
+	encodeFunctionResult,
+	parseAbi,
+	zeroAddress,
+} from "viem";
 
 import { TokenParserService } from "./tokens.js";
 
@@ -12,6 +19,10 @@ const erc20Abi = parseAbi([
 	"function name() view returns (string)",
 	"function symbol() view returns (string)",
 	"function decimals() view returns (uint8)",
+	"function allowance(address owner, address spender) view returns (uint256)",
+	"function transfer(address recipient, uint256 amount) returns (bool)",
+	"function transferFrom(address sender, address recipient, uint256 amount) returns (bool)",
+	"function approve(address spender, uint256 amount) returns (bool)",
 	"event Transfer(address indexed from, address indexed to, uint256 value)",
 	"event Approval(address indexed owner, address indexed spender, uint256 value)",
 ] as const);
@@ -20,6 +31,7 @@ const TOKEN = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 const OTHER_TOKEN = "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
 const HOLDER_ONE = "0x1111111111111111111111111111111111111111";
 const HOLDER_TWO = "0x2222222222222222222222222222222222222222";
+const PROBE_RECIPIENT = "0x000000000000000000000000000000000000dEaD";
 
 const contractAt = (index: number): string => `0x${(index + 1).toString(16).padStart(40, "c")}`;
 
@@ -57,7 +69,7 @@ const erc20Responses = (): Map<string, { success: boolean; output: Buffer }> =>
 		[calldataOf("decimals"), ok(encodeFunctionResult({ abi: erc20Abi, functionName: "decimals", result: 8 }))],
 	]);
 
-type ViewResponse = { success: boolean; output: Buffer };
+type ViewResponse = { success: boolean; output?: Buffer };
 
 type Ctx = {
 	app: Application;
@@ -302,6 +314,42 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 		}
 	});
 
+	it("probes with zero-amount writes from the zero address and the gas a mainstream ERC20 needs", async ({
+		evm,
+		service,
+	}) => {
+		const known = erc20Responses();
+		const gasLimits: Record<string, bigint> = {};
+		const senders = new Set<string>();
+		evm.view = async (options: any) => {
+			gasLimits[options.data.toString("hex")] = options.gasLimit;
+			senders.add(options.from);
+			return known.get(options.data.toString("hex")) ?? ok("0x01");
+		};
+
+		await service.parseReceipt(header(5), transaction(), {
+			logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n)],
+		} as any);
+
+		const calldata = (parameters: Parameters<typeof encodeFunctionData<typeof erc20Abi>>[0]) =>
+			encodeFunctionData(parameters).slice(2);
+		assert.equal([...senders], [zeroAddress]);
+		assert.equal(gasLimits, {
+			[calldataOf("totalSupply")]: 40_000n,
+			[calldataOf("name")]: 50_000n,
+			[calldataOf("symbol")]: 50_000n,
+			[calldataOf("decimals")]: 40_000n,
+			[calldata({ abi: erc20Abi, args: [zeroAddress, zeroAddress], functionName: "allowance" })]: 40_000n,
+			[balanceOfCalldata(zeroAddress)]: 40_000n,
+			[calldata({ abi: erc20Abi, args: [PROBE_RECIPIENT, 0n], functionName: "transfer" })]: 50_000n,
+			[calldata({ abi: erc20Abi, args: [zeroAddress, PROBE_RECIPIENT, 0n], functionName: "transferFrom" })]:
+				50_000n,
+			[calldata({ abi: erc20Abi, args: [PROBE_RECIPIENT, 0n], functionName: "approve" })]: 50_000n,
+			[balanceOfCalldata(HOLDER_ONE)]: 40_000n,
+			[balanceOfCalldata(HOLDER_TWO)]: 40_000n,
+		});
+	});
+
 	it("links a deployment transaction to the token", async (context) => {
 		respondAsErc20(context);
 
@@ -321,6 +369,20 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 
 		assert.equal(tokens, []);
 		assert.equal(tokenHolders, []);
+	});
+
+	it("does not treat a contract as a token when a probe runs out of gas", async ({ respond, service }) => {
+		const known = erc20Responses();
+		const approve = encodeFunctionData({ abi: erc20Abi, args: [PROBE_RECIPIENT, 0n], functionName: "approve" });
+		respond((calldata) =>
+			calldata === approve.slice(2) ? { output: undefined, success: false } : (known.get(calldata) ?? ok("0x01")),
+		);
+
+		const { tokens } = await service.parseReceipt(header(5), transaction(), {
+			logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n)],
+		} as any);
+
+		assert.equal(tokens, []);
 	});
 
 	it("does not treat a contract with incomplete metadata as a token", async (context) => {

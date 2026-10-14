@@ -30,7 +30,7 @@ const erc20MetadataFunctions = parseAbi([
 type Erc20Call = Omit<ContractFunctionParameters<typeof erc20AbiFunctions>, "address">;
 type Erc20MetadataCall = Omit<ContractFunctionParameters<typeof erc20MetadataFunctions>, "address">;
 
-type PreparedErc20Call = { call: Erc20Call | Erc20MetadataCall; data: string };
+type PreparedErc20Call = { call: Erc20Call | Erc20MetadataCall; data: string; gasLimit: bigint };
 
 const erc20AbiEvents = parseAbi([
 	"event Transfer(address indexed from, address indexed to, uint256 value)",
@@ -48,6 +48,28 @@ type TokenMetadataOptional = Partial<TokenMetadata>;
 
 const MAX_TOKEN_METADATA_LENGTH = 64;
 const MAX_UINT8 = 255;
+
+// Gas a mainstream ERC20 needs, directly or behind a proxy, including the 21k intrinsic: up to ~35k for reads,
+// ~48.5k for a 64-character name or symbol and ~44k for the write probes.
+const VIEW_GAS_LIMIT = 40_000n;
+const STRING_VIEW_GAS_LIMIT = 50_000n;
+const WRITE_VIEW_GAS_LIMIT = 50_000n;
+
+// In standard tokens a zero amount writes no new storage, and a non-zero recipient passes bare
+// `require(to != address(0))` checks that would otherwise revert without data.
+const PROBE_RECIPIENT = "0x000000000000000000000000000000000000dEaD";
+
+function probeGasLimit(functionName: (Erc20Call | Erc20MetadataCall)["functionName"]): bigint {
+	if (functionName === "name" || functionName === "symbol") {
+		return STRING_VIEW_GAS_LIMIT;
+	}
+
+	if (functionName === "transfer" || functionName === "transferFrom" || functionName === "approve") {
+		return WRITE_VIEW_GAS_LIMIT;
+	}
+
+	return VIEW_GAS_LIMIT;
+}
 
 // Postgres text cannot hold NUL.
 function isIndexableTokenString(value: string): boolean {
@@ -145,24 +167,24 @@ export class TokenParserService implements TokenParser {
 			},
 			{
 				abi: erc20AbiFunctions,
-				args: [zeroAddress, 1n],
+				args: [PROBE_RECIPIENT, 0n],
 				functionName: "transfer",
 			},
 			{
 				abi: erc20AbiFunctions,
-				args: [zeroAddress, zeroAddress, 1n],
+				args: [zeroAddress, PROBE_RECIPIENT, 0n],
 				functionName: "transferFrom",
 			},
 			{
 				abi: erc20AbiFunctions,
-				args: [zeroAddress, 1n],
+				args: [PROBE_RECIPIENT, 0n],
 				functionName: "approve",
 			},
 		];
 
 		for (const call of calls) {
 			const data = encodeFunctionData(call as EncodeFunctionDataParameters).slice(2);
-			this.#preparedFunctionCalls.push({ call, data });
+			this.#preparedFunctionCalls.push({ call, data, gasLimit: probeGasLimit(call.functionName) });
 		}
 
 		this.#resetTransferIndexes();
@@ -352,11 +374,12 @@ export class TokenParserService implements TokenParser {
 			totalSupply: undefined,
 		};
 
-		for (const { call, data } of this.#preparedFunctionCalls) {
+		for (const { call, data, gasLimit } of this.#preparedFunctionCalls) {
 			try {
 				const result = await this.evm.view({
 					data: Buffer.from(data, "hex"),
 					from: zeroAddress,
+					gasLimit,
 					specId: evmSpec,
 					to: contract,
 				});
@@ -403,6 +426,7 @@ export class TokenParserService implements TokenParser {
 			const result = await this.evm.view({
 				data: Buffer.from(data, "hex"),
 				from: zeroAddress,
+				gasLimit: VIEW_GAS_LIMIT,
 				specId: evmSpec,
 				to: contract,
 			});
