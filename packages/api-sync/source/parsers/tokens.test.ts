@@ -77,6 +77,7 @@ type Ctx = {
 	evm: { view: (options: { data: Buffer }) => Promise<ViewResponse> };
 	logger: any;
 	databaseToken: unknown;
+	queryBuilder: { getOne: () => Promise<unknown>; where: () => unknown };
 	respond: (impl: (calldata: string) => ViewResponse) => void;
 };
 
@@ -88,6 +89,7 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 			getOne: async () => context.databaseToken,
 			where: () => queryBuilder,
 		};
+		context.queryBuilder = queryBuilder;
 
 		context.evm = { view: async () => ({ output: Buffer.alloc(0), success: false }) };
 		context.respond = (impl) => {
@@ -361,6 +363,89 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 		assert.equal(tokens[0].deploymentHash, "0xtransaction");
 	});
 
+	it("does not probe a contract again once it is known not to be a token", async ({
+		evm,
+		queryBuilder,
+		respond,
+		service,
+	}) => {
+		respondWithOutput(respond, "name", "0x01");
+		const view = spy(evm, "view");
+		const lookup = spy(queryBuilder, "getOne");
+		const receipt = () => ({ logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n)] }) as any;
+
+		await service.parseReceipt(header(5), transaction(), receipt());
+		view.calledTimes(2);
+		lookup.calledOnce();
+		view.reset();
+		lookup.reset();
+
+		const { tokenHolders, tokens } = await service.parseReceipt(header(6), transaction(), receipt());
+
+		assert.equal(tokens, []);
+		assert.equal(tokenHolders, []);
+		view.neverCalled();
+		lookup.neverCalled();
+	});
+
+	it("probes a contract that is not a token again after 100 blocks", async ({ evm, service }) => {
+		const receipt = () => ({ logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n)] }) as any;
+		await service.parseReceipt(header(5), transaction(), receipt());
+		const view = spy(evm, "view");
+
+		await service.parseReceipt(header(104), transaction(), receipt());
+		view.neverCalled();
+
+		await service.parseReceipt(header(105), transaction(), receipt());
+		view.calledOnce();
+	});
+
+	it("keeps the most recently seen non-tokens cached, as many as the token cache holds", async ({ evm, service }) => {
+		const receiptOf = (contracts: string[]) =>
+			({ logs: contracts.map((contract) => transferLog(contract, HOLDER_ONE, HOLDER_TWO, 1n)) }) as any;
+		const others = Array.from({ length: 32 }, (_, index) => contractAt(index));
+
+		await service.parseReceipt(header(5), transaction(), receiptOf([TOKEN, ...others.slice(0, 31)]));
+		const view = spy(evm, "view");
+
+		await service.parseReceipt(header(6), transaction(), receiptOf([TOKEN, others[31]]));
+		await service.parseReceipt(header(7), transaction(), receiptOf([TOKEN, others[0]]));
+
+		view.calledTimes(2);
+	});
+
+	it("looks up a token evicted from the token cache in the database", async (context) => {
+		respondAsErc20(context, { [HOLDER_ONE]: 1n, [HOLDER_TWO]: 1n });
+		const receiptOf = (contracts: string[]) =>
+			({ logs: contracts.map((contract) => transferLog(contract, HOLDER_ONE, HOLDER_TWO, 1n)) }) as any;
+		await context.service.parseReceipt(header(5), transaction(), receiptOf([TOKEN]));
+
+		// Served from the database, 32 other tokens push TOKEN out of the token cache.
+		context.databaseToken = {
+			address: TOKEN,
+			decimals: 8,
+			name: "Test Token",
+			symbol: "TEST",
+			totalSupply: "5000",
+		};
+		await context.service.parseReceipt(
+			header(6),
+			transaction(),
+			receiptOf(Array.from({ length: 32 }, (_, index) => contractAt(index))),
+		);
+		const lookup = spy(context.queryBuilder, "getOne");
+
+		const { tokenHolders, tokens } = await context.service.parseReceipt(
+			header(7),
+			transaction(),
+			receiptOf([TOKEN]),
+		);
+
+		lookup.calledOnce();
+		assert.equal(tokens, []);
+		assert.equal(tokenHolders.length, 2);
+	});
+
 	it("does not treat a contract with empty call results as a token", async (context) => {
 		// Default view responds unsuccessful + empty, which means "function does not exist".
 		const { tokenHolders, tokens } = await context.service.parseReceipt(header(5), transaction(), {
@@ -402,22 +487,48 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 		assert.equal(tokens, []);
 	});
 
-	it("swallows exceptions thrown while probing a contract", async (context) => {
+	it("probes a contract again after a view call throws", async ({ logger, respond, service }) => {
 		const known = erc20Responses();
-		context.respond((calldata) => {
+		respond((calldata) => {
 			if (calldata === calldataOf("name")) {
-				throw new Error("view blew up");
+				throw new Error("view call failed reading state");
 			}
 			return known.get(calldata) ?? ok("0x01");
 		});
+		const warn = spy(logger, "warn");
+		const receipt = () => ({ logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n)] }) as any;
 
-		const { tokenActions, tokens } = await context.service.parseReceipt(header(5), transaction(), {
-			logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n)],
+		const failed = await service.parseReceipt(header(5), transaction(), receipt());
+		warn.calledOnce();
+
+		respond((calldata) => known.get(calldata) ?? ok("0x01"));
+		const retried = await service.parseReceipt(header(6), transaction(), receipt());
+
+		assert.equal(failed.tokenActions.length, 1);
+		assert.equal(failed.tokens, []);
+		assert.equal(retried.tokens.length, 1);
+	});
+
+	it("still probes the other contracts of a receipt after a view call throws", async ({ evm, service }) => {
+		const known = erc20Responses();
+		evm.view = async (options: any) => {
+			if (options.to === TOKEN) {
+				throw new Error("view call failed reading state");
+			}
+			return known.get(options.data.toString("hex")) ?? ok("0x01");
+		};
+
+		const { tokens } = await service.parseReceipt(header(5), transaction(), {
+			logs: [
+				transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n),
+				transferLog(OTHER_TOKEN, HOLDER_ONE, HOLDER_TWO, 1n),
+			],
 		} as any);
 
-		// The action is still recorded even though the metadata could not be resolved.
-		assert.equal(tokenActions.length, 1);
-		assert.equal(tokens, []);
+		assert.equal(
+			tokens.map((token) => token.address),
+			[OTHER_TOKEN],
+		);
 	});
 
 	it("skips the holder when balanceOf fails or throws", async ({ logger, respond, service }) => {

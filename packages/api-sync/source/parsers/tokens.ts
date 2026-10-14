@@ -59,6 +59,9 @@ const WRITE_VIEW_GAS_LIMIT = 50_000n;
 // `require(to != address(0))` checks that would otherwise revert without data.
 const PROBE_RECIPIENT = "0x000000000000000000000000000000000000dEaD";
 
+// Contracts not detected as tokens are checked again after this many blocks, in case they change.
+const NON_TOKEN_REPROBE_BLOCKS = 100;
+
 function probeGasLimit(functionName: (Erc20Call | Erc20MetadataCall)["functionName"]): bigint {
 	if (functionName === "name" || functionName === "symbol") {
 		return STRING_VIEW_GAS_LIMIT;
@@ -80,7 +83,12 @@ function decodeTokenMetadata(
 	functionName: Erc20MetadataCall["functionName"],
 	output: Buffer,
 ): string | number | undefined {
-	const decoded = decodeFunctionResult({ abi: erc20MetadataFunctions, data: toHex(output), functionName });
+	let decoded: unknown;
+	try {
+		decoded = decodeFunctionResult({ abi: erc20MetadataFunctions, data: toHex(output), functionName });
+	} catch {
+		return undefined;
+	}
 
 	if (functionName === "name" || functionName === "symbol") {
 		return isIndexableTokenString(decoded as string) ? (decoded as string) : undefined;
@@ -123,6 +131,7 @@ export class TokenParserService implements TokenParser {
 	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	#tokenCache!: LRUCache<string, Models.Token>;
+	#nonTokenCache!: LRUCache<string, number>;
 	#actionIndexes: Map<`0x${string}`, number> = new Map<`0x${string}`, number>();
 	#previousBlockNumber!: number;
 
@@ -130,9 +139,9 @@ export class TokenParserService implements TokenParser {
 
 	@postConstruct()
 	public initialize(): void {
-		this.#tokenCache = new LRUCache({
-			max: this.pluginConfiguration.getRequired<number>("tokenCacheSize"),
-		});
+		const tokenCacheSize = this.pluginConfiguration.getRequired<number>("tokenCacheSize");
+		this.#tokenCache = new LRUCache({ max: tokenCacheSize });
+		this.#nonTokenCache = new LRUCache({ max: tokenCacheSize });
 
 		const calls: (Erc20Call | Erc20MetadataCall)[] = [
 			{
@@ -271,6 +280,7 @@ export class TokenParserService implements TokenParser {
 		if (dirtyAccounts.size > 0) {
 			// Get tokens for corresponding contracts. Not all contracts are guaranteed to be a ERC20 contract.
 			const foundTokens = await this.#getTokens(
+				header.number,
 				transaction,
 				[...dirtyContractAddresses.values()],
 				tokenRepository,
@@ -313,6 +323,7 @@ export class TokenParserService implements TokenParser {
 	}
 
 	async #getTokens(
+		blockNumber: number,
 		transaction: Contracts.Crypto.Transaction,
 		addresses: string[],
 		tokenRepository?: ApiDatabaseContracts.TokenRepository,
@@ -330,6 +341,11 @@ export class TokenParserService implements TokenParser {
 				continue;
 			}
 
+			const judgedAt = this.#nonTokenCache.get(address);
+			if (judgedAt !== undefined && blockNumber - judgedAt < NON_TOKEN_REPROBE_BLOCKS) {
+				continue;
+			}
+
 			// Postgres might already have the contract, load it and bail early.
 			const databaseToken = await tokenRepository
 				.createQueryBuilder()
@@ -344,8 +360,17 @@ export class TokenParserService implements TokenParser {
 
 			// Perform calls on the contract to check if it conform to the ERC20 ABI.
 			// This should work regardless of what kind of ERC20 contract it is (Vanilla, Proxy, etc.)
-			const parsed = await this.#parseErc20Contract(address);
+			let parsed: TokenMetadata | undefined;
+			try {
+				parsed = await this.#parseErc20Contract(address);
+			} catch (rawError) {
+				// A failed state read says nothing about the contract, so it is not cached.
+				this.logger.warn(`Failed to probe '${address}' for ERC20: ${ensureError(rawError).message}`);
+				continue;
+			}
+
 			if (!parsed) {
+				this.#nonTokenCache.set(address, blockNumber);
 				continue;
 			}
 
@@ -375,35 +400,33 @@ export class TokenParserService implements TokenParser {
 		};
 
 		for (const { call, data, gasLimit } of this.#preparedFunctionCalls) {
-			try {
-				const result = await this.evm.view({
-					data: Buffer.from(data, "hex"),
-					from: zeroAddress,
-					gasLimit,
-					specId: evmSpec,
-					to: contract,
-				});
+			const result = await this.evm.view({
+				data: Buffer.from(data, "hex"),
+				from: zeroAddress,
+				gasLimit,
+				specId: evmSpec,
+				to: contract,
+			});
 
-				if (result.success && result.output) {
-					if (isTokenMetadataCall(call)) {
-						const value = decodeTokenMetadata(call.functionName, result.output);
-						if (value === undefined) {
-							return undefined;
-						}
-
-						tokenMetadata[call.functionName] = value as unknown as undefined;
+			if (result.success && result.output) {
+				if (isTokenMetadataCall(call)) {
+					const value = decodeTokenMetadata(call.functionName, result.output);
+					if (value === undefined) {
+						return undefined;
 					}
 
-					continue;
+					tokenMetadata[call.functionName] = value as unknown as undefined;
 				}
 
-				// The function does not exist if the output is 0x.
-				if (!result.output || result.output.byteLength === 0) {
-					return undefined;
-				}
+				continue;
+			}
 
-				// Anything else is malformed but not empty
-			} catch {}
+			// Empty output: a missing function, a revert without data or running out of gas.
+			if (!result.output || result.output.byteLength === 0) {
+				return undefined;
+			}
+
+			// Anything else is malformed but not empty
 		}
 
 		if (!hasRequiredTokenMetadata(tokenMetadata)) {
