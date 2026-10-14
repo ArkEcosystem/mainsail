@@ -66,9 +66,9 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 		await Promise.all(
 			this.apiNodeRepository
 				.getApiNodes()
-				.filter((apiNode) =>
+				.filter(
 					// ignore nodes that were pinged recently
-					(apiNode.lastPinged ?? dayjs()).isAfter(dayjs().add(10, "minutes")),
+					(apiNode) => !apiNode.lastPinged || apiNode.lastPinged.isBefore(dayjs().subtract(10, "minutes")),
 				)
 				.map((apiNode) => this.apiNodeProcessor.revalidateApiNode(apiNode)),
 		);

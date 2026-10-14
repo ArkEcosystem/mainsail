@@ -44,8 +44,7 @@ export class ApiNodeProcessor implements Contracts.P2P.ApiNodeProcessor {
 			return;
 		}
 
-		const lastPinged = apiNode.lastPinged ?? dayjs();
-		if (lastPinged.isBefore(dayjs().subtract(10, "minutes"))) {
+		if (apiNode.lastPinged && apiNode.lastPinged.isAfter(dayjs().subtract(10, "minutes"))) {
 			return;
 		}
 
