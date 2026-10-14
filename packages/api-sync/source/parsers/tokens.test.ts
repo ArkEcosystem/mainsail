@@ -21,6 +21,8 @@ const OTHER_TOKEN = "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
 const HOLDER_ONE = "0x1111111111111111111111111111111111111111";
 const HOLDER_TWO = "0x2222222222222222222222222222222222222222";
 
+const contractAt = (index: number): string => `0x${(index + 1).toString(16).padStart(40, "c")}`;
+
 const transferLog = (token: string, from: string, to: string, value: bigint) => ({
 	address: token,
 	data: encodeAbiParameters([{ type: "uint256" }], [value]),
@@ -100,6 +102,17 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 
 	const header = (number: number): any => ({ number });
 	const transaction = (to: string | undefined = HOLDER_ONE): any => ({ hash: "0xtransaction", to });
+
+	const respondWithOutput = (
+		respond: Ctx["respond"],
+		functionName: "name" | "symbol" | "decimals",
+		output: `0x${string}`,
+	) => {
+		const known = erc20Responses();
+		respond((calldata) =>
+			calldata === calldataOf(functionName) ? ok(output) : (known.get(calldata) ?? ok("0x01")),
+		);
+	};
 
 	// Responses for a valid token plus per-holder balances; every probe succeeds.
 	const respondAsErc20 = (context: Ctx, balances: Record<string, bigint> = {}) => {
@@ -216,6 +229,77 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 			tokenHolders.map((holder) => holder.tokenAddress),
 			[TOKEN, TOKEN],
 		);
+	});
+
+	it("does not treat a contract with a NUL byte in its name or symbol as a token", async ({ respond, service }) => {
+		const cases = [
+			["name", "Test\u0000Token"],
+			["name", "\u0000Test"],
+			["symbol", "T\u0000ST"],
+		] as const;
+
+		for (const [index, [functionName, result]] of cases.entries()) {
+			respondWithOutput(respond, functionName, encodeFunctionResult({ abi: erc20Abi, functionName, result }));
+
+			const { tokens } = await service.parseReceipt(header(5), transaction(), {
+				logs: [transferLog(contractAt(index), HOLDER_ONE, HOLDER_TWO, 1n)],
+			} as any);
+
+			assert.equal(tokens, []);
+		}
+	});
+
+	it("does not treat a contract whose name or symbol exceeds 64 characters as a token", async ({
+		respond,
+		service,
+	}) => {
+		for (const [index, functionName] of (["name", "symbol"] as const).entries()) {
+			respondWithOutput(
+				respond,
+				functionName,
+				encodeFunctionResult({ abi: erc20Abi, functionName, result: "S".repeat(64) }),
+			);
+			const accepted = await service.parseReceipt(header(5), transaction(), {
+				logs: [transferLog(contractAt(index * 2), HOLDER_ONE, HOLDER_TWO, 1n)],
+			} as any);
+
+			respondWithOutput(
+				respond,
+				functionName,
+				encodeFunctionResult({ abi: erc20Abi, functionName, result: "S".repeat(65) }),
+			);
+			const rejected = await service.parseReceipt(header(5), transaction(), {
+				logs: [transferLog(contractAt(index * 2 + 1), HOLDER_ONE, HOLDER_TWO, 1n)],
+			} as any);
+
+			assert.equal(
+				accepted.tokens.map((token) => token[functionName]),
+				["S".repeat(64)],
+			);
+			assert.equal(rejected.tokens, []);
+		}
+	});
+
+	it("does not treat a contract whose decimals exceed a uint8 as a token", async ({ respond, service }) => {
+		respondWithOutput(respond, "decimals", encodeAbiParameters([{ type: "uint256" }], [255n]));
+		const accepted = await service.parseReceipt(header(5), transaction(), {
+			logs: [transferLog(contractAt(0), HOLDER_ONE, HOLDER_TWO, 1n)],
+		} as any);
+
+		assert.equal(
+			accepted.tokens.map((token) => token.decimals),
+			[255],
+		);
+
+		for (const [index, decimals] of [256n, 2n ** 256n - 1n].entries()) {
+			respondWithOutput(respond, "decimals", encodeAbiParameters([{ type: "uint256" }], [decimals]));
+
+			const { tokens } = await service.parseReceipt(header(5), transaction(), {
+				logs: [transferLog(contractAt(index + 1), HOLDER_ONE, HOLDER_TWO, 1n)],
+			} as any);
+
+			assert.equal(tokens, []);
+		}
 	});
 
 	it("links a deployment transaction to the token", async (context) => {

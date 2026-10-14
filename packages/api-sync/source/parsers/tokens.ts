@@ -46,6 +46,33 @@ type TokenMetadata = {
 
 type TokenMetadataOptional = Partial<TokenMetadata>;
 
+const MAX_TOKEN_METADATA_LENGTH = 64;
+const MAX_UINT8 = 255;
+
+// Postgres text cannot hold NUL.
+function isIndexableTokenString(value: string): boolean {
+	return value.length <= MAX_TOKEN_METADATA_LENGTH && !value.includes("\u0000");
+}
+
+function decodeTokenMetadata(
+	functionName: Erc20MetadataCall["functionName"],
+	output: Buffer,
+): string | number | undefined {
+	const decoded = decodeFunctionResult({ abi: erc20MetadataFunctions, data: toHex(output), functionName });
+
+	if (functionName === "name" || functionName === "symbol") {
+		return isIndexableTokenString(decoded as string) ? (decoded as string) : undefined;
+	}
+
+	if (functionName === "decimals") {
+		// viem does not range-check a uint8 below 2^53.
+		const decimals = decoded as number;
+		return decimals <= MAX_UINT8 ? decimals : undefined;
+	}
+
+	return (decoded as bigint).toString();
+}
+
 function isTokenMetadataCall(call: Erc20Call | Erc20MetadataCall): call is Erc20MetadataCall {
 	return erc20MetadataFunctions.some((m) => m.name === call.functionName);
 }
@@ -337,17 +364,12 @@ export class TokenParserService implements TokenParser {
 
 				if (result.success && result.output) {
 					if (isTokenMetadataCall(call)) {
-						const decoded = decodeFunctionResult({
-							abi: erc20MetadataFunctions,
-							data: toHex(result.output),
-							functionName: call.functionName,
-						});
+						const value = decodeTokenMetadata(call.functionName, result.output);
+						if (value === undefined) {
+							return undefined;
+						}
 
-						// totalSupply decodes to a bigint; normalize to string to match the
-						// declared metadata/model contract (as balanceOf does below).
-						tokenMetadata[call.functionName] = (typeof decoded === "bigint"
-							? decoded.toString()
-							: decoded) as unknown as undefined;
+						tokenMetadata[call.functionName] = value as unknown as undefined;
 					}
 
 					continue;
