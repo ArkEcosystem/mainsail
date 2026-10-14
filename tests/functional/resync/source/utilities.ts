@@ -79,11 +79,7 @@ export const getRandomConsensusKeyPair = async ({
 		.fromMnemonic(seed);
 };
 
-export const getApiRow = async (
-	app: Contracts.Kernel.Application,
-	table: "wallets" | "legacy_cold_wallets",
-	address: string,
-): Promise<Record<string, any> | undefined> => {
+export const waitForApiSync = async (app: Contracts.Kernel.Application): Promise<void> => {
 	const blockNumber = app.get<Contracts.State.Store>(Identifiers.State.Store).getBlockNumber();
 	const apiSync = app.get<Contracts.ApiSync.Service>(Identifiers.ApiSync.Service);
 	const deadline = Date.now() + 30_000;
@@ -94,6 +90,14 @@ export const getApiRow = async (
 
 		await sleep(50);
 	}
+};
+
+export const getApiRow = async (
+	app: Contracts.Kernel.Application,
+	table: "wallets" | "legacy_cold_wallets",
+	address: string,
+): Promise<Record<string, any> | undefined> => {
+	await waitForApiSync(app);
 
 	const [row] = await runDatabaseQuery(app.get<string>(Identifiers.Application.Name), async (dataSource) =>
 		dataSource.query(`SELECT * FROM ${table} WHERE address = $1`, [address]),
