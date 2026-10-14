@@ -3,6 +3,16 @@ import { validatorSetPack, validatorSetUnpack } from "@mainsail/utils";
 type Bitmap = readonly boolean[];
 type BitmapFields = { validatorsSignedPrevote?: unknown; validatorsSignedPrecommit?: unknown };
 
+// The wire shape carries the bitmaps packed as bytes; callers hand in the boolean arrays and the codec packs them.
+export type Unpacked<T> = Omit<T, keyof BitmapFields> & {
+	validatorsSignedPrevote?: Bitmap | null;
+	validatorsSignedPrecommit?: Bitmap | null;
+};
+
+export type WithUnpackedHeaders<T extends { headers?: unknown }> = Omit<T, "headers"> & {
+	headers?: Unpacked<NonNullable<T["headers"]>> | null;
+};
+
 export const packBitmap = (bitmap: Bitmap): Buffer => {
 	if (bitmap.length > 255) {
 		throw new RangeError(`Bitmap of ${bitmap.length} validators does not fit the count byte`);
@@ -40,15 +50,15 @@ export const unpackBitmap = (packed: Uint8Array | null | undefined): boolean[] =
 	return validatorSetUnpack(value, count);
 };
 
-export const packBitmaps = <T extends BitmapFields>(object: T): T =>
+export const packBitmaps = <T extends BitmapFields>(object: Unpacked<T>): T =>
 	({
 		...object,
-		validatorsSignedPrecommit: packBitmap((object.validatorsSignedPrecommit ?? []) as Bitmap),
-		validatorsSignedPrevote: packBitmap((object.validatorsSignedPrevote ?? []) as Bitmap),
+		validatorsSignedPrecommit: packBitmap(object.validatorsSignedPrecommit ?? []),
+		validatorsSignedPrevote: packBitmap(object.validatorsSignedPrevote ?? []),
 	}) as T;
 
-export const packHeadersBitmaps = <T extends { headers?: unknown }>(object: T): T =>
-	object.headers ? ({ ...object, headers: packBitmaps(object.headers as BitmapFields) } as T) : object;
+export const packHeadersBitmaps = <T extends { headers?: unknown }>(object: WithUnpackedHeaders<T>): T =>
+	(object.headers ? { ...object, headers: packBitmaps(object.headers) } : object) as T;
 
 export const unpackBitmapsInPlace = (object: BitmapFields | null | undefined): void => {
 	if (object) {

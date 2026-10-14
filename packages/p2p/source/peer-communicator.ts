@@ -203,18 +203,10 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 			const timeBeforeSocketCall = performance.now();
 
-			const headers = this.headerFactory().toData();
 			const response = await this.connector.emit(
 				peer,
 				event,
-				codec.request.serialize({
-					...payload,
-					headers: {
-						...headers,
-						validatorsSignedPrecommit: [...headers.validatorsSignedPrecommit],
-						validatorsSignedPrevote: [...headers.validatorsSignedPrevote],
-					},
-				}),
+				codec.request.serialize({ ...payload, headers: this.headerFactory().toData() }),
 				options.timeout,
 			);
 			statistic.responseTime = Math.round(performance.now() - timeBeforeSocketCall);
