@@ -358,9 +358,9 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 		assert.equal(tokens, []);
 	});
 
-	it("falls back to a zero balance when balanceOf fails or throws", async (context) => {
+	it("skips the holder when balanceOf fails or throws", async ({ logger, respond, service }) => {
 		const known = erc20Responses();
-		context.respond((calldata) => {
+		respond((calldata) => {
 			if (calldata === balanceOfCalldata(HOLDER_ONE)) {
 				return { output: Buffer.alloc(0), success: false };
 			}
@@ -369,18 +369,95 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 			}
 			return known.get(calldata) ?? ok("0x01");
 		});
-		const warn = spy(context.logger, "warn");
+		const warn = spy(logger, "warn");
 
-		const { tokenHolders, tokens } = await context.service.parseReceipt(header(5), transaction(), {
+		const { tokenHolders, tokens } = await service.parseReceipt(header(5), transaction(), {
 			logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n)],
 		} as any);
 
 		assert.equal(tokens.length, 1);
-		assert.equal(
-			tokenHolders.map((holder) => holder.balance),
-			["0", "0"],
-		);
+		assert.equal(tokenHolders, []);
 		warn.calledTimes(2);
+	});
+
+	it("keeps a zero balance so the holder can be removed", async (context) => {
+		respondAsErc20(context, { [HOLDER_ONE]: 0n, [HOLDER_TWO]: 30n });
+
+		const { tokenHolders } = await context.service.parseReceipt(header(5), transaction(), {
+			logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 30n)],
+		} as any);
+
+		assert.equal(tokenHolders, [
+			{ address: HOLDER_ONE, balance: "0", tokenAddress: TOKEN },
+			{ address: HOLDER_TWO, balance: "30", tokenAddress: TOKEN },
+		]);
+	});
+
+	it("skips only the holder whose balance cannot be read", async ({ logger, respond, service }) => {
+		const known = erc20Responses();
+		respond((calldata) => {
+			if (calldata === balanceOfCalldata(HOLDER_ONE)) {
+				return { output: Buffer.alloc(0), success: false };
+			}
+			if (calldata === balanceOfCalldata(HOLDER_TWO)) {
+				return ok(encodeFunctionResult({ abi: erc20Abi, functionName: "balanceOf", result: 30n }));
+			}
+			return known.get(calldata) ?? ok("0x01");
+		});
+		const warn = spy(logger, "warn");
+
+		const { tokenHolders } = await service.parseReceipt(header(5), transaction(), {
+			logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 30n)],
+		} as any);
+
+		assert.equal(tokenHolders, [{ address: HOLDER_TWO, balance: "30", tokenAddress: TOKEN }]);
+		warn.calledOnce();
+	});
+
+	it("skips the holder when balanceOf succeeds with malformed output", async ({ logger, respond, service }) => {
+		const known = erc20Responses();
+		respond((calldata) => {
+			if (calldata === balanceOfCalldata(HOLDER_ONE)) {
+				return ok("0x01");
+			}
+			if (calldata === balanceOfCalldata(HOLDER_TWO)) {
+				return ok(encodeFunctionResult({ abi: erc20Abi, functionName: "balanceOf", result: 30n }));
+			}
+			return known.get(calldata) ?? ok("0x01");
+		});
+		const warn = spy(logger, "warn");
+
+		const { tokenHolders } = await service.parseReceipt(header(5), transaction(), {
+			logs: [transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 30n)],
+		} as any);
+
+		assert.equal(tokenHolders, [{ address: HOLDER_TWO, balance: "30", tokenAddress: TOKEN }]);
+		warn.calledOnce();
+	});
+
+	it("still reads the other tokens of an account after one balanceOf fails", async ({ evm, service }) => {
+		const known = erc20Responses();
+		evm.view = async (options: any) => {
+			const calldata = options.data.toString("hex");
+			if (calldata === balanceOfCalldata(HOLDER_ONE)) {
+				return options.to === TOKEN
+					? { output: Buffer.alloc(0), success: false }
+					: ok(encodeFunctionResult({ abi: erc20Abi, functionName: "balanceOf", result: 7n }));
+			}
+			return known.get(calldata) ?? ok("0x01");
+		};
+
+		const { tokenHolders } = await service.parseReceipt(header(5), transaction(), {
+			logs: [
+				transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n),
+				transferLog(OTHER_TOKEN, HOLDER_ONE, HOLDER_TWO, 1n),
+			],
+		} as any);
+
+		assert.equal(
+			tokenHolders.filter((holder) => holder.address === HOLDER_ONE),
+			[{ address: HOLDER_ONE, balance: "7", tokenAddress: OTHER_TOKEN }],
+		);
 	});
 
 	it("serves repeated contracts from the cache without re-emitting the token", async (context) => {

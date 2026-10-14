@@ -279,11 +279,10 @@ export class TokenParserService implements TokenParser {
 						}
 					}
 
-					tokenHolders.push({
-						address: account,
-						balance: await this.#getTokenBalance(contract, account),
-						tokenAddress: contract,
-					});
+					const balance = await this.#getTokenBalance(contract, account);
+					if (balance !== undefined) {
+						tokenHolders.push({ address: account, balance, tokenAddress: contract });
+					}
 				}
 			}
 		}
@@ -391,7 +390,7 @@ export class TokenParserService implements TokenParser {
 		return tokenMetadata;
 	}
 
-	async #getTokenBalance(contract: string, account: `0x${string}`): Promise<string> {
+	async #getTokenBalance(contract: string, account: `0x${string}`): Promise<string | undefined> {
 		const { evmSpec } = this.configuration.getMilestone();
 
 		const data = encodeFunctionData({
@@ -410,7 +409,7 @@ export class TokenParserService implements TokenParser {
 
 			if (!result.success) {
 				this.logger.warn(`Failed to call balanceOf on '${contract}' for ${account}`);
-				return "0";
+				return undefined;
 			}
 
 			assert.defined(result.output);
@@ -427,7 +426,7 @@ export class TokenParserService implements TokenParser {
 			this.logger.warn(`Failed to call balanceOf on '${contract}' for ${account}: ${error.message}`);
 		}
 
-		return "0";
+		return undefined;
 	}
 
 	#resetTransferIndexes(blockNumber: number = -1): void {
