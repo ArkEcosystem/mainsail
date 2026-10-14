@@ -412,6 +412,50 @@ describe<{
 		assert.true(downloader.isDownloading());
 	});
 
+	it("#download - should process a ready successor after dropping a replayed job that is already applied", async ({
+		downloader,
+	}) => {
+		// Blocks above 255 need two bytes.
+		const makeWideBlock = (number: number): Buffer => {
+			const buffer = Buffer.alloc(2);
+			buffer.writeUInt16BE(number, 0);
+			return buffer;
+		};
+		stub(commitFactory, "fromBytes").callsFake(async (buffer: Buffer) => {
+			const number = buffer.readUInt16BE(0);
+			return { block: { hash: `hash${number}`, number } };
+		});
+		// Blocks 401-402 form their own round, so the second job is processed as one slice.
+		stub(roundCalculator, "calculateRound").callsFake((number: number) => ({
+			maxValidators: 2,
+			roundHeight: number <= 400 ? 1 : 401,
+		}));
+		const process = stub(commitProcessor, "process").returnValue(Enums.Consensus.ProcessorResult.Accepted);
+
+		const requests: { resolve: any; reject: any }[] = [];
+		stub(communicator, "getBlocks").callsFake(
+			() => new Promise((resolve, reject) => requests.push({ reject, resolve })),
+		);
+		stub(repository, "getPeers").returnValue([makePeer(1000, "2.2.2.2")]);
+
+		// Jobs for blocks 1-400 and 401-402. The second one arrives first and waits for the first.
+		downloader.download(makePeer(401));
+		downloader.download(makePeer(403));
+		requests[1].resolve({ blocks: [makeWideBlock(401), makeWideBlock(402)] });
+		await sleep(10);
+		process.neverCalled();
+
+		// Consensus applies blocks 1-400 meanwhile, then the first request fails: its replay has
+		// nothing left to fetch and must hand over to the successor that is already ready.
+		stub(stateStore, "getBlockNumber").returnValue(400);
+		stub(stateStore, "getLastBlock").returnValue({ hash: "hash400" });
+		requests[0].reject(new Error("boom"));
+		await sleep(10);
+
+		process.calledTimes(2);
+		assert.false(downloader.isDownloading());
+	});
+
 	it("#download - should not ban when the short reply was near the payload limit", async ({ downloader }) => {
 		// 3 MiB of block data: adding another maxPayload (2 MiB) block could exceed the 5 MiB
 		// response limit, so the short reply is legitimate.

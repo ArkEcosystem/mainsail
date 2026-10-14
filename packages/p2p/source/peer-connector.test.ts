@@ -94,7 +94,7 @@ describe<{
 		assert.length(ClientMock.instances, 1);
 		assert.equal(ClientMock.instances[0].url, "ws://178.165.55.11:4000");
 		assert.equal(ClientMock.instances[0].options, { timeout: 10_000 });
-		assert.equal(ClientMock.instances[0].connectOptions, { reconnect: false });
+		assert.equal(ClientMock.instances[0].connectOptions, { reconnect: false, timeout: 10_000 });
 
 		assert.equal(await peerConnector.connect(peer), connection);
 		assert.length(ClientMock.instances, 1);

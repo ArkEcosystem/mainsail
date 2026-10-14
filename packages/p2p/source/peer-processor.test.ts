@@ -16,7 +16,8 @@ describe<{
 	peerCommunicator: any;
 	peerDiscoverer: any;
 	apiNodeDiscoverer: any;
-}>("PeerProcessor", ({ it, beforeEach, spy }) => {
+	configuration: any;
+}>("PeerProcessor", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
 		context.logger = { debug: () => {}, warn: () => {}, warnExtra: () => {} };
 		context.repository = {
@@ -37,10 +38,11 @@ describe<{
 		context.peerDiscoverer = { discoverPeers: async () => {} };
 		context.apiNodeDiscoverer = { discoverApiNodes: async () => {} };
 
-		const configuration = {
+		context.configuration = {
 			getOptional: (key: string, defaultValue: unknown) => defaultValue,
 			getRequired: (key: string) => ({ blacklist: [], maxSameSubnetPeers: 5, whitelist: ["*"] })[key],
 		};
+		const configuration = context.configuration;
 
 		const app = new Application();
 		app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(configuration).whenTagged("plugin", "p2p");
@@ -197,6 +199,44 @@ describe<{
 
 		verify.neverCalled();
 		setPendingPeer.neverCalled();
+	});
+
+	it("#validateAndAcceptPeer - should not learn new peers in non-discovery mode", async ({
+		processor,
+		repository,
+		peerVerifier,
+		configuration,
+	}) => {
+		configuration.getOptional = (key: string, defaultValue: unknown) =>
+			key === "disableDiscovery" ? true : defaultValue;
+		const verify = spy(peerVerifier, "verify");
+		const setPendingPeer = spy(repository, "setPendingPeer");
+
+		await processor.validateAndAcceptPeer("178.165.55.55");
+
+		verify.neverCalled();
+		setPendingPeer.neverCalled();
+	});
+
+	it("#validateAndAcceptPeer - should still accept seed peers in non-discovery mode", async ({
+		processor,
+		repository,
+		configuration,
+	}) => {
+		configuration.getOptional = (key: string, defaultValue: unknown) =>
+			key === "disableDiscovery" ? true : defaultValue;
+		const setPeer = spy(repository, "setPeer");
+
+		await processor.validateAndAcceptPeer("178.165.55.55", { seed: true });
+
+		setPeer.calledOnce();
+	});
+
+	it("#validatePeerIp - should not reject inbound requests in non-discovery mode", ({ processor, configuration }) => {
+		configuration.getOptional = (key: string, defaultValue: unknown) =>
+			key === "disableDiscovery" ? true : defaultValue;
+
+		assert.true(processor.validatePeerIp("178.165.55.55"));
 	});
 
 	it("#validateAndAcceptPeer - should reject localhost addresses", async ({ processor, peerVerifier }) => {
