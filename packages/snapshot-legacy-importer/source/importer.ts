@@ -76,12 +76,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		await this.prepareRestore();
 
-		if (this.snapshotHash !== snapshot.snapshotHash) {
-			throw new Error(
-				`snapshot hash ${this.snapshotHash} does not match milestone snapshot ${snapshot.snapshotHash}`,
-			);
-		}
-
 		if (this.previousGenesisBlockHash !== block.parentHash) {
 			throw new Error(
 				`snapshot chain tip ${this.previousGenesisBlockHash} does not match genesis parent hash ${block.parentHash}`,
@@ -111,7 +105,13 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		this.logger.info(`Importing genesis snapshot: ${snapshotPath}`);
 
-		return this.prepare(snapshotPath);
+		await this.prepare(snapshotPath);
+
+		if (this.snapshotHash !== milestone.snapshot.snapshotHash) {
+			throw new Error(
+				`snapshot hash ${this.snapshotHash} does not match milestone snapshot ${milestone.snapshot.snapshotHash}`,
+			);
+		}
 	}
 
 	public async prepare(snapshotPath: string): Promise<void> {

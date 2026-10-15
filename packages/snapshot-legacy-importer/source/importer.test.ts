@@ -670,6 +670,22 @@ describe<Context>("Importer", ({ it, assert, beforeEach, each, spy }) => {
 		assert.equal(importer.snapshotHash, snapshot.hash);
 	});
 
+	it("should reject a restore whose snapshot does not match the milestone", async ({
+		configuration,
+		fileSystem,
+		importer,
+		wallet,
+	}) => {
+		const snapshot = makeSnapshot([wallet]);
+		configuration.getMilestone = () => ({ snapshot: { snapshotHash: "f".repeat(64) } });
+		fileSystem.get = async () => compress(snapshot);
+
+		await assert.rejects(
+			() => importer.prepareRestore(),
+			new Error(`snapshot hash ${snapshot.hash} does not match milestone snapshot ${"f".repeat(64)}`),
+		);
+	});
+
 	it("should reject a restore without a snapshot milestone", async ({ importer }) => {
 		await assert.rejects(
 			() => importer.prepareRestore(),
