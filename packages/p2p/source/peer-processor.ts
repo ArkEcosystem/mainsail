@@ -75,7 +75,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		}
 
 		if (this.validatePeerIp(ip, options)) {
-			await this.#acceptNewPeer(ip);
+			await this.#acceptNewPeer(ip, options);
 		}
 	}
 
@@ -96,21 +96,29 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			return false;
 		}
 
-		const maxSameSubnetPeers = this.configuration.getRequired<number>("maxSameSubnetPeers");
+		return !this.#isSameSubnetLimitReached(ip, options);
+	}
 
-		if (this.repository.getSameSubnetPeers(ip).length >= maxSameSubnetPeers && !options.seed) {
-			this.logger.warnExtra(
-				`Rejected ${ip} because we are already at the ${maxSameSubnetPeers} limit for peers sharing the same /24 subnet.`,
-				"p2p",
-			);
-
+	#isSameSubnetLimitReached(ip: string, options: Contracts.P2P.AcceptNewPeerOptions): boolean {
+		if (options.seed) {
 			return false;
 		}
+
+		const maxSameSubnetPeers = this.configuration.getRequired<number>("maxSameSubnetPeers");
+
+		if (this.repository.getSameSubnetPeers(ip).length < maxSameSubnetPeers) {
+			return false;
+		}
+
+		this.logger.warnExtra(
+			`Rejected ${ip} because we are already at the ${maxSameSubnetPeers} limit for peers sharing the same /24 subnet.`,
+			"p2p",
+		);
 
 		return true;
 	}
 
-	async #acceptNewPeer(ip: string): Promise<void> {
+	async #acceptNewPeer(ip: string, options: Contracts.P2P.AcceptNewPeerOptions): Promise<void> {
 		const peer = this.app.get<Contracts.P2P.PeerFactory>(Identifiers.P2P.Peer.Factory)(ip);
 
 		this.repository.setPendingPeer(peer);
@@ -118,25 +126,30 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		try {
 			const txPoolNode = this.txPoolNodeFactory(ip);
 
-			// The ban is re-checked after the awaits: the peer may have been banned while its
-			// acceptance was being verified, and a banned peer must never enter the
-			// repository - nothing would remove it before the ban expires.
-			if (
-				(await this.peerVerifier.verify(peer)) &&
-				(await this.txPoolNodeVerifier.verify(txPoolNode)) &&
-				!this.peerDisposer.isBanned(peer.ip)
-			) {
-				this.repository.setPeer(peer);
-				this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
-
-				void this.events.dispatch(Events.PeerEvent.Added, peer);
-
-				await this.transactionPoolWorker.setPeer(peer.ip);
-
-				await this.peerCommunicator.pingPorts(peer);
-				await this.peerDiscoverer.discoverPeers(peer);
-				await this.ApiNodeDiscoverer.discoverApiNodes(peer);
+			if (!(await this.peerVerifier.verify(peer)) || !(await this.txPoolNodeVerifier.verify(txPoolNode))) {
+				return;
 			}
+
+
+			if (this.peerDisposer.isBanned(peer.ip)) {
+				return;
+			}
+
+			if (this.#isSameSubnetLimitReached(peer.ip, options)) {
+				this.peerDisposer.disposePeer(ip);
+				return;
+			}
+
+			this.repository.setPeer(peer);
+			this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
+
+			void this.events.dispatch(Events.PeerEvent.Added, peer);
+
+			await this.transactionPoolWorker.setPeer(peer.ip);
+
+			await this.peerCommunicator.pingPorts(peer);
+			await this.peerDiscoverer.discoverPeers(peer);
+			await this.ApiNodeDiscoverer.discoverApiNodes(peer);
 		} catch (rawError) {
 			this.peerDisposer.disposePeer(ip);
 		} finally {
