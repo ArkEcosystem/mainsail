@@ -49,6 +49,8 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
 
+	readonly #seedIps = new Set<string>();
+
 	@postConstruct()
 	public initialize(): void {
 		this.events.listen(Events.CryptoEvent.MilestoneChanged, {
@@ -65,11 +67,15 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	}
 
 	public async validateAndAcceptPeer(ip: string, options: Contracts.P2P.AcceptNewPeerOptions = {}): Promise<void> {
+		if (options.seed) {
+			this.#seedIps.add(ip);
+		}
+
 		if (this.repository.hasPeer(ip) || this.repository.hasPendingPeer(ip)) {
 			return;
 		}
 
-		if (!options.seed && this.configuration.getOptional<boolean>("disableDiscovery", false)) {
+		if (!this.#isSeed(ip, options) && this.configuration.getOptional<boolean>("disableDiscovery", false)) {
 			this.logger.debug(`Rejected ${ip} because the relay is in non-discovery mode.`, "p2p");
 			return;
 		}
@@ -99,8 +105,12 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		return !this.#isSameSubnetLimitReached(ip, options);
 	}
 
+	#isSeed(ip: string, options: Contracts.P2P.AcceptNewPeerOptions): boolean {
+		return !!options.seed || this.#seedIps.has(ip);
+	}
+
 	#isSameSubnetLimitReached(ip: string, options: Contracts.P2P.AcceptNewPeerOptions): boolean {
-		if (options.seed) {
+		if (this.#isSeed(ip, options)) {
 			return false;
 		}
 
