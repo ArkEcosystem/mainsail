@@ -343,9 +343,11 @@ export class GenesisBlockGenerator {
 				value: transaction.value,
 			});
 
+			// The gas tells running out of gas apart from a revert: inside the consensus proxy both end
+			// in a revert, with an empty or misleading reason
 			if (!receipt.status) {
 				throw new Error(
-					`genesis transaction ${transaction.hash} (from ${transaction.from} to ${transaction.to}) reverted during EVM execution: ${parseTransactionError(transaction, receipt)}`,
+					`genesis transaction ${transaction.hash} (from ${transaction.from} to ${transaction.to}) reverted during EVM execution: ${parseTransactionError(transaction, receipt)} (gas used ${receipt.gasUsed} of ${transaction.gasLimit})`,
 				);
 			}
 

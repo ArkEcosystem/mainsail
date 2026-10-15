@@ -272,7 +272,8 @@ describe<{
 					[],
 					baseOptions({ validators: 1, validatorRegistrations: [registration] }),
 				),
-			"reverted during EVM execution: InvalidProofOfPossession",
+			"reverted during EVM execution: InvalidProofOfPossession (gas used ",
+			" of 500000)",
 		);
 	});
 
