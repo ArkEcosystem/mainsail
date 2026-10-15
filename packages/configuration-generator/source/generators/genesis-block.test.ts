@@ -144,10 +144,10 @@ describe<{
 
 	// Presigns the registration transaction for a wallet exactly as external validator tooling
 	// would, so the generator itself never needs the validator secrets.
-	const presignRegistration = async (app: Application, wallet: Wallet): Promise<string> => {
+	const presignRegistration = async (app: Application, wallet: Wallet, popChainId = 123): Promise<string> => {
 		const consensusContract = app.get<string>(AppIdentifiers.EvmConsensus.Contracts.Consensus);
 		const { pop } = buildProofOfPossession(Buffer.from(wallet.consensusKeys.privateKey, "hex"), {
-			chainId: 123,
+			chainId: popChainId,
 			registrantAddress: wallet.address,
 		});
 
@@ -252,6 +252,27 @@ describe<{
 					}),
 				),
 			"validatorRegistrations[0] is not a registerValidator call to the consensus contract.",
+		);
+	});
+
+	it("#generate - should name the reason when a genesis transaction reverts", async ({
+		app,
+		generator,
+		mnemonicGenerator,
+	}) => {
+		const wallet = await app
+			.get<WalletGenerator>(Identifiers.Generator.Wallet)
+			.generate(mnemonicGenerator.generate());
+		const registration = await presignRegistration(app, wallet, 11_812);
+
+		await assert.rejects(
+			() =>
+				generator.generate(
+					mnemonicGenerator.generate(),
+					[],
+					baseOptions({ validators: 1, validatorRegistrations: [registration] }),
+				),
+			"reverted during EVM execution: InvalidProofOfPossession",
 		);
 	});
 
