@@ -624,6 +624,21 @@ describe<Ctx>("Restore", ({ it, beforeEach, assert, spy }) => {
 		prepareRestore.neverCalled();
 	});
 
+	it("rejects before writing when the snapshot does not match the milestone", async (context) => {
+		const { dataSource, restore, snapshotImporter, systemRepo } = context;
+
+		const error = new Error("snapshot hash 01 does not match milestone snapshot 02");
+		snapshotImporter.prepareRestore = async () => {
+			throw error;
+		};
+		const transaction = spy(dataSource, "transaction");
+
+		await assert.rejects(() => restore.restore(), error);
+
+		assert.equal(systemRepo.maintenance, []);
+		transaction.neverCalled();
+	});
+
 	it("rejects when a non-genesis block was proposed by an unknown validator", async (context) => {
 		const { restore } = context;
 
