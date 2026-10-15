@@ -6,6 +6,8 @@
     BSD Licensed
 */
 
+import type { Contracts } from "@mainsail/contracts";
+
 import WebSocket from "ws";
 
 import { parseNesMessage, stringifyNesMessage } from "./utilities.js";
@@ -23,21 +25,8 @@ const nextTick = function (callback) {
 	};
 };
 
-const NesError = function (err, type) {
-	if (typeof err === "string") {
-		err = new Error(err);
-	}
-
-	err.type = type;
-	err.isNes = true;
-
-	try {
-		throw err; // ensure stack trace for IE11
-	} catch (rawError) {
-		const error = ensureError(rawError);
-		return error;
-	}
-};
+export const NesError = (error: Error | string, type: string): Contracts.P2P.NesError =>
+	Object.assign(typeof error === "string" ? new Error(error) : error, { isNes: true as const, type });
 
 // Error codes
 
