@@ -201,6 +201,8 @@ export class Client {
 		this._reconnectionTimer = null;
 
 		const reconnect = (event) => {
+			clearTimeout(timeout);
+
 			if (ws.onopen) {
 				finalize(NesError("Connection terminated while waiting to connect", errorTypes.WS));
 			}
@@ -243,21 +245,25 @@ export class Client {
 			}
 		};
 
-		const timeout = options.timeout ? setTimeout(timeoutHandler, options.timeout) : null;
+		const timeout = options.timeout ? setTimeout(timeoutHandler, options.timeout) : undefined;
 
 		ws.addEventListener("open", () => {
-			if (timeout) {
-				clearTimeout(timeout);
-			}
 			ws.onopen = null;
 
 			this._hello(options.auth)
 				.then(() => {
+					clearTimeout(timeout);
 					this.onConnect();
 					finalize(undefined);
 				})
 				.catch((error) => {
-					this._disconnect(() => nextTick(finalize)(error), true); // Stop reconnection when the hello message returns error
+					clearTimeout(timeout);
+
+					if (!next) {
+						return; // the connect timeout already finalized and its cleanup rejected the hello
+					}
+
+					this._disconnect(() => nextTick(finalize)(error), true, true);
 				});
 		});
 
@@ -315,7 +321,7 @@ export class Client {
 			this._ws = null;
 
 			if (ws.readyState !== WebSocket.CLOSED && ws.readyState !== WebSocket.CLOSING) {
-				ws.close();
+				ws.terminate();
 			}
 
 			ws.onopen = null;
