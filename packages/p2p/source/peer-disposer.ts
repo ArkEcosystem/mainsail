@@ -66,7 +66,6 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 			const peer = this.repository.getPeer(ip);
 
 			this.repository.forgetPeer(peer);
-			peer.dispose();
 
 			void this.events.dispatch(Events.PeerEvent.Removed, peer);
 			void this.transactionPoolWorker.forgetPeer(ip);

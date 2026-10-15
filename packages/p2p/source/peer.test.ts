@@ -16,7 +16,6 @@ describe<{
 
 	beforeEach((context) => {
 		context.app = new Application();
-		context.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
 
 		context.peer = context.app.resolve(Peer).init(ip, port);
