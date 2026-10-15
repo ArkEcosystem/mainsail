@@ -80,7 +80,7 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 			return true;
 		}
 
-		return Object.keys(this.getPeers()).length >= this.configuration.getRequired<number>("minimumNetworkReach");
+		return this.getPeers().length >= this.configuration.getRequired<number>("minimumNetworkReach");
 	}
 
 	public getSameSubnetPeers(peerIp: string): Contracts.P2P.Peer[] {
