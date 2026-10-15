@@ -232,6 +232,61 @@ describe<{
 		setPeer.calledOnce();
 	});
 
+	it("#validateAndAcceptPeer - should re-check the subnet cap after verification", async ({
+		processor,
+		repository,
+		peerVerifier,
+		peerDisposer,
+		events,
+	}) => {
+		// Concurrent accepts from one /24 all pass validatePeerIp() while none of them is in the repository;
+		// the others land while this one is being verified.
+		const sameSubnetPeers: object[] = [];
+		repository.getSameSubnetPeers = () => sameSubnetPeers;
+		peerVerifier.verify = async () => {
+			sameSubnetPeers.push(...Array.from({ length: 5 }, (_, index) => ({ ip: `178.165.55.${index}` })));
+			return true;
+		};
+
+		const setPeer = spy(repository, "setPeer");
+		const disposePeer = spy(peerDisposer, "disposePeer");
+		const forgetPendingPeer = spy(repository, "forgetPendingPeer");
+		const dispatch = spy(events, "dispatch");
+
+		await processor.validateAndAcceptPeer("178.165.55.55");
+
+		setPeer.neverCalled();
+		dispatch.neverCalled();
+		disposePeer.calledWith("178.165.55.55");
+		forgetPendingPeer.calledOnce();
+	});
+
+	it("#validateAndAcceptPeer - should re-accept a disposed seed from an inbound request in non-discovery mode", async ({
+		processor,
+		repository,
+		configuration,
+	}) => {
+		configuration.getOptional = (key: string, defaultValue: unknown) =>
+			key === "disableDiscovery" ? true : defaultValue;
+		const setPeer = spy(repository, "setPeer");
+
+		await processor.validateAndAcceptPeer("178.165.55.55", { seed: true });
+		setPeer.calledOnce();
+
+		// The seed was disposed meanwhile (the repository no longer has it) and connects to us again:
+		// the inbound accept carries no seed flag, and nothing else re-populates seeds (launchMode=seed).
+		await processor.validateAndAcceptPeer("178.165.55.55");
+		setPeer.calledTimes(2);
+	});
+
+	it("#validatePeerIp - should exempt a known seed from the subnet cap", async ({ processor, repository }) => {
+		await processor.validateAndAcceptPeer("178.165.55.55", { seed: true });
+		repository.getSameSubnetPeers = () => Array.from({ length: 5 }, (_, index) => ({ ip: `178.165.55.${index}` }));
+
+		assert.true(processor.validatePeerIp("178.165.55.55"));
+		assert.false(processor.validatePeerIp("178.165.55.56"));
+	});
+
 	it("#validatePeerIp - should not reject inbound requests in non-discovery mode", ({ processor, configuration }) => {
 		configuration.getOptional = (key: string, defaultValue: unknown) =>
 			key === "disableDiscovery" ? true : defaultValue;
