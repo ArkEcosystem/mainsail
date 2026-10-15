@@ -130,7 +130,6 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 				return;
 			}
 
-
 			if (this.peerDisposer.isBanned(peer.ip)) {
 				return;
 			}
