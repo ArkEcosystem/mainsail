@@ -5,6 +5,7 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import esmock from "esmock";
 
+import { errorTypes } from "./hapi-nes/constants";
 import { PeerConnector } from "./peer-connector";
 
 type Deferred = { promise: Promise<void>; resolve: () => void; reject: (error: Error) => void };
@@ -55,14 +56,25 @@ class ClientMock {
 	}
 }
 
+type DelayImpl = (timeout: number, options: { signal: AbortSignal }) => Promise<void>;
+
 let delayCalls: number[] = [];
+let delayImpl: DelayImpl = async () => {};
+
+// Like the real delay: never elapses, rejects once the signal is aborted.
+const delayUntilAborted: DelayImpl = (_, { signal }) =>
+	new Promise((_, reject) => signal.addEventListener("abort", () => reject(new Error("aborted"))));
+
+// Lets the mocked delay elapse so the client exists and its connect() is pending.
+const tick = () => new Promise((resolve) => setImmediate(resolve));
 
 const { PeerConnector: PeerConnectorProxy } = await esmock("./peer-connector", {
 	"./hapi-nes": {
 		Client: ClientMock,
 	},
-	delay: async (timeout: number) => {
+	delay: (timeout: number, options: { signal: AbortSignal }) => {
 		delayCalls.push(timeout);
+		return delayImpl(timeout, options);
 	},
 });
 
@@ -78,6 +90,7 @@ describe<{
 		ClientMock.instances = [];
 		ClientMock.connectImpl = async () => {};
 		delayCalls = [];
+		delayImpl = async () => {};
 
 		context.peerDisposer = { banPeer: () => {}, disposePeer: () => {} };
 
@@ -155,33 +168,57 @@ describe<{
 		assert.not.equal(await peerConnector.connect(peer), connection);
 	});
 
-	it("#disconnect - should terminate a connection that is still being created", async ({ peerConnector }) => {
+	it("#disconnect - should terminate a client whose connect is pending instead of waiting for it", async ({
+		peerConnector,
+	}) => {
 		const connecting = deferred();
 		ClientMock.connectImpl = () => connecting.promise;
 
 		const connectPromise = peerConnector.connect(peer);
-		const disconnectPromise = peerConnector.disconnect(peer.ip);
+		await tick();
+		assert.length(ClientMock.instances, 1);
 
-		connecting.resolve();
-		const connection = await connectPromise;
-		await disconnectPromise;
+		// Resolves although connect() has not settled: a peer behind NAT would otherwise stall shutdown.
+		const disconnected = peerConnector.disconnect(peer.ip).then(() => true);
+		assert.true(await Promise.race([disconnected, tick().then(() => false)]));
 
-		assert.equal(connection.terminated, 1);
-		assert.not.equal(await peerConnector.connect(peer), connection);
+		assert.equal(ClientMock.instances[0].terminated, 1);
+
+		connecting.reject(new Error("terminated"));
+		await assert.rejects(() => connectPromise, "terminated");
+
+		ClientMock.connectImpl = async () => {};
+		await peerConnector.connect(peer);
 		assert.length(ClientMock.instances, 2);
 	});
 
-	it("#disconnect - should ignore a creation that fails", async ({ peerConnector }) => {
-		const connecting = deferred();
-		ClientMock.connectImpl = () => connecting.promise;
+	it("#disconnect - should cancel a creation that is still delayed", async ({ peerConnector }) => {
+		delayImpl = delayUntilAborted;
 
 		const connectPromise = peerConnector.connect(peer);
-		const disconnectPromise = peerConnector.disconnect(peer.ip);
+		await tick();
 
-		connecting.reject(new Error("refused"));
+		await peerConnector.disconnect(peer.ip);
 
-		await assert.rejects(() => connectPromise, "refused");
-		await assert.resolves(() => disconnectPromise);
+		const error = await connectPromise.then(
+			() => undefined,
+			(error) => error,
+		);
+		assert.true(error.isNes);
+		assert.equal(error.type, errorTypes.DISCONNECT);
+		assert.length(ClientMock.instances, 0);
+	});
+
+	it("#disconnect - should not open a client when it races with the end of the delay", async ({ peerConnector }) => {
+		const connectPromise = peerConnector.connect(peer);
+		await peerConnector.disconnect(peer.ip); // the delay has elapsed but its continuation has not run yet
+
+		const error = await connectPromise.then(
+			() => undefined,
+			(error) => error,
+		);
+		assert.equal(error.type, errorTypes.DISCONNECT);
+		assert.length(ClientMock.instances, 0);
 	});
 
 	it("#disconnect - should do nothing for an unknown peer", async ({ peerConnector }) => {

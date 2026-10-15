@@ -16,7 +16,8 @@ const { ApiNodeVerifier: ApiNodeVerifierProxy } = await esmock(
 
 describe<{
 	verifier: ApiNodeVerifier;
-}>("ApiNodeVerifier", ({ it, assert, beforeEach }) => {
+	logger: { debugExtra: (message: string, tag: string) => void };
+}>("ApiNodeVerifier", ({ it, assert, beforeEach, spy, match }) => {
 	const helloWorld = { data: "Hello World from Public API!" };
 	const contentLength = String(JSON.stringify(helloWorld).length);
 	const apiNode = () => ({ url: "http://1.2.3.4:4003/" }) as any;
@@ -28,8 +29,10 @@ describe<{
 	beforeEach((context) => {
 		respond(200, helloWorld, ["content-length", contentLength]);
 
+		context.logger = { debugExtra: () => {} };
+
 		const app = new Application();
-		app.bind(Identifiers.P2P.Logger).toConstantValue({ debugExtra: () => {} });
+		app.bind(Identifiers.P2P.Logger).toConstantValue(context.logger);
 		app.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue({ getRequired: () => 1024 })
 			.whenTagged("plugin", "p2p");
@@ -57,10 +60,12 @@ describe<{
 		assert.true(await verifier.verify(apiNode()));
 	});
 
-	it("#verify - should reject a missing content length", async ({ verifier }) => {
+	it("#verify - should reject a missing content length", async ({ verifier, logger }) => {
+		const debugExtra = spy(logger, "debugExtra");
 		respond(200, helloWorld, ["content-type", "application/json"]);
 
 		assert.false(await verifier.verify(apiNode()));
+		debugExtra.calledWith(match("missing content length"), "p2p");
 	});
 
 	it("#verify - should reject a wrong content length", async ({ verifier }) => {

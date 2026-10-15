@@ -412,7 +412,7 @@ describe<{
 		assert.true(downloader.isDownloading());
 	});
 
-	it("#download - should process a ready successor after dropping a replayed job that is already applied", async ({
+	it("#download - should process a ready successor after a replayed job turns out to be fully applied", async ({
 		downloader,
 	}) => {
 		// Blocks above 255 need two bytes.
@@ -430,7 +430,13 @@ describe<{
 			maxValidators: 2,
 			roundHeight: number <= 400 ? 1 : 401,
 		}));
-		const process = stub(commitProcessor, "process").returnValue(Enums.Consensus.ProcessorResult.Accepted);
+		let storedBlockNumber = 0;
+		stub(stateStore, "getBlockNumber").callsFake(() => storedBlockNumber);
+		// Live consensus applies blocks 1-400 while the first batch is being processed.
+		const process = stub(commitProcessor, "process").callsFake(async () => {
+			storedBlockNumber = 400;
+			return Enums.Consensus.ProcessorResult.Accepted;
+		});
 
 		const requests: { resolve: any; reject: any }[] = [];
 		stub(communicator, "getBlocks").callsFake(
@@ -445,14 +451,13 @@ describe<{
 		await sleep(10);
 		process.neverCalled();
 
-		// Consensus applies blocks 1-400 meanwhile, then the first request fails: its replay has
-		// nothing left to fetch and must hand over to the successor that is already ready.
-		stub(stateStore, "getBlockNumber").returnValue(400);
-		stub(stateStore, "getLastBlock").returnValue({ hash: "hash400" });
-		requests[0].reject(new Error("boom"));
+		// The first peer serves only block 1, so the job is replayed after processing. By then consensus
+		// is at 400: the replay has nothing left to fetch and must hand over to the successor that is
+		// already ready instead of leaving it queued forever.
+		requests[0].resolve({ blocks: [makeWideBlock(1)] });
 		await sleep(10);
 
-		process.calledTimes(2);
+		process.calledTimes(3);
 		assert.false(downloader.isDownloading());
 	});
 

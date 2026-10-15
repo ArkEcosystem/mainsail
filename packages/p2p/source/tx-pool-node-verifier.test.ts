@@ -17,7 +17,8 @@ const { TxPoolNodeVerifier: TxPoolNodeVerifierProxy } = await esmock(
 describe<{
 	verifier: TxPoolNodeVerifier;
 	configuration: any;
-}>("TxPoolNodeVerifier", ({ it, assert, beforeEach }) => {
+	logger: { debugExtra: (message: string, tag: string) => void };
+}>("TxPoolNodeVerifier", ({ it, assert, beforeEach, spy, match }) => {
 	const helloWorld = { data: "Hello World from Transaction Pool API!" };
 	const contentLength = String(JSON.stringify(helloWorld).length);
 	const node = { url: "http://1.2.3.4:4007/" } as any;
@@ -29,9 +30,10 @@ describe<{
 	beforeEach((context) => {
 		respond(200, helloWorld, ["content-length", contentLength]);
 		context.configuration = { getRequired: () => false };
+		context.logger = { debugExtra: () => {} };
 
 		const app = new Application();
-		app.bind(Identifiers.P2P.Logger).toConstantValue({ debugExtra: () => {} });
+		app.bind(Identifiers.P2P.Logger).toConstantValue(context.logger);
 		app.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(context.configuration)
 			.whenTagged("plugin", "p2p");
@@ -49,10 +51,18 @@ describe<{
 		assert.true(await verifier.verify(node));
 	});
 
-	it("#verify - should reject a missing content length", async ({ verifier }) => {
+	it("#verify - should only match header names, not values", async ({ verifier }) => {
+		respond(200, helloWorld, ["x-echo", "content-length", "content-length", contentLength]);
+
+		assert.true(await verifier.verify(node));
+	});
+
+	it("#verify - should reject a missing content length", async ({ verifier, logger }) => {
+		const debugExtra = spy(logger, "debugExtra");
 		respond(200, helloWorld, ["content-type", "application/json"]);
 
 		assert.false(await verifier.verify(node));
+		debugExtra.calledWith(match("missing content length"), "p2p");
 	});
 
 	it("#verify - should reject a wrong content length", async ({ verifier }) => {
