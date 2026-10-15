@@ -4,7 +4,7 @@ import { Enums, Identifiers, ZeroHash } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
-import { ConsensusAbi, FunctionSigs } from "@mainsail/evm-contracts";
+import { ConsensusAbi, FunctionSigs, parseTransactionError } from "@mainsail/evm-contracts";
 import { Application } from "@mainsail/kernel";
 import { assert, ensureError } from "@mainsail/utils";
 import dayjs from "dayjs";
@@ -343,9 +343,11 @@ export class GenesisBlockGenerator {
 				value: transaction.value,
 			});
 
+			// The gas tells running out of gas apart from a revert: inside the consensus proxy both end
+			// in a revert, with an empty or misleading reason
 			if (!receipt.status) {
 				throw new Error(
-					`genesis transaction ${transaction.hash} (from ${transaction.from} to ${transaction.to}) reverted during EVM execution`,
+					`genesis transaction ${transaction.hash} (from ${transaction.from} to ${transaction.to}) reverted during EVM execution: ${parseTransactionError(transaction, receipt)} (gas used ${receipt.gasUsed} of ${transaction.gasLimit})`,
 				);
 			}
 
