@@ -144,8 +144,17 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			{},
 		);
 
+		const arkAddresses = new Set<string>();
+
 		for (const wallet of snapshot.wallets) {
 			hash.update(JSON.stringify(wallet));
+
+			// A cold and a hot copy of a wallet go to separate EVM storages, so nothing later rejects a duplicate
+			if (arkAddresses.has(wallet.arkAddress)) {
+				throw new Error(`snapshot has duplicate wallet ${wallet.arkAddress}`);
+			}
+
+			arkAddresses.add(wallet.arkAddress);
 
 			// the received balance is based on 8 decimals; convert it to WEI (18 decimals)
 			const balance = BigInt(wallet.balance) * BigInt(1e10);

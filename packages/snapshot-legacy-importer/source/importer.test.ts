@@ -413,6 +413,24 @@ describe<Context>("Importer", ({ it, assert, beforeEach, each, spy }) => {
 		]);
 	});
 
+	it("should reject a wallet that is listed twice", async (context) => {
+		const { app, evm, importer, wallet } = context;
+		const coldCopy = await coldWallet(app, "hot wallet", { balance: "50000000" });
+		const importAccountInfos = spy(evm, "importAccountInfos");
+		const importLegacyColdWallets = spy(evm, "importLegacyColdWallets");
+
+		assert.equal(coldCopy.arkAddress, wallet.arkAddress);
+
+		await assert.rejects(
+			() => prepare(context, [coldCopy, wallet]),
+			new Error(`snapshot has duplicate wallet ${wallet.arkAddress}`),
+		);
+		await assert.rejects(() => importer.import({ commitKey, timestamp: 0 }), new Error("snapshot is not prepared"));
+
+		importAccountInfos.neverCalled();
+		importLegacyColdWallets.neverCalled();
+	});
+
 	it("should reject a delegate without a public key", async (context) => {
 		const { coldWallet } = context;
 
