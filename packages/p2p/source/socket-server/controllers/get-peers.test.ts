@@ -17,7 +17,6 @@ describe<{
 
 		context.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(peerRepository);
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
-		context.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
 
 		context.controller = context.app.resolve(GetPeersController);
 	});
