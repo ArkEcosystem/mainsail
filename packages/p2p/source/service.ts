@@ -110,6 +110,7 @@ export class Service implements Contracts.P2P.Service {
 
 	async #checkApiNodes(): Promise<void> {
 		try {
+			await this.ApiNodeDiscoverer.populateApiNodesFromConfiguration();
 			await this.ApiNodeDiscoverer.discoverNewApiNodes();
 			await this.ApiNodeDiscoverer.refreshApiNodes();
 		} catch (rawError) {

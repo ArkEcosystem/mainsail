@@ -2,15 +2,10 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Providers, Services } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
 
-import {
-	RevalidateApiNodeAction,
-	ValidateAndAcceptApiNodeAction,
-	ValidateAndAcceptPeerAction,
-} from "./actions/index.js";
 import { ApiNodeDiscoverer } from "./api-node-discoverer.js";
 import { ApiNodeProcessor } from "./api-node-processor.js";
 import { ApiNodeRepository } from "./api-node-repository.js";
@@ -60,8 +55,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.#registerFactories();
 
 		this.#registerServices();
-
-		this.#registerActions();
 	}
 
 	public async boot(): Promise<void> {
@@ -211,20 +204,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		assert.defined(serverConfig);
 
 		await server.initialize("P2P Server", serverConfig);
-	}
-
-	#registerActions(): void {
-		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-			.bind("validateAndAcceptPeer", new ValidateAndAcceptPeerAction(this.app));
-
-		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-			.bind("validateAndAcceptApiNode", new ValidateAndAcceptApiNodeAction(this.app));
-
-		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-			.bind("revalidateApiNode", new RevalidateApiNodeAction(this.app));
 	}
 
 	#registerValidation(): void {

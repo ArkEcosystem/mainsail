@@ -1,25 +1,25 @@
-import { packHeadersBitmaps, unpackHeadersBitmaps } from "./headers.js";
+import { packHeadersBitmaps, unpackHeadersBitmaps, type WithUnpackedHeaders } from "./headers.js";
 import { getStatus as proto } from "./proto/protos.js";
 
 export const getStatus = {
 	request: {
-		deserialize: (payload: Buffer): proto.IGetStatusRequest => {
+		deserialize: (payload: Buffer): proto.GetStatusRequest.$Properties => {
 			const decoded = proto.GetStatusRequest.decode(payload);
 			unpackHeadersBitmaps(decoded);
 			return decoded;
 		},
-		serialize: (object: proto.IGetStatusRequest): Buffer =>
+		serialize: (object: WithUnpackedHeaders<proto.GetStatusRequest.$Properties>): Buffer =>
 			Buffer.from(proto.GetStatusRequest.encode(packHeadersBitmaps(object)).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): proto.IGetStatusResponse => {
+		deserialize: (payload: Buffer): proto.GetStatusResponse.$Properties => {
 			const decoded = proto.GetStatusResponse.toObject(proto.GetStatusResponse.decode(payload), {
 				defaults: true,
 			});
 			unpackHeadersBitmaps(decoded);
 			return decoded;
 		},
-		serialize: (object: proto.IGetStatusResponse): Buffer =>
+		serialize: (object: WithUnpackedHeaders<proto.GetStatusResponse.$Properties>): Buffer =>
 			Buffer.from(proto.GetStatusResponse.encode(packHeadersBitmaps(object)).finish()),
 	},
 };

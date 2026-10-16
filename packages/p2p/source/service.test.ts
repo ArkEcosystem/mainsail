@@ -462,6 +462,40 @@ describe<{
 		}
 	});
 
+	it("#boot - should re-populate the configured api nodes on every api node check", async ({
+		service,
+		apiNodeDiscoverer,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const previous = process.env.MAINSAIL_ENV;
+		delete process.env.MAINSAIL_ENV;
+
+		let populateCalls = 0;
+		let refreshCalls = 0;
+		apiNodeDiscoverer.populateApiNodesFromConfiguration = async () => populateCalls++;
+		apiNodeDiscoverer.refreshApiNodes = async () => refreshCalls++;
+
+		try {
+			await service.boot();
+			await fakeTimers.tickAsync(0);
+			// The check interval is 10-20 minutes, so at least one more check ran.
+			await fakeTimers.tickAsync(20 * 60 * 1000);
+
+			// A configured node that a failed revalidation removed is only re-added when every check
+			// re-populates from the configuration, not just boot.
+			assert.gte(refreshCalls, 2);
+			assert.equal(populateCalls, refreshCalls + 1);
+		} finally {
+			await service.dispose();
+
+			if (previous === undefined) {
+				delete process.env.MAINSAIL_ENV;
+			} else {
+				process.env.MAINSAIL_ENV = previous;
+			}
+		}
+	});
+
 	it("#boot - should populate api nodes and seed peers, log discovered versions and start the loops", async ({
 		service,
 		apiNodeDiscoverer,
@@ -487,7 +521,8 @@ describe<{
 			await service.boot();
 			await fakeTimers.tickAsync(0);
 
-			populateApiNodes.calledOnce();
+			// Once at boot and once more by the api node check loop, which starts right away.
+			populateApiNodes.calledTimes(2);
 			populateSeedPeers.calledOnce();
 			discoverNewApiNodes.calledOnce();
 			info.calledWith("Discovered 2 peers with v0.0.1.", "p2p");

@@ -48,7 +48,7 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 			maxBytes,
 		);
 
-		this.logger.info(
+		this.logger.debug(
 			`${mapAddr(request.info.remoteAddress)} has downloaded ${pluralize(
 				"block",
 				blocks.length,

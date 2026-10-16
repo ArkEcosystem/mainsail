@@ -14,7 +14,6 @@ describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ it, assert, beforeEach, stub }) => {
-	const triggerService = { bind: () => {} };
 	const validator = { addFormat: () => {}, addKeyword: () => {} };
 	const server = { boot: async () => {}, dispose: async () => {}, initialize: async () => {} };
 	const statisticService = { boot: async () => {} };
@@ -25,7 +24,6 @@ describe<{
 	beforeEach((context) => {
 		context.app = new Application();
 
-		context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
 		context.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
 
@@ -93,13 +91,11 @@ describe<{
 }>("ServiceProvider.configSchema", ({ it, assert, beforeEach }) => {
 	const importDefaults = async () => (await importFresh<any>("../distribution/defaults.js")).defaults;
 
-	const triggerService = { bind: () => {} };
 	const validator = { addFormat: () => {} };
 
 	beforeEach((context) => {
 		context.app = new Application();
 
-		context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
 			getMilestone: () => ({
 				roundValidators: 2,
