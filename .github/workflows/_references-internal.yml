@@ -15,7 +15,7 @@ permissions:
 
 jobs:
     circuit-breaker:
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         outputs:
             is_references_fix: ${{ steps.detect.outputs.is_references_fix }}
         steps:
@@ -37,7 +37,7 @@ jobs:
     source:
         needs: circuit-breaker
         if: ${{ needs.circuit-breaker.outputs.is_references_fix != 'true' }}
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         outputs:
             did_commit: ${{ steps.commit.outputs.changes_detected }}
 
