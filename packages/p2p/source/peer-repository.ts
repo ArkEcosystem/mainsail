@@ -93,7 +93,6 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 		});
 	}
 
-	// TODO: canonicalise peer IPs before they reach the repository.
 	#networkAddress(ip: string): string {
 		return ipaddr.IPv4.networkAddressFromCIDR(`${ip}/24`).toString();
 	}
