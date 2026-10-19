@@ -12,7 +12,9 @@ export function normalizeUrl(urlString: string): string {
 		throw new InvalidApiNodeUrlError(urlString);
 	}
 
-	// Trim search parameters and the fragment
+	// Trim credentials, search parameters and the fragment
+	url.username = "";
+	url.password = "";
 	url.search = "";
 	url.hash = "";
 
