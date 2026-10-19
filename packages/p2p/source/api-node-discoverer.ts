@@ -35,7 +35,15 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 		try {
 			const { apiNodes } = await this.communicator.getApiNodes(peer);
 
-			for (const apiNode of apiNodes) {
+			for (const { url } of apiNodes) {
+				let apiNode: Contracts.P2P.ApiNode;
+				try {
+					apiNode = this.ApiNodeFactory(normalizeUrl(url));
+				} catch {
+					this.logger.debug(`Ignoring invalid API node url ${url} from ${peer.ip}`, "p2p");
+					continue;
+				}
+
 				await this.apiNodeProcessor.validateAndAcceptApiNode(apiNode, {});
 			}
 		} catch (rawError) {
