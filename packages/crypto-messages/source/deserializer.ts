@@ -29,7 +29,7 @@ export class Deserializer implements Contracts.Crypto.MessageDeserializer {
 			}
 		} catch (rawError) {
 			const error = ensureError(rawError);
-			throw new MessageDeserializationError(error instanceof Error ? error.message : "");
+			throw new MessageDeserializationError(error.message);
 		}
 
 		throw new MessageDeserializationError(`${buffer.getRemainderLength()} bytes remaining`);

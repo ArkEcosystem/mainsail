@@ -9,15 +9,15 @@ import { BasePlugin } from "./base-plugin.js";
 
 @injectable()
 export class ValidateIpPlugin extends BasePlugin {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.Peer.Processor)
 	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
+
+	@inject(Identifiers.P2P.Peer.Repository)
+	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
 	public register(server: Server): void {
 		if (this.configuration.getRequired("developmentMode.enabled")) {
@@ -30,11 +30,15 @@ export class ValidateIpPlugin extends BasePlugin {
 				const ip = getPeerIp(peerRequest);
 
 				if (this.peerDisposer.isBanned(ip)) {
-					return this.banAndReturnBadRequest(peerRequest, h, "Validation failed (peer is bannned)");
+					return this.banAndReturnBadRequest(peerRequest, "Validation failed (peer is bannned)");
+				}
+
+				if (this.peerRepository.hasPeer(ip)) {
+					return h.continue;
 				}
 
 				if (!this.peerProcessor.validatePeerIp(ip)) {
-					return this.disposeAndReturnBadRequest(peerRequest, h, "Validation failed (bad ip)");
+					return this.disposeAndReturnBadRequest(peerRequest, "Validation failed (bad ip)");
 				}
 
 				return h.continue;

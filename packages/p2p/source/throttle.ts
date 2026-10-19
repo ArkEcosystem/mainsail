@@ -2,7 +2,6 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import delay from "delay";
 
 import { RateLimiter } from "./rate-limiter.js";
 import { buildRateLimiter } from "./utils/index.js";
@@ -55,23 +54,35 @@ export class Throttle {
 	}
 
 	async #process(peer: Contracts.P2P.Peer, event: string, resolve: () => void): Promise<void> {
-		if (await this.#outgoingRateLimiter.hasExceededRateLimitNoConsume(peer.ip, event)) {
+		const retryAfter = await this.#outgoingRateLimiter.msBeforeNext(peer.ip, event);
+
+		if (retryAfter > 0) {
 			this.logger.debug(
 				`Throttling outgoing requests to ${peer.ip}/${event} to avoid triggering their rate limit`,
 				"p2p",
 			);
 
-			await delay(100);
+			// Wait outside the queue so a throttled peer or endpoint never
+			// delays sends to anybody else; requeue once the budget has
+			// actually refilled instead of checking again on a fixed interval.
+			setTimeout(() => {
+				// Mirror the queue's own stop() semantics: pending work is dropped on shutdown.
+				if (!this.#queue.isStarted()) {
+					return;
+				}
 
-			void this.#queue.push({
-				handle: async () => {
-					await this.#process(peer, event, resolve);
-				},
-			});
-		} else {
-			await this.#outgoingRateLimiter.consume(peer.ip, event);
+				void this.#queue.push({
+					handle: async () => {
+						await this.#process(peer, event, resolve);
+					},
+				});
+			}, retryAfter);
 
-			resolve();
+			return;
 		}
+
+		await this.#outgoingRateLimiter.consume(peer.ip, event);
+
+		resolve();
 	}
 }

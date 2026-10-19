@@ -21,6 +21,7 @@ import type {
 	TransactionSimulateContext,
 	TransactionViewContext,
 	UpdateRewardsAndVotesContext,
+	UpdateValidatorRegistrationFeeContext,
 	ViewResult,
 } from "./evm.js";
 
@@ -31,6 +32,7 @@ export interface Instance extends CommitHandler {
 	simulate(txContext: TransactionSimulateContext): Promise<SimulateResult>;
 	view(viewContext: TransactionViewContext): Promise<ViewResult>;
 	initializeGenesis(commit: GenesisInfo): Promise<void>;
+	seedGenesisAccount(): Promise<void>;
 	getAccountInfo(address: string, height?: bigint): Promise<AccountInfo>;
 	getAccountInfoExtended(address: string, legacyAddress?: string): Promise<AccountInfoExtended>;
 	importAccountInfos(infos: AccountInfoExtended[]): Promise<void>;
@@ -43,6 +45,7 @@ export interface Instance extends CommitHandler {
 	getReceiptsByBlockRange(fromBlockNumber: bigint, toBlockNumber: bigint): Promise<GetReceiptsResult>;
 	getReceipt(height: bigint, txHash: string): Promise<GetReceiptResult>;
 	calculateRoundValidators(context: CalculateRoundValidatorsContext): Promise<void>;
+	updateValidatorRegistrationFee(context: UpdateValidatorRegistrationFeeContext): Promise<void>;
 	updateRewardsAndVotes(context: UpdateRewardsAndVotesContext): Promise<void>;
 	logsBloom(commitKey: CommitKey): Promise<string>;
 	stateRoot(commitKey: CommitKey, currentHash: string): Promise<string>;

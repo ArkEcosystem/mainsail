@@ -1,4 +1,5 @@
 import { Console } from "@mainsail/cli";
+import { Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
 
 import { Command } from "./version";
@@ -11,9 +12,10 @@ describe<{
 	});
 
 	it("should log package version", async ({ cli }) => {
-		const spyConsoleLog = spy(console, "log");
+		const spyOnInfo = spy(cli.app.get(Identifiers.Cli.Service.Logger), "info");
 
 		await cli.execute(Command);
-		spyConsoleLog.calledWith(cli.pkg.version);
+
+		spyOnInfo.calledWith(cli.pkg.version);
 	});
 });

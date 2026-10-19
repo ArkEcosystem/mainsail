@@ -3,6 +3,8 @@ import type { Contracts } from "@mainsail/contracts";
 import { injectable } from "@mainsail/container";
 import { secp256k1 } from "bcrypto";
 
+const RECOVERY_IDS = new Set([0, 1]);
+
 @injectable()
 export class Signature implements Contracts.Crypto.SignatureEcdsa {
 	public async signRecoverable(message: Buffer, privateKey: Buffer): Promise<Contracts.Crypto.EcdsaSignature> {
@@ -20,12 +22,22 @@ export class Signature implements Contracts.Crypto.SignatureEcdsa {
 		message: Buffer,
 		publicKey: Buffer,
 	): Promise<boolean> {
-		const signatureRS = Buffer.from(signature.r + signature.s, "hex");
-		if (!secp256k1.isLowS(signatureRS)) {
+		if (!this.isLowS(signature) || !RECOVERY_IDS.has(signature.v)) {
 			return false;
 		}
 
-		return secp256k1.verify(message, signatureRS, publicKey);
+		const recovered = secp256k1.recover(
+			message,
+			Buffer.from(signature.r + signature.s, "hex"),
+			signature.v,
+			publicKey.length === 33,
+		);
+
+		return recovered !== null && recovered.equals(publicKey);
+	}
+
+	public isLowS(signature: Contracts.Crypto.EcdsaSignature): boolean {
+		return secp256k1.isLowS(Buffer.from(signature.r + signature.s, "hex"));
 	}
 
 	public recoverPublicKey(message: Buffer, signature: Contracts.Crypto.EcdsaSignature): string {

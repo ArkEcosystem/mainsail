@@ -90,38 +90,42 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		const { blockTime } = this.configuration.getMilestone().timeouts;
 		const isSyncing = block.timestamp < nowMs - blockTime * 3;
 
-		await this.ipcSubprocess.sendRequest(
-			"commit",
-			unit.blockNumber,
-			[...sendersAddresses.keys()],
-			block.gasUsed,
-			isSyncing,
-		);
+		await this.#send("commit", unit.blockNumber, [...sendersAddresses.keys()], block.gasUsed, isSyncing);
 	}
 
 	public async start(blockNumber: number): Promise<void> {
-		await this.ipcSubprocess.sendRequest("start", blockNumber);
+		await this.#send("start", blockNumber);
 	}
 
 	public async getTransactions(
 		options: Contracts.TransactionPool.GetBatchOptions,
 	): Promise<Contracts.TransactionPool.GetBatchResult> {
-		return this.ipcSubprocess.sendRequest("getTransactions", options);
+		return this.#send("getTransactions", options);
 	}
 
 	public async removeTransaction(address: string, id: string): Promise<void> {
-		await this.ipcSubprocess.sendRequest("removeTransaction", address, id);
+		await this.#send("removeTransaction", address, id);
 	}
 
 	public async setPeer(ip: string): Promise<void> {
-		await this.ipcSubprocess.sendRequest("setPeer", ip);
+		await this.#send("setPeer", ip);
 	}
 
 	public async forgetPeer(ip: string): Promise<void> {
-		await this.ipcSubprocess.sendRequest("forgetPeer", ip);
+		await this.#send("forgetPeer", ip);
 	}
 
 	public async reloadWebhooks(): Promise<void> {
-		await this.ipcSubprocess.sendRequest("reloadWebhooks");
+		await this.#send("reloadWebhooks");
+	}
+
+	async #send<T>(method: string, ...arguments_: unknown[]): Promise<T> {
+		if (!this.#bootPromise) {
+			throw new Error("worker request issued before boot()");
+		}
+
+		await this.#bootPromise;
+
+		return this.ipcSubprocess.sendRequest<T>(method, ...arguments_);
 	}
 }

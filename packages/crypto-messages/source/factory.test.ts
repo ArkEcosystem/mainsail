@@ -163,4 +163,22 @@ describe<{
 			"Message deserialization failed: Read over buffer boundary.",
 		);
 	});
+
+	it("#makeMessageFromBytes - should throw if the deserialized type is out of range", async ({ factory }) => {
+		// Structurally valid bytes, but the type byte (index 0) is neither Prevote(1) nor Precommit(2).
+		// The deserializer reads it as a raw uint8; only the schema rejects it.
+		const bytes = Buffer.from(serializedPrevote, "hex");
+		bytes[0] = 3;
+
+		await assert.rejects(() => factory.makeMessageFromBytes(bytes), MessageSchemaError);
+	});
+
+	it("#makeMessageFromBytes - should throw if validatorIndex exceeds roundValidators", async ({ factory }) => {
+		// validatorIndex byte is at index 42 (type[1] + blockNumber[4] + round[4] + presence[1] + blockHash[32]).
+		// roundValidators is 53 at blockNumber 1, so index 53 is out of range.
+		const bytes = Buffer.from(serializedPrevote, "hex");
+		bytes[42] = 53;
+
+		await assert.rejects(() => factory.makeMessageFromBytes(bytes), MessageSchemaError);
+	});
 });

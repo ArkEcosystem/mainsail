@@ -1,0 +1,200 @@
+{
+	"abi": [
+		{
+			"type": "function",
+			"name": "emitConsensusEvents",
+			"inputs": [
+				{ "name": "voter", "type": "address", "internalType": "address" },
+				{ "name": "validator", "type": "address", "internalType": "address" },
+				{ "name": "blsPublicKey", "type": "bytes", "internalType": "bytes" }
+			],
+			"outputs": [],
+			"stateMutability": "nonpayable"
+		},
+		{
+			"type": "function",
+			"name": "emitUsernameEvents",
+			"inputs": [{ "name": "addr", "type": "address", "internalType": "address" }],
+			"outputs": [],
+			"stateMutability": "nonpayable"
+		},
+		{
+			"type": "event",
+			"name": "Unvoted",
+			"inputs": [
+				{ "name": "voter", "type": "address", "indexed": false, "internalType": "address" },
+				{ "name": "validator", "type": "address", "indexed": false, "internalType": "address" }
+			],
+			"anonymous": false
+		},
+		{
+			"type": "event",
+			"name": "UsernameRegistered",
+			"inputs": [
+				{ "name": "addr", "type": "address", "indexed": false, "internalType": "address" },
+				{ "name": "username", "type": "string", "indexed": false, "internalType": "string" },
+				{ "name": "previousUsername", "type": "string", "indexed": false, "internalType": "string" }
+			],
+			"anonymous": false
+		},
+		{
+			"type": "event",
+			"name": "UsernameResigned",
+			"inputs": [
+				{ "name": "addr", "type": "address", "indexed": false, "internalType": "address" },
+				{ "name": "username", "type": "string", "indexed": false, "internalType": "string" }
+			],
+			"anonymous": false
+		},
+		{
+			"type": "event",
+			"name": "ValidatorRegistered",
+			"inputs": [
+				{ "name": "addr", "type": "address", "indexed": false, "internalType": "address" },
+				{ "name": "blsPublicKey", "type": "bytes", "indexed": false, "internalType": "bytes" }
+			],
+			"anonymous": false
+		},
+		{
+			"type": "event",
+			"name": "ValidatorResigned",
+			"inputs": [{ "name": "addr", "type": "address", "indexed": false, "internalType": "address" }],
+			"anonymous": false
+		},
+		{
+			"type": "event",
+			"name": "ValidatorUpdated",
+			"inputs": [
+				{ "name": "addr", "type": "address", "indexed": false, "internalType": "address" },
+				{ "name": "blsPublicKey", "type": "bytes", "indexed": false, "internalType": "bytes" }
+			],
+			"anonymous": false
+		},
+		{
+			"type": "event",
+			"name": "Voted",
+			"inputs": [
+				{ "name": "voter", "type": "address", "indexed": false, "internalType": "address" },
+				{ "name": "validator", "type": "address", "indexed": false, "internalType": "address" }
+			],
+			"anonymous": false
+		}
+	],
+	"bytecode": {
+		"object": "0x6080604052348015600e575f5ffd5b5061061c8061001c5f395ff3fe608060405234801561000f575f5ffd5b5060043610610034575f3560e01c8063996ee84f14610038578063f305bc1e14610054575b5f5ffd5b610052600480360381019061004d9190610300565b610070565b005b61006e60048036038101906100699190610371565b610195565b005b7fce0c7a2a940807f7dc2ce7a615c2532e915e6c0ac9a08bc4ed9d515a710a53e284846040516100a19291906103ab565b60405180910390a17f6572af8bf9a0a86efb88dcc30011626a15c9c4603503aa4466a3f87a1867deef84846040516100da9291906103ab565b60405180910390a17f61809fa303a3a57f4d70552f533f3e0b003173d424590cd4bb22a2afe000990c8483836040516101159392919061042c565b60405180910390a17f24250fc1ec78a1405ddd4cc8b75964858af228d05faa8d4bc1302966d8a541178460405161014c919061045c565b60405180910390a17f4af0b5984c9f88659d661fb64dcb63a5b946809cf1c78a8c6e0f6ef93c9170328483836040516101879392919061042c565b60405180910390a150505050565b7fdc393f1f31882fea068a12acfed8ed6e9f7e88a6ed213355b5afb78ad76a7045816040516101c491906104f2565b60405180910390a17fdc393f1f31882fea068a12acfed8ed6e9f7e88a6ed213355b5afb78ad76a7045816040516101fb919061057b565b60405180910390a17ff5a79d28213d53340730f0c5a952f4809e33db20cbe21a2a0b5fa7d77fa107b38160405161023291906105ba565b60405180910390a150565b5f5ffd5b5f5ffd5b5f73ffffffffffffffffffffffffffffffffffffffff82169050919050565b5f61026e82610245565b9050919050565b61027e81610264565b8114610288575f5ffd5b50565b5f8135905061029981610275565b92915050565b5f5ffd5b5f5ffd5b5f5ffd5b5f5f83601f8401126102c0576102bf61029f565b5b8235905067ffffffffffffffff8111156102dd576102dc6102a3565b5b6020830191508360018202830111156102f9576102f86102a7565b5b9250929050565b5f5f5f5f606085870312156103185761031761023d565b5b5f6103258782880161028b565b94505060206103368782880161028b565b935050604085013567ffffffffffffffff81111561035757610356610241565b5b610363878288016102ab565b925092505092959194509250565b5f602082840312156103865761038561023d565b5b5f6103938482850161028b565b91505092915050565b6103a581610264565b82525050565b5f6040820190506103be5f83018561039c565b6103cb602083018461039c565b9392505050565b5f82825260208201905092915050565b828183375f83830152505050565b5f601f19601f8301169050919050565b5f61040b83856103d2565b93506104188385846103e2565b610421836103f0565b840190509392505050565b5f60408201905061043f5f83018661039c565b8181036020830152610452818486610400565b9050949350505050565b5f60208201905061046f5f83018461039c565b92915050565b5f82825260208201905092915050565b7f616c6963650000000000000000000000000000000000000000000000000000005f82015250565b5f6104b9600583610475565b91506104c482610485565b602082019050919050565b50565b5f6104dd5f83610475565b91506104e8826104cf565b5f82019050919050565b5f6060820190506105055f83018461039c565b8181036020830152610516816104ad565b90508181036040830152610529816104d2565b905092915050565b7f626f6200000000000000000000000000000000000000000000000000000000005f82015250565b5f610565600383610475565b915061057082610531565b602082019050919050565b5f60608201905061058e5f83018461039c565b818103602083015261059f81610559565b905081810360408301526105b2816104ad565b905092915050565b5f6040820190506105cd5f83018461039c565b81810360208301526105de81610559565b90509291505056fea26469706673582212206ab90ba0af9389d48c6a85c9a0b00b51bc9f3a5ded285d2cdcbff1ecfb86f51664736f6c63430008240033",
+		"sourceMap": "260:1007:0:-:0;;;;;;;;;;;;;;;;;;;",
+		"linkReferences": {}
+	},
+	"methodIdentifiers": {
+		"emitConsensusEvents(address,address,bytes)": "996ee84f",
+		"emitUsernameEvents(address)": "f305bc1e"
+	},
+	"rawMetadata": "{\"compiler\":{\"version\":\"0.8.36+commit.8a079791\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"voter\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"validator\",\"type\":\"address\"}],\"name\":\"Unvoted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"username\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"previousUsername\",\"type\":\"string\"}],\"name\":\"UsernameRegistered\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"string\",\"name\":\"username\",\"type\":\"string\"}],\"name\":\"UsernameResigned\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"blsPublicKey\",\"type\":\"bytes\"}],\"name\":\"ValidatorRegistered\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"ValidatorResigned\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"bytes\",\"name\":\"blsPublicKey\",\"type\":\"bytes\"}],\"name\":\"ValidatorUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"voter\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"validator\",\"type\":\"address\"}],\"name\":\"Voted\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"voter\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"validator\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"blsPublicKey\",\"type\":\"bytes\"}],\"name\":\"emitConsensusEvents\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"}],\"name\":\"emitUsernameEvents\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"notice\":\"Test fixture emitting the exact event signatures of ConsensusV1 and UsernamesV1, so the Rust-side commit event decoding can be exercised without deploying the full consensus system.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"src/MainsailContractEvents.sol\":\"MainsailContractEvents\"},\"evmVersion\":\"osaka\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"src/MainsailContractEvents.sol\":{\"keccak256\":\"0xdb8d8d51861f5d165a6784a5c82bf29d45eca18eecd8819839a231d6ab863dfe\",\"license\":\"GPL-3.0-only\",\"urls\":[\"bzz-raw://869722dfdea82c07465d0aa00044f90b0c5bffc7e05dd5bc738b0a2fd4016be9\",\"dweb:/ipfs/QmaEtoFDB6Bxvjh3uiv322ZsBDUAEHAP4pGnCWDnPA3bWr\"]}},\"version\":1}",
+	"metadata": {
+		"compiler": { "version": "0.8.36+commit.8a079791" },
+		"language": "Solidity",
+		"output": {
+			"abi": [
+				{
+					"inputs": [
+						{ "internalType": "address", "name": "voter", "type": "address", "indexed": false },
+						{ "internalType": "address", "name": "validator", "type": "address", "indexed": false }
+					],
+					"type": "event",
+					"name": "Unvoted",
+					"anonymous": false
+				},
+				{
+					"inputs": [
+						{ "internalType": "address", "name": "addr", "type": "address", "indexed": false },
+						{ "internalType": "string", "name": "username", "type": "string", "indexed": false },
+						{ "internalType": "string", "name": "previousUsername", "type": "string", "indexed": false }
+					],
+					"type": "event",
+					"name": "UsernameRegistered",
+					"anonymous": false
+				},
+				{
+					"inputs": [
+						{ "internalType": "address", "name": "addr", "type": "address", "indexed": false },
+						{ "internalType": "string", "name": "username", "type": "string", "indexed": false }
+					],
+					"type": "event",
+					"name": "UsernameResigned",
+					"anonymous": false
+				},
+				{
+					"inputs": [
+						{ "internalType": "address", "name": "addr", "type": "address", "indexed": false },
+						{ "internalType": "bytes", "name": "blsPublicKey", "type": "bytes", "indexed": false }
+					],
+					"type": "event",
+					"name": "ValidatorRegistered",
+					"anonymous": false
+				},
+				{
+					"inputs": [{ "internalType": "address", "name": "addr", "type": "address", "indexed": false }],
+					"type": "event",
+					"name": "ValidatorResigned",
+					"anonymous": false
+				},
+				{
+					"inputs": [
+						{ "internalType": "address", "name": "addr", "type": "address", "indexed": false },
+						{ "internalType": "bytes", "name": "blsPublicKey", "type": "bytes", "indexed": false }
+					],
+					"type": "event",
+					"name": "ValidatorUpdated",
+					"anonymous": false
+				},
+				{
+					"inputs": [
+						{ "internalType": "address", "name": "voter", "type": "address", "indexed": false },
+						{ "internalType": "address", "name": "validator", "type": "address", "indexed": false }
+					],
+					"type": "event",
+					"name": "Voted",
+					"anonymous": false
+				},
+				{
+					"inputs": [
+						{ "internalType": "address", "name": "voter", "type": "address" },
+						{ "internalType": "address", "name": "validator", "type": "address" },
+						{ "internalType": "bytes", "name": "blsPublicKey", "type": "bytes" }
+					],
+					"stateMutability": "nonpayable",
+					"type": "function",
+					"name": "emitConsensusEvents"
+				},
+				{
+					"inputs": [{ "internalType": "address", "name": "addr", "type": "address" }],
+					"stateMutability": "nonpayable",
+					"type": "function",
+					"name": "emitUsernameEvents"
+				}
+			],
+			"devdoc": { "kind": "dev", "methods": {}, "version": 1 },
+			"userdoc": { "kind": "user", "methods": {}, "version": 1 }
+		},
+		"settings": {
+			"remappings": [],
+			"optimizer": { "enabled": false, "runs": 200 },
+			"metadata": { "bytecodeHash": "ipfs" },
+			"compilationTarget": { "src/MainsailContractEvents.sol": "MainsailContractEvents" },
+			"evmVersion": "osaka",
+			"libraries": {}
+		},
+		"sources": {
+			"src/MainsailContractEvents.sol": {
+				"keccak256": "0xdb8d8d51861f5d165a6784a5c82bf29d45eca18eecd8819839a231d6ab863dfe",
+				"urls": [
+					"bzz-raw://869722dfdea82c07465d0aa00044f90b0c5bffc7e05dd5bc738b0a2fd4016be9",
+					"dweb:/ipfs/QmaEtoFDB6Bxvjh3uiv322ZsBDUAEHAP4pGnCWDnPA3bWr"
+				],
+				"license": "GPL-3.0-only"
+			}
+		},
+		"version": 1
+	},
+	"id": 0
+}

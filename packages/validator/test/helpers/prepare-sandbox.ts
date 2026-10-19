@@ -15,17 +15,12 @@ import { ServiceProvider as CoreCryptoSignatureBls } from "@mainsail/crypto-sign
 import { ServiceProvider as CoreCryptoSignatureEcdsa } from "@mainsail/crypto-signature-ecdsa";
 import { ServiceProvider as CoreCryptoTransaction } from "@mainsail/crypto-transaction";
 import { ServiceProvider as CoreCryptoValidation } from "@mainsail/crypto-validation";
-import { ServiceProvider as CoreCryptoWif } from "@mainsail/crypto-wif";
-import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
 import { ServiceProvider as Forger } from "@mainsail/forger";
 import { Application } from "@mainsail/kernel";
 import { ServiceProvider as CoreSerializer } from "@mainsail/serializer";
-import { ServiceProvider as CoreTransactions } from "@mainsail/transactions";
 import { ServiceProvider as CoreValidation } from "@mainsail/validation";
 
 import crypto from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
-import { ServiceProvider as CoreEvents } from "../../../kernel/source/services/events/index.js";
-import { ServiceProvider as CoreTriggers } from "../../../kernel/source/services/triggers/index.js";
 
 export const prepareSandbox = async (context: { app?: Application }): Promise<void> => {
 	context.app = new Application();
@@ -33,9 +28,6 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	await context.app.resolve(CoreValidation).register();
 	await context.app.resolve(CryptoConfigServiceProvider).register();
 	context.app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).setHeight(1);
-
-	await context.app.resolve(CoreTriggers).register();
-	await context.app.resolve(CoreEvents).register();
 
 	await context.app.resolve(CoreSerializer).register();
 	await context.app.resolve(BlockchainUtilities).register();
@@ -47,7 +39,6 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	await context.app.resolve(CoreCryptoAddressKeccak256).register();
 	await context.app.resolve(CoreCryptoAddressBase58).register();
 	await context.app.resolve(CoreCryptoValidation).register();
-	await context.app.resolve(CoreCryptoWif).register();
 	await context.app.resolve(CoreCryptoSignatureBls).register();
 	await context.app.resolve(CoreCryptoKeyPairBls).register();
 
@@ -55,7 +46,6 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({ getRequired: () => 0.75 }); // txCollatorFactor
 
 	await context.app.resolve(CoreCryptoTransaction).register();
-	await context.app.resolve(CoreTransactions).register();
 	await context.app.resolve(CoreCryptoBlock).register();
 	await context.app.resolve(CoreCryptoProposal).register();
 	await context.app.resolve(CoreCryptoMessages).register();
@@ -90,11 +80,7 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 	};
 	context.app.bind(Identifiers.Evm.Instance).toConstantValue(evm).whenTagged("instance", "validator");
 
-	context.app.rebind(Identifiers.Transaction.Handler).toConstantValue({
-		apply: async () => ({ gasRefunded: 0n, gasUsed: 0n, logs: [], status: 1 }),
-	});
-
-	context.app.bind(EvmConsensusIdentifiers.Internal.GenesisInfo).toConstantValue({});
+	context.app.bind(Identifiers.EvmConsensus.GenesisInfo).toConstantValue({});
 
 	context.app.bind(Identifiers.State.Store).toConstantValue({
 		getGenesisCommit: () => ({
@@ -108,6 +94,7 @@ export const prepareSandbox = async (context: { app?: Application }): Promise<vo
 			number: 1,
 			parentHash: "0000000000000000000000000000000000000000000000000000000000000000",
 			stateRoot: "0000000000000000000000000000000000000000000000000000000000000000",
+			randaoReveal: "0".repeat(192),
 		}),
 	});
 

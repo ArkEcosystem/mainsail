@@ -31,7 +31,7 @@ export class Command extends Commands.Command {
 
 	public async execute(): Promise<void> {
 		this.environment.updateVariables(this.app.getCorePath("config", ".env"), {
-			[this.getFlag("key") as string]: this.getFlag("value"),
+			[this.getFlag<string>("key")]: this.getFlag("value"),
 		});
 	}
 }

@@ -8,7 +8,7 @@ import {
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
 import { setup, shutdown } from "./setup.js";
 import { Snapshot, takeSnapshot } from "./snapshot.js";
-import { addTransactionsToPool, getWallets, waitBlock, getAddressByPublicKey } from "./utilities.js";
+import { addTransactionsToPool, getWallets, getAddressByPublicKey } from "./utilities.js";
 import { getCreateAddress, Hex, parseEther } from "viem";
 
 describe<{
@@ -41,7 +41,7 @@ describe<{
 		assert.empty(tokenHolders);
 
 		await addTransactionsToPool(context, [deployTx]);
-		await waitBlock(context, 2);
+		await Utils.waitBlock(context, 5);
 
 		const erc20Address = getCreateAddress({
 			from: deployTx.from as Hex,
@@ -70,7 +70,7 @@ describe<{
 		});
 
 		await addTransactionsToPool(context, [transferTx]);
-		await waitBlock(context, 2);
+		await Utils.waitBlock(context, 2);
 
 		const balanceAfter = await EvmCalls.getErc20BalanceOf(context, erc20Address, randomWallet.address);
 		assert.equal(balanceAfter, transferAmount);
@@ -97,7 +97,7 @@ describe<{
 		assert.empty(approvals);
 
 		await addTransactionsToPool(context, [deployTx]);
-		await waitBlock(context, 2);
+		await Utils.waitBlock(context, 5);
 
 		const erc20Address = getCreateAddress({
 			from: deployTx.from as Hex,
@@ -113,7 +113,7 @@ describe<{
 		});
 
 		await addTransactionsToPool(context, [transferTx]);
-		await waitBlock(context, 2);
+		await Utils.waitBlock(context, 2);
 
 		approvals = await getAllTokenApprovals(context);
 		assert.length(approvals, 1);

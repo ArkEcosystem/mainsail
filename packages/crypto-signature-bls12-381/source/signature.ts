@@ -12,11 +12,7 @@ export class Signature implements Contracts.Crypto.SignatureBls {
 
 	public async verify(signature: Buffer, message: Buffer, publicKey: Buffer): Promise<boolean> {
 		const bls = await getBls();
-		return bls.verify(
-			bls.PublicKey.fromBytes(publicKey).toBytes(),
-			message,
-			bls.Signature.fromBytes(signature).toBytes(),
-		);
+		return bls.verify(publicKey, message, signature);
 	}
 
 	public async aggregate(signatures: Buffer[]): Promise<string> {

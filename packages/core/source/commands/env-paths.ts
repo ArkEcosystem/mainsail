@@ -13,7 +13,7 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		this.components.table(["Type", "Path"], (table) => {
 			for (const [type, path] of Object.entries(
-				this.app.get<Contracts.Cli.Flags>(Identifiers.Cli.Paths.Application),
+				this.app.get<Contracts.Cli.Paths>(Identifiers.Cli.Paths.Application),
 			)) {
 				table.push([type, path]);
 			}

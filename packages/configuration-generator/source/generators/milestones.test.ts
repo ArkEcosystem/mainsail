@@ -40,7 +40,7 @@ describe<{
 						version: 1,
 					},
 					epoch: date.toISOString().slice(0, 11) + "00:00:00.000Z",
-					evmSpec: Enums.Evm.SpecId.SHANGHAI,
+					evmSpec: Enums.Evm.SpecId.OSAKA,
 					gas: {
 						maximumGasLimit: 5_000_000,
 						maximumGasPrice: 10_000 * 1e9,
@@ -60,14 +60,40 @@ describe<{
 						stageTimeoutIncrease: 2000,
 						tolerance: 100,
 					},
-					validatorRegistrationFee: "250",
+					validatorRegistrationFee: "0",
 				},
 				{
 					roundValidators: 53,
 					height: 1,
+					validatorRegistrationFee: "250",
 				},
 			],
 		);
+	});
+
+	it("#setInitial - should use explicitly provided timeouts", ({ generator }) => {
+		const timeouts = {
+			blockPrepareTime: 1,
+			blockTime: 2,
+			stageTimeout: 3,
+			stageTimeoutIncrease: 4,
+			tolerance: 5,
+		};
+
+		const [initial] = generator
+			.setInitial({
+				blockTime: 8000,
+				epoch: new Date(),
+				initialBlockNumber: 0,
+				maxBlockGasLimit: 1000,
+				maxBlockPayload: 2000,
+				timeouts,
+				validators: 53,
+				validatorRegistrationFee: "250",
+			})
+			.generate();
+
+		assert.equal(initial.timeouts, timeouts);
 	});
 
 	it("#setReward - should set reward", ({ generator }) => {

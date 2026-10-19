@@ -1,9 +1,8 @@
-import type { Contracts } from "@mainsail/contracts";
-
 import { EnvironmentVariables, Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
+import { type Contracts } from "@mainsail/contracts";
 import { PoolError, TransactionAlreadyInPoolError, TransactionPoolFullError } from "@mainsail/exceptions";
-import { ensureError, Lock, randomNumber } from "@mainsail/utils";
+import { assert, ensureError, Lock, randomNumber } from "@mainsail/utils";
 
 @injectable()
 export class Service implements Contracts.TransactionPool.Service {
@@ -45,9 +44,21 @@ export class Service implements Contracts.TransactionPool.Service {
 	readonly #lock = new Lock();
 	readonly #txRebroadcastCooldowns = new Map<string, number>();
 
+	readonly #removalListener: Contracts.Kernel.EventListener = {
+		handle: async ({ data }): Promise<void> => {
+			const { hash } = data as Contracts.Crypto.TransactionData;
+			assert.string(hash);
+
+			this.#txRebroadcastCooldowns.delete(hash);
+		},
+	};
+
 	#disposed = false;
 
 	public async boot(): Promise<void> {
+		this.events.listen(Events.TransactionEvent.RemovedFromPool, this.#removalListener);
+		this.events.listen(Events.TransactionEvent.Expired, this.#removalListener);
+
 		if (
 			process.env[EnvironmentVariables.MAINSAIL_RESET_DATABASE] ||
 			process.env[EnvironmentVariables.MAINSAIL_RESET_POOL]
@@ -57,6 +68,9 @@ export class Service implements Contracts.TransactionPool.Service {
 	}
 
 	public dispose(): void {
+		this.events.forget(Events.TransactionEvent.RemovedFromPool, this.#removalListener);
+		this.events.forget(Events.TransactionEvent.Expired, this.#removalListener);
+
 		this.#disposed = true;
 	}
 
@@ -76,7 +90,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.storage.removeTransaction(transaction.hash);
 				this.#txRebroadcastCooldowns.delete(transaction.hash);
 				this.logger.debug(`Removed tx ${transaction.hash}`);
-				void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction);
+				void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.toData());
 			}
 
 			await this.#cleanUp();
@@ -109,13 +123,13 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.logger.debug(`tx ${transaction.hash} added to pool`);
 				this.#txRebroadcastCooldowns.set(transaction.hash, this.stateStore.getBlockNumber());
 
-				void this.events.dispatch(Events.TransactionEvent.AddedToPool, transaction);
+				void this.events.dispatch(Events.TransactionEvent.AddedToPool, transaction.toData());
 			} catch (rawError) {
 				const error = ensureError(rawError);
 				this.storage.removeTransaction(transaction.hash);
 				this.logger.warn(`tx ${transaction.hash} failed to enter pool: ${error.message}`);
 
-				void this.events.dispatch(Events.TransactionEvent.RejectedByPool, transaction);
+				void this.events.dispatch(Events.TransactionEvent.RejectedByPool, transaction.toData());
 
 				throw error instanceof PoolError ? error : new PoolError(error.message, "ERR_OTHER");
 			}
@@ -146,19 +160,21 @@ export class Service implements Contracts.TransactionPool.Service {
 
 						void this.events.dispatch(
 							Events.TransactionEvent.AddedToPool,
-							previouslyStoredTransaction.data,
+							previouslyStoredTransaction.toData(),
 						);
 
 						previouslyStoredSuccesses++;
 					} catch (rawError) {
 						const error = ensureError(rawError);
 						this.storage.removeTransaction(hash);
+						this.#txRebroadcastCooldowns.delete(hash);
 						this.logger.debug(`Failed to re-add previously stored tx ${hash}: ${error.message}`);
 
 						previouslyStoredFailures++;
 					}
 				} else {
 					this.storage.removeTransaction(hash);
+					this.#txRebroadcastCooldowns.delete(hash);
 					this.logger.debug(`Not re-adding previously stored expired tx ${hash}`);
 					previouslyStoredExpirations++;
 				}
@@ -184,6 +200,7 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			this.mempool.flush();
 			this.storage.flush();
+			this.#txRebroadcastCooldowns.clear();
 		});
 	}
 
@@ -210,8 +227,10 @@ export class Service implements Contracts.TransactionPool.Service {
 				this.storage.removeTransaction(removedTransactionHash);
 				this.#txRebroadcastCooldowns.delete(removedTransactionHash);
 				this.logger.debug(`Removed old tx ${removedTransactionHash}`);
+			}
 
-				void this.events.dispatch(Events.TransactionEvent.Expired, removedTransactionHash);
+			for (const removedTransaction of removedTransactions) {
+				void this.events.dispatch(Events.TransactionEvent.Expired, removedTransaction.toData());
 			}
 		}
 	}
@@ -229,7 +248,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			this.storage.removeTransaction(removedTransaction.hash);
 			this.#txRebroadcastCooldowns.delete(removedTransaction.hash);
 			this.logger.debug(`Removed lowest priority tx ${removedTransaction.hash}`);
-			void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, removedTransaction.data);
+			void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, removedTransaction.toData());
 		}
 	}
 

@@ -6,4 +6,6 @@ export interface AcceptNewApiNodeOptions {
 
 export interface ApiNodeProcessor {
 	validateAndAcceptApiNode(apiNode: ApiNode, options?: AcceptNewApiNodeOptions): Promise<void>;
+
+	revalidateApiNode(apiNode: ApiNode): Promise<void>;
 }

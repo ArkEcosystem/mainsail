@@ -9,7 +9,7 @@ export const defaults = {
 		},
 	},
 	syncInterval: Environment.get<number>(EnvironmentVariables.MAINSAIL_API_SYNC_INTERVAL, 8000),
-	tokenCacheSize: Environment.get<number>(EnvironmentVariables.MAINSAIL_API_SYNC_TOKEN_CACHE_SIZE, 256),
+	tokenCacheSize: Environment.get<number>(EnvironmentVariables.MAINSAIL_API_SYNC_TOKEN_CACHE_SIZE, 1024),
 	tokenWhitelistRefreshInterval: Environment.get<number>(
 		EnvironmentVariables.MAINSAIL_API_SYNC_TOKEN_WHITELIST_SYNC_INTERVAL,
 		1000 * 60,

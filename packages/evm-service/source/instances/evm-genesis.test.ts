@@ -2,7 +2,7 @@ import { Enums } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
 import { Application } from "@mainsail/kernel";
 import { setGracefulCleanup } from "tmp";
-import { zeroHash } from "viem";
+import { zeroAddress, zeroHash } from "viem";
 
 import { describe } from "@mainsail/test-runner";
 import { commitGenesis, processGenesis } from "../../test/helpers/commit-genesis";
@@ -27,6 +27,13 @@ describe<{
 		await context.instance.dispose();
 		setGracefulCleanup();
 	});
+
+	const blockContext: Omit<Contracts.Evm.BlockContext, "commitKey"> = {
+		gasLimit: 10_000_000n,
+		timestamp: 12_345n,
+		prevrandao: Buffer.alloc(32),
+		validatorAddress: zeroAddress,
+	};
 
 	it("isEmpty is false", async ({ instance }) => {
 		assert.false(await instance.isEmpty());
@@ -90,7 +97,7 @@ describe<{
 	it("getAccounts returns the committed accounts", async ({ instance }) => {
 		const { accounts } = await instance.getAccounts(0n, 1000n);
 
-		assert.equal(accounts.length, 55); // initial wallet, validators 0x1;
+		assert.equal(accounts.length, 54); // initial wallet, validators 0x1;
 	});
 
 	it("getLegacyColdWallets is empty", async ({ instance }) => {
@@ -137,6 +144,7 @@ describe<{
 
 			// genesis sets the deployer/validator contract addresses updateRewardsAndVotes needs.
 			await instance.initializeGenesis({
+				timestamp: 0n,
 				account: proposer,
 				deployerAccount: "0x0000000000000000000000000000000000000001",
 				initialBlockNumber: 0n,
@@ -148,11 +156,17 @@ describe<{
 			// Before: the proposer is unfunded.
 			assert.equal((await instance.getAccountInfo(proposer)).balance, 0n);
 
-			await instance.prepareNextCommit({ commitKey });
+			await instance.prepareNextCommit({
+				blockContext: {
+					...blockContext,
+					validatorAddress: proposer,
+					commitKey,
+				},
+			});
 			await instance.updateRewardsAndVotes({
 				blockReward: reward,
 				commitKey,
-				specId: Enums.Evm.SpecId.SHANGHAI,
+				specId: Enums.Evm.SpecId.OSAKA,
 				timestamp: 12_345n,
 				validatorAddress: proposer,
 			});
@@ -161,6 +175,7 @@ describe<{
 				getBlock: () => ({ number: 0n, round: 0n }),
 				round: 0n,
 				setAccountUpdates: () => {},
+				setContractEvents: () => {},
 			} as any);
 
 			// After: the block reward has been credited to the proposer.
@@ -180,6 +195,7 @@ describe<{
 			const commitKey = { blockNumber: 0n, round: 0n };
 
 			await instance.initializeGenesis({
+				timestamp: 0n,
 				account: proposer,
 				deployerAccount: "0x0000000000000000000000000000000000000001",
 				initialBlockNumber: 0n,
@@ -188,11 +204,18 @@ describe<{
 				validatorContract: "0x0000000000000000000000000000000000000001",
 			});
 
-			await instance.prepareNextCommit({ commitKey });
+			await instance.prepareNextCommit({
+				blockContext: {
+					...blockContext,
+					validatorAddress: proposer,
+					commitKey,
+				},
+			});
+
 			await instance.updateRewardsAndVotes({
 				blockReward: 0n,
 				commitKey,
-				specId: Enums.Evm.SpecId.SHANGHAI,
+				specId: Enums.Evm.SpecId.OSAKA,
 				timestamp: 12_345n,
 				validatorAddress: proposer,
 			});
@@ -201,7 +224,7 @@ describe<{
 				instance.calculateRoundValidators({
 					commitKey,
 					roundValidators: 0n,
-					specId: Enums.Evm.SpecId.SHANGHAI,
+					specId: Enums.Evm.SpecId.OSAKA,
 					timestamp: 12_345n,
 					validatorAddress: proposer,
 				}),
@@ -209,5 +232,147 @@ describe<{
 		} finally {
 			await instance.dispose();
 		}
+	});
+
+	it("seedGenesisAccount after the genesis commit keeps state roots in sync", async () => {
+		const genesisInfo: Contracts.Evm.GenesisInfo = {
+			account: "0x1111111111111111111111111111111111111111",
+			deployerAccount: "0x0000000000000000000000000000000000000001",
+			initialBlockNumber: 0n,
+			initialSupply: 0n,
+			usernameContract: "0x0000000000000000000000000000000000000001",
+			validatorContract: "0x0000000000000000000000000000000000000001",
+		};
+
+		const hasGenesisAccount = async (instance: Contracts.Evm.Instance & Contracts.Evm.Storage) => {
+			const { accounts } = await instance.getAccounts(0n, 1000n);
+			return accounts.some(({ address }) => address.toLowerCase() === genesisInfo.account.toLowerCase());
+		};
+
+		const commitGenesisBlock = async (instance: Contracts.Evm.Instance & Contracts.Evm.Storage) => {
+			const commitKey = { blockNumber: 0n, round: 0n };
+
+			await instance.initializeGenesis(genesisInfo);
+			await instance.seedGenesisAccount();
+			assert.true(await hasGenesisAccount(instance));
+
+			await instance.prepareNextCommit({
+				blockContext: { ...blockContext, commitKey, validatorAddress: genesisInfo.account },
+			});
+			await instance.updateRewardsAndVotes({
+				blockReward: 0n,
+				commitKey,
+				specId: Enums.Evm.SpecId.OSAKA,
+				timestamp: 12_345n,
+				validatorAddress: genesisInfo.account,
+			});
+			await instance.onCommit({
+				blockNumber: 0n,
+				getBlock: () => ({ number: 0n, round: 0n }),
+				round: 0n,
+				setAccountUpdates: () => {},
+				setContractEvents: () => {},
+			} as any);
+		};
+
+		const touchGenesisAccount = async (instance: Contracts.Evm.Instance) => {
+			const commitKey = { blockNumber: 1n, round: 0n };
+
+			await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+			const { receipt } = await instance.process({
+				commitKey,
+				data: Buffer.alloc(0),
+				from: genesisInfo.deployerAccount,
+				gasLimit: 21_000n,
+				gasPrice: 0n,
+				nonce: (await instance.getAccountInfo(genesisInfo.deployerAccount)).nonce,
+				specId: Enums.Evm.SpecId.OSAKA,
+				to: genesisInfo.account,
+				txHash: "11".repeat(32),
+				value: 0n,
+			});
+			assert.equal(receipt.status, 1);
+
+			return instance.stateRoot(commitKey, zeroHash.slice(2));
+		};
+
+		const instances: (Contracts.Evm.Instance & Contracts.Evm.Storage)[] = [];
+
+		try {
+			for (let index = 0; index < 2; index++) {
+				const context = {} as { app: Application };
+				await prepareSandbox(context);
+				instances.push(context.app.resolve<Contracts.Evm.Instance & Contracts.Evm.Storage>(EvmInstance));
+			}
+
+			const [running, restarted] = instances;
+
+			for (const instance of instances) {
+				await commitGenesisBlock(instance);
+				assert.false(await hasGenesisAccount(instance));
+			}
+
+			// A restart runs the deployer's genesis setup again.
+			await restarted.initializeGenesis(genesisInfo);
+			await restarted.seedGenesisAccount();
+
+			assert.false(await hasGenesisAccount(restarted));
+			assert.equal(await touchGenesisAccount(restarted), await touchGenesisAccount(running));
+		} finally {
+			for (const instance of instances) {
+				await instance.dispose();
+			}
+		}
+	});
+});
+
+// A fresh, uncommitted instance per test: genesis seeding mutates the database.
+describe<{
+	app: Application;
+	instance: Contracts.Evm.Instance & Contracts.Evm.Storage;
+}>("EvmInstance - genesis seeding", ({ assert, afterEach, beforeEach, it }) => {
+	const genesisInfo: Contracts.Evm.GenesisInfo = {
+		account: "0x1111111111111111111111111111111111111111",
+		deployerAccount: "0x0000000000000000000000000000000000000001",
+		initialBlockNumber: 0n,
+		initialSupply: 1_000n,
+		usernameContract: "0x0000000000000000000000000000000000000001",
+		validatorContract: "0x0000000000000000000000000000000000000001",
+	};
+
+	beforeEach(async (context) => {
+		await prepareSandbox(context);
+		context.instance = context.app.resolve(EvmInstance);
+	});
+
+	afterEach(async (context) => {
+		await context.instance.dispose();
+		setGracefulCleanup();
+	});
+
+	it("seedGenesisAccount, not initializeGenesis, seeds the genesis account", async ({ instance }) => {
+		await instance.initializeGenesis(genesisInfo);
+
+		assert.equal((await instance.getAccountInfo(genesisInfo.account)).balance, 0n);
+
+		await instance.seedGenesisAccount();
+
+		assert.equal((await instance.getAccountInfo(genesisInfo.account)).balance, 1_000n);
+	});
+
+	it("seedGenesisAccount rejects before initializeGenesis", async ({ instance }) => {
+		await assert.rejects(() => instance.seedGenesisAccount(), "genesis not initialized");
+	});
+
+	it("seedGenesisAccount overwrites a stale balance before the genesis commit", async ({ instance }) => {
+		await instance.initializeGenesis(genesisInfo);
+		await instance.seedGenesisAccount();
+
+		assert.equal((await instance.getAccountInfo(genesisInfo.account)).balance, 1_000n);
+
+		await instance.initializeGenesis({ ...genesisInfo, initialSupply: 2_000n });
+		await instance.seedGenesisAccount();
+
+		assert.equal((await instance.getAccountInfo(genesisInfo.account)).balance, 2_000n);
 	});
 });

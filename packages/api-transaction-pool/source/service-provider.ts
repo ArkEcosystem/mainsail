@@ -25,6 +25,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 		return Handlers as unknown as NamedPlugin<unknown>;
 	}
 
+	// Booted in transaction-pool-worker/source/handlers/start.ts
 	public async boot(): Promise<void> {}
 
 	protected getPlugins(): Plugin<unknown>[] {
@@ -38,9 +39,6 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				enabled: boolean;
 				points: number;
 				whitelist: string[];
-			};
-			pagination: {
-				limit: number;
 			};
 		}>("plugins");
 
@@ -60,16 +58,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				},
 				plugin: Plugins.rateLimit,
 			},
-			{
-				options: {
-					query: {
-						limit: {
-							default: config.pagination.limit,
-						},
-					},
-				},
-				plugin: Plugins.pagination,
-			},
+			{ plugin: Plugins.pagination },
 		] as unknown as Plugin<unknown>[];
 	}
 

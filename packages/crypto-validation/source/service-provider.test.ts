@@ -11,7 +11,7 @@ describe<{
 	app: Application;
 	validator: Contracts.Crypto.Validator;
 	serviceProvider: ServiceProvider;
-}>("ServiceProvider", ({ it, beforeEach, assert }) => {
+}>("ServiceProvider", ({ it, beforeEach, assert, spy }) => {
 	beforeEach(async (context) => {
 		context.app = new Application();
 		context.app.get<Contracts.Kernel.Repository>(Identifiers.Config.Repository).set("crypto", cryptoJson);
@@ -22,7 +22,16 @@ describe<{
 		context.serviceProvider = context.app.resolve(ServiceProvider);
 	});
 
-	it("should register", async ({ serviceProvider }) => {
+	it("should register and add all keywords to the validator", async ({ serviceProvider, validator }) => {
+		const addKeyword = spy(validator, "addKeyword");
+
 		await assert.resolves(() => serviceProvider.register());
+
+		addKeyword.calledTimes(4);
+
+		const registeredKeywords = [0, 1, 2, 3].map(
+			(index) => (addKeyword.getCallArgs(index)[0] as { keyword: string }).keyword,
+		);
+		assert.equal(registeredKeywords, ["bigInt", "buffer", "isValidatorIndex", "limitToRoundValidators"]);
 	});
 });

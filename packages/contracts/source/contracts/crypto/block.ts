@@ -24,6 +24,7 @@ export interface BlockHeaderRaw {
 	readonly payloadSize: number;
 	readonly transactionsRoot: string;
 	readonly proposer: string;
+	readonly randaoReveal: string;
 }
 
 export type BlockHeader = BlockHeaderRaw & {
@@ -58,6 +59,7 @@ export interface BlockJson {
 	readonly payloadSize: number;
 	readonly transactionsRoot: string;
 	readonly proposer: string;
+	readonly randaoReveal: string;
 
 	readonly serialized?: string;
 	readonly transactions: TransactionJson[];

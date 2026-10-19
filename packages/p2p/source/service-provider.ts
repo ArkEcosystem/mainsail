@@ -2,15 +2,10 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
-import { Providers, Services } from "@mainsail/kernel";
+import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
 
-import {
-	RevalidateApiNodeAction,
-	ValidateAndAcceptApiNodeAction,
-	ValidateAndAcceptPeerAction,
-} from "./actions/index.js";
 import { ApiNodeDiscoverer } from "./api-node-discoverer.js";
 import { ApiNodeProcessor } from "./api-node-processor.js";
 import { ApiNodeRepository } from "./api-node-repository.js";
@@ -31,6 +26,7 @@ import { PeerProcessor } from "./peer-processor.js";
 import { PeerRepository } from "./peer-repository.js";
 import { PeerVerifier } from "./peer-verifier.js";
 import { Peer } from "./peer.js";
+import { PendingCommits } from "./pending-commits.js";
 import { Service } from "./service.js";
 import {
 	GetApiNodesRoute,
@@ -59,8 +55,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.#registerFactories();
 
 		this.#registerServices();
-
-		this.#registerActions();
 	}
 
 	public async boot(): Promise<void> {
@@ -106,6 +100,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			skipDiscovery: Joi.bool(),
 			skipPeerStateVerification: Joi.bool(),
 			statistic: Joi.object({
+				maxTrackedPeers: Joi.number().integer().min(1).required(),
 				verbosity: Joi.number().integer().min(0).max(3).required(),
 			}).required(),
 			txPoolPort: Joi.number().integer().min(0).required(),
@@ -188,6 +183,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		this.app.bind(Identifiers.P2P.State).to(State).inSingletonScope();
 
+		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
+
 		for (const route of [
 			GetApiNodesRoute,
 			GetBlocksRoute,
@@ -208,20 +205,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		assert.defined(serverConfig);
 
 		await server.initialize("P2P Server", serverConfig);
-	}
-
-	#registerActions(): void {
-		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-			.bind("validateAndAcceptPeer", new ValidateAndAcceptPeerAction(this.app));
-
-		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-			.bind("validateAndAcceptApiNode", new ValidateAndAcceptApiNodeAction(this.app));
-
-		this.app
-			.get<Services.Triggers.Triggers>(Identifiers.Services.Trigger.Service)
-			.bind("revalidateApiNode", new RevalidateApiNodeAction(this.app));
 	}
 
 	#registerValidation(): void {

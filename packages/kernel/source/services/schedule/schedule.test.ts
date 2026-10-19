@@ -14,6 +14,7 @@ describe<{
 	beforeEach((context) => {
 		context.app = new Application();
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher);
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue({ warn: () => {} });
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({});
 
 		context.scheduleService = context.app.resolve<Schedule>(Schedule);

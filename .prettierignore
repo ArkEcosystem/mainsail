@@ -6,6 +6,7 @@ LICENSE
 CODE_OF_CONDUCT.md
 
 packages/p2p/source/socket-server/codecs/proto/protos.*
+packages/core/bin/config
 
 /.nx/cache
 /.nx/workspace-data

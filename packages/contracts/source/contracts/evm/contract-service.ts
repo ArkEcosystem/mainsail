@@ -20,7 +20,6 @@ export interface ValidatorRoundValidator {
 
 export interface ValidatorRound {
 	readonly round: number;
-	readonly roundHeight: number;
 	readonly validators: ValidatorRoundValidator[];
 }
 

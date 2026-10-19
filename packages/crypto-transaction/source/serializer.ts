@@ -17,8 +17,11 @@ export class Serializer implements Contracts.Crypto.TransactionSerializer {
 			toBytesCompat(transaction.value), // value - 4
 			toBytes(transaction.data), // data - 5
 			toBytesCompat(v), // v - 6
-			toBytesCompat(`0x${transaction.r}`), // r - 7
-			toBytesCompat(`0x${transaction.s}`), // s - 8
+			// r/s are RLP-encoded as minimal-length integers (leading zero bytes stripped),
+			// matching canonical Ethereum tooling so transaction hashes are interoperable.
+			// The 32-byte in-memory form is restored on deserialization.
+			toBytesCompat(BigInt(`0x${transaction.r}`)), // r - 7
+			toBytesCompat(BigInt(`0x${transaction.s}`)), // s - 8
 		];
 
 		if (transaction.legacySecondSignature) {

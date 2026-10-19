@@ -33,7 +33,9 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		method: "POST",
 		options: {
 			payload: {
-				maxBytes: 100 + maxTransactionsPerRequest * maxTransactionBytes * 2,
+				// Each transaction is hex encoded (2 chars per byte) and carries ~4 bytes
+				// of JSON overhead (quotes and comma), plus 100 bytes for the envelope.
+				maxBytes: 100 + maxTransactionsPerRequest * (maxTransactionBytes * 2 + 4),
 			},
 			validate: {
 				payload: Joi.object({
@@ -45,7 +47,8 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 								.max(maxTransactionBytes * 2),
 						)
 						.min(1)
-						.max(maxTransactionsPerRequest),
+						.max(maxTransactionsPerRequest)
+						.required(),
 				}),
 			},
 		},
@@ -78,7 +81,8 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		options: {
 			validate: {
 				params: Joi.object({
-					hash: Joi.string().hex().length(64),
+					// The pool stores hashes lowercase; accept any casing like the address filters do.
+					hash: Joi.string().lowercase().hex().length(64),
 				}),
 			},
 		},

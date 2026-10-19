@@ -100,6 +100,21 @@ describe("HTTP", ({ it, assert, beforeAll, afterAll, each }) => {
 		assert.equal(statusCode, 200);
 	});
 
+	it("#get - should connect to an IPv6 literal", async () => {
+		// URL.hostname keeps the brackets of an IPv6 literal; passing them on would resolve "[::1]" as a name.
+		const ipv6Server = Hapi.server({ host: "::1", port: 0 });
+		ipv6Server.route({ handler: () => ({}), method: "GET", path: "/get" });
+		await ipv6Server.start();
+
+		try {
+			const { statusCode } = await http.get(`http://[::1]:${ipv6Server.info.port}/get`);
+
+			assert.equal(statusCode, 200);
+		} finally {
+			await ipv6Server.stop();
+		}
+	});
+
 	it("#get - should send a request and receive status code 404", async () => {
 		await assert.rejects(() => http.get(`${serverURL}/status/404`), "Not Found");
 	});

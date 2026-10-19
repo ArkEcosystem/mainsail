@@ -1,4 +1,4 @@
-import { Services } from "@mainsail/cli";
+import { Commands, Services } from "@mainsail/cli";
 import prompts from "prompts";
 
 import { describe } from "@mainsail/test-runner";
@@ -12,7 +12,6 @@ describe("CLI", ({ beforeEach, it, assert, stub }) => {
 
 	it("should run successfully using valid commands", async () => {
 		const cli = new CommandLineInterface(["help"]);
-		await cli.execute("distribution");
 		await assert.resolves(() => cli.execute("distribution"));
 	});
 
@@ -57,5 +56,43 @@ describe("CLI", ({ beforeEach, it, assert, stub }) => {
 		await assert.resolves(() => cli.execute("distribution"));
 
 		mockExit.neverCalled();
+	});
+
+	it("should set NODE_PATH when it is not set", async () => {
+		// uvu runs every suite in one process: restore NODE_PATH afterwards so the
+		// mutation does not leak into subsequent tests.
+		const originalNodePath = process.env.NODE_PATH;
+
+		try {
+			delete process.env.NODE_PATH;
+
+			const cli = new CommandLineInterface(["help"]);
+
+			await assert.resolves(() => cli.execute("distribution"));
+			assert.true((process.env.NODE_PATH ?? "").length > 0);
+		} finally {
+			if (originalNodePath === undefined) {
+				delete process.env.NODE_PATH;
+			} else {
+				process.env.NODE_PATH = originalNodePath;
+			}
+		}
+	});
+
+	it("should execute a command discovered from plugins", async () => {
+		let executed = false;
+		stub(Commands.DiscoverCommands.prototype, "from").resolvedValue({
+			"plugin:test": {
+				register: () => {},
+				run: async () => {
+					executed = true;
+				},
+			},
+		});
+
+		const cli = new CommandLineInterface(["plugin:test"]);
+
+		await assert.resolves(() => cli.execute("distribution"));
+		assert.true(executed);
 	});
 });

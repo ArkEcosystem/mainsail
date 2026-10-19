@@ -150,10 +150,16 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		handler: (request: Types.HapiRequest) => controller.holders(request),
 		method: "GET",
 		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
 			validate: {
 				params: Joi.object({
 					address,
 				}),
+				query: Joi.object({}).concat(Schemas.pagination),
 			},
 		},
 		path: "/tokens/{address}/holders",

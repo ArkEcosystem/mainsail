@@ -30,10 +30,11 @@ describe<{
 		await assert.resolves(() => cli.execute(Command));
 
 		spyCheck.calledOnce();
+		spyCheck.calledWith(true);
 		spyUpdate.neverCalled();
 	});
 
-	it.only("should update with prompts", async ({ cli }) => {
+	it("should update with prompts", async ({ cli }) => {
 		const spyCheck = stub(updater, "check").resolvedValue(true);
 		const spyUpdate = stub(updater, "update");
 		const spyRestart = stub(actionFactory, "restartRunningProcess");
@@ -43,14 +44,15 @@ describe<{
 
 		spyCheck.calledOnce();
 		spyUpdate.calledOnce();
+		spyUpdate.calledWith(false, false);
 		spyRestart.neverCalled();
-		spyRestartWithPrompt.calledOnce();
+		spyRestartWithPrompt.calledTimes(1);
 	});
 
 	it("should update without a prompt if the [--force] flag is present", async ({ cli }) => {
 		const spyCheck = stub(updater, "check").resolvedValue(true);
 		const spyUpdate = stub(updater, "update");
-		const spyRestar = stub(actionFactory, "restartRunningProcess");
+		const spyRestart = stub(actionFactory, "restartRunningProcess");
 		const spyRestartWithPrompt = stub(actionFactory, "restartRunningProcessWithPrompt");
 
 		await assert.resolves(() => cli.withFlags({ force: true, updateProcessManager: false }).execute(Command));
@@ -58,7 +60,7 @@ describe<{
 		spyCheck.calledOnce();
 		spyUpdate.calledOnce();
 		spyUpdate.calledWith(false, true);
-		spyRestar.neverCalled();
+		spyRestart.neverCalled();
 		spyRestartWithPrompt.neverCalled();
 	});
 
@@ -67,7 +69,7 @@ describe<{
 	}) => {
 		const spyCheck = stub(updater, "check").resolvedValue(true);
 		const spyUpdate = stub(updater, "update");
-		const spyRestar = stub(actionFactory, "restartRunningProcess");
+		const spyRestart = stub(actionFactory, "restartRunningProcess");
 		const spyRestartWithPrompt = stub(actionFactory, "restartRunningProcessWithPrompt");
 
 		await assert.resolves(() => cli.withFlags({ force: true, updateProcessManager: true }).execute(Command));
@@ -75,14 +77,29 @@ describe<{
 		spyCheck.calledOnce();
 		spyUpdate.calledOnce();
 		spyUpdate.calledWith(true, true);
-		spyRestar.neverCalled();
+		spyRestart.neverCalled();
 		spyRestartWithPrompt.neverCalled();
+	});
+
+	it("should prompt to restart when the [--restart] flag is explicitly false", async ({ cli }) => {
+		const spyCheck = stub(updater, "check").resolvedValue(true);
+		const spyUpdate = stub(updater, "update");
+		const spyRestart = stub(actionFactory, "restartRunningProcess");
+		const spyRestartWithPrompt = stub(actionFactory, "restartRunningProcessWithPrompt");
+
+		// --restart=false must NOT force a restart (regression: hasFlag treated presence as true).
+		await assert.resolves(() => cli.withFlags({ restart: false }).execute(Command));
+
+		spyCheck.calledOnce();
+		spyUpdate.calledOnce();
+		spyRestart.neverCalled();
+		spyRestartWithPrompt.calledTimes(1);
 	});
 
 	it("should update and restart without a prompt if the [--force --restart] flag is present", async ({ cli }) => {
 		const spyCheck = stub(updater, "check").resolvedValue(true);
 		const spyUpdate = stub(updater, "update");
-		const spyRestar = stub(actionFactory, "restartRunningProcess");
+		const spyRestart = stub(actionFactory, "restartRunningProcess");
 		const spyRestartWithPrompt = stub(actionFactory, "restartRunningProcessWithPrompt");
 
 		await assert.resolves(() => cli.withFlags({ force: true, restart: true }).execute(Command));
@@ -90,79 +107,8 @@ describe<{
 		spyCheck.calledOnce();
 		spyUpdate.calledOnce();
 		spyUpdate.calledWith(false, true);
-		spyRestar.calledTimes(3);
-		spyRestartWithPrompt.neverCalled();
-	});
-
-	it("should update and restart core without a prompt if the [--force --restartCore] flag is present", async ({
-		cli,
-	}) => {
-		const spyCheck = stub(updater, "check").resolvedValue(true);
-		const spyUpdate = stub(updater, "update");
-		const spyRestar = stub(actionFactory, "restartRunningProcess");
-		const spyRestartWithPrompt = stub(actionFactory, "restartRunningProcessWithPrompt");
-
-		await assert.resolves(() => cli.withFlags({ force: true, restartCore: true }).execute(Command));
-
-		spyCheck.calledOnce();
-		spyUpdate.calledOnce();
-		spyUpdate.calledWith(false, true);
-		spyRestar.calledOnce();
-		spyRestar.calledWith("ark-core");
-		spyRestartWithPrompt.neverCalled();
-	});
-
-	it("should update and restart relay without a prompt if the [--force --restartRelay] flag is present", async ({
-		cli,
-	}) => {
-		const spyCheck = stub(updater, "check").resolvedValue(true);
-		const spyUpdate = stub(updater, "update");
-		const spyRestar = stub(actionFactory, "restartRunningProcess");
-		const spyRestartWithPrompt = stub(actionFactory, "restartRunningProcessWithPrompt");
-
-		await assert.resolves(() => cli.withFlags({ force: true, restartRelay: true }).execute(Command));
-
-		spyCheck.calledOnce();
-		spyUpdate.calledOnce();
-		spyUpdate.calledWith(false, true);
-		spyRestar.calledOnce();
-		spyRestar.calledWith("ark-relay");
-		spyRestartWithPrompt.neverCalled();
-	});
-
-	it("should update and restart relay without a prompt if the [--force --restartRelay] flag is present", async ({
-		cli,
-	}) => {
-		const spyCheck = stub(updater, "check").resolvedValue(true);
-		const spyUpdate = stub(updater, "update");
-		const spyRestar = stub(actionFactory, "restartRunningProcess");
-		const spyRestartWithPrompt = stub(actionFactory, "restartRunningProcessWithPrompt");
-
-		await assert.resolves(() => cli.withFlags({ force: true, restartRelay: true }).execute(Command));
-
-		spyCheck.calledOnce();
-		spyUpdate.calledOnce();
-		spyUpdate.calledWith(false, true);
-		spyRestar.calledOnce();
-		spyRestar.calledWith("ark-relay");
-		spyRestartWithPrompt.neverCalled();
-	});
-
-	it("should update and restart relay without a prompt if the [--force --restartForger] flag is present", async ({
-		cli,
-	}) => {
-		const spyCheck = stub(updater, "check").resolvedValue(true);
-		const spyUpdate = stub(updater, "update");
-		const spyRestar = stub(actionFactory, "restartRunningProcess");
-		const spyRestartWithPrompt = stub(actionFactory, "restartRunningProcessWithPrompt");
-
-		await assert.resolves(() => cli.withFlags({ force: true, restartForger: true }).execute(Command));
-
-		spyCheck.calledOnce();
-		spyUpdate.calledOnce();
-		spyUpdate.calledWith(false, true);
-		spyRestar.calledOnce();
-		spyRestar.calledWith("ark-forger");
+		spyRestart.calledTimes(1);
+		spyRestart.calledWith("mainsail");
 		spyRestartWithPrompt.neverCalled();
 	});
 });

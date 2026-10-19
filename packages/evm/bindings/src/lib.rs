@@ -1,7 +1,7 @@
 use std::{sync::Arc, u64};
 
 use ctx::{
-    BlockContext, CalculateRoundValidatorsContext, EvmOptions, ExecutionContext, GenesisContext,
+    CalculateRoundValidatorsContext, EvmOptions, ExecutionContext, GenesisContext,
     JsBlockHeaderData, JsCalculateRoundValidatorsContext, JsCommitData, JsCommitKey, JsEvmOptions,
     JsGenesisContext, JsPrepareNextCommitContext, JsPreverifyTransactionContext,
     JsTransactionContext, JsTransactionData, JsTransactionSimulateContext,
@@ -12,9 +12,10 @@ use logger::JsLogger;
 use mainsail_evm_core::{
     account::AccountInfoExtended,
     db::{
-        BlockHeaderData, CommitData, CommitKey, GenesisInfo, PendingCommit, PersistentDB,
-        PersistentDBOptions, ProofData, TransactionData, TxnDatabaseReader,
+        BlockContext, BlockHeaderData, CommitData, CommitKey, GenesisInfo, PendingCommit,
+        PersistentDB, PersistentDBOptions, ProofData, TransactionData, TxnDatabaseReader,
     },
+    events::ContractEvent,
     legacy::{LegacyAccountAttributes, LegacyAddress, LegacyColdWallet},
     logger::LogLevel,
     logs_bloom,
@@ -32,14 +33,19 @@ use result::{
 use revm::{
     Database, DatabaseCommit, DatabaseRef, ExecuteEvm, MainBuilder, MainContext,
     context::{
-        BlockEnv, ContextTr, TxEnv,
+        BlockEnv, CfgEnv, ContextTr, TxEnv,
         result::{EVMError, ExecutionResult, ResultAndState},
     },
-    database::{State, TransitionAccount, WrapDatabaseRef, bal::EvmDatabaseError},
-    handler::EvmTr,
-    primitives::{Address, B256, Bytes, TxKind, U256, hex::ToHexExt, map::HashMap},
+    database::{State, WrapDatabaseRef, bal::EvmDatabaseError},
+    handler::{EvmTr, MainnetContext},
+    primitives::{
+        Address, B256, Bytes, TxKind, U256, hardfork::SpecId, hex::ToHexExt, map::HashMap,
+    },
     state::AccountInfo,
 };
+use tokio::sync::Semaphore;
+
+use crate::ctx::{JsUpdateValidatorRegistrationFeeContext, UpdateValidatorRegistrationFeeContext};
 
 mod ctx;
 mod logger;
@@ -57,11 +63,14 @@ pub struct EvmInner {
     snapshot: Option<PendingCommit>,
 
     logger: JsLogger,
+
+    chain_id: u64,
 }
 
 impl EvmInner {
-    pub fn new(opts: EvmOptions) -> Self {
-        let logger = JsLogger::new(opts.logger_callback).expect("logger ok");
+    pub fn new(opts: EvmOptions) -> anyhow::Result<Self> {
+        let logger = JsLogger::new(opts.logger_callback)
+            .map_err(|err| anyhow::anyhow!("failed to create logger: {err}"))?;
 
         let mut db_opts = PersistentDBOptions::new(opts.path).with_logger(logger.inner());
 
@@ -71,21 +80,24 @@ impl EvmInner {
             }
         }
 
-        let persistent_db = PersistentDB::new(db_opts).expect("path ok");
+        let persistent_db = PersistentDB::new(db_opts)
+            .map_err(|err| anyhow::anyhow!("failed to open EVM database: {err}"))?;
 
-        EvmInner {
+        Ok(EvmInner {
             persistent_db,
             pending_commits: Default::default(),
             snapshot: None,
             logger,
-        }
+            chain_id: opts.chain_id,
+        })
     }
 
     pub fn prepare_next_commit(&mut self, ctx: PrepareNextCommitContext) -> Result<()> {
         let genesis_block_number = self.genesis_block_number();
-        if let Some(pending) = self.pending_commits.get(&ctx.commit_key) {
+        if let Some(pending) = self.pending_commits.get(&ctx.block_context.commit_key) {
             // do not replace any pending commit, while still in bootstrapping phase.
-            if pending.key.0 == genesis_block_number && ctx.commit_key == pending.key {
+            if pending.key.0 == genesis_block_number && ctx.block_context.commit_key == pending.key
+            {
                 return Ok(());
             }
 
@@ -93,13 +105,14 @@ impl EvmInner {
                 LogLevel::Debug,
                 format!(
                     "replacing existing pending commit {:?} for {:?}",
-                    pending.key, ctx.commit_key
+                    pending.key, ctx.block_context.commit_key
                 ),
             );
         }
 
         let pending_commit = PendingCommit {
-            key: ctx.commit_key,
+            key: ctx.block_context.commit_key,
+            block_context: ctx.block_context,
             ..Default::default()
         };
 
@@ -110,7 +123,7 @@ impl EvmInner {
     }
 
     pub fn view(&self, tx_ctx: TxViewContext) -> Result<TxViewResult> {
-        let result = self.transact_read(tx_ctx.into());
+        let result = self.transact_read(ExecutionContext::new_read(None, tx_ctx));
 
         Ok(match result {
             Ok((r, _)) => {
@@ -123,6 +136,11 @@ impl EvmInner {
                     success: r.is_success(),
                     output: r.into_output(),
                 }
+            }
+            Err(EVMError::Database(err)) => {
+                return Err(napi::Error::from_reason(format!(
+                    "view call failed reading state: {err:?}"
+                )));
             }
             Err(err) => {
                 self.logger.log(
@@ -190,21 +208,76 @@ impl EvmInner {
         }
     }
 
-    pub fn initialize_genesis(
-        &mut self,
-        genesis_ctx: GenesisContext,
-    ) -> std::result::Result<(), EVMError<String>> {
-        match self.persistent_db.set_genesis_info(GenesisInfo {
+    pub fn initialize_genesis(&mut self, genesis_ctx: GenesisContext) {
+        self.persistent_db.set_genesis_info(GenesisInfo {
             account: genesis_ctx.account,
             deployer_account: genesis_ctx.deployer_account,
             validator_contract: genesis_ctx.validator_contract,
             username_contract: genesis_ctx.username_contract,
             initial_block_number: genesis_ctx.initial_block_number,
             initial_supply: genesis_ctx.initial_supply,
+        });
+    }
+
+    pub fn seed_genesis_account(&self) -> std::result::Result<(), EVMError<String>> {
+        self.persistent_db.seed_genesis_account().map_err(|err| {
+            EVMError::Database(format!("seed_genesis_account failed: {}", err).into())
+        })
+    }
+
+    fn consensus_system_call(
+        &mut self,
+        commit_key: CommitKey,
+        timestamp: u64,
+        validator_address: Address,
+        spec_id: SpecId,
+        calldata: Bytes,
+        label: &str,
+    ) -> std::result::Result<(), EVMError<String>> {
+        let genesis_info = self.genesis_info()?;
+
+        let nonce = self
+            .get_account_nonce(&commit_key, genesis_info.deployer_account)
+            .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
+
+        let Some(pending_commit) = self.pending_commits.get(&commit_key) else {
+            return Err(EVMError::Custom(format!(
+                "{label} is missing commit key {:?}",
+                commit_key
+            )));
+        };
+
+        match self.transact_write(ExecutionContext {
+            block_context: Some(BlockContext {
+                commit_key,
+                gas_limit: u64::MAX,
+                timestamp,
+                validator_address,
+                prevrandao: pending_commit.block_context.prevrandao,
+            }),
+            from: genesis_info.deployer_account,
+            to: Some(genesis_info.validator_contract),
+            data: calldata,
+            value: U256::ZERO,
+            nonce: Some(nonce),
+            gas_limit: Some(u64::MAX),
+            gas_price: 0,
+            spec_id,
+            tx_hash: None,
         }) {
-            Ok(_) => Ok(()),
+            Ok((receipt, _)) => {
+                self.logger.log(
+                    LogLevel::Debug,
+                    format!("{label} {:?} {:?}", commit_key, receipt),
+                );
+
+                if !receipt.is_success() {
+                    return Err(EVMError::Custom(format!("{label} reverted: {receipt:?}")));
+                }
+                Ok(())
+            }
             Err(err) => Err(EVMError::Database(
-                format!("set_genesis_info failed: {}", err).into(),
+                format!("{label} failed: {}", err).into(),
             )),
         }
     }
@@ -213,93 +286,62 @@ impl EvmInner {
         &mut self,
         ctx: CalculateRoundValidatorsContext,
     ) -> std::result::Result<(), EVMError<String>> {
-        assert!(
-            self.pending_commits.contains_key(&ctx.commit_key),
-            "calculate_round_validators is missing commit key {:?}",
-            ctx.commit_key
-        );
-
-        let genesis_info = self
-            .persistent_db
-            .genesis_info
-            .as_ref()
-            .expect("genesis info")
-            .clone();
-
         let abi = ethers_contract::BaseContract::from(
             ethers_core::abi::parse_abi(&["function calculateRoundValidators(uint8 n) external"])
                 .expect("encode abi"),
         );
 
-        // encode abi into Bytes
         let calldata = abi
             .encode("calculateRoundValidators", ctx.round_validators)
             .expect("encode calculateRoundValidators");
 
-        let nonce = self
-            .get_account_nonce(&ctx.commit_key, genesis_info.deployer_account)
-            .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
+        self.consensus_system_call(
+            ctx.commit_key,
+            ctx.timestamp,
+            ctx.validator_address,
+            ctx.spec_id,
+            Bytes::from(calldata.0),
+            "calculate_round_validators",
+        )
+    }
 
-        match self.transact_write(ExecutionContext {
-            block_context: Some(BlockContext {
-                commit_key: ctx.commit_key,
-                gas_limit: u64::MAX,
-                timestamp: ctx.timestamp,
-                validator_address: ctx.validator_address,
-            }),
-            from: genesis_info.deployer_account,
-            to: Some(genesis_info.validator_contract),
-            data: Bytes::from(calldata.0),
-            value: U256::ZERO,
-            nonce: Some(nonce),
-            gas_limit: Some(u64::MAX),
-            gas_price: 0,
-            spec_id: ctx.spec_id,
-            tx_hash: None,
-        }) {
-            Ok((receipt, _)) => {
-                self.logger.log(
-                    LogLevel::Debug,
-                    format!(
-                        "calculate_round_validators {:?} {:?}",
-                        ctx.commit_key, receipt
-                    ),
-                );
+    pub fn update_validator_registration_fee(
+        &mut self,
+        ctx: UpdateValidatorRegistrationFeeContext,
+    ) -> std::result::Result<(), EVMError<String>> {
+        let abi = ethers_contract::BaseContract::from(
+            ethers_core::abi::parse_abi(&["function setFee(uint128 fee) external"])
+                .expect("encode abi"),
+        );
 
-                assert!(
-                    receipt.is_success(),
-                    "calculate_round_validators unsuccessful"
-                );
-                Ok(())
-            }
-            Err(err) => Err(EVMError::Database(
-                format!("calculate_round_validators failed: {}", err).into(),
-            )),
-        }
+        let calldata = abi.encode("setFee", ctx.fee).expect("encode setFee");
+
+        self.consensus_system_call(
+            ctx.commit_key,
+            ctx.timestamp,
+            ctx.validator_address,
+            ctx.spec_id,
+            Bytes::from(calldata.0),
+            "update_validator_registration_fee",
+        )
     }
 
     pub fn update_rewards_and_votes(
         &mut self,
         ctx: UpdateRewardsAndVotesContext,
     ) -> std::result::Result<(), EVMError<String>> {
-        assert!(
-            self.pending_commits.contains_key(&ctx.commit_key),
-            "update_rewards_and_votes is missing commit key {:?}",
-            ctx.commit_key
-        );
-
-        let genesis_info = self
-            .persistent_db
-            .genesis_info
-            .as_ref()
-            .expect("genesis info")
-            .clone();
+        let genesis_info = self.genesis_info()?;
 
         let nonce = self
             .get_account_nonce(&ctx.commit_key, genesis_info.deployer_account)
             .map_err(|err| EVMError::Database(format!("get_account_nonce: {err}").into()))?;
 
-        let mut pending_commit = self.pending_commits.get_mut(&ctx.commit_key).expect("ok");
+        let Some(mut pending_commit) = self.pending_commits.get_mut(&ctx.commit_key) else {
+            return Err(EVMError::Custom(format!(
+                "update_rewards_and_votes is missing commit key {:?}",
+                ctx.commit_key
+            )));
+        };
         let mut rewards = HashMap::<Address, u128>::default();
         rewards.insert(ctx.validator_address, ctx.block_reward);
 
@@ -325,12 +367,15 @@ impl EvmInner {
                     .encode("updateVoters", voters.clone())
                     .expect("encode updateVoters");
 
+                let prev_randao = pending_commit.block_context.prevrandao;
+
                 match self.transact_write(ExecutionContext {
                     block_context: Some(BlockContext {
                         commit_key: ctx.commit_key,
                         gas_limit: u64::MAX,
                         timestamp: ctx.timestamp,
                         validator_address: ctx.validator_address,
+                        prevrandao: prev_randao,
                     }),
                     from: genesis_info.deployer_account,
                     to: Some(genesis_info.validator_contract),
@@ -353,7 +398,11 @@ impl EvmInner {
                             ),
                         );
 
-                        assert!(receipt.is_success(), "vote_update unsuccessful");
+                        if !receipt.is_success() {
+                            return Err(EVMError::Custom(format!(
+                                "vote_update reverted: {receipt:?}"
+                            )));
+                        }
                         Ok(())
                     }
                     Err(err) => Err(EVMError::Database(
@@ -457,17 +506,32 @@ impl EvmInner {
     ) -> std::result::Result<(), EVMError<String>> {
         let genesis_block_number = self.genesis_block_number();
 
-        let (_, pending) = self
+        let Some((_, pending)) = self
             .pending_commits
             .iter_mut()
             .find(|(key, _)| key.0 == genesis_block_number)
-            .expect("genesis commit");
+        else {
+            return Err(EVMError::Custom(
+                "import_account_infos requires the genesis pending commit; call prepare_next_commit first".into(),
+            ));
+        };
 
         for info in infos {
-            assert!(!pending.cache.accounts.contains_key(&info.address));
+            if pending.cache.accounts.contains_key(&info.address) {
+                return Err(EVMError::Custom(format!(
+                    "import_account_infos: duplicate account {}",
+                    info.address
+                )));
+            }
 
             let (address, info, legacy_attributes) = info.into_parts();
-            pending.import_account(address, info, legacy_attributes);
+            let balance = u128::try_from(info.balance).map_err(|_| {
+                EVMError::Custom(format!(
+                    "import_account_infos: balance of {} does not fit into u128",
+                    address
+                ))
+            })?;
+            pending.import_account(address, balance, legacy_attributes);
         }
 
         Ok(())
@@ -479,14 +543,30 @@ impl EvmInner {
     ) -> std::result::Result<(), EVMError<String>> {
         let genesis_block_number = self.genesis_block_number();
 
-        let (_, pending) = self
+        let Some((_, pending)) = self
             .pending_commits
             .iter_mut()
             .find(|(key, _)| key.0 == genesis_block_number)
-            .expect("genesis commit");
+        else {
+            return Err(EVMError::Custom(
+                "import_legacy_cold_wallets requires the genesis pending commit; call prepare_next_commit first".into(),
+            ));
+        };
 
         for wallet in wallets {
-            assert!(!pending.legacy_cold_wallets.contains_key(&wallet.address));
+            if pending.legacy_cold_wallets.contains_key(&wallet.address) {
+                return Err(EVMError::Custom(format!(
+                    "import_legacy_cold_wallets: duplicate wallet {:?}",
+                    wallet.address
+                )));
+            }
+
+            if u128::try_from(wallet.balance).is_err() {
+                return Err(EVMError::Custom(format!(
+                    "import_legacy_cold_wallets: balance of {:?} does not fit into u128",
+                    wallet.address
+                )));
+            }
             pending.legacy_cold_wallets.insert(wallet.address, wallet);
         }
 
@@ -606,35 +686,6 @@ impl EvmInner {
     ) -> std::result::Result<PreverifyTxResult, EVMError<String>> {
         let mut pending_commit = PendingCommit::new(Default::default());
 
-        // Make legacy balance available to account in pending commit during preverification
-        if let Some(legacy_address) = ctx.legacy_address {
-            match self
-                .persistent_db
-                .get_legacy_cold_wallet(legacy_address)
-                .map_err(|err| {
-                    EVMError::Database(format!("failed reading legacy cold wallet: {}", err).into())
-                })? {
-                Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
-                    let mut legacy_balances = HashMap::<Address, u128>::default();
-                    legacy_balances.insert(
-                        ctx.from,
-                        legacy_cold_wallet.balance.try_into().expect("fit u128"),
-                    );
-                    state_commit::apply_rewards(
-                        &self.persistent_db,
-                        &mut pending_commit,
-                        legacy_balances,
-                    )
-                    .map_err(|err| {
-                        EVMError::Database(
-                            format!("failed to apply legacy balance: {}", err).into(),
-                        )
-                    })?;
-                }
-                _ => (),
-            }
-        }
-
         let db_reader = TxnDatabaseReader::new(&self.persistent_db).map_err(|err| {
             EVMError::Database(format!("failed to create tx database reader {}", err))
         })?;
@@ -645,11 +696,7 @@ impl EvmInner {
             .with_database(WrapDatabaseRef(db_reader))
             .build();
 
-        let evm = revm::Context::mainnet()
-            .with_db(state_db)
-            .modify_cfg_chained(|cfg| {
-                cfg.spec = ctx.spec_id;
-            })
+        let evm = new_context(state_db, ctx.spec_id, self.chain_id)
             .modify_block_chained(|block_env: &mut BlockEnv| {
                 block_env.gas_limit = ctx.block_gas_limit;
             })
@@ -677,6 +724,7 @@ impl EvmInner {
             false,
             false,
             0,
+            None,
         );
 
         Ok(match result {
@@ -716,6 +764,7 @@ impl EvmInner {
             }
             Err(err) => match err {
                 EVMError::Transaction(err) => Err(EVMError::Transaction(err)),
+                EVMError::Database(err) => Err(EVMError::Database(err.to_string())),
                 _ => {
                     panic!("fatal evm err {:?}", err);
                 }
@@ -727,15 +776,40 @@ impl EvmInner {
         &mut self,
         tx_ctx: TxContext,
     ) -> std::result::Result<TxReceipt, EVMError<String>> {
-        let commit_key = &tx_ctx.block_context.commit_key;
+        let commit_key = tx_ctx.commit_key;
 
         let (committed, _) = self
             .persistent_db
             .get_receipt(commit_key.0, tx_ctx.tx_hash)
             .map_err(|err| EVMError::Database(format!("commit receipt lookup: {}", err).into()))?;
-        assert!(!committed);
+        if committed {
+            return Err(EVMError::Custom(format!(
+                "cannot process transaction {}: block {} was already committed",
+                tx_ctx.tx_hash, commit_key.0
+            )));
+        }
 
-        if let Some(mut pending) = self.pending_commits.get_mut(commit_key) {
+        // A legacy cold-wallet merge mutates the pending commit *before* the transaction
+        // executes (so the tx can spend the merged balance). If the tx then fails it is
+        // dropped from the block, and an orphaned merge would diverge this validator's state
+        // root from nodes that replay the block. Snapshot the pending commit before such a
+        // merge so we can restore it on failure. This runs only for the first transaction of
+        // a legacy sender — a one-time, migration-era event — so the clone is not a hot path.
+        let mut merge_restore: Option<PendingCommit> = None;
+
+        // Without a pending commit there is no block env to execute against and no
+        // state write-back — the tx would run against block 0 and return a plausible
+        // receipt while never entering the block. Fail loudly instead.
+        let Some(mut pending) = self.pending_commits.get_mut(&commit_key) else {
+            return Err(EVMError::Custom(format!(
+                "process called with unknown commit key {:?}; call prepare_next_commit first",
+                commit_key
+            )));
+        };
+
+        let block_context = Some(pending.block_context.clone());
+
+        {
             // Make legacy cold wallet balance available to pending commit if not already present
             if let Some(legacy_address) = tx_ctx.legacy_address {
                 if !pending
@@ -752,10 +826,20 @@ impl EvmInner {
                             )
                         })? {
                         Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
+                            // Snapshot before the merge so a later transaction failure can
+                            // undo it. (An `apply_rewards` error is already self-healing: it
+                            // restores the prestate cache and never sets the bookkeeping.)
+                            merge_restore = Some(pending.clone());
+
                             let mut legacy_balances = HashMap::<Address, u128>::default();
                             legacy_balances.insert(
                                 tx_ctx.from,
-                                legacy_cold_wallet.balance.try_into().expect("fit u128"),
+                                legacy_cold_wallet.balance.try_into().map_err(|_| {
+                                    EVMError::Custom(format!(
+                                        "legacy cold wallet balance of {:?} does not fit into u128",
+                                        legacy_cold_wallet.address
+                                    ))
+                                })?,
                             );
 
                             state_commit::apply_rewards(
@@ -782,17 +866,26 @@ impl EvmInner {
             }
         }
 
-        match self.transact_write(tx_ctx.into()) {
+        match self.transact_write(ExecutionContext::new_write(block_context, tx_ctx)) {
             Ok((result, cumulative_gas_used)) => {
                 let receipt = map_execution_result(result, cumulative_gas_used);
                 Ok(receipt)
             }
-            Err(err) => match err {
-                EVMError::Transaction(err) => Err(EVMError::Transaction(err)),
-                _ => {
-                    panic!("fatal evm err {:?}", err);
+            Err(err) => {
+                // The transaction is dropped from the block; undo any legacy cold-wallet
+                // merge applied for it so the committed state never carries an orphaned merge.
+                if let Some(restore) = merge_restore {
+                    self.pending_commits.insert(commit_key, restore);
                 }
-            },
+
+                match err {
+                    EVMError::Transaction(err) => Err(EVMError::Transaction(err)),
+                    EVMError::Database(err) => Err(EVMError::Database(err.to_string())),
+                    _ => {
+                        panic!("fatal evm err {:?}", err);
+                    }
+                }
+            }
         }
     }
 
@@ -800,8 +893,13 @@ impl EvmInner {
         &mut self,
         commit_key: CommitKey,
         commit_data: Option<CommitData>,
-    ) -> std::result::Result<Vec<AccountUpdate>, EVMError<String>> {
-        assert!(self.pending_commits.contains_key(&commit_key));
+    ) -> std::result::Result<(Vec<AccountUpdate>, Vec<ContractEvent>), EVMError<String>> {
+        if !self.pending_commits.contains_key(&commit_key) {
+            return Err(EVMError::Custom(format!(
+                "commit is missing commit key {:?}",
+                commit_key
+            )));
+        }
 
         let pending_commit = self.take_pending_commit(commit_key);
 
@@ -825,18 +923,18 @@ impl EvmInner {
         commit_key: CommitKey,
         current_hash: B256,
     ) -> std::result::Result<String, EVMError<String>> {
-        let pending_commit = self
-            .pending_commits
-            .get_mut(&commit_key)
-            .expect("pending commit exists");
+        let Some(genesis_info) = self.persistent_db.genesis_info.as_ref() else {
+            return Err(EVMError::Custom("genesis not initialized".into()));
+        };
 
-        let genesis_info = self
-            .persistent_db
-            .genesis_info
-            .as_ref()
-            .expect("genesis info exists");
+        let Some(pending_commit) = self.pending_commits.get_mut(&commit_key) else {
+            return Err(EVMError::Custom(format!(
+                "state_root is missing commit key {:?}",
+                commit_key
+            )));
+        };
 
-        let result = state_root::calculate(&genesis_info, pending_commit, current_hash);
+        let result = state_root::calculate(genesis_info, pending_commit, current_hash);
 
         match result {
             Ok(result) => Ok(result.encode_hex()),
@@ -850,10 +948,12 @@ impl EvmInner {
         &self,
         commit_key: CommitKey,
     ) -> std::result::Result<String, EVMError<String>> {
-        let pending_commit = self
-            .pending_commits
-            .get(&commit_key)
-            .expect("pending commit exists");
+        let Some(pending_commit) = self.pending_commits.get(&commit_key) else {
+            return Err(EVMError::Custom(format!(
+                "logs_bloom is missing commit key {:?}",
+                commit_key
+            )));
+        };
 
         let result = logs_bloom::calculate(pending_commit);
 
@@ -1002,15 +1102,19 @@ impl EvmInner {
     }
 
     pub fn snapshot(&mut self, commit_key: CommitKey) -> std::result::Result<(), EVMError<String>> {
+        let Some(pending) = self.pending_commits.get(&commit_key) else {
+            return Err(EVMError::Custom(format!(
+                "snapshot is missing commit key {:?}",
+                commit_key
+            )));
+        };
+
         self.logger.inner().log(
             LogLevel::Debug,
             format!("taking snapshot of commit {:?}", commit_key),
         );
 
-        let _ = std::mem::replace(
-            &mut self.snapshot,
-            self.pending_commits.get(&commit_key).cloned(),
-        );
+        self.snapshot.replace(pending.clone());
 
         Ok(())
     }
@@ -1021,9 +1125,17 @@ impl EvmInner {
             format!("rolling back to commit {:?}", commit_key),
         );
 
-        match self.snapshot.take() {
+        // Validate before consuming: a failed rollback must not destroy the snapshot,
+        // or a retry gets "rollback to non-existent commit" instead of the real error.
+        match self.snapshot.as_ref() {
             Some(commit) if commit.key == commit_key => {
-                assert!(self.pending_commits.contains_key(&commit_key));
+                if !self.pending_commits.contains_key(&commit_key) {
+                    return Err(EVMError::Custom(format!(
+                        "rollback is missing commit key {:?}",
+                        commit_key
+                    )));
+                }
+                let commit = self.snapshot.take().expect("checked above");
                 self.pending_commits.insert(commit_key, commit);
 
                 Ok(())
@@ -1074,11 +1186,12 @@ impl EvmInner {
             .with_database(WrapDatabaseRef(db_reader))
             .build();
 
-        let mut evm = revm::Context::mainnet()
-            .with_db(state_db)
+        let mut evm = new_context(state_db, ctx.spec_id, self.chain_id)
             .modify_cfg_chained(|cfg| {
-                cfg.spec = ctx.spec_id;
                 cfg.disable_nonce_check = ctx.nonce.is_none();
+                // Mainsail enforces its own gas policy based on milestone which is
+                // passed via `block_ctx.gas_limit`.
+                cfg.tx_gas_limit_cap = Some(u64::MAX);
             })
             .modify_block_chained(|block_env: &mut BlockEnv| {
                 let Some(block_ctx) = ctx.block_context.as_ref() else {
@@ -1087,9 +1200,10 @@ impl EvmInner {
 
                 block_env.number = U256::from(block_ctx.commit_key.0);
                 block_env.beneficiary = block_ctx.validator_address;
-                block_env.timestamp = U256::from(block_ctx.timestamp);
+                block_env.timestamp = U256::from(block_ctx.timestamp / 1000);
                 block_env.gas_limit = block_ctx.gas_limit;
                 block_env.difficulty = U256::ZERO;
+                block_env.prevrandao = Some(block_ctx.prevrandao);
             })
             .modify_tx_chained(|tx_env: &mut TxEnv| {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or(u64::MAX);
@@ -1140,14 +1254,35 @@ impl EvmInner {
                                 .unwrap_or_default()
                                 .transitions
                                 .into_iter()
-                                .collect::<Vec<(Address, TransitionAccount)>>(),
+                                .map(|(address, account)| {
+                                    (
+                                        address,
+                                        mainsail_evm_core::state_commit::into_evm_transition(
+                                            account,
+                                        ),
+                                    )
+                                }),
                         );
                     }
                 }
 
                 Ok((result, cumulative_gas_used))
             }
-            Err(err) => Err(err),
+            Err(err) => {
+                // revm validates the tx before mutating state, so on a recoverable error
+                // nothing was committed and `state_db.cache` still holds the prestate we
+                // moved out of the pending commit. Hand it back so a failed tx is a no-op
+                // on the pending commit instead of leaving it empty — otherwise the next
+                // tx in this block executes against committed-only state and the forged
+                // block's state root diverges from honest re-execution.
+                if let Some(commit_key) = ctx.block_context.as_ref().map(|b| &b.commit_key) {
+                    let state_db = evm.db_mut();
+                    if let Some(pending_commit) = self.pending_commits.get_mut(commit_key) {
+                        pending_commit.cache = std::mem::take(&mut state_db.cache);
+                    }
+                }
+                Err(err)
+            }
         }
     }
 
@@ -1170,11 +1305,12 @@ impl EvmInner {
             .with_database(WrapDatabaseRef(db_reader))
             .build();
 
-        let mut evm = revm::Context::mainnet()
-            .with_db(state_db)
+        let mut evm = new_context(state_db, ctx.spec_id, self.chain_id)
             .modify_cfg_chained(|cfg| {
-                cfg.spec = ctx.spec_id;
                 cfg.disable_nonce_check = ctx.nonce.is_none();
+                // Mainsail enforces its own gas policy based on milestone which is
+                // passed via `block_ctx.gas_limit`.
+                cfg.tx_gas_limit_cap = Some(u64::MAX);
             })
             .modify_block_chained(|block_env: &mut BlockEnv| {
                 let Some(block_ctx) = ctx.block_context.as_ref() else {
@@ -1182,9 +1318,10 @@ impl EvmInner {
                 };
                 block_env.number = U256::from(block_ctx.commit_key.0);
                 block_env.beneficiary = block_ctx.validator_address;
-                block_env.timestamp = U256::from(block_ctx.timestamp);
+                block_env.timestamp = U256::from(block_ctx.timestamp / 1000);
                 block_env.gas_limit = block_ctx.gas_limit;
                 block_env.difficulty = U256::ZERO;
+                block_env.prevrandao = Some(block_ctx.prevrandao);
             })
             .modify_tx_chained(|tx_env: &mut TxEnv| {
                 tx_env.gas_limit = ctx.gas_limit.unwrap_or(u64::MAX);
@@ -1259,6 +1396,23 @@ impl EvmInner {
             .unwrap_or_default()
             .initial_block_number
     }
+
+    fn genesis_info(&self) -> std::result::Result<GenesisInfo, EVMError<String>> {
+        self.persistent_db
+            .genesis_info
+            .as_ref()
+            .cloned()
+            .ok_or_else(|| EVMError::Custom("genesis not initialized".into()))
+    }
+}
+
+fn new_context<DB: Database>(db: DB, spec_id: SpecId, chain_id: u64) -> MainnetContext<DB> {
+    revm::Context::mainnet()
+        .with_db(db)
+        .with_cfg(CfgEnv::new_with_spec(spec_id).with_chain_id(chain_id))
+        .modify_tx_chained(|tx_env: &mut TxEnv| {
+            tx_env.chain_id = Some(chain_id);
+        })
 }
 
 // The EVM wrapper is exposed to JavaScript.
@@ -1266,6 +1420,7 @@ impl EvmInner {
 #[napi(js_name = "Evm")]
 pub struct JsEvmWrapper {
     evm: Arc<parking_lot::RwLock<EvmInner>>,
+    concurrency: Option<Arc<Semaphore>>, // None => unbounded (consensus/forger)
 }
 
 /// Pin the napi tokio runtime explicitly instead of relying on napi-rs's implicit default.
@@ -1292,8 +1447,13 @@ impl JsEvmWrapper {
     #[napi(constructor)]
     pub fn new(opts: JsEvmOptions) -> Result<Self> {
         let opts = EvmOptions::try_from(opts)?;
+        let concurrency = opts
+            .concurrency
+            .map(|n| Arc::new(Semaphore::new(n as usize)));
+
         Ok(JsEvmWrapper {
-            evm: Arc::new(parking_lot::RwLock::new(EvmInner::new(opts))),
+            evm: Arc::new(parking_lot::RwLock::new(EvmInner::new(opts)?)),
+            concurrency,
         })
     }
 
@@ -1365,7 +1525,19 @@ impl JsEvmWrapper {
     ) -> Result<PromiseRaw<'env, ()>> {
         let ctx = GenesisContext::try_from(genesis_ctx)?;
 
-        self.write(env, move |evm| evm.initialize_genesis(ctx), |_, _| Ok(()))
+        self.write(
+            env,
+            move |evm| {
+                evm.initialize_genesis(ctx);
+                Ok::<(), EVMError<String>>(())
+            },
+            |_, _| Ok(()),
+        )
+    }
+
+    #[napi]
+    pub fn seed_genesis_account<'env>(&mut self, env: &'env Env) -> Result<PromiseRaw<'env, ()>> {
+        self.write(env, move |evm| evm.seed_genesis_account(), |_, _| Ok(()))
     }
 
     #[napi]
@@ -1395,6 +1567,21 @@ impl JsEvmWrapper {
     }
 
     #[napi]
+    pub fn update_validator_registration_fee<'env>(
+        &mut self,
+        env: &'env Env,
+        ctx: JsUpdateValidatorRegistrationFeeContext,
+    ) -> Result<PromiseRaw<'env, ()>> {
+        let ctx = UpdateValidatorRegistrationFeeContext::try_from(ctx)?;
+
+        self.write(
+            env,
+            move |evm| evm.update_validator_registration_fee(ctx),
+            |_, _| Ok(()),
+        )
+    }
+
+    #[napi]
     pub fn update_rewards_and_votes<'env>(
         &mut self,
         env: &'env Env,
@@ -1419,7 +1606,7 @@ impl JsEvmWrapper {
         let address = utils::create_address_from_string(&address)?;
 
         let block_number = match block_number {
-            Some(block_number) => Some(block_number.get_u64().1),
+            Some(block_number) => Some(utils::convert_bigint_to_u64(block_number, "blockNumber")?),
             None => None,
         };
 
@@ -1494,8 +1681,8 @@ impl JsEvmWrapper {
         offset: BigInt,
         limit: BigInt,
     ) -> Result<PromiseRaw<'env, result::JsGetAccounts>> {
-        let offset = offset.get_u64().1;
-        let limit = limit.get_u64().1;
+        let offset = utils::convert_bigint_to_u64(offset, "offset")?;
+        let limit = utils::convert_bigint_to_u64(limit, "limit")?;
 
         self.read(
             env,
@@ -1537,8 +1724,8 @@ impl JsEvmWrapper {
         offset: BigInt,
         limit: BigInt,
     ) -> Result<PromiseRaw<'env, result::JsGetLegacyColdWallets>> {
-        let offset = offset.get_u64().1;
-        let limit = limit.get_u64().1;
+        let offset = utils::convert_bigint_to_u64(offset, "offset")?;
+        let limit = utils::convert_bigint_to_u64(limit, "limit")?;
 
         self.read(
             env,
@@ -1554,8 +1741,8 @@ impl JsEvmWrapper {
         offset: BigInt,
         limit: BigInt,
     ) -> Result<PromiseRaw<'env, result::JsGetReceipts>> {
-        let offset = offset.get_u64().1;
-        let limit = limit.get_u64().1;
+        let offset = utils::convert_bigint_to_u64(offset, "offset")?;
+        let limit = utils::convert_bigint_to_u64(limit, "limit")?;
 
         self.read(
             env,
@@ -1570,7 +1757,7 @@ impl JsEvmWrapper {
         env: &'env Env,
         block_number: BigInt,
     ) -> Result<PromiseRaw<'env, HashMap<String, result::JsTransactionReceipt>>> {
-        let block_number = block_number.get_u64().1;
+        let block_number = utils::convert_bigint_to_u64(block_number, "blockNumber")?;
 
         self.read(
             env,
@@ -1591,8 +1778,8 @@ impl JsEvmWrapper {
         from_block_number: BigInt,
         to_block_number: BigInt,
     ) -> Result<PromiseRaw<'env, result::JsGetReceipts>> {
-        let from_block_number = from_block_number.get_u64().1;
-        let to_block_number = to_block_number.get_u64().1;
+        let from_block_number = utils::convert_bigint_to_u64(from_block_number, "fromBlockNumber")?;
+        let to_block_number = utils::convert_bigint_to_u64(to_block_number, "toBlockNumber")?;
 
         self.read(
             env,
@@ -1608,7 +1795,7 @@ impl JsEvmWrapper {
         block_number: BigInt,
         tx_hash: String,
     ) -> Result<PromiseRaw<'env, result::JsGetReceipt>> {
-        let block_number = block_number.get_u64().1;
+        let block_number = utils::convert_bigint_to_u64(block_number, "blockNumber")?;
         let tx_hash = utils::convert_string_to_b256(tx_hash)?;
 
         self.read(
@@ -1627,7 +1814,7 @@ impl JsEvmWrapper {
     ) -> Result<PromiseRaw<'env, String>> {
         let address = utils::create_address_from_string(&address)?;
         let block_number = match block_number {
-            Some(block_number) => Some(block_number.get_u64().1),
+            Some(block_number) => Some(utils::convert_bigint_to_u64(block_number, "blockNumber")?),
             None => None,
         };
 
@@ -1646,7 +1833,7 @@ impl JsEvmWrapper {
         slot: BigInt,
     ) -> Result<PromiseRaw<'env, String>> {
         let address = utils::create_address_from_string(&address)?;
-        let slot = utils::convert_bigint_to_u256(slot)?;
+        let slot = utils::convert_bigint_to_u256(slot, "slot")?;
 
         self.read(
             env,
@@ -1676,9 +1863,10 @@ impl JsEvmWrapper {
         self.write(
             env,
             move |evm| evm.commit(commit_key, commit_data),
-            |_, result| {
+            |_, (dirty_accounts, events)| {
                 Ok(result::JsCommitResult::new(CommitResult {
-                    dirty_accounts: result,
+                    dirty_accounts,
+                    events,
                 })?)
             },
         )
@@ -1736,7 +1924,7 @@ impl JsEvmWrapper {
         env: &'env Env,
         block_number: BigInt,
     ) -> Result<PromiseRaw<'env, Option<JsBlockHeaderData>>> {
-        let block_number = block_number.get_u64().1;
+        let block_number = utils::convert_bigint_to_u64(block_number, "blockNumber")?;
 
         self.read(
             env,
@@ -1776,7 +1964,7 @@ impl JsEvmWrapper {
         env: &'env Env,
         block_number: BigInt,
     ) -> Result<PromiseRaw<'env, Option<JsCommitData>>> {
-        let block_number = block_number.get_u64().1;
+        let block_number = utils::convert_bigint_to_u64(block_number, "blockNumber")?;
 
         self.read(
             env,
@@ -1798,9 +1986,9 @@ impl JsEvmWrapper {
         to_block_number: BigInt,
         max_bytes: BigInt,
     ) -> Result<PromiseRaw<'env, Vec<JsCommitData>>> {
-        let from_block_number = from_block_number.get_u64().1;
-        let to_block_number = to_block_number.get_u64().1;
-        let max_bytes = max_bytes.get_u64().1;
+        let from_block_number = utils::convert_bigint_to_u64(from_block_number, "fromBlockNumber")?;
+        let to_block_number = utils::convert_bigint_to_u64(to_block_number, "toBlockNumber")?;
+        let max_bytes = utils::convert_bigint_to_u64(max_bytes, "maxBytes")?;
 
         self.read(
             env,
@@ -1881,7 +2069,10 @@ impl JsEvmWrapper {
         V: ToNapiValue,
         C: FnOnce(&'env Env, R) -> Result<V> + 'static,
     {
-        env.spawn_future_with_callback(Self::with_read(self.evm.clone(), f), cb)
+        env.spawn_future_with_callback(
+            Self::with_read(self.evm.clone(), self.concurrency.clone(), f),
+            cb,
+        )
     }
 
     fn write<'env, F, R, E, C, V>(&self, env: &'env Env, f: F, cb: C) -> Result<PromiseRaw<'env, V>>
@@ -1892,17 +2083,34 @@ impl JsEvmWrapper {
         V: ToNapiValue,
         C: FnOnce(&'env Env, R) -> Result<V> + 'static,
     {
-        env.spawn_future_with_callback(Self::with_write(self.evm.clone(), f), cb)
+        env.spawn_future_with_callback(
+            Self::with_write(self.evm.clone(), self.concurrency.clone(), f),
+            cb,
+        )
     }
 
     /// Run `f` against a shared (read) view of the EVM on the blocking pool.
     /// Concurrent readers proceed in parallel; only an in-flight writer blocks them.
-    async fn with_read<F, R, E>(evm: Arc<parking_lot::RwLock<EvmInner>>, f: F) -> Result<R>
+    async fn with_read<F, R, E>(
+        evm: Arc<parking_lot::RwLock<EvmInner>>,
+        concurrency: Option<Arc<Semaphore>>,
+        f: F,
+    ) -> Result<R>
     where
         F: FnOnce(&EvmInner) -> std::result::Result<R, E> + Send + 'static,
         R: Send + 'static,
         E: std::fmt::Display + Send + 'static,
     {
+        // Bounded instances wait here — off the blocking pool — when at capacity.
+        let _permit = match concurrency {
+            Some(sem) => Some(
+                sem.acquire_owned()
+                    .await
+                    .map_err(|_| napi::Error::from_reason("evm concurrency limiter closed"))?,
+            ),
+            None => None,
+        };
+
         tokio::task::spawn_blocking(move || {
             let evm = evm.read(); // shared lock; dropped at closure end
             f(&evm)
@@ -1913,12 +2121,26 @@ impl JsEvmWrapper {
     }
 
     /// Run `f` against an exclusive (write) view of the EVM on the blocking pool.
-    async fn with_write<F, R, E>(evm: Arc<parking_lot::RwLock<EvmInner>>, f: F) -> Result<R>
+    async fn with_write<F, R, E>(
+        evm: Arc<parking_lot::RwLock<EvmInner>>,
+        concurrency: Option<Arc<Semaphore>>,
+        f: F,
+    ) -> Result<R>
     where
         F: FnOnce(&mut EvmInner) -> std::result::Result<R, E> + Send + 'static,
         R: Send + 'static,
         E: std::fmt::Display + Send + 'static,
     {
+        // Bounded instances wait here — off the blocking pool — when at capacity.
+        let _permit = match concurrency {
+            Some(sem) => Some(
+                sem.acquire_owned()
+                    .await
+                    .map_err(|_| napi::Error::from_reason("evm concurrency limiter closed"))?,
+            ),
+            None => None,
+        };
+
         tokio::task::spawn_blocking(move || {
             let mut evm = evm.write(); // exclusive lock
             f(&mut evm)

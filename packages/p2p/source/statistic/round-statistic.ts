@@ -1,24 +1,159 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { performance } from "perf_hooks";
 
-type BasicStatistic = {
-	endpoint: string;
-	responseTime: number;
-	success: boolean;
-	ip: string;
-};
-type JoinedEmitStatistic = Contracts.P2P.EmitStatistic & BasicStatistic;
-type JoinedPingStatistic = Contracts.P2P.PingStatistic & BasicStatistic;
+/* Each key holds running totals plus a fixed number of samples, so it costs the same whether it saw
+ * one request or a million, and the number of ip keys is capped by `statistic.maxTrackedPeers`. The counts reported by
+ * getGeneralStatistic stay exact regardless: a request from a peer past the cap still lands in the
+ * round totals, and is counted in `recordsUnattributed` so the cap is visible. The added, removed and
+ * banned lists are capped the same way, and what they leave out is counted in `peersDropped`.
+ */
+const MIN_MAX_SLICE = 3; // fastest / slowest response times reported per key
+const MAX_ENDPOINT_SAMPLES = 32; // most recent response times kept per peer and endpoint
 
-const MIN_MAX_SLICE = 3;
+const keepSlice = (slice: number[], responseTime: number, compare: (a: number, b: number) => number): void => {
+	slice.push(responseTime);
+	slice.sort(compare);
+	slice.length = Math.min(slice.length, MIN_MAX_SLICE);
+};
+
+class ResponseAccumulator {
+	public count = 0;
+	public success = 0;
+
+	#totalResponseTime = 0;
+	readonly #fastest: number[] = [];
+	readonly #slowest: number[] = [];
+
+	public add(responseTime: number, success: boolean): void {
+		this.count++;
+
+		if (success) {
+			this.success++;
+		}
+
+		this.#totalResponseTime += responseTime;
+		keepSlice(this.#fastest, responseTime, (a, b) => a - b);
+		keepSlice(this.#slowest, responseTime, (a, b) => b - a);
+	}
+
+	public get average(): number {
+		return this.count === 0 ? 0 : Math.round(this.#totalResponseTime / this.count);
+	}
+
+	public get max(): number[] {
+		return [...this.#slowest];
+	}
+
+	public get min(): number[] {
+		return [...this.#fastest];
+	}
+}
+
+class EndpointAccumulator {
+	public readonly responses = new ResponseAccumulator();
+
+	readonly #peers = new Set<string>();
+
+	public constructor(private readonly maxTrackedPeers: number) {}
+
+	public add(ip: string, responseTime: number, success: boolean): void {
+		this.responses.add(responseTime, success);
+
+		if (this.#peers.size < this.maxTrackedPeers) {
+			this.#peers.add(ip);
+		}
+	}
+
+	public get peers(): number {
+		return this.#peers.size;
+	}
+}
+
+class PeerAccumulator {
+	public readonly responses = new ResponseAccumulator();
+
+	readonly #endpoints = new Map<string, { count: number; responseTimes: number[] }>();
+
+	public add(endpoint: string, responseTime: number, success: boolean): void {
+		this.responses.add(responseTime, success);
+
+		let samples = this.#endpoints.get(endpoint);
+		if (samples === undefined) {
+			samples = { count: 0, responseTimes: [] };
+			this.#endpoints.set(endpoint, samples);
+		}
+
+		samples.count++;
+		samples.responseTimes.push(responseTime);
+
+		if (samples.responseTimes.length > MAX_ENDPOINT_SAMPLES) {
+			samples.responseTimes.shift();
+		}
+	}
+
+	public toStatistic(): Contracts.P2P.PeerSectionStatistic {
+		return {
+			average: this.responses.average,
+			count: this.responses.count,
+			endpoints: [...this.#endpoints.entries()]
+				.sort(([, a], [, b]) => b.count - a.count)
+				.map(([name, samples]) => ({
+					name,
+					responseTimes: [...samples.responseTimes].sort((a, b) => a - b),
+				})),
+			max: this.responses.max,
+			min: this.responses.min,
+			success: this.responses.success,
+		};
+	}
+}
+
+class SectionAccumulator {
+	public unattributed = 0;
+
+	public readonly byEndpoint = new Map<string, EndpointAccumulator>();
+	public readonly byPeer = new Map<string, PeerAccumulator>();
+	public readonly totals = new ResponseAccumulator();
+
+	public constructor(private readonly maxTrackedPeers: number) {}
+
+	public record(ip: string, endpoint: string, responseTime: number, success: boolean): void {
+		this.totals.add(responseTime, success);
+
+		let endpointAccumulator = this.byEndpoint.get(endpoint);
+		if (endpointAccumulator === undefined) {
+			endpointAccumulator = new EndpointAccumulator(this.maxTrackedPeers);
+			this.byEndpoint.set(endpoint, endpointAccumulator);
+		}
+
+		endpointAccumulator.add(ip, responseTime, success);
+
+		let peerAccumulator = this.byPeer.get(ip);
+		if (peerAccumulator === undefined) {
+			if (this.byPeer.size >= this.maxTrackedPeers) {
+				this.unattributed++;
+				return;
+			}
+
+			peerAccumulator = new PeerAccumulator();
+			this.byPeer.set(ip, peerAccumulator);
+		}
+
+		peerAccumulator.add(endpoint, responseTime, success);
+	}
+}
 
 @injectable()
 export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
+
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "p2p")
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	public height: number = 0;
 	public round: number = 0;
@@ -26,17 +161,24 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	#startTime!: number;
 	#endTime!: number;
 	#totalPeers!: number;
-	#totalPeersBanned!: number;
+	#totalPeersBanned = 0;
+	#maxTrackedPeers!: number;
 
-	#emitStatisticsByPeer = new Map<string, JoinedEmitStatistic[]>();
-	#emitStatisticsByEndpoint = new Map<string, JoinedEmitStatistic[]>();
-
-	#pingStatisticsByPeer = new Map<string, JoinedPingStatistic[]>();
-	#pingStatisticsByEndpoint = new Map<string, JoinedPingStatistic[]>();
+	#emits!: SectionAccumulator;
+	#pings!: SectionAccumulator;
 
 	#peersAdded = new Set<string>();
 	#peersRemoved = new Set<string>();
 	#peersBanned = new Set<string>();
+	#peersDropped = 0;
+
+	@postConstruct()
+	public init(): void {
+		this.#maxTrackedPeers = this.configuration.getRequired<number>("statistic.maxTrackedPeers");
+
+		this.#emits = new SectionAccumulator(this.#maxTrackedPeers);
+		this.#pings = new SectionAccumulator(this.#maxTrackedPeers);
+	}
 
 	public start(): void {
 		this.#startTime = performance.now();
@@ -54,90 +196,59 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	}
 
 	public addEmit(ip: string, endpoint: string, emitStatistic: Contracts.P2P.EmitStatistic): void {
-		const joined = { endpoint, ip, ...emitStatistic };
-
-		this.#getEmitStatisticsByPeer(ip).push(joined);
-		this.#getEmitStatisticsByEndpoint(endpoint).push(joined);
-	}
-
-	#getEmitStatisticsByPeer(ip: string): JoinedEmitStatistic[] {
-		if (!this.#emitStatisticsByPeer.has(ip)) {
-			this.#emitStatisticsByPeer.set(ip, []);
-		}
-
-		return this.#emitStatisticsByPeer.get(ip)!;
-	}
-
-	#getEmitStatisticsByEndpoint(endpoint: string): JoinedEmitStatistic[] {
-		if (!this.#emitStatisticsByEndpoint.has(endpoint)) {
-			this.#emitStatisticsByEndpoint.set(endpoint, []);
-		}
-
-		return this.#emitStatisticsByEndpoint.get(endpoint)!;
+		this.#emits.record(ip, endpoint, emitStatistic.responseTime, emitStatistic.success);
 	}
 
 	public addPing(ip: string, endpoint: string, pingStatistic: Contracts.P2P.PingStatistic): void {
-		const joined = { endpoint, ip, ...pingStatistic };
-
-		this.#getPingStatisticsByPeer(ip).push(joined);
-		this.#getPingStatisticsByEndpoint(endpoint).push(joined);
-	}
-
-	#getPingStatisticsByPeer(ip: string): JoinedPingStatistic[] {
-		if (!this.#pingStatisticsByPeer.has(ip)) {
-			this.#pingStatisticsByPeer.set(ip, []);
-		}
-
-		return this.#pingStatisticsByPeer.get(ip)!;
-	}
-
-	#getPingStatisticsByEndpoint(endpoint: string): JoinedPingStatistic[] {
-		if (!this.#pingStatisticsByEndpoint.has(endpoint)) {
-			this.#pingStatisticsByEndpoint.set(endpoint, []);
-		}
-
-		return this.#pingStatisticsByEndpoint.get(endpoint)!;
+		this.#pings.record(ip, endpoint, pingStatistic.responseTime, pingStatistic.success);
 	}
 
 	peerAdded(ip: string): void {
-		this.#peersAdded.add(ip);
+		this.#trackPeer(this.#peersAdded, ip);
 	}
 
 	peerRemoved(ip: string): void {
-		if (!this.#peersBanned.has(ip)) {
-			this.#peersRemoved.add(ip);
+		// A saturated banned list can no longer tell a removal from a ban, so it is left out
+		// entirely; the ban that caused it already counts in `peersDropped`.
+		if (this.#peersBanned.has(ip) || this.#peersBanned.size >= this.#maxTrackedPeers) {
+			return;
 		}
+
+		this.#trackPeer(this.#peersRemoved, ip);
 	}
 
 	peerBanned(ip: string): void {
-		if (this.#peersRemoved.has(ip)) {
-			this.#peersRemoved.delete(ip);
+		this.#peersRemoved.delete(ip);
+
+		this.#trackPeer(this.#peersBanned, ip);
+	}
+
+	#trackPeer(peers: Set<string>, ip: string): void {
+		if (peers.size >= this.#maxTrackedPeers) {
+			this.#peersDropped++;
+			return;
 		}
 
-		this.#peersBanned.add(ip);
+		peers.add(ip);
 	}
 
 	public getGeneralStatistic(): Contracts.P2P.GeneralStatistic {
 		const duration = Math.round(this.#endTime - this.#startTime);
 
-		const emits = [...this.#emitStatisticsByPeer.values()].flat();
-		const pings = [...this.#pingStatisticsByPeer.values()].flat();
-
-		const emitsFailed = emits.reduce((count, emit) => count + (emit.success ? 0 : 1), 0);
-		const pingsFailed = pings.reduce((count, ping) => count + (ping.success ? 0 : 1), 0);
-
 		const count = {
-			emitsFailed,
-			emitsSuccess: emits.length - emitsFailed,
+			emitsFailed: this.#emits.totals.count - this.#emits.totals.success,
+			emitsSuccess: this.#emits.totals.success,
 			peersBanned: this.#totalPeersBanned,
-			peersRound: this.#emitStatisticsByPeer.size,
+			peersDropped: this.#peersDropped,
+			peersRound: this.#emits.byPeer.size,
 			peersTotal: this.#totalPeers,
-			pingsFailed,
-			pingsSuccess: pings.length - pingsFailed,
+			pingsFailed: this.#pings.totals.count - this.#pings.totals.success,
+			pingsSuccess: this.#pings.totals.success,
+			recordsUnattributed: this.#emits.unattributed + this.#pings.unattributed,
 		};
 
 		const response = {
-			average: this.#calculateAverageResponseTime(emits),
+			average: this.#emits.totals.average,
 		};
 
 		const peers = {
@@ -150,96 +261,38 @@ export class RoundStatistic implements Contracts.P2P.RoundStatistic {
 	}
 
 	public getEmitStatistics(): Contracts.P2P.EndpointStatistic[] {
-		return this.#calculateEndpointStatistics(this.#emitStatisticsByEndpoint);
+		return this.#toEndpointStatistics(this.#emits.byEndpoint);
 	}
 
 	public getPingStatistics(): Contracts.P2P.EndpointStatistic[] {
-		return this.#calculateEndpointStatistics(this.#pingStatisticsByEndpoint);
+		return this.#toEndpointStatistics(this.#pings.byEndpoint);
 	}
 
-	#calculateEndpointStatistics(data: Map<string, BasicStatistic[]>): Contracts.P2P.EndpointStatistic[] {
-		const statistics: Contracts.P2P.EndpointStatistic[] = [];
-
-		for (const [endpoint, emits] of data.entries()) {
-			const count = {
-				emits: emits.length,
-				peers: new Set(emits.map((emit) => emit.ip)).size,
-				success: emits.filter((emit) => emit.success).length,
-			};
-
-			const response = {
-				average: this.#calculateAverageResponseTime(emits),
-				max: emits
-					.sort((a, b) => b.responseTime - a.responseTime)
-					.slice(0, MIN_MAX_SLICE)
-					.map((emit) => emit.responseTime),
-				min: emits
-					.sort((a, b) => a.responseTime - b.responseTime)
-					.slice(0, MIN_MAX_SLICE)
-					.map((emit) => emit.responseTime),
-			};
-
-			statistics.push({ count, endpoint, response });
-		}
-
-		return statistics;
+	#toEndpointStatistics(byEndpoint: Map<string, EndpointAccumulator>): Contracts.P2P.EndpointStatistic[] {
+		return [...byEndpoint.entries()].map(([endpoint, accumulator]) => ({
+			count: {
+				emits: accumulator.responses.count,
+				peers: accumulator.peers,
+				success: accumulator.responses.success,
+			},
+			endpoint,
+			response: {
+				average: accumulator.responses.average,
+				max: accumulator.responses.max,
+				min: accumulator.responses.min,
+			},
+		}));
 	}
 
 	public getPeerStatistics(): Contracts.P2P.PeerStatistic[] {
-		const statistics: Contracts.P2P.PeerStatistic[] = [];
+		const ips = new Set<string>([...this.#emits.byPeer.keys(), ...this.#pings.byPeer.keys()]);
 
-		const ips = new Set<string>([...this.#emitStatisticsByPeer.keys(), ...this.#pingStatisticsByPeer.keys()]);
-
-		for (const ip of ips) {
-			const emits = this.#emitStatisticsByPeer.get(ip) || [];
-			const pings = this.#pingStatisticsByPeer.get(ip) || [];
-
-			statistics.push({
-				emits: this.#calculatePeerSectionStatistic(emits),
+		return [...ips]
+			.map((ip) => ({
+				emits: (this.#emits.byPeer.get(ip) ?? new PeerAccumulator()).toStatistic(),
 				ip,
-				pings: this.#calculatePeerSectionStatistic(pings),
-			});
-		}
-
-		return statistics.sort((a, b) => b.emits.average - a.emits.average);
-	}
-
-	#calculatePeerSectionStatistic(items: BasicStatistic[]): Contracts.P2P.PeerSectionStatistic {
-		const endpointsMap = new Map<string, { name: string; responseTimes: number[] }>();
-		for (const emit of items) {
-			if (!endpointsMap.has(emit.endpoint)) {
-				endpointsMap.set(emit.endpoint, { name: emit.endpoint, responseTimes: [] });
-			}
-			endpointsMap.get(emit.endpoint)!.responseTimes.push(emit.responseTime);
-		}
-
-		const emitEndpoints = [...endpointsMap.values()];
-		for (const endpoint of emitEndpoints) {
-			endpoint.responseTimes.sort((a, b) => a - b);
-		}
-
-		return {
-			average: this.#calculateAverageResponseTime(items),
-			count: items.length,
-			endpoints: emitEndpoints.sort((a, b) => b.responseTimes.length - a.responseTimes.length),
-			max: items
-				.sort((a, b) => b.responseTime - a.responseTime)
-				.slice(0, MIN_MAX_SLICE)
-				.map((emit) => emit.responseTime),
-			min: items
-				.sort((a, b) => a.responseTime - b.responseTime)
-				.slice(0, MIN_MAX_SLICE)
-				.map((emit) => emit.responseTime),
-			success: items.filter((emit) => emit.success).length,
-		};
-	}
-
-	#calculateAverageResponseTime(items: BasicStatistic[]): number {
-		if (items.length === 0) {
-			return 0;
-		}
-
-		const totalResponseTime = items.reduce((sum, emit) => sum + emit.responseTime, 0);
-		return Math.round(totalResponseTime / items.length);
+				pings: (this.#pings.byPeer.get(ip) ?? new PeerAccumulator()).toStatistic(),
+			}))
+			.sort((a, b) => b.emits.average - a.emits.average);
 	}
 }

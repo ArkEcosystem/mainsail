@@ -75,7 +75,7 @@ describe<{
 			const serializedAltered = (
 				await serializer.serializeWithTransactions({ ...data, transactions: deserialized.transactions })
 			).toString("hex");
-			const buff = Buffer.from(serializedAltered.slice(0, serializedAltered.length - hex.length) + hex, "hex");
+			const buff = Buffer.from(serializedAltered + hex, "hex");
 
 			// Header can't detect it, because the payload size is correct
 			await assert.resolves(() => deserializer.deserializeHeader(buff));

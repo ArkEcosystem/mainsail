@@ -13,12 +13,12 @@ export class Command extends Commands.Command {
 
 	@postConstruct()
 	public configure(): void {
-		this.definition.setFlag("daemon", "Stop the Core process or daemon.", Joi.boolean());
+		this.definition.setFlag("daemon", "Stop the Core process or daemon.", Joi.boolean().default(false));
 	}
 
 	public async execute(): Promise<void> {
 		this.app
 			.get<Contracts.Cli.ProcessFactory>(Identifiers.Cli.ProcessFactory)("mainsail")
-			.stop(this.getFlag("daemon"));
+			.stop(this.getFlag<boolean>("daemon"));
 	}
 }

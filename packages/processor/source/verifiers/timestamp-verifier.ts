@@ -2,14 +2,10 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { FutureBlock, InvalidTimestamp } from "@mainsail/exceptions";
-import dayjs from "dayjs";
+import { InvalidTimestamp } from "@mainsail/exceptions";
 
 @injectable()
 export class TimestampVerifier implements Contracts.Processor.Handler {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.State.Store)
 	private readonly store!: Contracts.State.Store;
 
@@ -20,19 +16,16 @@ export class TimestampVerifier implements Contracts.Processor.Handler {
 	private readonly timestampCalculator!: Contracts.BlockchainUtils.TimestampCalculator;
 
 	public async execute(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
-		if (unit.getBlock().number === this.configuration.getGenesisHeight()) {
+		const block = unit.getBlock();
+
+		if (block.number === this.configuration.getGenesisHeight()) {
 			return;
 		}
 
-		if (unit.getBlock().timestamp > dayjs().valueOf() + this.configuration.getMilestone().timeouts.tolerance) {
-			throw new FutureBlock(unit.getBlock());
-		}
-
 		if (
-			unit.getBlock().timestamp <
-			this.timestampCalculator.calculateMinimalTimestamp(this.store.getLastBlock(), unit.getBlock().round)
+			block.timestamp < this.timestampCalculator.calculateMinimalTimestamp(this.store.getLastBlock(), block.round)
 		) {
-			throw new InvalidTimestamp(unit.getBlock());
+			throw new InvalidTimestamp(block);
 		}
 	}
 }

@@ -49,6 +49,8 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
 
+	readonly #seedIps = new Set<string>();
+
 	@postConstruct()
 	public initialize(): void {
 		this.events.listen(Events.CryptoEvent.MilestoneChanged, {
@@ -65,21 +67,25 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	}
 
 	public async validateAndAcceptPeer(ip: string, options: Contracts.P2P.AcceptNewPeerOptions = {}): Promise<void> {
+		if (options.seed) {
+			this.#seedIps.add(ip);
+		}
+
 		if (this.repository.hasPeer(ip) || this.repository.hasPendingPeer(ip)) {
 			return;
 		}
 
+		if (!this.#isSeed(ip, options) && this.configuration.getOptional<boolean>("disableDiscovery", false)) {
+			this.logger.debug(`Rejected ${ip} because the relay is in non-discovery mode.`, "p2p");
+			return;
+		}
+
 		if (this.validatePeerIp(ip, options)) {
-			await this.#acceptNewPeer(ip);
+			await this.#acceptNewPeer(ip, options);
 		}
 	}
 
 	public validatePeerIp(ip: string, options: Contracts.P2P.AcceptNewPeerOptions = {}): boolean {
-		if (this.configuration.getOptional<boolean>("disableDiscovery", false)) {
-			this.logger.warn(`Rejected ${ip} because the relay is in non-discovery mode.`, "p2p");
-			return false;
-		}
-
 		if (!isValidPeerIp(ip)) {
 			return false;
 		}
@@ -96,28 +102,53 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			return false;
 		}
 
-		const maxSameSubnetPeers = this.configuration.getRequired<number>("maxSameSubnetPeers");
+		return !this.#isSameSubnetLimitReached(ip, options);
+	}
 
-		if (this.repository.getSameSubnetPeers(ip).length >= maxSameSubnetPeers && !options.seed) {
-			this.logger.warnExtra(
-				`Rejected ${ip} because we are already at the ${maxSameSubnetPeers} limit for peers sharing the same /24 subnet.`,
-				"p2p",
-			);
+	#isSeed(ip: string, options: Contracts.P2P.AcceptNewPeerOptions): boolean {
+		return !!options.seed || this.#seedIps.has(ip);
+	}
 
+	#isSameSubnetLimitReached(ip: string, options: Contracts.P2P.AcceptNewPeerOptions): boolean {
+		if (this.#isSeed(ip, options)) {
 			return false;
 		}
+
+		const maxSameSubnetPeers = this.configuration.getRequired<number>("maxSameSubnetPeers");
+
+		if (this.repository.getSameSubnetPeers(ip).length < maxSameSubnetPeers) {
+			return false;
+		}
+
+		this.logger.warnExtra(
+			`Rejected ${ip} because we are already at the ${maxSameSubnetPeers} limit for peers sharing the same /24 subnet.`,
+			"p2p",
+		);
 
 		return true;
 	}
 
-	async #acceptNewPeer(ip: string): Promise<void> {
+	async #acceptNewPeer(ip: string, options: Contracts.P2P.AcceptNewPeerOptions): Promise<void> {
 		const peer = this.app.get<Contracts.P2P.PeerFactory>(Identifiers.P2P.Peer.Factory)(ip);
 
 		this.repository.setPendingPeer(peer);
 
-		const txPoolNode = this.txPoolNodeFactory(ip);
+		try {
+			const txPoolNode = this.txPoolNodeFactory(ip);
 
-		if ((await this.peerVerifier.verify(peer)) && (await this.txPoolNodeVerifier.verify(txPoolNode))) {
+			if (!(await this.peerVerifier.verify(peer)) || !(await this.txPoolNodeVerifier.verify(txPoolNode))) {
+				return;
+			}
+
+			if (this.peerDisposer.isBanned(peer.ip)) {
+				return;
+			}
+
+			if (this.#isSameSubnetLimitReached(peer.ip, options)) {
+				this.peerDisposer.disposePeer(ip);
+				return;
+			}
+
 			this.repository.setPeer(peer);
 			this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
 
@@ -128,9 +159,11 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 			await this.peerCommunicator.pingPorts(peer);
 			await this.peerDiscoverer.discoverPeers(peer);
 			await this.ApiNodeDiscoverer.discoverApiNodes(peer);
+		} catch (rawError) {
+			this.peerDisposer.disposePeer(ip);
+		} finally {
+			this.repository.forgetPendingPeer(peer);
 		}
-
-		this.repository.forgetPendingPeer(peer);
 	}
 
 	async #disconnectInvalidPeers(): Promise<void> {

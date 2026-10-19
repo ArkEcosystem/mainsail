@@ -1,6 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { injectable } from "@mainsail/container";
+import { IpAddress } from "@mainsail/utils";
 
 @injectable()
 export class TxPoolNode implements Contracts.P2P.TxPoolNode {
@@ -15,6 +16,6 @@ export class TxPoolNode implements Contracts.P2P.TxPoolNode {
 	}
 
 	public get url(): string {
-		return `http://${this.ip}:${this.port}/`;
+		return `http://${IpAddress.normalizeAddress(this.ip)}:${this.port}/`;
 	}
 }

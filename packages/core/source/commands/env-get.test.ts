@@ -41,8 +41,6 @@ describe<{
 	});
 
 	it("should fail if the environment configuration doesn't exist", async ({ cli }) => {
-		ensureDirSync(`${process.env.MAINSAIL_PATH_CONFIG}/core/jestnet`);
-
 		await assert.rejects(
 			() => cli.withFlags({ key: "FAKE_KEY" }).execute(Command),
 			`No environment file found at ${process.env.MAINSAIL_PATH_CONFIG}/core/.env`,

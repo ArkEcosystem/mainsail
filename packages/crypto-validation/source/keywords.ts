@@ -3,33 +3,22 @@ import type { FuncKeywordDefinition } from "ajv";
 
 import { parseBlockNumber } from "./parse-block-number.js";
 
+const isInteger = (data: unknown): data is number => Number.isInteger(data);
+
 export const makeKeywords = (
 	configuration: Contracts.Crypto.Configuration,
 ): {
-	maxBytes: FuncKeywordDefinition;
 	bigInt: FuncKeywordDefinition;
 	buffer: FuncKeywordDefinition;
 	isValidatorIndex: FuncKeywordDefinition;
 	limitToRoundValidators: FuncKeywordDefinition;
 } => {
-	const maxBytes: FuncKeywordDefinition = {
-		compile: (schema) => (data) => Buffer.byteLength(data, "utf8") <= schema,
-		errors: false,
-		keyword: "maxBytes",
-		metaSchema: {
-			minimum: 0,
-			type: "integer",
-		},
-		type: "string",
-	};
-
 	const bigInt: FuncKeywordDefinition = {
-		compile: (schema) => (data) => {
-			const minimum = schema.minimum !== undefined ? schema.minimum : 0n;
-			const maximum =
-				schema.maximum !== undefined
-					? schema.maximum
-					: BigInt("0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
+		compile: (schema: { minimum?: number; maximum?: number }) => (data) => {
+			const minimum = BigInt(schema.minimum ?? 0);
+			const maximum = BigInt(
+				schema.maximum ?? "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+			);
 
 			if (typeof data !== "bigint") {
 				return false;
@@ -48,6 +37,7 @@ export const makeKeywords = (
 		errors: false,
 		keyword: "bigInt",
 		metaSchema: {
+			additionalProperties: false,
 			properties: {
 				maximum: { type: "integer" },
 				minimum: { type: "integer" },
@@ -74,7 +64,7 @@ export const makeKeywords = (
 
 				const blockNumber = parseBlockNumber(schema.blockNumberPath, parentSchema);
 				const { roundValidators } = configuration.getMilestone(blockNumber);
-				const minimum = schema.minimum !== undefined ? schema.minimum : roundValidators;
+				const minimum = schema.minimum ?? roundValidators;
 
 				if (data.length < minimum || data.length > roundValidators) {
 					return false;
@@ -86,6 +76,7 @@ export const makeKeywords = (
 		errors: false,
 		keyword: "limitToRoundValidators",
 		metaSchema: {
+			additionalProperties: false,
 			properties: {
 				blockNumberPath: { type: "string" },
 				minimum: { type: "integer" },
@@ -98,7 +89,7 @@ export const makeKeywords = (
 	const isValidatorIndex: FuncKeywordDefinition = {
 		compile(schema: { blockNumberPath?: string }) {
 			return (data, parentSchema) => {
-				if (!Number.isInteger(data)) {
+				if (!isInteger(data)) {
 					return false;
 				}
 
@@ -115,6 +106,7 @@ export const makeKeywords = (
 		errors: false,
 		keyword: "isValidatorIndex",
 		metaSchema: {
+			additionalProperties: false,
 			properties: {
 				blockNumberPath: { type: "string" },
 			},
@@ -122,5 +114,5 @@ export const makeKeywords = (
 		},
 	};
 
-	return { bigInt, buffer, isValidatorIndex, limitToRoundValidators, maxBytes };
+	return { bigInt, buffer, isValidatorIndex, limitToRoundValidators };
 };

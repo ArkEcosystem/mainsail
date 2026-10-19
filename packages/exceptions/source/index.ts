@@ -4,6 +4,7 @@ export * from "./config.js";
 export * from "./consensus.js";
 export * from "./container.js";
 export * from "./crypto.js";
+export * from "./database.js";
 export * from "./filesystem.js";
 export * from "./logic.js";
 export * from "./p2p.js";

@@ -1,8 +1,28 @@
 use revm::{
     context::result::{ExecutionResult, Output},
-    primitives::{Bytes, Log},
+    primitives::{Address, B256, Bytes, Log},
 };
 use serde::{Deserialize, Serialize};
+
+// Mirror of alloys `Log` so that neither the bincode encoding persisted in the
+// commits table nor the JSON crossing the napi boundary depends on an upstream serde impl.
+#[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+pub struct StoredLog {
+    pub address: Address,
+    pub topics: Vec<B256>,
+    pub data: Bytes,
+}
+
+impl From<Log> for StoredLog {
+    fn from(log: Log) -> Self {
+        let (topics, data) = log.data.split();
+        Self {
+            address: log.address,
+            topics,
+            data,
+        }
+    }
+}
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 pub struct TxReceipt {
@@ -11,7 +31,7 @@ pub struct TxReceipt {
     pub gas_refunded: u64,
     pub success: u8,
     pub contract_address: Option<String>,
-    pub logs: Option<Vec<Log>>,
+    pub logs: Option<Vec<StoredLog>>,
     pub output: Option<Bytes>,
 }
 
@@ -26,7 +46,7 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
                 cumulative_gas_used,
                 success: 1,
                 contract_address: None,
-                logs: Some(logs),
+                logs: Some(map_logs(logs)),
                 output: Some(output),
             },
             Output::Create(output, address) => TxReceipt {
@@ -35,7 +55,7 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
                 cumulative_gas_used,
                 success: 1,
                 contract_address: address.map(|address| address.to_string()),
-                logs: Some(logs),
+                logs: Some(map_logs(logs)),
                 output: Some(output),
             },
         },
@@ -60,12 +80,53 @@ pub fn map_execution_result(result: ExecutionResult, cumulative_gas_used: u64) -
     }
 }
 
+fn map_logs(logs: Vec<Log>) -> Vec<StoredLog> {
+    logs.into_iter().map(Into::into).collect()
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::receipt::map_execution_result;
-    use alloy_primitives::address;
+    use crate::receipt::{StoredLog, map_execution_result};
+    use alloy_primitives::{Log, LogData, address, b256};
     use bytes::Bytes;
     use revm::context::result::{ExecutionResult, HaltReason, Output, ResultGas, SuccessReason};
+
+    fn sample_log() -> Log {
+        Log {
+            address: address!("00000000000000000000000000000000000000aa"),
+            data: LogData::new(
+                vec![
+                    b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+                    b256!("0000000000000000000000000000000000000000000000000000000000000002"),
+                ],
+                alloy_primitives::Bytes::from_static(&[0xde, 0xad, 0xbe, 0xef]),
+            )
+            .unwrap(),
+        }
+    }
+
+    #[test]
+    fn stored_log_bincode_matches_alloy_log() {
+        let log = sample_log();
+        let stored = StoredLog::from(log.clone());
+
+        let alloy_bytes = bincode::serialize(&log).unwrap();
+        assert_eq!(bincode::serialize(&stored).unwrap(), alloy_bytes);
+
+        let decoded: StoredLog = bincode::deserialize(&alloy_bytes).unwrap();
+        assert_eq!(decoded, stored);
+    }
+
+    #[test]
+    fn stored_log_json_matches_alloy_log() {
+        let log = sample_log();
+        let stored = StoredLog::from(log.clone());
+
+        assert_eq!(
+            serde_json::to_value(&stored).unwrap(),
+            serde_json::to_value(&log).unwrap()
+        );
+    }
 
     #[test]
     fn test_map_execution_result_call() {

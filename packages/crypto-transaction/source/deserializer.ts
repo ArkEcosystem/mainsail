@@ -3,6 +3,9 @@ import type { Contracts } from "@mainsail/contracts";
 import { injectable } from "@mainsail/container";
 import { bytesToHex, getAddress, Hex, hexToBigInt } from "viem";
 
+// secp256k1 group order (n). Valid ECDSA r/s values are in the range [1, n).
+const SECP256K1_ORDER = BigInt("0xfffffffffffffffffffffffffffffffebaaedce6af48a03bbfd25e8cd0364141");
+
 function decodeListBounds(buffer: Uint8Array): { start: number; end: number } {
 	if (buffer.byteLength === 0) {
 		throw new Error("decode RLP empty buffer");
@@ -33,7 +36,7 @@ function decodeListBounds(buffer: Uint8Array): { start: number; end: number } {
 				throw new Error("decode RLP leading zero in length");
 			}
 
-			length = (length << 8) | v;
+			length = length * 256 + v;
 		}
 		if (length < 56) {
 			throw new Error("decode RLP non-minimal long list");
@@ -115,7 +118,7 @@ function readLength(buffer: Uint8Array, offset: number, lengthOfLength: number) 
 		if (index === 0 && lengthOfLength > 1 && v === 0) {
 			throw new Error("decode RLP leading zero in length");
 		}
-		length = (length << 8) | v;
+		length = length * 256 + v;
 	}
 
 	return { len: length, next: offset + lengthOfLength };
@@ -135,7 +138,7 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		const fields: Hex[] = [];
 		let offset = start;
 		while (offset < end) {
-			if (fields.length > 10) {
+			if (fields.length >= 10) {
 				throw new Error("decoded RLP contains too many fields");
 			}
 
@@ -152,29 +155,43 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 			throw new Error("decoded RLP contains too few fields");
 		}
 
-		const nonce = this.#parseBigInt(fields[0]);
-		const gasPrice = this.#parseNumber(fields[1]);
-		const gasLimit = this.#parseNumber(fields[2]);
+		const nonce = this.#parseBigInt(fields[0], "nonce");
+		const gasPrice = this.#parseNumber(fields[1], "gasPrice");
+		const gasLimit = this.#parseNumber(fields[2], "gasLimit");
 
 		const recipientAddressRaw = this.#parseAddress(fields[3]);
 		const to = recipientAddressRaw ? getAddress(recipientAddressRaw) : undefined;
 
-		const value = this.#parseBigInt(fields[4]);
+		const value = this.#parseBigInt(fields[4], "value");
 		const data = this.#parseData(fields[5]);
 
 		// Signature
-		const v = this.#parseNumber(fields[6]);
+		const v = this.#parseNumber(fields[6], "v");
+		if (v < 35) {
+			throw new Error("decoded RLP v is below 35 (not EIP-155)");
+		}
+
 		const chainId = Math.floor((v - 35) / 2);
 		const network = chainId;
 
 		const normalizedV = v - (chainId * 2 + 35);
-		const r = fields[7].slice(2);
-		const s = fields[8].slice(2);
+		// RLP encodes r/s as minimal-length integers, so canonical Ethereum wallets strip
+		// leading zero bytes (~1 in 128 signatures). Mainsail's canonical form is a fixed
+		// 32-byte r/s (its signer pads, its serializer preserves 32 bytes, the AJV schema
+		// pins 64 hex chars, and the Rust boundary requires exactly 32 bytes). Left-pad here
+		// so externally-signed transactions normalize to that form instead of being rejected.
+		const r = this.#parseSignaturePart(fields[7], "r");
+		const s = this.#parseSignaturePart(fields[8], "s");
 
 		let legacySecondSignature: string | undefined = undefined;
 
 		// Legacy second signature
 		if (fields.length === 10) {
+			// r (32) + s (32) + v (1); the verifier slices exactly these offsets and the AJV schema pins 130 hex chars.
+			if (fields[9].length !== 2 + 65 * 2) {
+				throw new Error("decoded RLP legacy second signature is not 65 bytes");
+			}
+
 			legacySecondSignature = fields[9].slice(2);
 		}
 
@@ -203,12 +220,53 @@ export class Deserializer implements Contracts.Crypto.TransactionDeserializer {
 		return { data: transaction, serialized };
 	}
 
-	#parseNumber(value: Hex): number {
-		return value === "0x" ? 0 : Number(value);
+	#parseSignaturePart(value: Hex, field: "r" | "s"): string {
+		const hex = value.slice(2);
+		if (hex.length > 64) {
+			throw new Error(`decoded RLP signature ${field} exceeds 32 bytes`);
+		}
+
+		this.#assertCanonicalInteger(value, field);
+
+		// Enforce the ECDSA range [1, n) at the decode boundary
+		// instead of relying on the downstream recover/verify/low-s checks to reject 0 or
+		// out-of-range values as a side effect. The low-s bound (s <= n/2) stays in the verifier.
+		const numeric = value === "0x" ? 0n : hexToBigInt(value);
+		if (numeric === 0n || numeric >= SECP256K1_ORDER) {
+			throw new Error(`decoded RLP signature ${field} is out of range`);
+		}
+
+		return hex.padStart(64, "0");
 	}
 
-	#parseBigInt(value: Hex): bigint {
+	#parseNumber(value: Hex, field: string): number {
+		this.#assertCanonicalInteger(value, field);
+		if (value === "0x") {
+			return 0;
+		}
+
+		// Number() silently loses precision above 2^53 and turns very long integers into Infinity.
+		const number = Number(value);
+		if (!Number.isSafeInteger(number)) {
+			throw new Error(`decoded RLP ${field} exceeds the safe integer range`);
+		}
+
+		return number;
+	}
+
+	#parseBigInt(value: Hex, field: string): bigint {
+		this.#assertCanonicalInteger(value, field);
 		return value === "0x" ? 0n : hexToBigInt(value);
+	}
+
+	// Canonical RLP integers are minimal big-endian: zero is the empty string ("0x") and no
+	// non-zero value carries a leading zero byte. Geth rejects the non-canonical forms with
+	// "rlp: non-canonical integer (leading zeroes)"; mirror that so a transaction has exactly
+	// one admissible wire encoding and keccak256(serialized) === hash always holds.
+	#assertCanonicalInteger(value: Hex, field: string): void {
+		if (value.startsWith("00", 2)) {
+			throw new Error(`decoded RLP ${field} is a non-canonical integer (leading zeroes)`);
+		}
 	}
 
 	#parseAddress(value: Hex): string | undefined {

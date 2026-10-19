@@ -451,11 +451,26 @@ describe<{
 		};
 		serviceProviderRepository.set("stub", serviceProvider);
 		serviceProviderRepository.load("stub");
+		const spyError = spy(context.logger, "error");
 
 		await context.app.boot();
 		await context.app.terminate();
 
 		spyExit.calledWith(0);
+		spyError.calledOnce();
+		assert.match(spyError.getCallArgs(0)[0], "Failed to dispose");
+		assert.match(spyError.getCallArgs(0)[0], "dispose boom");
+	});
+
+	it("should fail by starting the termination without waiting for it and throwing the error", (context) => {
+		const error = new Error("Hello World");
+		// Never resolves, like a termination that waits on a lock the failing caller holds.
+		const spyTerminate = stub(context.app, "terminate").callsFake(() => new Promise(() => {}));
+
+		assert.throws(() => context.app.fail("Hello World", error), "Hello World");
+
+		spyTerminate.calledOnce();
+		spyTerminate.calledWith("Hello World", error);
 	});
 
 	it("should warn about active handles still open at shutdown", async (context) => {

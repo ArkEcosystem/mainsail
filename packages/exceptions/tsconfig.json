@@ -7,7 +7,7 @@
 	"include": ["source/**/**.ts"],
 	"references": [
 		{
-			"path": "../utils"
+			"path": "../constants"
 		}
 	]
 }

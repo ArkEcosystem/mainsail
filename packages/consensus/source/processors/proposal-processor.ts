@@ -17,9 +17,6 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@tagged("type", "consensus")
 	private readonly consensusSignature!: Contracts.Crypto.SignatureBls;
 
-	@inject(Identifiers.Cryptography.Configuration)
-	private readonly configuration!: Contracts.Crypto.Configuration;
-
 	@inject(Identifiers.Consensus.Aggregator)
 	private readonly aggregator!: Contracts.Consensus.Aggregator;
 
@@ -35,44 +32,56 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	@inject(Identifiers.P2P.Broadcaster)
 	private readonly broadcaster!: Contracts.P2P.Broadcaster;
 
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
+	@inject(Identifiers.ConsensusStorage.Service)
+	private readonly storage!: Contracts.ConsensusStorage.Service;
 
 	async process(
 		proposal: Contracts.Crypto.Proposal,
 		broadcast: boolean = true,
 	): Promise<Contracts.Consensus.ProcessorResult> {
 		return this.commitLock.runNonExclusive(async () => {
-			if (!this.hasValidBlockNumberOrRound({ blockNumber: proposal.blockHeader.number, round: proposal.round })) {
+			if (this.isConsensusDisposed()) {
 				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
-			if (!this.isRoundInBounds(proposal)) {
-				return Enums.Consensus.ProcessorResult.Invalid;
+			if (
+				!this.hasValidBlockNumberAndRound({ blockNumber: proposal.blockHeader.number, round: proposal.round })
+			) {
+				return Enums.Consensus.ProcessorResult.Skipped;
+			}
+
+			if (this.isRoundAheadOfTime(proposal)) {
+				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
 			if (!this.#hasValidProposer(proposal)) {
 				return Enums.Consensus.ProcessorResult.Invalid;
 			}
 
+			const roundState = this.roundStateRepo.getRoundState(proposal.blockHeader.number, proposal.round);
+			if (this.#isDuplicateProposal(roundState, proposal)) {
+				return Enums.Consensus.ProcessorResult.Skipped;
+			}
+
 			if (!(await this.#hasValidSignature(proposal))) {
 				return Enums.Consensus.ProcessorResult.Invalid;
 			}
 
-			const roundState = this.roundStateRepo.getRoundState(proposal.blockHeader.number, proposal.round);
-			if (roundState.hasProposal()) {
+			if (this.#isDuplicateProposal(roundState, proposal)) {
 				return Enums.Consensus.ProcessorResult.Skipped;
 			}
 
 			roundState.addProposal(proposal);
 
+			await this.storage.saveProposal(proposal);
+
 			if (broadcast) {
 				void this.broadcaster.broadcastProposal(proposal);
 			}
 
-			// Add some time to allow the proposal to be broadcasted to other nodes before processing it.
+			// Add some time to allow the proposal to be broadcast to other nodes before processing it.
 			setTimeout(() => {
-				void this.getConsensus().handle(roundState);
+				this.handleRoundState(roundState);
 			}, 0);
 
 			return Enums.Consensus.ProcessorResult.Accepted;
@@ -80,8 +89,29 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	}
 
 	async hasValidLockProof(proposal: Contracts.Crypto.Proposal): Promise<boolean> {
-		if (proposal.validRound === undefined) {
+		if (proposal.validRound === undefined && proposal.lockProof === undefined) {
 			return true;
+		}
+
+		// A re-proposal carries both: validRound names the round its value was found valid in, and lockProof
+		// holds the +2/3 prevotes of that round. One without the other is malformed. The proposal factory
+		// rejects such bytes already; this keeps the check self-contained.
+		if (proposal.lockProof === undefined) {
+			this.logger.debug(
+				`Received proposal ${proposal.blockHeader.number}/${proposal.round} has validRound ${proposal.validRound} but no lock proof`,
+				"consensus",
+			);
+
+			return false;
+		}
+
+		if (proposal.validRound === undefined) {
+			this.logger.debug(
+				`Received proposal ${proposal.blockHeader.number}/${proposal.round} has a lock proof but no validRound`,
+				"consensus",
+			);
+
+			return false;
 		}
 
 		if (proposal.validRound >= proposal.round) {
@@ -91,14 +121,6 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 			);
 
 			return false;
-		}
-
-		if (!proposal.lockProof) {
-			this.logger.debug(
-				`Received proposal ${proposal.blockHeader.number}/${proposal.round} with missing lock proof`,
-				"consensus",
-			);
-			return true;
 		}
 
 		const data = await this.messageSerializer.serializeMessageForSignature(
@@ -125,6 +147,22 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 		}
 
 		return verified;
+	}
+
+	#isDuplicateProposal(roundState: Contracts.Consensus.RoundState, proposal: Contracts.Crypto.Proposal): boolean {
+		if (!roundState.hasProposal()) {
+			return false;
+		}
+
+		const existingProposal = roundState.getProposal();
+		if (existingProposal && !existingProposal.serialized.equals(proposal.serialized)) {
+			this.logger.warn(
+				`Conflicting proposal for ${proposal.blockHeader.number}/${proposal.round}. Existing: ${existingProposal.blockHeader.hash}, New: ${proposal.blockHeader.hash}`,
+				"consensus",
+			);
+		}
+
+		return true;
 	}
 
 	#hasValidProposer(proposal: Contracts.Crypto.Proposal): boolean {

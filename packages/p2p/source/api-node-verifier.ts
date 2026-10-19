@@ -55,7 +55,14 @@ export class ApiNodeVerifier implements Contracts.P2P.ApiNodeVerifier {
 	}
 
 	#verifyHeaders(response: HttpResponse): void {
-		const contentLength = Number(response.headers[response.headers.indexOf("content-length") + 1]);
+		const index = response.headers.findIndex(
+			(header, index) => index % 2 === 0 && header.toLowerCase() === "content-length",
+		);
+		if (index === -1) {
+			throw new Error("missing content length");
+		}
+
+		const contentLength = Number(response.headers[index + 1]);
 		if (contentLength !== helloWorldLength) {
 			throw new Error("invalid content length");
 		}

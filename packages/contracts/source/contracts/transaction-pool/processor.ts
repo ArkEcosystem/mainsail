@@ -1,5 +1,3 @@
-import type { Transaction } from "../crypto/transactions.js";
-
 export type ProcessorError = {
 	type: string;
 	message: string;
@@ -12,10 +10,6 @@ export type ProcessorResult = {
 	excess: number[];
 	errors?: { [index: string]: ProcessorError };
 };
-
-export interface ProcessorExtension {
-	throwIfCannotBroadcast(transaction: Transaction): Promise<void>;
-}
 
 export interface Processor {
 	process(data: Buffer[]): Promise<ProcessorResult>;

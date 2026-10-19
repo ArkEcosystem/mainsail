@@ -71,7 +71,7 @@ describe<{
 			uint16Value: 0x0203,
 			uint32Value: 0x04050607,
 			uint48Value: 0x010203040506,
-			uint64Value: 123_456_789,
+			uint64Value: 123_456_789n,
 			uint256Value: 12345678901234567890n,
 			bigintValue: 987654321n,
 
@@ -143,6 +143,23 @@ describe<{
 		);
 
 		assert.equal(serialized, Buffer.from([0x00, 0x00, 0xaa]));
+	});
+
+	it("rejects a non-canonical presence flag for an optional field", async ({ serializer }) => {
+		const schema = { blockHashValue: { type: "blockHash", optional: true } } as const;
+
+		const serialized = await serializer.serialize(
+			{ blockHashValue: "33".repeat(32) },
+			{ length: 1 + 32, schema, skip: 0 },
+		);
+
+		assert.equal(serialized[0], 1); // canonical "present" flag
+		serialized[0] = 2; // non-canonical / malleable
+
+		await assert.rejects(
+			() => serializer.deserialize(ByteBuffer.fromBuffer(serialized), {}, { schema }),
+			"Invalid optional presence flag: expected 0 or 1, got 2",
+		);
 	});
 
 	it("throws when serializing an unsupported schema type", async ({ serializer }) => {

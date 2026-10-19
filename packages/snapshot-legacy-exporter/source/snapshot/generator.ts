@@ -9,12 +9,12 @@ import { writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import { brotliCompress } from "node:zlib";
 import { DataSource, EntityManager } from "typeorm";
-import { PostgresConnectionOptions } from "typeorm/driver/postgres/PostgresConnectionOptions.js";
+import { PostgresDataSourceOptions } from "typeorm/driver/postgres/PostgresDataSourceOptions.js";
 
 import { Identifiers as InternalIdentifiers } from "../identifiers.js";
 import { LegacyChainTip, LegacySnapshot, LegacyWallet } from "../interfaces.js";
 
-interface DatabaseOptions extends PostgresConnectionOptions {
+interface DatabaseOptions extends PostgresDataSourceOptions {
 	readonly v3: {
 		readonly host: string;
 		readonly port: number;

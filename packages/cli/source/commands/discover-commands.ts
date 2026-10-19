@@ -32,7 +32,7 @@ export class DiscoverCommands implements Contracts.Cli.DiscoverCommands {
 	public async from(packages: string[]): Promise<Contracts.Cli.CommandList> {
 		const commands: Contracts.Cli.CommandList = {};
 
-		if (!Array.isArray(packages) || packages.length <= 0) {
+		if (!Array.isArray(packages) || packages.length === 0) {
 			return commands;
 		}
 

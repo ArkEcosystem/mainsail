@@ -80,6 +80,24 @@ export interface AccountUpdate {
 	readonly legacyMergeInfo?: AccountMergeInfo;
 }
 
+export type ContractEvent = {
+	readonly txHash: string;
+	readonly txIndex: number;
+} & (
+	| { readonly event: "Voted"; readonly voter: string; readonly validator: string }
+	| { readonly event: "Unvoted"; readonly voter: string; readonly validator: string }
+	| { readonly event: "ValidatorRegistered"; readonly addr: string; readonly blsPublicKey: string }
+	| { readonly event: "ValidatorResigned"; readonly addr: string }
+	| { readonly event: "ValidatorUpdated"; readonly addr: string; readonly blsPublicKey: string }
+	| {
+			readonly event: "UsernameRegistered";
+			readonly addr: string;
+			readonly username: string;
+			readonly previousUsername?: string;
+	  }
+	| { readonly event: "UsernameResigned"; readonly addr: string; readonly username: string }
+);
+
 export interface AccountUpdateContext {
 	readonly account: string;
 	readonly commitKey: CommitKey;
@@ -87,7 +105,7 @@ export interface AccountUpdateContext {
 }
 
 export interface PrepareNextCommitContext {
-	readonly commitKey: CommitKey;
+	readonly blockContext: BlockContext;
 }
 
 export interface PreverifyTransactionContext {
@@ -101,7 +119,6 @@ export interface PreverifyTransactionContext {
 	readonly nonce: bigint;
 	readonly data: Buffer;
 	readonly txHash: string;
-	readonly index?: number;
 	readonly specId: SpecId;
 	readonly blockGasLimit: bigint;
 }
@@ -116,7 +133,7 @@ export interface TransactionContext {
 	readonly gasPrice: bigint;
 	readonly nonce: bigint;
 	readonly data: Buffer;
-	readonly blockContext: BlockContext;
+	readonly commitKey: CommitKey;
 	readonly txHash: string;
 	readonly specId: SpecId;
 }
@@ -166,6 +183,7 @@ export interface BlockContext {
 	readonly gasLimit: bigint;
 	readonly timestamp: bigint;
 	readonly validatorAddress: string;
+	readonly prevrandao: Buffer;
 }
 
 export interface CalculateRoundValidatorsContext {
@@ -175,6 +193,15 @@ export interface CalculateRoundValidatorsContext {
 	readonly roundValidators: bigint;
 	readonly specId: SpecId;
 }
+
+export interface UpdateValidatorRegistrationFeeContext {
+	readonly commitKey: CommitKey;
+	readonly timestamp: bigint;
+	readonly validatorAddress: string;
+	readonly fee: bigint;
+	readonly specId: SpecId;
+}
+
 export interface UpdateRewardsAndVotesContext {
 	readonly commitKey: CommitKey;
 	readonly timestamp: bigint;

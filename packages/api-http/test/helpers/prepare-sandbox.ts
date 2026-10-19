@@ -205,6 +205,7 @@ export const prepareSandbox = async (context: { app: Application }): Promise<Api
 		error: (message) => console.log(message),
 		info: (message) => console.log(message),
 		notice: (message) => console.log(message),
+		warn: (message) => console.log(message),
 		warning: (message) => console.log(message),
 	});
 

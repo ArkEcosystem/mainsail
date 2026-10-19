@@ -47,6 +47,7 @@ export const schemas: Record<
 			payloadSize: { minimum: 0, type: "integer" },
 			transactionsRoot: { $ref: "transactionsRoot" },
 			proposer: { $ref: "address" },
+			randaoReveal: { allOf: [{ $ref: "hex", maxLength: 192, minLength: 192 }], type: "string" },
 			/* eslint-enable perfectionist/sort-objects */
 		},
 		required: [
@@ -65,6 +66,7 @@ export const schemas: Record<
 			"payloadSize",
 			"transactionsRoot",
 			"proposer",
+			"randaoReveal",
 		],
 		type: "object",
 	},

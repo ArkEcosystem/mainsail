@@ -82,7 +82,7 @@ async function waitForResults() {
 			try {
 				let tokensOk = true;
 				for (const validation of tokenContractValidations) {
-					const { results: holders } = await getApiHttp(config.peer, `/tokens/${validation.address}/holders`);
+					const { data: holders } = await getApiHttp(config.peer, `/tokens/${validation.address}/holders`);
 					const hasTokenHolder = holders.some(h => h.address === config.tokenBeneficiary && h.balance === validation.tokenBeneficiaryBalance);
 					if (!hasTokenHolder) {
 						tokensOk = false;

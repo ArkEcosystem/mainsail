@@ -6,7 +6,6 @@ export type EnvironmentOptions = {
 	coreDBDatabase?: string;
 
 	coreP2PPort: number;
-	coreWebhooksPort: number;
 };
 
 export type MilestoneOptions = {
@@ -14,7 +13,6 @@ export type MilestoneOptions = {
 	validatorRegistrationFee: string;
 	maxBlockPayload: number;
 	maxBlockGasLimit: number;
-	maxTxPerBlock: number;
 	blockTime: number;
 	timeouts?: {
 		blockPrepareTime: number;
@@ -43,13 +41,11 @@ export type RewardOptions = {
 };
 
 export type GenesisBlockOptions = {
-	distribute: boolean;
 	premine: string;
 	chainId: number;
 	epoch: Date;
 	snapshot?: SnapshotOptions;
 	initialBlockNumber: number;
-	mockFakeValidatorBlsKeys?: boolean;
 };
 
 export type SnapshotOptions = {
@@ -70,7 +66,19 @@ export type InternalOptions = EnvironmentOptions &
 		packageName?: string;
 		configPath?: string;
 		overwriteConfig: boolean;
-		force: boolean;
+
+		// Externally supplied secrets. When provided they are used verbatim instead of
+		// generating random ones — required e.g. for a mainnet genesis built from
+		// pre-generated validator keys. Each must be a valid BIP39 mnemonic.
+		genesisMnemonic?: string;
+		validatorMnemonics?: string[];
+
+		// Hex-encoded presigned validator registrations (one registerValidator call per
+		// validator; anything else is rejected), used instead of validator mnemonics so a
+		// genesis block can be generated without holding any validator secrets. Mutually
+		// exclusive with validatorMnemonics. The genesis wallet distributes the premine to
+		// the sender addresses recovered from these transactions.
+		validatorRegistrations?: string[];
 
 		// Testing
 		createLegacyColdWallets?: boolean;
@@ -81,14 +89,4 @@ export type Options = Partial<InternalOptions> & {
 	token: string;
 	symbol: string;
 	chainId: number;
-};
-
-export type WriteOptions = {
-	writeApp: boolean;
-	writePeers: boolean;
-	writeEnvironment: boolean;
-	writeValidators: boolean;
-	writeGenesisBlock: boolean;
-	writeCrypto: boolean;
-	writeSnapshot: boolean;
 };

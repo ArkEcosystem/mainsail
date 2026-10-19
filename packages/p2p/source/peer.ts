@@ -9,9 +9,6 @@ import { getPeerUrl } from "./utils/get-peer-url.js";
 
 @injectable()
 export class Peer implements Contracts.P2P.Peer {
-	@inject(Identifiers.Services.Queue.Factory)
-	private readonly createQueue!: Contracts.Kernel.QueueFactory;
-
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -29,15 +26,9 @@ export class Peer implements Contracts.P2P.Peer {
 
 	public lastPinged: number | undefined;
 
-	public sequentialErrorCounter = 0;
-
 	public plugins: Contracts.P2P.PeerPlugins = {};
 
-	public apiNodes: Contracts.P2P.ApiNode[] = [];
-
 	#header: Contracts.P2P.HeaderData | undefined;
-
-	#transactionsQueue!: Contracts.Kernel.Queue;
 
 	public init(ip: string, port: number): Peer {
 		this.ip = ip;
@@ -85,19 +76,5 @@ export class Peer implements Contracts.P2P.Peer {
 			port: this.port,
 			protocol: this.protocol,
 		};
-	}
-
-	public async getTransactionsQueue(): Promise<Contracts.Kernel.Queue> {
-		if (!this.#transactionsQueue) {
-			this.#transactionsQueue = await this.createQueue();
-		}
-
-		return this.#transactionsQueue;
-	}
-
-	public dispose(): void {
-		if (this.#transactionsQueue) {
-			void this.#transactionsQueue.stop();
-		}
 	}
 }

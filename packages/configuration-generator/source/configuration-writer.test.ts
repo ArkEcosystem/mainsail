@@ -1,5 +1,5 @@
-import { existsSync, readFileSync } from "fs";
-import { readJSONSync } from "fs-extra/esm";
+import { existsSync, readFileSync, writeFileSync } from "fs";
+import { ensureDirSync, readJSONSync } from "fs-extra/esm";
 import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
@@ -86,5 +86,26 @@ describe<{
 
 		assert.true(existsSync(join(dataPath, "crypto.json")));
 		assert.equal(readJSONSync(join(dataPath, "crypto.json")), { genesisBlock, milestones, network });
+	});
+
+	it("#writeCrypto - should serialize bigint fields to strings", ({ dataPath, networkWriter }) => {
+		networkWriter.writeCrypto({ fee: 5n } as any, [{ reward: 7n } as any], {} as any);
+
+		const crypto = readJSONSync(join(dataPath, "crypto.json"));
+		assert.equal(crypto.genesisBlock.fee, "5");
+		assert.equal(crypto.milestones[0].reward, "7");
+	});
+
+	it("#writeSnapshot - should copy the snapshot into the snapshot directory", ({ dataPath, networkWriter }) => {
+		const source = join(dataPath, "1da14326.compressed");
+		writeFileSync(source, "snapshot-bytes");
+		// The orchestrator creates this directory before calling writeSnapshot.
+		ensureDirSync(join(dataPath, "snapshot"));
+
+		networkWriter.writeSnapshot(source);
+
+		const target = join(dataPath, "snapshot", "1da14326.compressed");
+		assert.true(existsSync(target));
+		assert.equal(readFileSync(target).toString(), "snapshot-bytes");
 	});
 });

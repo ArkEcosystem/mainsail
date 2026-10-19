@@ -2,16 +2,16 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { Identifiers as EvmConsensusIdentifiers } from "@mainsail/evm-consensus";
-import { ConsensusAbi, UsernamesAbi } from "@mainsail/evm-contracts";
+import { ConsensusAbi, parseTransactionError, UsernamesAbi } from "@mainsail/evm-contracts";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, chunk, ensureError } from "@mainsail/utils";
-import { entropyToMnemonic } from "bip39";
 import { createHash } from "node:crypto";
 import { promisify } from "node:util";
 import { brotliDecompress } from "node:zlib";
 import path from "path";
 import { encodeFunctionData } from "viem";
+
+const TRANSACTION_GAS_LIMIT = 200_000_000;
 
 @injectable()
 export class Importer implements Contracts.Snapshot.LegacyImporter {
@@ -24,55 +24,29 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.Cryptography.Identity.KeyPair.Factory)
-	@tagged("type", "consensus")
-	private readonly consensusKeyPairFactory!: Contracts.Crypto.KeyPairFactory;
-
-	@inject(Identifiers.Cryptography.Identity.PublicKey.Factory)
-	@tagged("type", "consensus")
-	private readonly consensusPublicKeyFactory!: Contracts.Crypto.PublicKeyFactory;
-
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
-
-	@inject(Identifiers.ServiceProvider.Configuration)
-	@tagged("plugin", "snapshot-legacy-importer")
-	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Evm.Instance)
 	@tagged("instance", "evm")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	@inject(EvmConsensusIdentifiers.Internal.Addresses.Deployer)
+	@inject(Identifiers.EvmConsensus.DeployerAddress)
 	private readonly deployerAddress!: string;
+
+	@inject(Identifiers.EvmConsensus.Contracts.Consensus)
+	private readonly consensusContractAddress!: string;
+
+	@inject(Identifiers.EvmConsensus.Contracts.Usernames)
+	private readonly usernameContractAddress!: string;
 
 	@inject(Identifiers.Cryptography.Hash.Factory)
 	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	#prepared = false;
+	#imported = false;
 
-	#consensusProxyContractAddress!: string;
-	#usernamesProxyContractAddress!: string;
-
-	#data: {
-		wallets: Contracts.Snapshot.ImportedLegacyWallet[];
-		voters: Contracts.Snapshot.ImportedLegacyVoter[];
-		validators: Contracts.Snapshot.ImportedLegacyValidator[];
-		snapshotHash: string;
-		genesisBlockNumber: bigint;
-		previousGenesisBlockHash: string;
-		totalSupply: bigint;
-		result: Contracts.Snapshot.LegacyImportResult | undefined;
-	} = {
-		genesisBlockNumber: 0n,
-		previousGenesisBlockHash: "",
-		result: undefined,
-		snapshotHash: "",
-		totalSupply: 0n,
-		validators: [],
-		voters: [],
-		wallets: [],
-	};
+	#data = this.#emptyData();
 
 	public get validators(): Contracts.Snapshot.ImportedLegacyValidator[] {
 		return this.#data.validators;
@@ -90,38 +64,28 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		return this.#data.previousGenesisBlockHash;
 	}
 
-	public get totalSupply(): bigint {
-		return this.#data.totalSupply;
-	}
-
-	public get result(): Contracts.Snapshot.LegacyImportResult | undefined {
-		return this.#data.result;
-	}
-
 	#nonce = 0n;
 
 	public async run(genesisCommit: Contracts.Crypto.Commit): Promise<Contracts.Snapshot.LegacyImportResult> {
-		await this.prepareRestore();
-
 		const { block } = genesisCommit;
 
-		const milestone = this.configuration.getMilestone(this.configuration.getGenesisHeight());
-		assert.defined(milestone.snapshot);
-
-		if (this.snapshotHash !== milestone.snapshot.snapshotHash) {
-			throw new Error("imported snapshot hash mismatch");
+		const { snapshot } = this.configuration.getMilestone(this.configuration.getGenesisHeight());
+		if (!snapshot) {
+			throw new Error(`genesis block has parent hash ${block.parentHash} but no snapshot milestone`);
 		}
 
+		await this.prepareRestore();
+
 		if (this.previousGenesisBlockHash !== block.parentHash) {
-			throw new Error("genesis block previous block hash mismatch ");
+			throw new Error(
+				`snapshot chain tip ${this.previousGenesisBlockHash} does not match genesis parent hash ${block.parentHash}`,
+			);
 		}
 
 		const result = await this.import({
 			commitKey: { blockHash: block.hash, blockNumber: BigInt(block.number), round: BigInt(block.round) },
 			timestamp: block.timestamp,
 		});
-
-		this.#data.result = result;
 
 		this.logger.info(
 			`snapshot import result: ${JSON.stringify({ ...result, initialTotalSupply: result.initialTotalSupply.toString() })}`,
@@ -141,7 +105,13 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 
 		this.logger.info(`Importing genesis snapshot: ${snapshotPath}`);
 
-		return this.prepare(snapshotPath);
+		await this.prepare(snapshotPath);
+
+		if (this.snapshotHash !== milestone.snapshot.snapshotHash) {
+			throw new Error(
+				`snapshot hash ${this.snapshotHash} does not match milestone snapshot ${milestone.snapshot.snapshotHash}`,
+			);
+		}
 	}
 
 	public async prepare(snapshotPath: string): Promise<void> {
@@ -174,8 +144,17 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			{},
 		);
 
+		const arkAddresses = new Set<string>();
+
 		for (const wallet of snapshot.wallets) {
 			hash.update(JSON.stringify(wallet));
+
+			// A cold and a hot copy of a wallet go to separate EVM storages, so nothing later rejects a duplicate
+			if (arkAddresses.has(wallet.arkAddress)) {
+				throw new Error(`snapshot has duplicate wallet ${wallet.arkAddress}`);
+			}
+
+			arkAddresses.add(wallet.arkAddress);
 
 			// the received balance is based on 8 decimals; convert it to WEI (18 decimals)
 			const balance = BigInt(wallet.balance) * BigInt(1e10);
@@ -222,9 +201,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				assert.defined(votedWallet.ethAddress);
 
 				voters.push({
-					arkAddress: wallet.arkAddress,
 					ethAddress,
-					publicKey: wallet.publicKey,
 					vote: votedWallet.ethAddress,
 				});
 			}
@@ -239,11 +216,8 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				}
 
 				validators.push({
-					arkAddress: wallet.arkAddress,
-					blsPublicKey: wallet.attributes?.["delegate"]["blsPublicKey"],
 					ethAddress,
-					isResigned: wallet.attributes?.["delegate"]["isResigned"] ?? false,
-					publicKey: wallet.publicKey,
+					isResigned: wallet.attributes?.["delegate"]["resigned"] ?? false,
 					username: wallet.attributes?.["delegate"]["username"],
 				});
 			}
@@ -265,6 +239,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			`snapshot stats: ${JSON.stringify({
 				coldWallets: foundColdWallets,
 				genesisBlockNumber: genesisBlockNumber.toString(),
+				resignedValidators: validators.filter(({ isResigned }) => isResigned).length,
 				totalSupply: totalSupply.toString(),
 				validators: validators.length,
 				voters: voters.length,
@@ -275,7 +250,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		this.#data = {
 			genesisBlockNumber,
 			previousGenesisBlockHash: snapshot.chainTip.hash,
-			result: undefined,
 			snapshotHash: calculatedHash,
 			totalSupply,
 			validators,
@@ -289,31 +263,34 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	public async import(
 		options: Contracts.Snapshot.LegacyImportOptions,
 	): Promise<Contracts.Snapshot.LegacyImportResult> {
-		options = {
-			...options,
-			mockFakeValidatorBlsKeys:
-				options.mockFakeValidatorBlsKeys ??
-				this.pluginConfiguration.getOptional<boolean>("mockFakeValidatorBlsKeys", false),
-		};
+		if (!this.#prepared) {
+			throw new Error("snapshot is not prepared");
+		}
 
-		await this.evm.prepareNextCommit({ commitKey: options.commitKey });
+		if (this.#imported) {
+			throw new Error("snapshot already imported");
+		}
+
+		this.#imported = true;
+
+		await this.evm.prepareNextCommit({
+			blockContext: {
+				commitKey: options.commitKey,
+				gasLimit: BigInt(250_000_000),
+				prevrandao: Buffer.alloc(32),
+				timestamp: BigInt(options.timestamp),
+				validatorAddress: this.deployerAddress,
+			},
+		});
 
 		const deployerAccount = await this.evm.getAccountInfo(this.deployerAddress);
 		this.#nonce = deployerAccount.nonce;
 
-		this.#consensusProxyContractAddress = this.app.get<string>(
-			EvmConsensusIdentifiers.Contracts.Addresses.Consensus,
-		);
-
-		this.#usernamesProxyContractAddress = this.app.get<string>(
-			EvmConsensusIdentifiers.Contracts.Addresses.Usernames,
-		);
-
 		// 1) Seed account balances
-		const totalSupply = await this.#seedWallets(options);
+		await this.#seedWallets();
 
 		// 2) Seed validators
-		const { importedValidatorsWithBlsKey, importedValidatorsWithoutBlsKey } = await this.#seedValidators(options);
+		const importedValidators = await this.#seedValidators(options);
 
 		// 3) Seed voters
 		const importedVoters = await this.#seedVoters(options);
@@ -321,16 +298,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		// 4) Seed usernames
 		const importedUsernames = await this.#seedUsernames(options);
 
-		if (totalSupply !== this.totalSupply) {
-			throw new Error("totalSupply mismatch");
-		}
-
 		return {
 			importedUsernames,
-			importedValidatorsWithBlsKey,
-			importedValidatorsWithoutBlsKey,
+			importedValidators,
 			importedVoters,
-			initialTotalSupply: totalSupply,
+			initialTotalSupply: this.#data.totalSupply,
 		};
 	}
 
@@ -343,14 +315,32 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 	}
 
 	public dispose(): void {
-		this.#data.wallets = [];
-		this.#data.validators = [];
-		this.#data.voters = [];
+		this.#data = this.#emptyData();
+		this.#prepared = false;
+		this.#imported = false;
 	}
 
-	async #seedWallets(options: Contracts.Snapshot.LegacyImportOptions): Promise<bigint> {
-		let totalSupply = 0n;
+	#emptyData(): {
+		wallets: Contracts.Snapshot.ImportedLegacyWallet[];
+		voters: Contracts.Snapshot.ImportedLegacyVoter[];
+		validators: Contracts.Snapshot.ImportedLegacyValidator[];
+		snapshotHash: string;
+		genesisBlockNumber: bigint;
+		previousGenesisBlockHash: string;
+		totalSupply: bigint;
+	} {
+		return {
+			genesisBlockNumber: 0n,
+			previousGenesisBlockHash: "",
+			snapshotHash: "",
+			totalSupply: 0n,
+			validators: [],
+			voters: [],
+			wallets: [],
+		};
+	}
 
+	async #seedWallets(): Promise<void> {
 		this.logger.info(`seeding ${this.#data.wallets.length} wallets`);
 
 		const wallets: Contracts.Evm.AccountInfoExtended[] = [];
@@ -371,8 +361,6 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 					legacyAttributes: wallet.legacyAttributes,
 				});
 			}
-
-			totalSupply += wallet.balance;
 		}
 
 		for (const batch of chunk(wallets, 1000)) {
@@ -382,58 +370,19 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		for (const batch of chunk(coldWallets, 1000)) {
 			await this.evm.importLegacyColdWallets(batch);
 		}
-
-		return totalSupply;
 	}
 
-	async #seedValidators(options: Contracts.Snapshot.LegacyImportOptions): Promise<{
-		importedValidatorsWithBlsKey: number;
-		importedValidatorsWithoutBlsKey: number;
-	}> {
-		this.logger.info(`seeding ${this.#data.validators.length} validators`);
+	async #seedValidators(options: Contracts.Snapshot.LegacyImportOptions): Promise<number> {
+		let importedValidators = 0;
 
-		const stats = {
-			importedValidatorsWithBlsKey: 0,
-			importedValidatorsWithoutBlsKey: 0,
-		};
+		this.logger.info(`seeding ${this.#data.validators.length} validators`);
 
 		for (const validator of this.#data.validators) {
 			assert.defined(validator.ethAddress);
 
-			if (!validator.blsPublicKey) {
-				if (!options.mockFakeValidatorBlsKeys) {
-					this.logger.debug(
-						`importing legacy delegate ${validator.arkAddress} (${validator.username}) without registered blsPublicKey`,
-					);
-					stats.importedValidatorsWithoutBlsKey++;
-				} else {
-					const entropy = this.hashFactory.sha256(Buffer.from(validator.username, "utf8"));
-					const mnemonic = entropyToMnemonic(entropy);
-
-					const consensusKeyPair = await this.consensusKeyPairFactory.fromMnemonic(mnemonic);
-					validator.blsPublicKey = consensusKeyPair.publicKey;
-				}
-			} else {
-				if (await this.consensusPublicKeyFactory.verify(validator.blsPublicKey)) {
-					this.logger.info(
-						`importing legacy delegate ${validator.arkAddress} (${validator.username}) with valid blsPublicKey '${validator.blsPublicKey}'`,
-					);
-				} else {
-					this.logger.warn(
-						`importing legacy delegate ${validator.arkAddress} (${validator.username}) with invalid blsPublicKey '${validator.blsPublicKey}'`,
-					);
-				}
-
-				stats.importedValidatorsWithBlsKey++;
-			}
-
 			const data = encodeFunctionData({
 				abi: ConsensusAbi.abi,
-				args: [
-					validator.ethAddress,
-					validator.blsPublicKey ? `0x${validator.blsPublicKey}` : `0x`,
-					validator.isResigned,
-				],
+				args: [validator.ethAddress, validator.isResigned],
 				functionName: "addValidator",
 			}).slice(2);
 
@@ -441,16 +390,18 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				this.#getTransactionContext({
 					...options,
 					data,
-					to: this.#consensusProxyContractAddress,
+					to: this.consensusContractAddress,
 				}),
 			);
 
 			if (!result.receipt.status) {
-				throw new Error("failed to add validator");
+				throw new Error(`failed to add validator ${validator.ethAddress}: ${this.#getError(result.receipt)}`);
 			}
+
+			importedValidators++;
 		}
 
-		return stats;
+		return importedValidators;
 	}
 
 	async #seedVoters(options: Contracts.Snapshot.LegacyImportOptions): Promise<number> {
@@ -482,13 +433,14 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				this.#getTransactionContext({
 					...options,
 					data,
-					to: this.#consensusProxyContractAddress,
+					to: this.consensusContractAddress,
 				}),
 			);
 
 			if (!result.receipt.status) {
-				console.log(result.receipt, result.receipt.output?.toString("hex"));
-				throw new Error("failed to add votes");
+				throw new Error(
+					`failed to add ${voterAddresses.length} votes starting with ${voterAddresses[0]}: ${this.#getError(result.receipt)}`,
+				);
 			}
 
 			importedVoters += voterAddresses.length;
@@ -516,12 +468,14 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				this.#getTransactionContext({
 					...options,
 					data,
-					to: this.#usernamesProxyContractAddress,
+					to: this.usernameContractAddress,
 				}),
 			);
 
 			if (!result.receipt.status) {
-				throw new Error("failed to add username");
+				throw new Error(
+					`failed to add username ${validator.username} for ${validator.ethAddress}: ${this.#getError(result.receipt)}`,
+				);
 			}
 
 			importedUsernames++;
@@ -540,15 +494,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		const nonce = this.#nonce;
 
 		return {
-			blockContext: {
-				commitKey: options.commitKey,
-				gasLimit: BigInt(250_000_000),
-				timestamp: BigInt(options.timestamp),
-				validatorAddress: this.deployerAddress,
-			},
+			commitKey: options.commitKey,
 			data: Buffer.from(options.data, "hex"),
 			from: this.deployerAddress,
-			gasLimit: BigInt(200_000_000),
+			gasLimit: BigInt(TRANSACTION_GAS_LIMIT),
 			gasPrice: BigInt(0),
 			nonce,
 			specId: evmSpec,
@@ -558,26 +507,19 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		} as Contracts.Evm.TransactionContext;
 	}
 
+	#getError(receipt: Contracts.Evm.TransactionReceipt): string | undefined {
+		return parseTransactionError({ gasLimit: TRANSACTION_GAS_LIMIT } as Contracts.Crypto.Transaction, receipt);
+	}
+
 	#generateTxHash = () =>
 		this.hashFactory.sha256(Buffer.from(`tx-${this.deployerAddress}-${this.#nonce++}`, "utf8")).toString("hex");
 
 	async #readSnapshot(snapshotPath: string): Promise<Interfaces.LegacySnapshot> {
-		if (snapshotPath.endsWith(".compressed")) {
-			return this.#decompressBrotli(snapshotPath);
-		}
-
-		return this.fileSystem.readJSONSync<Interfaces.LegacySnapshot>(snapshotPath);
-	}
-
-	async #decompressBrotli(inputPath: string): Promise<Interfaces.LegacySnapshot> {
 		try {
-			const compressedData = await this.fileSystem.get(inputPath);
-			const decompressed = await promisify(brotliDecompress)(compressedData);
+			const decompressed = await promisify(brotliDecompress)(await this.fileSystem.get(snapshotPath));
 			return JSON.parse(decompressed.toString()) as Interfaces.LegacySnapshot;
-		} catch (rawError) {
-			const error = ensureError(rawError);
-			console.error("Error decompressing snapshot", error);
-			throw error;
+		} catch (error) {
+			throw new Error(`failed to read snapshot ${snapshotPath}: ${ensureError(error).message}`);
 		}
 	}
 }

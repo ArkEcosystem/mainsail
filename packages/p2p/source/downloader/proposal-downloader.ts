@@ -1,14 +1,13 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { Enums, Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
+import { Enums, Events, Identifiers } from "@mainsail/constants";
+import { inject, injectable, postConstruct } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
 import { getRandomPeer } from "../utils/index.js";
 
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;
-	peerHeader: Contracts.P2P.HeaderData;
 	blockNumber: number;
 	round: number;
 };
@@ -38,7 +37,19 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 	@inject(Identifiers.P2P.State)
 	private readonly state!: Contracts.P2P.State;
 
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly events!: Contracts.Kernel.EventDispatcher;
+
 	#downloadsByBlockNumber: Map<number, Set<number>> = new Map();
+
+	@postConstruct()
+	public initialize(): void {
+		this.events.listen(Events.BlockEvent.Applied, {
+			handle: async ({ data }): Promise<void> => {
+				this.#downloadsByBlockNumber.delete((data as Contracts.Crypto.BlockData).number);
+			},
+		});
+	}
 
 	public tryToDownload(): void {
 		if (this.blockDownloader.isDownloading()) {
@@ -66,7 +77,6 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		const job: DownloadJob = {
 			blockNumber: peer.header.blockNumber,
 			peer,
-			peerHeader: peer.header,
 			round: peer.header.round,
 		};
 
@@ -117,7 +127,10 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		let error: Error | undefined;
 
 		try {
-			const result = await this.communicator.getProposal(job.peer);
+			const result = await this.communicator.getProposal(job.peer, {
+				blockNumber: job.blockNumber,
+				round: job.round,
+			});
 
 			if (result.proposal.length === 0) {
 				return;
@@ -142,9 +155,11 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 			this.state.resetLastMessageTime();
 		} catch (rawError) {
 			error = ensureError(rawError);
+		} finally {
+			// Always free the slot, even on an empty reply (the peer has moved past the
+			// requested round); otherwise the round could never be requested again.
+			this.#removeDownload(job);
 		}
-
-		this.#removeDownload(job);
 
 		if (error) {
 			this.peerDisposer.banPeer(job.peer.ip, error);

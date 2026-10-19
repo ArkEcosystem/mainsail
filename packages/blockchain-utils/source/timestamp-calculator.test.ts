@@ -34,7 +34,7 @@ describe<Context>("TimestampCalculator", ({ assert, it, beforeEach }) => {
 		context.timestampCalculator = context.app.resolve(TimestampCalculator);
 	});
 
-	it("should throw if round is too high", async ({ timestampCalculator }) => {
+	it("should throw if round is too high", ({ timestampCalculator }) => {
 		const block = {
 			timestamp: 0,
 		} as Contracts.Crypto.Block;
@@ -47,20 +47,7 @@ describe<Context>("TimestampCalculator", ({ assert, it, beforeEach }) => {
 		);
 	});
 
-	it("should throw if round is too high", async ({ timestampCalculator }) => {
-		const block = {
-			timestamp: 0,
-		} as Contracts.Crypto.Block;
-
-		const round = 100_001;
-
-		assert.throws(
-			() => timestampCalculator.calculateMinimalTimestamp(block, round),
-			new Error(`Round ${round} is too high`),
-		);
-	});
-
-	it("should return block timestamp if all milestones values are 0", async ({ timestampCalculator }) => {
+	it("should return block timestamp if all milestones values are 0", ({ timestampCalculator }) => {
 		const block = {
 			timestamp: 0,
 		} as Contracts.Crypto.Block;
@@ -73,7 +60,7 @@ describe<Context>("TimestampCalculator", ({ assert, it, beforeEach }) => {
 		assert.equal(timestampCalculator.calculateMinimalTimestamp(block2, 0), 1000);
 	});
 
-	it("should read blockTime from milestones and use it only once", async ({ timestampCalculator, timeouts }) => {
+	it("should read blockTime from milestones and use it only once", ({ timestampCalculator, timeouts }) => {
 		const block = {
 			timestamp: 0,
 		} as Contracts.Crypto.Block;
@@ -85,10 +72,7 @@ describe<Context>("TimestampCalculator", ({ assert, it, beforeEach }) => {
 		assert.equal(timestampCalculator.calculateMinimalTimestamp(block, 2), 1000);
 	});
 
-	it("should read stageTimeout from milestones and increase it every round", async ({
-		timestampCalculator,
-		timeouts,
-	}) => {
+	it("should read stageTimeout from milestones and increase it every round", ({ timestampCalculator, timeouts }) => {
 		const block = {
 			timestamp: 0,
 		} as Contracts.Crypto.Block;
@@ -100,7 +84,7 @@ describe<Context>("TimestampCalculator", ({ assert, it, beforeEach }) => {
 		assert.equal(timestampCalculator.calculateMinimalTimestamp(block, 2), 2000);
 	});
 
-	it("should read stageTimeoutIncrease from milestones and increase it every round after 2nd arithmetically", async ({
+	it("should read stageTimeoutIncrease from milestones and increase it every round after 2nd arithmetically", ({
 		timestampCalculator,
 		timeouts,
 	}) => {
@@ -118,10 +102,7 @@ describe<Context>("TimestampCalculator", ({ assert, it, beforeEach }) => {
 		assert.equal(timestampCalculator.calculateMinimalTimestamp(block, 6), 15000);
 	});
 
-	it("should read all milestone values and increase each round accordingly", async ({
-		timestampCalculator,
-		timeouts,
-	}) => {
+	it("should read all milestone values and increase each round accordingly", ({ timestampCalculator, timeouts }) => {
 		const block = {
 			timestamp: 0,
 		} as Contracts.Crypto.Block;

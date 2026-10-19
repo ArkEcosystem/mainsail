@@ -14,7 +14,6 @@ describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ it, assert, beforeEach, stub }) => {
-	const triggerService = { bind: () => {} };
 	const validator = { addFormat: () => {}, addKeyword: () => {} };
 	const server = { boot: async () => {}, dispose: async () => {}, initialize: async () => {} };
 	const statisticService = { boot: async () => {} };
@@ -25,7 +24,6 @@ describe<{
 	beforeEach((context) => {
 		context.app = new Application();
 
-		context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
 		context.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
 
@@ -93,13 +91,11 @@ describe<{
 }>("ServiceProvider.configSchema", ({ it, assert, beforeEach }) => {
 	const importDefaults = async () => (await importFresh<any>("../distribution/defaults.js")).defaults;
 
-	const triggerService = { bind: () => {} };
 	const validator = { addFormat: () => {} };
 
 	beforeEach((context) => {
 		context.app = new Application();
 
-		context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
 			getMilestone: () => ({
 				roundValidators: 2,
@@ -323,6 +319,22 @@ describe<{
 
 		assert.undefined(result.error);
 		assert.equal(result.value.developmentMode.enabled, true);
+	});
+
+	it("should parse process.env.MAINSAIL_P2P_STATISTIC_MAX_TRACKED_PEERS", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_P2P_STATISTIC_MAX_TRACKED_PEERS = "1000";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.statistic.maxTrackedPeers, 1000);
+	});
+
+	it("should default statistic.maxTrackedPeers when the environment does not set it", async ({ serviceProvider }) => {
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.statistic.maxTrackedPeers, 250);
 	});
 
 	it("should parse process.env.MAINSAIL_P2P_API_NODES_MAX_CONTENT_LENGTH", async ({ serviceProvider }) => {

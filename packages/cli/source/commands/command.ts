@@ -10,16 +10,13 @@ import { Box } from "../components/index.js";
 import { InputDefinition } from "../input/definition.js";
 import { Input } from "../input/index.js";
 import { Output } from "../output/index.js";
-import { Config, Environment } from "../services/index.js";
+import { Config } from "../services/index.js";
 import { CommandHelp } from "./command-help.js";
 
 @injectable()
 export abstract class Command implements Contracts.Cli.Command {
 	@inject(Identifiers.Cli.Application.Instance)
 	protected readonly app!: Contracts.Cli.Application;
-
-	@inject(Identifiers.Cli.Service.Environment)
-	protected readonly env!: Environment;
 
 	@inject(Identifiers.Cli.Output.Instance)
 	protected readonly output!: Output;

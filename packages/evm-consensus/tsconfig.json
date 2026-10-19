@@ -7,19 +7,19 @@
 	"include": ["source/**/**.ts", "source/**/**.json"],
 	"references": [
 		{
-			"path": "../container"
+			"path": "../constants"
 		},
 		{
-			"path": "../contracts"
+			"path": "../container"
 		},
 		{
 			"path": "../evm-contracts"
 		},
 		{
-			"path": "../kernel"
+			"path": "../exceptions"
 		},
 		{
-			"path": "../utils"
+			"path": "../kernel"
 		}
 	]
 }

@@ -78,19 +78,22 @@ export class LocalFilesystem implements Contracts.Kernel.Filesystem {
 	public async files(directory: string): Promise<string[]> {
 		directory = resolve(directory);
 
+		// Read the entry types from a single readdir instead of an lstat per entry: this avoids a
+		// readdir/lstat TOCTOU race (an entry removed in between made lstatSync throw ENOENT and
+		// rejected the whole call) and one syscall per entry. Like lstat, dirents don't follow symlinks.
 		return this.fs
-			.readdirSync(directory)
-			.map((item: string) => `${directory}/${item}`)
-			.filter((item: string) => this.fs.lstatSync(item).isFile());
+			.readdirSync(directory, { withFileTypes: true })
+			.filter((item) => item.isFile())
+			.map((item) => `${directory}/${item.name}`);
 	}
 
 	public async directories(directory: string): Promise<string[]> {
 		directory = resolve(directory);
 
 		return this.fs
-			.readdirSync(directory)
-			.map((item: string) => `${directory}/${item}`)
-			.filter((item: string) => this.fs.lstatSync(item).isDirectory());
+			.readdirSync(directory, { withFileTypes: true })
+			.filter((item) => item.isDirectory())
+			.map((item) => `${directory}/${item.name}`);
 	}
 
 	public async makeDirectory(path: string): Promise<boolean> {

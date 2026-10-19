@@ -71,7 +71,7 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 			});
 
 			if (receipt.status === 1) {
-				return `0x${receipt.output?.toString("hex")}`;
+				return receipt.output ? `0x${receipt.output.toString("hex")}` : "0x";
 			} else {
 				const data = receipt.output ? `0x${receipt.output.toString("hex")}` : undefined;
 				throw new RpcError("execution reverted", data);
@@ -149,6 +149,7 @@ export class CallAction implements Contracts.Api.RPC.Action<[TxData, Contracts.C
 		return {
 			commitKey: { blockNumber: BigInt(this.configuration.getHeight()), round: BigInt(0) },
 			gasLimit: BigInt(milestone.block.maxGasLimit),
+			prevrandao: Buffer.alloc(32),
 			timestamp: BigInt(dayjs().valueOf()),
 			validatorAddress: "0x0000000000000000000000000000000000000001",
 		};

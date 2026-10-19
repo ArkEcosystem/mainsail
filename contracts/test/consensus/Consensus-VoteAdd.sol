@@ -56,7 +56,7 @@ contract ConsensusTest is Base {
 
         // Register validator
         address addr = address(1);
-        consensus.addValidator(addr, prepareBLSKey(addr), true);
+        consensus.addValidator(addr, true);
 
         // Prepare voter
         address voterAddr = address(2);
@@ -95,7 +95,7 @@ contract ConsensusTest is Base {
 
         // Register validator
         address addr = address(1);
-        consensus.addValidator(addr, new bytes(0), false);
+        consensus.addValidator(addr, false);
 
         // Prepare voter
         address voterAddr = address(2);
@@ -145,7 +145,7 @@ contract ConsensusTest is Base {
         address[] memory validators = new address[](1);
         validators[0] = addr;
 
-        consensus.addValidator(addr, prepareBLSKey(addr), false);
+        registerValidator(addr);
 
         consensus.calculateRoundValidators(1);
 

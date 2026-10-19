@@ -48,6 +48,8 @@ export interface Application {
 
 	terminate(reason?: string, error?: Error): Promise<never>;
 
+	fail(reason: string, error: Error): never;
+
 	bind<T>(serviceIdentifier: ServiceIdentifier<T>): BindToFluentSyntax<T>;
 
 	rebind<T>(serviceIdentifier: ServiceIdentifier<T>): BindToFluentSyntax<T>;
@@ -75,10 +77,7 @@ export interface Application {
 
 export interface PluginDependency {
 	name: string;
-
 	version?: string;
-
-	required?: boolean | (() => Promise<boolean>);
 }
 
 export interface Bootstrapper {

@@ -6,10 +6,6 @@ import { injectable } from "@mainsail/container";
 
 @injectable()
 export class AcceptAnyTransactionVerifier implements Contracts.Crypto.TransactionVerifier {
-	public async verifyHash(data: Contracts.Crypto.TransactionData): Promise<boolean> {
-		return true;
-	}
-
 	public async verifySchemaUnsigned(
 		data: Contracts.Crypto.TransactionUnsignedSerializable,
 	): Promise<Contracts.Crypto.SchemaValidationResult<Contracts.Crypto.TransactionUnsignedSerializable>> {

@@ -1,4 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
 import { ConsensusAbi, parseTransactionError } from "@mainsail/evm-contracts";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
@@ -10,7 +11,6 @@ import {
 	getTransactionReceipt,
 	getWallets,
 	isTransactionCommitted,
-	waitBlock,
 	getRandomConsensusKeyPair,
 } from "./utilities.js";
 import { decodeEventLog, Hex, parseEther } from "viem";
@@ -44,7 +44,7 @@ describe<{
 			value: parseEther("300"),
 		});
 		await addTransactionsToPool(context, [fundTx]);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 
 		const validatorKeyPair = await getRandomConsensusKeyPair(context);
 		const tx = await EvmCalls.makeValidatorRegistration(context, {
@@ -55,7 +55,7 @@ describe<{
 		const { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 
 		const receipt = await getTransactionReceipt(context, tx);
@@ -83,7 +83,7 @@ describe<{
 			value: parseEther("1000"),
 		});
 		await addTransactionsToPool(context, [fundTx]);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 
 		// Register first time
 		const validatorKeyPair = await getRandomConsensusKeyPair(context);
@@ -95,7 +95,7 @@ describe<{
 		let { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 		let receipt = await getTransactionReceipt(context, tx);
 		assert.defined(receipt);
@@ -111,7 +111,7 @@ describe<{
 		({ accept } = await addTransactionsToPool(context, [tx]));
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 
 		receipt = await getTransactionReceipt(context, tx);
@@ -132,7 +132,7 @@ describe<{
 				value: parseEther("1000"),
 			});
 			await addTransactionsToPool(context, [fundTx]);
-			await waitBlock(context);
+			await Utils.waitBlock(context);
 		}
 
 		const validatorKeyPair = await getRandomConsensusKeyPair(context);
@@ -146,7 +146,7 @@ describe<{
 		let { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 		let receipt = await getTransactionReceipt(context, tx);
 		assert.defined(receipt);
@@ -161,7 +161,7 @@ describe<{
 		({ accept } = await addTransactionsToPool(context, [tx]));
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 
 		receipt = await getTransactionReceipt(context, tx);
@@ -180,12 +180,18 @@ describe<{
 			value: parseEther("1000"),
 		});
 		await addTransactionsToPool(context, [fundTx]);
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 
 		const validatorKeyPair = await getRandomConsensusKeyPair(context);
 		const validatorKeyPairFake = await getRandomConsensusKeyPair(context);
 
-		const { pop: fakePop } = buildProofOfPossession(Buffer.from(validatorKeyPairFake.privateKey, "hex"));
+		const { chainId } = context.app
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.getNetwork();
+		const { pop: fakePop } = buildProofOfPossession(Buffer.from(validatorKeyPairFake.privateKey, "hex"), {
+			chainId,
+			registrantAddress: randomWallet.address,
+		});
 		const payload = EvmCalls.encodeValidatorRegistration(validatorKeyPair.publicKey, fakePop);
 
 		let tx = await EvmCalls.makeValidatorRegistration(context, {
@@ -197,7 +203,7 @@ describe<{
 		let { accept } = await addTransactionsToPool(context, [tx]);
 		assert.equal(accept, [0]);
 
-		await waitBlock(context);
+		await Utils.waitBlock(context);
 		assert.true(await isTransactionCommitted(context, tx));
 		let receipt = await getTransactionReceipt(context, tx);
 		assert.defined(receipt);
@@ -205,5 +211,65 @@ describe<{
 
 		const error = parseTransactionError(tx, receipt!);
 		assert.equal(error, "InvalidProofOfPossession");
+	});
+
+	it("should reject a registration replayed by another sender", async (context) => {
+		const registrant = await Utils.getRandomColdWallet(context);
+		const otherWallet = await Utils.getRandomColdWallet(context);
+
+		const fundRegistrant = await EvmCalls.makeEvmCall(context, {
+			recipient: registrant.address,
+			value: parseEther("1000"),
+		});
+		const fundOther = await EvmCalls.makeEvmCall(context, {
+			nonceOffset: 1,
+			recipient: otherWallet.address,
+			value: parseEther("1000"),
+		});
+		await addTransactionsToPool(context, [fundRegistrant, fundOther]);
+		await Utils.waitBlock(context);
+
+		const validatorKeyPair = await getRandomConsensusKeyPair(context);
+		const { chainId } = context.app
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.getNetwork();
+		const { pop } = buildProofOfPossession(Buffer.from(validatorKeyPair.privateKey, "hex"), {
+			chainId,
+			registrantAddress: registrant.address,
+		});
+		const payload = EvmCalls.encodeValidatorRegistration(validatorKeyPair.publicKey, pop);
+
+		// A different sender submits the same (key, pop) pair first.
+		const replayed = await EvmCalls.makeValidatorRegistration(context, {
+			payload,
+			sender: otherWallet.keyPair,
+			validatorKeyPair,
+		});
+
+		let { accept } = await addTransactionsToPool(context, [replayed]);
+		assert.equal(accept, [0]);
+
+		await Utils.waitBlock(context);
+		assert.true(await isTransactionCommitted(context, replayed));
+		let receipt = await getTransactionReceipt(context, replayed);
+		assert.defined(receipt);
+		assert.equal(receipt!.status, 0);
+		assert.equal(parseTransactionError(replayed, receipt!), "InvalidProofOfPossession");
+
+		// The key was never burned, so the bound sender can still register it.
+		const owned = await EvmCalls.makeValidatorRegistration(context, {
+			payload,
+			sender: registrant.keyPair,
+			validatorKeyPair,
+		});
+
+		({ accept } = await addTransactionsToPool(context, [owned]));
+		assert.equal(accept, [0]);
+
+		await Utils.waitBlock(context);
+		assert.true(await isTransactionCommitted(context, owned));
+		receipt = await getTransactionReceipt(context, owned);
+		assert.defined(receipt);
+		assert.equal(receipt!.status, 1);
 	});
 });

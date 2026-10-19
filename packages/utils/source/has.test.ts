@@ -28,4 +28,9 @@ describe("has", async ({ assert, it, nock, loader }) => {
 
 		assert.false(has(object, "a.b.c"));
 	});
+
+	it("should return false if an intermediate segment is null", () => {
+		assert.false(has({ a: null }, "a.b"));
+		assert.false(has(null, "a"));
+	});
 });

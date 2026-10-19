@@ -25,9 +25,6 @@ export abstract class AbstractListener<TEventData, TEntity extends object> imple
 	@tagged("plugin", "api-sync")
 	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
-	@inject(Identifiers.Cryptography.Configuration)
-	protected readonly configuration!: Contracts.Crypto.Configuration;
-
 	@inject(ApiDatabaseIdentifiers.DataSource)
 	protected readonly dataSource!: ApiDatabaseContracts.RepositoryDataSource;
 

@@ -10,9 +10,6 @@ import { getPeerIp } from "../../utils/get-peer-ip.js";
 
 @injectable()
 export class HeaderHandlePlugin {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.P2P.Header.Service)
 	private readonly headerService!: Contracts.P2P.HeaderService;
 
@@ -20,17 +17,14 @@ export class HeaderHandlePlugin {
 	private readonly peerRepository!: Contracts.P2P.PeerRepository;
 
 	public register(server) {
-		const headerService = this.headerService;
-		const peerRepository = this.peerRepository;
-
 		server.ext({
-			async method(request: Contracts.P2P.Request, h) {
+			method: async (request: Contracts.P2P.Request, h) => {
 				const peerIp = getPeerIp(request);
 
-				if (peerRepository.hasPeer(peerIp)) {
-					const peer = peerRepository.getPeer(peerIp);
+				if (this.peerRepository.hasPeer(peerIp)) {
+					const peer = this.peerRepository.getPeer(peerIp);
 
-					void headerService.handle(peer, request.payload.headers);
+					void this.headerService.handle(peer, request.payload.headers);
 				}
 
 				return h.continue;

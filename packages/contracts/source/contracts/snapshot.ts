@@ -13,20 +13,16 @@ export interface LegacyImporter {
 	snapshotHash: string;
 	genesisBlockNumber: bigint;
 	previousGenesisBlockHash: string;
-	totalSupply: bigint;
-	result: LegacyImportResult | undefined;
 }
 
 export interface LegacyImportOptions {
 	readonly timestamp: number;
 	readonly commitKey: CommitKey;
-	readonly mockFakeValidatorBlsKeys?: boolean;
 }
 
 export interface LegacyImportResult {
 	readonly initialTotalSupply: bigint;
-	readonly importedValidatorsWithBlsKey: number;
-	readonly importedValidatorsWithoutBlsKey: number;
+	readonly importedValidators: number;
 	readonly importedUsernames: number;
 	readonly importedVoters: number;
 }
@@ -53,18 +49,13 @@ export interface ImportedLegacyMultiSignatureAttribute {
 }
 
 export interface ImportedLegacyVoter {
-	readonly arkAddress: string;
 	readonly ethAddress?: string;
-	readonly publicKey: string;
 	readonly vote: string;
 }
 
 export interface ImportedLegacyValidator {
-	readonly arkAddress: string;
 	readonly ethAddress: string;
-	readonly publicKey: string;
 	readonly isResigned: boolean;
 
 	username: string;
-	blsPublicKey?: string;
 }

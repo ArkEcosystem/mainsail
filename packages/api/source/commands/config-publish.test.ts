@@ -1,31 +1,30 @@
 import { Console } from "@mainsail/cli";
-import { describe } from "@mainsail/test-runner";
 import { Identifiers } from "@mainsail/constants";
-import fs from "fs-extra/esm";
+import { describe } from "@mainsail/test-runner";
+import { existsSync } from "fs";
+import { ensureDirSync } from "fs-extra";
+import { join } from "path";
 import { dirSync, setGracefulCleanup } from "tmp";
 
+import { apiPackageJson } from "../../test/fixtures";
 import { Command } from "./config-publish";
 
 describe<{
 	cli: Console;
-}>("ConfigPublishCommand", ({ beforeEach, afterAll, it, assert, stub, spy }) => {
+	configDestination: string;
+}>("ConfigPublishCommand", ({ beforeEach, afterAll, it, assert }) => {
 	beforeEach((context) => {
 		process.env.MAINSAIL_PATH_CONFIG = dirSync().name;
 
-		context.cli = new Console();
+		context.configDestination = join(process.env.MAINSAIL_PATH_CONFIG, "api");
+
+		context.cli = new Console(true, apiPackageJson);
 	});
 
 	afterAll(() => setGracefulCleanup());
 
-	it.skip("should throw if the network is invalid", async ({ cli }) => {
-		await assert.rejects(
-			() => cli.withFlags({ network: "invalid" }).execute(Command),
-			'"network" must be one of [devnet, mainnet, testnet]',
-		);
-	});
-
-	it.skip("should throw if the destination already exists", async ({ cli }) => {
-		stub(fs, "existsSync").returnValueOnce(true);
+	it("should fail if the destination already exists", async ({ cli, configDestination }) => {
+		ensureDirSync(configDestination);
 
 		await assert.rejects(
 			() => cli.execute(Command),
@@ -33,126 +32,38 @@ describe<{
 		);
 	});
 
-	it.skip("should throw if the configuration files cannot be found", async ({ cli }) => {
-		stub(fs, "existsSync").returnValue(false);
+	it("should fail if the core configuration files cannot be found", async ({ cli }) => {
+		// Point the config source at a name that has no directory under bin/config.
+		cli.app.rebind(Identifiers.Application.Name).toConstantValue("unknown");
 
-		await assert.rejects(() => cli.execute(Command), "Couldn't find the core configuration files");
+		await assert.rejects(() => cli.execute(Command), "Couldn't find the api configuration files at");
 	});
 
-	it.skip("should throw if the environment file cannot be found", async ({ cli }) => {
-		const responseValues = [false, true, false];
-		stub(fs, "existsSync").callsFake(() => responseValues.shift());
+	it("should fail if the environment file cannot be found", async ({ cli }) => {
+		// "." resolves the config source to bin/config itself, which exists but holds no .env file.
+		cli.app.rebind(Identifiers.Application.Name).toConstantValue(".");
 
-		const spyEnsure = spy(fs, "ensureDirSync");
-
-		await assert.rejects(() => cli.execute(Command), "Couldn't find the environment file");
-
-		spyEnsure.calledOnce();
+		await assert.rejects(() => cli.execute(Command), "Couldn't find the environment file at");
 	});
 
-	it.skip("should publish the configuration", async ({ cli }) => {
-		const responseValues = [false, true, true];
-		stub(fs, "existsSync").callsFake(() => responseValues.shift());
-
-		const spyEnsure = spy(fs, "ensureDirSync");
-		const spyCopy = spy(fs, "copySync");
-
+	it("should publish the configuration", async ({ cli, configDestination }) => {
 		await cli.execute(Command);
 
-		spyEnsure.calledOnce();
-		spyCopy.calledTimes(2);
+		assert.true(existsSync(join(configDestination, ".env")));
+		assert.true(existsSync(join(configDestination, "app.json")));
 	});
 
-	it.skip("should reset the configuration", async ({ cli }) => {
-		const responseValues = [false, true, true];
-		stub(fs, "existsSync").callsFake(() => responseValues.shift());
+	it("should overwrite the existing configuration with the reset flag", async ({ cli, configDestination }) => {
+		await cli.execute(Command);
 
-		const spyRemove = spy(fs, "removeSync");
-		const spyEnsure = spy(fs, "ensureDirSync");
-		const spyCopy = spy(fs, "copySync");
+		await assert.rejects(
+			() => cli.execute(Command),
+			"Please use the --reset flag if you wish to reset your configuration.",
+		);
 
 		await cli.withFlags({ reset: true }).execute(Command);
 
-		spyRemove.calledOnce();
-		spyEnsure.calledOnce();
-		spyCopy.calledTimes(2);
-	});
-
-	it.skip("should publish the configuration via prompt", async ({ cli }) => {
-		const responseValues = [false, true, true];
-		stub(fs, "existsSync").callsFake(() => responseValues.shift());
-
-		const spyEnsure = spy(fs, "ensureDirSync");
-		const spyCopy = spy(fs, "copySync");
-
-		stub(cli.app.get(Identifiers.Cli.Component.Prompt), "render").returnValue({
-			confirm: true,
-			network: "mainnet",
-		});
-
-		await cli.execute(Command);
-
-		spyEnsure.calledOnce();
-		spyCopy.calledTimes(2);
-	});
-
-	it.skip("should throw if no network is selected via prompt", async ({ cli }) => {
-		const responseValues = [false, true, true];
-		stub(fs, "existsSync").callsFake(() => responseValues.shift());
-
-		const spyEnsure = spy(fs, "ensureDirSync");
-		const spyCopy = spy(fs, "copySync");
-
-		stub(cli.app.get(Identifiers.Cli.Component.Prompt), "render").returnValue({
-			confirm: true,
-			network: undefined,
-		});
-
-		await assert.rejects(
-			() => cli.withFlags({ network: undefined }).execute(Command),
-			"You'll need to select the network to continue.",
-		);
-
-		spyEnsure.neverCalled();
-		spyCopy.neverCalled();
-	});
-
-	it.skip("should throw if the selected network is invalid via prompt", async ({ cli }) => {
-		const responseValues = [false, true, true];
-		stub(fs, "existsSync").callsFake(() => responseValues.shift());
-
-		const spyEnsure = spy(fs, "ensureDirSync");
-		const spyCopy = spy(fs, "copySync");
-
-		stub(cli.app.get(Identifiers.Cli.Component.Prompt), "render").returnValue({
-			confirm: false,
-			network: "mainnet",
-		});
-
-		await assert.rejects(
-			() => cli.withFlags({ network: undefined }).execute(Command),
-			"You'll need to confirm the network to continue.",
-		);
-
-		spyEnsure.neverCalled();
-		spyCopy.neverCalled();
-	});
-
-	it.skip("should publish the configuration via prompt without flag set before", async ({ cli }) => {
-		const responseValues = [false, true, true];
-		stub(fs, "existsSync").callsFake(() => responseValues.shift());
-
-		const spyEnsure = spy(fs, "ensureDirSync");
-		const spyCopy = spy(fs, "copySync");
-
-		stub(cli.app.get(Identifiers.Cli.Component.Prompt), "render").returnValue({
-			confirm: true,
-			network: "mainnet",
-		});
-
-		await cli.withFlags({ network: undefined }).execute(Command);
-
-		spyEnsure.calledOnce();
-		spyCopy.calledTimes(2);
+		assert.true(existsSync(join(configDestination, ".env")));
+		assert.true(existsSync(join(configDestination, "app.json")));
 	});
 });

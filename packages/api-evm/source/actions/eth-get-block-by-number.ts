@@ -31,7 +31,7 @@ export class EthGetBlockByNumberAction implements Contracts.Api.RPC.Action<
 		type: "array",
 	};
 
-	public async handle(parameters: [string | Contracts.Crypto.BlockTag, boolean]): Promise<object | null> {
+	public async handle(parameters: [string, boolean]): Promise<object | null> {
 		const height = await resolveBlockTag(this.stateStore, parameters[0]);
 		const transactionObject = parameters[1];
 

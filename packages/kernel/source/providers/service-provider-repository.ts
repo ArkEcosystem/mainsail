@@ -75,7 +75,7 @@ export class ServiceProviderRepository {
 		this.app
 			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(serviceProvider.config())
-			.whenTagged("plugin", name.split("/")[1]);
+			.whenTagged("plugin", name.split("/")[1] ?? name);
 
 		await serviceProvider.register();
 		await this.eventDispatcher.dispatch(Events.KernelEvent.ServiceProviderRegistered, { name });

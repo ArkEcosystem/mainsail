@@ -2,7 +2,7 @@ import { describe } from "@mainsail/test-runner";
 import { majorityMinority } from "../test/fixtures/active-validators";
 import { isMinority } from "./is-minority";
 
-describe("isMajority", ({ assert, it }) => {
+describe("isMinority", ({ assert, it }) => {
 	it("should be ok ", () => {
 		for (const { n, minority } of majorityMinority) {
 			assert.true(isMinority(minority, n));

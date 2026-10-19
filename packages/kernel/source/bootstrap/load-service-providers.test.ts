@@ -67,6 +67,21 @@ describe<{
 		);
 	});
 
+	it("should throw a module-not-found error (not a TypeError) for an unscoped, missing package", async (context) => {
+		stub(context.app, "dataPath").returnValue(resolve(new URL(".", import.meta.url).pathname, "../../test/stubs"));
+
+		context.configRepository.merge({
+			app: { plugins: [{ package: "non-existing-plugin" }] },
+		});
+
+		// Without the `?? packageId` fallback, `"non-existing-plugin".split("/")[1]` is undefined and
+		// path.resolve throws "Path must be a string", an error that does not mention the package name.
+		await assert.rejects(
+			() => context.app.resolve<LoadServiceProviders>(LoadServiceProviders).bootstrap(),
+			"non-existing-plugin",
+		);
+	});
+
 	it("should throw if the plugin package exports no ServiceProvider", async (context) => {
 		stub(context.app, "dataPath").returnValue(resolve(new URL(".", import.meta.url).pathname, "../../test/stubs"));
 

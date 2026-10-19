@@ -7,16 +7,13 @@
 	"include": ["source/**/**.ts", "source/**/**.json"],
 	"references": [
 		{
+			"path": "../constants"
+		},
+		{
 			"path": "../container"
 		},
 		{
-			"path": "../contracts"
-		},
-		{
 			"path": "../kernel"
-		},
-		{
-			"path": "../utils"
 		}
 	]
 }

@@ -1,17 +1,25 @@
+import { packHeadersBitmaps, unpackHeadersBitmaps, type WithUnpackedHeaders } from "./headers.js";
 import { getPeers as proto } from "./proto/protos.js";
 
 export const getPeers = {
 	request: {
-		deserialize: (payload: Buffer): proto.IGetPeersRequest => proto.GetPeersRequest.decode(payload),
-		serialize: (object: proto.IGetPeersRequest): Buffer =>
-			Buffer.from(proto.GetPeersRequest.encode(object).finish()),
+		deserialize: (payload: Buffer): proto.GetPeersRequest.$Properties => {
+			const decoded = proto.GetPeersRequest.decode(payload);
+			unpackHeadersBitmaps(decoded);
+			return decoded;
+		},
+		serialize: (object: WithUnpackedHeaders<proto.GetPeersRequest.$Properties>): Buffer =>
+			Buffer.from(proto.GetPeersRequest.encode(packHeadersBitmaps(object)).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): proto.IGetPeersResponse =>
-			proto.GetPeersResponse.toObject(proto.GetPeersResponse.decode(payload), {
+		deserialize: (payload: Buffer): proto.GetPeersResponse.$Properties => {
+			const decoded = proto.GetPeersResponse.toObject(proto.GetPeersResponse.decode(payload), {
 				defaults: true,
-			}),
-		serialize: (object: proto.IGetPeersResponse): Buffer =>
-			Buffer.from(proto.GetPeersResponse.encode(object).finish()),
+			});
+			unpackHeadersBitmaps(decoded);
+			return decoded;
+		},
+		serialize: (object: WithUnpackedHeaders<proto.GetPeersResponse.$Properties>): Buffer =>
+			Buffer.from(proto.GetPeersResponse.encode(packHeadersBitmaps(object)).finish()),
 	},
 };

@@ -1,409 +1,267 @@
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Identifiers } from "@mainsail/constants";
-import { Configuration } from "@mainsail/crypto-config";
 
-import { AddressFactory } from "../../crypto-address-base58/source/address.factory";
-import { KeyPairFactory } from "../../crypto-key-pair-ecdsa/source/pair";
-import { PublicKeyFactory } from "../../crypto-key-pair-ecdsa/source/public";
-import { describeSkip } from "@mainsail/test-runner";
-import { Stub } from "../../test-runner/distribution/stub";
-import { Mempool } from ".";
+import { Events, Identifiers } from "@mainsail/constants";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 
-describeSkip<{
-	container: Container;
-	logger: any;
-	config: Configuration;
-	createSenderMempool: Stub;
-	createPublicKey: (mnemonic: string) => Promise<string>;
-}>("Mempool", ({ it, beforeAll, assert, beforeEach, spy, stub, stubFn }) => {
-	beforeAll((context) => {
-		context.createSenderMempool = stubFn();
-		context.logger = { debug: () => {} };
+import { Mempool } from "./mempool";
 
-		context.container = new Container();
-		context.container
-			.bind(Identifiers.TransactionPool.SenderMempool.Factory)
-			.toConstantValue(context.createSenderMempool);
-		context.container.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
-		context.container.bind(Identifiers.Cryptography.Identity.Address.Factory).to(AddressFactory);
-		context.container.bind(Identifiers.Cryptography.Identity.PublicKey.Factory).to(PublicKeyFactory);
-		context.container.bind(Identifiers.Cryptography.Identity.KeyPair.Factory).to(KeyPairFactory);
-		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
+const alice = "0x75545540230d5c3BEf023202d23CB74cFA723376";
+const bob = "0xbbe7B35057F3431E001d2b96817e3061B59849c9";
+const legacyAddresses = {
+	[alice]: "DH8WhBj6ron2tQhdFPQzjDcrk2CCY997MP",
+	[bob]: "DQogphvhHjJsqEhhR7befFiTzHQWLrQV3d",
+};
 
-		context.config = context.container.get<Configuration>(Identifiers.Cryptography.Configuration);
+const makeTransaction = (from: string, nonce: bigint, gasPrice = 5): Contracts.Crypto.Transaction =>
+	({
+		from,
+		gasPrice,
+		hash: `${from}-${nonce}-${gasPrice}`,
+		nonce,
+		senderLegacyAddress: legacyAddresses[from],
+		toData: () => ({ hash: `${from}-${nonce}-${gasPrice}` }),
+	}) as unknown as Contracts.Crypto.Transaction;
 
-		const factory = context.container.get<Contracts.Crypto.PublicKeyFactory>(
-			Identifiers.Cryptography.Identity.PublicKey.Factory,
-		);
+const makeSenderMempool = () => ({
+	addTransaction: async () => {},
+	getNonce: () => 0n,
+	getSize: () => 0,
+	isDisposable: () => false,
+	reAddTransactions: async () => [],
+	removeTransaction: () => [],
+	replaceTransaction: async () => [],
+});
 
-		context.createPublicKey = async (mnemonic: string) => await factory.fromMnemonic(mnemonic);
-	});
-
+describe<{
+	app: Application;
+	mempool: Mempool;
+	senderMempools: Record<string, ReturnType<typeof makeSenderMempool>>;
+	createSenderMempool: any;
+	events: any;
+	storage: any;
+}>("Mempool", ({ it, assert, beforeEach, each, spy, stub, stubFn }) => {
 	beforeEach((context) => {
-		stub(context.config, "getMilestone").returnValue({ address: { base58: "ark" } });
+		context.senderMempools = { [alice]: makeSenderMempool(), [bob]: makeSenderMempool() };
+		context.createSenderMempool = stubFn().callsFake(async (address: string) => context.senderMempools[address]);
+		context.events = { dispatch: async () => {} };
+		context.storage = { removeTransaction: () => {} };
+
+		context.app = new Application();
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue({ debug: () => {} });
+		context.app
+			.bind(Identifiers.TransactionPool.SenderMempool.Factory)
+			.toConstantValue(context.createSenderMempool.toFunction());
+		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.events);
+		context.app.bind(Identifiers.TransactionPool.Storage).toConstantValue(context.storage);
+
+		context.mempool = context.app.resolve(Mempool);
 	});
 
-	it("getSize - should return sum of transaction counts of sender states", async (context) => {
-		const senderMempool1 = {
-			addTransaction: () => {},
-			getSize: () => 10,
-			isDisposable: () => false,
-		};
-
-		const senderMempool2 = {
-			addTransaction: () => {},
-			getSize: () => 20,
-			isDisposable: () => false,
-		};
-
-		context.createSenderMempool.returnValueNth(0, senderMempool1).returnValueNth(1, senderMempool2);
-
-		const transaction1 = {
-			data: { senderPublicKey: await context.createPublicKey("sender1") },
-			id: "transaction1-id",
-		} as Contracts.Crypto.Transaction;
-
-		const transaction2 = {
-			data: { senderPublicKey: await context.createPublicKey("sender2") },
-			id: "transaction2-id",
-		} as Contracts.Crypto.Transaction;
-
-		const memory = context.container.get(Mempool, { autobind: true });
-		await memory.addTransaction(transaction1);
-		await memory.addTransaction(transaction2);
-		const size = memory.getSize();
-
-		assert.equal(size, 30);
+	it("getSize - should return zero when empty", ({ mempool }) => {
+		assert.equal(mempool.getSize(), 0);
 	});
 
-	it("hasSenderMempool - should return true if sender's transaction was added previously", async (context) => {
-		const senderMempool = {
-			addTransaction: () => {},
-			isDisposable: () => false,
-		};
+	it("getSize - should return the sum of all sender mempool sizes", async ({ mempool, senderMempools }) => {
+		await mempool.addTransaction(makeTransaction(alice, 0n));
+		await mempool.addTransaction(makeTransaction(bob, 0n));
+		stub(senderMempools[alice], "getSize").returnValue(2);
+		stub(senderMempools[bob], "getSize").returnValue(3);
 
-		context.createSenderMempool.returnValue(senderMempool);
-
-		const transaction = {
-			data: { senderPublicKey: await context.createPublicKey("sender") },
-			id: "transaction-id",
-		} as Contracts.Crypto.Transaction;
-
-		const memory = context.container.get(Mempool, { autobind: true });
-		await memory.addTransaction(transaction);
-		const has = memory.hasSenderMempool(transaction.data.senderPublicKey);
-
-		assert.true(has);
+		assert.equal(mempool.getSize(), 5);
 	});
 
-	it("hasSenderMempool - should return false if sender's transaction wasn't added previously", async (context) => {
-		const senderMempool = {
-			addTransaction: () => {},
-			isDisposable: () => false,
-		};
-
-		context.createSenderMempool.returnValue(senderMempool);
-
-		const transaction = {
-			data: { senderPublicKey: await context.createPublicKey("sender") },
-			id: "transaction-id",
-		} as Contracts.Crypto.Transaction;
-
-		const memory = context.container.get(Mempool, { autobind: true });
-		await memory.addTransaction(transaction);
-		const has = memory.hasSenderMempool(await context.createPublicKey("not sender"));
-
-		assert.false(has);
+	it("hasSenderMempool - should return false for an unknown sender", ({ mempool }) => {
+		assert.false(mempool.hasSenderMempool(alice));
 	});
 
-	it("getSenderMempool - should return sender state if sender's transaction was added previously", async (context) => {
-		const senderMempool = {
-			addTransaction: () => {},
-			isDisposable: () => false,
-		};
-
-		context.createSenderMempool.returnValue(senderMempool);
-
-		const transaction = {
-			data: { senderPublicKey: await context.createPublicKey("sender") },
-			id: "transaction-id",
-		} as Contracts.Crypto.Transaction;
-
-		const memory = context.container.get(Mempool, { autobind: true });
-		await memory.addTransaction(transaction);
-
-		assert.equal(memory.getSenderMempool(transaction.data.senderPublicKey), senderMempool);
+	it("getSenderMempool - should throw for an unknown sender", ({ mempool }) => {
+		assert.throws(() => mempool.getSenderMempool(alice), "Unknown sender");
 	});
 
-	it("getSenderMempool - should throw if sender's transaction wasn't added previously", async (context) => {
-		const senderMempool = {
-			addTransaction: () => {},
-			isDisposable: () => false,
-		};
+	it("addTransaction - should create a sender mempool for a new sender", async ({
+		mempool,
+		createSenderMempool,
+		senderMempools,
+	}) => {
+		await mempool.addTransaction(makeTransaction(alice, 0n));
 
-		context.createSenderMempool.returnValueNth(0, senderMempool);
-
-		const transaction = {
-			data: { senderPublicKey: await context.createPublicKey("sender") },
-			id: "transaction-id",
-		} as Contracts.Crypto.Transaction;
-
-		const key = await context.createPublicKey("not sender");
-
-		const memory = context.container.get(Mempool, { autobind: true });
-		await memory.addTransaction(transaction);
-		const callback = () => memory.getSenderMempool(key);
-
-		assert.throws(callback);
+		createSenderMempool.calledOnce();
+		createSenderMempool.calledWith(alice, legacyAddresses[alice]);
+		assert.true(mempool.hasSenderMempool(alice));
+		assert.equal(mempool.getSenderMempool(alice), senderMempools[alice]);
+		assert.equal([...mempool.getSenderMempools()], [senderMempools[alice]]);
 	});
 
-	it("getSenderMempools - should return all sender states", async (context) => {
-		const senderMempool1 = {
-			addTransaction: () => {},
-			isDisposable: () => false,
-		};
+	it("addTransaction - should reuse the sender mempool of a known sender", async ({
+		mempool,
+		createSenderMempool,
+	}) => {
+		await mempool.addTransaction(makeTransaction(alice, 0n));
+		await mempool.addTransaction(makeTransaction(alice, 1n));
 
-		const senderMempool2 = {
-			addTransaction: () => {},
-			isDisposable: () => false,
-		};
-
-		context.createSenderMempool.returnValueNth(0, senderMempool1).returnValueNth(1, senderMempool2);
-
-		const transaction1 = {
-			data: { senderPublicKey: await context.createPublicKey("sender1") },
-			id: "transaction1-id",
-		} as Contracts.Crypto.Transaction;
-
-		const transaction2 = {
-			data: { senderPublicKey: await context.createPublicKey("sender2") },
-			id: "transaction2-id",
-		} as Contracts.Crypto.Transaction;
-
-		const memory = context.container.get(Mempool, { autobind: true });
-		await memory.addTransaction(transaction1);
-		await memory.addTransaction(transaction2);
-		const senderMempools = memory.getSenderMempools();
-
-		assert.length([...senderMempools], 2);
+		createSenderMempool.calledOnce();
 	});
 
-	it("addTransaction - should add transaction to sender state", async (context) => {
-		const senderMempool = {
-			addTransaction: () => {},
-			isDisposable: () => false,
-		};
+	it("addTransaction - should add a transaction whose nonce is above the sender nonce", async ({
+		mempool,
+		senderMempools,
+	}) => {
+		const add = spy(senderMempools[alice], "addTransaction");
+		const replace = spy(senderMempools[alice], "replaceTransaction");
+		const transaction = makeTransaction(alice, 1n);
 
-		context.createSenderMempool.returnValue(senderMempool);
+		await mempool.addTransaction(transaction);
 
-		const addTransactionSpy = spy(senderMempool, "addTransaction");
-
-		const transaction = {
-			data: { senderPublicKey: await context.createPublicKey("sender1") },
-			id: "transaction-id",
-		} as Contracts.Crypto.Transaction;
-
-		const loggerSpy = spy(context.logger, "debug");
-
-		const memory = context.container.get(Mempool, { autobind: true });
-		await memory.addTransaction(transaction);
-
-		addTransactionSpy.calledWith(transaction);
-		loggerSpy.calledOnce();
+		add.calledOnce();
+		add.calledWith(transaction);
+		replace.neverCalled();
 	});
 
-	it("addTransaction - should forget sender state if it's empty even if error was thrown", async (context) => {
-		const error = new Error("Something went horribly wrong");
+	it("addTransaction - should replace a transaction whose nonce is not above the sender nonce", async ({
+		mempool,
+		senderMempools,
+		storage,
+		events,
+	}) => {
+		const dropped = [makeTransaction(alice, 0n), makeTransaction(alice, 1n)];
+		const replace = stub(senderMempools[alice], "replaceTransaction").resolvedValue(dropped);
+		const add = spy(senderMempools[alice], "addTransaction");
+		const removeFromStorage = spy(storage, "removeTransaction");
+		const dispatch = spy(events, "dispatch");
+		const transaction = makeTransaction(alice, 0n, 10);
 
-		const senderMempool = {
-			addTransaction: () => {},
-			isDisposable: () => true,
-		};
+		await mempool.addTransaction(transaction);
 
-		stub(senderMempool, "addTransaction").rejectedValue(error);
-
-		context.createSenderMempool.returnValue(senderMempool);
-
-		const transaction = {
-			data: { senderPublicKey: await context.createPublicKey("sender1") },
-			id: "transaction-id",
-		} as Contracts.Crypto.Transaction;
-
-		const loggerSpy = spy(context.logger, "debug");
-
-		const memory = context.container.get(Mempool, { autobind: true });
-		const promise = memory.addTransaction(transaction);
-
-		await assert.rejects(() => promise, "Something went horribly wrong");
-
-		const has = memory.hasSenderMempool(transaction.data.senderPublicKey);
-
-		loggerSpy.calledTimes(2);
-		assert.false(has);
+		replace.calledOnce();
+		replace.calledWith(transaction);
+		add.neverCalled();
+		// Everything the replacement dropped leaves the pool.
+		removeFromStorage.calledTimes(2);
+		removeFromStorage.calledWith(dropped[0].hash);
+		removeFromStorage.calledWith(dropped[1].hash);
+		dispatch.calledTimes(2);
+		dispatch.calledWith(Events.TransactionEvent.RemovedFromPool, dropped[0].toData());
+		dispatch.calledWith(Events.TransactionEvent.RemovedFromPool, dropped[1].toData());
 	});
 
-	it("removeTransaction - should return empty array when removing transaction of sender that wasn't previously added", async (context) => {
-		const transaction = {
-			data: { senderPublicKey: await context.createPublicKey("sender1") },
-			id: "transaction-id",
-		} as Contracts.Crypto.Transaction;
+	it("addTransaction - should add the transaction as usual when nothing was replaced", async ({
+		mempool,
+		senderMempools,
+		storage,
+	}) => {
+		const add = spy(senderMempools[alice], "addTransaction");
+		const removeFromStorage = spy(storage, "removeTransaction");
+		const transaction = makeTransaction(alice, 0n);
 
-		const memory = context.container.get(Mempool, { autobind: true });
-		const removedTransactions = await memory.removeTransaction(transaction.data.senderPublicKey, transaction.id);
+		await mempool.addTransaction(transaction);
 
-		assert.equal(removedTransactions, []);
+		add.calledOnce();
+		add.calledWith(transaction);
+		removeFromStorage.neverCalled();
 	});
 
-	it("removeTransaction - should remove previously added transaction and return list of removed transactions", async (context) => {
-		const transaction = {
-			data: { senderPublicKey: await context.createPublicKey("sender1") },
-			id: "transaction-id",
-		} as Contracts.Crypto.Transaction;
+	each<"addTransaction" | "replaceTransaction">(
+		"addTransaction - should rethrow and dispose of an empty sender mempool when %s fails",
+		async ({ context: { mempool, senderMempools }, dataset: method }) => {
+			stub(senderMempools[alice], method).rejectedValue(new Error("invalid"));
+			stub(senderMempools[alice], "isDisposable").returnValue(true);
 
-		const senderMempool = {
-			addTransaction: () => {},
-			isDisposable: () => false,
-			removeTransaction: () => {},
-		};
+			await assert.rejects(() => mempool.addTransaction(makeTransaction(alice, 0n)), "invalid");
 
-		const removeTransactionStub = stub(senderMempool, "removeTransaction").returnValue([transaction]);
+			assert.false(mempool.hasSenderMempool(alice));
+		},
+		["addTransaction", "replaceTransaction"],
+	);
 
-		context.createSenderMempool.returnValue(senderMempool);
+	it("addTransaction - should keep a sender mempool that still holds transactions when adding fails", async ({
+		mempool,
+		senderMempools,
+	}) => {
+		stub(senderMempools[alice], "addTransaction").rejectedValue(new Error("invalid"));
 
-		const loggerSpy = spy(context.logger, "debug");
+		await assert.rejects(() => mempool.addTransaction(makeTransaction(alice, 0n)), "invalid");
 
-		const memory = context.container.get(Mempool, { autobind: true });
-		await memory.addTransaction(transaction);
-		const removedTransactions = await memory.removeTransaction(transaction.data.senderPublicKey, transaction.id);
-
-		removeTransactionStub.calledWith(transaction.id);
-		assert.equal(removedTransactions, [transaction]);
-		loggerSpy.calledOnce();
+		assert.true(mempool.hasSenderMempool(alice));
 	});
 
-	it("removeTransaction - should forget sender state if it's empty even if error was thrown", async (context) => {
-		const error = new Error("Something went horribly wrong");
-		const transaction = {
-			data: { senderPublicKey: await context.createPublicKey("sender1") },
-			id: "transaction-id",
-		} as Contracts.Crypto.Transaction;
-
-		const senderMempool = {
-			addTransaction: () => {},
-			isDisposable: () => {},
-			removeTransaction: () => {},
-		};
-
-		stub(senderMempool, "removeTransaction").rejectedValue(error);
-		stub(senderMempool, "isDisposable").returnValueNth(0, false).returnValueNth(1, true);
-
-		context.createSenderMempool.returnValue(senderMempool);
-
-		const loggerSpy = spy(context.logger, "debug");
-
-		const memory = context.container.get(Mempool, { autobind: true });
-		await memory.addTransaction(transaction);
-		const promise = memory.removeTransaction(transaction.data.senderPublicKey, transaction.id);
-
-		await assert.rejects(() => promise, "Something went horribly wrong");
-
-		const has = memory.hasSenderMempool(transaction.data.senderPublicKey);
-
-		loggerSpy.calledTimes(2);
-		assert.false(has);
+	it("removeTransaction - should return nothing for an unknown sender", async ({ mempool }) => {
+		assert.equal(await mempool.removeTransaction(alice, "hash"), []);
 	});
 
-	it("removeForgedTransaction - should return empty array when accepting transaction of sender that wasn't previously added", async (context) => {
-		const memory = context.container.get(Mempool, { autobind: true });
-		const removedTransactions = await memory.removeForgedTransaction(
-			await context.createPublicKey("sender1"),
-			"none",
-		);
+	it("removeTransaction - should return what the sender mempool removed and keep it while non-empty", async ({
+		mempool,
+		senderMempools,
+	}) => {
+		await mempool.addTransaction(makeTransaction(alice, 0n));
+		const removed = [makeTransaction(alice, 1n)];
+		const remove = stub(senderMempools[alice], "removeTransaction").returnValue(removed);
 
-		assert.equal(removedTransactions, []);
+		assert.equal(await mempool.removeTransaction(alice, removed[0].hash), removed);
+
+		remove.calledWith(removed[0].hash);
+		assert.true(mempool.hasSenderMempool(alice));
 	});
 
-	it("removeForgedTransaction - should remove previously added transaction and return list of removed transactions", async (context) => {
-		const transaction = {
-			data: { senderPublicKey: await context.createPublicKey("sender1") },
-			id: "transaction-id",
-		} as Contracts.Crypto.Transaction;
+	it("removeTransaction - should dispose of a sender mempool that became empty", async ({
+		mempool,
+		senderMempools,
+	}) => {
+		await mempool.addTransaction(makeTransaction(alice, 0n));
+		stub(senderMempools[alice], "isDisposable").returnValue(true);
 
-		const senderMempool = {
-			addTransaction: () => {},
-			isDisposable: () => false,
-			removeForgedTransaction: () => {},
-		};
+		await mempool.removeTransaction(alice, "hash");
 
-		const removeStub = stub(senderMempool, "removeForgedTransaction").returnValue([transaction]);
-
-		context.createSenderMempool.returnValue(senderMempool);
-
-		const loggerSpy = spy(context.logger, "debug");
-
-		const memory = context.container.get(Mempool, { autobind: true });
-		await memory.addTransaction(transaction);
-		const removedTransactions = await memory.removeForgedTransaction(
-			transaction.data.senderPublicKey,
-			transaction.id,
-		);
-
-		removeStub.calledWith(transaction.id);
-		assert.equal(removedTransactions, [transaction]);
-		loggerSpy.calledOnce();
+		assert.false(mempool.hasSenderMempool(alice));
 	});
 
-	it("removeForgedTransaction - should forget sender state if it's empty even if error was thrown", async (context) => {
-		const error = new Error("Something went horribly wrong");
-		const transaction = {
-			data: { senderPublicKey: await context.createPublicKey("sender1") },
-			id: "transaction-id",
-		} as Contracts.Crypto.Transaction;
+	it("reAddTransactions - should re-add the given senders and return everything they dropped", async ({
+		mempool,
+		senderMempools,
+	}) => {
+		await mempool.addTransaction(makeTransaction(alice, 0n));
+		await mempool.addTransaction(makeTransaction(bob, 0n));
+		const aliceDropped = [makeTransaction(alice, 0n)];
+		const bobDropped = [makeTransaction(bob, 0n)];
+		stub(senderMempools[alice], "reAddTransactions").resolvedValue(aliceDropped);
+		stub(senderMempools[bob], "reAddTransactions").resolvedValue(bobDropped);
 
-		const senderMempool = {
-			addTransaction: () => {},
-			isDisposable: () => {},
-			removeForgedTransaction: () => {},
-		};
-
-		stub(senderMempool, "removeForgedTransaction").rejectedValue(error);
-		stub(senderMempool, "isDisposable").returnValueNth(0, false).returnValueNth(1, true);
-
-		context.createSenderMempool.returnValue(senderMempool);
-
-		const loggerSpy = spy(context.logger, "debug");
-
-		const memory = context.container.get(Mempool, { autobind: true });
-		await memory.addTransaction(transaction);
-		const promise = memory.removeForgedTransaction(transaction.data.senderPublicKey, transaction.id);
-
-		await assert.rejects(() => promise, "Something went horribly wrong");
-
-		const has = memory.hasSenderMempool(transaction.data.senderPublicKey);
-
-		loggerSpy.calledTimes(2);
-		assert.false(has);
+		assert.equal(await mempool.reAddTransactions([alice, bob]), [...aliceDropped, ...bobDropped]);
 	});
 
-	it("flush - should remove all sender states", async (context) => {
-		const senderMempool = {
-			addTransaction: () => {},
-			isDisposable: () => false,
-		};
+	it("reAddTransactions - should skip senders without a mempool", async ({ mempool, senderMempools }) => {
+		await mempool.addTransaction(makeTransaction(alice, 0n));
+		const reAdd = spy(senderMempools[alice], "reAddTransactions");
+		const bobReAdd = spy(senderMempools[bob], "reAddTransactions");
 
-		context.createSenderMempool.returnValue(senderMempool);
+		assert.equal(await mempool.reAddTransactions([bob, alice]), []);
 
-		const transaction = {
-			data: { senderPublicKey: await context.createPublicKey("sender1") },
-			id: "transaction-id",
-		} as Contracts.Crypto.Transaction;
+		reAdd.calledOnce();
+		bobReAdd.neverCalled();
+	});
 
-		const memory = context.container.get(Mempool, { autobind: true });
-		await memory.addTransaction(transaction);
-		memory.flush();
-		const has = memory.hasSenderMempool(transaction.data.senderPublicKey);
+	it("reAddTransactions - should dispose of sender mempools that became empty", async ({
+		mempool,
+		senderMempools,
+	}) => {
+		await mempool.addTransaction(makeTransaction(alice, 0n));
+		await mempool.addTransaction(makeTransaction(bob, 0n));
+		stub(senderMempools[alice], "isDisposable").returnValue(true);
 
-		assert.false(has);
+		await mempool.reAddTransactions([alice, bob]);
+
+		assert.false(mempool.hasSenderMempool(alice));
+		assert.true(mempool.hasSenderMempool(bob));
+	});
+
+	it("flush - should drop every sender mempool", async ({ mempool }) => {
+		await mempool.addTransaction(makeTransaction(alice, 0n));
+		await mempool.addTransaction(makeTransaction(bob, 0n));
+
+		mempool.flush();
+
+		assert.false(mempool.hasSenderMempool(alice));
+		assert.false(mempool.hasSenderMempool(bob));
+		assert.equal(mempool.getSize(), 0);
 	});
 });

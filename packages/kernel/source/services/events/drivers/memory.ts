@@ -10,8 +10,11 @@ class OnceListener implements Contracts.Kernel.EventListener {
 		private readonly listener: Contracts.Kernel.EventListener,
 	) {}
 
-	public async handle({ name }: { name: string }): Promise<void> {
-		this.dispatcher.forget(name, this.listener);
+	public async handle({ data, name }: { data?: unknown; name: string }): Promise<void> {
+		// Unsubscribe before delegating so the wrapper can never fire twice or leak.
+		this.dispatcher.forget(name, this);
+
+		await this.listener.handle({ data, name });
 	}
 }
 
@@ -39,8 +42,6 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 	}
 
 	public listenOnce(name: string, listener: Contracts.Kernel.EventListener): void {
-		this.listen(name, listener);
-
 		this.listen(name, new OnceListener(this, listener));
 	}
 
@@ -124,6 +125,11 @@ export class MemoryEventDispatcher implements Contracts.Kernel.EventDispatcher {
 		}
 
 		for (const match of matches) {
+			// "*" listeners are already collected above; skip to avoid double-counting.
+			if (match === "*") {
+				continue;
+			}
+
 			const matchListeners: Set<Contracts.Kernel.EventListener> | undefined = this.#getListenersByEvent(match);
 
 			if (matchListeners && matchListeners.size > 0) {

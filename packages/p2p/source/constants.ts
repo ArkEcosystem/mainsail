@@ -3,10 +3,15 @@ import { Units } from "@mainsail/constants";
 export const constants = {
 	CHECK_HEADER_DELAY: 2000,
 
+	// cut-loose timeout for a fast peer cleanse. slow verifications continue in the background
+	FAST_VERIFY_TIMEOUT: 1500,
+
 	MAX_DOWNLOAD_BLOCKS: 400, // maximum number of blocks we can download at once
 	MAX_DOWNLOAD_BLOCKS_JOBS: 10, // maximum number of blocks jobs
 
 	MAX_PAYLOAD_CLIENT: 5 * Units.MEGABYTE, // max size of a complete serialized response frame the WS client accepts
+	// A serialized prevote/precommit is ~140 bytes and the request headers ~200 bytes; 1 KB leaves ample room.
+	MAX_PAYLOAD_POST_MESSAGE: Units.KILOBYTE,
 	MAX_PAYLOAD_SERVER: 3 * Units.MEGABYTE,
 
 	MAX_PEERS_GET_API_NODES: 100,

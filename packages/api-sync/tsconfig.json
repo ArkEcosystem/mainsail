@@ -10,16 +10,16 @@
 			"path": "../api-database"
 		},
 		{
+			"path": "../constants"
+		},
+		{
 			"path": "../container"
 		},
 		{
-			"path": "../contracts"
-		},
-		{
-			"path": "../evm-consensus"
-		},
-		{
 			"path": "../evm-contracts"
+		},
+		{
+			"path": "../exceptions"
 		},
 		{
 			"path": "../kernel"

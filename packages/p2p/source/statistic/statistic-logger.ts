@@ -56,6 +56,14 @@ export class StatisticLogger implements Contracts.P2P.StatisticLogger {
 		log += ` pings=${generalStatistic.count.pingsSuccess}/${pingsTotal}`;
 		log += ` average=${generalStatistic.response.average} ms`;
 
+		if (generalStatistic.count.recordsUnattributed > 0) {
+			log += ` unattributed=${generalStatistic.count.recordsUnattributed}`;
+		}
+
+		if (generalStatistic.count.peersDropped > 0) {
+			log += ` peersDropped=${generalStatistic.count.peersDropped}`;
+		}
+
 		this.logger.info(log, "p2p");
 	}
 

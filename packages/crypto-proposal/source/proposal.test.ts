@@ -123,12 +123,12 @@ describe<{
 	it("#toString - should be ok", ({ proposal, proposalFull }) => {
 		assert.equal(
 			proposal.toString(),
-			`{"block":"a82964de6a37876e9e955cb5f97f6c25b9f52871cdb66c4dae9b33f0c832df65","blockNumber":2,"round":1,"validatorIndex":0}`,
+			`{"block":"11aff6f1418cf870f35fb2dc114eee89fd1094107cb5dc0a6a9cafbe381e1764","blockNumber":2,"round":1,"validatorIndex":0}`,
 		);
 
 		assert.equal(
 			proposalFull.toString(),
-			`{"block":"a82964de6a37876e9e955cb5f97f6c25b9f52871cdb66c4dae9b33f0c832df65","blockNumber":2,"round":1,"validatorIndex":0,"validRound":0}`,
+			`{"block":"11aff6f1418cf870f35fb2dc114eee89fd1094107cb5dc0a6a9cafbe381e1764","blockNumber":2,"round":1,"validatorIndex":0,"validRound":0}`,
 		);
 	});
 

@@ -1,29 +1,31 @@
-import { Consensus } from "@mainsail/consensus/distribution/consensus.js";
-import { Identifiers } from "@mainsail/constants";
+import type { Consensus } from "@mainsail/consensus/distribution/consensus.js";
+import { Enums, Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
 import { sleep } from "@mainsail/utils";
 
 import crypto from "../config/crypto.json" with { type: "json" };
 import validators from "../config/validators.json" with { type: "json" };
-import { assertBlockHash, assertBlockNumber, assertBlockRound } from "./asserts.js";
-import { Validator } from "./contracts.js";
+import { assertBlockHash, assertBlockNumber, assertBlockRound, assertLastBlockNumber } from "./asserts.js";
+import type { Validator } from "./contracts.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, runMany, setup, stopMany } from "./setup.js";
 import {
 	getLastCommit,
-	getValidators,
+	getNodeForValidator,
+	getValidatorsInSlotOrder,
 	makePrevote,
 	makeProposal,
 	prepareNodeValidators,
 	snoozeForBlock,
+	snoozeUntil,
 } from "./utilities.js";
 import type { Contracts } from "@mainsail/contracts";
 
 describe<{
-	nodes: Contracts.Kernel.Application[],
+	nodes: Contracts.Kernel.Application[];
 	validators: Validator[];
 	p2p: P2PRegistry;
-}>("Propose", ({ beforeEach, afterEach, it, assert, stub }) => {
+}>("Prevote", ({ beforeEach, afterEach, it, assert, stub }) => {
 	const totalNodes = 5;
 
 	beforeEach(async (context) => {
@@ -39,15 +41,19 @@ describe<{
 		await bootMany(context.nodes);
 		await bootstrapMany(context.nodes);
 
-		context.validators = await getValidators(context.nodes[0], validators);
+		context.validators = await getValidatorsInSlotOrder(context.nodes[0], validators);
 	});
 
 	afterEach(async ({ nodes }) => {
 		await stopMany(nodes);
 	});
 
-	it("should confirm block, if < minority does not prevote", async ({ nodes, p2p }) => {
-		const node0 = nodes[0];
+	it("should confirm the block, if fewer than 1/3 of the validators do not prevote", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrevote = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
 		stubPrevote.callsFake(async () => {
@@ -58,8 +64,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes - 1); // Assert number of prevotes
@@ -69,31 +75,51 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 	});
 
-	it("should not confirm block, if > minority does not prevote", async ({ nodes, p2p }) => {
-		const node0 = nodes[0];
+	it("should not confirm a block, if more than 1/3 of the validators do not prevote", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrevote0 = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote0.callsFake(async () => {
 			stubPrevote0.restore();
 		});
 
-		const node1 = nodes[1];
+		const node1 = getNodeForValidator(nodes, validators[1]);
 		const stubPrevote1 = stub(node1.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		stubPrevote1.callsFake(async () => {
 			stubPrevote1.restore();
 		});
 
 		await runMany(nodes);
+		await snoozeUntil(() => p2p.prevotes.getMessages(1, 0).length === totalNodes - 2);
 		await sleep(500);
 
+		// Three prevotes are below +2/3 for the block and below +2/3 of any kind, so nobody precommits and no timeout
+		// runs: every node stays in round 0 at the prevote step, and nothing is confirmed.
+		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes - 2);
 		assert.equal(p2p.precommits.getMessages(1, 0).length, 0);
+		await assertLastBlockNumber(nodes, 0);
+		for (const node of nodes) {
+			const consensus = node.get<Contracts.Consensus.Service>(Identifiers.Consensus.Service);
+			assert.equal(
+				[consensus.getBlockNumber(), consensus.getRound(), consensus.getStep()],
+				[1, 0, Enums.Consensus.Step.Prevote],
+			);
+		}
 	});
 
-	it("should confirm block, if < minority prevote null", async ({ nodes, validators, p2p }) => {
-		const node0 = nodes[0];
+	it("should confirm the block, if fewer than 1/3 of the validators prevote null", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrevote = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
 		const prevote = await makePrevote(node0, validators[0], 1, 0);
@@ -107,8 +133,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -121,25 +147,23 @@ describe<{
 				.getMessages(1, 0)
 				.map((prevote) => prevote.blockHash)
 				.sort(),
-			[
-				undefined,
-				commit.block.hash,
-				commit.block.hash,
-				commit.block.hash,
-				commit.block.hash,
-			].sort(),
+			[undefined, commit.block.hash, commit.block.hash, commit.block.hash, commit.block.hash].sort(),
 		);
 
 		// Next block
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 	});
 
-	it("should not confirm block, if > minority prevote null", async ({ nodes, validators, p2p }) => {
-		const node0 = nodes[0];
+	it("should confirm a block only in round 1, if more than 1/3 of the validators prevote null", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrevote0 = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		const prevote0 = await makePrevote(node0, validators[0], 1, 0);
 
@@ -148,7 +172,7 @@ describe<{
 			await p2p.broadcastMessage(prevote0);
 		});
 
-		const node1 = nodes[1];
+		const node1 = getNodeForValidator(nodes, validators[1]);
 		const stubPrevote1 = stub(node1.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 		const prevote1 = await makePrevote(node1, validators[1], 1, 0);
 
@@ -161,8 +185,10 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
+
+		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === totalNodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -183,12 +209,16 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 	});
 
-	it("should confirm block, if < minority prevote random block", async ({ nodes, validators, p2p }) => {
-		const node0 = nodes[0];
+	it("should confirm the block, if fewer than 1/3 of the validators prevote another block", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrevote = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
 		const proposal = await makeProposal(node0, validators[0], 1, 0, Date.now());
@@ -203,8 +233,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -230,13 +260,17 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 	});
 
-	it("should not confirm block, if > minority prevote random block", async ({ nodes, validators, p2p }) => {
-		const node0 = nodes[0];
-		const node1 = nodes[1];
+	it("should confirm a block only in round 1, if more than 1/3 of the validators prevote another block", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
+		const node1 = getNodeForValidator(nodes, validators[1]);
 
 		const proposal = await makeProposal(node0, validators[0], 1, 0, Date.now());
 		const prevote0 = await makePrevote(node0, validators[0], 1, 0, proposal.getPayload().block.hash);
@@ -257,8 +291,10 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 1);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 1);
+		await assertBlockHash(nodes, 1);
+
+		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === totalNodes);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes); // Assert number of prevotes
@@ -285,12 +321,16 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 	});
 
-	it("should confirm block, if < minority prevote multiple random blocks", async ({ nodes, validators, p2p }) => {
-		const node0 = nodes[0];
+	it("should confirm the block, if fewer than 1/3 of the validators prevote several other blocks", async ({
+		nodes,
+		validators,
+		p2p,
+	}) => {
+		const node0 = getNodeForValidator(nodes, validators[0]);
 		const stubPrevote = stub(node0.get<Consensus>(Identifiers.Consensus.Service), "prevote");
 
 		const proposal0 = await makeProposal(node0, validators[0], 1, 0, Date.now());
@@ -317,8 +357,8 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 1);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 1, 0);
+		await assertBlockHash(nodes, 1);
 
 		assert.equal(p2p.proposals.getMessages(1, 0).length, 1); // Assert number of proposals
 		assert.equal(p2p.prevotes.getMessages(1, 0).length, totalNodes + 4); // Assert number of prevotes
@@ -348,7 +388,7 @@ describe<{
 		await snoozeForBlock(nodes);
 
 		await assertBlockNumber(nodes, 2);
-		await assertBlockRound(nodes, 0);
-		await assertBlockHash(nodes);
+		await assertBlockRound(nodes, 2, 0);
+		await assertBlockHash(nodes, 2);
 	});
 });

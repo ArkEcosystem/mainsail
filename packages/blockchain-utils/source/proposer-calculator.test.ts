@@ -33,18 +33,18 @@ describe<Context>("ProposerCalculator", ({ assert, it, beforeEach }) => {
 		context.proposerCalculator = context.app.resolve(ProposerCalculator);
 	});
 
-	it("should return correct validator index", async ({ proposerCalculator }) => {
-		assert.equal(await proposerCalculator.getValidatorIndex(0), 0);
-		assert.equal(await proposerCalculator.getValidatorIndex(1), 1);
-		assert.equal(await proposerCalculator.getValidatorIndex(2), 2);
-		assert.equal(await proposerCalculator.getValidatorIndex(52), 52);
+	it("should return correct validator index", ({ proposerCalculator }) => {
+		assert.equal(proposerCalculator.getValidatorIndex(0), 0);
+		assert.equal(proposerCalculator.getValidatorIndex(1), 1);
+		assert.equal(proposerCalculator.getValidatorIndex(2), 2);
+		assert.equal(proposerCalculator.getValidatorIndex(52), 52);
 
-		assert.equal(await proposerCalculator.getValidatorIndex(53), 0);
-		assert.equal(await proposerCalculator.getValidatorIndex(54), 1);
-		assert.equal(await proposerCalculator.getValidatorIndex(55), 2);
+		assert.equal(proposerCalculator.getValidatorIndex(53), 0);
+		assert.equal(proposerCalculator.getValidatorIndex(54), 1);
+		assert.equal(proposerCalculator.getValidatorIndex(55), 2);
 
-		assert.equal(await proposerCalculator.getValidatorIndex(106), 0);
-		assert.equal(await proposerCalculator.getValidatorIndex(107), 1);
-		assert.equal(await proposerCalculator.getValidatorIndex(108), 2);
+		assert.equal(proposerCalculator.getValidatorIndex(106), 0);
+		assert.equal(proposerCalculator.getValidatorIndex(107), 1);
+		assert.equal(proposerCalculator.getValidatorIndex(108), 2);
 	});
 });

@@ -15,13 +15,12 @@
 		"build:watch": "pnpm run clean && tsc -w",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
-		"test:coverage": "c8 -r=text -r=lcov --all pnpm run test",
-		"test:coverage:html": "c8 -r html --all pnpm run test",
+		"test:coverage": "c8 --experimental-monocart -r=text -r=lcov --all pnpm run test",
 		"test:file": "pnpm run uvu source",
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
-		"inversify": "8.1.0",
+		"inversify": "8.2.3",
 		"reflect-metadata": "0.2.2"
 	},
 	"devDependencies": {

@@ -4,9 +4,11 @@ import Hapi from "@hapi/hapi";
 import { Enums, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { RpcError } from "@mainsail/exceptions";
-import { ensureError } from "@mainsail/utils";
+import { chunk, ensureError } from "@mainsail/utils";
 
 import { getRcpId, prepareRcpError } from "./utilities.js";
+
+const BATCH_CONCURRENCY = 10;
 
 @injectable()
 export class Processor implements Contracts.Api.RPC.Processor {
@@ -30,11 +32,16 @@ export class Processor implements Contracts.Api.RPC.Processor {
 		}
 
 		const payload = request.payload as Contracts.Api.RPC.Request<[]>;
-		if (Array.isArray(payload)) {
-			return Promise.all(payload.map(async (rcpRequest) => await this.#processSingle(rcpRequest)));
-		} else {
+
+		if (!Array.isArray(payload)) {
 			return this.#processSingle(payload);
 		}
+
+		const responses: (Contracts.Api.RPC.Response | Contracts.Api.RPC.Error)[] = [];
+		for (const group of chunk(payload, BATCH_CONCURRENCY)) {
+			responses.push(...(await Promise.all(group.map((rcpRequest) => this.#processSingle(rcpRequest)))));
+		}
+		return responses;
 	}
 
 	async #processSingle(

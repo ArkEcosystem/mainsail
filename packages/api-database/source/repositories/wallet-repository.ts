@@ -11,17 +11,15 @@ const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting 
 		return defaultSort;
 	}
 
-	return sorting.map(
-		(item): SortFragment => ({
-			direction: item.direction,
-			jsonFieldAccessor: {
-				cast: "numeric",
-				fieldName: item.property.replace("attributes.", ""),
-				operator: "->>",
-			},
-			property: "attributes",
-		}),
-	);
+	return sorting.map((item): SortFragment => ({
+		direction: item.direction,
+		jsonFieldAccessor: {
+			cast: "numeric",
+			fieldName: item.property.replace("attributes.", ""),
+			operator: "->>",
+		},
+		property: "attributes",
+	}));
 };
 
 export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRepository =>

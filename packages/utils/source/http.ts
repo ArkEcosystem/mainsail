@@ -26,7 +26,7 @@ const sendRequest = <T>(method: string, url: string, options?: HttpOptions): Pro
 
 		options = { ...options };
 		options.host = parsedUrl.host;
-		options.hostname = parsedUrl.hostname;
+		options.hostname = parsedUrl.hostname.startsWith("[") ? parsedUrl.hostname.slice(1, -1) : parsedUrl.hostname;
 		options.port = parsedUrl.port;
 		options.protocol = parsedUrl.protocol;
 		options.method = method.toLowerCase();

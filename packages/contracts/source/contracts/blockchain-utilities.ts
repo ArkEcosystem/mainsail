@@ -9,7 +9,6 @@ export interface FeeCalculator {
 export interface RoundCalculator {
 	isNewRound(height: number): boolean;
 	calculateRound(height: number): RoundInfo;
-	calculateRoundInfoByRound(round: number): RoundInfo;
 }
 
 export interface TimestampCalculator {

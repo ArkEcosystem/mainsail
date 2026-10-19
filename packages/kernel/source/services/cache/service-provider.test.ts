@@ -12,6 +12,7 @@ describe<{
 	beforeEach((context) => {
 		context.app = new Application();
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).to(MemoryEventDispatcher).inSingletonScope();
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue({ warn: () => {} });
 	});
 
 	it("should register the service", async (context) => {

@@ -1,4 +1,3 @@
-import type { Types } from "@mainsail/api-common";
 import type { Contracts } from "@mainsail/contracts";
 
 import { ConfigurationController } from "../controllers/configuration.js";
@@ -8,7 +7,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 	server.bind(controller);
 
 	server.route({
-		handler: (request: Types.HapiRequest) => controller.configuration(request),
+		handler: () => controller.configuration(),
 		method: "GET",
 		path: "/configuration",
 	});

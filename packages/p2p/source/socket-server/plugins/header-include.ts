@@ -9,20 +9,15 @@ import { inject, injectable } from "@mainsail/container";
 
 @injectable()
 export class HeaderIncludePlugin {
-	@inject(Identifiers.Application.Instance)
-	protected readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.P2P.Header.Factory)
 	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
 
 	public register(server) {
-		const headerFactory = this.headerFactory;
-
 		server.ext({
-			async method(request, h: ResponseToolkit) {
+			method: async (request, h: ResponseToolkit) => {
 				request.response.source = {
 					...request.response.source,
-					headers: headerFactory().toData(),
+					headers: this.headerFactory().toData(),
 				};
 
 				return h.continue;

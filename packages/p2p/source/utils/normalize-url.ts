@@ -4,8 +4,9 @@ export function normalizeUrl(urlString: string): string {
 	try {
 		const url = new URL(urlString);
 
-		// Trim search parameters
+		// Trim search parameters and the fragment
 		url.search = "";
+		url.hash = "";
 
 		// Remove trailing slash for non-root paths
 		if (url.pathname !== "/") {

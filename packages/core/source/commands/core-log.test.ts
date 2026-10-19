@@ -6,22 +6,32 @@ import { Command } from "./core-log";
 
 describe<{
 	cli: Console;
-}>("CoreLogCommnad", ({ beforeEach, it, stub }) => {
-	const process = {
+}>("CoreLogCommand", ({ beforeEach, it, stub }) => {
+	const processMock = {
 		log: () => {},
 	};
 
 	beforeEach((context) => {
 		context.cli = new Console();
 
-		context.cli.app.rebind(Identifiers.Cli.ProcessFactory).toFactory(() => () => process);
+		context.cli.app.rebind(Identifiers.Cli.ProcessFactory).toFactory(() => () => processMock);
 	});
 
-	it("should call process log", async ({ cli }) => {
-		const spyLog = stub(process, "log");
+	it("should call process log with the lines flag default", async ({ cli }) => {
+		const spyLog = stub(processMock, "log");
 
 		await cli.execute(Command);
 
 		spyLog.calledOnce();
+		spyLog.calledWith(false, 15);
+	});
+
+	it("should call process log with the [--error] and [--lines] flags", async ({ cli }) => {
+		const spyLog = stub(processMock, "log");
+
+		await cli.withFlags({ error: true, lines: 100 }).execute(Command);
+
+		spyLog.calledOnce();
+		spyLog.calledWith(true, 100);
 	});
 });

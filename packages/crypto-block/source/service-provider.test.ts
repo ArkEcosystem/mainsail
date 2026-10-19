@@ -45,7 +45,7 @@ describe<{
 		assert.true(app.isBound(Identifiers.Cryptography.Block.Serializer));
 
 		const headerSize = app.get<() => number>(Identifiers.Cryptography.Block.HeaderSize);
-		assert.equal(headerSize(), 1 + 6 + 4 + 4 + 32 + 32 + 256 + 2 + 4 + 32 + 32 + 4 + 32 + 20);
+		assert.equal(headerSize(), 1 + 6 + 4 + 4 + 32 + 32 + 256 + 2 + 4 + 32 + 32 + 4 + 32 + 20 + 96);
 
 		assert.true(validator.hasSchema("blockHeader"));
 		assert.true(validator.hasSchema("block"));

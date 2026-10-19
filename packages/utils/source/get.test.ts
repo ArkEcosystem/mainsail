@@ -24,5 +24,7 @@ describe("get", async ({ assert, it, nock, loader }) => {
 	it("should exit early if it encounters an undefined value", () => {
 		assert.undefined(get({ a: undefined }, "a.b"));
 		assert.undefined(get({ a: null }, "a.b"));
+		assert.is(get({ a: null }, "a.b", "default"), "default");
+		assert.is(get(null, "a", "default"), "default");
 	});
 });

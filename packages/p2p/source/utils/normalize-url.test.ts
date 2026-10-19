@@ -15,6 +15,8 @@ describe<{}>("normalizeUrl", ({ assert, each }) => {
 			{ given: "http://example.com/", normalized: "http://example.com/" },
 			{ given: "http://example.com/path/", normalized: "http://example.com/path" },
 			{ given: "http://example.com/path?123534", normalized: "http://example.com/path" },
+			{ given: "http://example.com/path#section", normalized: "http://example.com/path" },
+			{ given: "http://example.com/#section", normalized: "http://example.com/" },
 			{ given: "https://example.com:4003/", normalized: "https://example.com:4003/" },
 			{ given: "https://example.com:4003/path", normalized: "https://example.com:4003/path" },
 		],

@@ -2,6 +2,7 @@
 import { Console } from "@mainsail/cli";
 import { describe } from "@mainsail/test-runner";
 import envPaths, { Paths } from "env-paths";
+import { join } from "path";
 
 import { Command } from "./env-paths";
 
@@ -19,12 +20,14 @@ describe<{
 
 		await cli.execute(Command);
 
+		// Paths are <envPaths("mainsail")>/<app name>, where the app name is the
+		// package name after the scope ("@mainsail/core" -> "core").
 		const paths: Paths = envPaths("mainsail", { suffix: "" });
 
-		assert.true(message.includes(paths.cache));
-		assert.true(message.includes(paths.config));
-		assert.true(message.includes(paths.data));
-		assert.true(message.includes(paths.log));
-		assert.true(message.includes(paths.temp));
+		assert.true(message.includes(join(paths.cache, "core")));
+		assert.true(message.includes(join(paths.config, "core")));
+		assert.true(message.includes(join(paths.data, "core")));
+		assert.true(message.includes(join(paths.log, "core")));
+		assert.true(message.includes(join(paths.temp, "core")));
 	});
 });

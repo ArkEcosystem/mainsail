@@ -1,4 +1,5 @@
 import type { AggregatedSignature, Block, KeyPair, Message, Proposal } from "./crypto/index.js";
+import type { EventListener } from "./kernel/events.js";
 
 export interface ValidatorKeyPair {
 	readonly publicKey: string;
@@ -8,6 +9,7 @@ export interface ValidatorKeyPair {
 export interface Validator {
 	configure(keyPair: ValidatorKeyPair): Validator;
 	getConsensusPublicKey(): string;
+	getRandaoReveal(blockNumber: number): Promise<string>;
 	propose(
 		validatorIndex: number,
 		round: number,
@@ -17,13 +19,13 @@ export interface Validator {
 	): Promise<Proposal>;
 	prevote(
 		validatorIndex: number,
-		blockHeight: number,
+		blockNumber: number,
 		round: number,
 		blockHash: string | undefined,
 	): Promise<Message>;
 	precommit(
 		validatorIndex: number,
-		blockHeight: number,
+		blockNumber: number,
 		round: number,
 		blockHash: string | undefined,
 	): Promise<Message>;
@@ -32,4 +34,9 @@ export interface Validator {
 export interface ValidatorRepository {
 	getValidator(publicKey: string): Validator | undefined;
 	printLoadedValidators(): void;
+}
+
+export interface ProposerReporter extends EventListener {
+	boot(): void;
+	dispose(): void;
 }

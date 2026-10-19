@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import child_process from "child_process";
-import { CommandLineInterface } from "../distribution/index.js";
 
 const jemallocPath = child_process
 	.spawnSync(
@@ -13,7 +12,8 @@ const jemallocPath = child_process
 	.shift()
 	.trim();
 
-if (jemallocPath) {
+const alreadyPreloaded = (process.env.LD_PRELOAD || "").includes("libjemalloc");
+if (jemallocPath && !alreadyPreloaded) {
 	if (process.env.LD_PRELOAD !== jemallocPath) {
 		process.env.LD_PRELOAD = jemallocPath;
 		let exitCode = 0;
@@ -25,7 +25,7 @@ if (jemallocPath) {
 		process.exitCode = exitCode;
 		process.exit();
 	}
-} else {
+} else if (!alreadyPreloaded) {
 	console.error(
 		"The jemalloc library was not found on your system. It is recommended to install it for better memory management. Falling back to the system default...",
 	);
@@ -33,6 +33,7 @@ if (jemallocPath) {
 
 const main = async () => {
 	try {
+		const { CommandLineInterface } = await import("../distribution/index.js");
 		const cmd = new CommandLineInterface(process.argv.slice(2));
 		await cmd.execute();
 	} catch (error) {

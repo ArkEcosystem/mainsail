@@ -88,7 +88,7 @@ export class LoadServiceProviders implements Contracts.Kernel.Bootstrapper {
 					"..",
 					"..",
 					"..",
-					packageId.split("/")[1],
+					packageId.split("/")[1] ?? packageId,
 					"distribution",
 					"index.js",
 				);

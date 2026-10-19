@@ -30,6 +30,7 @@ export class RoundState implements Contracts.Consensus.RoundState {
 	#proposal?: Contracts.Crypto.Proposal;
 	#processorResult?: Contracts.Processor.BlockProcessorResult;
 	#accountUpdates: Array<Contracts.Evm.AccountUpdate> = [];
+	#contractEvents: Array<Contracts.Evm.ContractEvent> = [];
 	#prevotes = new Map<number, Contracts.Crypto.Message>();
 	#prevotesCount = new Map<string | undefined, number>();
 	#precommits = new Map<number, Contracts.Crypto.Message>();
@@ -47,10 +48,6 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 	public get round(): number {
 		return this.#round;
-	}
-
-	public get persist(): boolean {
-		return true; // Store block in database every time
 	}
 
 	public get validators(): string[] {
@@ -112,10 +109,10 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 	public async getCommit(): Promise<Contracts.Crypto.Commit> {
 		if (!this.#commit) {
-			const majority = await this.aggregatePrecommits();
-
 			const proposal = this.getProposal();
 			assert.defined(proposal);
+
+			const majority = await this.aggregatePrecommits();
 
 			const round = proposal.round;
 			const block = proposal.getPayload().block;
@@ -161,6 +158,14 @@ export class RoundState implements Contracts.Consensus.RoundState {
 
 	public setAccountUpdates(accounts: Array<Contracts.Evm.AccountUpdate>): void {
 		this.#accountUpdates = accounts;
+	}
+
+	public getContractEvents(): Array<Contracts.Evm.ContractEvent> {
+		return this.#contractEvents;
+	}
+
+	public setContractEvents(events: Array<Contracts.Evm.ContractEvent>): void {
+		this.#contractEvents = events;
 	}
 
 	public hasPrevote(validatorIndex: number): boolean {
@@ -266,6 +271,22 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#isMajority(this.#precommits.size);
 	}
 
+	// More than 2/3 precommits for one block while the proposal for it never arrived. Null precommits do not
+	// count: they mark a round that failed, not a block this node is missing.
+	public hasMajorityPrecommitsWithoutProposal(): boolean {
+		if (this.#proposal) {
+			return false;
+		}
+
+		for (const [blockHash, count] of this.#precommitsCount) {
+			if (blockHash !== undefined && this.#isMajority(count)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public hasMinorityPrevotesOrPrecommits(): boolean {
 		return this.#hasMinorityPrevotes() || this.#hasMinorityPrecommits();
 	}
@@ -362,11 +383,13 @@ export class RoundState implements Contracts.Consensus.RoundState {
 		return this.#precommitsCount.get(blockHash) ?? 0;
 	}
 
-	#getSignatures(s: Map<number, { signature: string; blockHash?: string }>): Map<number, { signature: string }> {
+	#getSignatures(
+		messages: Map<number, { signature: string; blockHash?: string }>,
+	): Map<number, { signature: string }> {
 		assert.defined(this.#proposal);
 		const filtered: Map<number, { signature: string }> = new Map();
 
-		for (const [key, value] of s) {
+		for (const [key, value] of messages) {
 			if (value.blockHash === this.#proposal.blockHeader.hash) {
 				filtered.set(key, value);
 			}

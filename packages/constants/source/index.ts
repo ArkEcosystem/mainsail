@@ -3,6 +3,7 @@ export * from "./channels.js";
 export * as Enums from "./enums/index.js";
 export * from "./environment-variables.js";
 export * as Events from "./events.js";
+export * from "./hashes.js";
 export * from "./identifiers.js";
 export * from "./locale.js";
 export * from "./log-levels.js";

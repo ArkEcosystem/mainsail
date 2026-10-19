@@ -5,14 +5,13 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import {
 	InsufficientBalanceError,
 	TransactionExceedsMaximumByteSizeError,
-	TransactionFailedToApplyError,
-	TransactionFailedToVerifyError,
 	TransactionFromWrongNetworkError,
 	UnexpectedNonceError,
+	TransactionFailedToPreverifyError,
+	UnexpectedLegacySecondSignatureError,
 } from "@mainsail/exceptions";
-import { Services } from "@mainsail/kernel";
-import { Wallets } from "@mainsail/state";
-import { ensureError } from "@mainsail/utils";
+
+import { Wallet } from "./wallet.js";
 
 @injectable()
 export class SenderState implements Contracts.TransactionPool.SenderState {
@@ -21,7 +20,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "transaction-pool-service")
-	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
+	private readonly pluginConfiguration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
@@ -30,19 +29,16 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	@tagged("instance", "transaction-pool")
 	private readonly evm!: Contracts.Evm.Instance;
 
-	@inject(Identifiers.Transaction.Handler)
-	private readonly transactionHandler!: Contracts.Transactions.TransactionHandler;
-
-	@inject(Identifiers.Services.Trigger.Service)
-	private readonly triggers!: Services.Triggers.Triggers;
-
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
+
+	@inject(Identifiers.Cryptography.Transaction.Verifier)
+	private readonly verifier!: Contracts.Crypto.TransactionVerifier;
 
 	#wallet!: Contracts.State.Wallet;
 
 	public async configure(address: string, legacyAddress?: string): Promise<SenderState> {
-		this.#wallet = await this.app.resolve(Wallets.Wallet).init(address, legacyAddress);
+		this.#wallet = await this.app.resolve(Wallet).init(address, legacyAddress);
 		return this;
 	}
 
@@ -51,9 +47,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 	}
 
 	public async reset(): Promise<void> {
-		this.#wallet = await this.app
-			.resolve(Wallets.Wallet)
-			.init(this.#wallet.getAddress(), this.#wallet.getLegacyAddress());
+		this.#wallet = await this.app.resolve(Wallet).init(this.#wallet.getAddress(), this.#wallet.getLegacyAddress());
 	}
 
 	public async apply(transaction: Contracts.Crypto.Transaction): Promise<void> {
@@ -101,7 +95,7 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 		nonceOffset: bigint = 0n,
 		refund: bigint = 0n,
 	): Promise<void> {
-		const maxTransactionBytes: number = this.configuration.getRequired<number>("maxTransactionBytes");
+		const maxTransactionBytes: number = this.pluginConfiguration.getRequired<number>("maxTransactionBytes");
 		if (transaction.serialized.length > maxTransactionBytes) {
 			throw new TransactionExceedsMaximumByteSizeError(transaction, maxTransactionBytes);
 		}
@@ -119,25 +113,39 @@ export class SenderState implements Contracts.TransactionPool.SenderState {
 			throw new InsufficientBalanceError();
 		}
 
-		if (
-			await this.triggers.call("verifyTransaction", {
-				handler: this.transactionHandler,
-				transaction,
-			})
-		) {
-			try {
-				await this.triggers.call("throwIfCannotBeApplied", {
-					evm: this.evm,
-					handler: this.transactionHandler,
-					sender: this.#wallet,
-					transaction,
-				});
-			} catch (rawError) {
-				const error = ensureError(rawError);
-				throw new TransactionFailedToApplyError(transaction, error);
-			}
+		if (this.#wallet.hasLegacySecondPublicKey()) {
+			await this.verifier.verifyLegacySecondSignature(transaction, this.#wallet.legacySecondPublicKey());
 		} else {
-			throw new TransactionFailedToVerifyError(transaction);
+			if (transaction.legacySecondSignature) {
+				throw new UnexpectedLegacySecondSignatureError();
+			}
+		}
+
+		await this.#preverify(transaction);
+	}
+
+	async #preverify(transaction: Contracts.Crypto.Transaction): Promise<void> {
+		const milestone = this.cryptoConfiguration.getMilestone();
+
+		const preverified = await this.evm.preverifyTransaction({
+			blockGasLimit: BigInt(milestone.block.maxGasLimit),
+			data: Buffer.from(transaction.data.slice(2), "hex"),
+			from: transaction.from,
+			gasLimit: BigInt(transaction.gasLimit),
+			gasPrice: BigInt(transaction.gasPrice),
+			legacyAddress: transaction.senderLegacyAddress,
+			nonce: transaction.nonce,
+			specId: milestone.evmSpec,
+			to: transaction.to,
+			txHash: transaction.hash,
+			value: transaction.value,
+		});
+
+		if (!preverified.success) {
+			throw new TransactionFailedToPreverifyError(
+				transaction,
+				preverified.error ?? "Preverify failed for unknown reason",
+			);
 		}
 	}
 }

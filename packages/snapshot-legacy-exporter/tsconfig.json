@@ -7,10 +7,10 @@
 	"include": ["source/**/**.ts", "source/**/**.json"],
 	"references": [
 		{
-			"path": "../container"
+			"path": "../constants"
 		},
 		{
-			"path": "../contracts"
+			"path": "../container"
 		},
 		{
 			"path": "../crypto-address-keccak256"

@@ -1,3 +1,4 @@
+import { symlinkSync } from "fs";
 import { dirSync, fileSync, setGracefulCleanup } from "tmp";
 
 import { describe } from "@mainsail/test-runner";
@@ -107,6 +108,20 @@ describe<{
 
 		await context.fs.makeDirectory(subdir);
 
+		assert.equal(await context.fs.directories(dir), [subdir]);
+	});
+
+	it(".files and .directories should exclude symlinks (incl. dangling ones) without throwing", async (context) => {
+		const dir: string = dirSync().name;
+		const file = `${dir}/real.txt`;
+		const subdir = `${dir}/sub`;
+
+		await context.fs.put(file, "Hello World");
+		await context.fs.makeDirectory(subdir);
+		// Dangling symlink: neither a file nor a directory, and must not crash the scan.
+		symlinkSync(`${dir}/missing-target`, `${dir}/dangling`);
+
+		assert.equal(await context.fs.files(dir), [file]);
 		assert.equal(await context.fs.directories(dir), [subdir]);
 	});
 

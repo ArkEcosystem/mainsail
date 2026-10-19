@@ -45,6 +45,9 @@ export const blockHeaderSchema: Record<string, Contracts.Serializer.Deserializat
 	proposer: {
 		type: "address",
 	},
+	randaoReveal: {
+		type: "consensusSignature",
+	},
 };
 
 export const transactionsSchema: Record<string, Contracts.Serializer.SerializationSchema> = {

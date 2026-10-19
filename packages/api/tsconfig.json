@@ -16,10 +16,13 @@
 			"path": "../cli"
 		},
 		{
+			"path": "../constants"
+		},
+		{
 			"path": "../container"
 		},
 		{
-			"path": "../contracts"
+			"path": "../kernel"
 		},
 		{
 			"path": "../logger-pino"

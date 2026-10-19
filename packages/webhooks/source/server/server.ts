@@ -41,7 +41,7 @@ export class Server {
 		this.#server.app.database = this.database;
 
 		this.#server.ext({
-			async method(request: Hapi.Request, h: Hapi.ResponseToolkit) {
+			method: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
 				request.headers["content-type"] = "application/json";
 
 				return h.continue;
@@ -71,8 +71,7 @@ export class Server {
 
 			this.logger.info(`Webhook Server stopped at ${this.#server.info.uri}`);
 		} catch (rawError) {
-			const error = ensureError(rawError);
-			await this.app.terminate(`Failed to stop Webhook Server!`, error);
+			this.app.fail(`Failed to stop Webhook Server!`, ensureError(rawError));
 		}
 	}
 
