@@ -27,6 +27,16 @@ describe<{}>("normalizeUrl", ({ assert, each }) => {
 		({ dataset: url }) => {
 			assert.throws(() => normalizeUrl(url), `Invalid API Node url: ${url}`);
 		},
-		["localhost", "://localhost", "", "-", 1, "localhost.com"],
+		[
+			"localhost",
+			"://localhost",
+			"",
+			"-",
+			1,
+			"localhost.com",
+			"ftp://example.com/",
+			"ws://example.com/",
+			"file:///etc/passwd",
+		],
 	);
 });
