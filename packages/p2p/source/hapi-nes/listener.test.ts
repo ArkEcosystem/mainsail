@@ -56,7 +56,8 @@ describeSkip("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
-		const client2 = new Client("http://127.0.0.1:" + server.info.port);
+		// Connect from a different ip (::1) so the rejection comes from maxConnections, not the per ip limit
+		const client2 = new Client("http://[::1]:" + server.info.port);
 		client2.onError = Hoek.ignore;
 
 		await assert.rejects(() => client2.connect());
@@ -68,7 +69,7 @@ describeSkip("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 
 	it("limits number of connections per ip", async () => {
 		const server = Hapi.server();
-		await server.register({ plugin: plugin, options: { maxConnectionsPerIp: 1 } });
+		await server.register({ plugin: plugin, options: {} });
 
 		await server.start();
 		const client = new Client("http://127.0.0.1:" + server.info.port);
@@ -84,21 +85,34 @@ describeSkip("Listener", ({ it, spy, beforeEach, assert, nock, each }) => {
 		await server.stop();
 	});
 
-	it("exempts whitelisted ips from the per-ip connection limit", async () => {
+	it("allows one connection per ip from different ips", async () => {
 		const server = Hapi.server();
-		await server.register({
-			plugin: plugin,
-			options: { maxConnectionsPerIp: 1, maxConnectionsPerIpWhitelist: ["127.0.0.1", "::ffff:127.0.0.1", "::1"] },
-		});
+		await server.register({ plugin: plugin, options: {} });
 
 		await server.start();
 		const client = new Client("http://127.0.0.1:" + server.info.port);
 		await client.connect();
 
-		const client2 = new Client("http://127.0.0.1:" + server.info.port);
+		const client2 = new Client("http://[::1]:" + server.info.port);
 		await client2.connect();
 
 		await client.disconnect();
+		await client2.disconnect();
+		await server.stop();
+	});
+
+	it("frees the per ip slot when the connection is closed", async () => {
+		const server = Hapi.server();
+		await server.register({ plugin: plugin, options: {} });
+
+		await server.start();
+		const client = new Client("http://127.0.0.1:" + server.info.port);
+		await client.connect();
+		await client.disconnect();
+
+		const client2 = new Client("http://127.0.0.1:" + server.info.port);
+		await client2.connect();
+
 		await client2.disconnect();
 		await server.stop();
 	});
