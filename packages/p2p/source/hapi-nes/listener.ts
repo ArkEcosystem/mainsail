@@ -22,7 +22,7 @@ export class Listener {
 	private _heartbeat;
 	private _beatTimeout;
 	private _wss;
-	private _connectionsPerIp;
+	private _connectionsPerIp: Set<string>;
 
 	public constructor(server, settings) {
 		this._server = server;
@@ -32,7 +32,7 @@ export class Listener {
 		this._heartbeat = null;
 		this._beatTimeout = null;
 		this._stopped = false;
-		this._connectionsPerIp = new Set();
+		this._connectionsPerIp = new Set<string>();
 
 		// WebSocket listener
 
@@ -153,7 +153,7 @@ export class Listener {
 			return;
 		}
 
-		this._connectionsPerIp.set(ip);
+		this._connectionsPerIp.add(ip);
 	}
 
 	private _untrackConnection(ip) {
