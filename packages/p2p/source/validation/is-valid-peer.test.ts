@@ -1,9 +1,38 @@
 import os from "os";
 
 import { describe } from "@mainsail/test-runner";
-import { isLocalHost, isValidPeerIp } from "./is-valid-peer";
+import { isLocalHost, isPublicIp, isValidPeerIp } from "./is-valid-peer";
 
 describe("isValidPeer", ({ it, assert }) => {
+	it("#isPublicIp - should be ok for a globally routable address", () => {
+		for (const ip of ["1.2.3.4", "8.8.8.8", "2606:4700::1111", "::ffff:1.2.3.4"]) {
+			assert.true(isPublicIp(ip), ip);
+		}
+	});
+
+	it("#isPublicIp - should not be ok for a non-public or invalid address", () => {
+		for (const ip of [
+			"127.0.0.1",
+			"10.0.0.1",
+			"172.16.0.1",
+			"192.168.1.1",
+			"169.254.169.254",
+			"100.64.0.1",
+			"0.0.0.0",
+			"224.0.0.1",
+			"::1",
+			"::",
+			"fe80::1",
+			"fd00::1",
+			"::ffff:10.0.0.1",
+			"2001:db8::1",
+			"garbage",
+			"",
+		]) {
+			assert.false(isPublicIp(ip), ip);
+		}
+	});
+
 	it("#isLocalHost - should be ok for 127.0.0.1", () => {
 		assert.true(isLocalHost("127.0.0.1"));
 	});

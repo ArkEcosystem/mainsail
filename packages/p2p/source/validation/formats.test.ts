@@ -15,6 +15,7 @@ describe<{
 		const formats = makeFormats();
 
 		context.validator.addFormat("validPeer", formats.validPeer);
+		context.validator.addFormat("publicHttpUrl", formats.publicHttpUrl);
 	});
 
 	it("#peer - should be ok", (context) => {
@@ -39,6 +40,66 @@ describe<{
 
 		assert.defined(context.validator.validate("test", "aaaa").error);
 		assert.defined(context.validator.validate("test", "127.0.0.1").error);
+		assert.defined(context.validator.validate("test", null).error);
+		assert.defined(context.validator.validate("test", {}).error);
+		assert.defined(context.validator.validate("test").error);
+	});
+
+	it("#publicHttpUrl - should be ok", (context) => {
+		const schema = {
+			$id: "test",
+			format: "publicHttpUrl",
+			type: "string",
+		};
+		context.validator.addSchema(schema);
+
+		for (const url of [
+			"http://1.2.3.4:4003/",
+			"https://1.2.3.4/api",
+			"http://[2606:4700::1111]:4003/",
+			"https://api.example.com/api",
+			"http://example",
+			"http://node.local/",
+			"http://node.internal/",
+		]) {
+			assert.undefined(context.validator.validate("test", url).error, url);
+		}
+	});
+
+	it("#publicHttpUrl - should not be ok", (context) => {
+		const schema = {
+			$id: "test",
+			format: "publicHttpUrl",
+			type: "string",
+		};
+		context.validator.addSchema(schema);
+
+		for (const url of [
+			"",
+			"not a url",
+			"1.2.3.4:4003",
+			// localhost
+			"http://localhost:4003/",
+			"http://api.localhost/",
+			// non-public ip literals
+			"http://127.0.0.1:4003/",
+			"http://10.0.0.5:4003/",
+			"http://172.16.0.1/",
+			"http://192.168.1.1/",
+			"http://169.254.169.254/latest/meta-data",
+			"http://100.64.0.1/",
+			"http://0.0.0.0:4003/",
+			"http://224.0.0.1/",
+			"http://[::1]:4003/",
+			"http://[::]/",
+			"http://[fe80::1]/",
+			"http://[fd00::1]/",
+			"http://[::ffff:10.0.0.1]/",
+			"http://[2001:db8::1]/",
+		]) {
+			assert.defined(context.validator.validate("test", url).error, url);
+		}
+
 		assert.defined(context.validator.validate("test", null).error);
 		assert.defined(context.validator.validate("test", {}).error);
 		assert.defined(context.validator.validate("test").error);

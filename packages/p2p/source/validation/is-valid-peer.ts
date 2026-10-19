@@ -1,6 +1,14 @@
 import ipaddr from "ipaddr.js";
 import os from "os";
 
+export const isPublicIp = (ip: string): boolean => {
+	try {
+		return ipaddr.process(ip).range() === "unicast";
+	} catch {
+		return false;
+	}
+};
+
 export const sanitizeRemoteAddress = (ip: string): string | undefined => {
 	try {
 		return ipaddr.process(ip).toString();

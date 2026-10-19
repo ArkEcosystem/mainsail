@@ -74,13 +74,23 @@ describe<Context>("GetApiNodes Schema", ({ it, assert, beforeEach, each }) => {
 	});
 
 	each(
-		"should not pass if apiNode.url is not an http(s) url",
+		"should not pass if apiNode.url is not a public url",
 		({ context, dataset }) => {
 			const result = context.validator.validate(getApiNodes, { ...data, apiNodes: [{ url: dataset }] });
 
 			assert.defined(result.error);
 		},
-		["ftp://1.2.3.4/", "1.2.3.4:4003", "", 1, null],
+		[
+			"1.2.3.4:4003",
+			"",
+			1,
+			null,
+			"http://localhost:4003/",
+			"http://127.0.0.1:4003/",
+			"http://10.0.0.5:4003/",
+			"http://169.254.169.254/latest/meta-data",
+			"http://[::1]:4003/",
+		],
 	);
 
 	it("should not pass if apiNode.url is longer than 2048 characters", ({ validator }) => {

@@ -1,5 +1,4 @@
 import { constants } from "../constants.js";
-import { MAX_API_NODE_URL_LENGTH } from "../validation/index.js";
 import { headers } from "./headers.js";
 
 export const getApiNodes = {
@@ -9,8 +8,8 @@ export const getApiNodes = {
 				additionalProperties: false,
 				properties: {
 					url: {
-						maxLength: MAX_API_NODE_URL_LENGTH,
-						pattern: "^https?://",
+						format: "publicHttpUrl",
+						maxLength: constants.MAX_API_NODE_URL_LENGTH,
 						type: "string",
 					},
 				},
