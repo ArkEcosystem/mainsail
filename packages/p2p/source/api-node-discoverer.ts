@@ -5,8 +5,6 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { ensureError, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
-import { normalizeUrl } from "./utils/index.js";
-
 @injectable()
 export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 	@inject(Identifiers.ServiceProvider.Configuration)
@@ -38,7 +36,7 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 			for (const { url } of apiNodes) {
 				let apiNode: Contracts.P2P.ApiNode;
 				try {
-					apiNode = this.ApiNodeFactory(normalizeUrl(url));
+					apiNode = this.ApiNodeFactory(url);
 				} catch {
 					this.logger.debug(`Ignoring invalid API node url ${url} from ${peer.ip}`, "p2p");
 					continue;
@@ -53,10 +51,9 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 	}
 
 	async populateApiNodesFromConfiguration(): Promise<void> {
-		const apiNodes = this.configuration.getOptional<string[]>("apiNodes", []).map((url) => {
-			const normalizedUrl = normalizeUrl(url);
-			return this.ApiNodeFactory(normalizedUrl);
-		});
+		const apiNodes = this.configuration
+			.getOptional<string[]>("apiNodes", [])
+			.map((url) => this.ApiNodeFactory(url));
 
 		await Promise.all(
 			Object.values(apiNodes).map((apiNode: Contracts.P2P.ApiNode) =>

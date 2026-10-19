@@ -4,6 +4,7 @@ import { describe } from "@mainsail/test-runner";
 import dayjs from "dayjs";
 
 import { ApiNodeDiscoverer } from "./api-node-discoverer";
+import { normalizeUrl } from "./utils/index.js";
 
 describe<{
 	discoverer: ApiNodeDiscoverer;
@@ -24,7 +25,7 @@ describe<{
 		app.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue({ getOptional: (key: string, defaultValue: unknown) => defaultValue })
 			.whenTagged("plugin", "p2p");
-		app.bind(Identifiers.P2P.ApiNode.Factory).toConstantValue((url: string) => ({ url }));
+		app.bind(Identifiers.P2P.ApiNode.Factory).toConstantValue((url: string) => ({ url: normalizeUrl(url) }));
 		app.bind(Identifiers.P2P.ApiNode.Processor).toConstantValue(context.apiNodeProcessor);
 		app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(context.communicator);
 		app.bind(Identifiers.P2P.ApiNode.Repository).toConstantValue(context.apiNodeRepository);
@@ -50,7 +51,7 @@ describe<{
 		validateAndAcceptApiNode.calledWith({ url: "http://5.6.7.8:4003/" }, {});
 	});
 
-	it("#discoverApiNodes - should normalize the advertised url before handing it to the processor", async ({
+	it("#discoverApiNodes - should hand the factory-normalized url to the processor", async ({
 		discoverer,
 		communicator,
 		apiNodeProcessor,
@@ -64,7 +65,7 @@ describe<{
 		validateAndAcceptApiNode.calledWith({ url: "http://1.2.3.4:4003/api" }, {});
 	});
 
-	it("#discoverApiNodes - should skip an advertised url that cannot be normalized", async ({
+	it("#discoverApiNodes - should skip an advertised url the factory rejects", async ({
 		discoverer,
 		communicator,
 		apiNodeProcessor,
