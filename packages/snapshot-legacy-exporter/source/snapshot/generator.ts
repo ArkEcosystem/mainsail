@@ -26,16 +26,19 @@ interface DatabaseOptions extends PostgresDataSourceOptions {
 
 interface Totals {
 	wallets: bigint;
+	producedBlocks: bigint;
 }
 
 const TOTALS_QUERY = `
 	SELECT
-		count(*)
+		count(*),
+		coalesce(sum((attributes->'delegate'->>'producedBlocks')::numeric), 0)
 	FROM wallets
 `;
 
 const TOTALS_COLUMNS = `
-	wallets numeric
+	wallets numeric,
+	"producedBlocks" numeric
 `;
 
 // Byte order (COLLATE "C") keeps the snapshot hash independent of the V3 server's collation
@@ -160,6 +163,7 @@ export class Generator {
 		const [row] = await this.#queryV3<Record<keyof Totals, string>>(entityManager, TOTALS_QUERY, TOTALS_COLUMNS);
 
 		return {
+			producedBlocks: BigInt(row.producedBlocks),
 			wallets: BigInt(row.wallets),
 		};
 	}
@@ -167,6 +171,13 @@ export class Generator {
 	#assertTotals(chainTip: LegacyChainTip, totals: Totals): void {
 		if (totals.wallets === 0n) {
 			throw new Error(`V3 has no wallets at height ${chainTip.number}`);
+		}
+
+		const expectedBlocks = BigInt(chainTip.number) - 1n;
+		if (totals.producedBlocks !== expectedBlocks) {
+			throw new Error(
+				`V3 wallets account for ${totals.producedBlocks} produced blocks, expected ${expectedBlocks} at height ${chainTip.number}`,
+			);
 		}
 	}
 

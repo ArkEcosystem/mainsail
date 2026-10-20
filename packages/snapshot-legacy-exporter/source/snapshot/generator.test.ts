@@ -177,8 +177,17 @@ class V3Database {
 			}
 			case "totals": {
 				const { wallets } = this.#state();
+				const sum = (values: (bigint | number | string)[]) =>
+					values.reduce<bigint>((total, value) => total + BigInt(value), 0n).toString();
 
-				return [{ wallets: String(wallets.length) }];
+				return [
+					{
+						producedBlocks: sum(
+							wallets.map(({ attributes }) => (attributes as Attributes)?.delegate?.producedBlocks ?? 0),
+						),
+						wallets: String(wallets.length),
+					},
+				];
 			}
 			case "open": {
 				this.cursorStatement = String(parameters[0]).replaceAll(/\s+/g, " ").trim();
@@ -583,6 +592,60 @@ describe<{
 		await assert.rejects(
 			() => generator.generate(1000, chainTip.hash),
 			new Error("V3 has no wallets at height 1000"),
+		);
+
+		assert.equal(v3.statements, [...beforeFetch, "cancel", "disconnect"]);
+		assert.equal(writtenFiles(), []);
+	});
+
+	it("should abort without fetching when the V3 wallets table lags the chain tip", async ({
+		generator,
+		v3,
+		delegate,
+		secondDelegate,
+		sender,
+		recipient,
+		genesis,
+	}) => {
+		const laggingDelegate: LegacyWallet = {
+			...secondDelegate,
+			attributes: {
+				...secondDelegate.attributes,
+				delegate: { ...(secondDelegate.attributes?.delegate as object), producedBlocks: 398 },
+			},
+		};
+		v3.committed = { chainTip, wallets: [laggingDelegate, delegate, sender, recipient, genesis] };
+
+		await assert.rejects(
+			() => generator.generate(1000, chainTip.hash),
+			new Error("V3 wallets account for 998 produced blocks, expected 999 at height 1000"),
+		);
+
+		assert.equal(v3.statements, [...beforeFetch, "cancel", "disconnect"]);
+		assert.equal(writtenFiles(), []);
+	});
+
+	it("should abort without fetching when the V3 wallets account for more blocks than the chain tip", async ({
+		generator,
+		v3,
+		delegate,
+		secondDelegate,
+		sender,
+		recipient,
+		genesis,
+	}) => {
+		const leadingDelegate: LegacyWallet = {
+			...secondDelegate,
+			attributes: {
+				...secondDelegate.attributes,
+				delegate: { ...(secondDelegate.attributes?.delegate as object), producedBlocks: 400 },
+			},
+		};
+		v3.committed = { chainTip, wallets: [leadingDelegate, delegate, sender, recipient, genesis] };
+
+		await assert.rejects(
+			() => generator.generate(1000, chainTip.hash),
+			new Error("V3 wallets account for 1000 produced blocks, expected 999 at height 1000"),
 		);
 
 		assert.equal(v3.statements, [...beforeFetch, "cancel", "disconnect"]);
