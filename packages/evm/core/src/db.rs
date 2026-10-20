@@ -827,6 +827,35 @@ impl PersistentDB {
         })
     }
 
+    pub fn get_mergeable_legacy_cold_wallet(
+        &self,
+        address: Address,
+        legacy_address: LegacyAddress,
+    ) -> Result<Option<LegacyColdWallet>, Error> {
+        self.with_read_txn(|tx_env| {
+            let Some(legacy_cold_wallet) = self
+                .inner
+                .legacy_cold_wallets
+                .get(tx_env, &LegacyAddressWrapper(legacy_address))?
+                .map(|inner| inner.0)
+            else {
+                return Ok(None);
+            };
+
+            if legacy_cold_wallet.merge_info.is_some()
+                || self
+                    .inner
+                    .legacy_attributes
+                    .get(tx_env, &AddressWrapper(address))?
+                    .is_some()
+            {
+                return Ok(None);
+            }
+
+            Ok(Some(legacy_cold_wallet))
+        })
+    }
+
     pub fn resize(&self) -> Result<(), Error> {
         // Exclusive access: blocks until every in-flight transaction (across all instances sharing
         // this env in the process) has released its read guard, and prevents new ones from starting
@@ -3090,6 +3119,124 @@ mod tests {
                 second_public_key: Some("key".into()),
                 multi_signature: None,
             })
+        );
+    }
+
+    #[test]
+    fn test_get_mergeable_legacy_cold_wallet() {
+        let db = create_temp_database();
+
+        let address = address!("75545540230d5c3BEf023202d23CB74cFA723376");
+        let legacy_address: LegacyAddress =
+            "DH8WhBj6ron2tQhdFPQzjDcrk2CCY997MP".try_into().unwrap();
+
+        assert_eq!(
+            db.get_mergeable_legacy_cold_wallet(address, legacy_address)
+                .unwrap(),
+            None
+        );
+
+        let put_cold_wallet = |merge_info: Option<(B256, Address)>| {
+            let cold_wallet = LegacyColdWallet {
+                address: legacy_address,
+                balance: U256::from(10),
+                legacy_attributes: LegacyAccountAttributes {
+                    legacy_nonce: Some(0),
+                    ..Default::default()
+                },
+                merge_info,
+            };
+
+            let mut wtxn = db.env.write_txn().unwrap();
+            db.inner
+                .legacy_cold_wallets
+                .put(
+                    &mut wtxn,
+                    &LegacyAddressWrapper(legacy_address),
+                    &CompactBincode(&cold_wallet),
+                )
+                .unwrap();
+            wtxn.commit().unwrap();
+
+            cold_wallet
+        };
+
+        let cold_wallet = put_cold_wallet(None);
+        assert_eq!(
+            db.get_mergeable_legacy_cold_wallet(address, legacy_address)
+                .unwrap(),
+            Some(cold_wallet)
+        );
+
+        put_cold_wallet(Some((B256::repeat_byte(0xab), address)));
+        assert_eq!(
+            db.get_mergeable_legacy_cold_wallet(address, legacy_address)
+                .unwrap(),
+            None
+        );
+    }
+
+    #[test]
+    fn test_get_mergeable_legacy_cold_wallet_skips_account_with_legacy_attributes() {
+        let db = create_temp_database();
+
+        let address = address!("75545540230d5c3BEf023202d23CB74cFA723376");
+        let legacy_address: LegacyAddress =
+            "DH8WhBj6ron2tQhdFPQzjDcrk2CCY997MP".try_into().unwrap();
+
+        let cold_wallet = LegacyColdWallet {
+            address: legacy_address,
+            balance: U256::from(10),
+            legacy_attributes: LegacyAccountAttributes {
+                legacy_nonce: Some(0),
+                ..Default::default()
+            },
+            merge_info: None,
+        };
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            db.inner
+                .legacy_cold_wallets
+                .put(
+                    &mut wtxn,
+                    &LegacyAddressWrapper(legacy_address),
+                    &CompactBincode(&cold_wallet),
+                )
+                .unwrap();
+            wtxn.commit().unwrap();
+        }
+
+        assert_eq!(
+            db.get_mergeable_legacy_cold_wallet(address, legacy_address)
+                .unwrap(),
+            Some(cold_wallet)
+        );
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            db.inner
+                .legacy_attributes
+                .put(
+                    &mut wtxn,
+                    &AddressWrapper(address),
+                    &CompactBincode(&LegacyAccountAttributes {
+                        legacy_nonce: Some(4),
+                        second_public_key: Some(
+                            "02ef11726a15a2c1696d4253409b54975448146395a2c4f4fbf5eb9a10bec71092"
+                                .into(),
+                        ),
+                        multi_signature: None,
+                    }),
+                )
+                .unwrap();
+            wtxn.commit().unwrap();
+        }
+
+        assert_eq!(
+            db.get_mergeable_legacy_cold_wallet(address, legacy_address)
+                .unwrap(),
+            None
         );
     }
 
