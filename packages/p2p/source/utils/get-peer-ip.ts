@@ -1,11 +1,14 @@
 import type { Contracts } from "@mainsail/contracts";
 
-export const getPeerIp = (request: Contracts.P2P.Request): string => {
-	// WebSockets requests
-	if (request.socket) {
-		return request.socket.info.remoteAddress;
-	}
+import { assert } from "@mainsail/utils";
 
-	// HTTP requests
-	return request.info.remoteAddress;
+import { sanitizeRemoteAddress } from "../validation/is-valid-peer.js";
+
+export const getPeerIp = (request: Contracts.P2P.Request): string => {
+	const remoteAddress = request.socket ? request.socket.info.remoteAddress : request.info.remoteAddress;
+
+	const ip = sanitizeRemoteAddress(remoteAddress);
+	assert.string(ip);
+
+	return ip;
 };
