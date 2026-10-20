@@ -78,6 +78,13 @@ describe<{
 			"",
 			"not a url",
 			"1.2.3.4:4003",
+			// wrong scheme
+			"ftp://1.2.3.4/",
+			"ws://1.2.3.4:4003/",
+			"file:///etc/passwd",
+			"javascript:alert(1)",
+			"data:text/plain,hi",
+			"mailto:a@b.c",
 			// localhost
 			"http://localhost:4003/",
 			"http://api.localhost/",

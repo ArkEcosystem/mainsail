@@ -22,15 +22,20 @@ export const makeFormats = (): {
 	const publicHttpUrl: FormatDefinition<string> = {
 		type: "string",
 		validate: (urlString: string) => {
-			let hostname: string;
+			let url: URL;
 			try {
-				// URL.hostname wraps an IPv6 literal in brackets ("[::1]"); ipaddr.js wants it bare.
-				hostname = new URL(urlString).hostname.replace(/^\[|]$/g, "");
+				url = new URL(urlString);
 			} catch {
 				return false;
 			}
 
-			if (hostname === "localhost" || hostname.endsWith(".localhost")) {
+			if (url.protocol !== "http:" && url.protocol !== "https:") {
+				return false;
+			}
+
+			const hostname = url.hostname.replace(/^\[|]$/g, "");
+
+			if (hostname === "" || hostname === "localhost" || hostname.endsWith(".localhost")) {
 				return false;
 			}
 
