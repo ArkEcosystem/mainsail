@@ -387,7 +387,7 @@ describe<{
 		}
 		const snapshotHash = hash.digest("hex");
 
-		await generator.generate();
+		await generator.generate(1000, chainTip.hash);
 
 		assert.equal(writtenSnapshots(), [{ chainTip, hash: snapshotHash, wallets }]);
 		assert.equal(writtenFiles(), [`${snapshotHash}.compressed`]);
@@ -442,7 +442,7 @@ describe<{
 			],
 		};
 
-		await generator.generate();
+		await generator.generate(1000, chainTip.hash);
 
 		assert.equal(
 			writtenSnapshots()[0].wallets,
@@ -472,7 +472,7 @@ describe<{
 			}
 		};
 
-		await generator.generate();
+		await generator.generate(1000, chainTip.hash);
 
 		assert.equal(v3.committed.wallets, [
 			secondDelegate,
@@ -488,6 +488,26 @@ describe<{
 		);
 	});
 
+	it("should abort without writing when V3 is not at the expected height", async ({ generator, v3 }) => {
+		await assert.rejects(
+			() => generator.generate(1001, chainTip.hash),
+			new Error("V3 chain tip is at height 1000, expected 1001"),
+		);
+
+		assert.equal(v3.statements, [...beforeFetch, "cancel", "disconnect"]);
+		assert.equal(writtenFiles(), []);
+	});
+
+	it("should abort without writing when V3 has another block at the expected height", async ({ generator, v3 }) => {
+		await assert.rejects(
+			() => generator.generate(1000, nextChainTip.hash),
+			new Error(`V3 block 1000 is ${chainTip.hash}, expected ${nextChainTip.hash}`),
+		);
+
+		assert.equal(v3.statements, [...beforeFetch, "cancel", "disconnect"]);
+		assert.equal(writtenFiles(), []);
+	});
+
 	it("should abort without writing when V3 produces a block during the export", async ({ generator, v3 }) => {
 		v3.onStatement = (statement) => {
 			if (statement === "open") {
@@ -496,7 +516,7 @@ describe<{
 		};
 
 		await assert.rejects(
-			() => generator.generate(),
+			() => generator.generate(1000, chainTip.hash),
 			new Error(
 				`V3 chain tip moved from 1000 (${chainTip.hash}) to 1001 (${nextChainTip.hash}) during the export`,
 			),
@@ -519,7 +539,7 @@ describe<{
 		};
 
 		await assert.rejects(
-			() => generator.generate(),
+			() => generator.generate(1000, chainTip.hash),
 			new Error(
 				`V3 chain tip moved from 1000 (${chainTip.hash}) to 1000 (${nextChainTip.hash}) during the export`,
 			),
@@ -542,7 +562,10 @@ describe<{
 			}
 		};
 
-		await assert.rejects(() => generator.generate(), new Error("canceling statement due to statement timeout"));
+		await assert.rejects(
+			() => generator.generate(1000, chainTip.hash),
+			new Error("canceling statement due to statement timeout"),
+		);
 
 		assert.equal(v3.statements, [...beforeFetch, "open", "fetch", "fetch", "cancel", "disconnect"]);
 		release.calledOnce();
@@ -565,7 +588,7 @@ describe<{
 		};
 
 		await assert.rejects(
-			() => generator.generate(),
+			() => generator.generate(1000, chainTip.hash),
 			new Error("terminating connection due to administrator command"),
 		);
 
@@ -578,7 +601,7 @@ describe<{
 	it("should pass the V3 connection string as a quoted parameter", async ({ generator, v3, v3Options }) => {
 		v3Options.password = "it's a \\ secret";
 
-		await generator.generate();
+		await generator.generate(1000, chainTip.hash);
 
 		assert.equal(v3.connectStatement, "SELECT dblink_connect('v3_db', $1);");
 		assert.equal(
@@ -594,7 +617,7 @@ describe<{
 	}) => {
 		assert.true(databaseOptions.logging);
 
-		await generator.generate();
+		await generator.generate(1000, chainTip.hash);
 
 		assert.equal(
 			dataSources.map(({ options }) => options.logging),
@@ -609,11 +632,31 @@ describe<{
 			parameters: ["dbname='ark_devnet' password='secret password'"],
 		});
 
-		const error: Error = await generator.generate().catch((error) => error);
+		const error: Error = await generator.generate(1000, chainTip.hash).catch((error) => error);
 
 		assert.equal(error.message, 'Could not connect to V3: password authentication failed for user "test_db"');
 		assert.false(inspect(error).includes("secret password"));
 		assert.equal(v3.statements, ["create extension", "connect"]);
 		assert.equal(writtenFiles(), []);
+	});
+
+	it("should reject an expected height that is not a positive integer", async ({ generator, initialize }) => {
+		await assert.rejects(() => generator.generate(0, chainTip.hash), "Expected the V3 height to export, got 0");
+		await assert.rejects(
+			() => generator.generate(Number.NaN, chainTip.hash),
+			"Expected the V3 height to export, got NaN",
+		);
+
+		initialize.neverCalled();
+	});
+
+	it("should reject an expected block id that is not a block id", async ({ generator, initialize }) => {
+		await assert.rejects(() => generator.generate(1000, "1000"), "Expected the V3 block id to export, got 1000");
+		await assert.rejects(
+			() => generator.generate(1000, chainTip.hash.toUpperCase()),
+			`Expected the V3 block id to export, got ${chainTip.hash.toUpperCase()}`,
+		);
+
+		initialize.neverCalled();
 	});
 });

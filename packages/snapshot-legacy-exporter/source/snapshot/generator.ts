@@ -75,7 +75,15 @@ export class Generator {
 		);
 	}
 
-	public async generate(): Promise<void> {
+	public async generate(expectedHeight: number, expectedHash: string): Promise<void> {
+		if (!Number.isSafeInteger(expectedHeight) || expectedHeight < 1) {
+			throw new Error(`Expected the V3 height to export, got ${expectedHeight}`);
+		}
+
+		if (!/^[\da-f]{64}$/.test(expectedHash)) {
+			throw new Error(`Expected the V3 block id to export, got ${expectedHash}`);
+		}
+
 		await this.#runWithV3Connection(async (entityManager) => {
 			this.logger.info("connected!");
 
@@ -83,7 +91,7 @@ export class Generator {
 			await this.#executeOnV3(entityManager, "LOCK TABLE blocks, wallets IN ACCESS SHARE MODE");
 
 			const chainTip = await this.#getChainTip(entityManager);
-			assert.defined(chainTip);
+			this.#assertChainTip(chainTip, expectedHeight, expectedHash);
 
 			const wallets = await this.#fetchWallets(entityManager);
 
@@ -99,6 +107,20 @@ export class Generator {
 
 			await this.#writeSnapshot(chainTip, wallets);
 		});
+	}
+
+	#assertChainTip(
+		chainTip: LegacyChainTip | undefined,
+		expectedHeight: number,
+		expectedHash: string,
+	): asserts chainTip is LegacyChainTip {
+		if (chainTip?.number !== expectedHeight.toString()) {
+			throw new Error(`V3 chain tip is at height ${chainTip?.number}, expected ${expectedHeight}`);
+		}
+
+		if (chainTip.hash !== expectedHash) {
+			throw new Error(`V3 block ${chainTip.number} is ${chainTip.hash}, expected ${expectedHash}`);
+		}
 	}
 
 	async #fetchWallets(entityManager: EntityManager): Promise<LegacyWallet[]> {

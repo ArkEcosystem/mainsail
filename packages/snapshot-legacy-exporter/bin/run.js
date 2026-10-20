@@ -1,5 +1,6 @@
 import envPaths from "env-paths";
 import path from "path";
+import { parseArgs } from "util";
 import { makeApplication } from "../distribution/application-factory.js";
 import { Identifiers } from "../distribution/identifiers.js";
 
@@ -10,13 +11,20 @@ process.env.MAINSAIL_DB_USERNAME = "test_db";
 process.env.MAINSAIL_DB_PASSWORD = "password";
 
 async function run() {
+	const { values } = parseArgs({ options: { hash: { type: "string" }, height: { type: "string" } } });
+
+	if (values.height === undefined || values.hash === undefined) {
+		console.error("Usage: node bin/run.js --height <V3 height> --hash <V3 block id>");
+		process.exit(1);
+	}
+
 	const paths = envPaths("mainsail", { suffix: "" });
 	const configCore = path.join(paths.config, "core");
 
 	const app = await makeApplication(configCore, {});
 	const generator = app.get(Identifiers.Snapshot.Generator);
 
-	await generator.generate({});
+	await generator.generate(Number(values.height), values.hash);
 
 	// await generator.generateStatic(
 	// 	{ hash: "a1b8d3f6e9c2a0b4d7e1f0c8a3b5d6e7f9a0b1c3d4e5f6a7b8c9d0e1f2a3b4c5", number: 0 },
