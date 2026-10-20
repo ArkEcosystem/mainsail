@@ -575,4 +575,31 @@ describe<{
 		destroy.calledOnce();
 		assert.equal(writtenFiles(), []);
 	});
+
+	it("should pass the V3 connection string as a quoted parameter", async ({ generator, v3, v3Options }) => {
+		v3Options.password = "it's a \\ secret";
+
+		await generator.generate();
+
+		assert.equal(v3.connectStatement, "SELECT dblink_connect('v3_db', $1);");
+		assert.equal(
+			v3.connection,
+			"dbname='ark_devnet' host='localhost' password='it\\'s a \\\\ secret' port='5432' user='test_db'",
+		);
+	});
+
+	it("should not log the queries, as the V3 connection parameter carries the password", async ({
+		generator,
+		databaseOptions,
+		dataSources,
+	}) => {
+		assert.true(databaseOptions.logging);
+
+		await generator.generate();
+
+		assert.equal(
+			dataSources.map(({ options }) => options.logging),
+			[false],
+		);
+	});
 });
