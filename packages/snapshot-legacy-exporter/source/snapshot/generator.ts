@@ -7,7 +7,7 @@ import { assert } from "@mainsail/utils";
 import { createHash } from "node:crypto";
 import { writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
-import { brotliCompress } from "node:zlib";
+import { brotliCompress, constants } from "node:zlib";
 import { DataSource, EntityManager } from "typeorm";
 import { PostgresDataSourceOptions } from "typeorm/driver/postgres/PostgresDataSourceOptions.js";
 
@@ -392,7 +392,12 @@ export class Generator {
 
 	async #compressToBrotli(snapshot: LegacySnapshot, path: string): Promise<void> {
 		const jsonString = JSON.stringify(snapshot);
-		const compressedBuffer = await promisify(brotliCompress)(jsonString);
+		const compressedBuffer = await promisify(brotliCompress)(jsonString, {
+			params: {
+				[constants.BROTLI_PARAM_QUALITY]: 6,
+				[constants.BROTLI_PARAM_SIZE_HINT]: Buffer.byteLength(jsonString),
+			},
+		});
 		await writeFile(path, compressedBuffer);
 		this.logger.info(
 			`Wrote ${JSON.stringify(snapshot.chainTip)} with ${snapshot.wallets.length} wallets to '${path}'`,
