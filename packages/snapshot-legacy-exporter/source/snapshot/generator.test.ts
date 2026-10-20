@@ -12,6 +12,7 @@ import { createHash } from "node:crypto";
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { inspect } from "node:util";
 import { brotliDecompressSync } from "node:zlib";
 import { DataSource } from "typeorm";
 
@@ -114,6 +115,7 @@ class V3Database {
 	public lost = false;
 	public connection: unknown;
 	public connectStatement = "";
+	public connectError: Error | undefined;
 	public cursorStatement = "";
 	public readonly statements: string[] = [];
 	public readonly fetchSizes: number[] = [];
@@ -150,6 +152,10 @@ class V3Database {
 	#execute(statement: string, sql: string, parameters: unknown[]): unknown[] {
 		switch (statement) {
 			case "connect": {
+				if (this.connectError) {
+					throw this.connectError;
+				}
+
 				this.connectStatement = sql;
 				this.connection = parameters[0];
 				return [];
@@ -601,5 +607,20 @@ describe<{
 			dataSources.map(({ options }) => options.logging),
 			[false],
 		);
+	});
+
+	it("should keep the V3 password out of a connection error", async ({ generator, v3, v3Options }) => {
+		v3Options.password = "secret password";
+		v3.connectError = Object.assign(new Error("could not establish connection"), {
+			detail: 'password authentication failed for user "test_db"',
+			parameters: ["dbname='ark_devnet' password='secret password'"],
+		});
+
+		const error: Error = await generator.generate().catch((error) => error);
+
+		assert.equal(error.message, 'Could not connect to V3: password authentication failed for user "test_db"');
+		assert.false(inspect(error).includes("secret password"));
+		assert.equal(v3.statements, ["create extension", "connect"]);
+		assert.equal(writtenFiles(), []);
 	});
 });
