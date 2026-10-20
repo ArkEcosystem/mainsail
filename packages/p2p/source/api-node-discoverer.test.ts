@@ -11,6 +11,7 @@ describe<{
 	apiNodeRepository: any;
 	apiNodeProcessor: any;
 	communicator: any;
+	configuration: any;
 	logger: any;
 }>("ApiNodeDiscoverer", ({ it, beforeEach, spy }) => {
 	const peer = { ip: "1.2.3.4" };
@@ -19,11 +20,12 @@ describe<{
 		context.apiNodeRepository = { getApiNodes: () => [] };
 		context.apiNodeProcessor = { revalidateApiNode: async () => {}, validateAndAcceptApiNode: async () => {} };
 		context.communicator = { getApiNodes: async () => ({ apiNodes: [] }) };
-		context.logger = { debug: () => {} };
+		context.configuration = { getOptional: (key: string, defaultValue: unknown) => defaultValue };
+		context.logger = { debug: () => {}, warn: () => {} };
 
 		const app = new Application();
 		app.bind(Identifiers.ServiceProvider.Configuration)
-			.toConstantValue({ getOptional: (key: string, defaultValue: unknown) => defaultValue })
+			.toConstantValue(context.configuration)
 			.whenTagged("plugin", "p2p");
 		app.bind(Identifiers.P2P.ApiNode.Factory).toConstantValue((url: string) => ({ url: normalizeUrl(url) }));
 		app.bind(Identifiers.P2P.ApiNode.Processor).toConstantValue(context.apiNodeProcessor);
@@ -108,6 +110,45 @@ describe<{
 		validateAndAcceptApiNode.calledWith({ url: "http://1.2.3.4:4003/" }, {});
 		validateAndAcceptApiNode.calledWith({ url: "https://api.example.com/api" }, {});
 		debug.calledTimes(3);
+	});
+
+	it("#populateApiNodesFromConfiguration - should seed every configured node, private ones included", async ({
+		discoverer,
+		configuration,
+		apiNodeProcessor,
+	}) => {
+		configuration.getOptional = () => [
+			"http://10.0.0.5:4003",
+			"http://localhost:4003/",
+			"https://api.example.com/api/",
+		];
+		const validateAndAcceptApiNode = spy(apiNodeProcessor, "validateAndAcceptApiNode");
+
+		await discoverer.populateApiNodesFromConfiguration();
+
+		validateAndAcceptApiNode.calledTimes(3);
+		validateAndAcceptApiNode.calledWith({ url: "http://10.0.0.5:4003/" }, { seed: true });
+		validateAndAcceptApiNode.calledWith({ url: "http://localhost:4003/" }, { seed: true });
+		validateAndAcceptApiNode.calledWith({ url: "https://api.example.com/api" }, { seed: true });
+	});
+
+	it("#populateApiNodesFromConfiguration - should warn about and skip a configured url the factory rejects", async ({
+		discoverer,
+		configuration,
+		apiNodeProcessor,
+		logger,
+	}) => {
+		configuration.getOptional = () => ["ws://1.2.3.4:4003/", "http://1.2.3.4:4003/", "http://1.2.3.4:99999/"];
+		const validateAndAcceptApiNode = spy(apiNodeProcessor, "validateAndAcceptApiNode");
+		const warn = spy(logger, "warn");
+
+		await discoverer.populateApiNodesFromConfiguration();
+
+		validateAndAcceptApiNode.calledOnce();
+		validateAndAcceptApiNode.calledWith({ url: "http://1.2.3.4:4003/" }, { seed: true });
+		warn.calledTimes(2);
+		warn.calledWith("Skipping configured API node: Invalid API Node url: ws://1.2.3.4:4003/", "p2p");
+		warn.calledWith("Skipping configured API node: Invalid API Node url: http://1.2.3.4:99999/", "p2p");
 	});
 
 	it("#discoverApiNodes - should swallow a failed request", async ({

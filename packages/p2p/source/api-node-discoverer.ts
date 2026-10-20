@@ -58,14 +58,17 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 	}
 
 	async populateApiNodesFromConfiguration(): Promise<void> {
-		const apiNodes = this.configuration
-			.getOptional<string[]>("apiNodes", [])
-			.map((url) => this.ApiNodeFactory(url));
+		const apiNodes: Contracts.P2P.ApiNode[] = [];
+		for (const url of this.configuration.getOptional<string[]>("apiNodes", [])) {
+			try {
+				apiNodes.push(this.ApiNodeFactory(url));
+			} catch (rawError) {
+				this.logger.warn(`Skipping configured API node: ${ensureError(rawError).message}`, "p2p");
+			}
+		}
 
 		await Promise.all(
-			Object.values(apiNodes).map((apiNode: Contracts.P2P.ApiNode) =>
-				this.apiNodeProcessor.validateAndAcceptApiNode(apiNode, { seed: true }),
-			),
+			apiNodes.map((apiNode) => this.apiNodeProcessor.validateAndAcceptApiNode(apiNode, { seed: true })),
 		);
 	}
 
