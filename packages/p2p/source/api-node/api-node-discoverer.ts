@@ -5,7 +5,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { ensureError, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
-import { isPublicHttpUrl } from "./validation/index.js";
+import { isPublicHttpUrl } from "../validation/index.js";
 
 @injectable()
 export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {

@@ -4,7 +4,7 @@ import { describe } from "@mainsail/test-runner";
 import dayjs from "dayjs";
 
 import { ApiNodeDiscoverer } from "./api-node-discoverer";
-import { normalizeUrl } from "./utils/index.js";
+import { normalizeUrl } from "../utils/index.js";
 
 describe<{
 	discoverer: ApiNodeDiscoverer;
