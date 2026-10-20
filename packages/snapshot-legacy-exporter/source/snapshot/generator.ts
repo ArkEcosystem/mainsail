@@ -24,6 +24,27 @@ interface DatabaseOptions extends PostgresDataSourceOptions {
 	};
 }
 
+const WALLETS_CURSOR = `
+	SELECT
+		address,
+		public_key,
+		balance,
+		nonce,
+		attributes
+	FROM wallets
+	ORDER BY balance DESC, address ASC
+`;
+
+const WALLETS_COLUMNS = `
+	"arkAddress" varchar,
+	"publicKey" varchar,
+	balance bigint,
+	"legacyNonce" bigint,
+	attributes jsonb
+`;
+
+const FETCH_SIZE = 10_000;
+
 @injectable()
 export class Generator {
 	@inject(InternalIdentifiers.Application)
@@ -54,68 +75,98 @@ export class Generator {
 	}
 
 	public async generate(): Promise<void> {
-		await this.#runInTransaction(async (entityManager) => {
+		await this.#runWithV3Connection(async (entityManager) => {
 			this.logger.info("connected!");
 
-			const [chainTip] = await entityManager.query(
-				"SELECT * FROM dblink('v3_db', 'SELECT id, height FROM blocks ORDER BY height DESC LIMIT 1') AS blocks(hash varchar, number bigint);",
-			);
+			await this.#executeOnV3(entityManager, "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
+			await this.#executeOnV3(entityManager, "LOCK TABLE blocks, wallets IN ACCESS SHARE MODE");
 
-			const addressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
-				Identifiers.Cryptography.Identity.Address.Factory,
-			);
+			const chainTip = await this.#getChainTip(entityManager);
+			assert.defined(chainTip);
 
-			// Loop all wallets
-			const limit = 1000;
-			let offset = 0;
+			const wallets = await this.#fetchWallets(entityManager);
 
-			const wallets: LegacyWallet[] = [];
-			for (;;) {
-				this.logger.info(`Fetching wallets (offset: ${offset}, limit: ${limit})`);
+			await this.#executeOnV3(entityManager, "COMMIT");
 
-				const chunk: LegacyWallet[] = await entityManager.query(`
-					SELECT * FROM dblink(
-						'v3_db',
-						'
-							SELECT address, public_key, balance, nonce, attributes FROM wallets
-							ORDER BY balance DESC, address ASC LIMIT ${limit} OFFSET ${offset}
-						'
-					) AS wallets("arkAddress" varchar, "publicKey" varchar, balance bigint, "legacyNonce" bigint, attributes jsonb);
-				`);
+			const currentChainTip = await this.#getChainTip(entityManager);
 
-				for (const wallet of chunk) {
-					// sanitize
-					if (wallet.attributes?.["delegate"]) {
-						delete wallet.attributes?.["delegate"]["lastBlock"];
-					}
-
-					delete wallet.attributes?.["ipfs"]; // ?
-					delete wallet.attributes?.["business"]; // ?
-					delete wallet.attributes?.["htlc"]; // ?
-					delete wallet.attributes?.["entities"]; // ?
-
-					wallets.push({
-						...wallet,
-						...(wallet.publicKey
-							? {
-									ethAddress: await addressFactory.fromPublicKey(wallet.publicKey),
-								}
-							: {}),
-					});
-				}
-
-				offset += limit;
-
-				if (chunk.length === 0) {
-					break;
-				}
+			if (currentChainTip?.hash !== chainTip.hash || currentChainTip.number !== chainTip.number) {
+				throw new Error(
+					`V3 chain tip moved from ${chainTip.number} (${chainTip.hash}) to ${currentChainTip?.number} (${currentChainTip?.hash}) during the export`,
+				);
 			}
 
 			await this.#writeSnapshot(chainTip, wallets);
 		});
 	}
 
-	async #runInTransaction(callback: (entityManager: EntityManager) => Promise<void>): Promise<void> {
+	async #fetchWallets(entityManager: EntityManager): Promise<LegacyWallet[]> {
+		const addressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
+			Identifiers.Cryptography.Identity.Address.Factory,
+		);
+
+		await entityManager.query("SELECT dblink_open('v3_db', 'v3_wallets', $1::text);", [WALLETS_CURSOR]);
+
+		const wallets: LegacyWallet[] = [];
+
+		for (;;) {
+			const rows: LegacyWallet[] = await entityManager.query(
+				`SELECT * FROM dblink_fetch('v3_db', 'v3_wallets', $1::integer) AS wallets(${WALLETS_COLUMNS});`,
+				[FETCH_SIZE],
+			);
+
+			if (rows.length === 0) {
+				break;
+			}
+
+			for (const wallet of rows) {
+				// sanitize
+				if (wallet.attributes?.["delegate"]) {
+					delete wallet.attributes?.["delegate"]["lastBlock"];
+				}
+
+				delete wallet.attributes?.["ipfs"]; // ?
+				delete wallet.attributes?.["business"]; // ?
+				delete wallet.attributes?.["htlc"]; // ?
+				delete wallet.attributes?.["entities"]; // ?
+
+				wallets.push({
+					...wallet,
+					...(wallet.publicKey
+						? {
+								ethAddress: await addressFactory.fromPublicKey(wallet.publicKey),
+							}
+						: {}),
+				});
+			}
+
+			this.logger.info(`Fetched ${wallets.length} wallets`);
+		}
+
+		await entityManager.query("SELECT dblink_close('v3_db', 'v3_wallets');");
+
+		return wallets;
+	}
+
+	async #getChainTip(entityManager: EntityManager): Promise<LegacyChainTip | undefined> {
+		const [chainTip] = await this.#queryV3<LegacyChainTip>(
+			entityManager,
+			"SELECT id, height FROM blocks ORDER BY height DESC LIMIT 1",
+			"hash varchar, number bigint",
+		);
+
+		return chainTip;
+	}
+
+	async #queryV3<T>(entityManager: EntityManager, sql: string, columns: string): Promise<T[]> {
+		return entityManager.query(`SELECT * FROM dblink('v3_db', $1::text) AS v3(${columns});`, [sql]);
+	}
+
+	async #executeOnV3(entityManager: EntityManager, sql: string): Promise<void> {
+		await entityManager.query("SELECT dblink_exec('v3_db', $1::text);", [sql]);
+	}
+
+	async #runWithV3Connection(callback: (entityManager: EntityManager) => Promise<void>): Promise<void> {
 		const pluginConfig = await this.app
 			.resolve(Providers.PluginConfiguration)
 			.discover("@mainsail/snapshot-legacy-exporter", process.cwd());
@@ -134,19 +185,27 @@ export class Generator {
 
 		await dataSource.initialize();
 
-		try {
-			await dataSource.transaction("REPEATABLE READ", async (entityManager) => {
-				// Link v3 database
-				await entityManager.query("CREATE EXTENSION IF NOT EXISTS dblink;");
-				await entityManager
-					.query("SELECT dblink_connect('v3_db', $1);", [this.#connectionString(options.v3)])
-					.catch((error) => {
-						throw new Error(`Could not connect to V3: ${error.detail ?? error.message}`);
-					});
+		const queryRunner = dataSource.createQueryRunner();
 
-				await callback(entityManager);
-			});
+		try {
+			// Link v3 database
+			await queryRunner.query("CREATE EXTENSION IF NOT EXISTS dblink;");
+			await queryRunner
+				.query("SELECT dblink_connect('v3_db', $1);", [this.#connectionString(options.v3)])
+				.catch((error) => {
+					throw new Error(`Could not connect to V3: ${error.detail ?? error.message}`);
+				});
+
+			try {
+				await callback(queryRunner.manager);
+			} catch (error) {
+				await queryRunner.query("SELECT dblink_cancel_query('v3_db');").catch(() => {});
+				throw error;
+			} finally {
+				await queryRunner.query("SELECT dblink_disconnect('v3_db');").catch(() => {});
+			}
 		} finally {
+			await queryRunner.release();
 			await dataSource.destroy();
 		}
 	}

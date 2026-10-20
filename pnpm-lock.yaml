@@ -2765,6 +2765,12 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
+      '@mainsail/crypto-hash-bcrypto':
+        specifier: workspace:*
+        version: link:../crypto-hash-bcrypto
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
