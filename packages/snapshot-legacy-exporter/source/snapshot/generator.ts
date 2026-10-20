@@ -24,6 +24,7 @@ interface DatabaseOptions extends PostgresDataSourceOptions {
 	};
 }
 
+// Byte order (COLLATE "C") keeps the snapshot hash independent of the V3 server's collation
 const WALLETS_CURSOR = `
 	SELECT
 		address,
@@ -32,7 +33,7 @@ const WALLETS_CURSOR = `
 		nonce,
 		attributes
 	FROM wallets
-	ORDER BY balance DESC, address ASC
+	ORDER BY address COLLATE "C"
 `;
 
 const WALLETS_COLUMNS = `

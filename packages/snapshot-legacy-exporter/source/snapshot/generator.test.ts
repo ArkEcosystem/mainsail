@@ -78,16 +78,8 @@ const walletRow = ({ arkAddress, attributes = {}, balance, legacyNonce, publicKe
 	attributes: attributes as Attributes,
 });
 
-const byBalance = (wallets: LegacyWallet[]): LegacyWallet[] =>
-	[...wallets].sort((a, b) =>
-		BigInt(a.balance) === BigInt(b.balance)
-			? a.arkAddress < b.arkAddress
-				? -1
-				: 1
-			: BigInt(b.balance) > BigInt(a.balance)
-				? 1
-				: -1,
-	);
+const byAddress = (wallets: LegacyWallet[]): LegacyWallet[] =>
+	[...wallets].sort((a, b) => (a.arkAddress < b.arkAddress ? -1 : 1));
 
 interface V3State {
 	chainTip: LegacyChainTip;
@@ -176,7 +168,7 @@ class V3Database {
 			}
 			case "open": {
 				this.cursorStatement = String(parameters[0]).replaceAll(/\s+/g, " ").trim();
-				this.#cursor = byBalance(this.#state().wallets).map((wallet) => walletRow(structuredClone(wallet)));
+				this.#cursor = byAddress(this.#state().wallets).map((wallet) => walletRow(structuredClone(wallet)));
 				return [];
 			}
 			case "fetch": {
@@ -377,7 +369,7 @@ describe<{
 		rmSync(directory, { force: true, recursive: true });
 	});
 
-	it("should export every wallet in V3's order", async ({
+	it("should export every wallet in address order", async ({
 		generator,
 		v3,
 		delegate,
@@ -388,7 +380,7 @@ describe<{
 		genesis,
 		exported,
 	}) => {
-		const wallets = await exported(byBalance([delegate, secondDelegate, sender, recipient, emptied, genesis]));
+		const wallets = await exported(byAddress([delegate, secondDelegate, sender, recipient, emptied, genesis]));
 		const hash = createHash("sha256");
 		for (const value of [chainTip, ...wallets]) {
 			hash.update(JSON.stringify(value));
@@ -401,6 +393,7 @@ describe<{
 		assert.equal(writtenFiles(), [`${snapshotHash}.compressed`]);
 		assert.equal(v3.statements, [...exportStatements(4), "commit", "chain tip", "disconnect"]);
 		assert.equal(v3.fetchSizes, [10_000, 10_000, 10_000, 10_000]);
+		assert.true(v3.cursorStatement.endsWith('FROM wallets ORDER BY address COLLATE "C"'));
 	});
 
 	it("should drop the attributes that Mainsail does not import", async ({
@@ -453,7 +446,7 @@ describe<{
 
 		assert.equal(
 			writtenSnapshots()[0].wallets,
-			await exported(byBalance([delegate, secondDelegate, sender, recipient, genesis])),
+			await exported(byAddress([delegate, secondDelegate, sender, recipient, genesis])),
 		);
 	});
 
@@ -491,7 +484,7 @@ describe<{
 		]);
 		assert.equal(
 			writtenSnapshots()[0].wallets,
-			await exported(byBalance([delegate, secondDelegate, sender, recipient, emptied, genesis])),
+			await exported(byAddress([delegate, secondDelegate, sender, recipient, emptied, genesis])),
 		);
 	});
 
