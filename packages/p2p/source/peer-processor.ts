@@ -5,7 +5,7 @@ import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 import { isBlacklisted, isWhitelisted } from "@mainsail/utils";
 
 import { isValidVersion } from "./utils/index.js";
-import { isValidPeerIp } from "./validation/index.js";
+import { isValidPeerIp, sanitizeRemoteAddress } from "./validation/index.js";
 
 @injectable()
 export class PeerProcessor implements Contracts.P2P.PeerProcessor {
@@ -66,7 +66,12 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		return isWhitelisted(this.configuration.getOptional<string[]>("remoteAccess", []), peer.ip);
 	}
 
-	public async validateAndAcceptPeer(ip: string, options: Contracts.P2P.AcceptNewPeerOptions = {}): Promise<void> {
+	public async validateAndAcceptPeer(rawIp: string, options: Contracts.P2P.AcceptNewPeerOptions = {}): Promise<void> {
+		const ip = sanitizeRemoteAddress(rawIp);
+		if (!ip) {
+			return;
+		}
+
 		if (options.seed) {
 			this.#seedIps.add(ip);
 		}
