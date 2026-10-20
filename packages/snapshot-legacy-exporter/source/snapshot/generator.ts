@@ -126,6 +126,7 @@ export class Generator {
 		const dataSource = new DataSource({
 			...options,
 			entities: [],
+			logging: false,
 			migrations: [],
 			migrationsRun: false,
 			synchronize: false,

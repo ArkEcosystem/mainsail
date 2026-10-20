@@ -13,10 +13,6 @@ export const defaults = {
 
 		host: Environment.get(EnvironmentVariables.MAINSAIL_DB_HOST, "localhost"),
 
-		logger: "simple-console",
-
-		logging: Environment.isTrue(EnvironmentVariables.MAINSAIL_DB_LOGGING_ENABLED),
-
 		password: Environment.get(EnvironmentVariables.MAINSAIL_DB_PASSWORD, "password"),
 
 		port: Environment.get(EnvironmentVariables.MAINSAIL_DB_PORT, 5432),
