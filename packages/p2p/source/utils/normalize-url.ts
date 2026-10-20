@@ -12,6 +12,12 @@ export function normalizeUrl(urlString: string): string {
 		throw new InvalidApiNodeUrlError(urlString);
 	}
 
+	const hostname = url.hostname.replace(/\.+$/, "");
+	if (hostname === "") {
+		throw new InvalidApiNodeUrlError(urlString);
+	}
+	url.hostname = hostname;
+
 	// Trim credentials, search parameters and the fragment
 	url.username = "";
 	url.password = "";
