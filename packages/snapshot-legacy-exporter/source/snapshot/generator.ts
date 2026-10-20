@@ -218,6 +218,14 @@ export class Generator {
 		await entityManager.query("SELECT dblink_open('v3_db', 'v3_wallets', $1::text);", [WALLETS_CURSOR]);
 
 		const wallets: LegacyWallet[] = [];
+		const fetched: Totals = {
+			balances: 0n,
+			forgedRewards: 0n,
+			lockedBalances: 0n,
+			negativeWallets: 0n,
+			producedBlocks: 0n,
+			wallets: 0n,
+		};
 		let lastAddress = "";
 
 		for (;;) {
@@ -233,6 +241,12 @@ export class Generator {
 			for (const wallet of rows) {
 				this.#assertAfter(lastAddress, wallet);
 				lastAddress = wallet.arkAddress;
+
+				this.#addToTotals(
+					fetched,
+					wallet,
+					(wallet.attributes?.["htlc"] as { lockedBalance?: string } | undefined)?.lockedBalance ?? "0",
+				);
 
 				// sanitize
 				if (wallet.attributes?.["delegate"]) {
@@ -259,12 +273,37 @@ export class Generator {
 
 		await entityManager.query("SELECT dblink_close('v3_db', 'v3_wallets');");
 
+		this.#assertFetched(fetched, totals);
+
 		return wallets;
 	}
 
 	#assertAfter(lastAddress: string, { arkAddress }: LegacyWallet): void {
 		if (arkAddress <= lastAddress) {
 			throw new Error(`V3 returned wallet ${arkAddress} twice or out of order`);
+		}
+	}
+
+	#addToTotals(totals: Totals, { attributes, balance }: LegacyWallet, lockedBalance: string): void {
+		const delegate = attributes?.["delegate"] as { forgedRewards: string; producedBlocks: number } | undefined;
+
+		totals.wallets += 1n;
+		totals.balances += BigInt(balance);
+		totals.negativeWallets += BigInt(balance) < 0n ? 1n : 0n;
+		totals.lockedBalances += BigInt(lockedBalance);
+
+		if (delegate) {
+			totals.forgedRewards += BigInt(delegate.forgedRewards);
+			totals.producedBlocks += BigInt(delegate.producedBlocks);
+		}
+	}
+
+	#assertFetched(fetched: Totals, totals: Totals): void {
+		const mismatches = (Object.keys(totals) as (keyof Totals)[]).filter((key) => fetched[key] !== totals[key]);
+
+		if (mismatches.length > 0) {
+			const details = mismatches.map((key) => `${key} ${fetched[key]}, expected ${totals[key]}`).join("; ");
+			throw new Error(`The fetched V3 wallets do not add up to V3's totals: ${details}`);
 		}
 	}
 

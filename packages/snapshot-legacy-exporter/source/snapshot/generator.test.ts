@@ -118,6 +118,7 @@ class V3Database {
 	public readonly statements: string[] = [];
 	public readonly fetchSizes: number[] = [];
 	public onStatement: (statement: string) => void = () => {};
+	public tamper: (rows: Row[]) => Row[] = (rows) => rows;
 
 	#inTransaction = false;
 	#snapshot: V3State | undefined;
@@ -206,7 +207,7 @@ class V3Database {
 				const [count] = parameters as [number];
 				this.fetchSizes.push(count);
 
-				return this.#cursor!.splice(0, Math.min(count, 2));
+				return this.tamper(this.#cursor!.splice(0, Math.min(count, 2)));
 			}
 			default: {
 				return [];
@@ -807,6 +808,50 @@ describe<{
 		assert.equal(v3.statements.slice(0, beforeFetch.length + 1), [...beforeFetch, "open"]);
 		assert.equal(v3.statements.slice(-2), ["cancel", "disconnect"]);
 		assert.false(v3.statements.includes("commit"));
+		assert.equal(writtenFiles(), []);
+	});
+
+	it("should abort without writing when a wallet goes missing between V3 and the export", async ({
+		generator,
+		v3,
+		recipient,
+	}) => {
+		v3.tamper = (rows) => rows.filter(({ arkAddress }) => arkAddress !== recipient.arkAddress);
+
+		await assert.rejects(
+			() => generator.generate(1000, chainTip.hash),
+			new Error(
+				"The fetched V3 wallets do not add up to V3's totals: balances 199700000000, expected 199800000000; wallets 5, expected 6",
+			),
+		);
+
+		assert.equal(v3.statements, [...exportStatements(4), "cancel", "disconnect"]);
+		assert.equal(writtenFiles(), []);
+	});
+
+	it("should abort without writing when a wallet changes between V3 and the export", async ({
+		generator,
+		v3,
+		delegate,
+	}) => {
+		v3.tamper = (rows) =>
+			rows.map((row) =>
+				row.arkAddress === delegate.arkAddress
+					? {
+							...row,
+							attributes: {
+								...row.attributes,
+								delegate: { ...row.attributes.delegate, producedBlocks: 601 },
+							},
+						}
+					: row,
+			);
+
+		await assert.rejects(
+			() => generator.generate(1000, chainTip.hash),
+			new Error("The fetched V3 wallets do not add up to V3's totals: producedBlocks 1000, expected 999"),
+		);
+
 		assert.equal(writtenFiles(), []);
 	});
 
