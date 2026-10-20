@@ -33,6 +33,10 @@ interface Totals {
 	producedBlocks: bigint;
 }
 
+interface WalletRow extends LegacyWallet {
+	readonly lockedBalance: string;
+}
+
 const TOTALS_QUERY = `
 	SELECT
 		count(*),
@@ -60,7 +64,8 @@ const WALLETS_CURSOR = `
 		public_key,
 		balance,
 		nonce,
-		attributes
+		(attributes - 'business' - 'entities' - 'htlc' - 'ipfs') #- '{delegate,lastBlock}',
+		coalesce((attributes->'htlc'->>'lockedBalance')::numeric, 0)
 	FROM wallets
 	ORDER BY address COLLATE "C"
 `;
@@ -70,7 +75,8 @@ const WALLETS_COLUMNS = `
 	"publicKey" varchar,
 	balance bigint,
 	"legacyNonce" bigint,
-	attributes jsonb
+	attributes jsonb,
+	"lockedBalance" numeric
 `;
 
 const FETCH_SIZE = 10_000;
@@ -229,7 +235,7 @@ export class Generator {
 		let lastAddress = "";
 
 		for (;;) {
-			const rows: LegacyWallet[] = await entityManager.query(
+			const rows: WalletRow[] = await entityManager.query(
 				`SELECT * FROM dblink_fetch('v3_db', 'v3_wallets', $1::integer) AS wallets(${WALLETS_COLUMNS});`,
 				[FETCH_SIZE],
 			);
@@ -238,25 +244,11 @@ export class Generator {
 				break;
 			}
 
-			for (const wallet of rows) {
+			for (const { lockedBalance, ...wallet } of rows) {
 				this.#assertAfter(lastAddress, wallet);
 				lastAddress = wallet.arkAddress;
 
-				this.#addToTotals(
-					fetched,
-					wallet,
-					(wallet.attributes?.["htlc"] as { lockedBalance?: string } | undefined)?.lockedBalance ?? "0",
-				);
-
-				// sanitize
-				if (wallet.attributes?.["delegate"]) {
-					delete wallet.attributes?.["delegate"]["lastBlock"];
-				}
-
-				delete wallet.attributes?.["ipfs"]; // ?
-				delete wallet.attributes?.["business"]; // ?
-				delete wallet.attributes?.["htlc"]; // ?
-				delete wallet.attributes?.["entities"]; // ?
+				this.#addToTotals(fetched, wallet, lockedBalance);
 
 				wallets.push({
 					...wallet,

@@ -70,12 +70,31 @@ const coldWallet = async (
 
 type Attributes = Record<string, any>;
 
-const walletRow = ({ arkAddress, attributes = {}, balance, legacyNonce, publicKey }: LegacyWallet) => ({
+const walletRow = ({ arkAddress, attributes = {}, balance, legacyNonce, publicKey }: LegacyWallet) => {
+	const { business, entities, htlc, ipfs, ...kept } = attributes as Attributes;
+
+	if (kept.delegate) {
+		const { lastBlock, ...delegate } = kept.delegate;
+		kept.delegate = delegate;
+	}
+
+	return { arkAddress, attributes: kept, balance, lockedBalance: htlc?.lockedBalance ?? "0", legacyNonce, publicKey };
+};
+
+const columnOrder = ({
 	arkAddress,
 	publicKey,
 	balance,
 	legacyNonce,
-	attributes: attributes as Attributes,
+	attributes,
+	lockedBalance,
+}: ReturnType<typeof walletRow>) => ({
+	arkAddress,
+	publicKey,
+	balance,
+	legacyNonce,
+	attributes,
+	lockedBalance,
 });
 
 const byAddress = (wallets: LegacyWallet[]): LegacyWallet[] =>
@@ -86,7 +105,7 @@ interface V3State {
 	wallets: LegacyWallet[];
 }
 
-type Row = ReturnType<typeof walletRow>;
+type Row = ReturnType<typeof columnOrder>;
 
 const statements: [string, string][] = [
 	["CREATE EXTENSION IF NOT EXISTS dblink", "create extension"],
@@ -200,7 +219,9 @@ class V3Database {
 			}
 			case "open": {
 				this.cursorStatement = String(parameters[0]).replaceAll(/\s+/g, " ").trim();
-				this.#cursor = byAddress(this.#state().wallets).map((wallet) => walletRow(structuredClone(wallet)));
+				this.#cursor = byAddress(this.#state().wallets).map((wallet) =>
+					columnOrder(walletRow(structuredClone(wallet))),
+				);
 				return [];
 			}
 			case "fetch": {
@@ -329,12 +350,7 @@ describe<{
 		context.exported = (wallets) =>
 			Promise.all(
 				wallets.map(async (wallet) => {
-					const { business, entities, htlc, ipfs, ...attributes } = walletRow(wallet).attributes;
-					if (attributes.delegate) {
-						const { lastBlock, ...delegate } = attributes.delegate;
-						attributes.delegate = delegate;
-					}
-					const row = { ...walletRow(wallet), attributes };
+					const { lockedBalance, ...row } = columnOrder(walletRow(wallet));
 
 					return wallet.publicKey
 						? { ...row, ethAddress: await addressFactory.fromPublicKey(wallet.publicKey) }
@@ -428,7 +444,7 @@ describe<{
 		assert.true(v3.cursorStatement.endsWith('FROM wallets ORDER BY address COLLATE "C"'));
 	});
 
-	it("should drop the attributes that Mainsail does not import", async ({
+	it("should leave the attributes Mainsail does not import to V3 to drop", async ({
 		generator,
 		v3,
 		delegate,
@@ -476,6 +492,12 @@ describe<{
 
 		await generator.generate(1000, chainTip.hash);
 
+		assert.true(
+			v3.cursorStatement.includes(
+				"(attributes - 'business' - 'entities' - 'htlc' - 'ipfs') #- '{delegate,lastBlock}'",
+			),
+		);
+		assert.true(v3.cursorStatement.includes("coalesce((attributes->'htlc'->>'lockedBalance')::numeric, 0)"));
 		assert.equal(
 			writtenSnapshots()[0].wallets,
 			await exported(byAddress([delegate, secondDelegate, sender, recipient, genesis])),
