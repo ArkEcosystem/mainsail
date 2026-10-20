@@ -136,16 +136,26 @@ export class Generator {
 		try {
 			await dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 				// Link v3 database
-				await entityManager.query(`
-							CREATE EXTENSION IF NOT EXISTS dblink;
-							SELECT dblink_connect('v3_db', 'host=${options.v3.host} port=${options.v3.port} dbname=${options.v3.database} user=${options.v3.user} password=${options.v3.password}');
-						`);
+				await entityManager.query("CREATE EXTENSION IF NOT EXISTS dblink;");
+				await entityManager.query("SELECT dblink_connect('v3_db', $1);", [this.#connectionString(options.v3)]);
 
 				await callback(entityManager);
 			});
 		} finally {
 			await dataSource.destroy();
 		}
+	}
+
+	#connectionString(v3: DatabaseOptions["v3"]): string {
+		return Object.entries({
+			dbname: v3.database,
+			host: v3.host,
+			password: v3.password,
+			port: v3.port,
+			user: v3.user,
+		})
+			.map(([key, value]) => `${key}='${String(value).replaceAll("\\", "\\\\").replaceAll("'", "\\'")}'`)
+			.join(" ");
 	}
 
 	async #writeSnapshot(chainTip: LegacyChainTip, wallets: LegacyWallet[]): Promise<void> {
