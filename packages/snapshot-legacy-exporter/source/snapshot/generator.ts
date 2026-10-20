@@ -26,21 +26,30 @@ interface DatabaseOptions extends PostgresDataSourceOptions {
 
 interface Totals {
 	wallets: bigint;
+	balances: bigint;
 	negativeWallets: bigint;
+	lockedBalances: bigint;
+	forgedRewards: bigint;
 	producedBlocks: bigint;
 }
 
 const TOTALS_QUERY = `
 	SELECT
 		count(*),
+		coalesce(sum(balance), 0),
 		count(*) FILTER (WHERE balance < 0),
+		coalesce(sum((attributes->'htlc'->>'lockedBalance')::numeric), 0),
+		coalesce(sum((attributes->'delegate'->>'forgedRewards')::numeric), 0),
 		coalesce(sum((attributes->'delegate'->>'producedBlocks')::numeric), 0)
 	FROM wallets
 `;
 
 const TOTALS_COLUMNS = `
 	wallets numeric,
+	balances numeric,
 	"negativeWallets" numeric,
+	"lockedBalances" numeric,
+	"forgedRewards" numeric,
 	"producedBlocks" numeric
 `;
 
@@ -166,6 +175,9 @@ export class Generator {
 		const [row] = await this.#queryV3<Record<keyof Totals, string>>(entityManager, TOTALS_QUERY, TOTALS_COLUMNS);
 
 		return {
+			balances: BigInt(row.balances),
+			forgedRewards: BigInt(row.forgedRewards),
+			lockedBalances: BigInt(row.lockedBalances),
 			negativeWallets: BigInt(row.negativeWallets),
 			producedBlocks: BigInt(row.producedBlocks),
 			wallets: BigInt(row.wallets),
@@ -187,6 +199,13 @@ export class Generator {
 		if (totals.negativeWallets !== 1n) {
 			throw new Error(
 				`V3 has ${totals.negativeWallets} wallets with a negative balance, expected only the genesis wallet`,
+			);
+		}
+
+		const supply = totals.balances + totals.lockedBalances;
+		if (supply !== totals.forgedRewards) {
+			throw new Error(
+				`V3 balances and HTLC locks add up to ${supply}, expected the forged rewards ${totals.forgedRewards} at height ${chainTip.number}`,
 			);
 		}
 	}

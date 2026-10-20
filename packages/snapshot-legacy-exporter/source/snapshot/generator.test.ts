@@ -182,6 +182,13 @@ class V3Database {
 
 				return [
 					{
+						balances: sum(wallets.map(({ balance }) => balance)),
+						forgedRewards: sum(
+							wallets.map(({ attributes }) => (attributes as Attributes)?.delegate?.forgedRewards ?? 0),
+						),
+						lockedBalances: sum(
+							wallets.map(({ attributes }) => (attributes as Attributes)?.htlc?.lockedBalance ?? 0),
+						),
 						negativeWallets: String(wallets.filter(({ balance }) => BigInt(balance) < 0n).length),
 						producedBlocks: sum(
 							wallets.map(({ attributes }) => (attributes as Attributes)?.delegate?.producedBlocks ?? 0),
@@ -651,6 +658,94 @@ describe<{
 
 		assert.equal(v3.statements, [...beforeFetch, "cancel", "disconnect"]);
 		assert.equal(writtenFiles(), []);
+	});
+
+	it("should abort without fetching when the balances add up to more than the forged rewards", async ({
+		generator,
+		v3,
+		delegate,
+		secondDelegate,
+		sender,
+		recipient,
+		genesis,
+	}) => {
+		v3.committed = {
+			chainTip,
+			wallets: [secondDelegate, delegate, sender, { ...recipient, balance: "100000001" }, genesis],
+		};
+
+		await assert.rejects(
+			() => generator.generate(1000, chainTip.hash),
+			new Error(
+				"V3 balances and HTLC locks add up to 199800000001, expected the forged rewards 199800000000 at height 1000",
+			),
+		);
+
+		assert.equal(v3.statements, [...beforeFetch, "cancel", "disconnect"]);
+		assert.equal(writtenFiles(), []);
+	});
+
+	it("should abort without fetching when the balances add up to less than the forged rewards", async ({
+		generator,
+		v3,
+		delegate,
+		secondDelegate,
+		sender,
+		recipient,
+		genesis,
+	}) => {
+		v3.committed = {
+			chainTip,
+			wallets: [secondDelegate, delegate, sender, { ...recipient, balance: "99999999" }, genesis],
+		};
+
+		await assert.rejects(
+			() => generator.generate(1000, chainTip.hash),
+			new Error(
+				"V3 balances and HTLC locks add up to 199799999999, expected the forged rewards 199800000000 at height 1000",
+			),
+		);
+
+		assert.equal(v3.statements, [...beforeFetch, "cancel", "disconnect"]);
+		assert.equal(writtenFiles(), []);
+	});
+
+	it("should count HTLC locks into the supply and leave them out of the export", async ({
+		generator,
+		v3,
+		delegate,
+		secondDelegate,
+		sender,
+		recipient,
+		genesis,
+	}) => {
+		const lockingDelegate: LegacyWallet = {
+			...secondDelegate,
+			attributes: {
+				...secondDelegate.attributes,
+				htlc: {
+					lockedBalance: "5000000",
+					locks: {
+						d4f33d788a8c8392b70d346c947df83f07bf31ea2f67f04f124de68e50c07dd7: {
+							amount: "5000000",
+							expiration: { type: 2, value: 1100 },
+							recipientId: recipient.arkAddress,
+							secretHash: "3a8cafac738cc24997d5eaaa13b3cffd06585cbb19da658860e11f5708cbb518",
+						},
+					},
+				},
+			},
+			balance: "1499995000000",
+		};
+		v3.committed = { chainTip, wallets: [lockingDelegate, delegate, sender, recipient, genesis] };
+
+		await generator.generate(1000, chainTip.hash);
+
+		const [exported] = writtenSnapshots()[0].wallets.filter(
+			({ arkAddress }) => arkAddress === secondDelegate.arkAddress,
+		);
+		assert.equal(exported.balance, "1499995000000");
+		assert.false("htlc" in (exported.attributes ?? {}));
 	});
 
 	it("should abort without fetching when another wallet than the genesis wallet is negative", async ({
