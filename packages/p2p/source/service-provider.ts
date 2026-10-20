@@ -71,7 +71,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
-			apiNodes: Joi.array().items(Joi.string()).default([]),
+			apiNodes: Joi.array()
+				.items(Joi.string().uri({ scheme: ["http", "https"] }))
+				.default([]),
 			apiNodesMaxContentLength: Joi.number().integer().min(0).required(),
 			blacklist: Joi.array().items(Joi.string()).required(),
 			developmentMode: Joi.object({
