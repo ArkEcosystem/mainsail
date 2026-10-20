@@ -8,7 +8,7 @@ export const defaults = {
 		entityPrefix: "public.",
 
 		extra: {
-			options: "-c statement_timeout=3000ms",
+			options: "-c statement_timeout=120000ms",
 		},
 
 		host: Environment.get(EnvironmentVariables.MAINSAIL_DB_HOST, "localhost"),
