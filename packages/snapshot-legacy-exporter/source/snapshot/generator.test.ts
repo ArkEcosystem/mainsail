@@ -96,6 +96,10 @@ const statements: [string, string][] = [
 	["dblink_open", "open"],
 	["dblink_fetch", "fetch"],
 	["dblink_close", "close"],
+	[
+		"SELECT count(*) FROM pg_stat_activity WHERE datname = current_database() AND usesysid IS NOT NULL AND pid <> pg_backend_pid()",
+		"sessions",
+	],
 	["BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY", "begin"],
 	["LOCK TABLE blocks, wallets IN ACCESS SHARE MODE", "lock"],
 	["SELECT id, height FROM blocks ORDER BY height DESC LIMIT 1", "chain tip"],
@@ -105,6 +109,7 @@ const statements: [string, string][] = [
 class V3Database {
 	public committed: V3State;
 	public lost = false;
+	public otherSessions = 0;
 	public connection: unknown;
 	public connectStatement = "";
 	public connectError: Error | undefined;
@@ -151,6 +156,9 @@ class V3Database {
 				this.connectStatement = sql;
 				this.connection = parameters[0];
 				return [];
+			}
+			case "sessions": {
+				return [{ sessions: String(this.otherSessions) }];
 			}
 			case "begin": {
 				this.#inTransaction = true;
@@ -201,7 +209,7 @@ const writtenSnapshots = (): LegacySnapshot[] =>
 		.filter((file) => file.endsWith(".compressed"))
 		.map((file) => JSON.parse(brotliDecompressSync(readFileSync(join(snapshotDirectory, file))).toString()));
 
-const beforeFetch = ["create extension", "connect", "begin", "lock", "chain tip"];
+const beforeFetch = ["create extension", "connect", "sessions", "begin", "lock", "chain tip"];
 
 const exportStatements = (fetches: number): string[] => [
 	...beforeFetch,
@@ -486,6 +494,20 @@ describe<{
 			writtenSnapshots()[0].wallets,
 			await exported(byAddress([delegate, secondDelegate, sender, recipient, emptied, genesis])),
 		);
+	});
+
+	it("should abort without writing while another session uses the V3 database", async ({ generator, v3 }) => {
+		v3.otherSessions = 1;
+
+		await assert.rejects(
+			() => generator.generate(1000, chainTip.hash),
+			new Error(
+				"V3 database has 1 other session(s), stop V3 (core, relay, forger, API) and close other clients (e.g. psql) before the export",
+			),
+		);
+
+		assert.equal(v3.statements, ["create extension", "connect", "sessions", "cancel", "disconnect"]);
+		assert.equal(writtenFiles(), []);
 	});
 
 	it("should abort without writing when V3 is not at the expected height", async ({ generator, v3 }) => {

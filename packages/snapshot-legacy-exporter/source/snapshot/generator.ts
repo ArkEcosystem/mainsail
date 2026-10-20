@@ -87,6 +87,8 @@ export class Generator {
 		await this.#runWithV3Connection(async (entityManager) => {
 			this.logger.info("connected!");
 
+			await this.#assertV3Stopped(entityManager);
+
 			await this.#executeOnV3(entityManager, "BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY");
 			await this.#executeOnV3(entityManager, "LOCK TABLE blocks, wallets IN ACCESS SHARE MODE");
 
@@ -107,6 +109,20 @@ export class Generator {
 
 			await this.#writeSnapshot(chainTip, wallets);
 		});
+	}
+
+	async #assertV3Stopped(entityManager: EntityManager): Promise<void> {
+		const [{ sessions }] = await this.#queryV3<{ sessions: string }>(
+			entityManager,
+			"SELECT count(*) FROM pg_stat_activity WHERE datname = current_database() AND usesysid IS NOT NULL AND pid <> pg_backend_pid()",
+			"sessions bigint",
+		);
+
+		if (Number(sessions) !== 0) {
+			throw new Error(
+				`V3 database has ${sessions} other session(s), stop V3 (core, relay, forger, API) and close other clients (e.g. psql) before the export`,
+			);
+		}
 	}
 
 	#assertChainTip(
