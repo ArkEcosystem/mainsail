@@ -33,13 +33,15 @@ describe<{
 		context.controller = context.app.resolve(GetApiNodesController);
 	});
 
-	it("should return only the url of healthy api nodes sorted by latency", async ({ controller }) => {
+	it("should return only the url of healthy, public api nodes sorted by latency", async ({ controller }) => {
 		stub(apiNodeRepository, "getApiNodes").returnValue([
 			makeApiNode("http://1.2.3.4:4003/", 300),
 			makeApiNode("http://2.2.3.4:4003/", 100),
 			makeApiNode("http://3.2.3.4:4003/", undefined), // never pinged
 			makeApiNode("http://4.2.3.4:4003/", 50, 500), // unhealthy
 			makeApiNode("http://5.2.3.4:4003/", 200),
+			makeApiNode("http://10.0.0.5:4003/", 10), // configured LAN node, not for peers
+			makeApiNode("http://localhost:4003/", 20), // configured loopback node, not for peers
 		]);
 
 		const response = await controller.handle({ info: { remoteAddress: "187.55.33.22" }, payload: {} }, {});

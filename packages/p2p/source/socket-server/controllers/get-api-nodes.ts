@@ -6,6 +6,7 @@ import { inject, injectable } from "@mainsail/container";
 import { assert } from "@mainsail/utils";
 
 import { constants } from "../../constants.js";
+import { isPublicHttpUrl } from "../../validation/index.js";
 
 @injectable()
 export class GetApiNodesController implements Contracts.P2P.Controller {
@@ -20,6 +21,7 @@ export class GetApiNodesController implements Contracts.P2P.Controller {
 			apiNodes: this.ApiNodeRepository.getApiNodes()
 				.filter((node) => !!node.latency)
 				.filter((node) => node.statusCode === 200)
+				.filter((node) => isPublicHttpUrl(node.url))
 				.sort((a, b) => {
 					assert.number(a.latency);
 					assert.number(b.latency);
