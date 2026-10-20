@@ -103,7 +103,7 @@ const statements: [string, string][] = [
 	["BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY", "begin"],
 	["LOCK TABLE blocks, wallets IN ACCESS SHARE MODE", "lock"],
 	["SELECT id, height FROM blocks ORDER BY height DESC LIMIT 1", "chain tip"],
-	["FROM wallets", "totals"],
+	["count(*) FILTER (WHERE balance < 0)", "totals"],
 	["COMMIT", "commit"],
 ];
 
@@ -182,6 +182,7 @@ class V3Database {
 
 				return [
 					{
+						negativeWallets: String(wallets.filter(({ balance }) => BigInt(balance) < 0n).length),
 						producedBlocks: sum(
 							wallets.map(({ attributes }) => (attributes as Attributes)?.delegate?.producedBlocks ?? 0),
 						),
@@ -646,6 +647,54 @@ describe<{
 		await assert.rejects(
 			() => generator.generate(1000, chainTip.hash),
 			new Error("V3 wallets account for 1000 produced blocks, expected 999 at height 1000"),
+		);
+
+		assert.equal(v3.statements, [...beforeFetch, "cancel", "disconnect"]);
+		assert.equal(writtenFiles(), []);
+	});
+
+	it("should abort without fetching when another wallet than the genesis wallet is negative", async ({
+		generator,
+		v3,
+		delegate,
+		secondDelegate,
+		sender,
+		recipient,
+		genesis,
+	}) => {
+		v3.committed = {
+			chainTip,
+			wallets: [
+				secondDelegate,
+				delegate,
+				sender,
+				{ ...recipient, balance: "-100000000" },
+				{ ...genesis, balance: "-3801100000000" },
+			],
+		};
+
+		await assert.rejects(
+			() => generator.generate(1000, chainTip.hash),
+			new Error("V3 has 2 wallets with a negative balance, expected only the genesis wallet"),
+		);
+
+		assert.equal(v3.statements, [...beforeFetch, "cancel", "disconnect"]);
+		assert.equal(writtenFiles(), []);
+	});
+
+	it("should abort without fetching when no wallet is negative", async ({
+		generator,
+		v3,
+		delegate,
+		secondDelegate,
+		sender,
+		recipient,
+	}) => {
+		v3.committed = { chainTip, wallets: [secondDelegate, delegate, sender, recipient] };
+
+		await assert.rejects(
+			() => generator.generate(1000, chainTip.hash),
+			new Error("V3 has 0 wallets with a negative balance, expected only the genesis wallet"),
 		);
 
 		assert.equal(v3.statements, [...beforeFetch, "cancel", "disconnect"]);
