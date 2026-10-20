@@ -8,7 +8,6 @@ export const getApiNodes = {
 				additionalProperties: false,
 				properties: {
 					url: {
-						format: "publicHttpUrl",
 						maxLength: constants.MAX_API_NODE_URL_LENGTH,
 						type: "string",
 					},

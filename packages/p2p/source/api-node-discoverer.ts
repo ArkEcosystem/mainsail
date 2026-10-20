@@ -5,6 +5,8 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { ensureError, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
+import { isPublicHttpUrl } from "./validation/index.js";
+
 @injectable()
 export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 	@inject(Identifiers.ServiceProvider.Configuration)
@@ -39,6 +41,11 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 					apiNode = this.ApiNodeFactory(url);
 				} catch {
 					this.logger.debug(`Ignoring invalid API node url ${url} from ${peer.ip}`, "p2p");
+					continue;
+				}
+
+				if (!isPublicHttpUrl(apiNode.url)) {
+					this.logger.debug(`Ignoring non-public API node url ${url} from ${peer.ip}`, "p2p");
 					continue;
 				}
 

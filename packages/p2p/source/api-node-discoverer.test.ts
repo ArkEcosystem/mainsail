@@ -84,6 +84,32 @@ describe<{
 		debug.calledTimes(2);
 	});
 
+	it("#discoverApiNodes - should skip a non-public advertised url without dropping the rest", async ({
+		discoverer,
+		communicator,
+		apiNodeProcessor,
+		logger,
+	}) => {
+		communicator.getApiNodes = async () => ({
+			apiNodes: [
+				{ url: "http://10.0.0.5:4003/" },
+				{ url: "http://1.2.3.4:4003/" },
+				{ url: "http://localhost:4003/" },
+				{ url: "http://[::1]:4003/" },
+				{ url: "https://api.example.com/api" },
+			],
+		});
+		const validateAndAcceptApiNode = spy(apiNodeProcessor, "validateAndAcceptApiNode");
+		const debug = spy(logger, "debug");
+
+		await discoverer.discoverApiNodes(peer);
+
+		validateAndAcceptApiNode.calledTimes(2);
+		validateAndAcceptApiNode.calledWith({ url: "http://1.2.3.4:4003/" }, {});
+		validateAndAcceptApiNode.calledWith({ url: "https://api.example.com/api" }, {});
+		debug.calledTimes(3);
+	});
+
 	it("#discoverApiNodes - should swallow a failed request", async ({
 		discoverer,
 		communicator,

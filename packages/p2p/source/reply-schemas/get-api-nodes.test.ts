@@ -74,24 +74,24 @@ describe<Context>("GetApiNodes Schema", ({ it, assert, beforeEach, each }) => {
 	});
 
 	each(
-		"should not pass if apiNode.url is not a public url",
+		"should not pass if apiNode.url is not a string",
 		({ context, dataset }) => {
 			const result = context.validator.validate(getApiNodes, { ...data, apiNodes: [{ url: dataset }] });
 
 			assert.defined(result.error);
 		},
-		[
-			"1.2.3.4:4003",
-			"",
-			1,
-			null,
-			"http://localhost:4003/",
-			"http://127.0.0.1:4003/",
-			"http://10.0.0.5:4003/",
-			"http://169.254.169.254/latest/meta-data",
-			"http://[::1]:4003/",
-		],
+		[1, null, true, {}, []],
 	);
+
+	// A single non-public entry must not reject the whole reply; the discoverer drops such entries one by one.
+	it("should pass a non-public url next to public ones", ({ validator }) => {
+		const result = validator.validate(getApiNodes, {
+			...data,
+			apiNodes: [{ url: "http://10.0.0.5:4003/" }, { url: "http://1.2.3.4:4003/" }, { url: "not a url" }],
+		});
+
+		assert.undefined(result.error);
+	});
 
 	it("should not pass if apiNode.url is longer than 2048 characters", ({ validator }) => {
 		const result = validator.validate(getApiNodes, {
