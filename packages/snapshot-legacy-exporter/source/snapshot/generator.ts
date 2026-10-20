@@ -137,7 +137,11 @@ export class Generator {
 			await dataSource.transaction("REPEATABLE READ", async (entityManager) => {
 				// Link v3 database
 				await entityManager.query("CREATE EXTENSION IF NOT EXISTS dblink;");
-				await entityManager.query("SELECT dblink_connect('v3_db', $1);", [this.#connectionString(options.v3)]);
+				await entityManager
+					.query("SELECT dblink_connect('v3_db', $1);", [this.#connectionString(options.v3)])
+					.catch((error) => {
+						throw new Error(`Could not connect to V3: ${error.detail ?? error.message}`);
+					});
 
 				await callback(entityManager);
 			});
