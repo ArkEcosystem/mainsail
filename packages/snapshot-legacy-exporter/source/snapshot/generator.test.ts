@@ -796,6 +796,20 @@ describe<{
 		assert.equal(writtenFiles(), []);
 	});
 
+	it("should abort without writing when V3 returns a wallet twice", async ({ generator, v3, emptied }) => {
+		v3.committed = { ...v3.committed, wallets: [...v3.committed.wallets, { ...emptied }] };
+
+		await assert.rejects(
+			() => generator.generate(1000, chainTip.hash),
+			new Error(`V3 returned wallet ${emptied.arkAddress} twice or out of order`),
+		);
+
+		assert.equal(v3.statements.slice(0, beforeFetch.length + 1), [...beforeFetch, "open"]);
+		assert.equal(v3.statements.slice(-2), ["cancel", "disconnect"]);
+		assert.false(v3.statements.includes("commit"));
+		assert.equal(writtenFiles(), []);
+	});
+
 	it("should cancel and close the V3 connection when a fetch fails", async ({
 		generator,
 		v3,

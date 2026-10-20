@@ -218,6 +218,7 @@ export class Generator {
 		await entityManager.query("SELECT dblink_open('v3_db', 'v3_wallets', $1::text);", [WALLETS_CURSOR]);
 
 		const wallets: LegacyWallet[] = [];
+		let lastAddress = "";
 
 		for (;;) {
 			const rows: LegacyWallet[] = await entityManager.query(
@@ -230,6 +231,9 @@ export class Generator {
 			}
 
 			for (const wallet of rows) {
+				this.#assertAfter(lastAddress, wallet);
+				lastAddress = wallet.arkAddress;
+
 				// sanitize
 				if (wallet.attributes?.["delegate"]) {
 					delete wallet.attributes?.["delegate"]["lastBlock"];
@@ -256,6 +260,12 @@ export class Generator {
 		await entityManager.query("SELECT dblink_close('v3_db', 'v3_wallets');");
 
 		return wallets;
+	}
+
+	#assertAfter(lastAddress: string, { arkAddress }: LegacyWallet): void {
+		if (arkAddress <= lastAddress) {
+			throw new Error(`V3 returned wallet ${arkAddress} twice or out of order`);
+		}
 	}
 
 	async #getChainTip(entityManager: EntityManager): Promise<LegacyChainTip | undefined> {
