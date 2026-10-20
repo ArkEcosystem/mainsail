@@ -24,6 +24,20 @@ interface DatabaseOptions extends PostgresDataSourceOptions {
 	};
 }
 
+interface Totals {
+	wallets: bigint;
+}
+
+const TOTALS_QUERY = `
+	SELECT
+		count(*)
+	FROM wallets
+`;
+
+const TOTALS_COLUMNS = `
+	wallets numeric
+`;
+
 // Byte order (COLLATE "C") keeps the snapshot hash independent of the V3 server's collation
 const WALLETS_CURSOR = `
 	SELECT
@@ -95,7 +109,10 @@ export class Generator {
 			const chainTip = await this.#getChainTip(entityManager);
 			this.#assertChainTip(chainTip, expectedHeight, expectedHash);
 
-			const wallets = await this.#fetchWallets(entityManager);
+			const totals = await this.#getTotals(entityManager);
+			this.#assertTotals(chainTip, totals);
+
+			const wallets = await this.#fetchWallets(entityManager, totals);
 
 			await this.#executeOnV3(entityManager, "COMMIT");
 
@@ -139,7 +156,21 @@ export class Generator {
 		}
 	}
 
-	async #fetchWallets(entityManager: EntityManager): Promise<LegacyWallet[]> {
+	async #getTotals(entityManager: EntityManager): Promise<Totals> {
+		const [row] = await this.#queryV3<Record<keyof Totals, string>>(entityManager, TOTALS_QUERY, TOTALS_COLUMNS);
+
+		return {
+			wallets: BigInt(row.wallets),
+		};
+	}
+
+	#assertTotals(chainTip: LegacyChainTip, totals: Totals): void {
+		if (totals.wallets === 0n) {
+			throw new Error(`V3 has no wallets at height ${chainTip.number}`);
+		}
+	}
+
+	async #fetchWallets(entityManager: EntityManager, totals: Totals): Promise<LegacyWallet[]> {
 		const addressFactory = this.app.get<Contracts.Crypto.AddressFactory>(
 			Identifiers.Cryptography.Identity.Address.Factory,
 		);
@@ -179,7 +210,7 @@ export class Generator {
 				});
 			}
 
-			this.logger.info(`Fetched ${wallets.length} wallets`);
+			this.logger.info(`Fetched ${wallets.length} of ${totals.wallets} wallets`);
 		}
 
 		await entityManager.query("SELECT dblink_close('v3_db', 'v3_wallets');");

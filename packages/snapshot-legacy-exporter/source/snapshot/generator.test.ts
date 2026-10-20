@@ -103,6 +103,7 @@ const statements: [string, string][] = [
 	["BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY", "begin"],
 	["LOCK TABLE blocks, wallets IN ACCESS SHARE MODE", "lock"],
 	["SELECT id, height FROM blocks ORDER BY height DESC LIMIT 1", "chain tip"],
+	["FROM wallets", "totals"],
 	["COMMIT", "commit"],
 ];
 
@@ -174,6 +175,11 @@ class V3Database {
 			case "chain tip": {
 				return [{ ...this.#state().chainTip }];
 			}
+			case "totals": {
+				const { wallets } = this.#state();
+
+				return [{ wallets: String(wallets.length) }];
+			}
 			case "open": {
 				this.cursorStatement = String(parameters[0]).replaceAll(/\s+/g, " ").trim();
 				this.#cursor = byAddress(this.#state().wallets).map((wallet) => walletRow(structuredClone(wallet)));
@@ -209,7 +215,7 @@ const writtenSnapshots = (): LegacySnapshot[] =>
 		.filter((file) => file.endsWith(".compressed"))
 		.map((file) => JSON.parse(brotliDecompressSync(readFileSync(join(snapshotDirectory, file))).toString()));
 
-const beforeFetch = ["create extension", "connect", "sessions", "begin", "lock", "chain tip"];
+const beforeFetch = ["create extension", "connect", "sessions", "begin", "lock", "chain tip", "totals"];
 
 const exportStatements = (fetches: number): string[] => [
 	...beforeFetch,
@@ -458,7 +464,7 @@ describe<{
 		);
 	});
 
-	it("should read every wallet from the snapshot the chain tip was read in", async ({
+	it("should read the totals and every wallet from the snapshot the chain tip was read in", async ({
 		generator,
 		v3,
 		delegate,
@@ -516,7 +522,7 @@ describe<{
 			new Error("V3 chain tip is at height 1000, expected 1001"),
 		);
 
-		assert.equal(v3.statements, [...beforeFetch, "cancel", "disconnect"]);
+		assert.equal(v3.statements, [...beforeFetch.slice(0, -1), "cancel", "disconnect"]);
 		assert.equal(writtenFiles(), []);
 	});
 
@@ -526,7 +532,7 @@ describe<{
 			new Error(`V3 block 1000 is ${chainTip.hash}, expected ${nextChainTip.hash}`),
 		);
 
-		assert.equal(v3.statements, [...beforeFetch, "cancel", "disconnect"]);
+		assert.equal(v3.statements, [...beforeFetch.slice(0, -1), "cancel", "disconnect"]);
 		assert.equal(writtenFiles(), []);
 	});
 
@@ -568,6 +574,18 @@ describe<{
 		);
 
 		assert.equal(v3.committed.chainTip, replacedChainTip);
+		assert.equal(writtenFiles(), []);
+	});
+
+	it("should abort without writing when V3 has no wallets", async ({ generator, v3 }) => {
+		v3.committed = { chainTip, wallets: [] };
+
+		await assert.rejects(
+			() => generator.generate(1000, chainTip.hash),
+			new Error("V3 has no wallets at height 1000"),
+		);
+
+		assert.equal(v3.statements, [...beforeFetch, "cancel", "disconnect"]);
 		assert.equal(writtenFiles(), []);
 	});
 
