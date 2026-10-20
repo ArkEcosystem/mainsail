@@ -12,7 +12,7 @@ import { DataSource, EntityManager } from "typeorm";
 import { PostgresDataSourceOptions } from "typeorm/driver/postgres/PostgresDataSourceOptions.js";
 
 import { Identifiers as InternalIdentifiers } from "../identifiers.js";
-import { LegacyChainTip, LegacySnapshot, LegacyWallet } from "../interfaces.js";
+import { LegacyChainTip, LegacySnapshot, LegacySnapshotManifest, LegacyWallet } from "../interfaces.js";
 
 interface DatabaseOptions extends PostgresDataSourceOptions {
 	readonly v3: {
@@ -107,6 +107,7 @@ export class Generator {
 						: {}),
 				})),
 			),
+			0n,
 		);
 	}
 
@@ -145,7 +146,7 @@ export class Generator {
 				);
 			}
 
-			await this.#writeSnapshot(chainTip, wallets);
+			await this.#writeSnapshot(chainTip, wallets, totals.lockedBalances);
 		});
 	}
 
@@ -373,7 +374,7 @@ export class Generator {
 			.join(" ");
 	}
 
-	async #writeSnapshot(chainTip: LegacyChainTip, wallets: LegacyWallet[]): Promise<void> {
+	async #writeSnapshot(chainTip: LegacyChainTip, wallets: LegacyWallet[], lockedBalances: bigint): Promise<void> {
 		const hash = createHash("sha256");
 		hash.update(JSON.stringify(chainTip));
 
@@ -387,7 +388,63 @@ export class Generator {
 			wallets,
 		};
 
-		await this.#compressToBrotli(snapshot, `distribution/snapshot/${snapshot.hash}.compressed`);
+		const path = `distribution/snapshot/${snapshot.hash}`;
+		await this.#compressToBrotli(snapshot, `${path}.compressed`);
+
+		const manifest = this.#manifest(snapshot, lockedBalances);
+		await writeFile(`${path}.manifest.json`, `${JSON.stringify(manifest, undefined, "\t")}\n`);
+		this.logger.info(`Wrote the manifest to '${path}.manifest.json': ${JSON.stringify(manifest)}`);
+	}
+
+	#manifest({ chainTip, hash, wallets }: LegacySnapshot, lockedBalances: bigint): LegacySnapshotManifest {
+		let balances = 0n;
+		let positiveBalances = 0n;
+		let forgedRewards = 0n;
+		let producedBlocks = 0n;
+		let withPublicKey = 0;
+		let delegates = 0;
+		let resignedDelegates = 0;
+		let voters = 0;
+		const negativeWallets: LegacySnapshotManifest["negativeWallets"] = [];
+
+		for (const { arkAddress, attributes, balance, publicKey } of wallets) {
+			const delegate = attributes?.["delegate"] as
+				{ forgedRewards: string; producedBlocks: number; resigned?: boolean } | undefined;
+
+			balances += BigInt(balance);
+
+			if (BigInt(balance) > 0n) {
+				positiveBalances += BigInt(balance);
+			} else if (BigInt(balance) < 0n) {
+				negativeWallets.push({ address: arkAddress, balance });
+			}
+
+			withPublicKey += publicKey ? 1 : 0;
+			voters += attributes?.["vote"] ? 1 : 0;
+
+			if (delegate) {
+				delegates++;
+				resignedDelegates += delegate.resigned ? 1 : 0;
+				forgedRewards += BigInt(delegate.forgedRewards);
+				producedBlocks += BigInt(delegate.producedBlocks);
+			}
+		}
+
+		return {
+			chainTip,
+			delegates,
+			droppedHtlcLocks: lockedBalances.toString(),
+			forgedRewards: forgedRewards.toString(),
+			hash,
+			negativeWallets,
+			positiveBalances: positiveBalances.toString(),
+			producedBlocks: producedBlocks.toString(),
+			resignedDelegates,
+			totalBalances: balances.toString(),
+			voters,
+			wallets: wallets.length,
+			walletsWithPublicKey: withPublicKey,
+		};
 	}
 
 	async #compressToBrotli(snapshot: LegacySnapshot, path: string): Promise<void> {

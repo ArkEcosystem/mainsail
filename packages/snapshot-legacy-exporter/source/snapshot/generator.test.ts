@@ -17,7 +17,7 @@ import { brotliDecompressSync } from "node:zlib";
 import { DataSource } from "typeorm";
 
 import { Identifiers as InternalIdentifiers } from "../identifiers";
-import { LegacyChainTip, LegacySnapshot, LegacyWallet } from "../interfaces";
+import { LegacyChainTip, LegacySnapshot, LegacySnapshotManifest, LegacyWallet } from "../interfaces";
 import { Generator } from "./generator";
 
 const chainTip: LegacyChainTip = {
@@ -254,6 +254,11 @@ const writtenSnapshots = (): LegacySnapshot[] =>
 		.filter((file) => file.endsWith(".compressed"))
 		.map((file) => JSON.parse(brotliDecompressSync(readFileSync(join(snapshotDirectory, file))).toString()));
 
+const writtenManifests = (): LegacySnapshotManifest[] =>
+	writtenFiles()
+		.filter((file) => file.endsWith(".manifest.json"))
+		.map((file) => JSON.parse(readFileSync(join(snapshotDirectory, file)).toString()));
+
 const beforeFetch = ["create extension", "connect", "sessions", "begin", "lock", "chain tip", "totals"];
 
 const exportStatements = (fetches: number): string[] => [
@@ -271,6 +276,7 @@ describe<{
 	databaseOptions: { [option: string]: unknown; logging: boolean };
 	dataSources: DataSource[];
 	queryRunner: { manager: { query: V3Database["query"] }; query: V3Database["query"]; release: () => Promise<void> };
+	logged: string[];
 	initialize: TestRunnerContracts.Stub;
 	destroy: TestRunnerContracts.Stub;
 	cwd: string;
@@ -405,8 +411,11 @@ describe<{
 			getRequired: () => context.databaseOptions,
 		};
 
+		context.logged = [];
 		context.app.bind(InternalIdentifiers.Application).toConstantValue(context.app);
-		context.app.bind(Identifiers.Services.Log.Service).toConstantValue({ info: () => {} });
+		context.app
+			.bind(Identifiers.Services.Log.Service)
+			.toConstantValue({ info: (message: string) => context.logged.push(message) });
 		context.app.bind(Providers.PluginConfiguration).toConstantValue(pluginConfiguration);
 
 		context.generator = context.app.resolve(Generator);
@@ -438,7 +447,7 @@ describe<{
 		await generator.generate(1000, chainTip.hash);
 
 		assert.equal(writtenSnapshots(), [{ chainTip, hash: snapshotHash, wallets }]);
-		assert.equal(writtenFiles(), [`${snapshotHash}.compressed`]);
+		assert.equal(writtenFiles(), [`${snapshotHash}.compressed`, `${snapshotHash}.manifest.json`]);
 		assert.equal(v3.statements, [...exportStatements(4), "commit", "chain tip", "disconnect"]);
 		assert.equal(v3.fetchSizes, [10_000, 10_000, 10_000, 10_000]);
 		assert.true(v3.cursorStatement.endsWith('FROM wallets ORDER BY address COLLATE "C"'));
@@ -769,6 +778,7 @@ describe<{
 		);
 		assert.equal(exported.balance, "1499995000000");
 		assert.false("htlc" in (exported.attributes ?? {}));
+		assert.equal(writtenManifests()[0].droppedHtlcLocks, "5000000");
 	});
 
 	it("should abort without fetching when another wallet than the genesis wallet is negative", async ({
@@ -924,6 +934,34 @@ describe<{
 		release.calledOnce();
 		destroy.calledOnce();
 		assert.equal(writtenFiles(), []);
+	});
+
+	it("should write a manifest of the snapshot next to it", async ({ generator, logged, genesis }) => {
+		await generator.generate(1000, chainTip.hash);
+
+		const [{ hash }] = writtenSnapshots();
+		const manifest: LegacySnapshotManifest = {
+			chainTip,
+			delegates: 2,
+			droppedHtlcLocks: "0",
+			forgedRewards: "199800000000",
+			hash,
+			negativeWallets: [{ address: genesis.arkAddress, balance: "-3801300000000" }],
+			positiveBalances: "4001100000000",
+			producedBlocks: "999",
+			resignedDelegates: 1,
+			totalBalances: "199800000000",
+			voters: 1,
+			wallets: 6,
+			walletsWithPublicKey: 4,
+		};
+
+		assert.equal(writtenManifests(), [manifest]);
+		assert.true(
+			logged.includes(
+				`Wrote the manifest to 'distribution/snapshot/${hash}.manifest.json': ${JSON.stringify(manifest)}`,
+			),
+		);
 	});
 
 	it("should pass the V3 connection string as a quoted parameter", async ({ generator, v3, v3Options }) => {
