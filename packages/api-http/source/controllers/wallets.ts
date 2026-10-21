@@ -499,7 +499,7 @@ export class WalletsController extends Controller {
 				.addOrderBy("th.address", "ASC")
 				.getRawMany(),
 
-			tokenHoldersQuery.clone().select("COUNT(DISTINCT th.address)", "cnt").getRawOne<{ cnt: string }>(),
+			tokenHoldersQuery.clone().select("COUNT(*)", "cnt").getRawOne<{ cnt: string }>(),
 		]);
 
 		const totalCount = Number(totalCountRow?.cnt ?? 0);
