@@ -43,7 +43,8 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX multi_payments_hash_to ON multi_payments(hash, "to") WHERE success IS TRUE;
             CREATE INDEX multi_payments_to ON multi_payments("to") WHERE success IS TRUE;
 
-            CREATE INDEX wallets_balance ON wallets(balance);
+            -- wallets break balance ties on their address, in the direction of the balance
+            CREATE INDEX wallets_balance_address ON wallets(balance, address);
             CREATE INDEX wallets_attributes ON wallets using GIN(attributes);
             CREATE INDEX wallets_validators ON wallets ((attributes->>'validatorPublicKey'))
                             WHERE (attributes ? 'validatorPublicKey');
@@ -114,7 +115,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX receipts_block_height;
             DROP INDEX receipts_contracts;
 
-            DROP INDEX wallets_balance;
+            DROP INDEX wallets_balance_address;
             DROP INDEX wallets_attributes;
             DROP INDEX wallets_validators;
             DROP INDEX wallets_unique_public_key;
