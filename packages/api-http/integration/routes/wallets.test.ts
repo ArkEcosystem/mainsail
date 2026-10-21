@@ -230,6 +230,33 @@ describe<{
 		}
 	});
 
+	it("/wallets?orderBy columns", async () => {
+		const [a, b, c, d] = wallets;
+		await apiContext.walletRepository.save([
+			{ ...a, balance: "300", nonce: "2" },
+			{ ...b, balance: "1000", nonce: "10" },
+			{ ...c, balance: "20", nonce: "3", publicKey: undefined },
+			{ ...d, balance: "5000", nonce: "0" },
+		]);
+
+		const testCases = [
+			{ path: "/wallets", result: [d, b, a, c] },
+			{ path: "/wallets/top", result: [d, b, a, c] },
+			{ path: "/wallets?orderBy=balance:asc", result: [c, a, b, d] },
+			{ path: "/wallets?orderBy=nonce:desc", result: [b, c, a, d] },
+			{ path: "/wallets?orderBy=publicKey:asc", result: [a, b, d, c] },
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map((wallet) => wallet.address),
+				result.map((wallet) => wallet.address),
+			);
+		}
+	});
+
 	it("/wallets?orderBy rejects SQL injection in the sort field", async () => {
 		await apiContext.walletRepository.save(wallets);
 
