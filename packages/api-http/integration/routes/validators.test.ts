@@ -188,7 +188,9 @@ describe<{
 	});
 
 	it("/validators numeric filters", async () => {
-		const votes = ["900", "10000", "5", "80", "7000", "60", "3", "400"];
+		const votes = ["900", "10000", "5", "80", "7000", "60", "3", "400"].map(
+			(value) => `${value}000000000000000000`,
+		);
 		const approvals = [1.5, 0.25, 10.75, 3, 0.5, 2.25, 7, 0.125];
 		const rows = validators.map((validator, index) => {
 			const { validatorProducedBlocks, ...attributes } = validator.attributes;
@@ -208,7 +210,7 @@ describe<{
 
 		const testCases = [
 			{ path: "rank.from=5&rank.to=13", result: [0, 2, 5] },
-			{ path: "votes.from=1000", result: [1, 4] },
+			{ path: "votes.from=1000000000000000000000", result: [1, 4] },
 			{ path: "production.approval.from=2", result: [2, 3, 5, 6] },
 			{ path: "blocks.produced.to=0", result: [0, 3, 6] },
 			{ path: "attributes.validatorProducedBlocks.to=0", result: [0, 3, 6] },

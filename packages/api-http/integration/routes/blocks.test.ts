@@ -53,6 +53,21 @@ describe<{
 		}
 	});
 
+	it("/blocks?reward beyond the safe integers", async () => {
+		const [first, second] = blocks;
+		await apiContext.blockRepository.save([
+			{ ...first, reward: "2000000000000000000" },
+			{ ...second, reward: "1000000000000000000" },
+		]);
+
+		const { statusCode, data } = await request("/blocks?reward.from=1500000000000000000", options);
+		assert.equal(statusCode, 200);
+		assert.equal(
+			data.data.map((block) => block.hash),
+			[first.hash],
+		);
+	});
+
 	it("/blocks?transactionsRoot", async () => {
 		await apiContext.blockRepository.save(blocks);
 		const genesis = blocks.find((block) => block.number === "0")!;

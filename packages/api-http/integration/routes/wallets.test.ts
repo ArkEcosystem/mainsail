@@ -160,6 +160,21 @@ describe<{
 		);
 	});
 
+	it("/wallets?balance beyond the safe integers", async () => {
+		// Every fixture wallet has a balance of 2358490566037735849056603.
+		await apiContext.walletRepository.save(wallets);
+
+		for (const [path, length] of [
+			["balance.from=2358490566037735849056603", wallets.length],
+			["balance.from=2358490566037735849056604", 0],
+			["balance=2358490566037735849056603", wallets.length],
+		] as const) {
+			const { statusCode, data } = await request(`/wallets?limit=100&${path}`, options);
+			assert.equal(statusCode, 200);
+			assert.length(data.data, length);
+		}
+	});
+
 	it("/wallets?attributes rejects SQL injection in attribute keys", async () => {
 		await apiContext.walletRepository.save(wallets);
 
