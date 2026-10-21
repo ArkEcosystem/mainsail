@@ -284,6 +284,20 @@ describe<{
 		assert.is(page.totalCount, 3);
 	});
 
+	it("listByExpression: estimate path counts at least the rows up to the current page", async () => {
+		const explainStub = stubFn().resolvedValue([
+			{ "QUERY PLAN": [{ Plan: { "Node Type": "Seq Scan", "Plan Rows": 1 } }] },
+		]);
+		const { repo } = makeListSetup({
+			explainStub,
+			results: [{ address: "0x1" }, { address: "0x2" }, { address: "0x3" }],
+		});
+
+		const page = await repo.listByExpression({ op: "true" }, [], { limit: 10, offset: 20 });
+
+		assert.is(page.totalCount, 23);
+	});
+
 	it("listByExpression: options.selection resets select then addSelect per item", async () => {
 		const { repo, resultsQb } = makeListSetup({
 			explainStub: stubFn().resolvedValue([

@@ -102,7 +102,8 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 				// the rows of a single parallel worker.
 				const totalCountEstimated: number = (plan["Node Type"] === "Limit" ? plan.Plans[0] : plan)["Plan Rows"];
 
-				const totalCount = Math.max(totalCountEstimated, results.length);
+				// The rows up to and on this page exist, whatever the estimate.
+				const totalCount = Math.max(totalCountEstimated, pagination.offset + results.length);
 
 				await queryRunner.commitTransaction();
 
