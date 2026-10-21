@@ -118,7 +118,7 @@ export class TokenParserService implements TokenParser {
 
 	#tokenCache!: LRUCache<string, Models.Token>;
 	#nonTokenCache!: LRUCache<string, number>;
-	#actionIndexes: Map<`0x${string}`, number> = new Map<`0x${string}`, number>();
+	#actionIndex = 0;
 	#previousBlockNumber!: number;
 
 	#preparedFunctionCalls: PreparedErc20Call[] = [];
@@ -217,8 +217,8 @@ export class TokenParserService implements TokenParser {
 		for (const event of eventLogs) {
 			// Emitted events during deployment can have a event.logIndex of undefined and
 			// we only care about having a accurate sort order, so we manage an index manually.
-			const actionIndex = (this.#actionIndexes.get(event.address) ?? -1) + 1;
-			this.#actionIndexes.set(event.address, actionIndex);
+			// It counts the actions of all tokens in a block, so that they sort in the order they were emitted.
+			const actionIndex = this.#actionIndex++;
 
 			let from: `0x${string}`;
 			let to: `0x${string}`;
@@ -463,7 +463,7 @@ export class TokenParserService implements TokenParser {
 	}
 
 	#resetTransferIndexes(blockNumber: number = -1): void {
-		this.#actionIndexes.clear();
+		this.#actionIndex = 0;
 		this.#previousBlockNumber = blockNumber;
 	}
 }
