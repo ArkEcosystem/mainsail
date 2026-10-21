@@ -26,7 +26,8 @@ export class ValidatorsController extends Controller {
 			request.query,
 			validatorCriteriaSchemaObject,
 		) as Search.Criteria.ValidatorCriteria;
-		const options = this.getListingOptions(request);
+		// There are only a few hundred validators, which the estimate gets far off.
+		const options = { ...this.getListingOptions(request), estimateTotalCount: false };
 
 		const wallets = await this.walletRepositoryFactory().findManyValidatorsByCritera(
 			criteria,
@@ -63,7 +64,8 @@ export class ValidatorsController extends Controller {
 			request.query,
 			walletCriteriaSchemaObject,
 		) as Search.Criteria.WalletCriteria;
-		const options = this.getListingOptions(request);
+		// The voters of a validator are a range of an index, so counting them is cheap.
+		const options = { ...this.getListingOptions(request), estimateTotalCount: false };
 
 		const wallets = await this.walletRepositoryFactory().findManyByCriteria(
 			{

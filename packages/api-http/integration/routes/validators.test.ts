@@ -264,6 +264,20 @@ describe<{
 		assert.equal(after.statusCode, 200);
 	});
 
+	it("/validators counts validators and voters exactly", async () => {
+		await apiContext.walletRepository.save(validators);
+		await apiContext.walletRepository.save(
+			wallets.slice(1, 6).map((wallet) => ({ ...wallet, attributes: { vote: validators[0].address } })),
+		);
+
+		let { data } = await request("/validators?limit=2", options);
+		assert.equal(data.meta.totalCount, validators.length);
+
+		// The validator votes for itself, too.
+		({ data } = await request(`/validators/${validators[0].address}/voters?limit=2`, options));
+		assert.equal(data.meta.totalCount, 6);
+	});
+
 	it("/validators?username", async () => {
 		await apiContext.walletRepository.save(validators);
 
