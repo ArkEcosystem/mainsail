@@ -121,6 +121,27 @@ describe("WalletFilter.getExpression", ({ it, assert }) => {
 		});
 	});
 
+	it("should infer casts for legacy and validator count attributes", async () => {
+		for (const [fieldName, cast] of [
+			["multiSignature.min", "bigint"],
+			["validatorVotersCount", "bigint"],
+			["legacyNonce", "numeric"],
+			["validatorFee", "numeric"],
+		]) {
+			const [key, nested] = fieldName.split(".");
+			const expression = await WalletFilter.getExpression({
+				attributes: { [key]: nested ? { [nested]: { from: "1" } } : { from: "1" } },
+			});
+
+			assert.equal(expression, {
+				jsonFieldAccessor: { cast, fieldName, operator: "->>" },
+				op: "greaterThanEqual",
+				property: "attributes",
+				value: "1",
+			});
+		}
+	});
+
 	it("should leave unknown attribute cast type undefined", async () => {
 		const expression = await WalletFilter.getExpression({ attributes: { username: "alice" } });
 

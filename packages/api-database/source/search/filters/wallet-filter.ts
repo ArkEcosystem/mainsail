@@ -132,8 +132,10 @@ export class WalletFilter {
 		if (
 			[
 				"nonce",
+				"multiSignature.min",
 				"validatorRank",
 				"validatorProducedBlocks",
+				"validatorVotersCount",
 				"validatorLastBlock.number",
 				"validatorLastBlock.timestamp",
 			].includes(attribute)
@@ -144,7 +146,10 @@ export class WalletFilter {
 		if (
 			[
 				"balance",
+				// u64, which does not fit into bigint
+				"legacyNonce",
 				"validatorApproval",
+				"validatorFee",
 				"validatorVoteBalance",
 				"validatorForgedFees",
 				"validatorForgedRewards",
