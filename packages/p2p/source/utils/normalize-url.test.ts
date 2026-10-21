@@ -1,7 +1,8 @@
 import { describe } from "@mainsail/test-runner";
+import { constants } from "../constants";
 import { normalizeUrl } from "./normalize-url";
 
-describe<{}>("normalizeUrl", ({ assert, each }) => {
+describe<{}>("normalizeUrl", ({ assert, each, it }) => {
 	each(
 		"normalizeUrl",
 		({ dataset: { given, normalized } }) => {
@@ -53,4 +54,45 @@ describe<{}>("normalizeUrl", ({ assert, each }) => {
 			"http://../",
 		],
 	);
+
+	it("should accept a url that is exactly MAX_API_NODE_URL_LENGTH long once normalized", () => {
+		const prefix = "http://1.2.3.4/";
+		const url = `${prefix}${"a".repeat(constants.MAX_API_NODE_URL_LENGTH - prefix.length)}`;
+
+		assert.equal(normalizeUrl(url), url);
+		assert.equal(normalizeUrl(url).length, constants.MAX_API_NODE_URL_LENGTH);
+	});
+
+	it("should reject a url that is one character over MAX_API_NODE_URL_LENGTH once normalized", () => {
+		const prefix = "http://1.2.3.4/";
+		const url = `${prefix}${"a".repeat(constants.MAX_API_NODE_URL_LENGTH - prefix.length + 1)}`;
+
+		assert.throws(() => normalizeUrl(url), `Invalid API Node url: ${url}`);
+	});
+
+	// Percent-encoding turns every CJK character into 9; a raw url within the limit grows ~9x.
+	it("should reject a url within the limit whose percent-encoded form exceeds it", () => {
+		const prefix = "http://1.2.3.4/";
+		const url = `${prefix}${"\u4E2D".repeat(constants.MAX_API_NODE_URL_LENGTH - prefix.length)}`;
+
+		assert.equal(url.length, constants.MAX_API_NODE_URL_LENGTH);
+		assert.true(new URL(url).toString().length > constants.MAX_API_NODE_URL_LENGTH);
+		assert.throws(() => normalizeUrl(url), `Invalid API Node url: ${url}`);
+	});
+
+	it("should reject a unicode hostname whose punycode form exceeds the limit", () => {
+		const labels = Array.from({ length: 40 }, () => "\u4E2D".repeat(50)).join(".");
+		const url = `http://${labels}/`;
+
+		assert.true(url.length < constants.MAX_API_NODE_URL_LENGTH);
+		assert.throws(() => normalizeUrl(url), `Invalid API Node url: ${url}`);
+	});
+
+	// The limit bounds what is stored and re-advertised, so the stripped parts do not count.
+	it("should accept a url over the limit whose normalized form is within it", () => {
+		const url = `http://user:pw@1.2.3.4/api?${"q".repeat(constants.MAX_API_NODE_URL_LENGTH)}#${"f".repeat(100)}`;
+
+		assert.true(url.length > constants.MAX_API_NODE_URL_LENGTH);
+		assert.equal(normalizeUrl(url), "http://1.2.3.4/api");
+	});
 });

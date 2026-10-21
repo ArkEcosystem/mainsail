@@ -3,8 +3,9 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import dayjs from "dayjs";
 
-import { ApiNodeDiscoverer } from "./api-node-discoverer";
+import { constants } from "../constants";
 import { normalizeUrl } from "../utils/index.js";
+import { ApiNodeDiscoverer } from "./api-node-discoverer";
 
 describe<{
 	discoverer: ApiNodeDiscoverer;
@@ -84,6 +85,26 @@ describe<{
 		validateAndAcceptApiNode.calledOnce();
 		validateAndAcceptApiNode.calledWith({ url: "http://5.6.7.8:4003/" }, {});
 		debug.calledTimes(2);
+	});
+
+	// The reply schema bounds the raw url, but normalizing can push it past the limit; that is rejected per entry.
+	it("#discoverApiNodes - should skip an advertised url that grows over the limit when normalized", async ({
+		discoverer,
+		communicator,
+		apiNodeProcessor,
+		logger,
+	}) => {
+		const prefix = "http://1.2.3.4/";
+		const url = `${prefix}${"\u4E2D".repeat(constants.MAX_API_NODE_URL_LENGTH - prefix.length)}`;
+		communicator.getApiNodes = async () => ({ apiNodes: [{ url }, { url: "http://5.6.7.8:4003/" }] });
+		const validateAndAcceptApiNode = spy(apiNodeProcessor, "validateAndAcceptApiNode");
+		const debug = spy(logger, "debug");
+
+		await discoverer.discoverApiNodes(peer);
+
+		validateAndAcceptApiNode.calledOnce();
+		validateAndAcceptApiNode.calledWith({ url: "http://5.6.7.8:4003/" }, {});
+		debug.calledOnce();
 	});
 
 	it("#discoverApiNodes - should skip a non-public advertised url without dropping the rest", async ({

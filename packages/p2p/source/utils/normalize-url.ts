@@ -1,5 +1,7 @@
 import { InvalidApiNodeUrlError } from "@mainsail/exceptions";
 
+import { constants } from "../constants.js";
+
 export function normalizeUrl(urlString: string): string {
 	let url: URL;
 	try {
@@ -29,5 +31,11 @@ export function normalizeUrl(urlString: string): string {
 		url.pathname = url.pathname.replace(/\/$/, "");
 	}
 
-	return url.toString();
+	const normalized = url.toString();
+
+	if (normalized.length > constants.MAX_API_NODE_URL_LENGTH) {
+		throw new InvalidApiNodeUrlError(urlString);
+	}
+
+	return normalized;
 }

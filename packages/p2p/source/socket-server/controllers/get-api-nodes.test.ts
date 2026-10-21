@@ -55,6 +55,31 @@ describe<{
 		});
 	});
 
+	// A single over-long url would make every peer reject the whole reply against its reply schema.
+	it("should not advertise an api node whose url is longer than MAX_API_NODE_URL_LENGTH", async ({
+		controller,
+		validator,
+	}) => {
+		const prefix = "http://1.2.3.4/";
+		const longestUrl = `${prefix}${"a".repeat(constants.MAX_API_NODE_URL_LENGTH - prefix.length)}`;
+		const overLongUrl = `${longestUrl}a`;
+		const encodedUrl = new URL(
+			`${prefix}${"\u4E2D".repeat(constants.MAX_API_NODE_URL_LENGTH - prefix.length)}`,
+		).toString();
+
+		stub(apiNodeRepository, "getApiNodes").returnValue([
+			makeApiNode(overLongUrl, 10),
+			makeApiNode(encodedUrl, 20),
+			makeApiNode(longestUrl, 30),
+			makeApiNode("http://5.6.7.8:4003/", 40),
+		]);
+
+		const response = await controller.handle({ info: { remoteAddress: "187.55.33.22" }, payload: {} }, {});
+
+		assert.equal(response, { apiNodes: [{ url: longestUrl }, { url: "http://5.6.7.8:4003/" }] });
+		assert.undefined(validator.validate(replySchema, { ...response, headers }).error);
+	});
+
 	it("should return at most MAX_PEERS_GET_API_NODES api nodes", async ({ controller }) => {
 		stub(apiNodeRepository, "getApiNodes").returnValue(
 			Array.from({ length: constants.MAX_PEERS_GET_API_NODES + 10 }, (_, index) =>
