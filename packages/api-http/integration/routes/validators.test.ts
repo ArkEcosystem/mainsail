@@ -55,6 +55,88 @@ describe<{
 		assert.equal(data.data, sorted);
 	});
 
+	it("/validators?orderBy names", async () => {
+		const wei = (value: string) => `${value}000000000000000000`;
+		const fees = ["900", "10000", "5", "80", "7000", "60", "3", "400"].map(wei);
+		const rewards = ["3", "70", "800", "1", "20000", "9", "600", "50"].map(wei);
+		const votes = ["40", "5000", "1", "300", "70", "20000", "8", "600"].map(wei);
+		const approvals = [1.5, 0.25, 10.75, 3, 0.5, 2.25, 7, 0.125];
+		const produced = [9, 30, 4, 12, 1, 7, 25, 2];
+		const lastBlocks = [54, 2, 3, 400, 5, 61, 7, 1000];
+		const hashes = ["c1", "a2", "f3", "b4", "e5", "d6", "07", "98"].map((prefix) => prefix.padEnd(64, "0"));
+
+		const rows = validators.map((validator, index) => ({
+			...validator,
+			attributes: {
+				...validator.attributes,
+				validatorApproval: approvals[index],
+				validatorForgedFees: fees[index],
+				validatorForgedRewards: rewards[index],
+				validatorForgedTotal: (BigInt(fees[index]) + BigInt(rewards[index])).toString(),
+				validatorLastBlock: { hash: hashes[index], number: lastBlocks[index], timestamp: 0 },
+				validatorProducedBlocks: produced[index],
+				validatorResigned: index % 3 === 0,
+				validatorVoteBalance: votes[index],
+			},
+		}));
+		await apiContext.walletRepository.save(rows);
+
+		const sortedBy = (key: (row: (typeof rows)[number]) => bigint | number | string, direction = "asc") =>
+			[...rows]
+				.sort((a, b) => {
+					const order = key(a) < key(b) ? -1 : key(a) > key(b) ? 1 : 0;
+					return direction === "asc" ? order : -order;
+				})
+				.map((row) => row.address);
+
+		const testCases = [
+			{ orderBy: "address:asc", result: sortedBy((row) => row.address.toLowerCase()) },
+			{ orderBy: "publicKey:desc", result: sortedBy((row) => row.publicKey, "desc") },
+			{ orderBy: "rank:desc", result: sortedBy((row) => row.attributes.validatorRank, "desc") },
+			{ orderBy: "votes:desc", result: sortedBy((row) => BigInt(row.attributes.validatorVoteBalance), "desc") },
+			{ orderBy: "votes:asc", result: sortedBy((row) => BigInt(row.attributes.validatorVoteBalance)) },
+			{ orderBy: "username:asc", result: sortedBy((row) => row.attributes.username) },
+			{ orderBy: "blocks.produced:asc", result: sortedBy((row) => row.attributes.validatorProducedBlocks) },
+			{
+				orderBy: "blocks.last.number:desc",
+				result: sortedBy((row) => row.attributes.validatorLastBlock.number, "desc"),
+			},
+			{ orderBy: "blocks.last.hash:asc", result: sortedBy((row) => row.attributes.validatorLastBlock.hash) },
+			{
+				orderBy: "forged.fees:desc",
+				result: sortedBy((row) => BigInt(row.attributes.validatorForgedFees), "desc"),
+			},
+			{ orderBy: "forged.rewards:asc", result: sortedBy((row) => BigInt(row.attributes.validatorForgedRewards)) },
+			{
+				orderBy: "forged.total:desc",
+				result: sortedBy((row) => BigInt(row.attributes.validatorForgedTotal), "desc"),
+			},
+			{
+				orderBy: "production.approval:desc",
+				result: sortedBy((row) => row.attributes.validatorApproval, "desc"),
+			},
+			{
+				orderBy: "isResigned:desc,rank:asc",
+				result: [...rows]
+					.sort(
+						(a, b) =>
+							Number(b.attributes.validatorResigned) - Number(a.attributes.validatorResigned) ||
+							a.attributes.validatorRank - b.attributes.validatorRank,
+					)
+					.map((row) => row.address),
+			},
+		];
+
+		for (const { orderBy, result } of testCases) {
+			const { statusCode, data } = await request(`/validators?orderBy=${orderBy}`, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map((validator) => validator.address),
+				result,
+			);
+		}
+	});
+
 	it("/validators?attributes filters by a jsonb attribute (escapeLiteral path)", async () => {
 		await apiContext.walletRepository.save(validators);
 

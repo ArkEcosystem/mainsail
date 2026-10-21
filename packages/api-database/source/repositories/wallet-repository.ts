@@ -8,6 +8,21 @@ import { makeExtendedRepository } from "./repository-extension.js";
 
 const columns = new Set(["address", "balance", "nonce", "publicKey"]);
 
+// Validator sorting names and the attributes they are stored as, see ValidatorFilter.
+const validatorAttributes = new Map([
+	["blocks.last.hash", "validatorLastBlock.hash"],
+	["blocks.last.number", "validatorLastBlock.number"],
+	["blocks.produced", "validatorProducedBlocks"],
+	["forged.fees", "validatorForgedFees"],
+	["forged.rewards", "validatorForgedRewards"],
+	["forged.total", "validatorForgedTotal"],
+	["isResigned", "validatorResigned"],
+	["production.approval", "validatorApproval"],
+	["rank", "validatorRank"],
+	["username", "username"],
+	["votes", "validatorVoteBalance"],
+]);
+
 const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting => {
 	if (sorting.length === 0) {
 		return defaultSort;
@@ -18,7 +33,7 @@ const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting 
 			return { direction, property };
 		}
 
-		const fieldName = property.replace(/^attributes\./, "");
+		const fieldName = validatorAttributes.get(property) ?? property.replace(/^attributes\./, "");
 
 		return {
 			direction,

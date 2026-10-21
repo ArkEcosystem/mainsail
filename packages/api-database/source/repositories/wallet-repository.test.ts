@@ -58,4 +58,58 @@ describe<{
 			},
 		]);
 	});
+
+	it("should sort validators by rank by default", async ({ repository }) => {
+		assert.equal(await repository.findManyValidatorsByCritera({}, [], pagination), [
+			{
+				direction: "asc",
+				jsonFieldAccessor: { cast: "bigint", fieldName: "validatorRank", operator: "->>" },
+				property: "attributes",
+			},
+		]);
+	});
+
+	it("should sort validator names by the attributes they are stored as", async ({ repository }) => {
+		for (const [property, fieldName, cast] of [
+			["blocks.last.hash", "validatorLastBlock.hash", undefined],
+			["blocks.last.number", "validatorLastBlock.number", "bigint"],
+			["blocks.produced", "validatorProducedBlocks", "bigint"],
+			["forged.fees", "validatorForgedFees", "numeric"],
+			["forged.rewards", "validatorForgedRewards", "numeric"],
+			["forged.total", "validatorForgedTotal", "numeric"],
+			["isResigned", "validatorResigned", undefined],
+			["production.approval", "validatorApproval", "numeric"],
+			["rank", "validatorRank", "bigint"],
+			["username", "username", undefined],
+			["votes", "validatorVoteBalance", "numeric"],
+		]) {
+			assert.equal(
+				await repository.findManyValidatorsByCritera({}, [{ direction: "desc", property }], pagination),
+				[
+					{
+						direction: "desc",
+						jsonFieldAccessor: { cast, fieldName, operator: "->>" },
+						property: "attributes",
+					},
+				],
+			);
+		}
+	});
+
+	it("should not treat inherited object keys as validator names", async ({ repository }) => {
+		assert.equal(
+			await repository.findManyValidatorsByCritera(
+				{},
+				[{ direction: "asc", property: "constructor" }],
+				pagination,
+			),
+			[
+				{
+					direction: "asc",
+					jsonFieldAccessor: { cast: undefined, fieldName: "constructor", operator: "->>" },
+					property: "attributes",
+				},
+			],
+		);
+	});
 });
