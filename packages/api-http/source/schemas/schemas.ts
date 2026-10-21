@@ -51,13 +51,13 @@ export const blockCriteriaSchemas = {
 	hash: Schemas.orEqualCriteria(blockHash),
 	number: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	parentHash: Schemas.orEqualCriteria(blockHash),
-	payloadHash: Schemas.orEqualCriteria(Joi.string().hex()),
 	payloadSize: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	proposer: Schemas.orEqualCriteria(Joi.string().hex().length(66)),
 	reward: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	round: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	timestamp: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	transactionsCount: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
+	transactionsRoot: Schemas.orEqualCriteria(Joi.string().hex()),
 };
 
 export const transactionCriteriaSchemas = {

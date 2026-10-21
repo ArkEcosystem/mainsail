@@ -53,6 +53,22 @@ describe<{
 		}
 	});
 
+	it("/blocks?transactionsRoot", async () => {
+		await apiContext.blockRepository.save(blocks);
+		const genesis = blocks.find((block) => block.number === "0")!;
+
+		let { statusCode, data } = await request(`/blocks?transactionsRoot=${genesis.transactionsRoot}`, options);
+		assert.equal(statusCode, 200);
+		assert.equal(
+			data.data.map((block) => block.hash),
+			[genesis.hash],
+		);
+
+		({ statusCode, data } = await request("/blocks?orderBy=transactionsRoot:asc", options));
+		assert.equal(statusCode, 200);
+		assert.equal(data.data[0].hash, genesis.hash);
+	});
+
 	it("/blocks/first", async () => {
 		await apiContext.blockRepository.save(blocks);
 
