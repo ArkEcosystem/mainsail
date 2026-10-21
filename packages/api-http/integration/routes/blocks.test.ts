@@ -40,6 +40,19 @@ describe<{
 		assert.equal(statusCode, 200);
 	});
 
+	it("/blocks rejects amount, which blocks do not have", async () => {
+		for (const path of ["/blocks?amount=1", "/blocks?orderBy=amount:desc"]) {
+			let statusCode;
+			try {
+				statusCode = (await request(path, options)).statusCode;
+			} catch (ex) {
+				statusCode = ex.response?.statusCode;
+			}
+
+			assert.equal(statusCode, 422);
+		}
+	});
+
 	it("/blocks/first", async () => {
 		await apiContext.blockRepository.save(blocks);
 

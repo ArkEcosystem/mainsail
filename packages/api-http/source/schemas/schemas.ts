@@ -47,7 +47,6 @@ export const blocksOrderBy = orderBy.default("number:desc");
 export const transactionsOrderBy = orderBy.default(["timestamp:desc", "transactionIndex:desc"]);
 
 export const blockCriteriaSchemas = {
-	amount: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	fee: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	hash: Schemas.orEqualCriteria(blockHash),
 	number: Schemas.orNumericCriteria(Joi.number().integer().min(0)),

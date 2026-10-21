@@ -59,12 +59,6 @@ export class BlockFilter {
 						handleComparisonCriteria("transactionsCount", c),
 					);
 				}
-				case "amount": {
-					return handleOrCriteria(criteria.amount, async (c) =>
-						// @ts-ignore
-						handleComparisonCriteria("amount", c),
-					);
-				}
 				case "fee": {
 					return handleOrCriteria(criteria.fee, async (c) =>
 						// @ts-ignore
