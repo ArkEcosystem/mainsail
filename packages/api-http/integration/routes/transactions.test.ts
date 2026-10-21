@@ -45,6 +45,19 @@ describe<{
 		assert.equal(data.data, transactionsResponse);
 	});
 
+	it("/transactions?orderBy rejects criteria that only filter", async () => {
+		for (const path of ["/transactions?orderBy=address:asc", "/transactions?orderBy=asset:asc"]) {
+			let statusCode;
+			try {
+				statusCode = (await request(path, options)).statusCode;
+			} catch (ex) {
+				statusCode = ex.response?.statusCode;
+			}
+
+			assert.equal(statusCode, 422);
+		}
+	});
+
 	it("/transactions?data", async () => {
 		await apiContext.transactionRepository.save(transactions);
 
