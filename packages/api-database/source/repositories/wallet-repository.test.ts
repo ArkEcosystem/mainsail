@@ -4,6 +4,9 @@ import { makeWalletRepository } from "./wallet-repository";
 
 const pagination = { limit: 100, offset: 0 };
 
+// Ties are broken on the address, in the direction of the last sort key.
+const byAddress = (direction: string) => ({ direction, property: "address" });
+
 describe<{
 	repository: any;
 }>("WalletRepository", ({ it, beforeEach, assert }) => {
@@ -22,6 +25,7 @@ describe<{
 	it("should sort wallets by balance by default", async ({ repository }) => {
 		assert.equal(await repository.findManyByCriteria({}, [], pagination), [
 			{ direction: "desc", property: "balance" },
+			byAddress("desc"),
 		]);
 	});
 
@@ -29,6 +33,7 @@ describe<{
 		for (const property of ["address", "balance", "nonce", "publicKey"]) {
 			assert.equal(await repository.findManyByCriteria({}, [{ direction: "asc", property }], pagination), [
 				{ direction: "asc", property },
+				...(property === "address" ? [] : [byAddress("asc")]),
 			]);
 		}
 	});
@@ -56,6 +61,7 @@ describe<{
 				jsonFieldAccessor: { cast: undefined, fieldName: "username", operator: "->>" },
 				property: "attributes",
 			},
+			byAddress("asc"),
 		]);
 	});
 
@@ -66,6 +72,7 @@ describe<{
 				jsonFieldAccessor: { cast: "bigint", fieldName: "validatorRank", operator: "->>" },
 				property: "attributes",
 			},
+			byAddress("asc"),
 		]);
 	});
 
@@ -91,6 +98,7 @@ describe<{
 						jsonFieldAccessor: { ...jsonFieldAccessor, operator: "->>" },
 						property: "attributes",
 					},
+					byAddress("desc"),
 				],
 			);
 		}
@@ -102,9 +110,11 @@ describe<{
 
 		assert.equal(await repository.findManyByCriteria({}, sorting, pagination), [
 			{ direction: "asc", jsonFieldAccessor, property: "attributes" },
+			byAddress("asc"),
 		]);
 		assert.equal(await repository.findManyValidatorsByCritera({}, sorting, pagination), [
 			{ direction: "asc", jsonFieldAccessor: { ...jsonFieldAccessor, fallback: "0" }, property: "attributes" },
+			byAddress("asc"),
 		]);
 	});
 
@@ -121,6 +131,7 @@ describe<{
 					jsonFieldAccessor: { cast: undefined, fieldName: "constructor", operator: "->>" },
 					property: "attributes",
 				},
+				byAddress("asc"),
 			],
 		);
 	});

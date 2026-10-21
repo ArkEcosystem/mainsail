@@ -1,6 +1,6 @@
 import { describe } from "@mainsail/test-runner";
 
-import { makeExtendedRepository } from "./repository-extension";
+import { breakTies, makeExtendedRepository } from "./repository-extension";
 
 // Minimal fake EntityMetadata: QueryHelper.getColumnName reads metadata.columns.
 const makeMetadata = () => ({
@@ -146,6 +146,17 @@ describe<{
 		assert.length(qb.calls, 2);
 		assert.equal(qb.calls[0], { args: ["balance", "DESC", "NULLS LAST"], name: "orderBy" });
 		assert.equal(qb.calls[1], { args: ["address", "ASC", undefined], name: "addOrderBy" });
+	});
+
+	it("breakTies: appends the property in the direction of the last sort key, unless already sorted", () => {
+		assert.equal(breakTies([], "address"), [{ direction: "asc", property: "address" }]);
+		assert.equal(breakTies([{ direction: "desc", property: "balance" }], "address"), [
+			{ direction: "desc", property: "balance" },
+			{ direction: "desc", property: "address" },
+		]);
+		assert.equal(breakTies([{ direction: "desc", property: "address" }], "address"), [
+			{ direction: "desc", property: "address" },
+		]);
 	});
 
 	it("addSkipOffset: applies skip(offset).take(limit)", ({ metadata }) => {

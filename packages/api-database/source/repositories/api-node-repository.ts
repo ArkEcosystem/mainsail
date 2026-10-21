@@ -3,7 +3,7 @@ import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "../sea
 
 import { ApiNode } from "../models/api-node.js";
 import { ApiNodeFilter } from "../search/filters/index.js";
-import { makeExtendedRepository } from "./repository-extension.js";
+import { breakTies, makeExtendedRepository } from "./repository-extension.js";
 
 export const makeApiNodeRepository = (dataSource: RepositoryDataSource): ApiNodeRepository =>
 	makeExtendedRepository<ApiNode, ApiNodeRepositoryExtension>(ApiNode, dataSource, {
@@ -14,6 +14,6 @@ export const makeApiNodeRepository = (dataSource: RepositoryDataSource): ApiNode
 			options?: Options,
 		): Promise<ResultsPage<ApiNode>> {
 			const peerExpression = await ApiNodeFilter.getExpression(peerCriteria);
-			return this.listByExpression(peerExpression, sorting, pagination, options);
+			return this.listByExpression(peerExpression, breakTies(sorting, "url"), pagination, options);
 		},
 	});

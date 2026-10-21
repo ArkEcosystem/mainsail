@@ -128,3 +128,10 @@ export const makeExtendedRepository = <TEntity extends ObjectLiteral, CustomRepo
 		...getRepositoryExtension(),
 		...extend,
 	});
+
+// Breaks ties on a unique property, so that pages neither overlap nor skip rows. It follows the direction of the last
+// sort key, so that one index on both serves either direction.
+export const breakTies = (sorting: Sorting, property: string): Sorting =>
+	sorting.some((item) => item.property === property)
+		? sorting
+		: [...sorting, { direction: sorting.at(-1)?.direction ?? "asc", property }];

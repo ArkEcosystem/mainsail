@@ -28,6 +28,12 @@ describe<{
 
 	let options = {};
 
+	// Wallets with equal balances are ordered by address, by default descending like the balance.
+	const sortedByAddress = <T extends { address: string }>(rows: T[], direction = "asc"): T[] =>
+		[...rows].sort(
+			(a, b) => (a.address.toLowerCase() < b.address.toLowerCase() ? -1 : 1) * (direction === "asc" ? 1 : -1),
+		);
+
 	beforeAll(async (context) => {
 		nock.enableNetConnect();
 		apiContext = await prepareSandbox(context);
@@ -52,6 +58,22 @@ describe<{
 		const { statusCode, data } = await request("/wallets", options);
 		assert.equal(statusCode, 200);
 		assert.equal(data.data.length, wallets.length);
+	});
+
+	it("/wallets pages through equal balances by address", async () => {
+		// Every fixture wallet has the same balance.
+		await apiContext.walletRepository.save([...wallets].reverse());
+
+		const addresses: string[] = [];
+		for (let page = 1; page <= Math.ceil(wallets.length / 10); page++) {
+			const { data } = await request(`/wallets?limit=10&page=${page}`, options);
+			addresses.push(...data.data.map((wallet) => wallet.address));
+		}
+
+		assert.equal(
+			addresses,
+			sortedByAddress(wallets, "desc").map((wallet) => wallet.address),
+		);
 	});
 
 	it("/wallets?attributes", async () => {
@@ -88,7 +110,7 @@ describe<{
 			const { statusCode, data } = await request(`/wallets?${path}`, options);
 			assert.equal(statusCode, 200);
 			assert.equal(data.data.length, result.length);
-			assert.equal(data.data, result);
+			assert.equal(data.data, sortedByAddress(result, "desc"));
 		}
 	});
 
