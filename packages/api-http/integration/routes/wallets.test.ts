@@ -281,6 +281,31 @@ describe<{
 		}
 	});
 
+	it("/wallets?orderBy counts a missing legacy flag as false", async () => {
+		const [a, b, c, d] = wallets;
+		await apiContext.walletRepository.save([
+			{ ...a, attributes: { isLegacy: true }, balance: "300" },
+			{ ...b, attributes: {}, balance: "1000" },
+			{ ...c, attributes: { isLegacy: true }, balance: "20" },
+			{ ...d, attributes: {}, balance: "5000" },
+		]);
+
+		const testCases = [
+			{ path: "/wallets?orderBy=attributes.isLegacy:asc,balance:desc", result: [d, b, a, c] },
+			{ path: "/wallets?orderBy=attributes.isLegacy:desc,balance:desc", result: [a, c, d, b] },
+			{ path: "/wallets?attributes.isLegacy=false", result: [d, b] },
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map((wallet) => wallet.address),
+				result.map((wallet) => wallet.address),
+			);
+		}
+	});
+
 	it("/wallets?orderBy rejects SQL injection in the sort field", async () => {
 		await apiContext.walletRepository.save(wallets);
 

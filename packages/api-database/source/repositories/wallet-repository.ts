@@ -35,11 +35,7 @@ const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting 
 
 		const fieldName = validatorAttributes.get(property) ?? property.replace(/^attributes\./, "");
 
-		return {
-			direction,
-			jsonFieldAccessor: { cast: WalletFilter.inferAttributeCastType(fieldName), fieldName, operator: "->>" },
-			property: "attributes",
-		};
+		return { direction, jsonFieldAccessor: WalletFilter.getAttributeAccessor(fieldName), property: "attributes" };
 	});
 };
 

@@ -111,4 +111,6 @@ export type JsonFieldAccessor = {
 	operator: JsonFieldOperator;
 	fieldName: string;
 	cast?: JsonFieldCastType;
+	// value of an absent field
+	fallback?: string;
 };

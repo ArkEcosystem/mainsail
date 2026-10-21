@@ -142,6 +142,28 @@ describe("WalletFilter.getExpression", ({ it, assert }) => {
 		}
 	});
 
+	it("should fall back to false for a missing legacy flag", async () => {
+		const expression = await WalletFilter.getExpression({ attributes: { isLegacy: "false" } });
+
+		assert.equal(expression, {
+			jsonFieldAccessor: { cast: undefined, fallback: "false", fieldName: "isLegacy", operator: "->>" },
+			op: "equal",
+			property: "attributes",
+			value: "false",
+		});
+	});
+
+	it("should not fall back to zero for missing validator counters, as most wallets are no validators", async () => {
+		const expression = await WalletFilter.getExpression({ attributes: { validatorProducedBlocks: "0" } });
+
+		assert.equal(expression, {
+			jsonFieldAccessor: { cast: "bigint", fieldName: "validatorProducedBlocks", operator: "->>" },
+			op: "equal",
+			property: "attributes",
+			value: "0",
+		});
+	});
+
 	it("should leave unknown attribute cast type undefined", async () => {
 		const expression = await WalletFilter.getExpression({ attributes: { username: "alice" } });
 

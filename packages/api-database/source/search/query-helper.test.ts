@@ -53,6 +53,21 @@ describe<{
 		);
 	});
 
+	it("getColumnName falls back to a value for an absent json field, which is then not nullable", ({
+		helper,
+		metadata,
+	}) => {
+		assert.equal(
+			helper.getColumnName(metadata, "data", {
+				cast: "bigint",
+				fallback: "0",
+				fieldName: "validatorBlock.number",
+				operator: "->>",
+			}),
+			{ isNullable: false, name: `(COALESCE(data->'validatorBlock'->>'number', '0'))::bigint` },
+		);
+	});
+
 	it("getColumnName json accessor is always nullable regardless of column isNullable", ({ helper }) => {
 		const metadata = makeMetadata([
 			{ databaseName: "data", isNullable: false, propertyName: "data", type: "jsonb" },

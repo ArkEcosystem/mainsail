@@ -3,7 +3,7 @@ import { isObject } from "@mainsail/utils";
 
 import type { Wallet } from "../../models/index.js";
 import type { EqualCriteria, NumericCriteria, OrWalletCriteria, WalletCriteria } from "../types/criteria.js";
-import type { Expression, JsonFieldCastType, OrExpression } from "../types/expressions.js";
+import type { Expression, JsonFieldAccessor, JsonFieldCastType, OrExpression } from "../types/expressions.js";
 
 import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
@@ -97,18 +97,32 @@ export class WalletFilter {
 						throw new InvalidCriteria(`Invalid attribute key '${k}'`);
 					}
 
-					return handleComparisonCriteria<Wallet, "attributes">("attributes", v, {
-						cast: this.inferAttributeCastType(k),
-						fieldName: k,
-						operator: "->>",
-					});
+					return handleComparisonCriteria<Wallet, "attributes">(
+						"attributes",
+						v,
+						this.getAttributeAccessor(k),
+					);
 				}),
 			),
 			op: "or",
 		};
 	}
 
-	public static inferAttributeCastType(attribute: string): JsonFieldCastType | undefined {
+	// api-sync leaves these attributes out while they are false.
+	private static readonly attributeFallbacks = new Map([["isLegacy", "false"]]);
+
+	public static getAttributeAccessor(attribute: string): JsonFieldAccessor {
+		const fallback = this.attributeFallbacks.get(attribute);
+
+		return {
+			cast: this.inferAttributeCastType(attribute),
+			fieldName: attribute,
+			operator: "->>",
+			...(fallback === undefined ? {} : { fallback }),
+		};
+	}
+
+	private static inferAttributeCastType(attribute: string): JsonFieldCastType | undefined {
 		// Since object attributes can exist with arbitrary keys, we hardcode a list of 'numeric like' attributes
 		// and treat the rest as is.
 

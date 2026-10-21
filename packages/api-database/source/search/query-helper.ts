@@ -50,12 +50,17 @@ export class QueryHelper<TEntity> {
 				fullFieldPath = `${column.databaseName}${fullFieldPath}`;
 			}
 
+			if (jsonFieldAccessor.fallback !== undefined) {
+				// column->>'number' => COALESCE(column->>'number', '0')
+				fullFieldPath = `COALESCE(${fullFieldPath}, ${escapeLiteral(jsonFieldAccessor.fallback)})`;
+			}
+
 			if (jsonFieldAccessor.cast) {
 				// (column->'validatorBlock'->'last'->>'number')::bigint
 				fullFieldPath = `(${fullFieldPath})::${jsonFieldAccessor.cast}`;
 			}
 
-			return { isNullable: true, name: fullFieldPath };
+			return { isNullable: jsonFieldAccessor.fallback === undefined, name: fullFieldPath };
 		}
 
 		// Escape reserved keyword
