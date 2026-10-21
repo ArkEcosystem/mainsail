@@ -74,6 +74,14 @@ export class ValidatorFilter {
 					}));
 				}
 
+				case "username": {
+					return handleOrCriteria(criteria.username, async (c) => ({
+						op: "contains",
+						property: "attributes",
+						value: { username: c },
+					}));
+				}
+
 				case "forged": {
 					return this.handleForgedCriteria(criteria.forged);
 				}

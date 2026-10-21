@@ -83,6 +83,15 @@ describe("ValidatorFilter", ({ it, assert }) => {
 		});
 	});
 
+	it("should build a contains expression for username", async () => {
+		const expression = await ValidatorFilter.getExpression({ username: "alice" });
+
+		assert.equal(expression, {
+			expressions: [...validatorGuard, { op: "contains", property: "attributes", value: { username: "alice" } }],
+			op: "and",
+		});
+	});
+
 	it("should build a jsonFieldAccessor comparison for scalar votes", async () => {
 		const expression = await ValidatorFilter.getExpression({ votes: "100" });
 
