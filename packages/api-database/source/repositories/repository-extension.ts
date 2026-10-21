@@ -91,15 +91,16 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 					return { meta: { totalCountIsEstimate: false }, results, totalCount };
 				}
 
-				let totalCountEstimated = 0;
 				const [resultsSql, resultsParameters] = resultsQueryBuilder.getQueryAndParameters();
-				const resultsExplainedRows = await queryRunner.query(`EXPLAIN ${resultsSql}`, resultsParameters);
-				for (const resultsExplainedRow of resultsExplainedRows) {
-					const match = resultsExplainedRow["QUERY PLAN"].match(/rows=(\d+)/);
-					if (match) {
-						totalCountEstimated = Number.parseFloat(match[1]);
-					}
-				}
+				const [
+					{
+						"QUERY PLAN": [{ Plan: plan }],
+					},
+				] = await queryRunner.query(`EXPLAIN (FORMAT JSON) ${resultsSql}`, resultsParameters);
+
+				// The node below the LIMIT estimates every matching row. Nodes further down may only estimate
+				// the rows of a single parallel worker.
+				const totalCountEstimated: number = (plan["Node Type"] === "Limit" ? plan.Plans[0] : plan)["Plan Rows"];
 
 				const totalCount = Math.max(totalCountEstimated, results.length);
 

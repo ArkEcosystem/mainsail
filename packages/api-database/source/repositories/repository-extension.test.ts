@@ -235,9 +235,25 @@ describe<{
 		assert.equal(countQb.calls[1], { args: ["COUNT(*) AS total_count"], name: "select" });
 	});
 
-	it("listByExpression: EXPLAIN estimate path picks max(estimate, results.length)", async () => {
+	it("listByExpression: EXPLAIN estimate path takes the rows below the LIMIT, max(estimate, results.length)", async () => {
 		const explainStub = stubFn().resolvedValue([
-			{ "QUERY PLAN": "Seq Scan on wallets  (cost=... rows=1234 width=8)" },
+			{
+				"QUERY PLAN": [
+					{
+						Plan: {
+							"Node Type": "Limit",
+							"Plan Rows": 10,
+							Plans: [
+								{
+									"Node Type": "Gather Merge",
+									"Plan Rows": 1234,
+									Plans: [{ "Node Type": "Parallel Seq Scan", "Plan Rows": 514 }],
+								},
+							],
+						},
+					},
+				],
+			},
 		]);
 		const { repo, qr } = makeListSetup({
 			explainStub,
@@ -250,12 +266,14 @@ describe<{
 		assert.true(page.meta.totalCountIsEstimate);
 		assert.is(page.totalCount, 1234);
 		explainStub.calledOnce();
-		assert.equal(explainStub.getCallArgs(0)[0], "EXPLAIN SELECT * FROM wallets WHERE x");
+		assert.equal(explainStub.getCallArgs(0)[0], "EXPLAIN (FORMAT JSON) SELECT * FROM wallets WHERE x");
 		qr.commitTransaction.calledOnce();
 	});
 
 	it("listByExpression: estimate path falls back to results.length when estimate is smaller", async () => {
-		const explainStub = stubFn().resolvedValue([{ "QUERY PLAN": "rows=1" }]);
+		const explainStub = stubFn().resolvedValue([
+			{ "QUERY PLAN": [{ Plan: { "Node Type": "Seq Scan", "Plan Rows": 1 } }] },
+		]);
 		const { repo } = makeListSetup({
 			explainStub,
 			results: [{ address: "0x1" }, { address: "0x2" }, { address: "0x3" }],
@@ -268,7 +286,9 @@ describe<{
 
 	it("listByExpression: options.selection resets select then addSelect per item", async () => {
 		const { repo, resultsQb } = makeListSetup({
-			explainStub: stubFn().resolvedValue([{ "QUERY PLAN": "rows=5" }]),
+			explainStub: stubFn().resolvedValue([
+				{ "QUERY PLAN": [{ Plan: { "Node Type": "Seq Scan", "Plan Rows": 5 } }] },
+			]),
 		});
 
 		await repo.listByExpression(
