@@ -40,4 +40,23 @@ describe<{
 		// ordered by url
 		assert.equal(data.data, [apiNodes[1], apiNodes[0]]);
 	});
+
+	it("/api-nodes?orderBy", async () => {
+		await apiContext.apiNodesRepository.save(apiNodes);
+
+		const { statusCode, data } = await request("/api-nodes?orderBy=url:desc", options);
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, [apiNodes[0], apiNodes[1]]);
+
+		for (const orderBy of ["url:DESC", "unknown:asc"]) {
+			let statusCode;
+			try {
+				statusCode = (await request(`/api-nodes?orderBy=${orderBy}`, options)).statusCode;
+			} catch (ex) {
+				statusCode = ex.response?.statusCode;
+			}
+
+			assert.equal(statusCode, 422);
+		}
+	});
 });

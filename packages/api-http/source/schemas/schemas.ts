@@ -43,6 +43,20 @@ export const numberFixedOrBetween = Joi.alternatives().try(
 	}),
 );
 
+export const apiNodeSortingSchema = Schemas.createSortingSchema({
+	height: Joi.number(),
+	latency: Joi.number(),
+	url: Joi.string(),
+	version: Joi.string(),
+});
+export const peerSortingSchema = Schemas.createSortingSchema({
+	blockNumber: Joi.number(),
+	ip: Joi.string(),
+	latency: Joi.number(),
+	port: Joi.number(),
+	version: Joi.string(),
+});
+
 export const blocksOrderBy = orderBy.default("number:desc");
 export const transactionsOrderBy = orderBy.default(["timestamp:desc", "transactionIndex:desc"]);
 

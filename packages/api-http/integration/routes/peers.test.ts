@@ -42,6 +42,30 @@ describe<{
 		assert.equal(data.data, [peers[1], peers[0], peers[2]]);
 	});
 
+	it("/peers?orderBy", async () => {
+		await apiContext.peerRepository.save(peers);
+
+		for (const [orderBy, result] of [
+			["latency:desc", [peers[0], peers[1], peers[2]]],
+			["blockNumber:asc", [peers[1], peers[2], peers[0]]],
+		] as const) {
+			const { statusCode, data } = await request(`/peers?orderBy=${orderBy}`, options);
+			assert.equal(statusCode, 200);
+			assert.equal(data.data, result);
+		}
+
+		for (const orderBy of ["latency:DESC", "plugins:asc", "unknown:asc"]) {
+			let statusCode;
+			try {
+				statusCode = (await request(`/peers?orderBy=${orderBy}`, options)).statusCode;
+			} catch (ex) {
+				statusCode = ex.response?.statusCode;
+			}
+
+			assert.equal(statusCode, 422);
+		}
+	});
+
 	it("/peers/{ip}", async () => {
 		await apiContext.peerRepository.save(peers);
 
