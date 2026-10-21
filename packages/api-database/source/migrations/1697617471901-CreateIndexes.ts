@@ -50,6 +50,9 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
                             WHERE (attributes ? 'validatorPublicKey');
             CREATE UNIQUE INDEX wallets_unique_public_key ON wallets (public_key)
             WHERE public_key IS NOT NULL;
+            -- voters are listed by balance and address, so each page of them is a range of this index;
+            -- it is not partial, as Postgres only keeps statistics on the expressions of non-partial indexes
+            CREATE INDEX wallets_vote_balance_address ON wallets ((attributes->>'vote'), balance, address);
 
             CREATE UNIQUE INDEX legacy_cold_wallets_unique_merge_address ON legacy_cold_wallets (merge_info_wallet_address)
             WHERE merge_info_wallet_address IS NOT NULL;
@@ -119,6 +122,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX wallets_attributes;
             DROP INDEX wallets_validators;
             DROP INDEX wallets_unique_public_key;
+            DROP INDEX wallets_vote_balance_address;
 
             DROP INDEX legacy_cold_wallets_unique_merge_address;
 
