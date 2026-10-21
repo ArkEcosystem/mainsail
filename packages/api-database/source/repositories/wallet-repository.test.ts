@@ -70,30 +70,42 @@ describe<{
 	});
 
 	it("should sort validator names by the attributes they are stored as", async ({ repository }) => {
-		for (const [property, fieldName, cast] of [
-			["blocks.last.hash", "validatorLastBlock.hash", undefined],
-			["blocks.last.number", "validatorLastBlock.number", "bigint"],
-			["blocks.produced", "validatorProducedBlocks", "bigint"],
-			["forged.fees", "validatorForgedFees", "numeric"],
-			["forged.rewards", "validatorForgedRewards", "numeric"],
-			["forged.total", "validatorForgedTotal", "numeric"],
-			["isResigned", "validatorResigned", undefined],
-			["production.approval", "validatorApproval", "numeric"],
-			["rank", "validatorRank", "bigint"],
-			["username", "username", undefined],
-			["votes", "validatorVoteBalance", "numeric"],
-		]) {
+		for (const [property, jsonFieldAccessor] of [
+			["blocks.last.hash", { cast: undefined, fieldName: "validatorLastBlock.hash" }],
+			["blocks.last.number", { cast: "bigint", fieldName: "validatorLastBlock.number" }],
+			["blocks.produced", { cast: "bigint", fallback: "0", fieldName: "validatorProducedBlocks" }],
+			["forged.fees", { cast: "numeric", fallback: "0", fieldName: "validatorForgedFees" }],
+			["forged.rewards", { cast: "numeric", fallback: "0", fieldName: "validatorForgedRewards" }],
+			["forged.total", { cast: "numeric", fallback: "0", fieldName: "validatorForgedTotal" }],
+			["isResigned", { cast: undefined, fieldName: "validatorResigned" }],
+			["production.approval", { cast: "numeric", fieldName: "validatorApproval" }],
+			["rank", { cast: "bigint", fieldName: "validatorRank" }],
+			["username", { cast: undefined, fieldName: "username" }],
+			["votes", { cast: "numeric", fieldName: "validatorVoteBalance" }],
+		] as const) {
 			assert.equal(
 				await repository.findManyValidatorsByCritera({}, [{ direction: "desc", property }], pagination),
 				[
 					{
 						direction: "desc",
-						jsonFieldAccessor: { cast, fieldName, operator: "->>" },
+						jsonFieldAccessor: { ...jsonFieldAccessor, operator: "->>" },
 						property: "attributes",
 					},
 				],
 			);
 		}
+	});
+
+	it("should count missing counters as zero for validators only", async ({ repository }) => {
+		const sorting = [{ direction: "asc", property: "attributes.validatorProducedBlocks" }];
+		const jsonFieldAccessor = { cast: "bigint", fieldName: "validatorProducedBlocks", operator: "->>" };
+
+		assert.equal(await repository.findManyByCriteria({}, sorting, pagination), [
+			{ direction: "asc", jsonFieldAccessor, property: "attributes" },
+		]);
+		assert.equal(await repository.findManyValidatorsByCritera({}, sorting, pagination), [
+			{ direction: "asc", jsonFieldAccessor: { ...jsonFieldAccessor, fallback: "0" }, property: "attributes" },
+		]);
 	});
 
 	it("should not treat inherited object keys as validator names", async ({ repository }) => {

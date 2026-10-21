@@ -81,6 +81,7 @@ export class WalletFilter {
 
 	public static async handleAttributesCriteria(
 		criteria: Record<string, NumericCriteria<string>>,
+		validators: boolean = false,
 	): Promise<OrExpression<Wallet>> {
 		return {
 			expressions: await Promise.all(
@@ -100,7 +101,7 @@ export class WalletFilter {
 					return handleComparisonCriteria<Wallet, "attributes">(
 						"attributes",
 						v,
-						this.getAttributeAccessor(k),
+						this.getAttributeAccessor(k, validators),
 					);
 				}),
 			),
@@ -111,8 +112,18 @@ export class WalletFilter {
 	// api-sync leaves these attributes out while they are false.
 	private static readonly attributeFallbacks = new Map([["isLegacy", "false"]]);
 
-	public static getAttributeAccessor(attribute: string): JsonFieldAccessor {
-		const fallback = this.attributeFallbacks.get(attribute);
+	// api-sync leaves the counters of a validator out while they are zero. Other wallets have no counters at all.
+	private static readonly validatorAttributeFallbacks = new Map([
+		["validatorForgedFees", "0"],
+		["validatorForgedRewards", "0"],
+		["validatorForgedTotal", "0"],
+		["validatorProducedBlocks", "0"],
+	]);
+
+	public static getAttributeAccessor(attribute: string, validators: boolean = false): JsonFieldAccessor {
+		const fallback =
+			this.attributeFallbacks.get(attribute) ??
+			(validators ? this.validatorAttributeFallbacks.get(attribute) : undefined);
 
 		return {
 			cast: this.inferAttributeCastType(attribute),

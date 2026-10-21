@@ -137,23 +137,77 @@ describe<{
 		}
 	});
 
+	it("/validators?orderBy counts missing counters as zero", async () => {
+		// api-sync leaves the counters out while they are zero
+		const produced = [2, undefined, 1, 5, undefined, 3, 4, 6];
+		const rows = validators.map((validator, index) => {
+			const {
+				validatorForgedFees,
+				validatorForgedRewards,
+				validatorForgedTotal,
+				validatorProducedBlocks,
+				...attributes
+			} = validator.attributes;
+
+			return {
+				...validator,
+				attributes:
+					produced[index] === undefined
+						? attributes
+						: {
+								...attributes,
+								validatorForgedTotal: `${produced[index]}000000000000000000`,
+								validatorProducedBlocks: produced[index],
+							},
+			};
+		});
+		await apiContext.walletRepository.save(rows);
+
+		const ascending = [4, 1, 2, 0, 5, 6, 3, 7].map((index) => rows[index].address);
+		const descending = [7, 3, 6, 5, 0, 2, 4, 1].map((index) => rows[index].address);
+
+		const testCases = [
+			{ orderBy: "blocks.produced:asc,rank:asc", result: ascending },
+			{ orderBy: "blocks.produced:desc,rank:asc", result: descending },
+			{ orderBy: "forged.total:asc,rank:asc", result: ascending },
+			{ orderBy: "forged.total:desc,rank:asc", result: descending },
+		];
+
+		for (const { orderBy, result } of testCases) {
+			const { statusCode, data } = await request(`/validators?orderBy=${orderBy}`, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map((validator) => validator.address),
+				result,
+			);
+		}
+	});
+
 	it("/validators numeric filters", async () => {
 		const votes = ["900", "10000", "5", "80", "7000", "60", "3", "400"];
 		const approvals = [1.5, 0.25, 10.75, 3, 0.5, 2.25, 7, 0.125];
-		const rows = validators.map((validator, index) => ({
-			...validator,
-			attributes: {
-				...validator.attributes,
-				validatorApproval: approvals[index],
-				validatorVoteBalance: votes[index],
-			},
-		}));
+		const rows = validators.map((validator, index) => {
+			const { validatorProducedBlocks, ...attributes } = validator.attributes;
+
+			return {
+				...validator,
+				attributes: {
+					...attributes,
+					// api-sync leaves the counter out while it is zero
+					...(index % 3 === 0 ? {} : { validatorProducedBlocks: index }),
+					validatorApproval: approvals[index],
+					validatorVoteBalance: votes[index],
+				},
+			};
+		});
 		await apiContext.walletRepository.save(rows);
 
 		const testCases = [
 			{ path: "rank.from=5&rank.to=13", result: [0, 2, 5] },
 			{ path: "votes.from=1000", result: [1, 4] },
 			{ path: "production.approval.from=2", result: [2, 3, 5, 6] },
+			{ path: "blocks.produced.to=0", result: [0, 3, 6] },
+			{ path: "attributes.validatorProducedBlocks.to=0", result: [0, 3, 6] },
 		];
 
 		for (const { path, result } of testCases) {

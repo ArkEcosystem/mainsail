@@ -61,6 +61,28 @@ describe("ValidatorFilter", ({ it, assert }) => {
 		});
 	});
 
+	it("should fall back to zero for missing counters in attribute criteria", async () => {
+		const expression = await ValidatorFilter.getExpression({ attributes: { validatorProducedBlocks: "0" } });
+
+		assert.equal(expression, {
+			expressions: [
+				...validatorGuard,
+				{
+					jsonFieldAccessor: {
+						cast: "bigint",
+						fallback: "0",
+						fieldName: "validatorProducedBlocks",
+						operator: "->>",
+					},
+					op: "equal",
+					property: "attributes",
+					value: "0",
+				},
+			],
+			op: "and",
+		});
+	});
+
 	it("should build a jsonFieldAccessor comparison for scalar votes", async () => {
 		const expression = await ValidatorFilter.getExpression({ votes: "100" });
 
@@ -137,6 +159,7 @@ describe("ValidatorFilter", ({ it, assert }) => {
 						{
 							jsonFieldAccessor: {
 								cast: "numeric",
+								fallback: "0",
 								fieldName: "validatorForgedFees",
 								operator: "->>",
 							},
@@ -147,6 +170,7 @@ describe("ValidatorFilter", ({ it, assert }) => {
 						{
 							jsonFieldAccessor: {
 								cast: "numeric",
+								fallback: "0",
 								fieldName: "validatorForgedRewards",
 								operator: "->>",
 							},
@@ -157,6 +181,7 @@ describe("ValidatorFilter", ({ it, assert }) => {
 						{
 							jsonFieldAccessor: {
 								cast: "numeric",
+								fallback: "0",
 								fieldName: "validatorForgedTotal",
 								operator: "->>",
 							},
@@ -202,6 +227,7 @@ describe("ValidatorFilter", ({ it, assert }) => {
 						{
 							jsonFieldAccessor: {
 								cast: "bigint",
+								fallback: "0",
 								fieldName: "validatorProducedBlocks",
 								operator: "->>",
 							},

@@ -122,6 +122,22 @@ describe<{
 		}
 	});
 
+	it("/wallets?attributes leaves out wallets without validator counters", async () => {
+		const [a, b, c] = wallets;
+		await apiContext.walletRepository.save([
+			{ ...a, attributes: { validatorProducedBlocks: 2 } },
+			{ ...b, attributes: { validatorProducedBlocks: 9 } },
+			{ ...c, attributes: {} },
+		]);
+
+		const { statusCode, data } = await request("/wallets?attributes.validatorProducedBlocks.to=5", options);
+		assert.equal(statusCode, 200);
+		assert.equal(
+			data.data.map((wallet) => wallet.address),
+			[a.address],
+		);
+	});
+
 	it("/wallets?attributes rejects SQL injection in attribute keys", async () => {
 		await apiContext.walletRepository.save(wallets);
 

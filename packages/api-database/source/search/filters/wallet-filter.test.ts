@@ -164,6 +164,22 @@ describe("WalletFilter.getExpression", ({ it, assert }) => {
 		});
 	});
 
+	it("should fall back to zero for missing counters of validators", async () => {
+		for (const [fieldName, cast] of [
+			["validatorForgedFees", "numeric"],
+			["validatorForgedRewards", "numeric"],
+			["validatorForgedTotal", "numeric"],
+			["validatorProducedBlocks", "bigint"],
+		]) {
+			assert.equal(WalletFilter.getAttributeAccessor(fieldName, true), {
+				cast,
+				fallback: "0",
+				fieldName,
+				operator: "->>",
+			});
+		}
+	});
+
 	it("should leave unknown attribute cast type undefined", async () => {
 		const expression = await WalletFilter.getExpression({ attributes: { username: "alice" } });
 
