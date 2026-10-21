@@ -18,13 +18,11 @@ const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting 
 			return { direction, property };
 		}
 
+		const fieldName = property.replace(/^attributes\./, "");
+
 		return {
 			direction,
-			jsonFieldAccessor: {
-				cast: "numeric",
-				fieldName: property.replace("attributes.", ""),
-				operator: "->>",
-			},
+			jsonFieldAccessor: { cast: WalletFilter.inferAttributeCastType(fieldName), fieldName, operator: "->>" },
 			property: "attributes",
 		};
 	});

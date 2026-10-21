@@ -108,7 +108,7 @@ export class WalletFilter {
 		};
 	}
 
-	private static inferAttributeCastType(attribute: string): JsonFieldCastType | undefined {
+	public static inferAttributeCastType(attribute: string): JsonFieldCastType | undefined {
 		// Since object attributes can exist with arbitrary keys, we hardcode a list of 'numeric like' attributes
 		// and treat the rest as is.
 

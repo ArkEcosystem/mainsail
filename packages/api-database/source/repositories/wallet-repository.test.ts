@@ -32,4 +32,30 @@ describe<{
 			]);
 		}
 	});
+
+	it("should sort attributes by their inferred type", async ({ repository }) => {
+		const sorting = [
+			{ direction: "desc", property: "attributes.validatorVoteBalance" },
+			{ direction: "asc", property: "attributes.validatorLastBlock.number" },
+			{ direction: "asc", property: "attributes.username" },
+		];
+
+		assert.equal(await repository.findManyByCriteria({}, sorting, pagination), [
+			{
+				direction: "desc",
+				jsonFieldAccessor: { cast: "numeric", fieldName: "validatorVoteBalance", operator: "->>" },
+				property: "attributes",
+			},
+			{
+				direction: "asc",
+				jsonFieldAccessor: { cast: "bigint", fieldName: "validatorLastBlock.number", operator: "->>" },
+				property: "attributes",
+			},
+			{
+				direction: "asc",
+				jsonFieldAccessor: { cast: undefined, fieldName: "username", operator: "->>" },
+				property: "attributes",
+			},
+		]);
+	});
 });

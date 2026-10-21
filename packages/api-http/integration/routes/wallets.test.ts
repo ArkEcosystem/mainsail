@@ -257,6 +257,30 @@ describe<{
 		}
 	});
 
+	it("/wallets?orderBy text attributes", async () => {
+		const [a, b, c, d] = wallets;
+		await apiContext.walletRepository.save([
+			{ ...a, attributes: { username: "carol" }, balance: "1" },
+			{ ...b, attributes: { username: "alice" }, balance: "2" },
+			{ ...c, attributes: { username: "bob" }, balance: "3" },
+			{ ...d, attributes: {}, balance: "4" },
+		]);
+
+		const testCases = [
+			{ path: "/wallets?orderBy=attributes.username:asc", result: [b, c, a, d] },
+			{ path: "/wallets?orderBy=attributes.username:desc", result: [a, c, b, d] },
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map((wallet) => wallet.address),
+				result.map((wallet) => wallet.address),
+			);
+		}
+	});
+
 	it("/wallets?orderBy rejects SQL injection in the sort field", async () => {
 		await apiContext.walletRepository.save(wallets);
 
