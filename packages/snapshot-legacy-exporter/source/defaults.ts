@@ -8,14 +8,10 @@ export const defaults = {
 		entityPrefix: "public.",
 
 		extra: {
-			options: "-c statement_timeout=3000ms",
+			options: "-c statement_timeout=120000ms",
 		},
 
 		host: Environment.get(EnvironmentVariables.MAINSAIL_DB_HOST, "localhost"),
-
-		logger: "simple-console",
-
-		logging: Environment.isTrue(EnvironmentVariables.MAINSAIL_DB_LOGGING_ENABLED),
 
 		password: Environment.get(EnvironmentVariables.MAINSAIL_DB_PASSWORD, "password"),
 
