@@ -322,6 +322,17 @@ describe<{
 		}
 	});
 
+	it("/wallets?orderBy rejects attributes without a key", async () => {
+		let statusCode;
+		try {
+			statusCode = (await request("/wallets?orderBy=attributes:asc", options)).statusCode;
+		} catch (ex) {
+			statusCode = ex.response?.statusCode;
+		}
+
+		assert.equal(statusCode, 422);
+	});
+
 	it("/wallets?orderBy rejects SQL injection in the sort field", async () => {
 		await apiContext.walletRepository.save(wallets);
 

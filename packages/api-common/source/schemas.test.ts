@@ -104,6 +104,19 @@ describe<{}>("Schemas", ({ it, assert }) => {
 			});
 		});
 
+		it("should contain error if property is a wildcard path itself", () => {
+			const sortingSchema = schemas.createSortingSchema(
+				{ ...testCriteriaSchemaObject, attributes: Joi.object() },
+				["attributes"],
+			);
+
+			assert.equal(sortingSchema.validate({ orderBy: "attributes.username:asc" }).error, undefined);
+			assert.equal(
+				sortingSchema.validate({ orderBy: "attributes:asc" }).error!.message,
+				"Unknown orderBy property 'attributes'",
+			);
+		});
+
 		it("should handle multiple comma-separated properties", () => {
 			const sortingSchema = schemas.createSortingSchema({
 				name: Joi.string(),
