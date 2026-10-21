@@ -132,6 +132,22 @@ describe<{
 		assert.equal(qb.calls[1], { args: ["address", "ASC", undefined], name: "addOrderBy" });
 	});
 
+	it("addOrderBy: a column sorted twice keeps its first direction", ({ metadata }) => {
+		const qb = makeQueryBuilder();
+		const base = makeBase({ metadata });
+		const repo = makeExtendedRepository({} as any, makeDataSource(base) as any, {});
+
+		repo.addOrderBy(qb, [
+			{ direction: "desc", property: "balance" },
+			{ direction: "asc", property: "address" },
+			{ direction: "asc", property: "balance" },
+		]);
+
+		assert.length(qb.calls, 2);
+		assert.equal(qb.calls[0], { args: ["balance", "DESC", "NULLS LAST"], name: "orderBy" });
+		assert.equal(qb.calls[1], { args: ["address", "ASC", undefined], name: "addOrderBy" });
+	});
+
 	it("addSkipOffset: applies skip(offset).take(limit)", ({ metadata }) => {
 		const qb = makeQueryBuilder();
 		const base = makeBase({ metadata });

@@ -93,6 +93,10 @@ describe<{
 			{ orderBy: "address:asc", result: sortedBy((row) => row.address.toLowerCase()) },
 			{ orderBy: "publicKey:desc", result: sortedBy((row) => row.publicKey, "desc") },
 			{ orderBy: "rank:desc", result: sortedBy((row) => row.attributes.validatorRank, "desc") },
+			{
+				orderBy: "rank:asc,attributes.validatorRank:desc",
+				result: sortedBy((row) => row.attributes.validatorRank),
+			},
 			{ orderBy: "votes:desc", result: sortedBy((row) => BigInt(row.attributes.validatorVoteBalance), "desc") },
 			{ orderBy: "votes:asc", result: sortedBy((row) => BigInt(row.attributes.validatorVoteBalance)) },
 			{ orderBy: "username:asc", result: sortedBy((row) => row.attributes.username) },
