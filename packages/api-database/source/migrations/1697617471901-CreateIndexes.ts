@@ -67,8 +67,8 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE UNIQUE INDEX legacy_cold_wallets_unique_merge_address ON legacy_cold_wallets (merge_info_wallet_address)
             WHERE merge_info_wallet_address IS NOT NULL;
 
-            CREATE INDEX token_holders_address ON token_holders ("address");
-            CREATE INDEX token_holders_address_token ON token_holders ("address", "token_address");
+            -- lookups by address use token_holders_token_address_balance, which leads with the address
+            CREATE INDEX token_holders_token_balance_address ON token_holders ("token_address", "balance" DESC, "address");
             CREATE INDEX token_holders_token_address_balance ON token_holders ("address", "token_address", "balance");
 
             CREATE INDEX token_actions_all ON token_actions (action, "block_number" DESC, "index" DESC);
@@ -149,8 +149,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX tokens_symbol_prefix;
             DROP INDEX tokens_name_prefix;
 
-            DROP INDEX token_holders_address;
-            DROP INDEX token_holders_address_token;
+            DROP INDEX token_holders_token_balance_address;
             DROP INDEX token_holders_token_address_balance;
 
             DROP INDEX token_actions_all;
