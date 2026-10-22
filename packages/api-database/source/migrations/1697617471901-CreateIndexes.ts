@@ -31,7 +31,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX transactions_value_asc_transaction_index_desc ON transactions(value ASC, transaction_index DESC);
             CREATE INDEX transactions_gas_price_asc_transaction_index_desc ON transactions(gas_price ASC, transaction_index DESC);
             CREATE INDEX transactions_nonce_asc_transaction_index_desc ON transactions(nonce ASC, transaction_index DESC);
-            CREATE INDEX transactions_timestamp_asc_transaction_index_desc ON transactions(timestamp ASC, transaction_index DESC);
+            CREATE INDEX transactions_timestamp_asc_transaction_index_desc ON transactions(timestamp ASC, transaction_index DESC) INCLUDE (gas_price);
 
             CREATE INDEX transactions_function_sig_address ON transactions(
                   SUBSTRING(data FROM 1 FOR 4),
