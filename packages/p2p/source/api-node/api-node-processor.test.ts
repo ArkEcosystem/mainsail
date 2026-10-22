@@ -49,6 +49,32 @@ describe<{
 		forgetPendingApiNode.calledWith(apiNode);
 	});
 
+	it("#validateAndAcceptApiNode - should verify a peer-sourced node as non-seed", async ({
+		processor,
+		repository,
+		apiNodeVerifier,
+	}) => {
+		repository.hasApiNode = () => false;
+		const verify = spy(apiNodeVerifier, "verify");
+
+		await processor.validateAndAcceptApiNode(apiNode);
+
+		verify.calledWith(apiNode, { seed: false });
+	});
+
+	it("#validateAndAcceptApiNode - should verify a configured node as seed", async ({
+		processor,
+		repository,
+		apiNodeVerifier,
+	}) => {
+		repository.hasApiNode = () => false;
+		const verify = spy(apiNodeVerifier, "verify");
+
+		await processor.validateAndAcceptApiNode(apiNode, { seed: true });
+
+		verify.calledWith(apiNode, { seed: true });
+	});
+
 	it("#validateAndAcceptApiNode - should skip a node that is already known or pending", async ({
 		processor,
 		repository,
@@ -93,6 +119,24 @@ describe<{
 		await processor.revalidateApiNode(apiNode);
 
 		verify.calledWith(apiNode);
+	});
+
+	it("#revalidateApiNode - should remember that a node was configured", async ({
+		processor,
+		repository,
+		apiNodeVerifier,
+	}) => {
+		const seed = { url: "http://10.0.0.5:4003/" } as any;
+		repository.hasApiNode = () => false;
+		await processor.validateAndAcceptApiNode(seed, { seed: true });
+		repository.hasApiNode = () => true;
+		const verify = spy(apiNodeVerifier, "verify");
+
+		await processor.revalidateApiNode(seed);
+		await processor.revalidateApiNode(apiNode);
+
+		verify.calledWith(seed, { seed: true });
+		verify.calledWith(apiNode, { seed: false });
 	});
 
 	it("#revalidateApiNode - should verify a node whose last ping is older than ten minutes", async ({

@@ -17,8 +17,14 @@ describe<{
 }>("GetApiNodesController", ({ it, assert, beforeEach, stub }) => {
 	const apiNodeRepository = { getApiNodes: () => [] };
 
-	const makeApiNode = (url: string, latency?: number, statusCode = 200): Contracts.P2P.ApiNode => ({
+	const makeApiNode = (
+		url: string,
+		latency?: number,
+		statusCode = 200,
+		remoteAddress = "1.2.3.4",
+	): Contracts.P2P.ApiNode => ({
 		latency,
+		remoteAddress,
 		statusCode,
 		url,
 	});
@@ -52,6 +58,23 @@ describe<{
 				{ url: "http://5.2.3.4:4003/" },
 				{ url: "http://1.2.3.4:4003/" },
 			],
+		});
+	});
+
+	it("should not advertise an api node that was verified over a non-public address", async ({ controller }) => {
+		stub(apiNodeRepository, "getApiNodes").returnValue([
+			makeApiNode("http://mainsail-api:4003/", 10, 200, "172.18.0.5"),
+			makeApiNode("http://localtest.me:4003/", 20, 200, "127.0.0.1"),
+			makeApiNode("http://[2606:4700::1111]:4003/", 25, 200, "::ffff:10.0.0.5"),
+			{ ...makeApiNode("http://unverified.example:4003/", 30), remoteAddress: undefined },
+			makeApiNode("https://api.example.com/api", 40, 200, "2606:4700::1111"),
+			makeApiNode("http://5.6.7.8:4003/", 50, 200, "5.6.7.8"),
+		]);
+
+		const response = await controller.handle({ info: { remoteAddress: "187.55.33.22" }, payload: {} }, {});
+
+		assert.equal(response, {
+			apiNodes: [{ url: "https://api.example.com/api" }, { url: "http://5.6.7.8:4003/" }],
 		});
 	});
 

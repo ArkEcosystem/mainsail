@@ -5,7 +5,7 @@ import esmock from "esmock";
 
 import { ApiNodeVerifier } from "./api-node-verifier";
 
-let httpGet: (url: string, options: unknown) => Promise<unknown>;
+let httpGet: (url: string, options: any) => Promise<unknown>;
 
 const { ApiNodeVerifier: ApiNodeVerifierProxy } = await esmock(
 	"./api-node-verifier",
@@ -23,7 +23,14 @@ describe<{
 	const apiNode = () => ({ url: "http://1.2.3.4:4003/" }) as any;
 
 	const respond = (statusCode: number, data: unknown, headers: string[]) => {
-		httpGet = async () => ({ data, headers, method: "GET", statusCode, statusMessage: "" });
+		httpGet = async () => ({
+			data,
+			headers,
+			method: "GET",
+			remoteAddress: "1.2.3.4",
+			statusCode,
+			statusMessage: "",
+		});
 	};
 
 	beforeEach((context) => {
@@ -46,6 +53,54 @@ describe<{
 		assert.true(await verifier.verify(node));
 		assert.equal(node.statusCode, 200);
 		assert.defined(node.lastPinged);
+	});
+
+	it("#verify - should record the address the check connected to", async ({ verifier }) => {
+		const node = apiNode();
+
+		await verifier.verify(node);
+
+		assert.equal(node.remoteAddress, "1.2.3.4");
+	});
+
+	it("#verify - should resolve a peer-sourced host name through the public-address guard on a fresh connection", async ({
+		verifier,
+	}) => {
+		let options: any;
+		const respondWith = httpGet;
+		httpGet = async (url, options_) => {
+			options = options_;
+			return respondWith(url, options_);
+		};
+
+		assert.true(await verifier.verify(apiNode()));
+		assert.function(options.lookup);
+		assert.false(options.agent);
+	});
+
+	it("#verify - should not guard the resolved address of a configured node", async ({ verifier }) => {
+		let options: any;
+		const respondWith = httpGet;
+		httpGet = async (url, options_) => {
+			options = options_;
+			return respondWith(url, options_);
+		};
+
+		assert.true(await verifier.verify(apiNode(), { seed: true }));
+		assert.undefined(options.lookup);
+	});
+
+	it("#verify - should reject a node whose host name resolves to a non-public address", async ({
+		verifier,
+		logger,
+	}) => {
+		const debugExtra = spy(logger, "debugExtra");
+		httpGet = async () => {
+			throw new Error("localtest.me resolves to the non-public address 127.0.0.1");
+		};
+
+		assert.false(await verifier.verify({ url: "http://localtest.me:4003/" } as any));
+		debugExtra.calledWith(match("resolves to the non-public address 127.0.0.1"), "p2p");
 	});
 
 	it("#verify - should match the content-length header regardless of its case", async ({ verifier }) => {

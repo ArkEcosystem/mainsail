@@ -6,6 +6,7 @@ export interface ApiNode {
 	statusCode?: number;
 	latency?: number;
 	lastPinged?: Dayjs;
+	remoteAddress?: string;
 
 	// future proof
 	height?: number;
