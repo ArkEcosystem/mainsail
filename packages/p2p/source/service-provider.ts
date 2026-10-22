@@ -6,11 +6,11 @@ import { Providers } from "@mainsail/kernel";
 import { assert } from "@mainsail/utils";
 import Joi from "joi";
 
-import { ApiNodeDiscoverer } from "./api-node-discoverer.js";
-import { ApiNodeProcessor } from "./api-node-processor.js";
-import { ApiNodeRepository } from "./api-node-repository.js";
-import { ApiNodeVerifier } from "./api-node-verifier.js";
-import { ApiNode } from "./api-node.js";
+import { ApiNodeDiscoverer } from "./api-node/api-node-discoverer.js";
+import { ApiNodeProcessor } from "./api-node/api-node-processor.js";
+import { ApiNodeRepository } from "./api-node/api-node-repository.js";
+import { ApiNodeVerifier } from "./api-node/api-node-verifier.js";
+import { ApiNode } from "./api-node/api-node.js";
 import { Broadcaster } from "./broadcaster.js";
 import { BlockDownloader } from "./downloader/block-downloader.js";
 import { MessageDownloader } from "./downloader/message-downloader.js";
@@ -71,7 +71,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
-			apiNodes: Joi.array().items(Joi.string()).default([]),
+			apiNodes: Joi.array()
+				.items(Joi.string().uri({ scheme: ["http", "https"] }))
+				.default([]),
 			apiNodesMaxContentLength: Joi.number().integer().min(0).required(),
 			blacklist: Joi.array().items(Joi.string()).required(),
 			developmentMode: Joi.object({

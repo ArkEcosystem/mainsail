@@ -5,34 +5,17 @@ export const getApiNodes = {
 	properties: {
 		apiNodes: {
 			items: {
+				additionalProperties: false,
 				properties: {
-					ip: {
-						anyOf: [
-							{
-								format: "ipv4",
-								type: "string",
-							},
-							{
-								format: "ipv6",
-								type: "string",
-							},
-						],
-					},
-					port: {
-						maximum: 65_535,
-						minimum: 0,
-						type: "integer",
-					},
-					protocol: {
-						maximum: 1,
-						minimum: 0,
-						type: "integer",
+					url: {
+						maxLength: constants.MAX_API_NODE_URL_LENGTH,
+						type: "string",
 					},
 				},
-				required: ["ip", "port", "protocol"],
+				required: ["url"],
 				type: "object",
 			},
-			maxItems: constants.MAX_PEERS_GET_PEERS,
+			maxItems: constants.MAX_PEERS_GET_API_NODES,
 			type: "array",
 		},
 		headers,

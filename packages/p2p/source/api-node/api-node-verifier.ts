@@ -5,6 +5,8 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { ensureError, http, HttpResponse } from "@mainsail/utils";
 import dayjs from "dayjs";
 
+import { publicLookup } from "../validation/index.js";
+
 // The default API server "/" response
 const helloWorld = { data: "Hello World from Public API!" };
 const helloWorldLength = JSON.stringify(helloWorld).length;
@@ -18,7 +20,10 @@ export class ApiNodeVerifier implements Contracts.P2P.ApiNodeVerifier {
 	@tagged("plugin", "p2p")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
-	public async verify(apiNode: Contracts.P2P.ApiNode): Promise<boolean> {
+	public async verify(
+		apiNode: Contracts.P2P.ApiNode,
+		options: Contracts.P2P.AcceptNewApiNodeOptions = {},
+	): Promise<boolean> {
 		try {
 			const apiNodesMaxContentLength = this.configuration.getRequired<number>("apiNodesMaxContentLength");
 
@@ -26,7 +31,13 @@ export class ApiNodeVerifier implements Contracts.P2P.ApiNodeVerifier {
 			apiNode.lastPinged = t0;
 
 			const response = await http.get<{ data: string }>(apiNode.url, {
+				// A fresh connection per check, so the lookup below runs every time instead of a kept-alive socket
+				// being reused. Checks are minutes apart, keep-alive buys nothing here.
+				agent: false,
 				headers: {},
+				// A peer-sourced host name must resolve to a public address, otherwise a peer could point this node
+				// at its own API, a LAN service or a metadata endpoint. Configured nodes are the operator's choice.
+				lookup: options.seed ? undefined : publicLookup,
 				maxContentLength: apiNodesMaxContentLength,
 				timeout: 5000,
 			});
@@ -35,6 +46,7 @@ export class ApiNodeVerifier implements Contracts.P2P.ApiNodeVerifier {
 
 			apiNode.statusCode = response.statusCode;
 			apiNode.latency = t1.valueOf() - t0.valueOf();
+			apiNode.remoteAddress = response.remoteAddress;
 
 			this.#verifyStatusCode(response);
 			this.#verifyHeaders(response);

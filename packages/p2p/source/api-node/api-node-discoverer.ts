@@ -5,7 +5,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { ensureError, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
-import { normalizeUrl } from "./utils/index.js";
+import { isPublicHttpUrl } from "../validation/index.js";
 
 @injectable()
 export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
@@ -35,7 +35,20 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 		try {
 			const { apiNodes } = await this.communicator.getApiNodes(peer);
 
-			for (const apiNode of apiNodes) {
+			for (const { url } of apiNodes) {
+				let apiNode: Contracts.P2P.ApiNode;
+				try {
+					apiNode = this.ApiNodeFactory(url);
+				} catch {
+					this.logger.debug(`Ignoring invalid API node url ${url} from ${peer.ip}`, "p2p");
+					continue;
+				}
+
+				if (!isPublicHttpUrl(apiNode.url)) {
+					this.logger.debug(`Ignoring non-public API node url ${url} from ${peer.ip}`, "p2p");
+					continue;
+				}
+
 				await this.apiNodeProcessor.validateAndAcceptApiNode(apiNode, {});
 			}
 		} catch (rawError) {
@@ -45,15 +58,17 @@ export class ApiNodeDiscoverer implements Contracts.P2P.ApiNodeDiscoverer {
 	}
 
 	async populateApiNodesFromConfiguration(): Promise<void> {
-		const apiNodes = this.configuration.getOptional<string[]>("apiNodes", []).map((url) => {
-			const normalizedUrl = normalizeUrl(url);
-			return this.ApiNodeFactory(normalizedUrl);
-		});
+		const apiNodes: Contracts.P2P.ApiNode[] = [];
+		for (const url of this.configuration.getOptional<string[]>("apiNodes", [])) {
+			try {
+				apiNodes.push(this.ApiNodeFactory(url));
+			} catch (rawError) {
+				this.logger.warn(`Skipping configured API node: ${ensureError(rawError).message}`, "p2p");
+			}
+		}
 
 		await Promise.all(
-			Object.values(apiNodes).map((apiNode: Contracts.P2P.ApiNode) =>
-				this.apiNodeProcessor.validateAndAcceptApiNode(apiNode, { seed: true }),
-			),
+			apiNodes.map((apiNode) => this.apiNodeProcessor.validateAndAcceptApiNode(apiNode, { seed: true })),
 		);
 	}
 

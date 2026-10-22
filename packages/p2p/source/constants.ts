@@ -6,6 +6,8 @@ export const constants = {
 	// cut-loose timeout for a fast peer cleanse. slow verifications continue in the background
 	FAST_VERIFY_TIMEOUT: 1500,
 
+	MAX_API_NODE_URL_LENGTH: 2048,
+
 	MAX_DOWNLOAD_BLOCKS: 400, // maximum number of blocks we can download at once
 	MAX_DOWNLOAD_BLOCKS_JOBS: 10, // maximum number of blocks jobs
 

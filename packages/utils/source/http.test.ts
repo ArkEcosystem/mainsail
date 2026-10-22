@@ -100,6 +100,26 @@ describe("HTTP", ({ it, assert, beforeAll, afterAll, each }) => {
 		assert.equal(statusCode, 200);
 	});
 
+	it("#get - should report the address the connection was made to", async () => {
+		const { remoteAddress } = await http.get(`${serverURL}/get`, { agent: false });
+
+		assert.true(["127.0.0.1", "::1", "::ffff:127.0.0.1"].includes(remoteAddress!), remoteAddress);
+	});
+
+	it("#get - should use the given agent and lookup instead of the global agent", async () => {
+		const lookups: string[] = [];
+		const lookup = (hostname: string, _: unknown, callback: (error: Error) => void) => {
+			lookups.push(hostname);
+			callback(new Error("lookup refused"));
+		};
+
+		await assert.rejects(
+			() => http.get(`${serverURL}/get`, { agent: false, lookup: lookup as any }),
+			"lookup refused",
+		);
+		assert.equal(lookups, ["localhost"]);
+	});
+
 	it("#get - should connect to an IPv6 literal", async () => {
 		// URL.hostname keeps the brackets of an IPv6 literal; passing them on would resolve "[::1]" as a name.
 		const ipv6Server = Hapi.server({ host: "::1", port: 0 });
