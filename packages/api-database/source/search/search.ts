@@ -135,3 +135,41 @@ export const handleComparisonCriteria = async <TEntity, TProperty extends keyof 
 
 	return { jsonFieldAccessor, op: "equal", property, value: criteria };
 };
+
+export const groupEqualities = <TEntity>(expression: Expression<TEntity>): Expression<TEntity> => {
+	if (expression.op === "and") {
+		return { expressions: expression.expressions.map((e) => groupEqualities(e)), op: "and" };
+	}
+
+	if (expression.op !== "or") {
+		return expression;
+	}
+
+	const equalities = new Map<keyof TEntity, unknown[]>();
+	const recipients: string[] = [];
+	const others: Expression<TEntity>[] = [];
+
+	for (const e of expression.expressions.map((e) => groupEqualities(e))) {
+		if (e.op === "equal" && !e.jsonFieldAccessor) {
+			const values = equalities.get(e.property) ?? [];
+			values.push(e.value);
+			equalities.set(e.property, values);
+		} else if (e.op === "multiPayment") {
+			recipients.push(...e.value);
+		} else {
+			others.push(e);
+		}
+	}
+
+	const expressions: Expression<TEntity>[] = [...equalities].map(([property, values]) =>
+		values.length === 1 ? { op: "equal", property, value: values[0] } : { op: "in", property, values },
+	);
+
+	if (recipients.length > 0) {
+		expressions.push({ op: "multiPayment", value: recipients });
+	}
+
+	expressions.push(...others);
+
+	return expressions.length === 1 ? expressions[0] : { expressions, op: "or" };
+};

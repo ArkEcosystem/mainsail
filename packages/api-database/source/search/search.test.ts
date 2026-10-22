@@ -2,6 +2,7 @@ import { describe } from "@mainsail/test-runner";
 
 import {
 	everyOrCriteria,
+	groupEqualities,
 	handleAndCriteria,
 	handleComparisonCriteria,
 	handleOrCriteria,
@@ -297,5 +298,84 @@ describe("handleComparisonCriteria", ({ it, assert }) => {
 		const accessor = { attribute: "x", cast: "text" } as any;
 		const result = await handleComparisonCriteria("amount" as any, { from: 1, to: 2 } as any, accessor);
 		assert.is((result as any).jsonFieldAccessor, accessor);
+	});
+});
+
+describe("groupEqualities", ({ it, assert }) => {
+	it("should turn the equalities of an or into one IN per column", () => {
+		const expression = {
+			expressions: [
+				{ op: "equal", property: "from", value: "a" },
+				{ op: "equal", property: "to", value: "a" },
+				{ op: "equal", property: "from", value: "b" },
+				{ op: "equal", property: "to", value: "b" },
+				{ op: "equal", property: "nonce", value: 1 },
+			],
+			op: "or",
+		} as any;
+
+		assert.equal(groupEqualities(expression), {
+			expressions: [
+				{ op: "in", property: "from", values: ["a", "b"] },
+				{ op: "in", property: "to", values: ["a", "b"] },
+				{ op: "equal", property: "nonce", value: 1 },
+			],
+			op: "or",
+		});
+	});
+
+	it("should merge multipayment recipients and keep other expressions", () => {
+		const expression = {
+			expressions: [
+				{ op: "multiPayment", value: ["a"] },
+				{
+					jsonFieldAccessor: { fieldName: "x", operator: "->>" },
+					op: "equal",
+					property: "attributes",
+					value: 1,
+				},
+				{ op: "multiPayment", value: ["b"] },
+				{ op: "greaterThanEqual", property: "nonce", value: 3 },
+			],
+			op: "or",
+		} as any;
+
+		assert.equal(groupEqualities(expression), {
+			expressions: [
+				{ op: "multiPayment", value: ["a", "b"] },
+				{
+					jsonFieldAccessor: { fieldName: "x", operator: "->>" },
+					op: "equal",
+					property: "attributes",
+					value: 1,
+				},
+				{ op: "greaterThanEqual", property: "nonce", value: 3 },
+			],
+			op: "or",
+		});
+	});
+
+	it("should group inside and, and unwrap an or left with one expression", () => {
+		const expression = {
+			expressions: [
+				{ op: "equal", property: "hash", value: "h" },
+				{
+					expressions: [
+						{ op: "equal", property: "from", value: "a" },
+						{ op: "equal", property: "from", value: "b" },
+					],
+					op: "or",
+				},
+			],
+			op: "and",
+		} as any;
+
+		assert.equal(groupEqualities(expression), {
+			expressions: [
+				{ op: "equal", property: "hash", value: "h" },
+				{ op: "in", property: "from", values: ["a", "b"] },
+			],
+			op: "and",
+		});
 	});
 });

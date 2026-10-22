@@ -227,10 +227,17 @@ describe<{
 		);
 	});
 
-	it("op multiPayment -> ARRAY citext with comma-joined value", ({ helper, metadata }) => {
+	it("op multiPayment -> overlap with a citext array of the recipients", ({ helper, metadata }) => {
 		assert.equal(helper.getWhereExpressionSql(metadata, { op: "multiPayment", value: ["a", "b"] } as any), {
-			parameters: { p1: "a,b" },
-			query: "multi_payment_recipients @> ARRAY[:p1]::citext[]",
+			parameters: { p1: ["a", "b"] },
+			query: "multi_payment_recipients && ARRAY[:...p1]::citext[]",
+		});
+	});
+
+	it("op in -> column IN expanded parameters, quoting reserved names", ({ helper, metadata }) => {
+		assert.equal(helper.getWhereExpressionSql(metadata, { op: "in", property: "to", values: ["a", "b"] } as any), {
+			parameters: { p1: ["a", "b"] },
+			query: '"to" IN (:...p1)',
 		});
 	});
 

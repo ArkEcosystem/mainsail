@@ -164,9 +164,16 @@ export class QueryHelper<TEntity> {
 			}
 			case "multiPayment": {
 				const parameter = `p${this.paramNo++}`;
-				const query = `multi_payment_recipients @> ARRAY[:${parameter}]::citext[]`;
-
-				const parameters = { [parameter]: expression.value.join(",") };
+				const query = `multi_payment_recipients && ARRAY[:...${parameter}]::citext[]`;
+				const parameters = { [parameter]: expression.value };
+				return { parameters, query };
+			}
+			case "in": {
+				// one parameter per value, so each is typed from the column and its index stays usable
+				const column = this.getColumnName(metadata, expression.property);
+				const parameter = `p${this.paramNo++}`;
+				const query = `${column.name} IN (:...${parameter})`;
+				const parameters = { [parameter]: expression.values };
 				return { parameters, query };
 			}
 			default: {
