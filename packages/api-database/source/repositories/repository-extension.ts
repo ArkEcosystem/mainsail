@@ -11,7 +11,7 @@ import type {
 import type { Expression } from "../search/types/expressions.js";
 import type { Expressions, Options, Pagination, ResultsPage, Sorting } from "../search/types/index.js";
 
-import { QueryHelper } from "../search/index.js";
+import { groupEqualities, QueryHelper } from "../search/index.js";
 
 const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExtension<TEntity> &
 	ThisRepositoryExtension<TEntity> => ({
@@ -44,7 +44,7 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 	},
 
 	addWhere(queryBuilder: SelectQueryBuilder<TEntity>, expression: Expressions.Expression<TEntity>): void {
-		const sqlExpression = this.queryHelper.getWhereExpressionSql(this.metadata, expression);
+		const sqlExpression = this.queryHelper.getWhereExpressionSql(this.metadata, groupEqualities(expression));
 		queryBuilder.where(sqlExpression.query, sqlExpression.parameters);
 	},
 

@@ -79,6 +79,14 @@ export class QueryHelper<TEntity> {
 				const parameter = `p${this.paramNo++}`;
 				const query = `${column.name} = :${parameter}`;
 				const parameters = { [parameter]: expression.value };
+
+				if (expression.jsonFieldAccessor) {
+					return this.withJsonContainment(metadata, expression.property, expression.jsonFieldAccessor, {
+						parameters,
+						query,
+					});
+				}
+
 				return { parameters, query };
 			}
 			case "notEqual": {
@@ -127,20 +135,20 @@ export class QueryHelper<TEntity> {
 			case "and": {
 				const built = expression.expressions.map((e) => this.getWhereExpressionSql(metadata, e));
 				const query = `(${built.map((b) => b.query).join(" AND ")})`;
-				let parameters = {};
+				const parameters = {};
 
 				for (const b of built) {
-					parameters = Object.assign({}, parameters, b.parameters);
+					Object.assign(parameters, b.parameters);
 				}
 				return { parameters, query };
 			}
 			case "or": {
 				const built = expression.expressions.map((e) => this.getWhereExpressionSql(metadata, e));
 				const query = `(${built.map((b) => b.query).join(" OR ")})`;
-				let parameters = {};
+				const parameters = {};
 
 				for (const b of built) {
-					parameters = Object.assign({}, parameters, b.parameters);
+					Object.assign(parameters, b.parameters);
 				}
 				return { parameters, query };
 			}
@@ -164,14 +172,55 @@ export class QueryHelper<TEntity> {
 			}
 			case "multiPayment": {
 				const parameter = `p${this.paramNo++}`;
-				const query = `multi_payment_recipients @> ARRAY[:${parameter}]::citext[]`;
-
-				const parameters = { [parameter]: expression.value.join(",") };
+				const query = `multi_payment_recipients && ARRAY[:...${parameter}]::citext[]`;
+				const parameters = { [parameter]: expression.value };
+				return { parameters, query };
+			}
+			case "in": {
+				// one parameter per value, so each is typed from the column and its index stays usable
+				const column = this.getColumnName(metadata, expression.property);
+				const parameter = `p${this.paramNo++}`;
+				const query = `${column.name} IN (:...${parameter})`;
+				const parameters = { [parameter]: expression.values };
 				return { parameters, query };
 			}
 			default: {
 				throw new Error(`Unexpected expression`);
 			}
 		}
+	}
+
+	// Containment lets the GIN index narrow the rows down, the equality still decides. The field may hold the value as
+	// a string, number or boolean.
+	private withJsonContainment(
+		metadata: EntityMetadata,
+		property: keyof TEntity,
+		{ fieldName }: JsonFieldAccessor,
+		equality: SqlExpression,
+	): SqlExpression {
+		const column = this.getColumnName(metadata, property);
+		const value = String(Object.values(equality.parameters)[0]);
+
+		const scalars = new Set([JSON.stringify(value)]);
+		if (/^-?\d+$/.test(value)) {
+			const integer = BigInt(value).toString();
+			scalars.add(integer).add(JSON.stringify(integer));
+		} else if (/^(-?\d+\.\d+|true|false)$/.test(value)) {
+			scalars.add(value);
+		}
+
+		const parameters = { ...equality.parameters };
+		const containments = [...scalars].map((scalar) => {
+			let json = scalar;
+			for (const key of fieldName.split(".").toReversed()) {
+				json = `{${JSON.stringify(key)}:${json}}`;
+			}
+
+			const parameter = `p${this.paramNo++}`;
+			parameters[parameter] = json;
+			return `${column.name} @> CAST(:${parameter} AS jsonb)`;
+		});
+
+		return { parameters, query: `(${containments.join(" OR ")}) AND ${equality.query}` };
 	}
 }

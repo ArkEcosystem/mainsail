@@ -6,7 +6,6 @@ import {
 	Identifiers as ApiDatabaseIdentifiers,
 	Models,
 	Search,
-	TypeOrm,
 } from "@mainsail/api-database";
 import { inject, injectable } from "@mainsail/container";
 import { FunctionSigs } from "@mainsail/evm-contracts";
@@ -49,6 +48,46 @@ type WalletActivityRaw = {
 	tokenDecimals?: number;
 };
 
+const toList = (value: unknown): string[] => ([value ?? []].flat() as string[]).map((v) => v.trim()).filter(Boolean);
+
+// what the addresses sent is read by their from-branches only, so the branches never overlap
+const notSentByAddresses = (alias: string, direction: "from" | "to") =>
+	direction === "to" ? `AND ${alias}."from" <> ALL($1::citext[])` : "";
+
+const transactionBranch = (direction: "from" | "to", depth: number) => `
+	SELECT x.* FROM addresses CROSS JOIN LATERAL (
+		SELECT t.hash, t.block_number, t.transaction_index FROM transactions t
+		WHERE t."${direction}" = addresses.address ${notSentByAddresses("t", direction)}
+		ORDER BY t.timestamp DESC, t.transaction_index DESC LIMIT ${depth}
+	) x`;
+
+// only the parameters a filter refers to are passed, as Postgres cannot type unused ones
+const getActivityTokenFilter = (
+	request: Types.HapiRequest,
+): { condition: string; parameters: string[][]; tokens: string } => {
+	const whitelist = toList(request.query.whitelist);
+	const blacklist = toList(request.query.blacklist);
+	const isToken = "AND EXISTS (SELECT 1 FROM tokens WHERE tokens.address = ta.address)";
+
+	if (request.query.ignoreWhitelist) {
+		return { condition: isToken, parameters: [], tokens: "" };
+	}
+
+	if (whitelist.length === 0 && blacklist.length > 0) {
+		return { condition: `${isToken} AND ta.address <> ALL($2::citext[])`, parameters: [blacklist], tokens: "" };
+	}
+
+	return {
+		condition: "AND ta.address = listed.address",
+		parameters: [whitelist, blacklist],
+		tokens: `CROSS JOIN (
+			SELECT address FROM tokens
+			WHERE address IN (SELECT address FROM token_whitelist UNION SELECT unnest($2::citext[]))
+				AND address <> ALL($3::citext[])
+		) listed`,
+	};
+};
+
 @injectable()
 export class WalletsController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TransactionRepositoryFactory)
@@ -56,9 +95,6 @@ export class WalletsController extends Controller {
 
 	@inject(ApiDatabaseIdentifiers.TokenRepositoryFactory)
 	private readonly tokenRepositoryFactory!: ApiDatabaseContracts.TokenRepositoryFactory;
-
-	@inject(ApiDatabaseIdentifiers.TokenActionRepositoryFactory)
-	private readonly tokenActionRepositoryFactory!: ApiDatabaseContracts.TokenActionRepositoryFactory;
 
 	@inject(ApiDatabaseIdentifiers.TokenHolderRepositoryFactory)
 	private readonly tokenHolderRepositoryFactory!: ApiDatabaseContracts.TokenHolderRepositoryFactory;
@@ -289,120 +325,61 @@ export class WalletsController extends Controller {
 			return this.getEmptyPage();
 		}
 
-		// Transactions
-		const transactionsQuery = this.transactionRepositoryFactory()
-			.createQueryBuilder("t")
-			.leftJoin(Models.Token, "tok", `tok.address = t."to"`);
-
-		transactionsQuery.andWhere(
-			new TypeOrm.Brackets((b) => {
-				b.where("t.from IN (:...addresses)", { addresses }).orWhere("t.to IN (:...addresses)", {
-					addresses,
-				});
-			}),
-		);
-
-		const queryTransactions = transactionsQuery
-			.clone()
-			.select([
-				't."hash" AS "transactionHash"',
-				't."timestamp" AS "timestamp"',
-				't."block_number" AS "blockNumber"',
-				't."transaction_index" AS "transactionIndex"',
-				'NULL AS "index"',
-				't."from" AS "from"',
-				't."to" AS "to"',
-				't."value" AS "value"',
-				'NULL AS "action"',
-				'SUBSTRING(t."data" FROM 1 FOR 4) AS "functionSig"',
-
-				'tok."address" AS "tokenAddress"',
-				'tok."name" AS "tokenName"',
-				'tok."symbol" AS "tokenSymbol"',
-				'tok."decimals" AS "tokenDecimals"',
-			])
-			.orderBy("t.block_number", "DESC")
-			.addOrderBy("t.transaction_index", "DESC");
-
-		// Actions
-		const tokenActionsQuery = this.tokenActionRepositoryFactory()
-			.createQueryBuilder("ta")
-			.innerJoin(Models.Token, "tok", "tok.address = ta.address");
-
-		TokensController.andWhereWhitelisted(tokenActionsQuery, request);
-
-		tokenActionsQuery.andWhere(
-			new TypeOrm.Brackets((b) => {
-				b.where("ta.from IN (:...addresses)", { addresses }).orWhere("ta.to IN (:...addresses)", {
-					addresses,
-				});
-			}),
-		);
-
-		const queryTokenActions = tokenActionsQuery
-			.clone()
-			.select([
-				'ta."transaction_hash" AS "transactionHash"',
-				't."timestamp" AS "timestamp"',
-				't."block_number" AS "blockNumber"',
-				't."transaction_index" AS "transactionIndex"',
-				'ta."index" AS "index"',
-				'ta."from" AS "from"',
-				'ta."to" AS "to"',
-				'ta."value" AS "value"',
-				'ta."action" AS "action"',
-				'SUBSTRING(t."data" FROM 1 FOR 4) AS "functionSig"',
-
-				'tok."address" AS "tokenAddress"',
-				'tok."name" AS "tokenName"',
-				'tok."symbol" AS "tokenSymbol"',
-				'tok."decimals" AS "tokenDecimals"',
-			])
-			.innerJoin(Models.Transaction, "t", "t.hash = ta.transaction_hash")
-			.orderBy("ta.block_number", "DESC")
-			.addOrderBy("t.transaction_index", "DESC")
-			.addOrderBy("ta.index", "DESC", "NULLS LAST");
-
-		const parameters = {
-			...queryTransactions.getParameters(),
-			...queryTokenActions.getParameters(),
-		};
-
-		const unionCte = `(${queryTransactions.getQuery()})
-						UNION ALL
-					(${queryTokenActions.getQuery()})
-				`;
+		const depth = pagination.offset + pagination.limit;
+		const { parameters, sql } = this.getActivityQuery(request, addresses);
 
 		const [walletActivityRows, totalCountRow] = await Promise.all([
-			this.dataSource
-				.createQueryBuilder()
-				.addCommonTableExpression(unionCte, "unioned")
-				.select("u.*")
-				.from("unioned", "u")
-				.limit(pagination.limit)
-				.offset(pagination.offset)
-				.addOrderBy(`"blockNumber"`, "DESC")
-				.addOrderBy(`"transactionIndex"`, "DESC")
-				.addOrderBy(`"index"`, "DESC", "NULLS LAST")
-				.setParameters({
-					...parameters,
-				})
-				.getRawMany<WalletActivityRaw>(),
-			this.dataSource
-				.createQueryBuilder()
-				.addCommonTableExpression(unionCte, "unioned")
-				.select("COUNT(1)")
-				.from("unioned", "u")
-				.setParameters({
-					...parameters,
-				})
-				.getRawOne(),
+			this.dataSource.query<WalletActivityRaw[]>(
+				`${sql(depth)},
+				page_token_actions AS (
+					-- the whole last block is kept, as its actions are ordered by transaction index only after the join
+					SELECT
+						ta.transaction_hash, ta.block_number, t.transaction_index, ta.index, ta.address, ta.action,
+						ta."from", ta."to", ta.value
+					FROM token_action_keys ta JOIN transactions t ON t.hash = ta.transaction_hash
+					WHERE ta.block_number >= COALESCE(
+						(SELECT block_number FROM token_action_keys ORDER BY block_number DESC OFFSET ${depth - 1} LIMIT 1),
+						0
+					)
+				),
+				page AS (
+					SELECT
+						hash AS transaction_hash, block_number, transaction_index, NULL::smallint AS "index",
+						NULL::citext AS address, NULL::token_action_enum AS action, NULL::citext AS "from",
+						NULL::citext AS "to", NULL::numeric AS value
+					FROM transaction_keys
+					UNION ALL
+					SELECT * FROM page_token_actions
+					ORDER BY block_number DESC, transaction_index DESC, "index" DESC NULLS LAST
+					LIMIT ${pagination.limit} OFFSET ${pagination.offset}
+				)
+				-- sender, recipient and value of a token action are never null
+				SELECT
+					page.transaction_hash AS "transactionHash", t.timestamp AS "timestamp",
+					page.block_number AS "blockNumber", page.transaction_index AS "transactionIndex",
+					page.index AS "index", COALESCE(page."from", t."from") AS "from", COALESCE(page."to", t."to") AS "to",
+					COALESCE(page.value, t.value) AS "value", page.action AS "action",
+					SUBSTRING(t.data FROM 1 FOR 4) AS "functionSig", tok.address AS "tokenAddress",
+					tok.name AS "tokenName", tok.symbol AS "tokenSymbol", tok.decimals AS "tokenDecimals"
+				FROM page
+				JOIN transactions t ON t.hash = page.transaction_hash
+				LEFT JOIN tokens tok ON tok.address = COALESCE(page.address, t."to")
+				ORDER BY page.block_number DESC, page.transaction_index DESC, page.index DESC NULLS LAST`,
+				parameters,
+			),
+			this.dataSource.query<{ count: string }[]>(
+				`${sql(10_001)}
+				SELECT COUNT(*) AS count FROM (
+					SELECT hash FROM transaction_keys UNION ALL SELECT transaction_hash FROM token_action_keys LIMIT 10001
+				) activity`,
+				parameters,
+			),
 		]);
 
-		const totalCount = Number(totalCountRow?.count ?? 0);
+		const totalCount = Number(totalCountRow[0]?.count ?? 0);
 		return this.toPagination(
 			{
-				meta: { totalCountIsEstimate: false },
+				meta: { totalCountIsEstimate: totalCount > 10_000 },
 				results: walletActivityRows.map((row) => ({
 					/* eslint-disable perfectionist/sort-objects */
 					blockNumber: row.blockNumber,
@@ -429,6 +406,31 @@ export class WalletsController extends Controller {
 			},
 			WalletResource,
 		);
+	}
+
+	private getActivityQuery(
+		request: Types.HapiRequest,
+		addresses: string[],
+	): { parameters: unknown[]; sql: (depth: number) => string } {
+		const { condition, parameters, tokens } = getActivityTokenFilter(request);
+
+		const tokenActionBranch = (direction: "from" | "to", depth: number) => `
+			SELECT x.* FROM addresses ${tokens} CROSS JOIN unnest(enum_range(NULL::token_action_enum)) actions(action)
+			CROSS JOIN LATERAL (
+				SELECT ta.transaction_hash, ta.address, ta.action, ta.block_number, ta.index, ta."from", ta."to", ta.value
+				FROM token_actions ta
+				WHERE ta.action = actions.action ${condition}
+					AND ta."${direction}" = addresses.address ${notSentByAddresses("ta", direction)}
+				ORDER BY ta.block_number DESC, ta.index DESC LIMIT ${depth}
+			) x`;
+
+		return {
+			parameters: [addresses, ...parameters],
+			sql: (depth: number) => `
+				WITH addresses AS (SELECT DISTINCT unnest($1::citext[]) AS address),
+				transaction_keys AS (${transactionBranch("from", depth)} UNION ALL ${transactionBranch("to", depth)}),
+				token_action_keys AS (${tokenActionBranch("from", depth)} UNION ALL ${tokenActionBranch("to", depth)})`,
+		};
 	}
 
 	private async getTransactions(request: Types.HapiRequest, criteria: Search.Criteria.TransactionCriteria) {

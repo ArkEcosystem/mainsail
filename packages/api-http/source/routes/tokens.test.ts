@@ -130,7 +130,7 @@ describe<{
 		await server.inject({ method: "GET", url: `/api/tokens/transfers?blacklist=${ADDRESS_A}` });
 
 		const blacklisted = (repos.tokenAction.qb.calls.andWhere ?? []).find(
-			([condition]) => condition === "tok.address NOT IN (:...customBlacklist)",
+			([condition]) => condition === "tf.address NOT IN (:...customBlacklist)",
 		);
 		assert.defined(blacklisted);
 		assert.equal(blacklisted![1], { customBlacklist: [ADDRESS_A] });
@@ -160,10 +160,8 @@ describe<{
 
 	it("GET /api/tokens/{address}/holders - lists the holders of the token", async ({ server, repos }) => {
 		repos.token.data.one = makeToken();
-		repos.tokenHolder.data.manyAndCount = [
-			[{ address: ADDRESS_A, balance: "12000000", tokenAddress: TOKEN_ADDRESS }],
-			1,
-		];
+		repos.tokenHolder.data.many = [{ address: ADDRESS_A, balance: "12000000", tokenAddress: TOKEN_ADDRESS }];
+		repos.dataSource.data.rawOne = { cnt: "1" };
 
 		const response = await server.inject({ method: "GET", url: `/api/tokens/${TOKEN_ADDRESS}/holders?limit=10` });
 
@@ -176,7 +174,7 @@ describe<{
 		// The holder listing is ordered and windowed by the query pagination.
 		assert.equal(repos.tokenHolder.qb.calls.orderBy, [["balance", "DESC"]]);
 		assert.equal(repos.tokenHolder.qb.calls.offset, [[0]]);
-		assert.equal(repos.tokenHolder.qb.calls.limit, [[10]]);
+		assert.equal(repos.tokenHolder.qb.calls.limit, [[10], [10_001]]);
 	});
 
 	it("GET /api/tokens/{address}/holders - responds 404 for an unknown token", async ({ server }) => {
@@ -186,8 +184,8 @@ describe<{
 	});
 
 	it("GET /api/tokens/transfers - lists transfer actions with token metadata", async ({ server, repos }) => {
-		repos.tokenAction.data.rawMany = [makeTransferRow()];
-		repos.tokenAction.data.rawOne = { cnt: "1" };
+		repos.dataSource.data.rawMany = [makeTransferRow()];
+		repos.dataSource.data.rawOne = { cnt: "1" };
 
 		const response = await server.inject({ method: "GET", url: "/api/tokens/transfers" });
 
@@ -285,8 +283,8 @@ describe<{
 
 	it("GET /api/tokens/{address}/transfers - scopes the actions to the token", async ({ server, repos }) => {
 		repos.token.data.one = makeToken();
-		repos.tokenAction.data.rawMany = [makeTransferRow()];
-		repos.tokenAction.data.rawOne = { cnt: "1" };
+		repos.dataSource.data.rawMany = [makeTransferRow()];
+		repos.dataSource.data.rawOne = { cnt: "1" };
 
 		const response = await server.inject({ method: "GET", url: `/api/tokens/${TOKEN_ADDRESS}/transfers` });
 

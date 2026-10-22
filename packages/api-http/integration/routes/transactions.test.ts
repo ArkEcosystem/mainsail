@@ -71,6 +71,29 @@ describe<{
 		}
 	});
 
+	it("/transactions with lists of values", async () => {
+		await apiContext.transactionRepository.save(transactions);
+		await apiContext.walletRepository.save(wallets);
+
+		const [first, second] = transactionsResponse;
+		const nobody = "0x0000000000000000000000000000000000000001";
+		const testCases = [
+			{ path: `/transactions?from=${first.from},${second.from}`, result: [first, second] },
+			{ path: `/transactions?hash=${first.hash},${second.hash}`, result: [first, second] },
+			{ path: `/transactions?address=${first.from},${nobody}`, result: [first] },
+			{ path: `/transactions?address=${nobody},${nobody}`, result: [] },
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map((transaction) => transaction.hash).sort(),
+				result.map((transaction) => transaction.hash).sort(),
+			);
+		}
+	});
+
 	it("/transactions?address", async () => {
 		await apiContext.transactionRepository.save(transactions);
 		await apiContext.walletRepository.save(wallets);
@@ -92,6 +115,21 @@ describe<{
 			assert.equal(statusCode, 200);
 			assert.equal(data.data, result);
 		}
+	});
+
+	it("/transactions rejects more than 50 values for one parameter", async () => {
+		const nonces = Array.from({ length: 51 }, (_, index) => index + 1);
+
+		let statusCode;
+		try {
+			statusCode = (await request(`/transactions?nonce=${nonces.join(",")}`, options)).statusCode;
+		} catch (ex) {
+			statusCode = ex.response?.statusCode;
+		}
+		assert.equal(statusCode, 422);
+
+		({ statusCode } = await request(`/transactions?nonce=${nonces.slice(0, 50).join(",")}`, options));
+		assert.equal(statusCode, 200);
 	});
 
 	it("/transactions/{hash}", async () => {

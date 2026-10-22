@@ -162,6 +162,18 @@ describe<{ subject: Extension }>("Extension", ({ it, beforeEach, assert }) => {
 		assert.equal(newSource.meta.previous, null);
 	});
 
+	it("onPostHandler should stop the links at the configured depth", () => {
+		const subject = new Extension({ maxDepth: 20, query: { limit: { default: 100 } } });
+		const request: any = makePostRequest({ results: [{ id: 1 }], totalCount: 25 });
+
+		subject.onPostHandler(request, fakeH() as any);
+
+		const newSource = request.response.source;
+		assert.is(newSource.meta.pageCount, 2);
+		assert.equal(newSource.meta.last, "/blocks?limit=10&page=2");
+		assert.is(newSource.meta.totalCount, 25);
+	});
+
 	it("onPostHandler should link the previous page and an exact page count on later pages", ({ subject }) => {
 		const h = fakeH();
 		const results = [{ id: 11 }, { id: 12 }];

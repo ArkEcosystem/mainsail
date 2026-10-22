@@ -83,6 +83,12 @@ export type MultiPaymentExpression = {
 	value: string[];
 };
 
+export type InExpression<TEntity, TValue = unknown> = {
+	property: keyof TEntity;
+	op: "in";
+	values: TValue[];
+};
+
 export type NotNullExpression<TEntity> = {
 	property: keyof TEntity;
 	op: "notNull";
@@ -103,6 +109,7 @@ export type Expression<TEntity> =
 	| JsonbAttributeExists<TEntity>
 	| FunctionSigExpression<TEntity>
 	| MultiPaymentExpression
+	| InExpression<TEntity>
 	| NotNullExpression<TEntity>;
 
 export type JsonFieldOperator = "->>";

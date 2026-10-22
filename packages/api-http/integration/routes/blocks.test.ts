@@ -48,6 +48,19 @@ describe<{
 		assert.equal(data.data, blocksResponse[0]);
 	});
 
+	it("/blocks?proposer", async () => {
+		await apiContext.blockRepository.save(blocks);
+
+		for (const proposer of [blocks[0].proposer, blocks[0].proposer.toLowerCase()]) {
+			const { statusCode, data } = await request(`/blocks?proposer=${proposer}`, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map(({ hash }) => hash),
+				[blocks[0].hash],
+			);
+		}
+	});
+
 	it("/blocks/last", async () => {
 		await apiContext.blockRepository.save(blocks);
 
@@ -62,6 +75,25 @@ describe<{
 		const { statusCode, data } = await request("/blocks/1", options);
 		assert.equal(statusCode, 200);
 		assert.equal(data.data, blocksResponse[1]);
+	});
+
+	it("/blocks ends pages at row 10000", async () => {
+		await apiContext.blockRepository.save(blocks);
+
+		for (const path of ["/blocks?limit=100&page=101", "/blocks?limit=100&offset=9901"]) {
+			let statusCode;
+			try {
+				statusCode = (await request(path, options)).statusCode;
+			} catch (ex) {
+				statusCode = ex.response?.statusCode;
+			}
+
+			assert.equal(statusCode, 422);
+		}
+
+		const { statusCode, data } = await request("/blocks?limit=100&page=100", options);
+		assert.equal(statusCode, 200);
+		assert.length(data.data, 0);
 	});
 
 	it("/blocks/{id}", async () => {

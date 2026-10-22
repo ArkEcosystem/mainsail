@@ -47,6 +47,25 @@ describe<{
 		assert.equal(request.query.x, ["", "", "a"]);
 	});
 
+	it("should reject a parameter with more than 50 values, whether comma-separated or repeated", ({ h }) => {
+		const values = Array.from({ length: 51 }, (_, index) => String(index));
+
+		for (const query of [
+			{ nonce: values.join(",") },
+			{ nonce: values },
+			{ nonce: [values.slice(0, 30).join(","), ...values.slice(30)] },
+		]) {
+			assert.throws(
+				() => commaArrayQuery.onRequest({ query } as any, h as any),
+				"'nonce' takes at most 50 values",
+			);
+		}
+
+		const request: any = { query: { nonce: values.slice(0, 50).join(",") } };
+		assert.is(commaArrayQuery.onRequest(request, h as any), h.continue);
+		assert.length(request.query.nonce, 50);
+	});
+
 	it("should register onRequest extension", ({ h }) => {
 		const ext = spyFn();
 		const server: any = { ext: ext.toFunction() };

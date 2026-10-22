@@ -4,6 +4,7 @@ import Joi from "joi";
 
 export const getConfig = (options: Joi.ValidationOptions): { config?: object; error?: Joi.ValidationError } => {
 	const { error, value } = Joi.object({
+		maxDepth: Joi.number().integer().positive(),
 		query: Joi.object({
 			limit: Joi.object({
 				default: Joi.number().integer().positive().default(100),

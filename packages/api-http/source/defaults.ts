@@ -16,6 +16,7 @@ export const defaults = {
 		},
 		pagination: {
 			limit: 100,
+			maxDepth: 10_000,
 		},
 		rateLimit: {
 			blacklist:

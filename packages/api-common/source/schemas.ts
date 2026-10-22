@@ -93,6 +93,15 @@ export const pagination = Joi.object({
 	limit: paginationLimit,
 	offset: Joi.number().integer().min(0),
 	page: Joi.number().integer().positive().default(1),
+}).custom((value, helpers) => {
+	const maxDepth: number | undefined = helpers.prefs.context?.configuration?.plugins?.pagination?.maxDepth;
+	const offset: number = value.offset ?? (value.page - 1) * value.limit;
+
+	if (maxDepth !== undefined && offset + value.limit > maxDepth) {
+		return helpers.message({ custom: `Pages end at row ${maxDepth}; use filters to reach the rows after it` });
+	}
+
+	return value;
 });
 
 export const equalCriteria = (value: Joi.Schema): Joi.Schema => value;

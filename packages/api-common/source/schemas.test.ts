@@ -252,6 +252,19 @@ describe<{}>("Schemas", ({ it, assert }) => {
 			assert.defined(result.error);
 		});
 
+		it("should end pages at the configured depth", () => {
+			const deep = { context: { configuration: { plugins: { pagination: { limit: 100, maxDepth: 10_000 } } } } };
+
+			assert.undefined(schemas.pagination.validate({ limit: 100, page: 100 }, deep).error);
+			assert.undefined(schemas.pagination.validate({ limit: 100, offset: 9900 }, deep).error);
+			assert.equal(
+				schemas.pagination.validate({ limit: 100, page: 101 }, deep).error!.message,
+				"Pages end at row 10000; use filters to reach the rows after it",
+			);
+			assert.defined(schemas.pagination.validate({ limit: 100, offset: 9901 }, deep).error);
+			assert.undefined(schemas.pagination.validate({ limit: 100, page: 100_000 }, context).error);
+		});
+
 		it("should cap the default limit at a configured max below 100", () => {
 			const result = schemas.pagination.validate(
 				{},
