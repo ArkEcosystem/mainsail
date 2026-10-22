@@ -48,6 +48,19 @@ describe<{
 		assert.equal(data.data, blocksResponse[0]);
 	});
 
+	it("/blocks?proposer", async () => {
+		await apiContext.blockRepository.save(blocks);
+
+		for (const proposer of [blocks[0].proposer, blocks[0].proposer.toLowerCase()]) {
+			const { statusCode, data } = await request(`/blocks?proposer=${proposer}`, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map(({ hash }) => hash),
+				[blocks[0].hash],
+			);
+		}
+	});
+
 	it("/blocks/last", async () => {
 		await apiContext.blockRepository.save(blocks);
 

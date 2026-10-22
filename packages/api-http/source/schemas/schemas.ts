@@ -54,7 +54,7 @@ export const blockCriteriaSchemas = {
 	parentHash: Schemas.orEqualCriteria(blockHash),
 	payloadHash: Schemas.orEqualCriteria(Joi.string().hex()),
 	payloadSize: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
-	proposer: Schemas.orEqualCriteria(Joi.string().hex().length(66)),
+	proposer: Schemas.orEqualCriteria(address),
 	reward: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	round: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	timestamp: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
