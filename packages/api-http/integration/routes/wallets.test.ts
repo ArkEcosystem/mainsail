@@ -412,6 +412,43 @@ describe<{
 		}
 	});
 
+	it("/wallets/activity token filters", async () => {
+		await apiContext.tokenRepository.save(tokens);
+		await apiContext.tokenActionRepository.save(tokenActions);
+		await apiContext.transactionRepository.save(tokenTransferTransactions);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist.slice(1, 2));
+
+		// receives a mint of each token, newest first; only the third is whitelisted, the newest actions are of no token
+		const address = "0x432b093d9542B905C87587607491C369408475b4";
+		const [first, second, third] = [tokens[2].address, tokens[0].address, tokens[1].address];
+
+		const testCases = [
+			{ path: `/wallets/activity?addresses=${address}`, result: [third] },
+			{ path: `/wallets/activity?addresses=${address}&ignoreWhitelist=true`, result: [first, second, third] },
+			{ path: `/wallets/activity?addresses=${address}&ignoreWhitelist=true&limit=1`, result: [first] },
+			{
+				path: `/wallets/activity?addresses=${address},0x0000000000000000000000000000000000000000&ignoreWhitelist=true`,
+				result: [first, second, third],
+			},
+			{
+				path: `/wallets/activity?addresses=${address}&ignoreWhitelist=true&blacklist=${first}`,
+				result: [first, second, third],
+			},
+			{ path: `/wallets/activity?addresses=${address}&blacklist=${third}`, result: [first, second] },
+			{ path: `/wallets/activity?addresses=${address}&whitelist=${first}`, result: [first, third] },
+			{ path: `/wallets/activity?addresses=${address}&whitelist=${first}&blacklist=${first}`, result: [third] },
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map(({ token }) => token.address),
+				result,
+			);
+		}
+	});
+
 	it("/wallets/tokens?addresses", async () => {
 		await apiContext.tokenRepository.save(tokens);
 		await apiContext.tokenHolderRepository.save(tokenHolders);
