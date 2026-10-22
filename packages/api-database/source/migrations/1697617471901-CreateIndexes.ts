@@ -12,6 +12,13 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 
             CREATE INDEX transactions_block_hash ON transactions(block_hash);
 
+            -- the default sample underestimates the distinct values of these skewed columns
+            ALTER TABLE transactions
+                ALTER COLUMN "from" SET STATISTICS 1000,
+                ALTER COLUMN "to" SET STATISTICS 1000,
+                ALTER COLUMN sender_public_key SET STATISTICS 1000,
+                ALTER COLUMN block_hash SET STATISTICS 1000;
+
             CREATE INDEX transactions_value ON transactions(value);
             CREATE INDEX transactions_gas_price ON transactions(gas_price);
             CREATE INDEX transactions_nonce ON transactions(nonce);
@@ -101,6 +108,12 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX transactions_timestamp_asc_transaction_index_desc;
             DROP INDEX transactions_function_sig_address;
             DROP INDEX transactions_deployed_contract_index;
+
+            ALTER TABLE transactions
+                ALTER COLUMN "from" SET STATISTICS -1,
+                ALTER COLUMN "to" SET STATISTICS -1,
+                ALTER COLUMN sender_public_key SET STATISTICS -1,
+                ALTER COLUMN block_hash SET STATISTICS -1;
 
             DROP INDEX multi_payments_hash;
             DROP INDEX multi_payments_hash_to;
