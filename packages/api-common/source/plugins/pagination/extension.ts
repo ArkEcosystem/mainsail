@@ -83,6 +83,8 @@ export class Extension {
 			pageCount = Math.trunc(totalCount / currentLimit) + (totalCount % currentLimit === 0 ? 0 : 1);
 		}
 
+		pageCount = this.getReachablePageCount(pageCount, currentLimit);
+
 		const getUri = (page: number): string =>
 			baseUri + Qs.stringify(applyToDefaults({ ...query, ...request.orig.query }, { page }));
 
@@ -136,5 +138,11 @@ export class Extension {
 		}
 
 		return plugins["pagination"] as { enabled: boolean };
+	}
+
+	private getReachablePageCount(pageCount: number, limit: number): number {
+		const maxDepth: number | undefined = get(this.config, "maxDepth");
+
+		return maxDepth === undefined ? pageCount : Math.min(pageCount, Math.max(1, Math.floor(maxDepth / limit)));
 	}
 }

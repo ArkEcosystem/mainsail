@@ -43,6 +43,7 @@ const setupHttp = async (app: Application): Promise<CoreApiHttp> => {
 		plugins: {
 			pagination: {
 				limit: 100,
+				maxDepth: 10_000,
 			},
 			rateLimit: {
 				enabled: false,

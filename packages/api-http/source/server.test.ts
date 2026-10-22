@@ -13,7 +13,7 @@ describe<{
 		context.app = new Application();
 
 		context.configuration = context.app.resolve(Providers.PluginConfiguration).from("api-http", {
-			plugins: { pagination: { limit: 100 }, socketTimeout: 5000 },
+			plugins: { pagination: { limit: 100, maxDepth: 10_000 }, socketTimeout: 5000 },
 		});
 
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue({
@@ -50,7 +50,7 @@ describe<{
 		assert.equal(options.routes.validate.options.context, {
 			configuration: {
 				plugins: {
-					pagination: { limit: 100 },
+					pagination: { limit: 100, maxDepth: 10_000 },
 				},
 			},
 		});
