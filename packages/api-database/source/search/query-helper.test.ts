@@ -1,6 +1,7 @@
 import { describe } from "@mainsail/test-runner";
 
 import { QueryHelper } from "./query-helper";
+import { optimizeExpression } from "./search";
 
 const makeMetadata = (columns: any[]) => ({ columns }) as any;
 
@@ -263,6 +264,24 @@ describe<{
 			} as any),
 			{ parameters: { p1: 1, p2: 2 }, query: "(id = :p1 OR amount = :p2)" },
 		);
+	});
+
+	it("builds a long or-list in linear time", ({ helper, metadata }) => {
+		const values = Array.from({ length: 20_000 }, (_, index) => index);
+		const expression = optimizeExpression({
+			expressions: values.map((value) => ({
+				expressions: [{ op: "equal", property: "id", value }],
+				op: "or",
+			})),
+			op: "or",
+		} as any);
+
+		const started = performance.now();
+		const { parameters } = helper.getWhereExpressionSql(metadata, expression as any);
+
+		assert.length(Object.keys(parameters), values.length);
+		assert.equal(parameters["p20000"], 19_999);
+		assert.true(performance.now() - started < 1000);
 	});
 
 	it("nested and/or nest parentheses and keep a single monotonic parameter counter", ({ helper, metadata }) => {

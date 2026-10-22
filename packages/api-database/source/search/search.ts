@@ -14,10 +14,10 @@ export const optimizeExpression = <TEntity>(expression: Expression<TEntity>): Ex
 	switch (expression.op) {
 		case "and": {
 			const optimized = expression.expressions.map(optimizeExpression);
-			let flattened = [] as Expression<TEntity>[];
+			const flattened = [] as Expression<TEntity>[];
 
 			for (const e of optimized) {
-				flattened = e.op === "and" ? [...flattened, ...e.expressions] : [...flattened, e];
+				flattened.push(...(e.op === "and" ? e.expressions : [e]));
 			}
 
 			if (flattened.every((e) => e.op === "true")) {
@@ -33,10 +33,10 @@ export const optimizeExpression = <TEntity>(expression: Expression<TEntity>): Ex
 
 		case "or": {
 			const optimized = expression.expressions.map(optimizeExpression);
-			let flattened = [] as Expression<TEntity>[];
+			const flattened = [] as Expression<TEntity>[];
 
 			for (const e of optimized) {
-				flattened = e.op === "or" ? [...flattened, ...e.expressions] : [...flattened, e];
+				flattened.push(...(e.op === "or" ? e.expressions : [e]));
 			}
 
 			if (flattened.every((e) => e.op === "false")) {
