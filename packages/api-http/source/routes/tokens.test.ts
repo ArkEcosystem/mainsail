@@ -160,10 +160,8 @@ describe<{
 
 	it("GET /api/tokens/{address}/holders - lists the holders of the token", async ({ server, repos }) => {
 		repos.token.data.one = makeToken();
-		repos.tokenHolder.data.manyAndCount = [
-			[{ address: ADDRESS_A, balance: "12000000", tokenAddress: TOKEN_ADDRESS }],
-			1,
-		];
+		repos.tokenHolder.data.many = [{ address: ADDRESS_A, balance: "12000000", tokenAddress: TOKEN_ADDRESS }];
+		repos.dataSource.data.rawOne = { cnt: "1" };
 
 		const response = await server.inject({ method: "GET", url: `/api/tokens/${TOKEN_ADDRESS}/holders?limit=10` });
 
@@ -176,7 +174,7 @@ describe<{
 		// The holder listing is ordered and windowed by the query pagination.
 		assert.equal(repos.tokenHolder.qb.calls.orderBy, [["balance", "DESC"]]);
 		assert.equal(repos.tokenHolder.qb.calls.offset, [[0]]);
-		assert.equal(repos.tokenHolder.qb.calls.limit, [[10]]);
+		assert.equal(repos.tokenHolder.qb.calls.limit, [[10], [10_001]]);
 	});
 
 	it("GET /api/tokens/{address}/holders - responds 404 for an unknown token", async ({ server }) => {

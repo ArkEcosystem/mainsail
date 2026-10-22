@@ -96,19 +96,34 @@ export class TokensController extends Controller {
 
 		const pagination = this.getQueryPagination(request.query);
 
-		const [tokenHolders, totalCount] = await this.tokenHolderRepositoryFactory()
+		const tokenHoldersQuery = this.tokenHolderRepositoryFactory()
 			.createQueryBuilder()
 			.select()
-			.where("token_address = :address", { address: request.params.address })
-			.orderBy("balance", "DESC")
-			.addOrderBy("address", "ASC")
-			.offset(pagination.offset)
-			.limit(pagination.limit)
-			.getManyAndCount();
+			.where("token_address = :address", { address: request.params.address });
+
+		const [tokenHolders, totalCountRow] = await Promise.all([
+			tokenHoldersQuery
+				.clone()
+				.orderBy("balance", "DESC")
+				.addOrderBy("address", "ASC")
+				.offset(pagination.offset)
+				.limit(pagination.limit)
+				.getMany(),
+
+			this.dataSource
+				.createQueryBuilder()
+				.addCommonTableExpression(tokenHoldersQuery.clone().select("1").limit(10_001).getQuery(), "matching")
+				.select("COUNT(*)", "cnt")
+				.from("matching", "m")
+				.setParameters(tokenHoldersQuery.getParameters())
+				.getRawOne<{ cnt: string }>(),
+		]);
+
+		const totalCount = Number(totalCountRow?.cnt ?? 0);
 
 		return this.toPagination(
 			{
-				meta: { totalCountIsEstimate: false },
+				meta: { totalCountIsEstimate: totalCount > 10_000 },
 				results: tokenHolders,
 				totalCount,
 			},
