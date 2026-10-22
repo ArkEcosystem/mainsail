@@ -38,6 +38,12 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
                   "to"
             );
 
+            -- 0x6dd7d8ea is vote(address) of ConsensusV1
+            CREATE INDEX transactions_votes_sender_timestamp_tx_index ON transactions(sender_public_key, timestamp DESC, transaction_index DESC)
+            WHERE SUBSTRING(data FROM 1 FOR 4) = '\\x6dd7d8ea';
+            CREATE INDEX transactions_votes_timestamp_tx_index ON transactions(timestamp DESC, transaction_index DESC)
+            WHERE SUBSTRING(data FROM 1 FOR 4) = '\\x6dd7d8ea';
+
             CREATE INDEX transactions_deployed_contract_index ON transactions(deployed_contract_address, block_number DESC, transaction_index DESC)
             WHERE deployed_contract_address IS NOT NULL;
 
@@ -107,6 +113,8 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX transactions_nonce_asc_transaction_index_desc;
             DROP INDEX transactions_timestamp_asc_transaction_index_desc;
             DROP INDEX transactions_function_sig_address;
+            DROP INDEX transactions_votes_sender_timestamp_tx_index;
+            DROP INDEX transactions_votes_timestamp_tx_index;
             DROP INDEX transactions_deployed_contract_index;
 
             ALTER TABLE transactions
