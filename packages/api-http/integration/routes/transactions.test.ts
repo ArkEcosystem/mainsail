@@ -94,6 +94,21 @@ describe<{
 		}
 	});
 
+	it("/transactions rejects more than 50 values for one parameter", async () => {
+		const nonces = Array.from({ length: 51 }, (_, index) => index + 1);
+
+		let statusCode;
+		try {
+			statusCode = (await request(`/transactions?nonce=${nonces.join(",")}`, options)).statusCode;
+		} catch (ex) {
+			statusCode = ex.response?.statusCode;
+		}
+		assert.equal(statusCode, 422);
+
+		({ statusCode } = await request(`/transactions?nonce=${nonces.slice(0, 50).join(",")}`, options));
+		assert.equal(statusCode, 200);
+	});
+
 	it("/transactions/{hash}", async () => {
 		await apiContext.transactionRepository.save(transactions);
 

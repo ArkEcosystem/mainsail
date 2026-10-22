@@ -1,6 +1,9 @@
 import type Hapi from "@hapi/hapi";
 
+import Boom from "@hapi/boom";
 import { set } from "@mainsail/utils";
+
+const maxValues = 50;
 
 export const commaArrayQuery = {
 	name: "comma-array-query",
@@ -16,6 +19,10 @@ export const commaArrayQuery = {
 
 		for (const [key, value] of Object.entries(request.query)) {
 			query[key] = Array.isArray(value) ? value.flatMap((entry) => split(entry)) : split(value);
+
+			if (Array.isArray(query[key]) && query[key].length > maxValues) {
+				throw Boom.badData(`'${key}' takes at most ${maxValues} values`);
+			}
 		}
 
 		set(request, "query", query);
