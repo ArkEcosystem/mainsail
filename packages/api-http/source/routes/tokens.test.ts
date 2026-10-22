@@ -130,7 +130,7 @@ describe<{
 		await server.inject({ method: "GET", url: `/api/tokens/transfers?blacklist=${ADDRESS_A}` });
 
 		const blacklisted = (repos.tokenAction.qb.calls.andWhere ?? []).find(
-			([condition]) => condition === "tok.address NOT IN (:...customBlacklist)",
+			([condition]) => condition === "tf.address NOT IN (:...customBlacklist)",
 		);
 		assert.defined(blacklisted);
 		assert.equal(blacklisted![1], { customBlacklist: [ADDRESS_A] });
@@ -186,8 +186,8 @@ describe<{
 	});
 
 	it("GET /api/tokens/transfers - lists transfer actions with token metadata", async ({ server, repos }) => {
-		repos.tokenAction.data.rawMany = [makeTransferRow()];
-		repos.tokenAction.data.rawOne = { cnt: "1" };
+		repos.dataSource.data.rawMany = [makeTransferRow()];
+		repos.dataSource.data.rawOne = { cnt: "1" };
 
 		const response = await server.inject({ method: "GET", url: "/api/tokens/transfers" });
 
@@ -285,8 +285,8 @@ describe<{
 
 	it("GET /api/tokens/{address}/transfers - scopes the actions to the token", async ({ server, repos }) => {
 		repos.token.data.one = makeToken();
-		repos.tokenAction.data.rawMany = [makeTransferRow()];
-		repos.tokenAction.data.rawOne = { cnt: "1" };
+		repos.dataSource.data.rawMany = [makeTransferRow()];
+		repos.dataSource.data.rawOne = { cnt: "1" };
 
 		const response = await server.inject({ method: "GET", url: `/api/tokens/${TOKEN_ADDRESS}/transfers` });
 
