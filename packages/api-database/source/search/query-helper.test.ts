@@ -148,7 +148,7 @@ describe<{
 		});
 	});
 
-	it("op equal uses jsonFieldAccessor when provided", ({ helper, metadata }) => {
+	it("op equal uses jsonFieldAccessor when provided, narrowed down by containment", ({ helper, metadata }) => {
 		assert.equal(
 			helper.getWhereExpressionSql(metadata, {
 				jsonFieldAccessor: { fieldName: "number", operator: "->>" },
@@ -156,8 +156,32 @@ describe<{
 				property: "data",
 				value: 5,
 			} as any),
-			{ parameters: { p1: 5 }, query: `data->>'number' = :p1` },
+			{
+				parameters: { p1: 5, p2: `{"number":"5"}`, p3: `{"number":5}` },
+				query: `(data @> CAST(:p2 AS jsonb) OR data @> CAST(:p3 AS jsonb)) AND data->>'number' = :p1`,
+			},
 		);
+	});
+
+	it("op equal on a json field contains the value as each form it can take", ({ helper, metadata }) => {
+		const containments = (value: unknown, fieldName = "a") => {
+			const { parameters } = helper.getWhereExpressionSql(metadata, {
+				jsonFieldAccessor: { cast: "numeric", fieldName, operator: "->>" },
+				op: "equal",
+				property: "data",
+				value,
+			} as any);
+			return Object.values(parameters).slice(1);
+		};
+
+		assert.equal(containments("x", "b.c"), [`{"b":{"c":"x"}}`]);
+		assert.equal(containments(true), [`{"a":"true"}`, `{"a":true}`]);
+		assert.equal(containments("1.5"), [`{"a":"1.5"}`, `{"a":1.5}`]);
+		assert.equal(containments("007"), [`{"a":"007"}`, `{"a":7}`, `{"a":"7"}`]);
+		assert.equal(containments("123456789012345678901234567890"), [
+			`{"a":"123456789012345678901234567890"}`,
+			`{"a":123456789012345678901234567890}`,
+		]);
 	});
 
 	it("op notEqual -> column <> :p1", ({ helper, metadata }) => {

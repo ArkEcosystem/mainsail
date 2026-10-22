@@ -79,6 +79,14 @@ export class QueryHelper<TEntity> {
 				const parameter = `p${this.paramNo++}`;
 				const query = `${column.name} = :${parameter}`;
 				const parameters = { [parameter]: expression.value };
+
+				if (expression.jsonFieldAccessor) {
+					return this.withJsonContainment(metadata, expression.property, expression.jsonFieldAccessor, {
+						parameters,
+						query,
+					});
+				}
+
 				return { parameters, query };
 			}
 			case "notEqual": {
@@ -180,5 +188,39 @@ export class QueryHelper<TEntity> {
 				throw new Error(`Unexpected expression`);
 			}
 		}
+	}
+
+	// Containment lets the GIN index narrow the rows down, the equality still decides. The field may hold the value as
+	// a string, number or boolean.
+	private withJsonContainment(
+		metadata: EntityMetadata,
+		property: keyof TEntity,
+		{ fieldName }: JsonFieldAccessor,
+		equality: SqlExpression,
+	): SqlExpression {
+		const column = this.getColumnName(metadata, property);
+		const value = String(Object.values(equality.parameters)[0]);
+
+		const scalars = new Set([JSON.stringify(value)]);
+		if (/^-?\d+$/.test(value)) {
+			const integer = BigInt(value).toString();
+			scalars.add(integer).add(JSON.stringify(integer));
+		} else if (/^(-?\d+\.\d+|true|false)$/.test(value)) {
+			scalars.add(value);
+		}
+
+		const parameters = { ...equality.parameters };
+		const containments = [...scalars].map((scalar) => {
+			let json = scalar;
+			for (const key of fieldName.split(".").toReversed()) {
+				json = `{${JSON.stringify(key)}:${json}}`;
+			}
+
+			const parameter = `p${this.paramNo++}`;
+			parameters[parameter] = json;
+			return `${column.name} @> CAST(:${parameter} AS jsonb)`;
+		});
+
+		return { parameters, query: `(${containments.join(" OR ")}) AND ${equality.query}` };
 	}
 }
