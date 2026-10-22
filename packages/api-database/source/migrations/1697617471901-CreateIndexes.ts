@@ -51,6 +51,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX blocks_reward ON blocks(reward, number DESC);
             CREATE INDEX blocks_fee ON blocks(fee, number DESC);
             CREATE INDEX blocks_validator_round ON blocks(validator_round);
+            CREATE INDEX blocks_proposer_number ON blocks(proposer, number DESC);
 
             CREATE INDEX multi_payments_hash ON multi_payments(hash) INCLUDE (amount) WHERE success IS TRUE;
             CREATE INDEX multi_payments_hash_to ON multi_payments(hash, "to") WHERE success IS TRUE;
@@ -131,6 +132,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX blocks_reward;
             DROP INDEX blocks_fee;
             DROP INDEX blocks_validator_round;
+            DROP INDEX blocks_proposer_number;
 
             DROP INDEX receipts_block_height;
             DROP INDEX receipts_contracts;
