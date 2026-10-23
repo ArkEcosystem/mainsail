@@ -2648,18 +2648,12 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
       '@mainsail/p2p-websocket':
         specifier: workspace:*
         version: link:../p2p-websocket
-      '@mainsail/utils':
-        specifier: workspace:*
-        version: link:../utils
       joi:
         specifier: 18.2.5
         version: 18.2.5
@@ -2679,6 +2673,9 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2689,9 +2686,6 @@ importers:
         specifier: 8.21.3
         version: 8.21.3
     devDependencies:
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
