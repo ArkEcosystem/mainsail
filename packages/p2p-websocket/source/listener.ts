@@ -3,7 +3,7 @@ import { type AddressInfo } from "node:net";
 import { WebSocketServer } from "ws";
 
 import { Connection } from "./connection.js";
-import { CloseReason, Direction } from "./enums.js";
+import { CloseReason, Direction, ListenerState } from "./enums.js";
 
 export type ListenerOptions = {
 	host: string;
@@ -20,14 +20,22 @@ export class Listener {
 	// Called once the handshake has completed.
 	public onConnection?: (connection: Connection) => void;
 
+	// Server-level errors after start() has resolved (startup errors reject start() instead).
+	public onError?: (error: Error) => void;
+
 	readonly #options: ListenerOptions;
 	readonly #connections = new Set<Connection>();
 
+	#state = ListenerState.Stopped;
 	#http?: HttpServer;
 	#wss?: WebSocketServer;
 
 	public constructor(options: ListenerOptions) {
 		this.#options = options;
+	}
+
+	public get state(): ListenerState {
+		return this.#state;
 	}
 
 	public get address(): AddressInfo | undefined {
@@ -40,6 +48,12 @@ export class Listener {
 	}
 
 	public async start(): Promise<void> {
+		if (this.#state !== ListenerState.Stopped) {
+			throw new Error(`Listener cannot start while ${this.#state}`);
+		}
+
+		this.#state = ListenerState.Starting;
+
 		this.#http = createServer((_, response) => {
 			// Plain HTTP is not served; only the WebSocket upgrade is.
 			response.writeHead(426, { Connection: "close", Upgrade: "websocket" }).end();
@@ -49,6 +63,13 @@ export class Listener {
 			maxPayload: this.#options.maxPayload,
 			perMessageDeflate: false,
 			server: this.#http,
+		});
+
+		// ws re-emits the http server's errors here; without a listener they would crash the process.
+		this.#wss.on("error", (error) => {
+			if (this.#state === ListenerState.Listening) {
+				this.onError?.(error);
+			}
 		});
 
 		this.#wss.on("connection", (ws, request) => {
@@ -62,7 +83,9 @@ export class Listener {
 				version: this.#options.version,
 			});
 
-			const rejection = this.accept?.(remoteAddress);
+			// Sockets that complete the upgrade while stop() is in progress are dropped here.
+			const rejection =
+				this.#state === ListenerState.Listening ? this.accept?.(remoteAddress) : CloseReason.Shutdown;
 			if (rejection) {
 				connection.terminate(rejection);
 				return;
@@ -78,16 +101,32 @@ export class Listener {
 		});
 
 		const http = this.#http;
-		await new Promise<void>((resolve, reject) => {
-			http.once("error", reject);
-			http.listen(this.#options.port, this.#options.host, () => {
-				http.off("error", reject);
-				resolve();
+		try {
+			await new Promise<void>((resolve, reject) => {
+				http.once("error", reject);
+				http.listen(this.#options.port, this.#options.host, () => {
+					http.off("error", reject);
+					resolve();
+				});
 			});
-		});
+		} catch (error) {
+			this.#wss.close();
+			this.#http = undefined;
+			this.#wss = undefined;
+			this.#state = ListenerState.Stopped;
+			throw error;
+		}
+
+		this.#state = ListenerState.Listening;
 	}
 
 	public async stop(): Promise<void> {
+		if (this.#state !== ListenerState.Listening) {
+			return;
+		}
+
+		this.#state = ListenerState.Stopping;
+
 		await Promise.all([...this.#connections].map((connection) => connection.close(CloseReason.Shutdown)));
 
 		this.#wss?.close();
@@ -106,5 +145,6 @@ export class Listener {
 
 		this.#http = undefined;
 		this.#wss = undefined;
+		this.#state = ListenerState.Stopped;
 	}
 }

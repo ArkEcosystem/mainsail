@@ -10,6 +10,13 @@ export enum ConnectionState {
 	Closed = "closed",
 }
 
+export enum ListenerState {
+	Stopped = "stopped",
+	Starting = "starting",
+	Listening = "listening",
+	Stopping = "stopping",
+}
+
 export enum CloseReason {
 	LocalClose = "localClose",
 	RemoteClose = "remoteClose",
