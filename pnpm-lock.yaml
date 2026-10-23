@@ -2640,6 +2640,37 @@ importers:
         specifier: 0.5.6
         version: 0.5.6
 
+  packages/p2p-websocket:
+    dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      ws:
+        specifier: 8.21.3
+        version: 8.21.3
+    devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
+      '@types/ws':
+        specifier: 8.18.1
+        version: 8.18.1
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
+
   packages/processor:
     dependencies:
       '@mainsail/blockchain-utils':
@@ -12279,7 +12310,7 @@ snapshots:
 
   '@types/duplexify@3.6.5':
     dependencies:
-      '@types/node': 26.2.0
+      '@types/node': 24.13.3
 
   '@types/esrecurse@4.3.1': {}
 
@@ -12312,7 +12343,7 @@ snapshots:
 
   '@types/jsonfile@6.1.4':
     dependencies:
-      '@types/node': 26.2.0
+      '@types/node': 24.13.3
 
   '@types/linkify-it@5.0.0': {}
 
@@ -12400,7 +12431,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 26.2.0
+      '@types/node': 24.13.3
 
   '@types/yargs-parser@21.0.3': {}
 
