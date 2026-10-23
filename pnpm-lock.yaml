@@ -2651,6 +2651,9 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2660,10 +2663,10 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      joi:
+        specifier: 18.2.5
+        version: 18.2.5
     devDependencies:
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner

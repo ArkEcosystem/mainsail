@@ -130,6 +130,9 @@ export class Connection {
 		this.#state = ConnectionState.Closing;
 		this.#closeReason = reason;
 		this.#closeError = error;
+
+		// A close that starts during the handshake must fail open(), so the owner never sees the connection.
+		this.#handshake.abort(new ConnectionError(reason, "Connection closed during handshake", { cause: error }));
 	}
 
 	#waitForOpen(): Promise<void> {
