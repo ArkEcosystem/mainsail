@@ -13,6 +13,9 @@
 			"path": "../container"
 		},
 		{
+			"path": "../contracts"
+		},
+		{
 			"path": "../kernel"
 		},
 		{
