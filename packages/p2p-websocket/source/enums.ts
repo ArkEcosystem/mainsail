@@ -12,7 +12,6 @@ export enum ConnectionState {
 
 export enum ListenerState {
 	Stopped = "stopped",
-	Starting = "starting",
 	Listening = "listening",
 	Stopping = "stopping",
 }
