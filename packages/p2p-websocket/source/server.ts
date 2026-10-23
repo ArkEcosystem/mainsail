@@ -1,12 +1,11 @@
 import type { Contracts } from "@mainsail/contracts";
-import type { Server as HttpServer } from "node:http";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
+import { createServer, type Server as HttpServer } from "node:http";
 
 import { constants } from "./constants.js";
-import { close, createHttpServer, listen } from "./http-server.js";
 import { Listener } from "./listener.js";
 
 export type ServerOptions = {
@@ -32,7 +31,7 @@ export class Server {
 	public initialize(name: string, options: ServerOptions): void {
 		this.#name = name;
 		this.#options = options;
-		this.#http = createHttpServer();
+		this.#http = this.#createHttpServer();
 		this.#listener = new Listener({
 			handshakeTimeout: constants.HANDSHAKE_TIMEOUT,
 			maxPayload: constants.MAX_PAYLOAD,
@@ -48,7 +47,7 @@ export class Server {
 	public async boot(): Promise<void> {
 		try {
 			this.#listener.start();
-			await listen(this.#http, { host: this.#options.hostname, port: this.#options.port });
+			await this.#listen();
 			this.logger.info(`${this.#name} started at ${this.#options.hostname}:${this.#options.port}`, "p2p");
 		} catch (rawError) {
 			await this.#listener.stop();
@@ -59,10 +58,41 @@ export class Server {
 	public async dispose(): Promise<void> {
 		try {
 			await this.#listener.stop();
-			await close(this.#http);
+			await this.#close();
 			this.logger.info(`${this.#name} stopped at ${this.#options.hostname}:${this.#options.port}`, "p2p");
 		} catch (rawError) {
 			this.app.fail(`Failed to stop ${this.#name}!`, ensureError(rawError));
 		}
+	}
+
+	// Serves nothing over plain HTTP; only the WebSocket upgrade is accepted.
+	#createHttpServer(): HttpServer {
+		return createServer((_, response) => {
+			response.writeHead(426, { Connection: "close", Upgrade: "websocket" }).end();
+		});
+	}
+
+	// Resolves once the server is listening; rejects with the listen error (busy port, EACCES, ...).
+	#listen(): Promise<void> {
+		return new Promise<void>((resolve, reject) => {
+			this.#http.once("error", reject);
+			this.#http.listen(this.#options.port, this.#options.hostname, () => {
+				this.#http.off("error", reject);
+				resolve();
+			});
+		});
+	}
+
+	// Resolves once the port is released. Idle keep-alive connections are dropped so this does not hang.
+	#close(): Promise<void> {
+		return new Promise<void>((resolve) => {
+			if (!this.#http.listening) {
+				resolve();
+				return;
+			}
+
+			this.#http.close(() => resolve());
+			this.#http.closeIdleConnections();
+		});
 	}
 }
