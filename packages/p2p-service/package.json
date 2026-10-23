@@ -22,12 +22,13 @@
 	"dependencies": {
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/p2p-websocket": "workspace:*",
-		"@mainsail/utils": "workspace:*"
+		"@mainsail/utils": "workspace:*",
+		"joi": "18.2.5"
 	},
 	"devDependencies": {
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"uvu": "0.5.6"
 	},
