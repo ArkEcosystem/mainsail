@@ -3,12 +3,16 @@ import type { Server as HttpServer } from "node:http";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { close, createHttpServer, listen, Listener } from "@mainsail/p2p-websocket";
 import { ensureError } from "@mainsail/utils";
 
 import { constants } from "./constants.js";
+import { close, createHttpServer, listen } from "./http-server.js";
+import { Listener } from "./listener.js";
 
-export type ServerOptions = { hostname: string; port: number };
+export type ServerOptions = {
+	hostname: string;
+	port: number;
+};
 
 // Owns the HTTP server and its lifecycle; the listener only accepts upgrades on it.
 // initialize() is called by the service provider, boot() and dispose() by the bootstrapper.

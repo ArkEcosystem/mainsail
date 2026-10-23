@@ -1,9 +1,8 @@
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
+import { Server, type ServerOptions } from "@mainsail/p2p-websocket";
 import Joi from "joi";
-
-import { Server, type ServerOptions } from "./server.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
