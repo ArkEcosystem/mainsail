@@ -13,16 +13,10 @@
 			"path": "../container"
 		},
 		{
-			"path": "../contracts"
-		},
-		{
 			"path": "../kernel"
 		},
 		{
 			"path": "../p2p-websocket"
-		},
-		{
-			"path": "../utils"
 		}
 	]
 }
