@@ -23,8 +23,7 @@
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
-		"@mainsail/p2p-websocket": "workspace:*",
-		"joi": "18.2.5"
+		"@mainsail/p2p-websocket": "workspace:*"
 	},
 	"devDependencies": {
 		"@mainsail/test-runner": "workspace:*",
