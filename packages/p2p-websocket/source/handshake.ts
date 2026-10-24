@@ -31,7 +31,7 @@ export class Handshake {
 	}
 
 	// Our hello is always sent; the peer may already have settled the handshake by sending theirs first.
-	public start(): Promise<void> {
+	public async start(): Promise<void> {
 		this.#options.send({ type: "hello", version: constants.PROTOCOL_VERSION });
 
 		if (!this.#settled) {
@@ -40,7 +40,7 @@ export class Handshake {
 			}, constants.HANDSHAKE_TIMEOUT);
 		}
 
-		return this.#done;
+		await this.#done;
 	}
 
 	public onHello(message: HelloMessage): void {
