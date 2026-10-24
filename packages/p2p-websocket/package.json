@@ -23,7 +23,6 @@
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/contracts": "workspace:*",
-		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"ws": "8.21.3"
 	},
