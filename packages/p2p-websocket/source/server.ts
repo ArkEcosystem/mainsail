@@ -6,7 +6,10 @@ import { ensureError } from "@mainsail/utils";
 import { once } from "node:events";
 import { createServer, type Server as HttpServer } from "node:http";
 
+import type { ConnectionRepository } from "./connection-repository.js";
 import type { Listener } from "./listener.js";
+
+import { CloseReason } from "./enums.js";
 
 export type ServerOptions = {
 	hostname: string;
@@ -25,6 +28,9 @@ export class Server {
 
 	@inject(Identifiers.P2P.WebSocket.Listener)
 	private readonly listener!: Listener;
+
+	@inject(Identifiers.P2P.WebSocket.Connection.Repository)
+	private readonly repository!: ConnectionRepository;
 
 	#name!: string;
 	#options!: ServerOptions;
@@ -51,6 +57,8 @@ export class Server {
 	public async dispose(): Promise<void> {
 		try {
 			await this.listener.stop();
+			// The listener closed the inbound side; whatever is left was dialed by us.
+			await Promise.all(this.repository.all().map((connection) => connection.close(CloseReason.Shutdown)));
 			await this.#close();
 			this.logger.info(`${this.#name} stopped at ${this.#options.hostname}:${this.#options.port}`, "p2p");
 		} catch (rawError) {
