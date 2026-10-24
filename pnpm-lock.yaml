@@ -2676,9 +2676,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/kernel':
-        specifier: workspace:*
-        version: link:../kernel
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils

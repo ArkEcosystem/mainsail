@@ -6,4 +6,3 @@ export * from "./errors.js";
 export * from "./listener.js";
 export * from "./message.js";
 export * from "./server.js";
-export * from "./service-provider.js";
