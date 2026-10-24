@@ -3,10 +3,12 @@ import type { Server as HttpServer } from "node:http";
 import type { Server as HttpsServer } from "node:https";
 
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, multiInject } from "@mainsail/container";
 import { WebSocketServer } from "ws";
 
+import type { ConnectionRepository } from "./connection-repository.js";
 import type { Connection, ConnectionFactory } from "./connection.js";
+import type { ConnectionVerifier } from "./interfaces.js";
 
 import { constants } from "./constants.js";
 import { CloseReason, Direction, ListenerState } from "./enums.js";
@@ -21,7 +23,13 @@ export class Listener {
 	@inject(Identifiers.P2P.WebSocket.Connection.Factory)
 	private readonly createConnection!: ConnectionFactory;
 
-	// Called before the handshake. Returning a reason rejects the socket.
+	@inject(Identifiers.P2P.WebSocket.Connection.Repository)
+	private readonly repository!: ConnectionRepository;
+
+	@multiInject(Identifiers.P2P.WebSocket.Connection.Verifiers)
+	private readonly verifiers!: ConnectionVerifier[];
+
+	// Called after the verifiers, before the handshake. Returning a reason rejects the socket.
 	public accept?: (remoteAddress: string) => CloseReason | undefined;
 
 	// Called once the handshake has completed.
@@ -29,8 +37,6 @@ export class Listener {
 
 	// Errors ws re-emits from the underlying server while the listener is attached.
 	public onError?: (error: Error) => void;
-
-	readonly #connections = new Set<Connection>();
 
 	// Owned by the caller: it is listened on and closed outside the listener.
 	#server!: HttpServer | HttpsServer;
@@ -43,10 +49,6 @@ export class Listener {
 
 	public get state(): ListenerState {
 		return this.#state;
-	}
-
-	public get connections(): ReadonlySet<Connection> {
-		return this.#connections;
 	}
 
 	public start(): void {
@@ -76,15 +78,15 @@ export class Listener {
 
 			// Sockets that complete the upgrade while stop() is in progress are dropped here.
 			const rejection =
-				this.#state === ListenerState.Listening ? this.accept?.(remoteAddress) : CloseReason.Shutdown;
+				this.#state === ListenerState.Listening ? this.#verify(remoteAddress) : CloseReason.Shutdown;
 			if (rejection) {
 				this.logger.debug(`Rejected inbound socket from ${remoteAddress}: ${rejection}`, "p2p");
 				connection.terminate(rejection);
 				return;
 			}
 
-			this.#connections.add(connection);
-			connection.onClose = () => this.#connections.delete(connection);
+			this.repository.add(connection);
+			connection.onClose(() => this.repository.remove(connection));
 
 			void this.#open(connection);
 		});
@@ -92,7 +94,7 @@ export class Listener {
 		this.#state = ListenerState.Listening;
 	}
 
-	// Closes all connections and detaches from the server. The server itself stays up.
+	// Closes the inbound connections and detaches from the server. The server itself stays up.
 	public async stop(): Promise<void> {
 		if (this.#state !== ListenerState.Listening) {
 			return;
@@ -100,7 +102,12 @@ export class Listener {
 
 		this.#state = ListenerState.Stopping;
 
-		await Promise.all([...this.#connections].map((connection) => connection.close(CloseReason.Shutdown)));
+		await Promise.all(
+			this.repository
+				.all()
+				.filter((connection) => connection.direction === Direction.Inbound)
+				.map((connection) => connection.close(CloseReason.Shutdown)),
+		);
 
 		this.#wss?.close();
 		for (const ws of this.#wss?.clients ?? []) {
@@ -109,6 +116,17 @@ export class Listener {
 
 		this.#wss = undefined;
 		this.#state = ListenerState.Stopped;
+	}
+
+	#verify(remoteAddress: string): CloseReason | undefined {
+		for (const verifier of this.verifiers) {
+			const rejection = verifier.verify(remoteAddress);
+			if (rejection) {
+				return rejection;
+			}
+		}
+
+		return this.accept?.(remoteAddress);
 	}
 
 	async #open(connection: Connection): Promise<void> {
