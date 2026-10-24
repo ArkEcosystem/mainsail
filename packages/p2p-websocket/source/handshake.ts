@@ -1,11 +1,10 @@
 import type { HelloMessage, Message } from "./message.js";
 
+import { constants } from "./constants.js";
 import { CloseReason } from "./enums.js";
 import { ConnectionError } from "./errors.js";
 
 export type HandshakeOptions = {
-	version: number;
-	timeout: number;
 	send: (message: Message) => void;
 };
 
@@ -33,12 +32,12 @@ export class Handshake {
 
 	// Our hello is always sent; the peer may already have settled the handshake by sending theirs first.
 	public start(): Promise<void> {
-		this.#options.send({ type: "hello", version: this.#options.version });
+		this.#options.send({ type: "hello", version: constants.PROTOCOL_VERSION });
 
 		if (!this.#settled) {
 			this.#timer = setTimeout(() => {
 				this.#fail(new ConnectionError(CloseReason.HandshakeTimeout, "Handshake timed out"));
-			}, this.#options.timeout);
+			}, constants.HANDSHAKE_TIMEOUT);
 		}
 
 		return this.#done;
@@ -50,11 +49,11 @@ export class Handshake {
 			return;
 		}
 
-		if (message.version !== this.#options.version) {
+		if (message.version !== constants.PROTOCOL_VERSION) {
 			this.#fail(
 				new ConnectionError(
 					CloseReason.VersionMismatch,
-					`Protocol version mismatch: expected ${this.#options.version}, got ${message.version}`,
+					`Protocol version mismatch: expected ${constants.PROTOCOL_VERSION}, got ${message.version}`,
 				),
 			);
 			return;

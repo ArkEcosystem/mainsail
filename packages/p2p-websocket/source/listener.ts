@@ -4,14 +4,12 @@ import type { Server as HttpsServer } from "node:https";
 import { WebSocketServer } from "ws";
 
 import { Connection } from "./connection.js";
+import { constants } from "./constants.js";
 import { CloseReason, Direction, ListenerState } from "./enums.js";
 
 export type ListenerOptions = {
 	// Owned by the caller: it is listened on and closed outside the listener.
 	server: HttpServer | HttpsServer;
-	version: number;
-	handshakeTimeout: number;
-	maxPayload: number;
 };
 
 // Accepts WebSocket upgrades on a server it does not own and turns them into connections.
@@ -50,7 +48,7 @@ export class Listener {
 		}
 
 		this.#wss = new WebSocketServer({
-			maxPayload: this.#options.maxPayload,
+			maxPayload: constants.MAX_PAYLOAD,
 			perMessageDeflate: false,
 			server: this.#options.server,
 		});
@@ -68,9 +66,7 @@ export class Listener {
 			const remoteAddress = request.socket.remoteAddress ?? "";
 			const connection = new Connection(ws, {
 				direction: Direction.Inbound,
-				handshakeTimeout: this.#options.handshakeTimeout,
 				remoteAddress,
-				version: this.#options.version,
 			});
 
 			// Sockets that complete the upgrade while stop() is in progress are dropped here.
