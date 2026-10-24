@@ -6,7 +6,7 @@ import { ensureError } from "@mainsail/utils";
 import { once } from "node:events";
 import { createServer, type Server as HttpServer } from "node:http";
 
-import { Listener } from "./listener.js";
+import type { Listener } from "./listener.js";
 
 export type ServerOptions = {
 	hostname: string;
@@ -23,36 +23,34 @@ export class Server {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	@inject(Identifiers.P2P.WebSocket.Listener)
+	private readonly listener!: Listener;
+
 	#name!: string;
 	#options!: ServerOptions;
 	#http!: HttpServer;
-	#listener!: Listener;
 
 	public initialize(name: string, options: ServerOptions): void {
 		this.#name = name;
 		this.#options = options;
 		this.#http = this.#createHttpServer();
-		this.#listener = new Listener({ server: this.#http });
-	}
-
-	public get listener(): Listener {
-		return this.#listener;
+		this.listener.initialize(this.#http);
 	}
 
 	public async boot(): Promise<void> {
 		try {
-			this.#listener.start();
+			this.listener.start();
 			await this.#listen();
 			this.logger.info(`${this.#name} started at ${this.#options.hostname}:${this.#options.port}`, "p2p");
 		} catch (rawError) {
-			await this.#listener.stop();
+			await this.listener.stop();
 			await this.app.terminate(`Failed to start ${this.#name}!`, ensureError(rawError));
 		}
 	}
 
 	public async dispose(): Promise<void> {
 		try {
-			await this.#listener.stop();
+			await this.listener.stop();
 			await this.#close();
 			this.logger.info(`${this.#name} stopped at ${this.#options.hostname}:${this.#options.port}`, "p2p");
 		} catch (rawError) {

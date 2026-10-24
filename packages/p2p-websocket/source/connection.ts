@@ -1,3 +1,7 @@
+import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
+import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 import { once } from "node:events";
 import WebSocket from "ws";
@@ -14,30 +18,46 @@ export type ConnectionOptions = {
 	remoteAddress: string;
 };
 
+export type ConnectionFactory = (ws: WebSocket, options: ConnectionOptions) => Connection;
+
+// One per socket, created through Identifiers.P2P.WebSocket.Connection.Factory and set up with init().
+@injectable()
 export class Connection {
-	public readonly direction: Direction;
-	public readonly remoteAddress: string;
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	public onClose?: (reason: CloseReason, error?: Error) => void;
 
-	readonly #ws: WebSocket;
-	readonly #handshake: Handshake;
+	#ws!: WebSocket;
+	#handshake!: Handshake;
+	#direction!: Direction;
+	#remoteAddress!: string;
 
 	#state = ConnectionState.Handshaking;
 	#closeReason?: CloseReason;
 	#closeError?: Error;
 	#closed?: Promise<void>;
 
-	public constructor(ws: WebSocket, options: ConnectionOptions) {
+	public init(ws: WebSocket, options: ConnectionOptions): this {
 		this.#ws = ws;
-		this.direction = options.direction;
-		this.remoteAddress = options.remoteAddress;
+		this.#direction = options.direction;
+		this.#remoteAddress = options.remoteAddress;
 
 		this.#handshake = new Handshake({ send: (message) => this.#send(message) });
 
 		this.#ws.on("message", (data) => this.#onMessage(data));
 		this.#ws.on("error", (error) => this.#onError(error));
 		this.#ws.on("close", () => this.#onClose());
+
+		return this;
+	}
+
+	public get direction(): Direction {
+		return this.#direction;
+	}
+
+	public get remoteAddress(): string {
+		return this.#remoteAddress;
 	}
 
 	public get state(): ConnectionState {
@@ -119,6 +139,11 @@ export class Connection {
 		}
 
 		this.#state = ConnectionState.Closed;
+		this.logger.debug(
+			`${this.#direction} connection to ${this.#remoteAddress} closed: ${this.#closeReason}` +
+				(this.#closeError ? ` (${this.#closeError.message})` : ""),
+			"p2p",
+		);
 		this.onClose?.(this.#closeReason, this.#closeError);
 	}
 
@@ -150,7 +175,7 @@ export class Connection {
 	}
 
 	// Not `once`: ws emits "error" before "close" when a connecting socket is aborted, and that must not
-	// reject the close promise. The constructor's error listener handles the error itself.
+	// reject the close promise. The error listener from init() handles the error itself.
 	#waitForClose(): Promise<void> {
 		if (this.#ws.readyState === WebSocket.CLOSED) {
 			return Promise.resolve();
