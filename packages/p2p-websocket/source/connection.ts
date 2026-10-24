@@ -81,21 +81,19 @@ export class Connection {
 	}
 
 	// Graceful close; resolves once the socket has emitted "close". Idempotent.
-	public close(reason: CloseReason = CloseReason.LocalClose): Promise<void> {
-		if (this.#closed) {
-			return this.#closed;
+	public async close(reason: CloseReason = CloseReason.LocalClose): Promise<void> {
+		if (!this.#closed) {
+			this.#begin(reason);
+			this.#closed = this.#waitForClose();
+
+			if (this.#ws.readyState === WebSocket.OPEN || this.#ws.readyState === WebSocket.CONNECTING) {
+				this.#ws.close();
+			} else {
+				this.#ws.terminate();
+			}
 		}
 
-		this.#begin(reason);
-		this.#closed = this.#waitForClose();
-
-		if (this.#ws.readyState === WebSocket.OPEN || this.#ws.readyState === WebSocket.CONNECTING) {
-			this.#ws.close();
-		} else {
-			this.#ws.terminate();
-		}
-
-		return this.#closed;
+		await this.#closed;
 	}
 
 	// Immediate close without the closing handshake.
@@ -176,12 +174,12 @@ export class Connection {
 
 	// Not `once`: ws emits "error" before "close" when a connecting socket is aborted, and that must not
 	// reject the close promise. The error listener from init() handles the error itself.
-	#waitForClose(): Promise<void> {
+	async #waitForClose(): Promise<void> {
 		if (this.#ws.readyState === WebSocket.CLOSED) {
-			return Promise.resolve();
+			return;
 		}
 
-		return new Promise<void>((resolve) => this.#ws.once("close", () => resolve()));
+		await new Promise<void>((resolve) => this.#ws.once("close", () => resolve()));
 	}
 
 	#send(message: Message): void {
