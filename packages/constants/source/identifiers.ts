@@ -234,8 +234,11 @@ export const Identifiers = {
 			Verifier: Symbol("P2P<TxPoolNode.Verifier>"),
 		},
 		WebSocket: {
+			BanList: Symbol("P2P<WebSocket.BanList>"),
 			Connection: {
 				Factory: Symbol("P2P<WebSocket.Connection.Factory>"),
+				Repository: Symbol("P2P<WebSocket.Connection.Repository>"),
+				Verifiers: Symbol("P2P<WebSocket.Connection.Verifiers>"),
 			},
 			Dialer: Symbol("P2P<WebSocket.Dialer>"),
 			Listener: Symbol("P2P<WebSocket.Listener>"),
