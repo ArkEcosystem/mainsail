@@ -10,7 +10,7 @@ import type { Direction } from "./enums.js";
 
 import { CloseReason, ConnectionState } from "./enums.js";
 import { ConnectionError } from "./errors.js";
-import { Handshake } from "./handshake.js";
+import { Handshake } from "./handlers/index.js";
 import { decode, encode, type Message } from "./message.js";
 
 export type ConnectionOptions = {
