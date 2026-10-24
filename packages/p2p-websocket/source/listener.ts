@@ -81,7 +81,7 @@ export class Listener {
 				this.#state === ListenerState.Listening ? this.#verify(remoteAddress) : CloseReason.Shutdown;
 			if (rejection) {
 				this.logger.debug(`Rejected inbound socket from ${remoteAddress}: ${rejection}`, "p2p");
-				connection.terminate(rejection);
+				connection.reject(rejection);
 				return;
 			}
 
