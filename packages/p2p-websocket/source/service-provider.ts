@@ -11,6 +11,8 @@ import { Connection, type ConnectionFactory, type ConnectionOptions } from "./co
 import { Dialer } from "./dialer.js";
 import { Listener } from "./listener.js";
 import { Logger } from "./logger.js";
+import { Server } from "./server.js";
+import { Service } from "./service.js";
 
 // Binds the transport. Register it before the package that owns the server lifecycle.
 @injectable()
@@ -33,6 +35,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			);
 		this.app.bind(Identifiers.P2P.WebSocket.Listener).to(Listener).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Dialer).to(Dialer).inSingletonScope();
+		this.app.bind(Identifiers.P2P.WebSocket.Server).to(Server).inSingletonScope();
+		this.app.bind(Identifiers.P2P.WebSocket.Service).to(Service).inSingletonScope();
 	}
 
 	public configSchema(): Joi.AnySchema {
