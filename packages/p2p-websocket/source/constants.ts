@@ -1,6 +1,8 @@
 import { Units } from "@mainsail/constants";
 
 export const constants = {
+	// Time allowed for the TCP connection and the HTTP upgrade of an outbound socket.
+	CONNECT_TIMEOUT: 5000,
 	// Time allowed for the hello exchange after the socket is open.
 	HANDSHAKE_TIMEOUT: 5000,
 	// Largest frame accepted on an inbound socket.
