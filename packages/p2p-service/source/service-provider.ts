@@ -1,26 +1,28 @@
+import type { ServerOptions, Service } from "@mainsail/p2p-websocket";
+
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
-import { Server, type ServerOptions } from "@mainsail/p2p-websocket";
 import Joi from "joi";
 
 // Requires the @mainsail/p2p-websocket service provider to be registered first.
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.P2P.Server).to(Server).inSingletonScope();
+		// The bootstrapper drives boot() and dispose() through this identifier.
+		this.app.bind(Identifiers.P2P.Server).toService(Identifiers.P2P.WebSocket.Service);
 	}
 
-	// Only prepares the server. Listening is started by the bootstrapper via Server.boot()
+	// Only prepares the server. Listening is started by the bootstrapper via boot()
 	// once the node state is ready to answer peers.
 	public async boot(): Promise<void> {
 		this.app
-			.get<Server>(Identifiers.P2P.Server)
+			.get<Service>(Identifiers.P2P.WebSocket.Service)
 			.initialize("P2P Server", this.config().getRequired<ServerOptions>("server"));
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<Server>(Identifiers.P2P.Server).dispose();
+		await this.app.get<Service>(Identifiers.P2P.WebSocket.Service).dispose();
 	}
 
 	public configSchema(): Joi.AnySchema {
