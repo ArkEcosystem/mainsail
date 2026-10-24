@@ -3,6 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
+import { once } from "node:events";
 import { createServer, type Server as HttpServer } from "node:http";
 
 import { constants } from "./constants.js";
@@ -72,27 +73,20 @@ export class Server {
 		});
 	}
 
-	// Resolves once the server is listening; rejects with the listen error (busy port, EACCES, ...).
-	#listen(): Promise<void> {
-		return new Promise<void>((resolve, reject) => {
-			this.#http.once("error", reject);
-			this.#http.listen(this.#options.port, this.#options.hostname, () => {
-				this.#http.off("error", reject);
-				resolve();
-			});
-		});
+	// Resolves once the server is listening; `once` rejects with the listen error (busy port, EACCES, ...).
+	async #listen(): Promise<void> {
+		this.#http.listen(this.#options.port, this.#options.hostname);
+		await once(this.#http, "listening");
 	}
 
 	// Resolves once the port is released. Idle keep-alive connections are dropped so this does not hang.
-	#close(): Promise<void> {
-		return new Promise<void>((resolve) => {
-			if (!this.#http.listening) {
-				resolve();
-				return;
-			}
+	async #close(): Promise<void> {
+		if (!this.#http.listening) {
+			return;
+		}
 
-			this.#http.close(() => resolve());
-			this.#http.closeIdleConnections();
-		});
+		this.#http.close();
+		this.#http.closeIdleConnections();
+		await once(this.#http, "close");
 	}
 }
