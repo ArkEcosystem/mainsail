@@ -24,5 +24,7 @@ export enum CloseReason {
 	ProtocolError = "protocolError",
 	SocketError = "socketError",
 	Rejected = "rejected",
+	Banned = "banned",
+	DuplicatePeer = "duplicatePeer",
 	Shutdown = "shutdown",
 }
