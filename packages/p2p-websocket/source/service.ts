@@ -6,7 +6,7 @@ import type { ConnectionRepository } from "./connection-repository.js";
 import type { Connection } from "./connection.js";
 import type { Dialer } from "./dialer.js";
 import type { Listener } from "./listener.js";
-import type { Server, ServerOptions } from "./server.js";
+import type { Server } from "./server.js";
 
 import { CloseReason } from "./enums.js";
 
@@ -32,8 +32,8 @@ export class Service {
 
 	// Lifecycle
 
-	public initialize(name: string, options: ServerOptions): void {
-		this.server.initialize(name, options);
+	public initialize(): void {
+		this.server.initialize();
 	}
 
 	public async boot(): Promise<void> {
