@@ -43,7 +43,11 @@ export class Connection {
 		this.#direction = options.direction;
 		this.#remoteAddress = options.remoteAddress;
 
-		this.#handshake = new Handshake({ send: (message) => this.#send(message) });
+		this.#handshake = new Handshake({
+			direction: options.direction,
+			reject: (reason) => this.reject(reason),
+			send: (message) => this.#send(message),
+		});
 
 		this.#ws.on("message", (data) => this.#onMessage(data));
 		this.#ws.on("error", (error) => this.#onError(error));
@@ -101,6 +105,23 @@ export class Connection {
 		await this.#closed;
 	}
 
+	// Tells the peer why it is being refused, then terminates once the frame has been flushed.
+	// Meant for the acceptor during the handshake; after that a plain close() is enough.
+	public reject(reason: CloseReason): void {
+		if (this.#closed) {
+			return;
+		}
+
+		this.#begin(reason);
+		this.#closed = this.#waitForClose();
+
+		if (this.#ws.readyState === WebSocket.OPEN) {
+			this.#ws.send(encode({ reason, type: "reject" }), () => this.#ws.terminate());
+		} else {
+			this.#ws.terminate();
+		}
+	}
+
 	// Immediate close without the closing handshake.
 	public terminate(reason: CloseReason, error?: Error): void {
 		if (this.#closed) {
@@ -124,6 +145,10 @@ export class Connection {
 		switch (message.type) {
 			case "hello": {
 				this.#handshake.onHello(message);
+				break;
+			}
+			case "reject": {
+				this.#handshake.onReject(message);
 				break;
 			}
 		}
