@@ -6,7 +6,6 @@ import { ensureError } from "@mainsail/utils";
 import { once } from "node:events";
 import { createServer, type Server as HttpServer } from "node:http";
 
-import { constants } from "./constants.js";
 import { Listener } from "./listener.js";
 
 export type ServerOptions = {
@@ -33,12 +32,7 @@ export class Server {
 		this.#name = name;
 		this.#options = options;
 		this.#http = this.#createHttpServer();
-		this.#listener = new Listener({
-			handshakeTimeout: constants.HANDSHAKE_TIMEOUT,
-			maxPayload: constants.MAX_PAYLOAD,
-			server: this.#http,
-			version: constants.PROTOCOL_VERSION,
-		});
+		this.#listener = new Listener({ server: this.#http });
 	}
 
 	public get listener(): Listener {

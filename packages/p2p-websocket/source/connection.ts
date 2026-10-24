@@ -12,8 +12,6 @@ import { decode, encode, type Message } from "./message.js";
 export type ConnectionOptions = {
 	direction: Direction;
 	remoteAddress: string;
-	version: number;
-	handshakeTimeout: number;
 };
 
 export class Connection {
@@ -35,11 +33,7 @@ export class Connection {
 		this.direction = options.direction;
 		this.remoteAddress = options.remoteAddress;
 
-		this.#handshake = new Handshake({
-			send: (message) => this.#send(message),
-			timeout: options.handshakeTimeout,
-			version: options.version,
-		});
+		this.#handshake = new Handshake({ send: (message) => this.#send(message) });
 
 		this.#ws.on("message", (data) => this.#onMessage(data));
 		this.#ws.on("error", (error) => this.#onError(error));
