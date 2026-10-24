@@ -15,7 +15,7 @@ import { CloseReason, Direction, ListenerState } from "./enums.js";
 // Attach it before the server starts listening, otherwise upgrades in between are refused.
 @injectable()
 export class Listener {
-	@inject(Identifiers.Services.Log.Service)
+	@inject(Identifiers.P2P.WebSocket.Logger)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.P2P.WebSocket.Connection.Factory)

@@ -23,7 +23,7 @@ export type ConnectionFactory = (ws: WebSocket, options: ConnectionOptions) => C
 // One per socket, created through Identifiers.P2P.WebSocket.Connection.Factory and set up with init().
 @injectable()
 export class Connection {
-	@inject(Identifiers.Services.Log.Service)
+	@inject(Identifiers.P2P.WebSocket.Logger)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	public onClose?: (reason: CloseReason, error?: Error) => void;
