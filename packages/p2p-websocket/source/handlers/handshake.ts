@@ -1,8 +1,8 @@
-import type { HelloMessage, Message, RejectMessage } from "./message.js";
+import type { HelloMessage, Message, RejectMessage } from "../message.js";
 
-import { constants } from "./constants.js";
-import { CloseReason, Direction } from "./enums.js";
-import { ConnectionError } from "./errors.js";
+import { constants } from "../constants.js";
+import { CloseReason, Direction } from "../enums.js";
+import { ConnectionError } from "../errors.js";
 
 export type HandshakeOptions = {
 	direction: Direction;
