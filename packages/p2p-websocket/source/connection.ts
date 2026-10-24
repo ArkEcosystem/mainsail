@@ -26,7 +26,7 @@ export class Connection {
 	@inject(Identifiers.P2P.WebSocket.Logger)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	public onClose?: (reason: CloseReason, error?: Error) => void;
+	readonly #closeListeners: ((reason: CloseReason, error?: Error) => void)[] = [];
 
 	#ws!: WebSocket;
 	#handshake!: Handshake;
@@ -50,6 +50,11 @@ export class Connection {
 		this.#ws.on("close", () => this.#onClose());
 
 		return this;
+	}
+
+	// Several owners (repository, peer) need to know; listeners run in registration order, once.
+	public onClose(listener: (reason: CloseReason, error?: Error) => void): void {
+		this.#closeListeners.push(listener);
 	}
 
 	public get direction(): Direction {
@@ -142,7 +147,9 @@ export class Connection {
 				(this.#closeError ? ` (${this.#closeError.message})` : ""),
 			"p2p",
 		);
-		this.onClose?.(this.#closeReason, this.#closeError);
+		for (const listener of this.#closeListeners) {
+			listener(this.#closeReason, this.#closeError);
+		}
 	}
 
 	#begin(reason: CloseReason, error?: Error): void {
