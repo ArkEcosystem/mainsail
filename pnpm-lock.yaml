@@ -2682,6 +2682,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      joi:
+        specifier: 18.2.5
+        version: 18.2.5
       ws:
         specifier: 8.21.3
         version: 8.21.3

@@ -25,6 +25,7 @@
 		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
+		"joi": "18.2.5",
 		"ws": "8.21.3"
 	},
 	"devDependencies": {
