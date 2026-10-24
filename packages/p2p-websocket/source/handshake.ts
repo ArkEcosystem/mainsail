@@ -1,16 +1,19 @@
-import type { HelloMessage, Message } from "./message.js";
+import type { HelloMessage, Message, RejectMessage } from "./message.js";
 
 import { constants } from "./constants.js";
-import { CloseReason } from "./enums.js";
+import { CloseReason, Direction } from "./enums.js";
 import { ConnectionError } from "./errors.js";
 
 export type HandshakeOptions = {
+	direction: Direction;
 	send: (message: Message) => void;
+	reject: (reason: CloseReason) => void;
 };
 
-// Both sides send hello as soon as the socket is open and wait for the peer's hello.
-// The peer's hello may arrive before start() is called (it can share the TCP chunk with
-// the upgrade response), so the result promise exists from construction.
+// The dialer sends hello and waits for the acceptor's hello back. The acceptor waits for the
+// dialer's hello, checks it, and either echoes hello or sends reject and closes. Both sides give
+// the other HANDSHAKE_TIMEOUT from start(). The dialer's hello may reach the acceptor before its
+// start() runs (same TCP chunk as the upgrade), so the result promise exists from construction.
 export class Handshake {
 	readonly #options: HandshakeOptions;
 	readonly #done: Promise<void>;
@@ -30,9 +33,10 @@ export class Handshake {
 		this.#done.catch(() => {});
 	}
 
-	// Our hello is always sent; the peer may already have settled the handshake by sending theirs first.
 	public async start(): Promise<void> {
-		this.#options.send({ type: "hello", version: constants.PROTOCOL_VERSION });
+		if (this.#options.direction === Direction.Outbound) {
+			this.#options.send({ type: "hello", version: constants.PROTOCOL_VERSION });
+		}
 
 		if (!this.#settled) {
 			this.#timer = setTimeout(() => {
@@ -50,6 +54,10 @@ export class Handshake {
 		}
 
 		if (message.version !== constants.PROTOCOL_VERSION) {
+			if (this.#options.direction === Direction.Inbound) {
+				this.#options.reject(CloseReason.VersionMismatch);
+			}
+
 			this.#fail(
 				new ConnectionError(
 					CloseReason.VersionMismatch,
@@ -59,8 +67,21 @@ export class Handshake {
 			return;
 		}
 
+		if (this.#options.direction === Direction.Inbound) {
+			this.#options.send({ type: "hello", version: constants.PROTOCOL_VERSION });
+		}
+
 		this.#settle();
 		this.#resolve();
+	}
+
+	public onReject(message: RejectMessage): void {
+		if (this.#settled || this.#options.direction !== Direction.Outbound) {
+			this.#fail(new ConnectionError(CloseReason.ProtocolError, "Unexpected reject"));
+			return;
+		}
+
+		this.#fail(new ConnectionError(message.reason, `Rejected by peer: ${message.reason}`));
 	}
 
 	public abort(error: ConnectionError): void {
