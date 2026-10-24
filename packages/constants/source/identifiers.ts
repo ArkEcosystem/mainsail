@@ -233,6 +233,13 @@ export const Identifiers = {
 			Factory: Symbol("P2P<TxPoolNode.Factory>"),
 			Verifier: Symbol("P2P<TxPoolNode.Verifier>"),
 		},
+		WebSocket: {
+			Connection: {
+				Factory: Symbol("P2P<WebSocket.Connection.Factory>"),
+			},
+			Dialer: Symbol("P2P<WebSocket.Dialer>"),
+			Listener: Symbol("P2P<WebSocket.Listener>"),
+		},
 	},
 	Processor: {
 		BlockProcessor: Symbol("Processor<Block.Processor>"),

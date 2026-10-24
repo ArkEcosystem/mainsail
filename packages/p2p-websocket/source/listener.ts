@@ -1,20 +1,26 @@
+import type { Contracts } from "@mainsail/contracts";
 import type { Server as HttpServer } from "node:http";
 import type { Server as HttpsServer } from "node:https";
 
+import { Identifiers } from "@mainsail/constants";
+import { inject, injectable } from "@mainsail/container";
 import { WebSocketServer } from "ws";
 
-import { Connection } from "./connection.js";
+import type { Connection, ConnectionFactory } from "./connection.js";
+
 import { constants } from "./constants.js";
 import { CloseReason, Direction, ListenerState } from "./enums.js";
 
-export type ListenerOptions = {
-	// Owned by the caller: it is listened on and closed outside the listener.
-	server: HttpServer | HttpsServer;
-};
-
 // Accepts WebSocket upgrades on a server it does not own and turns them into connections.
 // Attach it before the server starts listening, otherwise upgrades in between are refused.
+@injectable()
 export class Listener {
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
+	@inject(Identifiers.P2P.WebSocket.Connection.Factory)
+	private readonly createConnection!: ConnectionFactory;
+
 	// Called before the handshake. Returning a reason rejects the socket.
 	public accept?: (remoteAddress: string) => CloseReason | undefined;
 
@@ -24,14 +30,15 @@ export class Listener {
 	// Errors ws re-emits from the underlying server while the listener is attached.
 	public onError?: (error: Error) => void;
 
-	readonly #options: ListenerOptions;
 	readonly #connections = new Set<Connection>();
 
+	// Owned by the caller: it is listened on and closed outside the listener.
+	#server!: HttpServer | HttpsServer;
 	#state = ListenerState.Stopped;
 	#wss?: WebSocketServer;
 
-	public constructor(options: ListenerOptions) {
-		this.#options = options;
+	public initialize(server: HttpServer | HttpsServer): void {
+		this.#server = server;
 	}
 
 	public get state(): ListenerState {
@@ -50,12 +57,13 @@ export class Listener {
 		this.#wss = new WebSocketServer({
 			maxPayload: constants.MAX_PAYLOAD,
 			perMessageDeflate: false,
-			server: this.#options.server,
+			server: this.#server,
 		});
 
 		// ws re-emits the server's errors here; without a listener they would crash the process.
 		this.#wss.on("error", (error) => {
 			if (this.#state === ListenerState.Listening) {
+				this.logger.error(`Listener error: ${error.message}`, "p2p");
 				this.onError?.(error);
 			}
 		});
@@ -64,15 +72,13 @@ export class Listener {
 			ws.on("error", () => {});
 
 			const remoteAddress = request.socket.remoteAddress ?? "";
-			const connection = new Connection(ws, {
-				direction: Direction.Inbound,
-				remoteAddress,
-			});
+			const connection = this.createConnection(ws, { direction: Direction.Inbound, remoteAddress });
 
 			// Sockets that complete the upgrade while stop() is in progress are dropped here.
 			const rejection =
 				this.#state === ListenerState.Listening ? this.accept?.(remoteAddress) : CloseReason.Shutdown;
 			if (rejection) {
+				this.logger.debug(`Rejected inbound socket from ${remoteAddress}: ${rejection}`, "p2p");
 				connection.terminate(rejection);
 				return;
 			}
@@ -80,10 +86,7 @@ export class Listener {
 			this.#connections.add(connection);
 			connection.onClose = () => this.#connections.delete(connection);
 
-			void connection
-				.open()
-				.then(() => this.onConnection?.(connection))
-				.catch(() => {}); // The connection has already been terminated with its reason.
+			void this.#open(connection);
 		});
 
 		this.#state = ListenerState.Listening;
@@ -106,5 +109,16 @@ export class Listener {
 
 		this.#wss = undefined;
 		this.#state = ListenerState.Stopped;
+	}
+
+	async #open(connection: Connection): Promise<void> {
+		try {
+			await connection.open();
+		} catch {
+			return; // Already terminated with its reason, which the connection logged on close.
+		}
+
+		this.logger.debug(`Accepted inbound connection from ${connection.remoteAddress}`, "p2p");
+		this.onConnection?.(connection);
 	}
 }
