@@ -239,6 +239,7 @@ export const Identifiers = {
 			},
 			Dialer: Symbol("P2P<WebSocket.Dialer>"),
 			Listener: Symbol("P2P<WebSocket.Listener>"),
+			Logger: Symbol("P2P<WebSocket.Logger>"),
 		},
 	},
 	Processor: {
