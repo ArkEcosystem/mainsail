@@ -11,7 +11,7 @@ import { Connection, type ConnectionFactory, type ConnectionOptions } from "./co
 import { Dialer } from "./dialer.js";
 import { Listener } from "./listener.js";
 import { Logger } from "./logger.js";
-import { Server, type ServerOptions } from "./server.js";
+import { Server } from "./server.js";
 import { Service } from "./service.js";
 
 // Binds the transport. Register it before the package that owns the server lifecycle.
@@ -42,9 +42,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	// Only prepares the server. Listening is started by the bootstrapper via Service.boot()
 	// once the node state is ready to answer peers.
 	public async boot(): Promise<void> {
-		this.app
-			.get<Service>(Identifiers.P2P.WebSocket.Service)
-			.initialize("P2P Server", this.config().getRequired<ServerOptions>("server"));
+		this.app.get<Service>(Identifiers.P2P.WebSocket.Service).initialize();
 	}
 
 	public async dispose(): Promise<void> {
