@@ -1,3 +1,5 @@
+import { ensureError } from "@mainsail/utils";
+import { once } from "node:events";
 import WebSocket from "ws";
 
 import type { Direction } from "./enums.js";
@@ -135,29 +137,26 @@ export class Connection {
 		this.#handshake.abort(new ConnectionError(reason, "Connection closed during handshake", { cause: error }));
 	}
 
-	#waitForOpen(): Promise<void> {
+	// `once` rejects with the socket error if the connection attempt fails.
+	async #waitForOpen(): Promise<void> {
 		if (this.#ws.readyState === WebSocket.OPEN) {
-			return Promise.resolve();
+			return;
 		}
 
 		if (this.#ws.readyState !== WebSocket.CONNECTING) {
-			return Promise.reject(new ConnectionError(CloseReason.SocketError, "Socket is not open"));
+			throw new ConnectionError(CloseReason.SocketError, "Socket is not open");
 		}
 
-		return new Promise<void>((resolve, reject) => {
-			const onOpen = () => {
-				this.#ws.off("error", onError);
-				resolve();
-			};
-			const onError = (error: Error) => {
-				this.#ws.off("open", onOpen);
-				reject(new ConnectionError(CloseReason.SocketError, error.message, { cause: error }));
-			};
-			this.#ws.once("open", onOpen);
-			this.#ws.once("error", onError);
-		});
+		try {
+			await once(this.#ws, "open");
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			throw new ConnectionError(CloseReason.SocketError, error.message, { cause: error });
+		}
 	}
 
+	// Not `once`: ws emits "error" before "close" when a connecting socket is aborted, and that must not
+	// reject the close promise. The constructor's error listener handles the error itself.
 	#waitForClose(): Promise<void> {
 		if (this.#ws.readyState === WebSocket.CLOSED) {
 			return Promise.resolve();
