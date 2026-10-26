@@ -188,28 +188,30 @@ describe<Ctx>("TokenParserService", ({ it, beforeEach, assert, spy }) => {
 		assert.equal(tokens, []);
 	});
 
-	it("numbers actions per contract and resets the numbering on the next block", async ({ service }) => {
+	it("numbers actions across tokens in emission order and resets the numbering on the next block", async ({
+		service,
+	}) => {
 		const receiptOf = (token: string) => ({ logs: [transferLog(token, HOLDER_ONE, HOLDER_TWO, 1n)] }) as any;
 
 		const first = await service.parseReceipt(header(5), transaction(), {
 			logs: [
 				transferLog(TOKEN, HOLDER_ONE, HOLDER_TWO, 1n),
-				transferLog(TOKEN, HOLDER_TWO, HOLDER_ONE, 2n),
 				transferLog(OTHER_TOKEN, HOLDER_ONE, HOLDER_TWO, 3n),
+				transferLog(TOKEN, HOLDER_TWO, HOLDER_ONE, 2n),
 			],
 		} as any);
 		assert.equal(
 			first.tokenActions.map((action) => [action.address, action.index]),
 			[
 				[TOKEN, 0],
-				[TOKEN, 1],
-				[OTHER_TOKEN, 0],
+				[OTHER_TOKEN, 1],
+				[TOKEN, 2],
 			],
 		);
 
 		// A later receipt in the same block continues the numbering ...
 		const sameBlock = await service.parseReceipt(header(5), transaction(), receiptOf(TOKEN));
-		assert.equal(sameBlock.tokenActions[0].index, 2);
+		assert.equal(sameBlock.tokenActions[0].index, 3);
 
 		// ... and a new block starts over.
 		const nextBlock = await service.parseReceipt(header(6), transaction(), receiptOf(TOKEN));

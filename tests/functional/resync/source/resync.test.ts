@@ -1,9 +1,10 @@
 import type { Contracts } from "@mainsail/contracts";
+import { Identifiers } from "@mainsail/constants";
 import { describe } from "@mainsail/test-runner";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
-import { setupSyncNode } from "./setup.js";
+import { runDatabaseQuery, setupSyncNode } from "./setup.js";
 import { verifyNodeIntegrity } from "./integrity.js";
-import { forgeTransactions, getRandomConsensusKeyPair, getWallets } from "./utilities.js";
+import { forgeTransactions, getRandomConsensusKeyPair, getWallets, waitForApiSync } from "./utilities.js";
 import { dirSync } from "tmp";
 import { getCreateAddress, Hex, parseEther } from "viem";
 
@@ -131,6 +132,42 @@ describe<{
 		});
 
 		assert.true(await forgeTransactions(context, [transferTx]));
+	});
+
+	it("should number the token actions of a block across tokens", async ({ syncNode }) => {
+		const wallets = await getWallets(syncNode);
+		const context = { app: syncNode, wallets };
+
+		const deployments = [
+			await EvmCalls.makeEvmCallDeployErc20Contract(context),
+			await EvmCalls.makeEvmCallDeployErc20Contract(context, { nonceOffset: 1 }),
+		];
+		assert.true(await forgeTransactions(context, deployments));
+		const [first, second] = deployments.map(({ from, nonce }) => getCreateAddress({ from: from as Hex, nonce }));
+
+		const recipient = await Utils.getRandomColdWallet(context);
+		const payload = EvmCalls.encodeErc20Transfer(recipient.address, parseEther("1"));
+		const transfers = [
+			await EvmCalls.makeEvmCall(context, { payload, recipient: second }),
+			await EvmCalls.makeEvmCall(context, { nonceOffset: 1, payload, recipient: first }),
+		];
+		assert.true(await forgeTransactions(context, transfers));
+		await waitForApiSync(syncNode);
+
+		const actions = await runDatabaseQuery(syncNode.get<string>(Identifiers.Application.Name), (dataSource) =>
+			dataSource.query(
+				"SELECT address, block_number, index FROM token_actions WHERE transaction_hash = ANY($1) ORDER BY index",
+				[transfers.map(({ hash }) => hash)],
+			),
+		);
+		assert.equal(actions[0].block_number, actions[1].block_number);
+		assert.equal(
+			actions.map(({ address, index }) => [address.toLowerCase(), index]),
+			[
+				[second.toLowerCase(), 0],
+				[first.toLowerCase(), 1],
+			],
+		);
 	});
 
 	it.skip("should be ok with legacy wallets", async ({ syncNode }) => {
