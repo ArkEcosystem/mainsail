@@ -111,6 +111,24 @@ describe<{
 		assert.length(data.data, 0);
 	});
 
+	it("/blocks links keep the filters and offsets of a page", async () => {
+		await apiContext.blockRepository.save(blocks);
+
+		for (const [path, numbers] of [
+			["/blocks?limit=2&number.from=40", [44, 43]],
+			["/blocks?limit=2&offset=1", [43, 42]],
+		] as const) {
+			const { data: page } = await request(path, options);
+			const { statusCode, data } = await request(page.meta.next, options);
+
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map(({ number }) => number),
+				numbers,
+			);
+		}
+	});
+
 	it("/blocks/{id}", async () => {
 		await apiContext.blockRepository.save(blocks);
 
