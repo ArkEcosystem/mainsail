@@ -6,20 +6,22 @@ import { WalletFilter } from "../search/filters/index.js";
 import { ValidatorFilter } from "../search/filters/validator-filter.js";
 import { makeExtendedRepository } from "./repository-extension.js";
 
+const columns = new Set(["address", "balance", "nonce", "publicKey"]);
+
 const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting => {
 	if (sorting.length === 0) {
 		return defaultSort;
 	}
 
-	return sorting.map((item): SortFragment => ({
-		direction: item.direction,
-		jsonFieldAccessor: {
-			cast: "numeric",
-			fieldName: item.property.replace("attributes.", ""),
-			operator: "->>",
-		},
-		property: "attributes",
-	}));
+	return sorting.map(({ direction, property }): SortFragment =>
+		columns.has(property)
+			? { direction, property }
+			: {
+					direction,
+					jsonFieldAccessor: WalletFilter.getAttributeAccessor(property.replace(/^attributes\./, "")),
+					property: "attributes",
+				},
+	);
 };
 
 export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRepository =>
@@ -33,13 +35,7 @@ export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRe
 			const walletExpression = await WalletFilter.getExpression(walletCriteria);
 			return this.listByExpression(
 				walletExpression,
-				convertToJsonbSorting(sorting, [
-					{
-						direction: "desc",
-						jsonFieldAccessor: { cast: "numeric", fieldName: "balance", operator: "->>" },
-						property: "attributes",
-					},
-				]),
+				convertToJsonbSorting(sorting, [{ direction: "desc", property: "balance" }]),
 				pagination,
 				options,
 			);
@@ -57,7 +53,7 @@ export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRe
 				convertToJsonbSorting(sorting, [
 					{
 						direction: "asc",
-						jsonFieldAccessor: { cast: "bigint", fieldName: "validatorRank", operator: "->>" },
+						jsonFieldAccessor: WalletFilter.getAttributeAccessor("validatorRank"),
 						property: "attributes",
 					},
 				]),
