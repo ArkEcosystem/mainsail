@@ -36,7 +36,7 @@ export const createSortingSchema = (schemaObject: SchemaObject, wildcardPaths: s
 			isSchema(value) ? key : getObjectPaths(value).map((p) => `${key}.${p}`),
 		);
 
-	const exactPaths = getObjectPaths(schemaObject);
+	const exactPaths = getObjectPaths(schemaObject).filter((path) => !wildcardPaths.includes(path));
 
 	const orderBy = Joi.custom((value, helpers) => {
 		if (value === "") {
