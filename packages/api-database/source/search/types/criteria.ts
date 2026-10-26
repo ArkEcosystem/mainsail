@@ -92,6 +92,7 @@ export type ValidatorCriteria = {
 	votes?: OrEqualCriteria<string>;
 	rank?: OrEqualCriteria<number>;
 	isResigned?: OrEqualCriteria<boolean>;
+	username?: OrEqualCriteria<string>;
 
 	forged?: ValidatorForged;
 	production?: ValidatorProduction;

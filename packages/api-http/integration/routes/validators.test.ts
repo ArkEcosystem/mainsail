@@ -254,6 +254,17 @@ describe<{
 		assert.equal(after.statusCode, 200);
 	});
 
+	it("/validators?username", async () => {
+		await apiContext.walletRepository.save(validators);
+
+		const { statusCode, data } = await request("/validators?username=genesis_5", options);
+		assert.equal(statusCode, 200);
+		assert.equal(
+			data.data.map((validator) => validator.address),
+			[validators[2].address],
+		);
+	});
+
 	it("/validators/{id}", async () => {
 		await apiContext.walletRepository.save(validators);
 
