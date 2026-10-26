@@ -68,10 +68,10 @@ export const transactionCriteriaSchemas = {
 	from: Schemas.orEqualCriteria(address),
 	gasPrice: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	hash: Schemas.orEqualCriteria(Joi.string().hex().length(64)),
-	nonce: Schemas.orNumericCriteria(Joi.number().integer().positive()),
+	nonce: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	senderPublicKey: Schemas.orEqualCriteria(Joi.string().hex().length(66)),
 	timestamp: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	to: Schemas.orEqualCriteria(address),
-	transactionIndex: Schemas.orNumericCriteria(Joi.number().integer().positive()),
+	transactionIndex: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	value: Schemas.orNumericCriteria(Schemas.amountSchema),
 };

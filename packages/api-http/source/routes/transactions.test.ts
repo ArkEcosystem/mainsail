@@ -118,6 +118,14 @@ describe<{
 		assert.equal(options, { estimateTotalCount: true, fullReceipt: false });
 	});
 
+	it("GET /api/transactions - accepts a zero nonce and transaction index", async ({ server, repos }) => {
+		const response = await server.inject({ method: "GET", url: "/api/transactions?nonce=0&transactionIndex=0" });
+
+		assert.is(response.statusCode, 200);
+		const [, criteria] = repos.transaction.calls.findManyByCriteria[0];
+		assert.equal([criteria.nonce, criteria.transactionIndex], [0, 0]);
+	});
+
 	it("GET /api/transactions - rejects criteria and orderBy properties transactions do not have", async ({
 		server,
 	}) => {
