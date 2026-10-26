@@ -3,7 +3,7 @@ import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "../sea
 
 import { Peer } from "../models/peer.js";
 import { PeerFilter } from "../search/filters/index.js";
-import { makeExtendedRepository } from "./repository-extension.js";
+import { breakTies, makeExtendedRepository } from "./repository-extension.js";
 
 export const makePeerRepository = (dataSource: RepositoryDataSource): PeerRepository =>
 	makeExtendedRepository<Peer, PeerRepositoryExtension>(Peer, dataSource, {
@@ -14,7 +14,7 @@ export const makePeerRepository = (dataSource: RepositoryDataSource): PeerReposi
 			options?: Options,
 		): Promise<ResultsPage<Peer>> {
 			const peerExpression = await PeerFilter.getExpression(peerCriteria);
-			return this.listByExpression(peerExpression, sorting, pagination, options);
+			return this.listByExpression(peerExpression, breakTies(sorting, "ip"), pagination, options);
 		},
 
 		async getPeerBlockNumberP90(): Promise<number> {

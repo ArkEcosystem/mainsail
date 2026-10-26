@@ -37,6 +37,6 @@ describe<{
 		await apiContext.apiNodesRepository.save(apiNodes);
 
 		({ statusCode, data } = await request("/api-nodes", options));
-		assert.equal(data.data, apiNodes);
+		assert.equal(data.data, [apiNodes[1], apiNodes[0]]);
 	});
 });

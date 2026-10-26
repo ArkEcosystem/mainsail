@@ -52,6 +52,12 @@ describe<{
 		assert.equal(criteria.ip, "127.0.0.1");
 	});
 
+	it("GET /api/api-nodes - rejects orderBy properties api nodes do not have", async ({ server }) => {
+		const response = await server.inject({ method: "GET", url: "/api/api-nodes?orderBy=unknown:asc" });
+
+		assert.is(response.statusCode, 422);
+	});
+
 	it("GET /api/api-nodes - rejects a malformed ip filter", async ({ server }) => {
 		const response = await server.inject({ method: "GET", url: "/api/api-nodes?ip=not-an-ip" });
 
