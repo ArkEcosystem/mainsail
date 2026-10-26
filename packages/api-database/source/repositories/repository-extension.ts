@@ -9,7 +9,7 @@ import type {
 	ThisRepositoryExtension,
 } from "../contracts.js";
 import type { Expression } from "../search/types/expressions.js";
-import type { Expressions, Options, Pagination, ResultsPage, Sorting } from "../search/types/index.js";
+import type { Expressions, Options, Pagination, ResultsPage, SortFragment, Sorting } from "../search/types/index.js";
 
 import { groupEqualities, QueryHelper } from "../search/index.js";
 
@@ -128,3 +128,11 @@ export const makeExtendedRepository = <TEntity extends ObjectLiteral, CustomRepo
 		...getRepositoryExtension(),
 		...extend,
 	});
+
+// in the direction of the last distinct sort key, so that one index serves both directions
+export const breakTies = (sorting: Sorting, property: string, direction?: SortFragment["direction"]): Sorting => {
+	const keys = sorting.map((item) => `${item.property}.${item.jsonFieldAccessor?.fieldName ?? ""}`);
+	const last = sorting.findLast((_, index) => keys.indexOf(keys[index]) === index);
+
+	return [...sorting, { direction: direction ?? last?.direction ?? "asc", property }];
+};
