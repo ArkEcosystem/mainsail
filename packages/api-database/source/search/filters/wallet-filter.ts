@@ -3,7 +3,7 @@ import { isObject } from "@mainsail/utils";
 
 import type { Wallet } from "../../models/index.js";
 import type { EqualCriteria, NumericCriteria, OrWalletCriteria, WalletCriteria } from "../types/criteria.js";
-import type { Expression, JsonFieldCastType, OrExpression } from "../types/expressions.js";
+import type { Expression, JsonFieldAccessor, JsonFieldCastType, OrExpression } from "../types/expressions.js";
 
 import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 
@@ -97,15 +97,19 @@ export class WalletFilter {
 						throw new InvalidCriteria(`Invalid attribute key '${k}'`);
 					}
 
-					return handleComparisonCriteria<Wallet, "attributes">("attributes", v, {
-						cast: this.inferAttributeCastType(k),
-						fieldName: k,
-						operator: "->>",
-					});
+					return handleComparisonCriteria<Wallet, "attributes">(
+						"attributes",
+						v,
+						this.getAttributeAccessor(k),
+					);
 				}),
 			),
 			op: "or",
 		};
+	}
+
+	public static getAttributeAccessor(attribute: string): JsonFieldAccessor {
+		return { cast: this.inferAttributeCastType(attribute), fieldName: attribute, operator: "->>" };
 	}
 
 	private static inferAttributeCastType(attribute: string): JsonFieldCastType | undefined {
@@ -132,8 +136,10 @@ export class WalletFilter {
 		if (
 			[
 				"nonce",
+				"multiSignature.min",
 				"validatorRank",
 				"validatorProducedBlocks",
+				"validatorVotersCount",
 				"validatorLastBlock.number",
 				"validatorLastBlock.timestamp",
 			].includes(attribute)
@@ -144,7 +150,10 @@ export class WalletFilter {
 		if (
 			[
 				"balance",
+				// u64, which does not fit into bigint
+				"legacyNonce",
 				"validatorApproval",
+				"validatorFee",
 				"validatorVoteBalance",
 				"validatorForgedFees",
 				"validatorForgedRewards",

@@ -92,6 +92,36 @@ describe<{
 		}
 	});
 
+	it("/wallets?attributes numeric ranges", async () => {
+		const [a, b, c, d] = wallets;
+		await apiContext.walletRepository.save([
+			{ ...a, attributes: { legacyNonce: "2", validatorFee: "5000000000000000000", validatorVotersCount: 2 } },
+			{ ...b, attributes: { legacyNonce: "10", validatorFee: "40000000000000000000", validatorVotersCount: 10 } },
+			{ ...c, attributes: { legacyNonce: "3", validatorFee: "300000000000000000000", validatorVotersCount: 3 } },
+			{ ...d, attributes: { legacyNonce: "18446744073709551615", multiSignature: { min: 2 } } },
+		]);
+
+		const testCases = [
+			{ path: "attributes.legacyNonce.from=1&attributes.legacyNonce.to=3", result: [a, c] },
+			{ path: "attributes.legacyNonce.from=10000000000000000000", result: [d] },
+			{ path: "attributes.validatorVotersCount.from=1&attributes.validatorVotersCount.to=3", result: [a, c] },
+			{
+				path: "attributes.validatorFee.from=10000000000000000000&attributes.validatorFee.to=100000000000000000000",
+				result: [b],
+			},
+			{ path: "attributes.multiSignature.min.from=2", result: [d] },
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(`/wallets?${path}`, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map((wallet) => wallet.address).sort(),
+				result.map((wallet) => wallet.address).sort(),
+			);
+		}
+	});
+
 	it("/wallets?attributes rejects SQL injection in attribute keys", async () => {
 		await apiContext.walletRepository.save(wallets);
 

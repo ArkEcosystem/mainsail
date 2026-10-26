@@ -55,6 +55,37 @@ describe<{
 		assert.equal(data.data, sorted);
 	});
 
+	it("/validators numeric filters", async () => {
+		const votes = ["900", "10000", "5", "80", "7000", "60", "3", "400"].map(
+			(value) => `${value}000000000000000000`,
+		);
+		const approvals = [1.5, 0.25, 10.75, 3, 0.5, 2.25, 7, 0.125];
+		const rows = validators.map((validator, index) => ({
+			...validator,
+			attributes: {
+				...validator.attributes,
+				validatorApproval: approvals[index],
+				validatorVoteBalance: votes[index],
+			},
+		}));
+		await apiContext.walletRepository.save(rows);
+
+		const testCases = [
+			{ path: "rank.from=5&rank.to=13", result: [0, 2, 5] },
+			{ path: "votes.from=1000000000000000000000", result: [1, 4] },
+			{ path: "production.approval.from=2", result: [2, 3, 5, 6] },
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(`/validators?${path}`, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map((validator) => validator.address).sort(),
+				result.map((index) => rows[index].address).sort(),
+			);
+		}
+	});
+
 	it("/validators?attributes filters by a jsonb attribute (escapeLiteral path)", async () => {
 		await apiContext.walletRepository.save(validators);
 
