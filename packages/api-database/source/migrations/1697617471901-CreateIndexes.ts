@@ -5,9 +5,9 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 		// language=postgresql
 		await queryRunner.query(`
             CREATE UNIQUE INDEX transactions_sender_nonce ON transactions(sender_public_key, nonce);
-            CREATE INDEX transactions_to_timestamp_tx_index ON transactions("to", timestamp DESC, transaction_index DESC);
-            CREATE INDEX transactions_from_timestamp_tx_index ON transactions("from", timestamp DESC, transaction_index DESC);
-            CREATE INDEX transactions_sender_timestamp_tx_index ON transactions(sender_public_key, timestamp DESC, transaction_index DESC);
+            CREATE INDEX transactions_to_timestamp_tx_index ON transactions("to", timestamp, transaction_index);
+            CREATE INDEX transactions_from_timestamp_tx_index ON transactions("from", timestamp, transaction_index);
+            CREATE INDEX transactions_sender_timestamp_tx_index ON transactions(sender_public_key, timestamp, transaction_index);
             CREATE INDEX transactions_multi_payment_recipients ON transactions USING GIN (multi_payment_recipients);
 
             CREATE INDEX transactions_block_hash ON transactions(block_hash);
@@ -19,18 +19,10 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
                 ALTER COLUMN sender_public_key SET STATISTICS 1000,
                 ALTER COLUMN block_hash SET STATISTICS 1000;
 
-            CREATE INDEX transactions_value ON transactions(value);
-            CREATE INDEX transactions_gas_price ON transactions(gas_price);
-            CREATE INDEX transactions_nonce ON transactions(nonce);
-
-            CREATE INDEX transactions_value_transaction_index ON transactions(value, transaction_index);
-            CREATE INDEX transactions_gas_price_transaction_index ON transactions(gas_price, transaction_index);
-            CREATE INDEX transactions_nonce_transaction_index ON transactions(nonce, transaction_index);
+            CREATE INDEX transactions_value_timestamp_tx_index ON transactions(value, timestamp, transaction_index);
+            CREATE INDEX transactions_gas_price_timestamp_tx_index ON transactions(gas_price, timestamp, transaction_index);
+            CREATE INDEX transactions_nonce_timestamp_tx_index ON transactions(nonce, timestamp, transaction_index);
             CREATE INDEX transactions_timestamp_transaction_index ON transactions(timestamp, transaction_index);
-
-            CREATE INDEX transactions_value_asc_transaction_index_desc ON transactions(value ASC, transaction_index DESC);
-            CREATE INDEX transactions_gas_price_asc_transaction_index_desc ON transactions(gas_price ASC, transaction_index DESC);
-            CREATE INDEX transactions_nonce_asc_transaction_index_desc ON transactions(nonce ASC, transaction_index DESC);
             CREATE INDEX transactions_timestamp_asc_transaction_index_desc ON transactions(timestamp ASC, transaction_index DESC) INCLUDE (gas_price);
 
             CREATE INDEX transactions_function_sig_address ON transactions(
@@ -104,18 +96,10 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 
             DROP INDEX transactions_block_hash;
 
-            DROP INDEX transactions_value;
-            DROP INDEX transactions_gas_price;
-            DROP INDEX transactions_nonce;
-
-            DROP INDEX transactions_value_transaction_index;
-            DROP INDEX transactions_gas_price_transaction_index;
-            DROP INDEX transactions_nonce_transaction_index;
+            DROP INDEX transactions_value_timestamp_tx_index;
+            DROP INDEX transactions_gas_price_timestamp_tx_index;
+            DROP INDEX transactions_nonce_timestamp_tx_index;
             DROP INDEX transactions_timestamp_transaction_index;
-
-            DROP INDEX transactions_value_asc_transaction_index_desc;
-            DROP INDEX transactions_gas_price_asc_transaction_index_desc;
-            DROP INDEX transactions_nonce_asc_transaction_index_desc;
             DROP INDEX transactions_timestamp_asc_transaction_index_desc;
             DROP INDEX transactions_function_sig_address;
             DROP INDEX transactions_votes_sender_timestamp_tx_index;
