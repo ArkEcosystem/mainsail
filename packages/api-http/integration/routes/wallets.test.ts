@@ -122,6 +122,22 @@ describe<{
 		}
 	});
 
+	it("/wallets?attributes leaves out wallets without validator counters", async () => {
+		const [a, b, c] = wallets;
+		await apiContext.walletRepository.save([
+			{ ...a, attributes: { validatorProducedBlocks: 2 } },
+			{ ...b, attributes: { validatorProducedBlocks: 9 } },
+			{ ...c, attributes: {} },
+		]);
+
+		const { statusCode, data } = await request("/wallets?attributes.validatorProducedBlocks.to=5", options);
+		assert.equal(statusCode, 200);
+		assert.equal(
+			data.data.map((wallet) => wallet.address),
+			[a.address],
+		);
+	});
+
 	it("/wallets?attributes rejects SQL injection in attribute keys", async () => {
 		await apiContext.walletRepository.save(wallets);
 
@@ -283,6 +299,30 @@ describe<{
 		const testCases = [
 			{ path: "/wallets?orderBy=attributes.username:asc", result: [b, c, a, d] },
 			{ path: "/wallets?orderBy=attributes.username:desc", result: [a, c, b, d] },
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map((wallet) => wallet.address),
+				result.map((wallet) => wallet.address),
+			);
+		}
+	});
+
+	it("/wallets?orderBy counts a missing legacy flag as false", async () => {
+		const [a, b, c, d] = wallets;
+		await apiContext.walletRepository.save([
+			{ ...a, attributes: { isLegacy: true }, balance: "300" },
+			{ ...b, attributes: {}, balance: "1000" },
+			{ ...c, attributes: { isLegacy: true }, balance: "20" },
+			{ ...d, attributes: {}, balance: "5000" },
+		]);
+
+		const testCases = [
+			{ path: "/wallets?orderBy=attributes.isLegacy:asc,balance:desc", result: [d, b, a, c] },
+			{ path: "/wallets?attributes.isLegacy=false", result: [d, b] },
 		];
 
 		for (const { path, result } of testCases) {

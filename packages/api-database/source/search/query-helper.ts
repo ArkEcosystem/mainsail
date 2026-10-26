@@ -50,12 +50,16 @@ export class QueryHelper<TEntity> {
 				fullFieldPath = `${column.databaseName}${fullFieldPath}`;
 			}
 
+			if (jsonFieldAccessor.fallback !== undefined) {
+				fullFieldPath = `COALESCE(${fullFieldPath}, ${escapeLiteral(jsonFieldAccessor.fallback)})`;
+			}
+
 			if (jsonFieldAccessor.cast) {
 				// (column->'validatorBlock'->'last'->>'number')::bigint
 				fullFieldPath = `(${fullFieldPath})::${jsonFieldAccessor.cast}`;
 			}
 
-			return { isNullable: true, name: fullFieldPath };
+			return { isNullable: jsonFieldAccessor.fallback === undefined, name: fullFieldPath };
 		}
 
 		// Escape reserved keyword
@@ -80,7 +84,8 @@ export class QueryHelper<TEntity> {
 				const query = `${column.name} = :${parameter}`;
 				const parameters = { [parameter]: expression.value };
 
-				if (expression.jsonFieldAccessor) {
+				// a field with a fallback also matches the rows that lack it, which containment would leave out
+				if (expression.jsonFieldAccessor && expression.jsonFieldAccessor.fallback === undefined) {
 					return this.withJsonContainment(metadata, expression.property, expression.jsonFieldAccessor, {
 						parameters,
 						query,

@@ -118,4 +118,5 @@ export type JsonFieldAccessor = {
 	operator: JsonFieldOperator;
 	fieldName: string;
 	cast?: JsonFieldCastType;
+	fallback?: string;
 };

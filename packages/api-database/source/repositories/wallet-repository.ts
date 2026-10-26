@@ -21,7 +21,7 @@ const validatorAttributes = new Map([
 	["votes", "validatorVoteBalance"],
 ]);
 
-const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting => {
+const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting, validators: boolean = false): Sorting => {
 	if (sorting.length === 0) {
 		return defaultSort;
 	}
@@ -33,6 +33,7 @@ const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting 
 					direction,
 					jsonFieldAccessor: WalletFilter.getAttributeAccessor(
 						validatorAttributes.get(property) ?? property.replace(/^attributes\./, ""),
+						validators,
 					),
 					property: "attributes",
 				},
@@ -65,13 +66,17 @@ export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRe
 			const walletExpression = await ValidatorFilter.getExpression(validatorCriteria);
 			return this.listByExpression(
 				walletExpression,
-				convertToJsonbSorting(sorting, [
-					{
-						direction: "asc",
-						jsonFieldAccessor: WalletFilter.getAttributeAccessor("validatorRank"),
-						property: "attributes",
-					},
-				]),
+				convertToJsonbSorting(
+					sorting,
+					[
+						{
+							direction: "asc",
+							jsonFieldAccessor: WalletFilter.getAttributeAccessor("validatorRank", true),
+							property: "attributes",
+						},
+					],
+					true,
+				),
 				pagination,
 				options,
 			);

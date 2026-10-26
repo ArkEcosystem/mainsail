@@ -135,7 +135,12 @@ describe("ValidatorFilter", ({ it, assert }) => {
 				{
 					expressions: [
 						{
-							jsonFieldAccessor: { cast: "numeric", fieldName: "validatorForgedFees", operator: "->>" },
+							jsonFieldAccessor: {
+								cast: "numeric",
+								fallback: "0",
+								fieldName: "validatorForgedFees",
+								operator: "->>",
+							},
 							op: "equal",
 							property: "attributes",
 							value: "10",
@@ -143,6 +148,7 @@ describe("ValidatorFilter", ({ it, assert }) => {
 						{
 							jsonFieldAccessor: {
 								cast: "numeric",
+								fallback: "0",
 								fieldName: "validatorForgedRewards",
 								operator: "->>",
 							},
@@ -151,7 +157,12 @@ describe("ValidatorFilter", ({ it, assert }) => {
 							value: "20",
 						},
 						{
-							jsonFieldAccessor: { cast: "numeric", fieldName: "validatorForgedTotal", operator: "->>" },
+							jsonFieldAccessor: {
+								cast: "numeric",
+								fallback: "0",
+								fieldName: "validatorForgedTotal",
+								operator: "->>",
+							},
 							op: "equal",
 							property: "attributes",
 							value: "30",
@@ -194,6 +205,7 @@ describe("ValidatorFilter", ({ it, assert }) => {
 						{
 							jsonFieldAccessor: {
 								cast: "bigint",
+								fallback: "0",
 								fieldName: "validatorProducedBlocks",
 								operator: "->>",
 							},

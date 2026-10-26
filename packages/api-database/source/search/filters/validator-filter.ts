@@ -88,7 +88,7 @@ export class ValidatorFilter {
 				case "attributes": {
 					return handleOrCriteria(criteria.attributes, async (c) =>
 						// @ts-ignore
-						WalletFilter.handleAttributesCriteria(c),
+						WalletFilter.handleAttributesCriteria(c, true),
 					);
 				}
 				default: {
@@ -104,7 +104,7 @@ export class ValidatorFilter {
 	): Promise<Expression<Wallet>> {
 		return handleOrCriteria(criteria, async (c) =>
 			// @ts-ignore
-			handleComparisonCriteria("attributes", c, WalletFilter.getAttributeAccessor(fieldName)),
+			handleComparisonCriteria("attributes", c, WalletFilter.getAttributeAccessor(fieldName, true)),
 		);
 	}
 

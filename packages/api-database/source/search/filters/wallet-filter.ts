@@ -81,6 +81,7 @@ export class WalletFilter {
 
 	public static async handleAttributesCriteria(
 		criteria: Record<string, NumericCriteria<string>>,
+		validators: boolean = false,
 	): Promise<OrExpression<Wallet>> {
 		return {
 			expressions: await Promise.all(
@@ -100,7 +101,7 @@ export class WalletFilter {
 					return handleComparisonCriteria<Wallet, "attributes">(
 						"attributes",
 						v,
-						this.getAttributeAccessor(k),
+						this.getAttributeAccessor(k, validators),
 					);
 				}),
 			),
@@ -108,8 +109,28 @@ export class WalletFilter {
 		};
 	}
 
-	public static getAttributeAccessor(attribute: string): JsonFieldAccessor {
-		return { cast: this.inferAttributeCastType(attribute), fieldName: attribute, operator: "->>" };
+	// api-sync leaves these attributes out while they are false
+	private static readonly attributeFallbacks = new Map([["isLegacy", "false"]]);
+
+	// api-sync leaves out the counters of a validator while they are zero; other wallets have none
+	private static readonly validatorAttributeFallbacks = new Map([
+		["validatorForgedFees", "0"],
+		["validatorForgedRewards", "0"],
+		["validatorForgedTotal", "0"],
+		["validatorProducedBlocks", "0"],
+	]);
+
+	public static getAttributeAccessor(attribute: string, validators: boolean = false): JsonFieldAccessor {
+		const fallback =
+			this.attributeFallbacks.get(attribute) ??
+			(validators ? this.validatorAttributeFallbacks.get(attribute) : undefined);
+
+		return {
+			cast: this.inferAttributeCastType(attribute),
+			fieldName: attribute,
+			operator: "->>",
+			...(fallback === undefined ? {} : { fallback }),
+		};
 	}
 
 	private static inferAttributeCastType(attribute: string): JsonFieldCastType | undefined {
