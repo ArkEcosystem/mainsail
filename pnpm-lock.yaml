@@ -198,9 +198,6 @@ importers:
       '@hapi/hapi':
         specifier: 21.4.10
         version: 21.4.10
-      '@hapi/hoek':
-        specifier: 11.0.7
-        version: 11.0.7
       '@mainsail/api-database':
         specifier: workspace:*
         version: link:../api-database
