@@ -35,6 +35,8 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             WHERE SUBSTRING(data FROM 1 FOR 4) = '\\x6dd7d8ea';
             CREATE INDEX transactions_votes_timestamp_tx_index ON transactions(timestamp DESC, transaction_index DESC)
             WHERE SUBSTRING(data FROM 1 FOR 4) = '\\x6dd7d8ea';
+            CREATE INDEX transactions_votes_from_timestamp_tx_index ON transactions("from", timestamp DESC, transaction_index DESC)
+            WHERE SUBSTRING(data FROM 1 FOR 4) = '\\x6dd7d8ea';
 
             CREATE INDEX transactions_deployed_contract_index ON transactions(deployed_contract_address, block_number DESC, transaction_index DESC)
             WHERE deployed_contract_address IS NOT NULL;
@@ -104,6 +106,7 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX transactions_function_sig_address;
             DROP INDEX transactions_votes_sender_timestamp_tx_index;
             DROP INDEX transactions_votes_timestamp_tx_index;
+            DROP INDEX transactions_votes_from_timestamp_tx_index;
             DROP INDEX transactions_deployed_contract_index;
 
             ALTER TABLE transactions
