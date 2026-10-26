@@ -22,7 +22,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				query: Joi.object({
-					ip: Joi.string().ip({ version: ["ipv4", "ipv6"] }),
+					url: Joi.string().uri(),
 					version: Joi.string(),
 				})
 					.concat(apiNodeSortingSchema)
