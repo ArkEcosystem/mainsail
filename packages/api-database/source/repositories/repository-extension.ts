@@ -74,6 +74,17 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 
 				const results = await resultsQueryBuilder.getMany();
 
+				// a page short of the limit, or an empty first page, is the last one
+				if (results.length < pagination.limit && (results.length > 0 || pagination.offset === 0)) {
+					await queryRunner.commitTransaction();
+
+					return {
+						meta: { totalCountIsEstimate: false },
+						results,
+						totalCount: pagination.offset + results.length,
+					};
+				}
+
 				if (options?.estimateTotalCount === false) {
 					// typeorm@0.2.25 generates slow COUNT(DISTINCT primary_key_column) for getCount or getManyAndCount
 
@@ -91,17 +102,24 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 					return { meta: { totalCountIsEstimate: false }, results, totalCount };
 				}
 
-				let totalCountEstimated = 0;
 				const [resultsSql, resultsParameters] = resultsQueryBuilder.getQueryAndParameters();
-				const resultsExplainedRows = await queryRunner.query(`EXPLAIN ${resultsSql}`, resultsParameters);
-				for (const resultsExplainedRow of resultsExplainedRows) {
-					const match = resultsExplainedRow["QUERY PLAN"].match(/rows=(\d+)/);
-					if (match) {
-						totalCountEstimated = Number.parseFloat(match[1]);
-					}
-				}
+				const [
+					{
+						"QUERY PLAN": [{ Plan: plan }],
+					},
+				] = await queryRunner.query(`EXPLAIN (FORMAT JSON) ${resultsSql}`, resultsParameters);
 
-				const totalCount = Math.max(totalCountEstimated, results.length);
+				// nodes below the one under the LIMIT may estimate the rows of a single parallel worker only
+				const estimated =
+					plan["Node Type"] === "Limit"
+						? plan.Plans.find((child) => child["Parent Relationship"] === "Outer")
+						: plan;
+
+				// a full page may be followed by more rows, an empty page past the end by none
+				const totalCount: number =
+					results.length > 0
+						? Math.max(estimated["Plan Rows"], pagination.offset + results.length + 1)
+						: Math.min(estimated["Plan Rows"], pagination.offset);
 
 				await queryRunner.commitTransaction();
 
