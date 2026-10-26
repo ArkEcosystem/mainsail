@@ -121,7 +121,11 @@ describe<{
 	it("GET /api/transactions - rejects criteria and orderBy properties transactions do not have", async ({
 		server,
 	}) => {
-		for (const url of ["/api/transactions?orderBy=nope:asc", "/api/transactions?asset.type=1"]) {
+		for (const url of [
+			"/api/transactions?orderBy=nope:asc",
+			"/api/transactions?orderBy=address:asc",
+			"/api/transactions?asset.type=1",
+		]) {
 			const response = await server.inject({ method: "GET", url });
 
 			assert.is(response.statusCode, 422);

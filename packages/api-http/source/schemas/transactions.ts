@@ -4,6 +4,8 @@ import Joi from "joi";
 import { transactionCriteriaSchemas } from "./schemas.js";
 import { walletAddressSchema, walletPublicKeySchema } from "./wallets.js";
 
+const { address, ...transactionSortingSchemaObject } = transactionCriteriaSchemas;
+
 export const transactionHashSchema = Joi.string().hex().max(96);
 
 export const transactionCriteriaSchemaObject = {
@@ -18,4 +20,4 @@ export const transactionCriteriaSchemaObject = {
 };
 
 export const transactionParamSchema = transactionHashSchema;
-export const transactionSortingSchema = Schemas.createSortingSchema(transactionCriteriaSchemas, []);
+export const transactionSortingSchema = Schemas.createSortingSchema(transactionSortingSchemaObject, []);
