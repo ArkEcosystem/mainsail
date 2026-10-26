@@ -4,6 +4,9 @@ const isSchema = (value: Joi.Schema | SchemaObject): value is Joi.Schema => Joi.
 
 export const addressSchema = Joi.string().hex({ prefix: true }).length(42);
 
+// uint256, beyond the safe integers of Joi.number()
+export const amountSchema = Joi.string().pattern(/^\d+$/, "unsigned integer").max(78);
+
 // Criteria
 
 export type SchemaObject = {

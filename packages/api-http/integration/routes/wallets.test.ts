@@ -128,6 +128,20 @@ describe<{
 		assert.equal(after.data.data.length, wallets.length);
 	});
 
+	it("/wallets?balance beyond the safe integers", async () => {
+		await apiContext.walletRepository.save(wallets);
+
+		for (const [path, length] of [
+			["balance.from=2358490566037735849056603", wallets.length],
+			["balance.from=2358490566037735849056604", 0],
+			["balance=2358490566037735849056603", wallets.length],
+		] as const) {
+			const { statusCode, data } = await request(`/wallets?limit=100&${path}`, options);
+			assert.equal(statusCode, 200);
+			assert.length(data.data, length);
+		}
+	});
+
 	it("/wallets/top", async () => {
 		await apiContext.walletRepository.save(wallets);
 

@@ -448,6 +448,18 @@ describe<{}>("Schemas", ({ it, assert }) => {
 		});
 	});
 
+	describe("amountSchema", () => {
+		it("should keep unsigned integers beyond the safe integers as strings, and nothing else", () => {
+			assert.equal(schemas.amountSchema.validate("2358490566037735849056603"), {
+				value: "2358490566037735849056603",
+			});
+
+			for (const value of ["", "-1", "1.5", "1e18", "abc", "1".repeat(79)]) {
+				assert.defined(schemas.amountSchema.validate(value).error);
+			}
+		});
+	});
+
 	describe("addressSchema", () => {
 		it("should validate a 42-char 0x-prefixed hex string", () => {
 			const result = schemas.addressSchema.validate(`0x${"a".repeat(40)}`);
