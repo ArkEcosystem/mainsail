@@ -527,6 +527,7 @@ describe<{
 			const { statusCode, data } = await request(path, options);
 			assert.equal(statusCode, 200);
 			assert.equal(data.data, result);
+			assert.equal(data.meta.totalCount, result.length);
 		}
 	});
 
