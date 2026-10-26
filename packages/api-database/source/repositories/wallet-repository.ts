@@ -8,6 +8,19 @@ import { makeExtendedRepository } from "./repository-extension.js";
 
 const columns = new Set(["address", "balance", "nonce", "publicKey"]);
 
+const validatorAttributes = new Map([
+	["blocks.last.hash", "validatorLastBlock.hash"],
+	["blocks.last.number", "validatorLastBlock.number"],
+	["blocks.produced", "validatorProducedBlocks"],
+	["forged.fees", "validatorForgedFees"],
+	["forged.rewards", "validatorForgedRewards"],
+	["forged.total", "validatorForgedTotal"],
+	["isResigned", "validatorResigned"],
+	["production.approval", "validatorApproval"],
+	["rank", "validatorRank"],
+	["votes", "validatorVoteBalance"],
+]);
+
 const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting => {
 	if (sorting.length === 0) {
 		return defaultSort;
@@ -18,7 +31,9 @@ const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting 
 			? { direction, property }
 			: {
 					direction,
-					jsonFieldAccessor: WalletFilter.getAttributeAccessor(property.replace(/^attributes\./, "")),
+					jsonFieldAccessor: WalletFilter.getAttributeAccessor(
+						validatorAttributes.get(property) ?? property.replace(/^attributes\./, ""),
+					),
 					property: "attributes",
 				},
 	);
