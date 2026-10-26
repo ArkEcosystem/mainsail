@@ -225,8 +225,8 @@ describe<{
 
 		const flat = (repos.tokenAction.qb.calls.andWhere ?? []).map(([condition]) => condition);
 		assert.true(flat.includes("tf.transaction_hash = :transactionHash"));
-		// The addresses filter is applied as a bracketed from/to OR condition.
-		assert.true(flat.some((condition) => typeof condition === "object"));
+		assert.true(flat.includes('tf."from" = addresses.address'));
+		assert.true(flat.includes('tf."to" = addresses.address'));
 	});
 
 	it("GET /api/tokens/transfers - filters by from and to lists", async ({ server, repos }) => {
@@ -249,25 +249,7 @@ describe<{
 			url: `/api/tokens/transfers?addresses=${ADDRESS_A},${ADDRESS_B}`,
 		});
 
-		// The addresses filter is a bracketed from-or-to condition; replay it to see its parameters.
-		const [bracket] = repos.tokenAction.qb.calls.andWhere.at(-1)!;
-		const replayed: any[][] = [];
-		const recorder: any = {
-			orWhere: (...args: any[]) => {
-				replayed.push(args);
-				return recorder;
-			},
-			where: (...args: any[]) => {
-				replayed.push(args);
-				return recorder;
-			},
-		};
-		bracket.whereFactory(recorder);
-
-		assert.equal(replayed, [
-			["tf.from IN (:...addresses)", { addresses: [ADDRESS_A, ADDRESS_B] }],
-			["tf.to IN (:...addresses)", { addresses: [ADDRESS_A, ADDRESS_B] }],
-		]);
+		assert.equal(repos.tokenAction.qb.calls.setParameters[0][0].addresses, [ADDRESS_A, ADDRESS_B]);
 	});
 
 	it("GET /api/tokens/transfers - accepts comma separated from and to lists", async ({ server, repos }) => {
