@@ -256,6 +256,7 @@ describe<{
 		const testCases = [
 			{ path: "/wallets", result: [d, b, a, c] },
 			{ path: "/wallets?orderBy=balance:asc", result: [c, a, b, d] },
+			{ path: "/wallets?orderBy=balance:asc,balance:desc", result: [c, a, b, d] },
 			{ path: "/wallets?orderBy=nonce:desc", result: [b, c, a, d] },
 			{ path: "/wallets?orderBy=publicKey:asc", result: [a, b, d, c] },
 		];

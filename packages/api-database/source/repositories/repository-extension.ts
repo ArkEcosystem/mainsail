@@ -16,26 +16,24 @@ import { groupEqualities, QueryHelper } from "../search/index.js";
 const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExtension<TEntity> &
 	ThisRepositoryExtension<TEntity> => ({
 	addOrderBy(queryBuilder: SelectQueryBuilder<TEntity>, sorting: Sorting): void {
-		if (sorting.length > 0) {
-			const column = this.queryHelper.getColumnName(
-				this.metadata,
-				sorting[0].property,
-				sorting[0].jsonFieldAccessor,
-			);
-			queryBuilder.orderBy(
-				column.name,
-				sorting[0].direction === "desc" ? "DESC" : "ASC",
-				column.isNullable ? "NULLS LAST" : undefined,
-			);
+		const sorted = new Set<string>();
+		for (const item of sorting) {
+			const column = this.queryHelper.getColumnName(this.metadata, item.property, item.jsonFieldAccessor);
 
-			for (const item of sorting.slice(1)) {
-				const column = this.queryHelper.getColumnName(this.metadata, item.property, item.jsonFieldAccessor);
-				queryBuilder.addOrderBy(
-					column.name,
-					item.direction === "desc" ? "DESC" : "ASC",
-					column.isNullable ? "NULLS LAST" : undefined,
-				);
+			// TypeORM would keep the last direction of a column sorted twice
+			if (sorted.has(column.name)) {
+				continue;
 			}
+
+			const direction = item.direction === "desc" ? "DESC" : "ASC";
+			const nulls = column.isNullable ? "NULLS LAST" : undefined;
+			if (sorted.size === 0) {
+				queryBuilder.orderBy(column.name, direction, nulls);
+			} else {
+				queryBuilder.addOrderBy(column.name, direction, nulls);
+			}
+
+			sorted.add(column.name);
 		}
 	},
 
