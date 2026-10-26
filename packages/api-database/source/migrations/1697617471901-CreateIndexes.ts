@@ -39,11 +39,11 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX transactions_deployed_contract_index ON transactions(deployed_contract_address, block_number DESC, transaction_index DESC)
             WHERE deployed_contract_address IS NOT NULL;
 
-            CREATE INDEX blocks_transactions_count ON blocks(transactions_count, number DESC);
-            CREATE INDEX blocks_reward ON blocks(reward, number DESC);
-            CREATE INDEX blocks_fee ON blocks(fee, number DESC);
+            CREATE INDEX blocks_transactions_count ON blocks(transactions_count, number);
+            CREATE INDEX blocks_reward ON blocks(reward, number);
+            CREATE INDEX blocks_fee ON blocks(fee, number);
             CREATE INDEX blocks_validator_round ON blocks(validator_round);
-            CREATE INDEX blocks_proposer_number ON blocks(proposer, number DESC);
+            CREATE INDEX blocks_proposer_number ON blocks(proposer, number);
 
             CREATE INDEX multi_payments_hash ON multi_payments(hash) INCLUDE (amount) WHERE success IS TRUE;
             CREATE INDEX multi_payments_hash_to ON multi_payments(hash, "to") WHERE success IS TRUE;
