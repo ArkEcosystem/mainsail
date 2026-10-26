@@ -63,6 +63,10 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
                             WHERE (attributes ? 'validatorPublicKey');
             CREATE UNIQUE INDEX wallets_unique_public_key ON wallets (public_key)
             WHERE public_key IS NOT NULL;
+            CREATE INDEX wallets_vote_balance_address ON wallets ((attributes->>'vote'), balance, address)
+            WHERE (attributes->>'vote') IS NOT NULL;
+            -- the planner ignores the expression statistics of partial indexes
+            CREATE STATISTICS wallets_vote_statistics ON (attributes->>'vote') FROM wallets;
 
             CREATE UNIQUE INDEX legacy_cold_wallets_unique_merge_address ON legacy_cold_wallets (merge_info_wallet_address)
             WHERE merge_info_wallet_address IS NOT NULL;
@@ -141,6 +145,8 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX wallets_attributes;
             DROP INDEX wallets_validators;
             DROP INDEX wallets_unique_public_key;
+            DROP INDEX wallets_vote_balance_address;
+            DROP STATISTICS wallets_vote_statistics;
 
             DROP INDEX legacy_cold_wallets_unique_merge_address;
 

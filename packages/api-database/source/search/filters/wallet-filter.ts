@@ -120,6 +120,8 @@ export class WalletFilter {
 		["validatorProducedBlocks", "0"],
 	]);
 
+	private static readonly indexedAttributes = new Set(["vote"]);
+
 	public static getAttributeAccessor(attribute: string, validators: boolean = false): JsonFieldAccessor {
 		const fallback =
 			this.attributeFallbacks.get(attribute) ??
@@ -130,6 +132,7 @@ export class WalletFilter {
 			fieldName: attribute,
 			operator: "->>",
 			...(fallback === undefined ? {} : { fallback }),
+			...(this.indexedAttributes.has(attribute) ? { indexed: true } : {}),
 		};
 	}
 

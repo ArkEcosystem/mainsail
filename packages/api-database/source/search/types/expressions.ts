@@ -119,4 +119,5 @@ export type JsonFieldAccessor = {
 	fieldName: string;
 	cast?: JsonFieldCastType;
 	fallback?: string;
+	indexed?: boolean;
 };

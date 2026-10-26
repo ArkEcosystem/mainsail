@@ -84,8 +84,13 @@ export class QueryHelper<TEntity> {
 				const query = `${column.name} = :${parameter}`;
 				const parameters = { [parameter]: expression.value };
 
-				// a field with a fallback also matches the rows that lack it, which containment would leave out
-				if (expression.jsonFieldAccessor && expression.jsonFieldAccessor.fallback === undefined) {
+				// a field with a fallback also matches the rows that lack it, which containment would leave out, and an
+				// indexed field has statistics of its own, whose estimates a containment next to it would throw off
+				if (
+					expression.jsonFieldAccessor &&
+					expression.jsonFieldAccessor.fallback === undefined &&
+					!expression.jsonFieldAccessor.indexed
+				) {
 					return this.withJsonContainment(metadata, expression.property, expression.jsonFieldAccessor, {
 						parameters,
 						query,
