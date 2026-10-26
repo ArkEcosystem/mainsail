@@ -47,12 +47,10 @@ export const blocksOrderBy = orderBy.default("number:desc");
 export const transactionsOrderBy = orderBy.default(["timestamp:desc", "transactionIndex:desc"]);
 
 export const blockCriteriaSchemas = {
-	amount: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	fee: Schemas.orNumericCriteria(Schemas.amountSchema),
 	hash: Schemas.orEqualCriteria(blockHash),
 	number: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	parentHash: Schemas.orEqualCriteria(blockHash),
-	payloadHash: Schemas.orEqualCriteria(Joi.string().hex()),
 	payloadSize: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	proposer: Schemas.orEqualCriteria(address),
 	reward: Schemas.orNumericCriteria(Schemas.amountSchema),
@@ -63,7 +61,6 @@ export const blockCriteriaSchemas = {
 
 export const transactionCriteriaSchemas = {
 	address: Schemas.orEqualCriteria(address),
-	asset: Schemas.orContainsCriteria(Joi.object()),
 	blockHash: Schemas.orEqualCriteria(blockHash),
 	data: Schemas.orEqualCriteria(
 		Joi.alternatives().try(Joi.string().valid("", "0x"), Joi.string().hex({ prefix: "optional" }).max(10)),

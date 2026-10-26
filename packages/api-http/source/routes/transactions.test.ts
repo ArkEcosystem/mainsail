@@ -118,10 +118,14 @@ describe<{
 		assert.equal(options, { estimateTotalCount: true, fullReceipt: false });
 	});
 
-	it("GET /api/transactions - rejects an unknown orderBy property", async ({ server }) => {
-		const response = await server.inject({ method: "GET", url: "/api/transactions?orderBy=nope:asc" });
+	it("GET /api/transactions - rejects criteria and orderBy properties transactions do not have", async ({
+		server,
+	}) => {
+		for (const url of ["/api/transactions?orderBy=nope:asc", "/api/transactions?asset.type=1"]) {
+			const response = await server.inject({ method: "GET", url });
 
-		assert.is(response.statusCode, 422);
+			assert.is(response.statusCode, 422);
+		}
 	});
 
 	it("GET /api/transactions/{hash} - returns the enriched transaction", async ({ server, repos }) => {
