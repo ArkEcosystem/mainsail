@@ -159,6 +159,112 @@ describe<{
 		assert.equal(result, [bobTransaction1, bobTransaction2]);
 	});
 
+	it("getFromHighestPriority - should give equal priorities to the transaction queued first", async ({
+		query,
+		mempool,
+	}) => {
+		const a = [10, 7, 7].map((gasPrice, nonce) => makeTransaction("a", BigInt(nonce), gasPrice));
+		const b = [7, 9].map((gasPrice, nonce) => makeTransaction("b", BigInt(nonce), gasPrice));
+		const c = [makeTransaction("c", 0n, 7)];
+		const d = [makeTransaction("d", 0n, 10)];
+		stub(mempool, "getSenderMempools").returnValue([a, b, c, d].map((t) => ({ getFromEarliest: () => t })));
+
+		const result = await query.getFromHighestPriority().all();
+
+		assert.equal(result, [a[0], d[0], b[0], b[1], c[0], a[1], a[2]]);
+	});
+
+	it("getFromLowestPriority - should give equal priorities to the transaction queued first", async ({
+		query,
+		mempool,
+	}) => {
+		const a = [5, 9, 9].map((gasPrice, nonce) => makeTransaction("a", BigInt(2 - nonce), gasPrice));
+		const b = [9, 6].map((gasPrice, nonce) => makeTransaction("b", BigInt(1 - nonce), gasPrice));
+		const c = [makeTransaction("c", 0n, 9)];
+		stub(mempool, "getSenderMempools").returnValue([a, b, c].map((t) => ({ getFromLatest: () => t })));
+
+		const result = await query.getFromLowestPriority().all();
+
+		assert.equal(result, [a[0], b[0], b[1], c[0], a[1], a[2]]);
+	});
+
+	it("getFromHighestPriority and getFromLowestPriority - should match re-sorting the senders after every pick", async ({
+		query,
+		mempool,
+	}) => {
+		let seed = 1;
+		const random = (max: number) => (seed = (seed * 48_271) % 2_147_483_647) % max;
+
+		const senders = Array.from({ length: 200 }, (_, sender) =>
+			Array.from({ length: random(8) }, (_, nonce) => makeTransaction(`${sender}`, BigInt(nonce), random(4))),
+		);
+		stub(mempool, "getSenderMempools").returnValue(
+			senders.map((t) => ({ getFromEarliest: () => t, getFromLatest: () => t })),
+		);
+
+		const resorted = (sort: (a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) => number) => {
+			const queue = senders.filter((t) => t.length > 0).map((t) => [...t]);
+			const result: Contracts.Crypto.Transaction[] = [];
+			while (queue.length > 0) {
+				queue.sort((a, b) => sort(a[0], b[0]));
+				const sender = queue.shift()!;
+				result.push(sender.shift()!);
+				if (sender.length > 0) {
+					queue.push(sender);
+				}
+			}
+			return result;
+		};
+
+		assert.equal(
+			await query.getFromHighestPriority().all(),
+			resorted((a, b) => b.gasPrice - a.gasPrice),
+		);
+		assert.equal(
+			await query.getFromLowestPriority().all(),
+			resorted((a, b) => a.gasPrice - b.gasPrice),
+		);
+	});
+
+	it("getFromHighestPriority - should keep the transactions of the moment it was queried", async ({
+		query,
+		mempool,
+		aliceTransaction1,
+		aliceTransaction2,
+		bobTransaction1,
+	}) => {
+		const aliceTransactions = [aliceTransaction1, aliceTransaction2];
+		stub(mempool, "getSenderMempools").returnValue([
+			{ getFromEarliest: () => aliceTransactions },
+			{ getFromEarliest: () => [bobTransaction1] },
+		]);
+
+		const queryIterable = query.getFromHighestPriority();
+		aliceTransactions.pop();
+
+		assert.equal(await queryIterable.first(), bobTransaction1);
+		assert.equal(await queryIterable.all(), [bobTransaction1, aliceTransaction1, aliceTransaction2]);
+	});
+
+	it("getFromLowestPriority - should order no further than the first transaction", async ({
+		query,
+		mempool,
+		aliceTransaction2,
+		bobTransaction2,
+	}) => {
+		const unordered = Object.defineProperty(makeTransaction(alice, 1n, 0), "gasPrice", {
+			get: () => {
+				throw new Error("ordered beyond the first transaction");
+			},
+		});
+		stub(mempool, "getSenderMempools").returnValue([
+			{ getFromLatest: () => [aliceTransaction2, unordered] },
+			{ getFromLatest: () => [bobTransaction2] },
+		]);
+
+		assert.equal(await query.getFromLowestPriority().first(), aliceTransaction2);
+	});
+
 	it("whereHash - should filter transactions by hash", async ({ aliceTransaction1, aliceTransaction2 }) => {
 		const queryIterable = new QueryIterable([aliceTransaction1, aliceTransaction2]);
 		const result = await queryIterable.whereHash(aliceTransaction2.hash).all();
