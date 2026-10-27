@@ -23,6 +23,8 @@ export enum CloseReason {
 	VersionMismatch = "versionMismatch",
 	ProtocolError = "protocolError",
 	SocketError = "socketError",
+	RequestTimeout = "requestTimeout",
+	NotOpen = "notOpen",
 	Rejected = "rejected",
 	Banned = "banned",
 	DuplicatePeer = "duplicatePeer",
