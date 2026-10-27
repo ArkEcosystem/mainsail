@@ -26,7 +26,8 @@ export class ValidatorsController extends Controller {
 			request.query,
 			validatorCriteriaSchemaObject,
 		) as Search.Criteria.ValidatorCriteria;
-		const options = this.getListingOptions(request);
+		// few enough to count exactly, where the estimate is far off
+		const options = { ...this.getListingOptions(request), estimateTotalCount: false };
 
 		const wallets = await this.walletRepositoryFactory().findManyValidatorsByCritera(
 			criteria,
@@ -63,7 +64,7 @@ export class ValidatorsController extends Controller {
 			request.query,
 			walletCriteriaSchemaObject,
 		) as Search.Criteria.WalletCriteria;
-		const options = this.getListingOptions(request);
+		const options = { ...this.getListingOptions(request), estimateTotalCount: false };
 
 		const wallets = await this.walletRepositoryFactory().findManyByCriteria(
 			{

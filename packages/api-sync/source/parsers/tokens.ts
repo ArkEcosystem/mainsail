@@ -118,7 +118,7 @@ export class TokenParserService implements TokenParser {
 
 	#tokenCache!: LRUCache<string, Models.Token>;
 	#nonTokenCache!: LRUCache<string, number>;
-	#actionIndexes: Map<`0x${string}`, number> = new Map<`0x${string}`, number>();
+	#actionIndex = 0;
 	#previousBlockNumber!: number;
 
 	#preparedFunctionCalls: PreparedErc20Call[] = [];
@@ -182,7 +182,7 @@ export class TokenParserService implements TokenParser {
 			this.#preparedFunctionCalls.push({ call, data });
 		}
 
-		this.#resetTransferIndexes();
+		this.#resetActionIndex();
 	}
 
 	public async parseReceipt(
@@ -200,7 +200,7 @@ export class TokenParserService implements TokenParser {
 		const tokenActions: Models.TokenAction[] = [];
 
 		if (this.#previousBlockNumber !== header.number) {
-			this.#resetTransferIndexes(header.number);
+			this.#resetActionIndex(header.number);
 		}
 
 		const blockNumber = header.number.toString();
@@ -215,10 +215,8 @@ export class TokenParserService implements TokenParser {
 		const dirtyContractAddresses = new Set<string>();
 
 		for (const event of eventLogs) {
-			// Emitted events during deployment can have a event.logIndex of undefined and
-			// we only care about having a accurate sort order, so we manage an index manually.
-			const actionIndex = (this.#actionIndexes.get(event.address) ?? -1) + 1;
-			this.#actionIndexes.set(event.address, actionIndex);
+			// logIndex can be undefined during deployment, so the actions of a block are numbered here, in emission order
+			const actionIndex = this.#actionIndex++;
 
 			let from: `0x${string}`;
 			let to: `0x${string}`;
@@ -462,8 +460,8 @@ export class TokenParserService implements TokenParser {
 		return undefined;
 	}
 
-	#resetTransferIndexes(blockNumber: number = -1): void {
-		this.#actionIndexes.clear();
+	#resetActionIndex(blockNumber: number = -1): void {
+		this.#actionIndex = 0;
 		this.#previousBlockNumber = blockNumber;
 	}
 }

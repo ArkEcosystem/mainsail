@@ -305,6 +305,34 @@ export class Snapshot {
 			allValid = false;
 		}
 
+		// api-sync leaves out the counters of a validator while they are zero
+		const validators = await walletRepositoryFactory().findManyValidatorsByCritera(
+			{},
+			[{ direction: "asc", property: "blocks.produced" }],
+			{ limit: 1000, offset: 0 },
+			{ estimateTotalCount: false },
+		);
+		const idleValidators = await walletRepositoryFactory().findManyValidatorsByCritera(
+			{ attributes: { validatorProducedBlocks: { to: "0" } } },
+			[],
+			{ limit: 1000, offset: 0 },
+			{ estimateTotalCount: false },
+		);
+		const producedBlocks = validators.results.map(({ attributes }) =>
+			Number(attributes?.["validatorProducedBlocks"] ?? 0),
+		);
+		assert.equal(
+			producedBlocks,
+			[...producedBlocks].sort((a, b) => a - b),
+		);
+		assert.equal(
+			idleValidators.results.map(({ address }) => address).sort(),
+			validators.results
+				.filter((_, index) => producedBlocks[index] === 0)
+				.map(({ address }) => address)
+				.sort(),
+		);
+
 		if (!allValid) {
 			process.exit(1);
 		}

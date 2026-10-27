@@ -104,6 +104,19 @@ describe<{}>("Schemas", ({ it, assert }) => {
 			});
 		});
 
+		it("should contain error if property is a wildcard path itself", () => {
+			const sortingSchema = schemas.createSortingSchema(
+				{ ...testCriteriaSchemaObject, attributes: Joi.object() },
+				["attributes"],
+			);
+
+			assert.equal(sortingSchema.validate({ orderBy: "attributes.username:asc" }).error, undefined);
+			assert.equal(
+				sortingSchema.validate({ orderBy: "attributes:asc" }).error!.message,
+				"Unknown orderBy property 'attributes'",
+			);
+		});
+
 		it("should handle multiple comma-separated properties", () => {
 			const sortingSchema = schemas.createSortingSchema({
 				name: Joi.string(),
@@ -445,6 +458,18 @@ describe<{}>("Schemas", ({ it, assert }) => {
 			const schema = schemas.orContainsCriteria(item);
 
 			assert.equal(schema.validate(["alice", "bob"]), { value: ["alice", "bob"] });
+		});
+	});
+
+	describe("amountSchema", () => {
+		it("should keep unsigned integers beyond the safe integers as strings, and nothing else", () => {
+			assert.equal(schemas.amountSchema.validate("2358490566037735849056603"), {
+				value: "2358490566037735849056603",
+			});
+
+			for (const value of ["", "-1", "1.5", "1e18", "abc", "1".repeat(79)]) {
+				assert.defined(schemas.amountSchema.validate(value).error);
+			}
 		});
 	});
 

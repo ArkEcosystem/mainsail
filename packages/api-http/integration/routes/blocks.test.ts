@@ -40,6 +40,38 @@ describe<{
 		assert.equal(statusCode, 200);
 	});
 
+	it("/blocks?reward beyond the safe integers", async () => {
+		const [first, second] = blocks;
+		await apiContext.blockRepository.save([
+			{ ...first, reward: "2000000000000000000" },
+			{ ...second, reward: "1000000000000000000" },
+		]);
+
+		const { statusCode, data } = await request("/blocks?reward.from=1500000000000000000", options);
+		assert.equal(statusCode, 200);
+		assert.equal(
+			data.data.map((block) => block.hash),
+			[first.hash],
+		);
+	});
+
+	it("/blocks breaks sort ties on the number", async () => {
+		await apiContext.blockRepository.save(blocks);
+
+		for (const [orderBy, numbers] of [
+			["reward:asc", [0, 1, 2]],
+			["reward:desc", [46, 45, 44]],
+			["fee:asc", [0, 1, 2]],
+		] as const) {
+			const { statusCode, data } = await request(`/blocks?limit=3&orderBy=${orderBy}`, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map(({ number }) => number),
+				numbers,
+			);
+		}
+	});
+
 	it("/blocks/first", async () => {
 		await apiContext.blockRepository.save(blocks);
 
@@ -94,6 +126,24 @@ describe<{
 		const { statusCode, data } = await request("/blocks?limit=100&page=100", options);
 		assert.equal(statusCode, 200);
 		assert.length(data.data, 0);
+	});
+
+	it("/blocks links keep the filters and offsets of a page", async () => {
+		await apiContext.blockRepository.save(blocks);
+
+		for (const [path, numbers] of [
+			["/blocks?limit=2&number.from=40", [44, 43]],
+			["/blocks?limit=2&offset=1", [43, 42]],
+		] as const) {
+			const { data: page } = await request(path, options);
+			const { statusCode, data } = await request(page.meta.next, options);
+
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map(({ number }) => number),
+				numbers,
+			);
+		}
 	});
 
 	it("/blocks/{id}", async () => {

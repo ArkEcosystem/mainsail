@@ -191,6 +191,39 @@ describe<{ subject: Extension }>("Extension", ({ it, beforeEach, assert }) => {
 		assert.equal(newSource.meta.next, null);
 	});
 
+	it("onPostHandler should keep dot-notation filters in the links", ({ subject }) => {
+		const request: any = makePostRequest({ results: [{ id: 1 }], totalCount: 25 });
+		request.orig.query = { timestamp: { from: "1" } };
+
+		subject.onPostHandler(request, fakeH() as any);
+
+		assert.equal(request.response.source.meta.next, "/blocks?limit=10&page=2&timestamp.from=1");
+	});
+
+	it("onPostHandler should link offsets when paging by offset", () => {
+		const subject = new Extension({ maxDepth: 50, query: { limit: { default: 100 } } });
+		const getMeta = (offset: number, totalCount: number) => {
+			const request: any = makePostRequest({ results: [{ id: 1 }], totalCount });
+			request.query.offset = offset;
+			request.orig.query = { offset: String(offset) };
+
+			subject.onPostHandler(request, fakeH() as any);
+
+			return request.response.source.meta;
+		};
+
+		const meta = getMeta(15, 40);
+		assert.equal(meta.self, "/blocks?limit=10&offset=15");
+		assert.equal(meta.first, "/blocks?limit=10&offset=0");
+		assert.equal(meta.last, "/blocks?limit=10&offset=30");
+		assert.equal(meta.next, "/blocks?limit=10&offset=25");
+		assert.equal(meta.previous, "/blocks?limit=10&offset=5");
+
+		assert.equal(getMeta(35, 40).next, null);
+		assert.equal(getMeta(35, 100).next, null);
+		assert.equal(getMeta(30, 100).next, "/blocks?limit=10&offset=40");
+	});
+
 	it("onPostHandler should handle source as an array", ({ subject }) => {
 		const h = fakeH();
 		const results = [{ id: 1 }, { id: 2 }, { id: 3 }];

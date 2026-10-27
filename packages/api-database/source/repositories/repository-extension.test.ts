@@ -195,7 +195,7 @@ describe<{
 		const page = await repo.listByExpression(
 			{ op: "equal", property: "address", value: "0x1" },
 			[],
-			{ limit: 10, offset: 0 },
+			{ limit: 2, offset: 0 },
 			{ estimateTotalCount: false },
 		);
 
@@ -208,9 +208,27 @@ describe<{
 		assert.equal(countQb.calls[1], { args: ["COUNT(*) AS total_count"], name: "select" });
 	});
 
-	it("listByExpression: EXPLAIN estimate path picks max(estimate, results.length)", async () => {
+	it("listByExpression: EXPLAIN estimate path takes the rows of the plan below the LIMIT", async () => {
 		const explainStub = stubFn().resolvedValue([
-			{ "QUERY PLAN": "Seq Scan on wallets  (cost=... rows=1234 width=8)" },
+			{
+				"QUERY PLAN": [
+					{
+						Plan: {
+							"Node Type": "Limit",
+							"Plan Rows": 1,
+							Plans: [
+								{ "Node Type": "Result", "Parent Relationship": "InitPlan", "Plan Rows": 1 },
+								{
+									"Node Type": "Gather Merge",
+									"Parent Relationship": "Outer",
+									"Plan Rows": 1234,
+									Plans: [{ "Node Type": "Parallel Seq Scan", "Plan Rows": 514 }],
+								},
+							],
+						},
+					},
+				],
+			},
 		]);
 		const { repo, qr } = makeListSetup({
 			explainStub,
@@ -218,31 +236,50 @@ describe<{
 			results: [{ address: "0x1" }],
 		});
 
-		const page = await repo.listByExpression({ op: "true" }, [], { limit: 10, offset: 0 });
+		const page = await repo.listByExpression({ op: "true" }, [], { limit: 1, offset: 0 });
 
 		assert.true(page.meta.totalCountIsEstimate);
 		assert.is(page.totalCount, 1234);
 		explainStub.calledOnce();
-		assert.equal(explainStub.getCallArgs(0)[0], "EXPLAIN SELECT * FROM wallets WHERE x");
+		assert.equal(explainStub.getCallArgs(0)[0], "EXPLAIN (FORMAT JSON) SELECT * FROM wallets WHERE x");
 		qr.commitTransaction.calledOnce();
 	});
 
-	it("listByExpression: estimate path falls back to results.length when estimate is smaller", async () => {
-		const explainStub = stubFn().resolvedValue([{ "QUERY PLAN": "rows=1" }]);
-		const { repo } = makeListSetup({
-			explainStub,
-			results: [{ address: "0x1" }, { address: "0x2" }, { address: "0x3" }],
-		});
+	it("listByExpression: estimate path keeps a page after a full one", async () => {
+		const explainStub = stubFn().resolvedValue([
+			{ "QUERY PLAN": [{ Plan: { "Node Type": "Seq Scan", "Plan Rows": 1 } }] },
+		]);
+		const { repo } = makeListSetup({ explainStub, results: [{ address: "0x1" }, { address: "0x2" }] });
 
-		const page = await repo.listByExpression({ op: "true" }, [], { limit: 10, offset: 0 });
+		const page = await repo.listByExpression({ op: "true" }, [], { limit: 2, offset: 20 });
 
-		assert.is(page.totalCount, 3);
+		assert.is(page.totalCount, 23);
+	});
+
+	it("listByExpression: estimate path counts at most the offset for an empty page past the end", async () => {
+		const explainStub = stubFn().resolvedValue([
+			{ "QUERY PLAN": [{ Plan: { "Node Type": "Seq Scan", "Plan Rows": 1234 } }] },
+		]);
+		const { repo } = makeListSetup({ explainStub, results: [] });
+
+		const page = await repo.listByExpression({ op: "true" }, [], { limit: 10, offset: 20 });
+
+		assert.is(page.totalCount, 20);
+	});
+
+	it("listByExpression: counts a page short of the limit exactly", async () => {
+		const explainStub = stubFn();
+		const { repo } = makeListSetup({ explainStub, results: [{ address: "0x1" }, { address: "0x2" }] });
+
+		const page = await repo.listByExpression({ op: "true" }, [], { limit: 10, offset: 20 });
+
+		assert.false(page.meta.totalCountIsEstimate);
+		assert.is(page.totalCount, 22);
+		explainStub.neverCalled();
 	});
 
 	it("listByExpression: options.selection resets select then addSelect per item", async () => {
-		const { repo, resultsQb } = makeListSetup({
-			explainStub: stubFn().resolvedValue([{ "QUERY PLAN": "rows=5" }]),
-		});
+		const { repo, resultsQb } = makeListSetup();
 
 		await repo.listByExpression(
 			{ op: "true" },

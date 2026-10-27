@@ -49,37 +49,31 @@ export class PeersController extends Controller {
 			offset = 0;
 		}
 
-		const order: string = request.query.orderBy as string;
-		if (order) {
-			const orderByMapped = order.split(":").map((p) => p.toLowerCase());
+		const [order = ""]: string[] = [request.query.orderBy ?? []].flat();
+		const [property = "", direction] = order.toLowerCase().split(":");
+		const ascending = direction === "asc";
 
-			switch (orderByMapped[0]) {
-				case "version": {
-					results =
-						orderByMapped[1] === "asc"
-							? results.sort((a, b) => semver.compare(a[orderByMapped[0]], b[orderByMapped[0]]))
-							: results.sort((a, b) => semver.rcompare(a[orderByMapped[0]], b[orderByMapped[0]]));
-					break;
-				}
-				case "height": {
-					results = orderBy(
-						results,
-						(element) => element.header[orderByMapped[0]],
-						orderByMapped[1] === "asc" ? "asc" : "desc", // ? why desc is default
-					);
-					break;
-				}
-				case "latency": {
-					results = orderBy(results, orderByMapped[0], orderByMapped[1] === "asc" ? "asc" : "desc");
-					break;
-				}
-				default: {
-					results = results.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
-					break;
-				}
+		switch (property) {
+			case "version": {
+				const version = (peer: Contracts.P2P.Peer) => semver.valid(peer.version) ?? "0.0.0";
+				results = results.sort((a, b) =>
+					ascending ? semver.compare(version(a), version(b)) : semver.rcompare(version(a), version(b)),
+				);
+				break;
 			}
-		} else {
-			results = results.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
+			case "blocknumber":
+			case "height": {
+				results = orderBy(results, (peer) => peer.header?.blockNumber, ascending ? "asc" : "desc");
+				break;
+			}
+			case "latency": {
+				results = orderBy(results, "latency", ascending ? "asc" : "desc");
+				break;
+			}
+			default: {
+				results = results.sort((a, b) => (a.latency ?? 0) - (b.latency ?? 0));
+				break;
+			}
 		}
 
 		results = results.slice(offset, offset + limit);

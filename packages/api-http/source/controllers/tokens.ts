@@ -173,7 +173,9 @@ export class TokensController extends Controller {
 			.createQueryBuilder("tf")
 			.where("tf.action = :action", { action });
 
-		TokensController.andWhereTokenWhitelisted(tokenActionsQuery, request, "tf.address");
+		if (!request.query.addresses) {
+			TokensController.andWhereTokenWhitelisted(tokenActionsQuery, request, "tf.address");
+		}
 
 		if (request.params.address) {
 			const token = await this.getToken(request.params.address);
@@ -195,13 +197,11 @@ export class TokensController extends Controller {
 				? request.query.addresses
 				: [request.query.addresses];
 
-			tokenActionsQuery.andWhere(
-				new TypeOrm.Brackets((b) => {
-					b.where("tf.from IN (:...addresses)", { addresses }).orWhere("tf.to IN (:...addresses)", {
-						addresses,
-					});
-				}),
-			);
+			tokenActionsQuery.setParameters({
+				addresses,
+				customBlacklist: toStringArray(request.query.blacklist),
+				customWhitelist: toStringArray(request.query.whitelist),
+			});
 		} else {
 			if (request.query.from) {
 				const from = Array.isArray(request.query.from) ? request.query.from : [request.query.from];
@@ -214,18 +214,41 @@ export class TokensController extends Controller {
 			}
 		}
 
-		const page = tokenActionsQuery
-			.clone()
-			.select("tf.*")
-			.orderBy("tf.block_number", "DESC")
-			.addOrderBy("tf.index", "DESC")
-			.limit(pagination.limit)
-			.offset(pagination.offset);
+		// the actions of an address list are read per address, listed token and direction, each from its own index
+		// range, as the planner can only sort all of them when they are matched at once
+		const getAddressActions = (direction: "from" | "to", depth: number): string => {
+			const actions = tokenActionsQuery.clone().select("tf.*").andWhere(`tf."${direction}" = addresses.address`);
+			let listed = "";
+
+			if (!request.query.ignoreWhitelist) {
+				actions.andWhere("tf.address = listed.address");
+				listed = `CROSS JOIN (
+					SELECT address FROM token_whitelist
+					UNION SELECT unnest(CAST(:customWhitelist AS citext[]))
+					EXCEPT SELECT unnest(CAST(:customBlacklist AS citext[]))
+				) listed`;
+			}
+
+			if (direction === "to") {
+				actions.andWhere(`tf."from" <> ALL(CAST(:addresses AS citext[]))`);
+			}
+
+			return `SELECT x.* FROM (SELECT DISTINCT unnest(CAST(:addresses AS citext[])) AS address) addresses ${listed}
+				CROSS JOIN LATERAL (${actions.orderBy("tf.block_number", "DESC").addOrderBy("tf.index", "DESC").limit(depth).getQuery()}) x`;
+		};
+
+		const getActions = (depth: number): string =>
+			request.query.addresses
+				? `${getAddressActions("from", depth)} UNION ALL ${getAddressActions("to", depth)}`
+				: tokenActionsQuery.clone().select("tf.*").getQuery();
+
+		const page = `SELECT * FROM (${getActions(pagination.offset + pagination.limit)}) tf
+			ORDER BY tf.block_number DESC, tf.index DESC LIMIT ${pagination.limit} OFFSET ${pagination.offset}`;
 
 		const [tokenActionsRows, totalCountRow] = await Promise.all([
 			this.dataSource
 				.createQueryBuilder()
-				.addCommonTableExpression(page.getQuery(), "page")
+				.addCommonTableExpression(page, "page")
 				.select([
 					'tf."from" AS "from"',
 					'tf."to" AS "to"',
@@ -245,12 +268,12 @@ export class TokensController extends Controller {
 				.innerJoin(Models.Transaction, "t", "t.hash = tf.transaction_hash")
 				.orderBy('tf."block_number"', "DESC")
 				.addOrderBy('tf."index"', "DESC")
-				.setParameters(page.getParameters())
+				.setParameters(tokenActionsQuery.getParameters())
 				.getRawMany<TokenTransferRaw>(),
 
 			this.dataSource
 				.createQueryBuilder()
-				.addCommonTableExpression(tokenActionsQuery.clone().select("1").limit(10_001).getQuery(), "matching")
+				.addCommonTableExpression(`SELECT 1 FROM (${getActions(10_001)}) tf LIMIT 10001`, "matching")
 				.select("COUNT(*)", "cnt")
 				.from("matching", "m")
 				.setParameters(tokenActionsQuery.getParameters())

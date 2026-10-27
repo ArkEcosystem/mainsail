@@ -53,6 +53,14 @@ describe<{
 		assert.equal(criteria.version, "1.0.0");
 	});
 
+	it("GET /api/peers - rejects orderBy properties peers do not have", async ({ server }) => {
+		for (const orderBy of ["plugins:asc", "unknown:asc"]) {
+			const response = await server.inject({ method: "GET", url: `/api/peers?orderBy=${orderBy}` });
+
+			assert.is(response.statusCode, 422);
+		}
+	});
+
 	it("GET /api/peers - rejects a malformed ip filter", async ({ server }) => {
 		const response = await server.inject({ method: "GET", url: "/api/peers?ip=not-an-ip" });
 

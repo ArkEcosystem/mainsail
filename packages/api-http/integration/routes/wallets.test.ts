@@ -28,6 +28,11 @@ describe<{
 
 	let options = {};
 
+	const sortedByAddress = <T extends { address: string }>(rows: T[], direction = "asc"): T[] =>
+		[...rows].sort(
+			(a, b) => (a.address.toLowerCase() < b.address.toLowerCase() ? -1 : 1) * (direction === "asc" ? 1 : -1),
+		);
+
 	beforeAll(async (context) => {
 		nock.enableNetConnect();
 		apiContext = await prepareSandbox(context);
@@ -52,6 +57,21 @@ describe<{
 		const { statusCode, data } = await request("/wallets", options);
 		assert.equal(statusCode, 200);
 		assert.equal(data.data.length, wallets.length);
+	});
+
+	it("/wallets pages through equal balances by address", async () => {
+		await apiContext.walletRepository.save([...wallets].reverse());
+
+		const addresses: string[] = [];
+		for (let page = 1; page <= Math.ceil(wallets.length / 10); page++) {
+			const { data } = await request(`/wallets?limit=10&page=${page}`, options);
+			addresses.push(...data.data.map((wallet) => wallet.address));
+		}
+
+		assert.equal(
+			addresses,
+			sortedByAddress(wallets, "desc").map((wallet) => wallet.address),
+		);
 	});
 
 	it("/wallets?attributes", async () => {
@@ -88,8 +108,54 @@ describe<{
 			const { statusCode, data } = await request(`/wallets?${path}`, options);
 			assert.equal(statusCode, 200);
 			assert.equal(data.data.length, result.length);
-			assert.equal(data.data, result);
+			assert.equal(data.data, sortedByAddress(result, "desc"));
 		}
+	});
+
+	it("/wallets?attributes numeric ranges", async () => {
+		const [a, b, c, d] = wallets;
+		await apiContext.walletRepository.save([
+			{ ...a, attributes: { legacyNonce: "2", validatorFee: "5000000000000000000", validatorVotersCount: 2 } },
+			{ ...b, attributes: { legacyNonce: "10", validatorFee: "40000000000000000000", validatorVotersCount: 10 } },
+			{ ...c, attributes: { legacyNonce: "3", validatorFee: "300000000000000000000", validatorVotersCount: 3 } },
+			{ ...d, attributes: { legacyNonce: "18446744073709551615", multiSignature: { min: 2 } } },
+		]);
+
+		const testCases = [
+			{ path: "attributes.legacyNonce.from=1&attributes.legacyNonce.to=3", result: [a, c] },
+			{ path: "attributes.legacyNonce.from=10000000000000000000", result: [d] },
+			{ path: "attributes.validatorVotersCount.from=1&attributes.validatorVotersCount.to=3", result: [a, c] },
+			{
+				path: "attributes.validatorFee.from=10000000000000000000&attributes.validatorFee.to=100000000000000000000",
+				result: [b],
+			},
+			{ path: "attributes.multiSignature.min.from=2", result: [d] },
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(`/wallets?${path}`, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map((wallet) => wallet.address).sort(),
+				result.map((wallet) => wallet.address).sort(),
+			);
+		}
+	});
+
+	it("/wallets?attributes leaves out wallets without validator counters", async () => {
+		const [a, b, c] = wallets;
+		await apiContext.walletRepository.save([
+			{ ...a, attributes: { validatorProducedBlocks: 2 } },
+			{ ...b, attributes: { validatorProducedBlocks: 9 } },
+			{ ...c, attributes: {} },
+		]);
+
+		const { statusCode, data } = await request("/wallets?attributes.validatorProducedBlocks.to=5", options);
+		assert.equal(statusCode, 200);
+		assert.equal(
+			data.data.map((wallet) => wallet.address),
+			[a.address],
+		);
 	});
 
 	it("/wallets?attributes rejects SQL injection in attribute keys", async () => {
@@ -126,6 +192,20 @@ describe<{
 		const after = await request("/wallets", options);
 		assert.equal(after.statusCode, 200);
 		assert.equal(after.data.data.length, wallets.length);
+	});
+
+	it("/wallets?balance beyond the safe integers", async () => {
+		await apiContext.walletRepository.save(wallets);
+
+		for (const [path, length] of [
+			["balance.from=2358490566037735849056603", wallets.length],
+			["balance.from=2358490566037735849056604", 0],
+			["balance=2358490566037735849056603", wallets.length],
+		] as const) {
+			const { statusCode, data } = await request(`/wallets?limit=100&${path}`, options);
+			assert.equal(statusCode, 200);
+			assert.length(data.data, length);
+		}
 	});
 
 	it("/wallets/top", async () => {
@@ -197,6 +277,82 @@ describe<{
 			const { statusCode, data } = await request(path, options);
 			assert.equal(statusCode, 200);
 			assert.equal(data.data, result);
+		}
+	});
+
+	it("/wallets?orderBy columns", async () => {
+		const [a, b, c, d] = wallets;
+		await apiContext.walletRepository.save([
+			{ ...a, balance: "300", nonce: "2" },
+			{ ...b, balance: "1000", nonce: "10" },
+			{ ...c, balance: "20", nonce: "3", publicKey: undefined },
+			{ ...d, balance: "5000", nonce: "0" },
+		]);
+
+		const testCases = [
+			{ path: "/wallets", result: [d, b, a, c] },
+			{ path: "/wallets?orderBy=balance:asc", result: [c, a, b, d] },
+			{ path: "/wallets?orderBy=balance:asc,balance:desc", result: [c, a, b, d] },
+			{ path: "/wallets?orderBy=nonce:desc", result: [b, c, a, d] },
+			{ path: "/wallets?orderBy=publicKey:asc", result: [a, b, d, c] },
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map((wallet) => wallet.address),
+				result.map((wallet) => wallet.address),
+			);
+		}
+	});
+
+	it("/wallets?orderBy text attributes", async () => {
+		const [a, b, c, d] = wallets;
+		await apiContext.walletRepository.save([
+			{ ...a, attributes: { username: "carol" }, balance: "1" },
+			{ ...b, attributes: { username: "alice" }, balance: "2" },
+			{ ...c, attributes: { username: "bob" }, balance: "3" },
+			{ ...d, attributes: {}, balance: "4" },
+		]);
+
+		const testCases = [
+			{ path: "/wallets?orderBy=attributes.username:asc", result: [b, c, a, d] },
+			{ path: "/wallets?orderBy=attributes.username:desc", result: [a, c, b, d] },
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map((wallet) => wallet.address),
+				result.map((wallet) => wallet.address),
+			);
+		}
+	});
+
+	it("/wallets?orderBy counts a missing legacy flag as false", async () => {
+		const [a, b, c, d] = wallets;
+		await apiContext.walletRepository.save([
+			{ ...a, attributes: { isLegacy: true }, balance: "300" },
+			{ ...b, attributes: {}, balance: "1000" },
+			{ ...c, attributes: { isLegacy: true }, balance: "20" },
+			{ ...d, attributes: {}, balance: "5000" },
+		]);
+
+		const testCases = [
+			{ path: "/wallets?orderBy=attributes.isLegacy:asc,balance:desc", result: [d, b, a, c] },
+			{ path: "/wallets?attributes.isLegacy=false", result: [d, b] },
+			{ path: "/wallets?attributes.isLegacy=true", result: [a, c] },
+		];
+
+		for (const { path, result } of testCases) {
+			const { statusCode, data } = await request(path, options);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map((wallet) => wallet.address),
+				result.map((wallet) => wallet.address),
+			);
 		}
 	});
 
@@ -372,6 +528,7 @@ describe<{
 			const { statusCode, data } = await request(path, options);
 			assert.equal(statusCode, 200);
 			assert.equal(data.data, result);
+			assert.equal(data.meta.totalCount, result.length);
 		}
 	});
 

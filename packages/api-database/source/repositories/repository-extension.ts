@@ -9,33 +9,31 @@ import type {
 	ThisRepositoryExtension,
 } from "../contracts.js";
 import type { Expression } from "../search/types/expressions.js";
-import type { Expressions, Options, Pagination, ResultsPage, Sorting } from "../search/types/index.js";
+import type { Expressions, Options, Pagination, ResultsPage, SortFragment, Sorting } from "../search/types/index.js";
 
 import { groupEqualities, QueryHelper } from "../search/index.js";
 
 const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExtension<TEntity> &
 	ThisRepositoryExtension<TEntity> => ({
 	addOrderBy(queryBuilder: SelectQueryBuilder<TEntity>, sorting: Sorting): void {
-		if (sorting.length > 0) {
-			const column = this.queryHelper.getColumnName(
-				this.metadata,
-				sorting[0].property,
-				sorting[0].jsonFieldAccessor,
-			);
-			queryBuilder.orderBy(
-				column.name,
-				sorting[0].direction === "desc" ? "DESC" : "ASC",
-				column.isNullable ? "NULLS LAST" : undefined,
-			);
+		const sorted = new Set<string>();
+		for (const item of sorting) {
+			const column = this.queryHelper.getColumnName(this.metadata, item.property, item.jsonFieldAccessor);
 
-			for (const item of sorting.slice(1)) {
-				const column = this.queryHelper.getColumnName(this.metadata, item.property, item.jsonFieldAccessor);
-				queryBuilder.addOrderBy(
-					column.name,
-					item.direction === "desc" ? "DESC" : "ASC",
-					column.isNullable ? "NULLS LAST" : undefined,
-				);
+			// TypeORM would keep the last direction of a column sorted twice
+			if (sorted.has(column.name)) {
+				continue;
 			}
+
+			const direction = item.direction === "desc" ? "DESC" : "ASC";
+			const nulls = column.isNullable ? "NULLS LAST" : undefined;
+			if (sorted.size === 0) {
+				queryBuilder.orderBy(column.name, direction, nulls);
+			} else {
+				queryBuilder.addOrderBy(column.name, direction, nulls);
+			}
+
+			sorted.add(column.name);
 		}
 	},
 
@@ -76,6 +74,17 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 
 				const results = await resultsQueryBuilder.getMany();
 
+				// a page short of the limit, or an empty first page, is the last one
+				if (results.length < pagination.limit && (results.length > 0 || pagination.offset === 0)) {
+					await queryRunner.commitTransaction();
+
+					return {
+						meta: { totalCountIsEstimate: false },
+						results,
+						totalCount: pagination.offset + results.length,
+					};
+				}
+
 				if (options?.estimateTotalCount === false) {
 					// typeorm@0.2.25 generates slow COUNT(DISTINCT primary_key_column) for getCount or getManyAndCount
 
@@ -93,17 +102,24 @@ const getRepositoryExtension = <TEntity extends ObjectLiteral>(): RepositoryExte
 					return { meta: { totalCountIsEstimate: false }, results, totalCount };
 				}
 
-				let totalCountEstimated = 0;
 				const [resultsSql, resultsParameters] = resultsQueryBuilder.getQueryAndParameters();
-				const resultsExplainedRows = await queryRunner.query(`EXPLAIN ${resultsSql}`, resultsParameters);
-				for (const resultsExplainedRow of resultsExplainedRows) {
-					const match = resultsExplainedRow["QUERY PLAN"].match(/rows=(\d+)/);
-					if (match) {
-						totalCountEstimated = Number.parseFloat(match[1]);
-					}
-				}
+				const [
+					{
+						"QUERY PLAN": [{ Plan: plan }],
+					},
+				] = await queryRunner.query(`EXPLAIN (FORMAT JSON) ${resultsSql}`, resultsParameters);
 
-				const totalCount = Math.max(totalCountEstimated, results.length);
+				// nodes below the one under the LIMIT may estimate the rows of a single parallel worker only
+				const estimated =
+					plan["Node Type"] === "Limit"
+						? plan.Plans.find((child) => child["Parent Relationship"] === "Outer")
+						: plan;
+
+				// a full page may be followed by more rows, an empty page past the end by none
+				const totalCount: number =
+					results.length > 0
+						? Math.max(estimated["Plan Rows"], pagination.offset + results.length + 1)
+						: Math.min(estimated["Plan Rows"], pagination.offset);
 
 				await queryRunner.commitTransaction();
 
@@ -130,3 +146,11 @@ export const makeExtendedRepository = <TEntity extends ObjectLiteral, CustomRepo
 		...getRepositoryExtension(),
 		...extend,
 	});
+
+// in the direction of the last distinct sort key, so that one index serves both directions
+export const breakTies = (sorting: Sorting, property: string, direction?: SortFragment["direction"]): Sorting => {
+	const keys = sorting.map((item) => `${item.property}.${item.jsonFieldAccessor?.fieldName ?? ""}`);
+	const last = sorting.findLast((_, index) => keys.indexOf(keys[index]) === index);
+
+	return [...sorting, { direction: direction ?? last?.direction ?? "asc", property }];
+};
