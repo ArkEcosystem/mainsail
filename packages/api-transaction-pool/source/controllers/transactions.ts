@@ -80,7 +80,7 @@ export class TransactionsController extends AbstractController {
 	}
 
 	public async showUnconfirmed(request: Types.HapiRequest): Promise<object> {
-		const transactionQuery = this.poolQuery.getFromHighestPriority().whereHash(request.params.hash);
+		const transactionQuery = this.poolQuery.getAll().whereHash(request.params.hash);
 
 		if ((await transactionQuery.has()) === false) {
 			return notFound("Transaction not found");
