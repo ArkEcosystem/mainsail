@@ -5,6 +5,7 @@ import WebSocket from "ws";
 import type { ConnectionRepository } from "./connection-repository.js";
 import type { Connection, ConnectionFactory } from "./connection.js";
 import type { ConnectionVerifier } from "./interfaces.js";
+import type { Router } from "./router.js";
 
 import { constants } from "./constants.js";
 import { Direction } from "./enums.js";
@@ -21,6 +22,9 @@ export class Dialer {
 
 	@multiInject(Identifiers.P2P.WebSocket.Connection.Verifiers)
 	private readonly verifiers!: ConnectionVerifier[];
+
+	@inject(Identifiers.P2P.WebSocket.Router)
+	private readonly router!: Router;
 
 	// The connection takes the socket while it is still connecting so no frame is missed.
 	public async dial(url: string): Promise<Connection> {
@@ -40,6 +44,7 @@ export class Dialer {
 		});
 
 		const connection = this.createConnection(ws, { direction: Direction.Outbound, remoteAddress });
+		connection.onRequest = (path, payload) => this.router.handle(connection, path, payload);
 		this.repository.add(connection);
 		connection.onClose(() => this.repository.remove(connection));
 
