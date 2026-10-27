@@ -188,6 +188,9 @@ export const Identifiers = {
 	Forger: {
 		Block: Symbol("Forger<Block>"),
 	},
+	P2PService: {
+		Service: Symbol("P2PService<Service>"),
+	},
 	P2P: {
 		ApiNode: {
 			Discoverer: Symbol("P2P<ApiNode.Discoverer>"),
