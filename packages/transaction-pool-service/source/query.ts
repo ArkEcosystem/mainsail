@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
+import { Heap } from "heap-js";
 
 type SortFunction = (a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) => number;
 type SenderMempoolSelectorFunction = (
@@ -22,53 +23,22 @@ function* mergeByPriority(
 	prioritySort: SortFunction,
 ): Generator<Contracts.Crypto.Transaction> {
 	let queued = 0;
-	const heap: SenderQueue[] = senders.map((transactions) => ({ next: 0, queuedAt: queued++, transactions }));
+	const heap = new Heap<SenderQueue>(
+		(a, b) => prioritySort(a.transactions[a.next], b.transactions[b.next]) || a.queuedAt - b.queuedAt,
+	);
+	heap.init(senders.map((transactions) => ({ next: 0, queuedAt: queued++, transactions })));
 
-	const precedes = (a: SenderQueue, b: SenderQueue): boolean =>
-		(prioritySort(a.transactions[a.next], b.transactions[b.next]) || a.queuedAt - b.queuedAt) < 0;
-
-	const siftDown = (index: number): void => {
-		for (;;) {
-			const left = 2 * index + 1;
-			const right = left + 1;
-
-			let best = index;
-			if (left < heap.length && precedes(heap[left], heap[best])) {
-				best = left;
-			}
-			if (right < heap.length && precedes(heap[right], heap[best])) {
-				best = right;
-			}
-			if (best === index) {
-				return;
-			}
-
-			const sender = heap[index];
-			heap[index] = heap[best];
-			heap[best] = sender;
-			index = best;
-		}
-	};
-
-	for (let index = Math.floor(heap.length / 2) - 1; index >= 0; index--) {
-		siftDown(index);
-	}
-
-	while (heap.length > 0) {
-		const sender = heap[0];
+	for (let sender = heap.peek(); sender; sender = heap.peek()) {
 		yield sender.transactions[sender.next];
 
 		sender.next++;
 		if (sender.next < sender.transactions.length) {
 			sender.queuedAt = queued++;
+			// replace() overwrites the root before comparing, so the root may be re-keyed first
+			heap.replace(sender);
 		} else {
-			const last = heap.pop();
-			if (last && last !== sender) {
-				heap[0] = last;
-			}
+			heap.pop();
 		}
-
-		siftDown(0);
 	}
 }
 
