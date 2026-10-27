@@ -47,10 +47,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.get<Service>(Identifiers.P2P.WebSocket.Service).initialize();
 	}
 
-	public async dispose(): Promise<void> {
-		await this.app.get<Service>(Identifiers.P2P.WebSocket.Service).dispose();
-	}
-
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
 			logger: Joi.object({

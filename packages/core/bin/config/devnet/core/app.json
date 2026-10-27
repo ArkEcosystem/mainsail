@@ -88,6 +88,12 @@
             "package": "@mainsail/p2p"
         },
         {
+            "package": "@mainsail/p2p-websocket"
+        },
+        {
+            "package": "@mainsail/p2p-service"
+        },
+        {
             "package": "@mainsail/evm-api-worker"
         },
         {
