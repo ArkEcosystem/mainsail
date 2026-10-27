@@ -202,6 +202,7 @@ describe<{
 			{ path: "production.approval.from=2", result: [2, 3, 5, 6] },
 			{ path: "blocks.produced.to=0", result: [0, 3, 6] },
 			{ path: "attributes.validatorProducedBlocks.to=0", result: [0, 3, 6] },
+			{ path: "attributes.validatorProducedBlocks=00", result: [0, 3, 6] },
 		];
 
 		for (const { path, result } of testCases) {

@@ -84,20 +84,23 @@ export class QueryHelper<TEntity> {
 				const query = `${column.name} = :${parameter}`;
 				const parameters = { [parameter]: expression.value };
 
-				// a field with a fallback also matches the rows that lack it, which containment would leave out, and an
-				// indexed field has statistics of its own, whose estimates a containment next to it would throw off
-				if (
-					expression.jsonFieldAccessor &&
-					expression.jsonFieldAccessor.fallback === undefined &&
-					!expression.jsonFieldAccessor.indexed
-				) {
-					return this.withJsonContainment(metadata, expression.property, expression.jsonFieldAccessor, {
-						parameters,
-						query,
-					});
+				// an indexed field has statistics of its own, whose estimates a containment next to it would throw off
+				const accessor = expression.jsonFieldAccessor;
+				if (!accessor || accessor.indexed || this.mayMatchFallback(accessor, expression.value)) {
+					return { parameters, query };
 				}
 
-				return { parameters, query };
+				const containment = this.getContainmentSql(metadata, expression.property, accessor, expression.value);
+
+				// the COALESCE of a fallback has no statistics, which would throw off the estimates of the containment
+				if (accessor.fallback !== undefined && this.containmentImpliesEquality(expression.value)) {
+					return containment;
+				}
+
+				return {
+					parameters: { ...parameters, ...containment.parameters },
+					query: `${containment.query} AND ${query}`,
+				};
 			}
 			case "notEqual": {
 				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
@@ -200,16 +203,25 @@ export class QueryHelper<TEntity> {
 		}
 	}
 
-	// Containment lets the GIN index narrow the rows down, the equality still decides. The field may hold the value as
-	// a string, number or boolean.
-	private withJsonContainment(
+	// containment leaves out the rows that lack the field, and a cast spells the fallback in more ways than one
+	private mayMatchFallback({ cast, fallback }: JsonFieldAccessor, value: unknown): boolean {
+		return fallback !== undefined && (cast !== undefined || String(value) === fallback);
+	}
+
+	// jsonb compares numbers by value, and pg binds a list as an array instead of its String()
+	private containmentImpliesEquality(value: unknown): boolean {
+		return (typeof value === "string" || typeof value === "boolean") && !/^-?\d+(\.\d+)?$/.test(String(value));
+	}
+
+	// Containment lets the GIN index narrow the rows down. The field may hold the value as a string, number or boolean.
+	private getContainmentSql(
 		metadata: EntityMetadata,
 		property: keyof TEntity,
 		{ fieldName }: JsonFieldAccessor,
-		equality: SqlExpression,
+		rawValue: unknown,
 	): SqlExpression {
 		const column = this.getColumnName(metadata, property);
-		const value = String(Object.values(equality.parameters)[0]);
+		const value = String(rawValue);
 
 		const scalars = new Set([JSON.stringify(value)]);
 		if (/^-?\d+$/.test(value)) {
@@ -219,7 +231,7 @@ export class QueryHelper<TEntity> {
 			scalars.add(value);
 		}
 
-		const parameters = { ...equality.parameters };
+		const parameters: Record<string, string> = {};
 		const containments = [...scalars].map((scalar) => {
 			let json = scalar;
 			for (const key of fieldName.split(".").toReversed()) {
@@ -231,6 +243,6 @@ export class QueryHelper<TEntity> {
 			return `${column.name} @> CAST(:${parameter} AS jsonb)`;
 		});
 
-		return { parameters, query: `(${containments.join(" OR ")}) AND ${equality.query}` };
+		return { parameters, query: `(${containments.join(" OR ")})` };
 	}
 }

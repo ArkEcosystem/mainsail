@@ -184,6 +184,36 @@ describe<{
 		]);
 	});
 
+	it("op equal on a json field with a fallback is narrowed down by containment unless it may match the fallback", ({
+		metadata,
+	}) => {
+		const sql = (value: unknown, accessor: object) =>
+			new QueryHelper().getWhereExpressionSql(metadata, {
+				jsonFieldAccessor: { fieldName: "a", operator: "->>", ...accessor },
+				op: "equal",
+				property: "data",
+				value,
+			} as any).query;
+
+		const flag = { fallback: "false" };
+		const counter = { cast: "numeric", fallback: "0" };
+
+		assert.equal(sql("true", flag), "(data @> CAST(:p2 AS jsonb) OR data @> CAST(:p3 AS jsonb))");
+		assert.equal(sql(true, flag), "(data @> CAST(:p2 AS jsonb) OR data @> CAST(:p3 AS jsonb))");
+
+		assert.equal(
+			sql("7", flag),
+			"(data @> CAST(:p2 AS jsonb) OR data @> CAST(:p3 AS jsonb)) AND COALESCE(data->>'a', 'false') = :p1",
+		);
+		assert.equal(sql(["true", "x"], flag), "(data @> CAST(:p2 AS jsonb)) AND COALESCE(data->>'a', 'false') = :p1");
+		assert.equal(sql("x", {}), "(data @> CAST(:p2 AS jsonb)) AND data->>'a' = :p1");
+
+		assert.equal(sql("false", flag), "COALESCE(data->>'a', 'false') = :p1");
+		assert.equal(sql(false, flag), "COALESCE(data->>'a', 'false') = :p1");
+		assert.equal(sql("00", counter), "(COALESCE(data->>'a', '0'))::numeric = :p1");
+		assert.equal(sql("5", counter), "(COALESCE(data->>'a', '0'))::numeric = :p1");
+	});
+
 	it("op notEqual -> column <> :p1", ({ helper, metadata }) => {
 		assert.equal(helper.getWhereExpressionSql(metadata, { op: "notEqual", property: "id", value: 9 } as any), {
 			parameters: { p1: 9 },

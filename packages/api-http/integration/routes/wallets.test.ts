@@ -343,6 +343,7 @@ describe<{
 		const testCases = [
 			{ path: "/wallets?orderBy=attributes.isLegacy:asc,balance:desc", result: [d, b, a, c] },
 			{ path: "/wallets?attributes.isLegacy=false", result: [d, b] },
+			{ path: "/wallets?attributes.isLegacy=true", result: [a, c] },
 		];
 
 		for (const { path, result } of testCases) {
