@@ -10,8 +10,8 @@ import type { Direction } from "./enums.js";
 
 import { CloseReason, ConnectionState } from "./enums.js";
 import { ConnectionError } from "./errors.js";
-import { Handshake } from "./handlers/index.js";
-import { decode, encode, type Message } from "./message.js";
+import { Handshake, RequestTable, type Response } from "./handlers/index.js";
+import { decode, encode, type Message, type RequestMessage } from "./message.js";
 
 export type ConnectionOptions = {
 	direction: Direction;
@@ -20,13 +20,19 @@ export type ConnectionOptions = {
 
 export type ConnectionFactory = (ws: WebSocket, options: ConnectionOptions) => Connection;
 
+// Set by the owner; answers requests from the peer. Throwing yields a 500 with an empty payload.
+export type RequestHandler = (path: string, payload: Buffer) => Promise<Response>;
+
 // One per socket, created through Identifiers.P2P.WebSocket.Connection.Factory and set up with init().
 @injectable()
 export class Connection {
 	@inject(Identifiers.P2P.WebSocket.Logger)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	public onRequest?: RequestHandler;
+
 	readonly #closeListeners: ((reason: CloseReason, error?: Error) => void)[] = [];
+	readonly #requestTable = new RequestTable();
 
 	#ws!: WebSocket;
 	#handshake!: Handshake;
@@ -105,6 +111,18 @@ export class Connection {
 		await this.#closed;
 	}
 
+	// Sends a request and resolves with the peer's response, or rejects on timeout or close.
+	public async request(path: string, payload: Buffer): Promise<Response> {
+		if (this.#state !== ConnectionState.Open) {
+			throw new ConnectionError(CloseReason.NotOpen, `Connection is ${this.#state}`);
+		}
+
+		const { id, response } = this.#requestTable.open();
+		this.#send({ id, path, payload, type: "request" });
+
+		return response;
+	}
+
 	// Tells the peer why it is being refused, then terminates once the frame has been flushed.
 	// Meant for the acceptor during the handshake; after that a plain close() is enough.
 	public reject(reason: CloseReason): void {
@@ -151,7 +169,36 @@ export class Connection {
 				this.#handshake.onReject(message);
 				break;
 			}
+			case "request": {
+				void this.#onRequest(message);
+				break;
+			}
+			case "response": {
+				this.#requestTable.onResponse(message);
+				break;
+			}
 		}
+	}
+
+	// Frames that arrive before the handshake is done are a protocol violation, not an early request.
+	async #onRequest(message: RequestMessage): Promise<void> {
+		if (this.#state !== ConnectionState.Open) {
+			this.terminate(CloseReason.ProtocolError, new Error("Request before handshake"));
+			return;
+		}
+
+		let response: Response;
+		try {
+			response = this.onRequest
+				? await this.onRequest(message.path, message.payload)
+				: { payload: Buffer.alloc(0), statusCode: 404 };
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			this.logger.debug(`Request ${message.path} from ${this.#remoteAddress} failed: ${error.message}`, "p2p");
+			response = { payload: Buffer.alloc(0), statusCode: 500 };
+		}
+
+		this.#send({ id: message.id, payload: response.payload, statusCode: response.statusCode, type: "response" });
 	}
 
 	#onError(error: Error): void {
@@ -165,6 +212,10 @@ export class Connection {
 		if (this.#closeReason === undefined) {
 			this.#closeReason = CloseReason.RemoteClose;
 		}
+
+		this.#requestTable.abort(
+			new ConnectionError(this.#closeReason, "Connection closed", { cause: this.#closeError }),
+		);
 
 		this.#state = ConnectionState.Closed;
 		this.logger.debug(
@@ -184,6 +235,7 @@ export class Connection {
 
 		// A close that starts during the handshake must fail open(), so the owner never sees the connection.
 		this.#handshake.abort(new ConnectionError(reason, "Connection closed during handshake", { cause: error }));
+		this.#requestTable.abort(new ConnectionError(reason, "Connection closed", { cause: error }));
 	}
 
 	// `once` rejects with the socket error if the connection attempt fails.
