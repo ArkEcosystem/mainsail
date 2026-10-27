@@ -63,7 +63,7 @@ export class Service {
 		try {
 			this.#track(await this.websocket.dial(`ws://${seed.ip}:${seed.port}`));
 		} catch (rawError) {
-			this.logger.debug(`Dial to ${seed.ip}:${seed.port} failed: ${ensureError(rawError).message}`, "p2p");
+			this.logger.info(`Dial to ${seed.ip}:${seed.port} failed: ${ensureError(rawError).message}`, "p2p");
 		}
 	}
 
