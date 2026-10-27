@@ -2648,12 +2648,18 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
       '@mainsail/p2p-websocket':
         specifier: workspace:*
         version: link:../p2p-websocket
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
     devDependencies:
       '@mainsail/test-runner':
         specifier: workspace:*
