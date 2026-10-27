@@ -1087,6 +1087,12 @@ importers:
       '@mainsail/p2p':
         specifier: workspace:*
         version: link:../p2p
+      '@mainsail/p2p-service':
+        specifier: workspace:*
+        version: link:../p2p-service
+      '@mainsail/p2p-websocket':
+        specifier: workspace:*
+        version: link:../p2p-websocket
       '@mainsail/processor':
         specifier: workspace:*
         version: link:../processor
