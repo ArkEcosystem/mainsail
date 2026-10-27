@@ -16,11 +16,11 @@ const sortByLowestGasPrice = (a: Contracts.Crypto.Transaction, b: Contracts.Cryp
 	a.gasPrice - b.gasPrice;
 
 export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
-	public transactions: Contracts.Crypto.Transaction[];
+	public transactions: Iterable<Contracts.Crypto.Transaction>;
 	public predicates: Contracts.TransactionPool.QueryPredicate[] = [];
 
 	public constructor(
-		transactions: Contracts.Crypto.Transaction[],
+		transactions: Iterable<Contracts.Crypto.Transaction>,
 		predicate?: Contracts.TransactionPool.QueryPredicate,
 	) {
 		this.transactions = transactions;
@@ -43,15 +43,16 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 	}
 
 	public async first(): Promise<Contracts.Crypto.Transaction> {
-		for (const transaction of await this.all()) {
-			return transaction;
+		const transaction = await this.#find();
+		if (!transaction) {
+			throw new Error("Transaction not found");
 		}
 
-		throw new Error("Transaction not found");
+		return transaction;
 	}
 
 	public async has(): Promise<boolean> {
-		return (await this.all()).length > 0;
+		return (await this.#find()) !== undefined;
 	}
 
 	public wherePredicate(predicate: Contracts.TransactionPool.QueryPredicate): QueryIterable {
@@ -62,6 +63,16 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 
 	public whereHash(hash: string): QueryIterable {
 		return this.wherePredicate(async (t) => t.hash === hash);
+	}
+
+	async #find(): Promise<Contracts.Crypto.Transaction | undefined> {
+		for (const transaction of this.transactions) {
+			if (await this.#satisfiesPredicates(transaction)) {
+				return transaction;
+			}
+		}
+
+		return undefined;
 	}
 
 	async #satisfiesPredicates(transaction: Contracts.Crypto.Transaction): Promise<boolean> {

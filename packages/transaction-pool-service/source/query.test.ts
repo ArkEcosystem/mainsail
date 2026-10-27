@@ -206,4 +206,20 @@ describe<{
 		assert.true(await queryIterable.has());
 		assert.false(await queryIterable.whereHash("unknown").has());
 	});
+
+	it("first and has - should stop at the first matching transaction", async ({
+		aliceTransaction1,
+		aliceTransaction2,
+		bobTransaction1,
+	}) => {
+		const checked: Contracts.Crypto.Transaction[] = [];
+		const queryIterable = new QueryIterable([aliceTransaction1, aliceTransaction2, bobTransaction1], async (t) => {
+			checked.push(t);
+			return t.nonce > 1n;
+		});
+
+		assert.equal(await queryIterable.first(), aliceTransaction2);
+		assert.true(await queryIterable.has());
+		assert.equal(checked, [aliceTransaction1, aliceTransaction2, aliceTransaction1, aliceTransaction2]);
+	});
 });
