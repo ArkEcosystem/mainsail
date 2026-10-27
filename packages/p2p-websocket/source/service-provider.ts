@@ -11,6 +11,7 @@ import { Connection, type ConnectionFactory, type ConnectionOptions } from "./co
 import { Dialer } from "./dialer.js";
 import { Listener } from "./listener.js";
 import { Logger } from "./logger.js";
+import { Router } from "./router.js";
 import { Server } from "./server.js";
 import { Service } from "./service.js";
 
@@ -33,6 +34,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.toFactory(
 				() => (ws: WebSocket, options: ConnectionOptions) => this.app.resolve(Connection).init(ws, options),
 			);
+		this.app.bind(Identifiers.P2P.WebSocket.Router).to(Router).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Listener).to(Listener).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Dialer).to(Dialer).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Server).to(Server).inSingletonScope();
