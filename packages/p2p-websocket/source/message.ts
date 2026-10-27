@@ -15,16 +15,13 @@ type ResponseMessage = { type: "response"; id: number; statusCode: number; paylo
 
 type Message = HelloMessage | RejectMessage | RequestMessage | ResponseMessage;
 
-const typeToByte: Record<Message["type"], number> = {
-	hello: 0,
-	reject: 1,
-	request: 2,
-	response: 3,
-};
-
-const byteToType = new Map<number, Message["type"]>(
-	Object.entries(typeToByte).map(([type, byte]) => [byte, type as Message["type"]]),
-);
+// Wire value of each message type.
+enum MessageType {
+	Hello = 0,
+	Reject = 1,
+	Request = 2,
+	Response = 3,
+}
 
 // Only reasons an acceptor can tell a dialer; the wire value is stable, the enum order is not.
 const reasonToByte: Partial<Record<CloseReason, number>> = {
@@ -50,13 +47,13 @@ const encode = (message: Message): Buffer => {
 	switch (message.type) {
 		case "hello": {
 			const buffer = Buffer.alloc(3);
-			buffer.writeUInt8(typeToByte.hello, 0);
+			buffer.writeUInt8(MessageType.Hello, 0);
 			buffer.writeUInt16BE(message.version, 1);
 			return buffer;
 		}
 		case "reject": {
 			const buffer = Buffer.alloc(2);
-			buffer.writeUInt8(typeToByte.reject, 0);
+			buffer.writeUInt8(MessageType.Reject, 0);
 			buffer.writeUInt8(reasonToByte[message.reason] ?? REJECTED_BYTE, 1);
 			return buffer;
 		}
@@ -67,14 +64,14 @@ const encode = (message: Message): Buffer => {
 			}
 
 			const header = Buffer.alloc(REQUEST_HEADER_LENGTH);
-			header.writeUInt8(typeToByte.request, 0);
+			header.writeUInt8(MessageType.Request, 0);
 			header.writeUInt32BE(message.id, 1);
 			header.writeUInt8(path.byteLength, 5);
 			return Buffer.concat([header, path, message.payload]);
 		}
 		case "response": {
 			const header = Buffer.alloc(RESPONSE_HEADER_LENGTH);
-			header.writeUInt8(typeToByte.response, 0);
+			header.writeUInt8(MessageType.Response, 0);
 			header.writeUInt32BE(message.id, 1);
 			header.writeUInt16BE(message.statusCode, 5);
 			return Buffer.concat([header, message.payload]);
@@ -87,20 +84,15 @@ const decode = (buffer: Buffer): Message => {
 		throw protocolError("Empty frame");
 	}
 
-	const type = byteToType.get(buffer.readUInt8(0));
-	if (!type) {
-		throw protocolError("Unknown message type");
-	}
-
-	switch (type) {
-		case "hello": {
+	switch (buffer.readUInt8(0)) {
+		case MessageType.Hello: {
 			if (buffer.byteLength !== 3) {
 				throw protocolError("Invalid hello length");
 			}
 
-			return { type, version: buffer.readUInt16BE(1) };
+			return { type: "hello", version: buffer.readUInt16BE(1) };
 		}
-		case "reject": {
+		case MessageType.Reject: {
 			if (buffer.byteLength !== 2) {
 				throw protocolError("Invalid reject length");
 			}
@@ -110,9 +102,9 @@ const decode = (buffer: Buffer): Message => {
 				throw protocolError("Unknown reject reason");
 			}
 
-			return { reason, type };
+			return { reason, type: "reject" };
 		}
-		case "request": {
+		case MessageType.Request: {
 			if (buffer.byteLength < REQUEST_HEADER_LENGTH) {
 				throw protocolError("Invalid request length");
 			}
@@ -127,10 +119,10 @@ const decode = (buffer: Buffer): Message => {
 				id: buffer.readUInt32BE(1),
 				path: buffer.subarray(REQUEST_HEADER_LENGTH, pathEnd).toString(),
 				payload: buffer.subarray(pathEnd),
-				type,
+				type: "request",
 			};
 		}
-		case "response": {
+		case MessageType.Response: {
 			if (buffer.byteLength < RESPONSE_HEADER_LENGTH) {
 				throw protocolError("Invalid response length");
 			}
@@ -139,8 +131,11 @@ const decode = (buffer: Buffer): Message => {
 				id: buffer.readUInt32BE(1),
 				payload: buffer.subarray(RESPONSE_HEADER_LENGTH),
 				statusCode: buffer.readUInt16BE(5),
-				type,
+				type: "response",
 			};
+		}
+		default: {
+			throw protocolError("Unknown message type");
 		}
 	}
 };
