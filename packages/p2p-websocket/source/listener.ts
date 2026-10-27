@@ -9,6 +9,7 @@ import { WebSocketServer } from "ws";
 import type { ConnectionRepository } from "./connection-repository.js";
 import type { Connection, ConnectionFactory } from "./connection.js";
 import type { ConnectionVerifier } from "./interfaces.js";
+import type { Router } from "./router.js";
 
 import { constants } from "./constants.js";
 import { CloseReason, Direction, ListenerState } from "./enums.js";
@@ -28,6 +29,9 @@ export class Listener {
 
 	@multiInject(Identifiers.P2P.WebSocket.Connection.Verifiers)
 	private readonly verifiers!: ConnectionVerifier[];
+
+	@inject(Identifiers.P2P.WebSocket.Router)
+	private readonly router!: Router;
 
 	// Called after the verifiers, before the handshake. Returning a reason rejects the socket.
 	public accept?: (remoteAddress: string) => CloseReason | undefined;
@@ -75,6 +79,7 @@ export class Listener {
 
 			const remoteAddress = request.socket.remoteAddress ?? "";
 			const connection = this.createConnection(ws, { direction: Direction.Inbound, remoteAddress });
+			connection.onRequest = (path, payload) => this.router.handle(connection, path, payload);
 
 			// Sockets that complete the upgrade while stop() is in progress are dropped here.
 			const rejection =
