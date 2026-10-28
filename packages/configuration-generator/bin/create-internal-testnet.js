@@ -16,8 +16,7 @@ async function run() {
 	const generator = app.get(Identifiers.ConfigurationGenerator);
 
 	// Same shape as the generated validators.json: { "secrets": ["<mnemonic>", ...] }
-	const validatorMnemonics = [
-  	]
+	const validatorMnemonics = [];
 	await generator.generate({
 		network: "devnet",
 		symbol: "TѦ",
