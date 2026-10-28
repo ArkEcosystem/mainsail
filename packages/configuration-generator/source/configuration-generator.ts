@@ -201,7 +201,7 @@ export class ConfigurationGenerator {
 					}
 
 					ensureDirSync(join(this.configurationPath, "snapshot"));
-					this.configurationWriter.writeSnapshot(options.snapshot.path);
+					this.configurationWriter.writeSnapshot(options.snapshot.path, options.snapshot.snapshotHash);
 				},
 				title: `Writing snapshot.json in core config path.`,
 			});
