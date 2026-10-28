@@ -50,6 +50,7 @@ export const bindDependencies = (app: Application, dependencies: ServerDependenc
 
 	app.bind(Identifiers.TransactionPool.Processor).toConstantValue(dependencies.processor);
 	app.bind(Identifiers.TransactionPool.Query).toConstantValue({
+		getAll: () => makeQueryIterable(dependencies.transactions),
 		getFromHighestPriority: () => makeQueryIterable(dependencies.transactions),
 	});
 	app.bind(Identifiers.State.Store).toConstantValue({ getBlockNumber: () => 42 });
