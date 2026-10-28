@@ -17,8 +17,7 @@ async function run() {
 
 	// Same shape as the generated validators.json: { "secrets": ["<mnemonic>", ...] }
 	const validatorMnemonics = [
-
-  ]
+  	]
 	await generator.generate({
 		network: "devnet",
 		symbol: "TѦ",
@@ -27,7 +26,7 @@ async function run() {
 		chainId,
 		initialBlockNumber: 0,
 		snapshot: {
-			path: "./002d1b892ca9c970c53c8576907971593cd576749b4b26ea8ec7f3f52688aed7.compressed",
+			path: "./85d2e8564b7a7489cd3256216949275d9ed9b3aa58547213315a4b9e82173f5c.compressed",
 		},
 		validatorMnemonics,
 		validators: validatorMnemonics.length,
