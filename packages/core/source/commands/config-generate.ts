@@ -20,10 +20,14 @@ type Flag = {
 	default?: string | number | boolean | Date;
 };
 
-type Flags = Omit<AppContracts.NetworkGenerator.Options, "peers" | "rewardAmount" | "snapshot"> & {
+type Flags = Omit<
+	AppContracts.NetworkGenerator.Options,
+	"peers" | "rewardAmount" | "snapshot" | "validatorRegistrationFee"
+> & {
 	peers: string;
 	rewardAmount: number | string;
 	snapshot?: string;
+	validatorRegistrationFee: number | string;
 	validatorsFile?: string;
 };
 
@@ -99,6 +103,12 @@ export class Command extends Commands.Command {
 			schema: Joi.alternatives().try(Joi.string(), Joi.number()),
 			promptType: "number",
 			default: "2000000000000000000",
+		},
+		{
+			name: "validatorRegistrationFee",
+			description: "The fee to register a validator (in wei).",
+			schema: Joi.alternatives().try(Joi.string(), Joi.number()),
+			default: "250000000000000000000",
 		},
 		{
 			name: "pubKeyHash",
@@ -315,6 +325,7 @@ export class Command extends Commands.Command {
 				.filter((peer) => peer.length > 0),
 			rewardAmount: options.rewardAmount.toString(),
 			snapshot: this.#resolveSnapshot(options),
+			validatorRegistrationFee: options.validatorRegistrationFee.toString(),
 			validators,
 		};
 	}

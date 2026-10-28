@@ -448,6 +448,17 @@ describe<{
 		);
 	});
 
+	it("should apply a custom validator registration fee", async ({ cli, configPath }) => {
+		await cli
+			.withFlags(generateFlags(configPath, { validatorRegistrationFee: "300000000000000000000" }))
+			.execute(Command);
+
+		assert.equal(
+			readJSONSync(join(configPath, "devnet", "crypto.json")).milestones[1].validatorRegistrationFee,
+			"300000000000000000000",
+		);
+	});
+
 	it("should throw if the properties are not confirmed", async ({ cli }) => {
 		prompts.inject([
 			"devnet",
