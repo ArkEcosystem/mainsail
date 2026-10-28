@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { assert } from "@mainsail/utils";
+import { Heap } from "heap-js";
 
 type SortFunction = (a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) => number;
 type SenderMempoolSelectorFunction = (
@@ -15,12 +15,39 @@ const sortByHighestGasPrice = (a: Contracts.Crypto.Transaction, b: Contracts.Cry
 const sortByLowestGasPrice = (a: Contracts.Crypto.Transaction, b: Contracts.Crypto.Transaction) =>
 	a.gasPrice - b.gasPrice;
 
+type SenderQueue = { transactions: Contracts.Crypto.Transaction[]; next: number; queuedAt: number };
+
+// ties go to the transaction queued first; each sender's first transaction is queued in pool order
+function* mergeByPriority(
+	senders: Contracts.Crypto.Transaction[][],
+	prioritySort: SortFunction,
+): Generator<Contracts.Crypto.Transaction> {
+	let queued = 0;
+	const heap = new Heap<SenderQueue>(
+		(a, b) => prioritySort(a.transactions[a.next], b.transactions[b.next]) || a.queuedAt - b.queuedAt,
+	);
+	heap.init(senders.map((transactions) => ({ next: 0, queuedAt: queued++, transactions })));
+
+	for (let sender = heap.peek(); sender; sender = heap.peek()) {
+		yield sender.transactions[sender.next];
+
+		sender.next++;
+		if (sender.next < sender.transactions.length) {
+			sender.queuedAt = queued++;
+			// replace() overwrites the root before comparing, so the root may be re-keyed first
+			heap.replace(sender);
+		} else {
+			heap.pop();
+		}
+	}
+}
+
 export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
-	public transactions: Contracts.Crypto.Transaction[];
+	public transactions: Iterable<Contracts.Crypto.Transaction>;
 	public predicates: Contracts.TransactionPool.QueryPredicate[] = [];
 
 	public constructor(
-		transactions: Contracts.Crypto.Transaction[],
+		transactions: Iterable<Contracts.Crypto.Transaction>,
 		predicate?: Contracts.TransactionPool.QueryPredicate,
 	) {
 		this.transactions = transactions;
@@ -43,15 +70,16 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 	}
 
 	public async first(): Promise<Contracts.Crypto.Transaction> {
-		for (const transaction of await this.all()) {
-			return transaction;
+		const transaction = await this.#find();
+		if (!transaction) {
+			throw new Error("Transaction not found");
 		}
 
-		throw new Error("Transaction not found");
+		return transaction;
 	}
 
 	public async has(): Promise<boolean> {
-		return (await this.all()).length > 0;
+		return (await this.#find()) !== undefined;
 	}
 
 	public wherePredicate(predicate: Contracts.TransactionPool.QueryPredicate): QueryIterable {
@@ -62,6 +90,16 @@ export class QueryIterable implements Contracts.TransactionPool.QueryIterable {
 
 	public whereHash(hash: string): QueryIterable {
 		return this.wherePredicate(async (t) => t.hash === hash);
+	}
+
+	async #find(): Promise<Contracts.Crypto.Transaction | undefined> {
+		for (const transaction of this.transactions) {
+			if (await this.#satisfiesPredicates(transaction)) {
+				return transaction;
+			}
+		}
+
+		return undefined;
 	}
 
 	async #satisfiesPredicates(transaction: Contracts.Crypto.Transaction): Promise<boolean> {
@@ -107,47 +145,10 @@ export class Query implements Contracts.TransactionPool.Query {
 	}
 
 	#getTransactions(selector: SenderMempoolSelectorFunction, prioritySort: SortFunction): QueryIterable {
-		// Group transactions by sender mempool
-		const transactionsBySenderMempool: Record<string, Contracts.Crypto.Transaction[]> = {};
-		for (const senderMempool of this.mempool.getSenderMempools()) {
-			const transactions = selector(senderMempool);
-			if (transactions.length === 0) {
-				continue;
-			}
+		const senders = [...this.mempool.getSenderMempools()]
+			.map((senderMempool) => selector(senderMempool))
+			.filter((transactions) => transactions.length > 0);
 
-			transactionsBySenderMempool[transactions[0].from] = transactions;
-		}
-
-		// Add first transaction of each sender mempool
-		const priorityQueue: Contracts.Crypto.Transaction[] = [];
-		for (const transactions of Object.values(transactionsBySenderMempool)) {
-			priorityQueue.push(transactions[0]);
-		}
-
-		// Sort by priority (nonces are per sender and already handled by the provided selector)
-		priorityQueue.sort(prioritySort);
-
-		// Lastly, select transactions from priority queue until all sender mempools are empty.
-		const selectedTransactions: Contracts.Crypto.Transaction[] = [];
-		while (priorityQueue.length > 0) {
-			// Pick next priority transaction
-			const transaction = priorityQueue.shift();
-			assert.defined(transaction);
-			selectedTransactions.push(transaction);
-
-			// Remove the selected transaction from sender mempool
-			const senderMempool = transactionsBySenderMempool[transaction.from];
-			senderMempool.shift();
-
-			// If the sender has more transactions, add the next one to the queue
-			if (senderMempool.length > 0) {
-				priorityQueue.push(senderMempool[0]);
-			}
-
-			// Re-sort the priority queue
-			priorityQueue.sort(prioritySort);
-		}
-
-		return new QueryIterable(selectedTransactions);
+		return new QueryIterable({ [Symbol.iterator]: () => mergeByPriority(senders, prioritySort) });
 	}
 }
