@@ -254,10 +254,10 @@ describe<{
 		);
 	});
 
-	// A V3 delegate with one voter, saved under a file name that is not the snapshot hash.
+	// A V3 delegate and voter on prefix 23 (not the CLI default), under a file name that is not its hash.
 	const makeLegacySnapshot = async () => {
 		const app = await makeApplication(dirSync().name, {});
-		app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).set("network.pubKeyHash", 30);
+		app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).set("network.pubKeyHash", 23);
 
 		const hotWallet = async (mnemonic: string, fields: Record<string, unknown>) => {
 			const { publicKey } = await app
@@ -322,6 +322,7 @@ describe<{
 			.withFlags(
 				generateFlags(configPath, {
 					force: true,
+					pubKeyHash: undefined,
 					snapshot: snapshot.path,
 					validatorsFile,
 					validators: undefined,
@@ -330,6 +331,7 @@ describe<{
 			.execute(Command);
 
 		const crypto = readJSONSync(join(configPath, "devnet", "crypto.json"));
+		assert.equal(crypto.network.pubKeyHash, 23);
 		assert.equal(crypto.genesisBlock.block.number, 4001);
 		assert.equal(crypto.genesisBlock.block.parentHash, snapshot.chainTip.hash);
 		assert.equal(crypto.milestones[0].snapshot, {
@@ -348,6 +350,52 @@ describe<{
 				(plugin: { package: string }) => plugin.package === "@mainsail/snapshot-legacy-importer",
 			),
 		);
+	});
+
+	it("should throw if --pubKeyHash does not match the snapshot", async ({ cli, configPath }) => {
+		const snapshot = await makeLegacySnapshot();
+
+		await assert.rejects(
+			() =>
+				cli
+					.withFlags(generateFlags(configPath, { force: true, pubKeyHash: "30", snapshot: snapshot.path }))
+					.execute(Command),
+			"pubKeyHash 30 does not match the snapshot addresses (23)",
+		);
+	});
+
+	it("should accept a --pubKeyHash that matches the snapshot", async ({ cli, configPath }) => {
+		const snapshot = await makeLegacySnapshot();
+
+		await cli
+			.withFlags(generateFlags(configPath, { force: true, pubKeyHash: "23", snapshot: snapshot.path }))
+			.execute(Command);
+
+		assert.equal(readJSONSync(join(configPath, "devnet", "crypto.json")).network.pubKeyHash, 23);
+	});
+
+	it("should not prompt for the pubKeyHash when generating from a snapshot", async ({ cli, configPath }) => {
+		const snapshot = await makeLegacySnapshot();
+
+		prompts.inject([
+			"devnet",
+			"12500000000000000000000000",
+			"2",
+			"9000",
+			"122",
+			"123444",
+			"23000",
+			"2000000000000000000",
+			"27",
+			"myn",
+			"my",
+			"myex.io",
+			true,
+		]);
+
+		await cli.withFlags({ configPath, snapshot: snapshot.path }).execute(Command);
+
+		assert.equal(readJSONSync(join(configPath, "devnet", "mainsail", "crypto.json")).network.pubKeyHash, 23);
 	});
 
 	it("should throw if the snapshot file does not exist", async ({ cli, configPath }) => {

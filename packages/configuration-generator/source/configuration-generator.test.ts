@@ -515,20 +515,53 @@ describe<{
 		assert.true(environment.includes("MAINSAIL_DB_DATABASE=mydb"));
 	});
 
-	it("should throw when a snapshot is requested without a snapshot hash", async ({ app }) => {
-		const importer = {
+	const stubImporter = (app: Application, pubKeyHash: number | undefined) => {
+		app.rebind(Identifiers.Snapshot.Legacy.Importer).toConstantValue({
 			genesisBlockNumber: 0n,
 			prepare: async () => {},
 			previousGenesisBlockHash: "",
+			pubKeyHash,
 			snapshotHash: "",
 			validators: [],
-		};
-		app.rebind(Identifiers.Snapshot.Legacy.Importer).toConstantValue(importer);
-		const generator = app.get<ConfigurationGenerator>(InternalIdentifiers.ConfigurationGenerator);
+		});
+
+		return app.get<ConfigurationGenerator>(InternalIdentifiers.ConfigurationGenerator);
+	};
+
+	it("should throw when a snapshot is requested without a snapshot hash", async ({ app }) => {
+		const generator = stubImporter(app, 30);
 
 		await assert.rejects(
 			() => generator.generate(options({ snapshot: { path: "/snapshot/path" } })),
 			"missing snapshot config",
+		);
+	});
+
+	it("should infer the pubKeyHash from the snapshot", async ({ app, configPath }) => {
+		const generator = stubImporter(app, 23);
+		const path = join(dirSync().name, "v3.compressed");
+		writeFileSync(path, "snapshot-bytes");
+
+		await generator.generate(options({ snapshot: { path, snapshotHash: "a".repeat(64) } }));
+
+		assert.equal(readJSONSync(join(configPath, "crypto.json")).network.pubKeyHash, 23);
+	});
+
+	it("should throw when the pubKeyHash does not match the snapshot", async ({ app }) => {
+		const generator = stubImporter(app, 23);
+
+		await assert.rejects(
+			() => generator.generate(options({ pubKeyHash: 30, snapshot: { path: "/snapshot/path" } })),
+			"pubKeyHash 30 does not match the snapshot addresses (23)",
+		);
+	});
+
+	it("should throw when the snapshot has no wallet with a public key", async ({ app }) => {
+		const generator = stubImporter(app, undefined);
+
+		await assert.rejects(
+			() => generator.generate(options({ snapshot: { path: "/snapshot/path" } })),
+			"snapshot has no wallet with a public key to read the pubKeyHash from",
 		);
 	});
 });

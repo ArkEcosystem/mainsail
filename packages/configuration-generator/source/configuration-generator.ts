@@ -137,6 +137,7 @@ export class ConfigurationGenerator {
 						await this.importer.prepare(options.snapshot.path);
 						internalOptions.initialBlockNumber = Number(this.importer.genesisBlockNumber);
 						internalOptions.premine = "0";
+						internalOptions.pubKeyHash = this.#snapshotPubKeyHash(options.pubKeyHash);
 					}
 
 					const milestones = this.milestonesGenerator
@@ -247,6 +248,20 @@ export class ConfigurationGenerator {
 		}
 
 		this.logger.info(`Configuration generated on location: ${this.configurationPath}`);
+	}
+
+	#snapshotPubKeyHash(explicit: number | undefined): number {
+		const { pubKeyHash } = this.importer;
+
+		if (pubKeyHash === undefined) {
+			throw new Error("snapshot has no wallet with a public key to read the pubKeyHash from");
+		}
+
+		if (explicit !== undefined && explicit !== pubKeyHash) {
+			throw new Error(`pubKeyHash ${explicit} does not match the snapshot addresses (${pubKeyHash})`);
+		}
+
+		return pubKeyHash;
 	}
 
 	#assertCustomSecrets(options: Contracts.NetworkGenerator.InternalOptions): void {
