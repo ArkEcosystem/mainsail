@@ -4,18 +4,27 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers as ApiDatabaseIdentifiers } from "@mainsail/api-database";
 
+const refreshInterval = 1000;
+
 export const databaseReady = {
 	getOnRequestHandler(app: Contracts.Kernel.Application) {
 		const systemRepository = app.get<ApiDatabaseContracts.SystemRepositoryFactory>(
 			ApiDatabaseIdentifiers.SystemRepositoryFactory,
 		)();
 
-		const inMaintenance = async () => {
-			try {
-				return await systemRepository.inMaintenance();
-			} catch {
-				return true;
+		let check: Promise<boolean> | undefined;
+		let checkedAt = 0;
+
+		const inMaintenance = (): Promise<boolean> => {
+			if (!check || Date.now() - checkedAt >= refreshInterval) {
+				checkedAt = Date.now();
+				check = systemRepository.inMaintenance().catch(() => {
+					check = undefined;
+					return true;
+				});
 			}
+
+			return check;
 		};
 
 		return async (request: Hapi.Request, h: Hapi.ResponseToolkit): Promise<Hapi.Lifecycle.ReturnValue> => {

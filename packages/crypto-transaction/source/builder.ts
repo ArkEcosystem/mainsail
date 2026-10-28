@@ -185,7 +185,11 @@ export class TransactionBuilder {
 			throw new ValidationFailed(error);
 		}
 
-		const signature = await this.signer.legacySecondSign(data, keys);
+		if (!this.data.r || !this.data.s) {
+			throw new MissingTransactionSignatureError();
+		}
+
+		const signature = await this.signer.legacySecondSign(this.data, keys);
 
 		this.data.legacySecondSignature = signature;
 

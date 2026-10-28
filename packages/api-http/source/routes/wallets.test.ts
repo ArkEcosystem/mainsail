@@ -275,7 +275,7 @@ describe<{
 	});
 
 	it("GET /api/wallets/activity - merges transactions and token actions", async ({ server, repos }) => {
-		repos.dataSource.data.rawMany = [
+		const rows = [
 			{
 				action: undefined,
 				blockNumber: 90,
@@ -306,7 +306,11 @@ describe<{
 				value: "100",
 			},
 		];
-		repos.dataSource.data.rawOne = { count: "2" };
+		const queries: [string, unknown[]][] = [];
+		repos.dataSource.query = async (sql: string, parameters: unknown[]) => {
+			queries.push([sql, parameters]);
+			return sql.includes("COUNT(*)") ? [{ count: "2" }] : rows;
+		};
 
 		const response = await server.inject({
 			method: "GET",
@@ -317,6 +321,11 @@ describe<{
 
 		const body = JSON.parse(response.payload);
 		assert.is(body.meta.totalCount, 2);
+		assert.length(queries, 2);
+		assert.equal(
+			queries.map(([, parameters]) => parameters[0]),
+			[[ADDRESS_A], [ADDRESS_A]],
+		);
 
 		const [plain, tokenAction] = body.data;
 		assert.equal(plain.functionSig, "0x6dd7d8ea");
@@ -346,8 +355,6 @@ describe<{
 		const result = await controller.activity({ query: { addresses: [], limit: 100, page: 1 } } as any);
 
 		assert.equal(result, { meta: { totalCountIsEstimate: false }, results: [], totalCount: 0 });
-		// The early return skips the query building entirely: the transaction repository
-		// query builder (the first thing the full path touches) is never used.
-		assert.undefined(repos.transaction.qb.calls.leftJoin);
+		assert.length(repos.dataSource.queries, 0);
 	});
 });

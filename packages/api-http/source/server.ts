@@ -26,6 +26,10 @@ export class Server extends AbstractServer {
 				plugins: {
 					pagination: {
 						limit: this.configuration.getRequired<number>("plugins.pagination.limit"),
+						maxDepth: this.configuration.getOptional<number | undefined>(
+							"plugins.pagination.maxDepth",
+							undefined,
+						),
 					},
 				},
 			},

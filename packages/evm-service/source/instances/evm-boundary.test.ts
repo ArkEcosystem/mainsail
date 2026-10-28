@@ -336,7 +336,7 @@ describe<{
 					timestamp: 0n,
 					validatorAddress: zeroAddress,
 				}),
-			"out of range",
+			"roundValidators: expected an unsigned bigint fitting into 8 bits",
 		);
 
 		// The fee is a u128 on the wire; negative or wider values fail argument conversion
@@ -642,6 +642,68 @@ describe<{
 			() => transfer(0n, "0x5555555555555555555555555555555555555555", unknownLegacyAddress),
 			"lack of funds",
 		);
+	});
+
+	it("never merges a cold wallet into an account with legacy attributes", async ({ app, instance }) => {
+		const { genesisCommit } = await processGenesis(app, instance);
+
+		const address = "0x75545540230d5c3BEf023202d23CB74cFA723376";
+		const legacyAddress = "DH8WhBj6ron2tQhdFPQzjDcrk2CCY997MP";
+		const legacyAttributes = {
+			legacyNonce: 4n,
+			secondPublicKey: "02ef11726a15a2c1696d4253409b54975448146395a2c4f4fbf5eb9a10bec71092",
+		};
+		const coldWallet = { address: legacyAddress, balance: 10n ** 18n, legacyAttributes: { legacyNonce: 0n } };
+
+		await instance.importAccountInfos([{ address, balance: 5n * 10n ** 18n, legacyAttributes, nonce: 0n }]);
+		await instance.importLegacyColdWallets([coldWallet]);
+		await instance.onCommit(makeUnit(genesisCommit));
+
+		const assertAccount = async (balance: bigint, nonce: bigint) => {
+			assert.equal(await instance.getAccountInfoExtended(address, legacyAddress), {
+				address,
+				balance,
+				legacyAttributes,
+				nonce,
+			});
+			assert.equal(await instance.getLegacyAttributes(address, legacyAddress), legacyAttributes);
+			assert.equal((await instance.getLegacyColdWallets(0n, 10n)).wallets, [coldWallet]);
+		};
+
+		await assertAccount(5n * 10n ** 18n, 0n);
+
+		const commitKey = { blockNumber: 1n, round: 0n };
+		await instance.prepareNextCommit({ blockContext: { ...blockContext, commitKey } });
+
+		const { receipt } = await instance.process({
+			commitKey,
+			data: Buffer.alloc(0),
+			from: address,
+			gasLimit: 21_000n,
+			gasPrice: 0n,
+			legacyAddress,
+			nonce: 0n,
+			specId: Enums.Evm.SpecId.OSAKA,
+			to: wallets[1].address,
+			txHash: randomBytes(32).toString("hex"),
+			value: 1n,
+		});
+		assert.equal(receipt.status, 1);
+
+		let accountUpdates: Contracts.Evm.AccountUpdate[] = [];
+		await instance.onCommit({
+			blockNumber: 1n,
+			getBlock: () => ({ number: 1n, round: 0n }),
+			round: 0n,
+			setAccountUpdates: (updates: Contracts.Evm.AccountUpdate[]) => (accountUpdates = updates),
+			setContractEvents: () => {},
+		} as unknown as Contracts.Processor.ProcessableUnit);
+
+		const accountUpdate = accountUpdates.find((update) => update.address === address);
+		assert.defined(accountUpdate);
+		assert.undefined(accountUpdate!.legacyMergeInfo);
+
+		await assertAccount(5n * 10n ** 18n - 1n, 1n);
 	});
 
 	it("restores the snapshotted pending commit on rollback", async ({ instance }) => {

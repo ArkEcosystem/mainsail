@@ -541,31 +541,33 @@ impl PersistentDB {
         })
     }
 
-    pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) -> Result<(), Error> {
-        self.with_write_txn(|wtxn| {
-            let inner = &self.inner;
+    pub fn set_genesis_info(&mut self, genesis_info: GenesisInfo) {
+        self.genesis_info.replace(genesis_info);
+    }
 
-            if inner
-                .accounts
-                .get(wtxn, &AddressWrapper(genesis_info.account))?
-                .is_none()
-            {
-                inner.accounts.put(
-                    wtxn,
-                    &AddressWrapper(genesis_info.account),
-                    &CompactBincode(&StoredAccountInfo::new(
-                        genesis_info.initial_supply,
-                        0,
-                        KECCAK_EMPTY,
-                    )),
-                )?;
+    pub fn seed_genesis_account(&self) -> Result<(), Error> {
+        let genesis_info = self
+            .genesis_info
+            .as_ref()
+            .ok_or_else(|| Error::State("genesis not initialized".into()))?;
+
+        self.with_write_txn(|wtxn| {
+            if self.is_block_committed(wtxn, genesis_info.initial_block_number)? {
+                return Ok(());
             }
 
-            Ok(())
-        })?;
+            self.inner.accounts.put(
+                wtxn,
+                &AddressWrapper(genesis_info.account),
+                &CompactBincode(&StoredAccountInfo::new(
+                    genesis_info.initial_supply,
+                    0,
+                    KECCAK_EMPTY,
+                )),
+            )?;
 
-        self.genesis_info.replace(genesis_info);
-        Ok(())
+            Ok(())
+        })
     }
 
     pub fn get_accounts(
@@ -822,6 +824,35 @@ impl PersistentDB {
                 .legacy_cold_wallets
                 .get(tx_env, &LegacyAddressWrapper(address))?
                 .map(|inner| inner.0))
+        })
+    }
+
+    pub fn get_mergeable_legacy_cold_wallet(
+        &self,
+        address: Address,
+        legacy_address: LegacyAddress,
+    ) -> Result<Option<LegacyColdWallet>, Error> {
+        self.with_read_txn(|tx_env| {
+            let Some(legacy_cold_wallet) = self
+                .inner
+                .legacy_cold_wallets
+                .get(tx_env, &LegacyAddressWrapper(legacy_address))?
+                .map(|inner| inner.0)
+            else {
+                return Ok(None);
+            };
+
+            if legacy_cold_wallet.merge_info.is_some()
+                || self
+                    .inner
+                    .legacy_attributes
+                    .get(tx_env, &AddressWrapper(address))?
+                    .is_some()
+            {
+                return Ok(None);
+            }
+
+            Ok(Some(legacy_cold_wallet))
         })
     }
 
@@ -1443,7 +1474,7 @@ impl PersistentDB {
     /// (mdb_env_set_mapsize) while the txn is live.
     ///
     /// Unlike [`Self::open_read_txn`], this deliberately has no `MDB_MAP_RESIZED` recovery. Every
-    /// write txn on this env — genesis bootstrap (`set_genesis_info`) and block commits
+    /// write txn on this env — genesis account seeding (`seed_genesis_account`) and block commits
     /// (`commit_to_db`) alike — is opened by the single consensus/core process, which is also the one
     /// that grows the map (via `resize()` on `DbFull`); it adopts its own new size under the resize
     /// write-guard and never observes a peer-induced `MapResized`. If a second writer process is ever
@@ -2309,8 +2340,8 @@ mod tests {
             account: genesis,
             initial_supply: U256::from(1_000_000),
             ..Default::default()
-        })
-        .unwrap();
+        });
+        db.seed_genesis_account().unwrap();
 
         let info = db.basic(genesis).unwrap();
         assert_eq!(
@@ -2436,12 +2467,126 @@ mod tests {
     fn test_set_genesis_info() {
         let mut db = create_temp_database();
 
+        let genesis_info = crate::db::GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            initial_supply: U256::from(1_000_000),
+            ..Default::default()
+        };
+
         assert_eq!(db.genesis_info, None);
 
-        db.set_genesis_info(Default::default()).expect("ok");
+        db.set_genesis_info(genesis_info.clone());
 
-        assert_eq!(db.genesis_info, Some(Default::default()));
+        assert_eq!(db.genesis_info, Some(genesis_info.clone()));
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
     }
+
+    #[test]
+    fn test_seed_genesis_account_until_genesis_commit() {
+        let mut db = create_temp_database();
+
+        let genesis_info = crate::db::GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            initial_block_number: 1000,
+            ..Default::default()
+        };
+
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+
+        db.seed_genesis_account()
+            .expect_err("genesis not initialized");
+
+        db.set_genesis_info(genesis_info.clone());
+        db.seed_genesis_account().expect("ok");
+
+        assert_eq!(
+            db.basic(genesis_info.account).unwrap(),
+            Some(AccountInfo::default())
+        );
+
+        // A changed supply before the genesis commit overwrites the stale balance.
+        db.set_genesis_info(crate::db::GenesisInfo {
+            initial_supply: U256::from(1_000_000),
+            ..genesis_info.clone()
+        });
+        db.seed_genesis_account().expect("ok");
+
+        assert_eq!(
+            db.basic(genesis_info.account).unwrap(),
+            Some(AccountInfo {
+                balance: U256::from(1_000_000),
+                ..Default::default()
+            })
+        );
+
+        db.set_genesis_info(genesis_info.clone());
+        db.seed_genesis_account().expect("ok");
+
+        assert_eq!(
+            db.basic(genesis_info.account).unwrap(),
+            Some(AccountInfo::default())
+        );
+
+        // The genesis block deletes the empty genesis account.
+        let mut state_commit = StateCommit {
+            key: CommitKey(genesis_info.initial_block_number, 0, B256::ZERO),
+            change_set: StateChangeset {
+                accounts: vec![(genesis_info.account, None)],
+                ..Default::default()
+            },
+            results: Default::default(),
+        };
+        db.commit(&mut state_commit, &None).unwrap();
+
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+
+        // Seeding again after the genesis commit is a no-op.
+        db.seed_genesis_account().expect("ok");
+
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+    }
+
+    #[test]
+    fn test_seed_genesis_account_on_new_instance_after_genesis_commit() {
+        let path = tempfile::Builder::new()
+            .prefix("evm.mdb")
+            .tempdir()
+            .unwrap();
+
+        let genesis_info = crate::db::GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            initial_block_number: 1000,
+            ..Default::default()
+        };
+
+        let mut db =
+            PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("db");
+        db.set_genesis_info(genesis_info.clone());
+        db.seed_genesis_account().expect("ok");
+
+        let mut state_commit = StateCommit {
+            key: CommitKey(genesis_info.initial_block_number, 0, B256::ZERO),
+            change_set: StateChangeset {
+                accounts: vec![(genesis_info.account, None)],
+                ..Default::default()
+            },
+            results: Default::default(),
+        };
+        db.commit(&mut state_commit, &None).unwrap();
+        drop(db);
+
+        // Each boot opens a new instance and seeds again.
+        let mut db =
+            PersistentDB::new(PersistentDBOptions::new(path.path().to_path_buf())).expect("db");
+
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+
+        db.set_genesis_info(genesis_info.clone());
+        db.seed_genesis_account().expect("ok");
+
+        assert_eq!(db.basic(genesis_info.account).unwrap(), None);
+    }
+
     #[test]
     fn test_get_commits_by_block_range() {
         let db = create_temp_database();
@@ -2974,6 +3119,124 @@ mod tests {
                 second_public_key: Some("key".into()),
                 multi_signature: None,
             })
+        );
+    }
+
+    #[test]
+    fn test_get_mergeable_legacy_cold_wallet() {
+        let db = create_temp_database();
+
+        let address = address!("75545540230d5c3BEf023202d23CB74cFA723376");
+        let legacy_address: LegacyAddress =
+            "DH8WhBj6ron2tQhdFPQzjDcrk2CCY997MP".try_into().unwrap();
+
+        assert_eq!(
+            db.get_mergeable_legacy_cold_wallet(address, legacy_address)
+                .unwrap(),
+            None
+        );
+
+        let put_cold_wallet = |merge_info: Option<(B256, Address)>| {
+            let cold_wallet = LegacyColdWallet {
+                address: legacy_address,
+                balance: U256::from(10),
+                legacy_attributes: LegacyAccountAttributes {
+                    legacy_nonce: Some(0),
+                    ..Default::default()
+                },
+                merge_info,
+            };
+
+            let mut wtxn = db.env.write_txn().unwrap();
+            db.inner
+                .legacy_cold_wallets
+                .put(
+                    &mut wtxn,
+                    &LegacyAddressWrapper(legacy_address),
+                    &CompactBincode(&cold_wallet),
+                )
+                .unwrap();
+            wtxn.commit().unwrap();
+
+            cold_wallet
+        };
+
+        let cold_wallet = put_cold_wallet(None);
+        assert_eq!(
+            db.get_mergeable_legacy_cold_wallet(address, legacy_address)
+                .unwrap(),
+            Some(cold_wallet)
+        );
+
+        put_cold_wallet(Some((B256::repeat_byte(0xab), address)));
+        assert_eq!(
+            db.get_mergeable_legacy_cold_wallet(address, legacy_address)
+                .unwrap(),
+            None
+        );
+    }
+
+    #[test]
+    fn test_get_mergeable_legacy_cold_wallet_skips_account_with_legacy_attributes() {
+        let db = create_temp_database();
+
+        let address = address!("75545540230d5c3BEf023202d23CB74cFA723376");
+        let legacy_address: LegacyAddress =
+            "DH8WhBj6ron2tQhdFPQzjDcrk2CCY997MP".try_into().unwrap();
+
+        let cold_wallet = LegacyColdWallet {
+            address: legacy_address,
+            balance: U256::from(10),
+            legacy_attributes: LegacyAccountAttributes {
+                legacy_nonce: Some(0),
+                ..Default::default()
+            },
+            merge_info: None,
+        };
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            db.inner
+                .legacy_cold_wallets
+                .put(
+                    &mut wtxn,
+                    &LegacyAddressWrapper(legacy_address),
+                    &CompactBincode(&cold_wallet),
+                )
+                .unwrap();
+            wtxn.commit().unwrap();
+        }
+
+        assert_eq!(
+            db.get_mergeable_legacy_cold_wallet(address, legacy_address)
+                .unwrap(),
+            Some(cold_wallet)
+        );
+
+        {
+            let mut wtxn = db.env.write_txn().unwrap();
+            db.inner
+                .legacy_attributes
+                .put(
+                    &mut wtxn,
+                    &AddressWrapper(address),
+                    &CompactBincode(&LegacyAccountAttributes {
+                        legacy_nonce: Some(4),
+                        second_public_key: Some(
+                            "02ef11726a15a2c1696d4253409b54975448146395a2c4f4fbf5eb9a10bec71092"
+                                .into(),
+                        ),
+                        multi_signature: None,
+                    }),
+                )
+                .unwrap();
+            wtxn.commit().unwrap();
+        }
+
+        assert_eq!(
+            db.get_mergeable_legacy_cold_wallet(address, legacy_address)
+                .unwrap(),
+            None
         );
     }
 

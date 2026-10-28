@@ -3,7 +3,7 @@ import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "../sea
 
 import { Block } from "../models/block.js";
 import { BlockFilter } from "../search/filters/index.js";
-import { makeExtendedRepository } from "./repository-extension.js";
+import { breakTies, makeExtendedRepository } from "./repository-extension.js";
 
 export const makeBlockRepository = (dataSource: RepositoryDataSource): BlockRepository =>
 	makeExtendedRepository<Block, BlockRepositoryExtension>(Block, dataSource, {
@@ -14,7 +14,7 @@ export const makeBlockRepository = (dataSource: RepositoryDataSource): BlockRepo
 			options?: Options,
 		): Promise<ResultsPage<Block>> {
 			const blockExpression = await BlockFilter.getExpression(blockCriteria);
-			return this.listByExpression(blockExpression, sorting, pagination, options);
+			return this.listByExpression(blockExpression, breakTies(sorting, "number"), pagination, options);
 		},
 
 		async findOneByCriteria(blockCriteria: Criteria.OrBlockCriteria): Promise<Block | null> {

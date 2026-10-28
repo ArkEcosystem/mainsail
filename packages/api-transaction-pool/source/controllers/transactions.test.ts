@@ -10,7 +10,7 @@ describe<{
 	controller: TransactionsController;
 	processor: { process: (data: Buffer[]) => Promise<object> };
 	transactions: ReturnType<typeof makeTransaction>[];
-}>("TransactionsController", ({ it, assert, beforeEach, stub }) => {
+}>("TransactionsController", ({ it, assert, beforeEach, spy, stub }) => {
 	beforeEach((context) => {
 		context.transactions = [makeTransaction(1), makeTransaction(2)];
 		context.processor = { process: async () => ({}) };
@@ -18,6 +18,7 @@ describe<{
 		context.app = new Application();
 		context.app.bind(Identifiers.TransactionPool.Processor).toConstantValue(context.processor);
 		context.app.bind(Identifiers.TransactionPool.Query).toConstantValue({
+			getAll: () => makeQueryIterable(context.transactions),
 			getFromHighestPriority: () => makeQueryIterable(context.transactions),
 		});
 
@@ -141,5 +142,13 @@ describe<{
 
 		assert.true(result.isBoom);
 		assert.is(result.output.statusCode, 404);
+	});
+
+	it("#showUnconfirmed - looks the hash up without ordering the pool", async ({ app, controller, transactions }) => {
+		const getFromHighestPriority = spy(app.get<any>(Identifiers.TransactionPool.Query), "getFromHighestPriority");
+
+		await controller.showUnconfirmed({ params: { hash: transactions[1].hash } } as any);
+
+		getFromHighestPriority.neverCalled();
 	});
 });

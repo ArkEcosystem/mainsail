@@ -2,7 +2,7 @@ import { getPathSegments } from "./get-path-segments.js";
 import { isObject } from "./is-object.js";
 import { isString } from "./is-string.js";
 
-export const has = <T>(object: T, path: string | string[]): boolean => {
+export const has = <T>(object: T, path: string): boolean => {
 	if (!isObject(object) || !isString(path)) {
 		return false;
 	}

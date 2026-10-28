@@ -25,7 +25,7 @@ if (jemallocPath && !alreadyPreloaded) {
 		process.exitCode = exitCode;
 		process.exit();
 	}
-} else {
+} else if (!alreadyPreloaded) {
 	console.error(
 		"The jemalloc library was not found on your system. It is recommended to install it for better memory management. Falling back to the system default...",
 	);

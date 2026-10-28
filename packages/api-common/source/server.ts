@@ -17,6 +17,12 @@ import { readFileSync } from "fs";
 
 import { Processor } from "./rcp/index.js";
 
+// statement_timeout (57014), insufficient resources (class 53), or no pooled connection free in time
+const isDatabaseOverloaded = (error: Error & { code?: string }): boolean =>
+	(error.name === "QueryFailedError" && (error.code === "57014" || !!error.code?.startsWith("53"))) ||
+	error.message === "timeout exceeded when trying to connect" ||
+	error.message === "Connection terminated due to connection timeout";
+
 @injectable()
 export abstract class AbstractServer {
 	@inject(Identifiers.Application.Instance)
@@ -65,7 +71,10 @@ export abstract class AbstractServer {
 				// without the stack. QueryFailedError is external so it can't extend DatabaseException;
 				// match it by name.
 				const isQueryFailedError = request.response.name === "QueryFailedError";
-				if (isQueryFailedError || request.response instanceof DatabaseException) {
+				if (isDatabaseOverloaded(request.response)) {
+					this.logger.error(`${request.path} - ${request.response.message}`);
+					request.response = Boom.serverUnavailable("The database is too busy to answer");
+				} else if (isQueryFailedError || request.response instanceof DatabaseException) {
 					const message = isQueryFailedError
 						? `${request.response.name} ${request.response.message}`
 						: request.response.message;

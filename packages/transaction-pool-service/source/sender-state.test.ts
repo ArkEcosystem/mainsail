@@ -1,340 +1,384 @@
-import { Container } from "@mainsail/container";
 import type { Contracts } from "@mainsail/contracts";
-import { Identifiers, Events } from "@mainsail/constants";
-import * as Exceptions from "@mainsail/exceptions";
-import { Configuration } from "@mainsail/crypto-config";
 
-import crypto from "../../core/bin/config/devnet/core/crypto.json";
-import { describeSkip } from "@mainsail/test-runner";
-import { SenderState } from ".";
+import { Identifiers } from "@mainsail/constants";
+import {
+	InsufficientBalanceError,
+	TransactionExceedsMaximumByteSizeError,
+	TransactionFailedToPreverifyError,
+	TransactionFromWrongNetworkError,
+	UnexpectedLegacySecondSignatureError,
+	UnexpectedNonceError,
+} from "@mainsail/exceptions";
+import { Application } from "@mainsail/kernel";
+import { describe } from "@mainsail/test-runner";
 
-describeSkip<{
-	configuration: any;
-	handlerRegistry: any;
-	expirationService: any;
-	triggers: any;
-	emitter: any;
-	container: Container;
-	transaction: Contracts.Crypto.Transaction;
-	config: Configuration;
-	blockSerializer: any;
-	walletRepository: any;
-	stateService: any;
+import { SenderState } from "./sender-state";
+
+const address = "0x75545540230d5c3BEf023202d23CB74cFA723376";
+const legacyAddress = "DH8WhBj6ron2tQhdFPQzjDcrk2CCY997MP";
+const legacySecondPublicKey = "02f0f1217bace23ac2ac9438b65a8dcc693905bee511b49d5ade499a8c8da8a3e4";
+const legacySecondSignature =
+	"8f0145edea568df2dd39db91be0bff4ebf5b1e54cae49bf2090bf84fa0dd45a2273f828aaa99a54e31f8f3e316acc573c6f2490fb903052accddb979647fa5ce01";
+const chainId = 10_000;
+const maxTransactionBytes = 1024;
+const maxGasLimit = 30_000_000;
+
+const gasLimit = 21_000;
+const gasPrice = 5;
+const value = 1_000n;
+const cost = value + BigInt(gasPrice * gasLimit);
+
+const makeTransaction = (overrides: Record<string, unknown> = {}): Contracts.Crypto.Transaction =>
+	({
+		data: "0xabcd",
+		from: address,
+		gasLimit,
+		gasPrice,
+		hash: "hash",
+		network: chainId,
+		nonce: 5n,
+		senderLegacyAddress: legacyAddress,
+		serialized: Buffer.alloc(100),
+		to: "0x0000000000000000000000000000000000000001",
+		value,
+		...overrides,
+	}) as unknown as Contracts.Crypto.Transaction;
+
+describe<{
+	app: Application;
 	senderState: SenderState;
-}>("SenderState", ({ it, assert, beforeEach, stub, spy, match }) => {
+	account: { balance: bigint; nonce: bigint; legacyAttributes: Contracts.Evm.LegacyAttributes };
+	evm: any;
+	verifier: any;
+}>("SenderState", ({ it, assert, beforeEach, spy, stub }) => {
+	const assertZeroBalance = async (senderState: SenderState) => {
+		const nonce = senderState.getNonce();
+
+		await senderState.apply(makeTransaction({ gasPrice: 0, nonce, value: 0n }));
+		await assert.rejects(
+			() => senderState.apply(makeTransaction({ gasPrice: 0, nonce: nonce + 1n, value: 1n })),
+			InsufficientBalanceError,
+		);
+	};
+
 	beforeEach(async (context) => {
-		context.configuration = {
-			get: () => {},
-			getOptional: () => {},
-			getRequired: () => {},
-		};
-		context.handlerRegistry = {
-			getActivatedHandlerForData: () => {},
-		};
-		context.expirationService = {
-			getExpirationHeight: () => {},
-			isExpired: () => {},
-		};
-		context.triggers = {
-			call: () => {},
-		};
-		context.emitter = {
-			dispatch: () => {},
+		context.account = { balance: cost, legacyAttributes: {}, nonce: 5n };
+
+		context.evm = {
+			getAccountInfoExtended: async () => ({ ...context.account }),
+			preverifyTransaction: async () => ({ success: true }),
 		};
 
-		context.blockSerializer = {
-			headerSize: () => 152,
+		context.verifier = {
+			verifyLegacySecondSignature: async () => true,
 		};
 
-		context.walletRepository = {};
+		context.app = new Application();
+		context.app
+			.bind(Identifiers.ServiceProvider.Configuration)
+			.toConstantValue({ getRequired: (key: string) => ({ maxTransactionBytes })[key] })
+			.whenTagged("plugin", "transaction-pool-service");
+		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
+			getMilestone: () => ({ block: { maxGasLimit }, evmSpec: "Osaka" }),
+			getNetwork: () => ({ chainId }),
+		});
+		context.app.bind(Identifiers.Evm.Instance).toConstantValue(context.evm);
+		context.app.bind(Identifiers.BlockchainUtils.FeeCalculator).toConstantValue({
+			calculate: (transaction: Contracts.Crypto.Transaction) =>
+				BigInt(transaction.gasPrice) * BigInt(transaction.gasLimit),
+		});
+		context.app.bind(Identifiers.Cryptography.Transaction.Verifier).toConstantValue(context.verifier);
 
-		context.stateService = {};
-
-		context.container = new Container();
-		context.container.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(context.configuration);
-		context.container.bind(Identifiers.Cryptography.Block.Serializer).toConstantValue(context.blockSerializer);
-		context.container
-			.bind(Identifiers.TransactionPool.ExpirationService)
-			.toConstantValue(context.expirationService);
-		context.container.bind(Identifiers.Services.Trigger.Service).toConstantValue(context.triggers);
-		context.container.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.emitter);
-		context.container.bind(Identifiers.State.Service).toConstantValue(context.stateService);
-		context.container.bind(Identifiers.Cryptography.Configuration).to(Configuration).inSingletonScope();
-		context.container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig(crypto);
-
-		context.config = context.container.get(Identifiers.Cryptography.Configuration);
-
-		context.senderState = context.container.get(SenderState, { autobind: true });
-		await context.senderState.configure("sender's public key");
-
-		// @ts-ignore
-		context.transaction = {
-			data: { network: 30, senderPublicKey: "sender's public key" },
-			id: "tx1",
-			serialized: Buffer.alloc(10),
-			timestamp: 13_600,
-		} as Contracts.Crypto.Transaction;
+		context.senderState = await context.app.resolve(SenderState).configure(address, legacyAddress);
 	});
 
-	it("apply - should throw when transaction exceeds maximum byte size", async ({
+	it("configure - should load the sender wallet from the evm", async ({ senderState, account, evm }) => {
+		account.nonce = 7n;
+		const getAccountInfo = spy(evm, "getAccountInfoExtended");
+		assert.equal(senderState.getNonce(), 5n);
+
+		assert.equal(await senderState.configure(address, legacyAddress), senderState);
+
+		getAccountInfo.calledOnce();
+		getAccountInfo.calledWith(address, legacyAddress);
+		assert.equal(senderState.getNonce(), 7n);
+	});
+
+	it("apply - should increase the nonce", async ({ senderState }) => {
+		assert.equal(senderState.getNonce(), 5n);
+
+		await senderState.apply(makeTransaction());
+
+		assert.equal(senderState.getNonce(), 6n);
+	});
+
+	it("apply - should deduct value and fee from the balance", async ({ senderState, account }) => {
+		account.balance = 2n * cost;
+		await senderState.configure(address, legacyAddress);
+
+		await senderState.apply(makeTransaction({ nonce: 5n }));
+		await senderState.apply(makeTransaction({ nonce: 6n }));
+
+		await assertZeroBalance(senderState);
+	});
+
+	it("apply - should accept a transaction of exactly the maximum byte size", async ({ senderState }) => {
+		assert.equal(senderState.getNonce(), 5n);
+
+		await senderState.apply(makeTransaction({ serialized: Buffer.alloc(maxTransactionBytes) }));
+
+		assert.equal(senderState.getNonce(), 6n);
+	});
+
+	it("apply - should throw when the transaction exceeds the maximum byte size", async ({ senderState }) => {
+		assert.equal(senderState.getNonce(), 5n);
+
+		await assert.rejects(
+			() => senderState.apply(makeTransaction({ serialized: Buffer.alloc(maxTransactionBytes + 1) })),
+			TransactionExceedsMaximumByteSizeError,
+		);
+
+		assert.equal(senderState.getNonce(), 5n);
+	});
+
+	it("apply - should throw when the transaction is from another network", async ({ senderState }) => {
+		assert.equal(senderState.getNonce(), 5n);
+
+		await assert.rejects(
+			() => senderState.apply(makeTransaction({ network: chainId + 1 })),
+			TransactionFromWrongNetworkError,
+		);
+
+		assert.equal(senderState.getNonce(), 5n);
+	});
+
+	it("apply - should accept a transaction that does not specify a network", async ({ senderState }) => {
+		assert.equal(senderState.getNonce(), 5n);
+
+		await senderState.apply(makeTransaction({ network: undefined }));
+
+		assert.equal(senderState.getNonce(), 6n);
+	});
+
+	it("apply - should throw when the nonce is lower than the sender nonce", async ({ senderState }) => {
+		assert.equal(senderState.getNonce(), 5n);
+
+		await assert.rejects(() => senderState.apply(makeTransaction({ nonce: 4n })), UnexpectedNonceError);
+
+		assert.equal(senderState.getNonce(), 5n);
+	});
+
+	it("apply - should throw when the nonce is higher than the sender nonce", async ({ senderState }) => {
+		assert.equal(senderState.getNonce(), 5n);
+
+		await assert.rejects(() => senderState.apply(makeTransaction({ nonce: 6n })), UnexpectedNonceError);
+
+		assert.equal(senderState.getNonce(), 5n);
+	});
+
+	it("apply - should throw when the balance does not cover value and fee", async ({ senderState, account }) => {
+		account.balance = cost - 1n;
+		await senderState.configure(address, legacyAddress);
+		assert.equal(senderState.getNonce(), 5n);
+
+		await assert.rejects(() => senderState.apply(makeTransaction()), InsufficientBalanceError);
+
+		assert.equal(senderState.getNonce(), 5n);
+	});
+
+	it("apply - should verify the legacy second signature when the sender has a second public key", async ({
 		senderState,
-		transaction,
-		configuration,
+		account,
+		verifier,
 	}) => {
-		stub(configuration, "getRequired").returnValueOnce(0); // maxTransactionByte;
-
-		const promise = senderState.apply(transaction);
-
-		await assert.rejects(() => promise);
-
-		await promise.catch((error) => {
-			assert.instance(error, Exceptions.PoolError);
-			assert.equal(error.type, "ERR_TOO_LARGE");
-		});
-	});
-
-	it("apply - should throw when transaction is from wrong network", async ({
-		senderState,
-		container,
-		configuration,
-		transaction,
-	}) => {
-		container.get<Configuration>(Identifiers.Cryptography.Configuration).setConfig({
-			...crypto,
-			network: {
-				pubKeyHash: 123,
-			},
-		} as unknown as Contracts.Crypto.NetworkConfig);
-
-		stub(configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
-
-		const promise = senderState.apply(transaction);
-
-		await assert.rejects(() => promise);
-
-		await promise.catch((error) => {
-			assert.instance(error, Exceptions.PoolError);
-			assert.equal(error.type, "ERR_WRONG_NETWORK");
-		});
-	});
-
-	it.skip("apply - should throw when transaction is from future", async (context) => {
-		const senderState = context.container.get(SenderState, { autobind: true });
-
-		stub(context.configuration, "get").returnValue(123); // network.pubKeyHash
-		stub(context.configuration, "getRequired").returnValueOnce(1024); // maxTransactionByte;
-
-		const promise = senderState.apply(context.transaction);
-
-		await assert.rejects(() => promise);
-
-		await promise.catch((error) => {
-			assert.instance(error, Exceptions.PoolError);
-			assert.equal(error.type, "ERR_FROM_FUTURE");
-		});
-	});
-
-	it("apply - should throw when transaction expired", async ({
-		senderState,
-		configuration,
-		expirationService,
-		transaction,
-		emitter,
-	}) => {
-		stub(configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
-		stub(expirationService, "isExpired").returnValueOnce(true);
-		stub(expirationService, "getExpirationHeight").returnValueOnce(10);
-		const eventSpy = spy(emitter, "dispatch");
-
-		const promise = senderState.apply(transaction);
-
-		await assert.rejects(() => promise);
-
-		await promise.catch((error) => {
-			assert.instance(error, Exceptions.PoolError);
-			assert.equal(error.type, "ERR_EXPIRED");
-		});
-
-		eventSpy.calledTimes(1);
-		eventSpy.calledWith(Events.TransactionEvent.Expired);
-	});
-
-	it("apply - should throw when transaction fails to verify", async ({
-		senderState,
-		configuration,
-		expirationService,
-		handlerRegistry,
-		triggers,
-		transaction,
-		walletRepository,
-	}) => {
-		const handler = {};
-
-		stub(configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
-		stub(expirationService, "isExpired").returnValueOnce(false);
-		const handlerStub = stub(handlerRegistry, "getActivatedHandlerForData").resolvedValue(handler);
-		const triggersStub = stub(triggers, "call").resolvedValue(false); // verifyTransaction
-
-		const promise = senderState.apply(transaction);
-
-		await assert.rejects(() => promise);
-
-		await promise.catch((error) => {
-			assert.instance(error, Exceptions.PoolError);
-			assert.equal(error.type, "ERR_BAD_DATA");
-		});
-
-		handlerStub.calledWith(transaction.data);
-		triggersStub.calledWith("verifyTransaction", {
-			handler,
-			transaction: transaction,
-			walletRepository: walletRepository,
-		});
-	});
-
-	it.skip("apply - should throw when state is corrupted", async (context) => {
-		const senderState = context.container.get(SenderState, { autobind: true });
-		const handler = {};
-
-		stub(context.configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
-		stub(context.expirationService, "isExpired").returnValueOnce(false);
-		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData");
-		const triggerStub = stub(context.triggers, "call");
-
-		// revert
-		handlerStub.resolvedValueNth(0, handler);
-		triggerStub.rejectedValueNth(0, new Error("Corrupt it!")); // revertTransaction
-
-		// apply
-		handlerStub.resolvedValueNth(1, handler);
-		triggerStub.resolvedValueNth(1, true); // verifyTransaction
-
-		await senderState.revert(context.transaction).catch(() => {});
-		const promise = senderState.apply(context.transaction);
-
-		await assert.rejects(() => promise);
-
-		await promise.catch((error) => {
-			assert.instance(error, Exceptions.PoolError);
-			assert.equal(error.type, "ERR_RETRY");
-		});
-
-		// handlerStub.calledNthWith(0, context.transaction.data);
-		// triggerStub.calledNthWith(0, "revertTransaction", {
-		// 	handler,
-		// 	transaction: context.transaction,
-		// 	walletRepository: context.walletRepository,
-		// });
-
-		handlerStub.calledNthWith(1, context.transaction.data);
-		triggerStub.calledNthWith(1, "verifyTransaction", {
-			handler,
-			transaction: context.transaction,
-			walletRepository: context.walletRepository,
-		});
-	});
-
-	it("apply - should throw when transaction fails to apply", async ({
-		senderState,
-		configuration,
-		expirationService,
-		handlerRegistry,
-		triggers,
-		transaction,
-		walletRepository,
-	}) => {
-		const handler = {};
-
-		stub(configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
-		stub(expirationService, "isExpired").returnValueOnce(false);
-		const handlerStub = stub(handlerRegistry, "getActivatedHandlerForData").resolvedValueNth(0, handler);
-
-		const triggerStub = stub(triggers, "call");
-		triggerStub.resolvedValueNth(0, true); // verifyTransaction
-		triggerStub.resolvedValueNth(1, true); // throwIfCannotEnterPool
-		triggerStub.rejectedValueNth(2, new Error("Some apply error")); // applyTransaction
-
-		const promise = senderState.apply(transaction);
-
-		await assert.rejects(() => promise);
-
-		await promise.catch((error) => {
-			assert.instance(error, Exceptions.PoolError);
-			assert.equal(error.type, "ERR_APPLY");
-		});
-
-		handlerStub.calledWith(transaction.data);
-		triggerStub.calledNthWith(0, "verifyTransaction", {
-			handler,
-			transaction: transaction,
-			walletRepository: walletRepository,
-		});
-		triggerStub.calledNthWith(1, "throwIfCannotEnterPool", {
-			handler,
-			transaction: transaction,
-			walletRepository: walletRepository,
-		});
-		triggerStub.calledNthWith(2, "applyTransaction", {
-			handler,
-			transaction: transaction,
-			walletRepository: walletRepository,
-		});
-	});
-
-	it("apply - should call handler to apply transaction", async ({
-		senderState,
-		configuration,
-		expirationService,
-		handlerRegistry,
-		triggers,
-		transaction,
-		walletRepository,
-	}) => {
-		const handler = {};
-
-		stub(configuration, "getRequired").returnValueNth(1, 123).returnValueNth(2, 1024); // network.pubKeyHash & maxTransactionByte
-		stub(expirationService, "isExpired").returnValueOnce(false);
-		const handlerStub = stub(handlerRegistry, "getActivatedHandlerForData").resolvedValueNth(0, handler);
-
-		const triggerStub = stub(triggers, "call");
-		triggerStub.resolvedValueNth(0, true); // verifyTransaction
-		triggerStub.resolvedValueNth(1); // throwIfCannotEnterPool
-		triggerStub.resolvedValueNth(2); // applyTransaction
+		account.legacyAttributes = { secondPublicKey: legacySecondPublicKey };
+		await senderState.configure(address, legacyAddress);
+		const verify = spy(verifier, "verifyLegacySecondSignature");
+		const transaction = makeTransaction({ legacySecondSignature });
+		assert.equal(senderState.getNonce(), 5n);
 
 		await senderState.apply(transaction);
 
-		handlerStub.calledWith(transaction.data);
-		triggerStub.calledNthWith(0, "verifyTransaction", {
-			handler,
-			transaction: transaction,
-			walletRepository: walletRepository,
-		});
-		triggerStub.calledNthWith(1, "throwIfCannotEnterPool", {
-			handler,
-			transaction: transaction,
-			walletRepository: walletRepository,
-		});
-		triggerStub.calledNthWith(2, "applyTransaction", {
-			handler,
-			transaction: transaction,
-			walletRepository: walletRepository,
+		verify.calledOnce();
+		verify.calledWith(transaction, legacySecondPublicKey);
+		assert.equal(senderState.getNonce(), 6n);
+	});
+
+	it("apply - should throw when the legacy second signature fails to verify", async ({
+		senderState,
+		account,
+		verifier,
+	}) => {
+		account.legacyAttributes = { secondPublicKey: legacySecondPublicKey };
+		await senderState.configure(address, legacyAddress);
+		stub(verifier, "verifyLegacySecondSignature").rejectedValue(new Error("invalid second signature"));
+		assert.equal(senderState.getNonce(), 5n);
+
+		await assert.rejects(
+			() => senderState.apply(makeTransaction({ legacySecondSignature })),
+			"invalid second signature",
+		);
+
+		assert.equal(senderState.getNonce(), 5n);
+	});
+
+	it("apply - should throw when a legacy second signature is given but the sender has no second public key", async ({
+		senderState,
+		verifier,
+	}) => {
+		const verify = spy(verifier, "verifyLegacySecondSignature");
+		assert.equal(senderState.getNonce(), 5n);
+
+		await assert.rejects(
+			() => senderState.apply(makeTransaction({ legacySecondSignature })),
+			UnexpectedLegacySecondSignatureError,
+		);
+
+		verify.neverCalled();
+		assert.equal(senderState.getNonce(), 5n);
+	});
+
+	it("apply - should preverify the transaction against the current milestone", async ({ senderState, evm }) => {
+		const preverify = spy(evm, "preverifyTransaction");
+		const transaction = makeTransaction();
+
+		await senderState.apply(transaction);
+
+		preverify.calledOnce();
+		preverify.calledWith({
+			blockGasLimit: BigInt(maxGasLimit),
+			data: Buffer.from("abcd", "hex"),
+			from: address,
+			gasLimit: BigInt(gasLimit),
+			gasPrice: BigInt(gasPrice),
+			legacyAddress,
+			nonce: 5n,
+			specId: "Osaka",
+			to: transaction.to,
+			txHash: transaction.hash,
+			value,
 		});
 	});
 
-	it.skip("revert - should call handler to revert transaction", async (context) => {
-		const senderState = context.container.get(SenderState, { autobind: true });
-		const handler = {};
+	it("apply - should throw with the evm reason when preverification fails", async ({ senderState, evm }) => {
+		stub(evm, "preverifyTransaction").resolvedValue({ error: "insufficient gas", success: false });
+		assert.equal(senderState.getNonce(), 5n);
 
-		const handlerStub = stub(context.handlerRegistry, "getActivatedHandlerForData").resolvedValue(handler);
-		const triggerStub = stub(context.triggers, "call").resolvedValue(); // revertTransaction
+		await assert.rejects(
+			() => senderState.apply(makeTransaction()),
+			TransactionFailedToPreverifyError,
+			"insufficient gas",
+		);
 
-		await senderState.revert(context.transaction);
+		assert.equal(senderState.getNonce(), 5n);
+	});
 
-		handlerStub.calledWith(context.transaction.data);
-		triggerStub.calledWith("revertTransaction", {
-			handler,
-			transaction: context.transaction,
-			walletRepository: context.walletRepository,
-		});
+	it("apply - should throw a generic reason when preverification fails without one", async ({ senderState, evm }) => {
+		stub(evm, "preverifyTransaction").resolvedValue({ success: false });
+
+		await assert.rejects(
+			() => senderState.apply(makeTransaction()),
+			TransactionFailedToPreverifyError,
+			"Preverify failed for unknown reason",
+		);
+	});
+
+	it("apply - should not preverify a transaction that fails the cheaper checks", async ({ senderState, evm }) => {
+		const preverify = spy(evm, "preverifyTransaction");
+
+		await assert.rejects(() => senderState.apply(makeTransaction({ nonce: 6n })), UnexpectedNonceError);
+
+		preverify.neverCalled();
+	});
+
+	it("revert - should decrease the nonce and refund value and fee", async ({ senderState }) => {
+		const transaction = makeTransaction();
+		await senderState.apply(transaction);
+		assert.equal(senderState.getNonce(), 6n);
+
+		senderState.revert(transaction);
+
+		assert.equal(senderState.getNonce(), 5n);
+		// The full cost is available again.
+		await senderState.apply(transaction);
+	});
+
+	it("reset - should reload the wallet from the evm", async ({ senderState, account, evm }) => {
+		await senderState.apply(makeTransaction());
+		account.nonce = 9n;
+		const getAccountInfo = spy(evm, "getAccountInfoExtended");
+		assert.equal(senderState.getNonce(), 6n);
+
+		await senderState.reset();
+
+		getAccountInfo.calledOnce();
+		getAccountInfo.calledWith(address, legacyAddress);
+		assert.equal(senderState.getNonce(), 9n);
+	});
+
+	it("replace - should throw when the nonces do not match", async ({ senderState }) => {
+		await assert.rejects(
+			() => senderState.replace(makeTransaction({ nonce: 5n }), makeTransaction({ nonce: 6n }), 6n),
+			"cannot replace transaction with mismatching nonce",
+		);
+	});
+
+	it("replace - should swap the cost of the old transaction for the new one", async ({ senderState, account }) => {
+		account.balance = cost + 500n;
+		await senderState.configure(address, legacyAddress);
+		const oldTransaction = makeTransaction();
+		await senderState.apply(oldTransaction);
+
+		// Costs more than the remaining 500, but not more than 500 plus the refunded old cost.
+		const newTransaction = makeTransaction({ value: value + 500n });
+		assert.equal(senderState.getNonce(), 6n);
+
+		assert.true(await senderState.replace(oldTransaction, newTransaction, 6n));
+
+		assert.equal(senderState.getNonce(), 6n);
+		await assertZeroBalance(senderState);
+	});
+
+	it("replace - should validate the new transaction at the nonce it replaces", async ({ senderState, account }) => {
+		account.balance = 2n * cost;
+		await senderState.configure(address, legacyAddress);
+		const first = makeTransaction({ nonce: 5n });
+		await senderState.apply(first);
+		await senderState.apply(makeTransaction({ nonce: 6n }));
+		assert.equal(senderState.getNonce(), 7n);
+
+		assert.true(await senderState.replace(first, makeTransaction({ nonce: 5n }), 7n));
+
+		assert.equal(senderState.getNonce(), 7n);
+	});
+
+	it("replace - should return false and keep the state when the new cost is not affordable", async ({
+		senderState,
+		evm,
+	}) => {
+		const oldTransaction = makeTransaction();
+		await senderState.apply(oldTransaction);
+		const preverify = spy(evm, "preverifyTransaction");
+		assert.equal(senderState.getNonce(), 6n);
+
+		assert.false(await senderState.replace(oldTransaction, makeTransaction({ value: value + 1n }), 6n));
+
+		preverify.neverCalled();
+		assert.equal(senderState.getNonce(), 6n);
+		await assertZeroBalance(senderState);
+	});
+
+	it("replace - should throw and keep the state when the new transaction is invalid", async ({ senderState }) => {
+		const oldTransaction = makeTransaction();
+		await senderState.apply(oldTransaction);
+		assert.equal(senderState.getNonce(), 6n);
+
+		await assert.rejects(
+			() => senderState.replace(oldTransaction, makeTransaction({ network: chainId + 1 }), 6n),
+			TransactionFromWrongNetworkError,
+		);
+
+		assert.equal(senderState.getNonce(), 6n);
+		await assertZeroBalance(senderState);
 	});
 });

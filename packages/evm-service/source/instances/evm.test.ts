@@ -1080,6 +1080,7 @@ describe<{
 			usernameContract: zeroAddress,
 			validatorContract: zeroAddress,
 		});
+		await instance.seedGenesisAccount();
 
 		const ctx = {
 			nonce: 0n,
@@ -1179,6 +1180,7 @@ describe<{
 			usernameContract: zeroAddress,
 			validatorContract: zeroAddress,
 		});
+		await instance.seedGenesisAccount();
 
 		const senderAccountBefore = await instance.getAccountInfo(sender.address);
 		const recipientAccountBefore = await instance.getAccountInfo(recipient.address);
@@ -1250,6 +1252,7 @@ describe<{
 			usernameContract: zeroAddress,
 			validatorContract: zeroAddress,
 		});
+		await instance.seedGenesisAccount();
 
 		const { receipt } = await instance.simulate({
 			blockContext: { ...blockContext, commitKey: { blockNumber: BigInt(0), round: BigInt(0) } },

@@ -29,7 +29,6 @@ describeSkip<{
 		context.app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(communicator);
 		context.app.bind(Identifiers.Cryptography.Transaction.Serializer).toConstantValue(serializer);
 		context.app.bind(Identifiers.BlockchainService).toConstantValue(blockchain);
-		context.app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
 
 		context.broadcaster = context.app.resolve(Broadcaster);
 

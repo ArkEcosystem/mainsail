@@ -1,17 +1,25 @@
+import { packHeadersBitmaps, unpackHeadersBitmaps, type WithUnpackedHeaders } from "./headers.js";
 import { getApiNodes as proto } from "./proto/protos.js";
 
 export const getApiNodes = {
 	request: {
-		deserialize: (payload: Buffer): proto.IGetApiNodesRequest => proto.GetApiNodesRequest.decode(payload),
-		serialize: (object: proto.IGetApiNodesRequest): Buffer =>
-			Buffer.from(proto.GetApiNodesRequest.encode(object).finish()),
+		deserialize: (payload: Buffer): proto.GetApiNodesRequest.$Properties => {
+			const decoded = proto.GetApiNodesRequest.decode(payload);
+			unpackHeadersBitmaps(decoded);
+			return decoded;
+		},
+		serialize: (object: WithUnpackedHeaders<proto.GetApiNodesRequest.$Properties>): Buffer =>
+			Buffer.from(proto.GetApiNodesRequest.encode(packHeadersBitmaps(object)).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): proto.IGetApiNodesResponse =>
-			proto.GetApiNodesResponse.toObject(proto.GetApiNodesResponse.decode(payload), {
+		deserialize: (payload: Buffer): proto.GetApiNodesResponse.$Properties => {
+			const decoded = proto.GetApiNodesResponse.toObject(proto.GetApiNodesResponse.decode(payload), {
 				defaults: true,
-			}),
-		serialize: (object: proto.IGetApiNodesResponse): Buffer =>
-			Buffer.from(proto.GetApiNodesResponse.encode(object).finish()),
+			});
+			unpackHeadersBitmaps(decoded);
+			return decoded;
+		},
+		serialize: (object: WithUnpackedHeaders<proto.GetApiNodesResponse.$Properties>): Buffer =>
+			Buffer.from(proto.GetApiNodesResponse.encode(packHeadersBitmaps(object)).finish()),
 	},
 };

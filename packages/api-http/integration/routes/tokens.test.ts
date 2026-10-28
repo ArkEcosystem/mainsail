@@ -353,6 +353,29 @@ describe<{
 				},
 			},
 			{
+				query: `?addresses=0x432b093d9542B905C87587607491C369408475b4,0x0000000000000000000000000000000000000000&limit=2&offset=2`,
+				result: {
+					data: tokenTransfersResponse.slice(2, 4),
+					statusCode: 200,
+				},
+			},
+			{
+				query: `?addresses=0x432b093d9542B905C87587607491C369408475b4&blacklist=0xb78d7d1b9048afaf50a93d6b435ddf1c34c6afe2`,
+				result: {
+					data: tokenTransfersResponse.filter(
+						(t) => t.token.address !== "0xb78d7d1b9048afaf50a93d6b435ddf1c34c6afe2",
+					),
+					statusCode: 200,
+				},
+			},
+			{
+				query: `?addresses=0x432b093d9542B905C87587607491C369408475b4&ignoreWhitelist=true`,
+				result: {
+					data: tokenTransfersResponse,
+					statusCode: 200,
+				},
+			},
+			{
 				query: "?limit=1",
 				result: {
 					data: tokenTransfersResponse.slice(0, 1),

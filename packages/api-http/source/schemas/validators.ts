@@ -15,9 +15,9 @@ export const validatorCriteriaSchemaObject = {
 		produced: Schemas.createRangeCriteriaSchema(Joi.number().integer().min(0)),
 	},
 	forged: {
-		fees: Schemas.createRangeCriteriaSchema(Joi.number().integer().positive()),
-		rewards: Schemas.createRangeCriteriaSchema(Joi.number().integer().positive()),
-		total: Schemas.createRangeCriteriaSchema(Joi.number().integer().positive()),
+		fees: Schemas.createRangeCriteriaSchema(Schemas.amountSchema),
+		rewards: Schemas.createRangeCriteriaSchema(Schemas.amountSchema),
+		total: Schemas.createRangeCriteriaSchema(Schemas.amountSchema),
 	},
 	isResigned: Joi.boolean(),
 	production: {
@@ -26,7 +26,7 @@ export const validatorCriteriaSchemaObject = {
 	publicKey: walletCriteriaSchemaObject.publicKey,
 	rank: Schemas.createRangeCriteriaSchema(Joi.number().integer().min(1)),
 	username: Joi.string().max(256),
-	votes: Schemas.createRangeCriteriaSchema(Joi.number().integer().positive()),
+	votes: Schemas.createRangeCriteriaSchema(Schemas.amountSchema),
 };
 
 export const validatorCriteriaSchema = Schemas.createCriteriaSchema({

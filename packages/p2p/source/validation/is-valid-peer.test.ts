@@ -1,9 +1,87 @@
 import os from "os";
 
 import { describe } from "@mainsail/test-runner";
-import { isLocalHost, isValidPeerIp } from "./is-valid-peer";
+import { isLocalHost, isPublicHttpUrl, isPublicIp, isValidPeerIp } from "./is-valid-peer";
 
 describe("isValidPeer", ({ it, assert }) => {
+	it("#isPublicIp - should be ok for a globally routable address", () => {
+		for (const ip of ["1.2.3.4", "8.8.8.8", "2606:4700::1111", "::ffff:1.2.3.4"]) {
+			assert.true(isPublicIp(ip), ip);
+		}
+	});
+
+	it("#isPublicIp - should not be ok for a non-public or invalid address", () => {
+		for (const ip of [
+			"127.0.0.1",
+			"10.0.0.1",
+			"172.16.0.1",
+			"192.168.1.1",
+			"169.254.169.254",
+			"100.64.0.1",
+			"0.0.0.0",
+			"224.0.0.1",
+			"::1",
+			"::",
+			"fe80::1",
+			"fd00::1",
+			"::ffff:10.0.0.1",
+			"2001:db8::1",
+			"garbage",
+			"",
+		]) {
+			assert.false(isPublicIp(ip), ip);
+		}
+	});
+
+	it("#isPublicHttpUrl - should be ok for a http(s) url with a public host", () => {
+		for (const url of [
+			"http://1.2.3.4:4003/",
+			"https://1.2.3.4/api",
+			"http://[2606:4700::1111]:4003/",
+			"https://api.example.com/api",
+			"http://example",
+			"http://node.local/",
+			"http://node.internal/",
+		]) {
+			assert.true(isPublicHttpUrl(url), url);
+		}
+	});
+
+	it("#isPublicHttpUrl - should not be ok for a non-url, a wrong scheme, localhost or a non-public ip", () => {
+		for (const url of [
+			"",
+			"not a url",
+			"1.2.3.4:4003",
+			// wrong scheme
+			"ftp://1.2.3.4/",
+			"ws://1.2.3.4:4003/",
+			"file:///etc/passwd",
+			"javascript:alert(1)",
+			"data:text/plain,hi",
+			"mailto:a@b.c",
+			// localhost
+			"http://localhost:4003/",
+			"http://api.localhost/",
+			// non-public ip literals
+			"http://127.0.0.1:4003/",
+			"http://10.0.0.5:4003/",
+			"http://172.16.0.1/",
+			"http://192.168.1.1/",
+			"http://169.254.169.254/latest/meta-data",
+			"http://100.64.0.1/",
+			"http://0.0.0.0:4003/",
+			"http://224.0.0.1/",
+			"http://[::1]:4003/",
+			"http://[::]/",
+			"http://[fe80::1]/",
+			"http://[fd00::1]/",
+			"http://[::ffff:10.0.0.1]/",
+			"http://[2001:db8::1]/",
+		]) {
+			assert.false(isPublicHttpUrl(url), url);
+		}
+	});
+
 	it("#isLocalHost - should be ok for 127.0.0.1", () => {
 		assert.true(isLocalHost("127.0.0.1"));
 	});

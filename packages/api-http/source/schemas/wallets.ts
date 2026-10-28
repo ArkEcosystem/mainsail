@@ -17,7 +17,7 @@ export const walletId = Joi.alternatives().try(
 export const walletCriteriaSchemaObject = {
 	address: Schemas.orEqualCriteria(walletAddressSchema),
 	attributes: Joi.object(),
-	balance: Schemas.createRangeCriteriaSchema(Joi.number().integer().positive()),
+	balance: Schemas.createRangeCriteriaSchema(Schemas.amountSchema),
 	nonce: Schemas.createRangeCriteriaSchema(Joi.number().integer().min(0)),
 	publicKey: Joi.alternatives(
 		walletPublicKeySchema,

@@ -9,15 +9,18 @@ describe<{
 	app: Application;
 	server: Server;
 	inMaintenance: boolean;
+	reads: number;
 	throws: boolean;
-}>("DatabaseReady", ({ it, beforeEach, assert }) => {
+}>("DatabaseReady", ({ it, beforeEach, assert, clock }) => {
 	beforeEach((context) => {
 		context.inMaintenance = false;
+		context.reads = 0;
 		context.throws = false;
 
 		context.app = new Application();
 		context.app.bind(ApiDatabaseIdentifiers.SystemRepositoryFactory).toConstantValue(() => ({
 			inMaintenance: async () => {
+				context.reads++;
 				if (context.throws) {
 					throw new Error("boom");
 				}
@@ -67,6 +70,29 @@ describe<{
 		assert.is(response.statusCode, 503);
 		assert.equal(response.result, { error: "Service Unavailable", reason: "Database not ready" });
 		assert.is(response.headers["retry-after"], "10");
+	});
+
+	it("should read the flag once per second, but again after a failed read", async (context) => {
+		const { server } = context;
+		const fake = clock({ now: 1000, toFake: ["Date"] });
+		const status = async () => (await server.inject({ method: "GET", url: "/" })).statusCode;
+
+		assert.is(await status(), 200);
+
+		context.inMaintenance = true;
+		fake.tick(999);
+		assert.is(await status(), 200);
+		assert.is(context.reads, 1);
+
+		fake.tick(1);
+		assert.is(await status(), 503);
+		assert.is(context.reads, 2);
+
+		context.throws = true;
+		fake.tick(1000);
+		assert.is(await status(), 503);
+		assert.is(await status(), 503);
+		assert.is(context.reads, 4);
 	});
 
 	it("getOnRequestHandler should return h.continue when not in maintenance", async ({ app }) => {

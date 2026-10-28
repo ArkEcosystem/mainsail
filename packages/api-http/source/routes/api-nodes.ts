@@ -5,7 +5,7 @@ import { Schemas } from "@mainsail/api-common";
 import Joi from "joi";
 
 import { ApiNodesController } from "../controllers/api-nodes.js";
-import { orderBy } from "../schemas/index.js";
+import { apiNodeSortingSchema } from "../schemas/index.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(ApiNodesController);
@@ -22,10 +22,11 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			},
 			validate: {
 				query: Joi.object({
-					ip: Joi.string().ip({ version: ["ipv4", "ipv6"] }),
-					orderBy: orderBy,
+					url: Joi.string().uri(),
 					version: Joi.string(),
-				}).concat(Schemas.pagination),
+				})
+					.concat(apiNodeSortingSchema)
+					.concat(Schemas.pagination),
 			},
 		},
 		path: "/api-nodes",

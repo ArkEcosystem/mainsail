@@ -18,17 +18,23 @@ export class ApiNodeProcessor implements Contracts.P2P.ApiNodeProcessor {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
 
+	readonly #seedUrls = new Set<string>();
+
 	public async validateAndAcceptApiNode(
 		apiNode: Contracts.P2P.ApiNode,
-		options: Contracts.P2P.AcceptNewPeerOptions = {},
+		options: Contracts.P2P.AcceptNewApiNodeOptions = {},
 	): Promise<void> {
+		if (options.seed) {
+			this.#seedUrls.add(apiNode.url);
+		}
+
 		if (this.repository.hasApiNode(apiNode) || this.repository.hasPendingApiNode(apiNode)) {
 			return;
 		}
 
 		this.repository.setPendingApiNode(apiNode);
 
-		if (await this.apiNodeVerifier.verify(apiNode)) {
+		if (await this.apiNodeVerifier.verify(apiNode, { seed: this.#isSeed(apiNode) })) {
 			this.logger.debugExtra(`Accepted new API node ${apiNode.url}`, "p2p");
 
 			this.repository.setApiNode(apiNode);
@@ -44,16 +50,19 @@ export class ApiNodeProcessor implements Contracts.P2P.ApiNodeProcessor {
 			return;
 		}
 
-		const lastPinged = apiNode.lastPinged ?? dayjs();
-		if (lastPinged.isBefore(dayjs().subtract(10, "minutes"))) {
+		if (apiNode.lastPinged && apiNode.lastPinged.isAfter(dayjs().subtract(10, "minutes"))) {
 			return;
 		}
 
-		if (await this.apiNodeVerifier.verify(apiNode)) {
+		if (await this.apiNodeVerifier.verify(apiNode, { seed: this.#isSeed(apiNode) })) {
 			return;
 		}
 
 		this.repository.forgetApiNode(apiNode);
 		void this.events.dispatch(Events.ApiNodeEvent.Removed, apiNode);
+	}
+
+	#isSeed(apiNode: Contracts.P2P.ApiNode): boolean {
+		return this.#seedUrls.has(apiNode.url);
 	}
 }

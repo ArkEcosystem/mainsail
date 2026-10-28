@@ -182,6 +182,7 @@ describe<{
 			validatorContract: "0x0000000000000000000000000000000000000001",
 			usernameContract: "0x0000000000000000000000000000000000000001",
 		});
+		await evm.seedGenesisAccount();
 
 		await evm.prepareNextCommit({
 			blockContext: {

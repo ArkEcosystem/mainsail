@@ -8,7 +8,6 @@ import { getRandomPeer } from "../utils/index.js";
 
 type DownloadJob = {
 	peer: Contracts.P2P.Peer;
-	peerHeader: Contracts.P2P.HeaderData;
 	blockNumber: number;
 	round: number;
 };
@@ -78,7 +77,6 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		const job: DownloadJob = {
 			blockNumber: peer.header.blockNumber,
 			peer,
-			peerHeader: peer.header,
 			round: peer.header.round,
 		};
 
@@ -129,7 +127,10 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		let error: Error | undefined;
 
 		try {
-			const result = await this.communicator.getProposal(job.peer);
+			const result = await this.communicator.getProposal(job.peer, {
+				blockNumber: job.blockNumber,
+				round: job.round,
+			});
 
 			if (result.proposal.length === 0) {
 				return;

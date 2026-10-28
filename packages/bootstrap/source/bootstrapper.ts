@@ -153,7 +153,7 @@ export class Bootstrapper {
 		// assume snapshot is present if the previous block points to a non-zero hash
 		if (genesisBlock.block.parentHash === ZeroHash) {
 			if (milestone.snapshot) {
-				throw new Error("Previous block is set to snapshot, but there is no snapshot defined in milestones");
+				throw new Error("Snapshot is defined in milestones, but the genesis block has no parent hash");
 			}
 
 			return;

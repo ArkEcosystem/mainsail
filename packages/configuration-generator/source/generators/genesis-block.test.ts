@@ -4,6 +4,11 @@ import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { ConsensusAbi, FunctionSigs } from "@mainsail/evm-contracts";
 import { Application } from "@mainsail/kernel";
+import { createHash } from "node:crypto";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { brotliCompressSync } from "node:zlib";
 import { bytesToHex, encodeFunctionData } from "viem";
 
 import { describe } from "@mainsail/test-runner";
@@ -267,10 +272,10 @@ describe<{
 
 	// Presigns the registration transaction for a wallet exactly as external validator tooling
 	// would, so the generator itself never needs the validator secrets.
-	const presignRegistration = async (app: Application, wallet: Wallet): Promise<string> => {
+	const presignRegistration = async (app: Application, wallet: Wallet, popChainId = 123): Promise<string> => {
 		const consensusContract = app.get<string>(AppIdentifiers.EvmConsensus.Contracts.Consensus);
 		const { pop } = buildProofOfPossession(Buffer.from(wallet.consensusKeys.privateKey, "hex"), {
-			chainId: 123,
+			chainId: popChainId,
 			registrantAddress: wallet.address,
 		});
 
@@ -378,6 +383,28 @@ describe<{
 		);
 	});
 
+	it("#generate - should name the reason when a genesis transaction reverts", async ({
+		app,
+		generator,
+		mnemonicGenerator,
+	}) => {
+		const wallet = await app
+			.get<WalletGenerator>(Identifiers.Generator.Wallet)
+			.generate(mnemonicGenerator.generate());
+		const registration = await presignRegistration(app, wallet, 11_812);
+
+		await assert.rejects(
+			() =>
+				generator.generate(
+					mnemonicGenerator.generate(),
+					[],
+					baseOptions({ validators: 1, validatorRegistrations: [registration] }),
+				),
+			"reverted during EVM execution: InvalidProofOfPossession (gas used ",
+			" of 500000)",
+		);
+	});
+
 	it("#generate - should throw when a genesis transaction reverts", async ({ app, generator, mnemonicGenerator }) => {
 		const evm = app.getTagged<Contracts.Evm.Instance>(AppIdentifiers.Evm.Instance, "instance", "evm");
 		const realProcess = evm.process.bind(evm);
@@ -390,6 +417,125 @@ describe<{
 		await assert.rejects(
 			() => generator.generate(mnemonicGenerator.generate(), mnemonicGenerator.generateMany(2), baseOptions()),
 			"reverted during EVM execution",
+		);
+	});
+
+	it("#generate - should pin the genesis of a legacy snapshot", async ({ app, generator }) => {
+		app.get<Contracts.Crypto.Configuration>(AppIdentifiers.Cryptography.Configuration).setConfig(
+			{
+				// @ts-ignore
+				genesisBlock: { block: { number: 4001, timestamp: 0 } },
+				milestones: [
+					{
+						block: { maxGasLimit: 30_000_000, maxPayload: 2_097_152, version: 1 },
+						evmSpec: Enums.Evm.SpecId.OSAKA,
+						// @ts-ignore
+						gas: {
+							maximumGasLimit: 2_000_000,
+							maximumGasPrice: 10_000 * 1e9,
+							minimumGasLimit: 21_000,
+							minimumGasPrice: 5 * 1e9,
+						},
+						height: 4001,
+						reward: "0",
+						roundValidators: 0,
+					},
+					{ height: 4002, roundValidators: 2, validatorRegistrationFee: "0" },
+				],
+				// @ts-ignore
+				network: { chainId: 123, pubKeyHash: 30 },
+			},
+			false,
+		);
+
+		const hotWallet = async (mnemonic: string, fields: Record<string, unknown> = {}) => {
+			const { publicKey } = await app
+				.getTagged<Contracts.Crypto.KeyPairFactory>(
+					AppIdentifiers.Cryptography.Identity.KeyPair.Factory,
+					"type",
+					"wallet",
+				)
+				.fromMnemonic(mnemonic);
+
+			return {
+				arkAddress: await app
+					.get<Contracts.Crypto.AddressFactory>(AppIdentifiers.Cryptography.Legacy.Identity.AddressFactory)
+					.fromPublicKey(publicKey),
+				balance: "100000000",
+				ethAddress: await app
+					.getTagged<Contracts.Crypto.AddressFactory>(
+						AppIdentifiers.Cryptography.Identity.Address.Factory,
+						"type",
+						"wallet",
+					)
+					.fromPublicKey(publicKey),
+				legacyNonce: "1",
+				publicKey,
+				...fields,
+			};
+		};
+
+		const resignedDelegate = await hotWallet("resigned delegate", {
+			attributes: { delegate: { resigned: true, username: "resigned_delegate" } },
+			balance: "2500000000000",
+		});
+		const activeDelegate = await hotWallet("active delegate", {
+			attributes: { delegate: { username: "active_delegate" } },
+			balance: "1500000000000",
+		});
+		const secondKeyVoter = await hotWallet("second key voter", {
+			attributes: { secondPublicKey: resignedDelegate.publicKey, vote: activeDelegate.publicKey },
+		});
+		const voter = await hotWallet("voter", { attributes: { vote: resignedDelegate.publicKey } });
+		const multiSignatureWallet = await hotWallet("multisignature wallet", {
+			attributes: { multiSignature: { min: 1, publicKeys: [voter.publicKey, secondKeyVoter.publicKey] } },
+		});
+		const genesisWallet = await hotWallet("genesis wallet", { balance: "-5600200000000" });
+		const { arkAddress } = await hotWallet("cold wallet");
+
+		const chainTip = { hash: createHash("sha256").update("legacy chain tip").digest("hex"), number: "4000" };
+		const wallets = [
+			genesisWallet,
+			resignedDelegate,
+			activeDelegate,
+			secondKeyVoter,
+			voter,
+			multiSignatureWallet,
+			{ arkAddress, balance: "700000000", legacyNonce: "0" },
+		];
+		const hash = createHash("sha256").update(JSON.stringify(chainTip));
+		for (const wallet of wallets) {
+			hash.update(JSON.stringify(wallet));
+		}
+		const snapshot = { chainTip, hash: hash.digest("hex"), wallets };
+
+		const directory = mkdtempSync(join(tmpdir(), "legacy-snapshot-"));
+		const path = join(directory, `${snapshot.hash}.compressed`);
+		writeFileSync(path, brotliCompressSync(JSON.stringify(snapshot)));
+		await app.get<Contracts.Snapshot.LegacyImporter>(AppIdentifiers.Snapshot.Legacy.Importer).prepare(path);
+		rmSync(directory, { recursive: true });
+
+		const { block } = await generator.generate(
+			"abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about",
+			[
+				"legal winner thank year wave sausage worth useful legal winner thank yellow",
+				"letter advice cage absurd amount doctor acoustic avoid letter advice cage above",
+			],
+			baseOptions({
+				epoch: new Date(0),
+				initialBlockNumber: 4001,
+				premine: "0",
+				snapshot: { path },
+				validators: 2,
+			}),
+		);
+
+		assert.equal(block.number, 4001);
+		assert.equal(block.parentHash, chainTip.hash);
+		assert.equal(block.stateRoot, "c3458059d1354c4d6fa056051d3275add84f57dfddd7a60830573ad02ccd3901");
+		assert.equal(
+			block.logsBloom,
+			"00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000008000400000000000000000000000000000000000000000000000000000000000000000000800000000000200010000000000000000000000000000000000000008000000000000002000000000000000000000000000000000000000000000000000000000080800100000000000000000000000000000000000000400000000000000000000000000000000000000000000100000080000000000000000000000200000000000000000000000000000000000000000000",
 		);
 	});
 });

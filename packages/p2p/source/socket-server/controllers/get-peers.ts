@@ -23,7 +23,6 @@ export class GetPeersController implements Contracts.P2P.Controller {
 			peers: this.peerRepository
 				.getPeers()
 				.filter((peer) => peer.ip !== peerIp)
-				.filter((peer) => peer.port !== -1)
 				.sort((a, b) => {
 					assert.number(a.latency);
 					assert.number(b.latency);

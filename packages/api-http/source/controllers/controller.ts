@@ -171,7 +171,7 @@ SELECT
   tok.decimals AS "tokenDecimals",
   tok.name AS "tokenName"
 FROM
-  unnest($1::text[]) AS h(transaction_hash)
+  unnest($1::citext[]) AS h(transaction_hash)
   JOIN LATERAL (
     SELECT
       *

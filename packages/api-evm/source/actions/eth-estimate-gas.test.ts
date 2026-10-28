@@ -79,6 +79,7 @@ describe<{
 			usernameContract: zero,
 			validatorContract: zero,
 		});
+		await context.evm.seedGenesisAccount();
 
 		context.action = context.app.resolve(EthEstimateGasAction);
 		context.validator = context.app.get<Contracts.Crypto.Validator>(Identifiers.Cryptography.Validator);

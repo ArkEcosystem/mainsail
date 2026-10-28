@@ -20,7 +20,6 @@ export type BlockCriteria = {
 	number?: OrNumericCriteria<number | string>;
 	round?: OrEqualCriteria<number>;
 	transactionsCount?: OrNumericCriteria<number>;
-	amount?: OrNumericCriteria<number | string>;
 	fee?: OrNumericCriteria<number | string>;
 	reward?: OrNumericCriteria<number | string>;
 	payloadSize?: OrNumericCriteria<number>;
@@ -92,6 +91,7 @@ export type ValidatorCriteria = {
 	votes?: OrEqualCriteria<string>;
 	rank?: OrEqualCriteria<number>;
 	isResigned?: OrEqualCriteria<boolean>;
+	username?: OrEqualCriteria<string>;
 
 	forged?: ValidatorForged;
 	production?: ValidatorProduction;

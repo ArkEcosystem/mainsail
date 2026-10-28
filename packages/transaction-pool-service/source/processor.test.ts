@@ -46,7 +46,7 @@ describe<{
 		context.processor = context.app.resolve(Processor);
 	});
 
-	it("should accept and broadcast all valid transactions", async ({
+	it("process - should accept and broadcast all valid transactions", async ({
 		processor,
 		pool,
 		factory,
@@ -75,7 +75,7 @@ describe<{
 		assert.undefined(result.errors);
 	});
 
-	it("should mark transactions with invalid data as invalid", async ({
+	it("process - should mark transactions with invalid data as invalid", async ({
 		processor,
 		pool,
 		factory,
@@ -102,7 +102,7 @@ describe<{
 		assert.equal(result.errors["1"].message, "Invalid transaction data: malformed buffer");
 	});
 
-	it("should mark transactions rejected by the pool as invalid", async ({
+	it("process - should mark transactions rejected by the pool as invalid", async ({
 		processor,
 		pool,
 		factory,
@@ -132,7 +132,13 @@ describe<{
 		assert.equal(result.errors["1"].type, "ERR_LOW_FEE");
 	});
 
-	it("should track excess transactions", async ({ processor, pool, factory, broadcaster, transaction1 }) => {
+	it("process - should track excess transactions", async ({
+		processor,
+		pool,
+		factory,
+		broadcaster,
+		transaction1,
+	}) => {
 		stub(factory, "fromBytes").resolvedValue(transaction1);
 
 		const poolStub = stub(pool, "addTransaction").rejectedValueNth(
@@ -155,7 +161,52 @@ describe<{
 		assert.equal(result.errors["0"].type, "ERR_EXCEEDS_MAX_COUNT");
 	});
 
-	it("should rethrow unexpected error", async ({ processor, pool, factory, broadcaster, transaction1 }) => {
+	it("process - should report every pool rejection under its index", async ({
+		processor,
+		pool,
+		factory,
+		broadcaster,
+		transaction1,
+		transaction2,
+	}) => {
+		stub(factory, "fromBytes").resolvedValueNth(0, transaction1).resolvedValueNth(1, transaction2);
+
+		const feeTooLow = new Exceptions.TransactionFeeTooLowError(transaction1);
+		const exceedsMaxCount = new Exceptions.SenderExceededMaximumTransactionCountError(transaction2, 1);
+		stub(pool, "addTransaction").rejectedValueNth(0, feeTooLow).rejectedValueNth(1, exceedsMaxCount);
+
+		const spiedBroadcaster = spy(broadcaster, "broadcastTransactions");
+
+		const result = await processor.process([transaction1.serialized, transaction2.serialized]);
+
+		spiedBroadcaster.neverCalled();
+
+		assert.equal(result, {
+			accept: [],
+			broadcast: [],
+			errors: {
+				0: { message: feeTooLow.message, type: "ERR_LOW_FEE" },
+				1: { message: exceedsMaxCount.message, type: "ERR_EXCEEDS_MAX_COUNT" },
+			},
+			excess: [1],
+			invalid: [0, 1],
+		});
+	});
+
+	it("process - should return empty results without broadcasting when there are no transactions", async ({
+		processor,
+		broadcaster,
+	}) => {
+		const spiedBroadcaster = spy(broadcaster, "broadcastTransactions");
+
+		const result = await processor.process([]);
+
+		spiedBroadcaster.neverCalled();
+
+		assert.equal(result, { accept: [], broadcast: [], errors: undefined, excess: [], invalid: [] });
+	});
+
+	it("process - should rethrow unexpected error", async ({ processor, pool, factory, broadcaster, transaction1 }) => {
 		stub(factory, "fromBytes").resolvedValue(transaction1);
 
 		const poolStub = stub(pool, "addTransaction").rejectedValueNth(0, new Error("Unexpected error"));
@@ -170,7 +221,7 @@ describe<{
 		spiedBroadcaster.neverCalled();
 	});
 
-	it("should broadcast already accepted transactions when an unexpected error is rethrown", async ({
+	it("process - should broadcast already accepted transactions when an unexpected error is rethrown", async ({
 		processor,
 		pool,
 		factory,
@@ -193,7 +244,7 @@ describe<{
 		spiedBroadcaster.calledWith([transaction1]);
 	});
 
-	it("should log an error when broadcasting fails", async ({
+	it("process - should log an error when broadcasting fails", async ({
 		processor,
 		factory,
 		broadcaster,

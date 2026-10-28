@@ -4,7 +4,7 @@ export type QueryPredicate = (transaction: Transaction) => Promise<boolean>;
 
 export interface Query {
 	getAll(): QueryIterable;
-	getAllBySender(senderPublicKey: string): QueryIterable;
+	getAllBySender(address: string): QueryIterable;
 	getFromLowestPriority(): QueryIterable;
 	getFromHighestPriority(): QueryIterable;
 }

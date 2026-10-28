@@ -26,7 +26,7 @@ const sendRequest = <T>(method: string, url: string, options?: HttpOptions): Pro
 
 		options = { ...options };
 		options.host = parsedUrl.host;
-		options.hostname = parsedUrl.hostname;
+		options.hostname = parsedUrl.hostname.startsWith("[") ? parsedUrl.hostname.slice(1, -1) : parsedUrl.hostname;
 		options.port = parsedUrl.port;
 		options.protocol = parsedUrl.protocol;
 		options.method = method.toLowerCase();
@@ -39,7 +39,7 @@ const sendRequest = <T>(method: string, url: string, options?: HttpOptions): Pro
 			options.path += parsedUrl.search;
 		}
 
-		if (options.protocol === "http:" || options.protocol === "https:") {
+		if ((options.protocol === "http:" || options.protocol === "https:") && options.agent === undefined) {
 			options.agent = globalAgent;
 		}
 
@@ -49,6 +49,8 @@ const sendRequest = <T>(method: string, url: string, options?: HttpOptions): Pro
 
 		const maxContentLength = options.maxContentLength ?? Number.MAX_SAFE_INTEGER;
 		const request_: ClientRequest = request(options, (r: IncomingMessage): void => {
+			const remoteAddress = r.socket?.remoteAddress;
+
 			let accumulator = "";
 			let readBytes = 0;
 
@@ -70,6 +72,7 @@ const sendRequest = <T>(method: string, url: string, options?: HttpOptions): Pro
 					data: "",
 					headers: r.rawHeaders,
 					method,
+					remoteAddress,
 					statusCode: r.statusCode,
 					statusMessage: r.statusMessage,
 				};
@@ -127,6 +130,7 @@ export type HttpResponse<T = unknown> = {
 	statusMessage: string | undefined;
 	data: T;
 	headers: string[];
+	remoteAddress: string | undefined;
 };
 
 export class HttpError extends Error {

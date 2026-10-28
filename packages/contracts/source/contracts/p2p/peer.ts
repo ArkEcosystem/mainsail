@@ -1,5 +1,3 @@
-import type { Queue } from "../kernel/queue.js";
-import type { ApiNode } from "./api-node.js";
 import type { PeerProtocol } from "./enums.js";
 import type { HeaderData } from "./header.js";
 
@@ -26,15 +24,10 @@ export interface Peer {
 
 	header: HeaderData;
 	plugins: PeerPlugins;
-	sequentialErrorCounter: number;
-	apiNodes: ApiNode[];
 
 	setPinged(latency: number): void;
 
 	toBroadcast(): PeerBroadcast;
-
-	getTransactionsQueue(): Promise<Queue>;
-	dispose(): void;
 }
 
 export interface PeerBroadcast {

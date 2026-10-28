@@ -4,6 +4,9 @@ const isSchema = (value: Joi.Schema | SchemaObject): value is Joi.Schema => Joi.
 
 export const addressSchema = Joi.string().hex({ prefix: true }).length(42);
 
+// uint256, beyond the safe integers of Joi.number()
+export const amountSchema = Joi.string().pattern(/^\d+$/, "unsigned integer").max(78);
+
 // Criteria
 
 export type SchemaObject = {
@@ -33,7 +36,7 @@ export const createSortingSchema = (schemaObject: SchemaObject, wildcardPaths: s
 			isSchema(value) ? key : getObjectPaths(value).map((p) => `${key}.${p}`),
 		);
 
-	const exactPaths = getObjectPaths(schemaObject);
+	const exactPaths = getObjectPaths(schemaObject).filter((path) => !wildcardPaths.includes(path));
 
 	const orderBy = Joi.custom((value, helpers) => {
 		if (value === "") {
@@ -93,6 +96,15 @@ export const pagination = Joi.object({
 	limit: paginationLimit,
 	offset: Joi.number().integer().min(0),
 	page: Joi.number().integer().positive().default(1),
+}).custom((value, helpers) => {
+	const maxDepth: number | undefined = helpers.prefs.context?.configuration?.plugins?.pagination?.maxDepth;
+	const offset: number = value.offset ?? (value.page - 1) * value.limit;
+
+	if (maxDepth !== undefined && offset + value.limit > maxDepth) {
+		return helpers.message({ custom: `Pages end at row ${maxDepth}; use filters to reach the rows after it` });
+	}
+
+	return value;
 });
 
 export const equalCriteria = (value: Joi.Schema): Joi.Schema => value;

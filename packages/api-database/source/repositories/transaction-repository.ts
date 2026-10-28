@@ -11,7 +11,7 @@ import type { Criteria, Options, Pagination, ResultsPage, Sorting } from "../sea
 
 import { Transaction } from "../models/index.js";
 import { TransactionFilter } from "../search/filters/transaction-filter.js";
-import { makeExtendedRepository } from "./repository-extension.js";
+import { breakTies, makeExtendedRepository } from "./repository-extension.js";
 
 export const makeTransactionRepository = (dataSource: RepositoryDataSource): TransactionRepository =>
 	makeExtendedRepository<Transaction, TransactionRepositoryExtension>(Transaction, dataSource, {
@@ -57,7 +57,12 @@ export const makeTransactionRepository = (dataSource: RepositoryDataSource): Tra
 			}
 
 			const transactionExpression = await TransactionFilter.getExpression(walletRepository, transactionCriteria);
-			return this.listByExpression(transactionExpression, sorting, pagination, options);
+			return this.listByExpression(
+				transactionExpression,
+				breakTies(breakTies(sorting, "timestamp"), "transactionIndex"),
+				pagination,
+				options,
+			);
 		},
 
 		async getFeeStatistics(

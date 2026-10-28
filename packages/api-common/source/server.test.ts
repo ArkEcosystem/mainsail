@@ -136,6 +136,48 @@ describe<{
 		error.neverCalled();
 	});
 
+	it("onPreResponse - converts database overload to serverUnavailable and logs error", async ({
+		subject,
+		logger,
+	}) => {
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		const errors = {
+			"/connection-timeout": new Error("Connection terminated due to connection timeout"),
+			"/out-of-shared-memory": Object.assign(new Error("could not resize shared memory segment"), {
+				code: "53100",
+				name: "QueryFailedError",
+			}),
+			"/pool-timeout": new Error("timeout exceeded when trying to connect"),
+			"/statement-timeout": Object.assign(new Error("canceling statement due to statement timeout"), {
+				code: "57014",
+				name: "QueryFailedError",
+			}),
+		};
+
+		for (const [path, error] of Object.entries(errors)) {
+			await subject.route({
+				handler() {
+					throw error;
+				},
+				method: "GET",
+				path,
+			});
+		}
+
+		const warn = spy(logger, "warn");
+		const error = spy(logger, "error");
+
+		for (const path of Object.keys(errors)) {
+			const response = await subject.inject({ method: "GET", url: path });
+			assert.is(response.statusCode, 503);
+			assert.is(response.result.message, "The database is too busy to answer");
+		}
+
+		error.calledTimes(4);
+		warn.neverCalled();
+	});
+
 	it("onPreResponse - converts a DatabaseException to badRequest and logs warn", async ({ subject, logger }) => {
 		await subject.initialize(Enums.Api.ServerType.Http, {});
 

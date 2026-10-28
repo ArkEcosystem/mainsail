@@ -37,15 +37,7 @@ describe("BlockFilter", ({ it, assert }) => {
 	});
 
 	it("should map each numeric field to a comparison expression", async () => {
-		for (const property of [
-			"timestamp",
-			"round",
-			"transactionsCount",
-			"amount",
-			"fee",
-			"reward",
-			"payloadSize",
-		] as const) {
+		for (const property of ["timestamp", "round", "transactionsCount", "fee", "reward", "payloadSize"] as const) {
 			const expression = await BlockFilter.getExpression({ [property]: 9 } as any);
 
 			assert.equal(expression, { jsonFieldAccessor: undefined, op: "equal", property, value: 9 });

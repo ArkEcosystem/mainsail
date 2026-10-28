@@ -13,8 +13,6 @@ export interface LegacyImporter {
 	snapshotHash: string;
 	genesisBlockNumber: bigint;
 	previousGenesisBlockHash: string;
-	totalSupply: bigint;
-	result: LegacyImportResult | undefined;
 }
 
 export interface LegacyImportOptions {
@@ -51,16 +49,12 @@ export interface ImportedLegacyMultiSignatureAttribute {
 }
 
 export interface ImportedLegacyVoter {
-	readonly arkAddress: string;
 	readonly ethAddress?: string;
-	readonly publicKey: string;
 	readonly vote: string;
 }
 
 export interface ImportedLegacyValidator {
-	readonly arkAddress: string;
 	readonly ethAddress: string;
-	readonly publicKey: string;
 	readonly isResigned: boolean;
 
 	username: string;

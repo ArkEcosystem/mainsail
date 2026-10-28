@@ -36,6 +36,7 @@ describe<{
 			process: async (transactionContext: any) => ({
 				receipt: { contractAddress: addressForNonce(transactionContext.nonce), status: true },
 			}),
+			seedGenesisAccount: async () => {},
 		};
 		context.events = { dispatch: async () => {} };
 		context.logger = { info: () => {} };
@@ -85,8 +86,14 @@ describe<{
 		events,
 		genesisInfo,
 	}) => {
+		const genesisCalls: string[] = [];
 		const prepare = spy(evm, "prepareNextCommit");
-		const initialize = spy(evm, "initializeGenesis");
+		const initialize = stub(evm, "initializeGenesis").callsFake(async () => {
+			genesisCalls.push("initializeGenesis");
+		});
+		stub(evm, "seedGenesisAccount").callsFake(async () => {
+			genesisCalls.push("seedGenesisAccount");
+		});
 		const process = spy(evm, "process");
 		const onCommit = spy(evm, "onCommit");
 		const dispatch = spy(events, "dispatch");
@@ -95,6 +102,7 @@ describe<{
 
 		prepare.calledOnce();
 		initialize.calledWith(genesisInfo);
+		assert.equal(genesisCalls, ["initializeGenesis", "seedGenesisAccount"]);
 		process.calledTimes(6); // 3 implementations + 3 proxies
 		onCommit.calledOnce();
 		dispatch.calledTimes(3); // one ContractCreated event per proxy

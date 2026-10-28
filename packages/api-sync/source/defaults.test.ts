@@ -45,7 +45,7 @@ describe<{
 		assert.false(fresh.enabled);
 		assert.equal(fresh.restore.blocks.batchSize, 1000);
 		assert.equal(fresh.syncInterval, 8000);
-		assert.equal(fresh.tokenCacheSize, 256);
+		assert.equal(fresh.tokenCacheSize, 1024);
 		assert.equal(fresh.tokenWhitelistRefreshInterval, 60_000);
 		assert.equal(fresh.tokenWhitelistRemoteUrl, "");
 	});

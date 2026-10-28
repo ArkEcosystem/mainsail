@@ -9,6 +9,7 @@ import type { Validator } from "@mainsail/validation";
 import { ServiceProvider as ValidationServiceProvider } from "@mainsail/validation";
 
 import cryptoJson from "../../../core/bin/config/devnet/core/crypto.json" with { type: "json" };
+import { makeFormats } from "../../source/validation/formats.js";
 
 type Context = {
 	app: Application;
@@ -27,6 +28,10 @@ export const prepareValidatorContext = async (context: Context) => {
 	const validator = context.app.get<Validator>(Identifiers.Cryptography.Validator);
 	for (const keyword of Object.values(makeCryptoValidationKeywords(configuration))) {
 		validator.addKeyword(keyword);
+	}
+
+	for (const [name, format] of Object.entries(makeFormats())) {
+		validator.addFormat(name, format);
 	}
 
 	validator.addSchema(cryptoBlockSchemas.blockHash);

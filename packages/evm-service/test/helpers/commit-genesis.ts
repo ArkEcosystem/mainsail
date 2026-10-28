@@ -35,6 +35,7 @@ export const processGenesis = async (
 		usernameContract: "0x0000000000000000000000000000000000000001",
 		validatorContract: "0x0000000000000000000000000000000000000001",
 	});
+	await instance.seedGenesisAccount();
 
 	await instance.prepareNextCommit({
 		blockContext: {

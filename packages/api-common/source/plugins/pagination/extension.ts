@@ -3,11 +3,19 @@
 import type Hapi from "@hapi/hapi";
 import type { Utils } from "@mainsail/contracts";
 
-import { applyToDefaults } from "@hapi/hoek";
 import { assert, get } from "@mainsail/utils";
 import Qs from "querystring";
 
 import type { HapiRequest } from "../../types.js";
+
+const flatten = (query: object, prefix = ""): Record<string, unknown> =>
+	Object.fromEntries(
+		Object.entries(query).flatMap(([key, value]) =>
+			typeof value === "object" && value !== null && !Array.isArray(value)
+				? Object.entries(flatten(value, `${prefix}${key}.`))
+				: [[`${prefix}${key}`, value]],
+		),
+	);
 
 export class Extension {
 	private readonly routePathPrefix = "/api";
@@ -65,10 +73,7 @@ export class Extension {
 		const results = Array.isArray(source) ? source : source["results"];
 		assert.array(results);
 
-		// strip prefix in baseUri, we want a "clean" relative path
-		const baseUri = request.url.pathname.slice(this.routePathPrefix.length) + "?";
 		const { query, response } = request;
-		const currentPage = query.page;
 		const currentLimit = query.limit;
 
 		let totalCount = 0;
@@ -83,8 +88,9 @@ export class Extension {
 			pageCount = Math.trunc(totalCount / currentLimit) + (totalCount % currentLimit === 0 ? 0 : 1);
 		}
 
-		const getUri = (page: number): string =>
-			baseUri + Qs.stringify(applyToDefaults({ ...query, ...request.orig.query }, { page }));
+		pageCount = this.getReachablePageCount(pageCount, currentLimit);
+
+		const links = this.getLinks(request, pageCount, totalCount);
 
 		const newSource = {
 			meta: {
@@ -92,18 +98,15 @@ export class Extension {
 
 				count: results.length,
 
-				first: getUri(1),
+				first: links.first,
 
-				last: getUri(pageCount),
+				last: links.last,
 
-				// tslint:disable-next-line: no-null-keyword
-				next: totalCount && currentPage < pageCount ? getUri(currentPage + 1) : null,
+				next: links.next,
 				pageCount: pageCount,
 
-				previous:
-					// tslint:disable-next-line: no-null-keyword
-					totalCount && currentPage > 1 && currentPage <= pageCount + 1 ? getUri(currentPage - 1) : null,
-				self: getUri(currentPage),
+				previous: links.previous,
+				self: links.self,
 				totalCount: totalCount ? totalCount : 0,
 			},
 			// eslint-disable-next-line perfectionist/sort-objects
@@ -125,6 +128,45 @@ export class Extension {
 		return h.continue;
 	}
 
+	private getLinks(
+		request: HapiRequest,
+		pageCount: number,
+		totalCount: number,
+	): Record<"first" | "last" | "next" | "previous" | "self", string | null> {
+		const { limit, offset, page } = request.query;
+
+		// strip prefix in baseUri, we want a "clean" relative path
+		const baseUri = request.url.pathname.slice(this.routePathPrefix.length) + "?";
+		const query = flatten({ ...request.query, ...request.orig.query });
+		const getUri = (position: { page: number } | { offset: number }): string =>
+			baseUri + Qs.stringify({ ...query, ...position });
+
+		if (offset === undefined) {
+			return {
+				first: getUri({ page: 1 }),
+				last: getUri({ page: pageCount }),
+				next: totalCount && page < pageCount ? getUri({ page: page + 1 }) : null,
+				previous: totalCount && page > 1 && page <= pageCount + 1 ? getUri({ page: page - 1 }) : null,
+				self: getUri({ page }),
+			};
+		}
+
+		delete query.page;
+
+		const maxDepth: number = get(this.config, "maxDepth") ?? Number.POSITIVE_INFINITY;
+
+		return {
+			first: getUri({ offset: 0 }),
+			last: getUri({ offset: (pageCount - 1) * limit }),
+			next:
+				offset + limit < totalCount && offset + 2 * limit <= maxDepth
+					? getUri({ offset: offset + limit })
+					: null,
+			previous: offset > 0 ? getUri({ offset: Math.max(0, offset - limit) }) : null,
+			self: getUri({ offset }),
+		};
+	}
+
 	private getRoutePaginationOptions(request: HapiRequest): { enabled: boolean } | undefined {
 		const { plugins } = request.route.settings;
 		if (!plugins) {
@@ -136,5 +178,11 @@ export class Extension {
 		}
 
 		return plugins["pagination"] as { enabled: boolean };
+	}
+
+	private getReachablePageCount(pageCount: number, limit: number): number {
+		const maxDepth: number | undefined = get(this.config, "maxDepth");
+
+		return maxDepth === undefined ? pageCount : Math.min(pageCount, Math.max(1, Math.floor(maxDepth / limit)));
 	}
 }

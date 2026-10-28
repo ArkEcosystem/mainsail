@@ -14,7 +14,6 @@ describe<{
 	app: Application;
 	serviceProvider: ServiceProvider;
 }>("ServiceProvider", ({ it, assert, beforeEach, stub }) => {
-	const triggerService = { bind: () => {} };
 	const validator = { addFormat: () => {}, addKeyword: () => {} };
 	const server = { boot: async () => {}, dispose: async () => {}, initialize: async () => {} };
 	const statisticService = { boot: async () => {} };
@@ -25,7 +24,6 @@ describe<{
 	beforeEach((context) => {
 		context.app = new Application();
 
-		context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
 		context.app.bind(Identifiers.Cryptography.Validator).toConstantValue(validator);
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
 
@@ -93,13 +91,11 @@ describe<{
 }>("ServiceProvider.configSchema", ({ it, assert, beforeEach }) => {
 	const importDefaults = async () => (await importFresh<any>("../distribution/defaults.js")).defaults;
 
-	const triggerService = { bind: () => {} };
 	const validator = { addFormat: () => {} };
 
 	beforeEach((context) => {
 		context.app = new Application();
 
-		context.app.bind(Identifiers.Services.Trigger.Service).toConstantValue(triggerService);
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
 			getMilestone: () => ({
 				roundValidators: 2,
@@ -329,6 +325,33 @@ describe<{
 
 		assert.undefined(result.error);
 		assert.equal(result.value.apiNodesMaxContentLength, 25000);
+	});
+
+	it("#schemaRestrictions - apiNodes accepts http and https urls", async ({ serviceProvider }) => {
+		const defaults = await importDefaults();
+		defaults.apiNodes = [
+			"http://1.2.3.4:4003/",
+			"https://api.example.com/api",
+			"http://localhost:4003",
+			"http://[::1]:4003/",
+		];
+
+		const result = serviceProvider.configSchema().validate(defaults);
+
+		assert.undefined(result.error);
+		assert.equal(result.value.apiNodes, defaults.apiNodes);
+	});
+
+	it("#schemaRestrictions - apiNodes rejects a url that is not http(s)", async ({ serviceProvider }) => {
+		const defaults = await importDefaults();
+
+		for (const url of ["ws://1.2.3.4:4003/", "ftp://1.2.3.4/", "1.2.3.4:4003", "not a url", ""]) {
+			defaults.apiNodes = ["http://1.2.3.4:4003/", url];
+			const result = serviceProvider.configSchema().validate(defaults);
+
+			assert.defined(result.error, url);
+			assert.true(result.error!.message.startsWith('"apiNodes[1]"'), result.error!.message);
+		}
 	});
 
 	it("#schemaRestrictions - server is required && is object", async ({ serviceProvider }) => {
