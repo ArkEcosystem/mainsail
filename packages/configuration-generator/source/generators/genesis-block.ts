@@ -117,6 +117,7 @@ export class GenesisBlockGenerator {
 		transactions = [...transactions, ...validatorTransactions];
 
 		if (options.snapshot) {
+			this.#assertNoImportedValidators(validatorTransactions);
 			await this.#importLegacySnapshotData(options);
 		}
 
@@ -409,6 +410,22 @@ export class GenesisBlockGenerator {
 			),
 			transactions: transactionData,
 		};
+	}
+
+	#assertNoImportedValidators(transactions: Contracts.Crypto.Transaction[]): void {
+		const delegates = new Map(
+			this.snapshotLegacyImporter.validators.map(({ ethAddress, username }) => [
+				ethAddress.toLowerCase(),
+				username,
+			]),
+		);
+
+		for (const { from } of transactions) {
+			const username = delegates.get(from.toLowerCase());
+			if (username !== undefined) {
+				throw new Error(`genesis validator ${from} is the imported V3 delegate ${username}`);
+			}
+		}
 	}
 
 	async #importLegacySnapshotData(options: Contracts.NetworkGenerator.GenesisBlockOptions) {

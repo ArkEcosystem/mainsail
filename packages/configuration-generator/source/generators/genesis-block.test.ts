@@ -23,7 +23,7 @@ describe<{
 	app: Application;
 	generator: GenesisBlockGenerator;
 	mnemonicGenerator: MnemonicGenerator;
-}>("GenesisBlockGenerator", ({ it, assert, stub, afterEach, beforeEach }) => {
+}>("GenesisBlockGenerator", ({ it, assert, stub, spy, afterEach, beforeEach }) => {
 	const baseOptions = (overrides: Record<string, unknown> = {}) =>
 		({
 			chainId: 123,
@@ -119,6 +119,7 @@ describe<{
 			}),
 			previousGenesisBlockHash: "0".repeat(64),
 			snapshotHash: "0".repeat(64),
+			validators: [],
 		};
 		app.rebind(AppIdentifiers.Snapshot.Legacy.Importer).toConstantValue(importer as any);
 
@@ -204,6 +205,70 @@ describe<{
 		assert.equal(data.block.transactions[1].to, wallets[1].address);
 		assert.equal(data.block.transactions[0].value, BigInt(2_000_000_000 / 2));
 		assert.equal(data.block.transactions[1].value, BigInt(2_000_000_000 / 2));
+	});
+
+	const importDelegate = (app: Application, ethAddress: string) => {
+		const importer = {
+			genesisBlockNumber: 0n,
+			import: async () => {},
+			previousGenesisBlockHash: "0".repeat(64),
+			snapshotHash: "0".repeat(64),
+			validators: [{ ethAddress, isResigned: false, username: "dormant_delegate" }],
+		};
+		app.rebind(AppIdentifiers.Snapshot.Legacy.Importer).toConstantValue(importer as any);
+
+		return importer;
+	};
+
+	it("#generate - should reject a genesis validator that is an imported delegate", async ({
+		app,
+		mnemonicGenerator,
+	}) => {
+		const mnemonics = mnemonicGenerator.generateMany(2);
+		const wallet = await app.get<WalletGenerator>(Identifiers.Generator.Wallet).generate(mnemonics[1]);
+		const importer = importDelegate(app, wallet.address.toLowerCase());
+		const importSpy = spy(importer, "import");
+		const generator = app.get<GenesisBlockGenerator>(Identifiers.Generator.GenesisBlock);
+
+		await assert.rejects(
+			() =>
+				generator.generate(
+					mnemonicGenerator.generate(),
+					mnemonics,
+					baseOptions({ premine: "0", snapshot: { path: "/snapshot" } }),
+				),
+			`genesis validator ${wallet.address} is the imported V3 delegate dormant_delegate`,
+		);
+		importSpy.neverCalled();
+	});
+
+	it("#generate - should reject a presigned genesis validator that is an imported delegate", async ({
+		app,
+		mnemonicGenerator,
+	}) => {
+		const wallet = await app
+			.get<WalletGenerator>(Identifiers.Generator.Wallet)
+			.generate(mnemonicGenerator.generate());
+		const validatorRegistrations = [await presignRegistration(app, wallet)];
+		const importer = importDelegate(app, wallet.address);
+		const importSpy = spy(importer, "import");
+		const generator = app.get<GenesisBlockGenerator>(Identifiers.Generator.GenesisBlock);
+
+		await assert.rejects(
+			() =>
+				generator.generate(
+					mnemonicGenerator.generate(),
+					[],
+					baseOptions({
+						premine: "0",
+						snapshot: { path: "/snapshot" },
+						validatorRegistrations,
+						validators: 1,
+					}),
+				),
+			`genesis validator ${wallet.address} is the imported V3 delegate dormant_delegate`,
+		);
+		importSpy.neverCalled();
 	});
 
 	it("#generate - should reject a presigned validator registration that is not valid", async ({
