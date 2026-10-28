@@ -726,6 +726,23 @@ describe<Context>("Importer", ({ it, assert, beforeEach, each, spy }) => {
 		);
 	});
 
+	it("should reject a restore whose snapshot is for another network", async ({
+		configuration,
+		fileSystem,
+		importer,
+		wallet,
+	}) => {
+		const snapshot = makeSnapshot([wallet]);
+		configuration.getMilestone = () => ({ snapshot: { snapshotHash: snapshot.hash } });
+		configuration.getNetwork = () => ({ pubKeyHash: 23 });
+		fileSystem.get = async () => compress(snapshot);
+
+		await assert.rejects(
+			() => importer.prepareRestore(),
+			new Error("snapshot pubKeyHash 30 does not match network pubKeyHash 23"),
+		);
+	});
+
 	it("should reject a restore without a snapshot milestone", async ({ importer }) => {
 		await assert.rejects(
 			() => importer.prepareRestore(),

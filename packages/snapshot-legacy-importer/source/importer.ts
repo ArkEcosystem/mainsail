@@ -117,6 +117,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				`snapshot hash ${this.snapshotHash} does not match milestone snapshot ${milestone.snapshot.snapshotHash}`,
 			);
 		}
+
+		const { pubKeyHash } = this.configuration.getNetwork();
+		if (this.pubKeyHash !== pubKeyHash) {
+			throw new Error(`snapshot pubKeyHash ${this.pubKeyHash} does not match network pubKeyHash ${pubKeyHash}`);
+		}
 	}
 
 	public async prepare(snapshotPath: string): Promise<void> {
