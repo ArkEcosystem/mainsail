@@ -20,9 +20,10 @@ type Flag = {
 	default?: string | number | boolean | Date;
 };
 
-type Flags = Omit<AppContracts.NetworkGenerator.Options, "peers" | "rewardAmount"> & {
+type Flags = Omit<AppContracts.NetworkGenerator.Options, "peers" | "rewardAmount" | "snapshot"> & {
 	peers: string;
 	rewardAmount: number | string;
+	snapshot?: string;
 	validatorsFile?: string;
 };
 
@@ -158,6 +159,14 @@ export class Command extends Commands.Command {
 			name: "validatorsFile",
 			description:
 				'Path to a JSON file supplying the genesis validators: { "genesisMnemonic"?: string, "validatorMnemonics": string[] }. A validators.json-style { "secrets": [...] } is also accepted. Alternatively "validatorRegistrations": string[] supplies hex-encoded presigned transactions (one registerValidator call per validator; anything else is rejected) so no validator secrets are needed at all. When provided, the validator count follows the supplied list.',
+			schema: Joi.string(),
+		},
+
+		// Legacy snapshot
+		{
+			name: "snapshot",
+			description:
+				"Path to a legacy snapshot (.compressed) to start the network from. The genesis block continues the legacy chain and the premine is ignored.",
 			schema: Joi.string(),
 		},
 
@@ -305,8 +314,22 @@ export class Command extends Commands.Command {
 				.map((peer) => peer.trim())
 				.filter((peer) => peer.length > 0),
 			rewardAmount: options.rewardAmount.toString(),
+			snapshot: this.#resolveSnapshot(options),
 			validators,
 		};
+	}
+
+	#resolveSnapshot(options: Flags): AppContracts.NetworkGenerator.SnapshotOptions | undefined {
+		if (!options.snapshot) {
+			return undefined;
+		}
+
+		const resolved = path.resolve(options.snapshot);
+		if (!existsSync(resolved)) {
+			throw new Error(`Snapshot file not found: ${resolved}`);
+		}
+
+		return { path: resolved };
 	}
 
 	#readValidatorsFile(options: Flags): {

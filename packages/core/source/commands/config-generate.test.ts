@@ -4,11 +4,13 @@ import type { Contracts } from "@mainsail/contracts";
 import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { FunctionSigs } from "@mainsail/evm-contracts";
-import { existsSync, readFileSync } from "fs";
+import { createHash } from "crypto";
+import { existsSync, readFileSync, writeFileSync } from "fs";
 import { ensureDirSync, readJSONSync, writeJSONSync } from "fs-extra/esm";
 import { join } from "path";
 import prompts from "prompts";
 import { dirSync, setGracefulCleanup } from "tmp";
+import { brotliCompressSync } from "zlib";
 
 import { Console } from "@mainsail/cli";
 import { describe } from "@mainsail/test-runner";
@@ -249,6 +251,111 @@ describe<{
 					.withFlags(generateFlags(configPath, { force: true, validatorsFile, validators: undefined }))
 					.execute(Command),
 			'"validatorRegistrations" must be an array of hex-encoded transactions.',
+		);
+	});
+
+	// A V3 delegate with one voter, saved under a file name that is not the snapshot hash.
+	const makeLegacySnapshot = async () => {
+		const app = await makeApplication(dirSync().name, {});
+		app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).set("network.pubKeyHash", 30);
+
+		const hotWallet = async (mnemonic: string, fields: Record<string, unknown>) => {
+			const { publicKey } = await app
+				.getTagged<Contracts.Crypto.KeyPairFactory>(
+					Identifiers.Cryptography.Identity.KeyPair.Factory,
+					"type",
+					"wallet",
+				)
+				.fromMnemonic(mnemonic);
+
+			return {
+				arkAddress: await app
+					.get<Contracts.Crypto.AddressFactory>(Identifiers.Cryptography.Legacy.Identity.AddressFactory)
+					.fromPublicKey(publicKey),
+				balance: "100000000",
+				ethAddress: await app
+					.getTagged<Contracts.Crypto.AddressFactory>(
+						Identifiers.Cryptography.Identity.Address.Factory,
+						"type",
+						"wallet",
+					)
+					.fromPublicKey(publicKey),
+				legacyNonce: "1",
+				publicKey,
+				...fields,
+			};
+		};
+
+		const delegate = await hotWallet("delegate", { attributes: { delegate: { username: "delegate" } } });
+		const voter = await hotWallet("voter", { attributes: { vote: delegate.publicKey } });
+
+		for (const tag of ["evm", "validator", "transaction-pool", "rpc"]) {
+			await app.getTagged<{ dispose(): Promise<void> }>(Identifiers.Evm.Instance, "instance", tag).dispose();
+		}
+
+		const chainTip = { hash: createHash("sha256").update("legacy chain tip").digest("hex"), number: "4000" };
+		const wallets = [delegate, voter];
+		const hash = createHash("sha256").update(JSON.stringify(chainTip));
+		for (const wallet of wallets) {
+			hash.update(JSON.stringify(wallet));
+		}
+		const snapshot = { chainTip, hash: hash.digest("hex"), wallets };
+
+		const path = join(dirSync().name, "v3.compressed");
+		writeFileSync(path, brotliCompressSync(JSON.stringify(snapshot)));
+
+		return { chainTip, hash: snapshot.hash, path };
+	};
+
+	it("should generate genesis from a legacy snapshot", async ({ cli, configPath }) => {
+		const snapshot = await makeLegacySnapshot();
+
+		const validatorsFile = join(dirSync().name, "validators.json");
+		writeJSONSync(validatorsFile, {
+			secrets: [
+				"legal winner thank year wave sausage worth useful legal winner thank yellow",
+				"letter advice cage absurd amount doctor acoustic avoid letter advice cage above",
+			],
+		});
+
+		await cli
+			.withFlags(
+				generateFlags(configPath, {
+					force: true,
+					snapshot: snapshot.path,
+					validatorsFile,
+					validators: undefined,
+				}),
+			)
+			.execute(Command);
+
+		const crypto = readJSONSync(join(configPath, "devnet", "crypto.json"));
+		assert.equal(crypto.genesisBlock.block.number, 4001);
+		assert.equal(crypto.genesisBlock.block.parentHash, snapshot.chainTip.hash);
+		assert.equal(crypto.milestones[0].snapshot, {
+			previousGenesisBlockHash: snapshot.chainTip.hash,
+			snapshotHash: snapshot.hash,
+		});
+		assert.equal(crypto.milestones[1].roundValidators, 2);
+		assert.equal(crypto.milestones[2].height, 27_001);
+
+		// No premine transfers on top of the snapshot, only 2 registrations and 2 votes.
+		assert.equal(crypto.genesisBlock.block.transactionsCount, 4);
+
+		assert.true(existsSync(join(configPath, "devnet", "snapshot", `${snapshot.hash}.compressed`)));
+		assert.true(
+			readJSONSync(join(configPath, "devnet", "app.json")).main.some(
+				(plugin: { package: string }) => plugin.package === "@mainsail/snapshot-legacy-importer",
+			),
+		);
+	});
+
+	it("should throw if the snapshot file does not exist", async ({ cli, configPath }) => {
+		const snapshot = join(dirSync().name, "missing.compressed");
+
+		await assert.rejects(
+			() => cli.withFlags(generateFlags(configPath, { force: true, snapshot })).execute(Command),
+			`Snapshot file not found: ${snapshot}`,
 		);
 	});
 
