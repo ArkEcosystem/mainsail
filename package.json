@@ -21,6 +21,8 @@
 		"deps": "cross-env-shell ./scripts/deps/update.sh",
 		"deps:check": "node ./scripts/deps/check.js",
 		"deps:types": "./node_modules/typesync/bin/typesync",
+		"e2e:p2p": "docker compose -f tests/e2e/p2p/docker-compose.yml up --build",
+		"e2e:p2p:down": "docker compose -f tests/e2e/p2p/docker-compose.yml down",
 		"format": "pnpm run lint && pnpm run prettier",
 		"ignore:tokens": "bash scripts/git-ignore-tokens.sh",
 		"injects:check": "node ./scripts/dead-injects.js",
