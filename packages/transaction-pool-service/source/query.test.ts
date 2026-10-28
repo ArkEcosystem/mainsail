@@ -12,6 +12,8 @@ const bob = "0xbbe7B35057F3431E001d2b96817e3061B59849c9";
 const makeTransaction = (from: string, nonce: bigint, gasPrice: number): Contracts.Crypto.Transaction =>
 	({ from, gasPrice, hash: `${from}-${nonce}`, nonce }) as unknown as Contracts.Crypto.Transaction;
 
+const makeRandom = (seed: number) => (max: number) => (seed = (seed * 48_271) % 2_147_483_647) % max;
+
 describe<{
 	app: Application;
 	mempool: any;
@@ -192,9 +194,7 @@ describe<{
 		query,
 		mempool,
 	}) => {
-		let seed = 1;
-		const random = (max: number) => (seed = (seed * 48_271) % 2_147_483_647) % max;
-
+		const random = makeRandom(1);
 		const senders = Array.from({ length: 200 }, (_, sender) =>
 			Array.from({ length: random(8) }, (_, nonce) => makeTransaction(`${sender}`, BigInt(nonce), random(4))),
 		);
@@ -224,6 +224,35 @@ describe<{
 			await query.getFromLowestPriority().all(),
 			resorted((a, b) => a.gasPrice - b.gasPrice),
 		);
+	});
+
+	it("getFromHighestPriority and getFromLowestPriority - should not re-sort the senders after every pick", async ({
+		query,
+		mempool,
+	}) => {
+		const random = makeRandom(1);
+		let reads = 0;
+		const senders = Array.from({ length: 4096 }, (_, sender) => {
+			const gasPrice = random(1000);
+			return [
+				Object.defineProperty(makeTransaction(`${sender}`, 0n, gasPrice), "gasPrice", {
+					get: () => {
+						reads++;
+						return gasPrice;
+					},
+				}),
+			];
+		});
+		stub(mempool, "getSenderMempools").returnValue(
+			senders.map((t) => ({ getFromEarliest: () => t, getFromLatest: () => t })),
+		);
+
+		for (const getQueryIterable of [() => query.getFromHighestPriority(), () => query.getFromLowestPriority()]) {
+			reads = 0;
+			assert.length(await getQueryIterable().all(), senders.length);
+			// a heap reads about 4 n log n prices, re-sorting after every pick about n^2
+			assert.lt(reads, 20 * senders.length * Math.log2(senders.length));
+		}
 	});
 
 	it("getFromHighestPriority - should keep the transactions of the moment it was queried", async ({
