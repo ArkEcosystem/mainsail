@@ -4,6 +4,7 @@ import type { Server as HttpsServer } from "node:https";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject } from "@mainsail/container";
+import { IpAddress } from "@mainsail/utils";
 import { WebSocketServer } from "ws";
 
 import type { ConnectionRepository } from "./connection-repository.js";
@@ -76,7 +77,7 @@ export class Listener {
 		this.#wss.on("connection", (ws, request) => {
 			ws.on("error", () => {});
 
-			const remoteAddress = request.socket.remoteAddress ?? "";
+			const remoteAddress = IpAddress.sanitizeRemoteAddress(request.socket.remoteAddress ?? "") ?? "";
 			const connection = this.createConnection(ws, { direction: Direction.Inbound, remoteAddress });
 			connection.onRequest = (path, payload) => this.router.handle(connection, path, payload);
 
