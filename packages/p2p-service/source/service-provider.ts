@@ -2,6 +2,7 @@ import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 
+import { Logger } from "./logger.js";
 import { GetStatusRoute } from "./routes/index.js";
 import { Service } from "./service.js";
 
@@ -9,6 +10,8 @@ import { Service } from "./service.js";
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
+		this.app.bind(Identifiers.P2P.Logger).to(Logger).inSingletonScope();
+
 		for (const route of [GetStatusRoute]) {
 			this.app.bind(Identifiers.P2P.WebSocket.Routes).to(route).inSingletonScope();
 		}
