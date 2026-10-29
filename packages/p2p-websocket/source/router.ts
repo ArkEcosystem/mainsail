@@ -4,8 +4,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject, optional, postConstruct } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
-import type { Connection } from "./connection.js";
-import type { ReceiveContext, ReceiveMiddleware, Response, Route } from "./interfaces/index.js";
+import type { Connection, ReceiveContext, ReceiveMiddleware, Response, Route } from "./interfaces/index.js";
 
 import { RequestError } from "./errors.js";
 

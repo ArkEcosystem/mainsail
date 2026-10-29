@@ -9,7 +9,10 @@ import WebSocket from "ws";
 import type { Direction } from "./enums.js";
 import type {
 	Connection as ConnectionInterface,
+	ConnectionOptions,
+	Message,
 	RequestHandler,
+	RequestMessage,
 	Response,
 	RouteDefinition,
 	RouteSender,
@@ -18,14 +21,7 @@ import type {
 import { CloseReason, ConnectionState } from "./enums.js";
 import { ConnectionError } from "./errors.js";
 import { Handshake, RequestTable } from "./handlers/index.js";
-import { decode, encode, type Message, type RequestMessage } from "./message.js";
-
-export type ConnectionOptions = {
-	direction: Direction;
-	remoteAddress: string;
-};
-
-export type ConnectionFactory = (ws: WebSocket, options: ConnectionOptions) => Connection;
+import { decode, encode } from "./message.js";
 
 // One per socket, created through Identifiers.P2P.WebSocket.Connection.Factory and set up with init().
 @injectable()
