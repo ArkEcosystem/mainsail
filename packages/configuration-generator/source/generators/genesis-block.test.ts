@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Enums, Identifiers as AppIdentifiers } from "@mainsail/constants";
 import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
 import { TransactionBuilder } from "@mainsail/crypto-transaction";
-import { ConsensusAbi } from "@mainsail/evm-contracts";
+import { ConsensusAbi, FunctionSigs } from "@mainsail/evm-contracts";
 import { Application } from "@mainsail/kernel";
 import { createHash } from "node:crypto";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
@@ -140,6 +140,133 @@ describe<{
 				mnemonicGenerator.generateMany(2),
 				baseOptions({ snapshot: { path: "/snapshot" }, premine: "0" }),
 			),
+		);
+	});
+
+	// Mimics what the real importer does for a legacy delegate: `addValidator` registers the address
+	// with the consensus contract without a BLS key, exactly like a dormant snapshot validator.
+	const makeSnapshotImporter = (app: Application, validators: { address: string; isResigned: boolean }[]) => {
+		const evm = app.getTagged<Contracts.Evm.Instance>(AppIdentifiers.Evm.Instance, "instance", "evm");
+		const deployerAddress = app.get<string>(AppIdentifiers.EvmConsensus.DeployerAddress);
+		const consensusContract = app.get<string>(AppIdentifiers.EvmConsensus.Contracts.Consensus);
+
+		return {
+			genesisBlockNumber: 0n,
+			import: async ({ commitKey, timestamp }: Contracts.Snapshot.LegacyImportOptions) => {
+				await evm.prepareNextCommit({
+					blockContext: {
+						commitKey,
+						gasLimit: 30_000_000n,
+						prevrandao: Buffer.alloc(32),
+						timestamp: BigInt(timestamp),
+						validatorAddress: deployerAddress,
+					},
+				});
+
+				let { nonce } = await evm.getAccountInfo(deployerAddress);
+
+				for (const [index, { address, isResigned }] of validators.entries()) {
+					const { receipt } = await evm.process({
+						commitKey,
+						data: Buffer.from(
+							encodeFunctionData({
+								abi: ConsensusAbi.abi,
+								args: [address, isResigned],
+								functionName: "addValidator",
+							}).slice(2),
+							"hex",
+						),
+						from: deployerAddress,
+						gasLimit: 1_000_000n,
+						gasPrice: 0n,
+						nonce: nonce++,
+						specId: Enums.Evm.SpecId.OSAKA,
+						to: consensusContract,
+						txHash: index.toString(16).padStart(64, "0"),
+						value: 0n,
+					});
+
+					assert.equal(receipt.status, 1);
+				}
+
+				return {
+					importedUsernames: 0,
+					importedValidators: validators.length,
+					importedVoters: 0,
+					initialTotalSupply: 0n,
+				};
+			},
+			previousGenesisBlockHash: "0".repeat(64),
+			snapshotHash: "0".repeat(64),
+			validators: validators.map(({ address, isResigned }, index) => ({
+				arkAddress: "",
+				ethAddress: address,
+				isResigned,
+				publicKey: "",
+				username: `validator_${index}`,
+			})),
+		};
+	};
+
+	it("#generate - should update validators that already exist in the snapshot instead of registering them", async ({
+		app,
+		mnemonicGenerator,
+	}) => {
+		const walletGenerator = app.get<WalletGenerator>(Identifiers.Generator.Wallet);
+		const mnemonics = mnemonicGenerator.generateMany(2);
+		const [existing, fresh] = await Promise.all(
+			mnemonics.map(async (mnemonic) => await walletGenerator.generate(mnemonic)),
+		);
+
+		app.rebind(AppIdentifiers.Snapshot.Legacy.Importer).toConstantValue(
+			makeSnapshotImporter(app, [{ address: existing.address, isResigned: false }]) as any,
+		);
+
+		const generator = app.get<GenesisBlockGenerator>(Identifiers.Generator.GenesisBlock);
+
+		const data = await generator.generate(
+			mnemonicGenerator.generate(),
+			mnemonics,
+			baseOptions({ premine: "0", snapshot: { path: "/snapshot" }, validators: 2 }),
+		);
+
+		// 1 registration (fresh) + 1 update (existing) + 1 self-vote (fresh only); the existing
+		// validator keeps the votes imported from the snapshot, so no vote is emitted for it.
+		assert.length(data.block.transactions, 3);
+
+		const [registration, update, vote] = data.block.transactions;
+
+		assert.equal(registration.from, fresh.address);
+		assert.true(registration.data.startsWith(FunctionSigs.ConsensusV1.RegisterValidator));
+
+		assert.equal(update.from, existing.address);
+		assert.true(update.data.startsWith(FunctionSigs.ConsensusV1.UpdateValidator));
+
+		assert.equal(vote.from, fresh.address);
+		assert.true(vote.data.startsWith(FunctionSigs.ConsensusV1.Vote));
+	});
+
+	it("#generate - should reject a validator that is resigned in the snapshot", async ({ app, mnemonicGenerator }) => {
+		const walletGenerator = app.get<WalletGenerator>(Identifiers.Generator.Wallet);
+		const mnemonics = mnemonicGenerator.generateMany(1);
+		const [resigned] = await Promise.all(
+			mnemonics.map(async (mnemonic) => await walletGenerator.generate(mnemonic)),
+		);
+
+		app.rebind(AppIdentifiers.Snapshot.Legacy.Importer).toConstantValue(
+			makeSnapshotImporter(app, [{ address: resigned.address, isResigned: true }]) as any,
+		);
+
+		const generator = app.get<GenesisBlockGenerator>(Identifiers.Generator.GenesisBlock);
+
+		await assert.rejects(
+			() =>
+				generator.generate(
+					mnemonicGenerator.generate(),
+					mnemonics,
+					baseOptions({ premine: "0", snapshot: { path: "/snapshot" }, validators: 1 }),
+				),
+			`validator ${resigned.address} (validator_0) is resigned in the snapshot and cannot become active`,
 		);
 	});
 
