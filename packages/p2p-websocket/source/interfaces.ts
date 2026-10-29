@@ -18,12 +18,11 @@ export interface Codec<TRequest, TResponse> {
 	};
 }
 
-// One request path. With a codec (and the codec middleware registered) the handler receives the
-// decoded request and returns the response object; without one both are raw buffers.
-// A non-200 answer is a thrown RequestError.
-export interface Route<TRequest = Buffer, TResponse = Buffer> {
+// One request path. The codec middleware decodes the request and encodes the response, so the
+// handler works with objects only. A non-200 answer is a thrown RequestError.
+export interface Route<TRequest, TResponse> {
 	readonly path: string;
-	readonly codec?: Codec<TRequest, TResponse>;
+	readonly codec: Codec<TRequest, TResponse>;
 	readonly maxBytes?: number;
 	readonly schema?: string;
 
@@ -32,13 +31,13 @@ export interface Route<TRequest = Buffer, TResponse = Buffer> {
 
 // What `send` needs from a route: the same object a Route implementation can spread into itself,
 // so one definition drives both the handler and the typed client call.
-export type RouteDefinition<TRequest = Buffer, TResponse = Buffer> = Pick<Route<TRequest, TResponse>, "path" | "codec">;
+export type RouteDefinition<TRequest, TResponse> = Pick<Route<TRequest, TResponse>, "path" | "codec">;
 
 export interface ReceiveContext {
 	readonly connection: Connection;
 	readonly route: Route<unknown, unknown>;
-	readonly request: { readonly payload: Buffer; data: unknown };
-	readonly response: { payload: Buffer; data: unknown };
+	readonly request: { readonly payload: Buffer; data?: unknown };
+	readonly response: { payload?: Buffer; data?: unknown };
 }
 
 // A step around the route handler on the receiving side. `before` steps run in binding order, `after` steps in reverse.
@@ -53,8 +52,8 @@ export interface SendContext {
 	// `any`: a Codec is invariant in its type parameters, so no single concrete instantiation fits every route.
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	readonly route: RouteDefinition<any, any>;
-	readonly request: { data: unknown; payload: Buffer };
-	readonly response: { statusCode: number; payload: Buffer; data: unknown };
+	readonly request: { readonly data: unknown; payload?: Buffer };
+	readonly response: { statusCode: number; payload: Buffer; data?: unknown };
 }
 
 // A step around an outgoing request. `before` steps run in binding order before the frame is sent,

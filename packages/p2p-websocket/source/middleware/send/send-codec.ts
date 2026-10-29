@@ -8,17 +8,11 @@ import { RequestError } from "../../errors.js";
 @injectable()
 export class SendCodecMiddleware implements SendMiddleware {
 	public async before(context: SendContext): Promise<void> {
-		const { codec } = context.route;
-		if (codec) {
-			context.request.payload = codec.request.serialize(context.request.data);
-		}
+		context.request.payload = context.route.codec.request.serialize(context.request.data);
 	}
 
 	public async after(context: SendContext): Promise<void> {
 		const { codec } = context.route;
-		if (!codec) {
-			return;
-		}
 
 		try {
 			context.response.data = codec.response.deserialize(context.response.payload);
