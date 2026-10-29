@@ -8,11 +8,15 @@
 	"main": "distribution/index.js",
 	"types": "distribution/index.d.ts",
 	"files": [
-		"/distribution"
+		"/distribution",
+		"/protos"
 	],
 	"scripts": {
 		"build": "tsc -b",
+		"build:proto": "pnpm pbjs && pnpm pbts",
 		"build:watch": "pnpm run clean && tsc -w",
+		"pbjs": "pbjs -t static-module -w esm -r p2pService protos/*.proto -o protos/protos.js",
+		"pbts": "pbts protos/protos.js -o protos/protos.d.ts",
 		"release": "pnpm publish --access public",
 		"test": "pnpm run uvu source .test.ts",
 		"test:coverage": "c8 --experimental-monocart -r=text -r=lcov --all pnpm run test",
@@ -24,10 +28,12 @@
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/p2p-websocket": "workspace:*",
-		"@mainsail/utils": "workspace:*"
+		"@mainsail/utils": "workspace:*",
+		"protobufjs": "8.7.2"
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
+		"protobufjs-cli": "2.6.2",
 		"uvu": "0.5.6"
 	},
 	"engines": {

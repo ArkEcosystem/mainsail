@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+import "shared.proto";
+
+package getStatus;
+
+message GetStatusRequest {
+    shared.Headers headers = 1;
+}
+
+message GetStatusResponse {
+    message State {
+        uint32 blockNumber = 1;
+		string blockHash = 2;
+    }
+
+    message Config {
+        message Network {
+            message Token {
+                string name = 1;
+                string symbol = 2;
+            }
+
+            string name = 1;
+            string nethash = 2;
+            string explorer = 3;
+            Token token = 4;
+            uint32 version = 5;
+        }
+
+        message Plugin {
+            uint32 port = 1;
+            bool enabled = 2;
+            bool estimateTotalCount = 3;
+        }
+
+        string version = 1;
+        Network network = 2;
+        map<string, Plugin> plugins = 3;
+    }
+
+	shared.Headers headers = 1;
+    State state = 2;
+    Config config = 3;
+}
