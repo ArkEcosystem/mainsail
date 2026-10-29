@@ -33,6 +33,7 @@
 	},
 	"devDependencies": {
 		"@mainsail/contracts": "workspace:*",
+		"@mainsail/test-runner": "workspace:*",
 		"protobufjs-cli": "2.6.2",
 		"uvu": "0.5.6"
 	},
