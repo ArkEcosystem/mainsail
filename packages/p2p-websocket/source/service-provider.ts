@@ -11,6 +11,7 @@ import { Connection, type ConnectionFactory, type ConnectionOptions } from "./co
 import { Dialer } from "./dialer.js";
 import { Listener } from "./listener.js";
 import { Logger } from "./logger.js";
+import { CodecMiddleware } from "./middleware/index.js";
 import { Router } from "./router.js";
 import { Server } from "./server.js";
 import { Service } from "./service.js";
@@ -34,6 +35,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.toFactory(
 				() => (ws: WebSocket, options: ConnectionOptions) => this.app.resolve(Connection).init(ws, options),
 			);
+		// Middleware runs in binding order; other packages may add steps under the same identifier.
+		this.app.bind(Identifiers.P2P.WebSocket.Middleware).to(CodecMiddleware).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Router).to(Router).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Listener).to(Listener).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Dialer).to(Dialer).inSingletonScope();
