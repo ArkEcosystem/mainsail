@@ -11,7 +11,14 @@ import { Logger } from "./logger.js";
 import { PeerRepository } from "./peer-repository.js";
 import { Peer } from "./peer.js";
 import { PendingCommits } from "./pending-commits.js";
-import { GetStatusRoute } from "./routes/index.js";
+import {
+	GetBlocksRoute,
+	GetMessagesRoute,
+	GetProposalRoute,
+	GetStatusRoute,
+	PostMessageRoute,
+	PostProposalRoute,
+} from "./routes/index.js";
 import { Service } from "./service.js";
 import { State } from "./state.js";
 
@@ -35,7 +42,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				.init(sanitizedIp, Number(this.#transportConfiguration().getRequired<number>("server.port")));
 		});
 
-		for (const route of [GetStatusRoute]) {
+		for (const route of [
+			GetBlocksRoute,
+			GetMessagesRoute,
+			GetProposalRoute,
+			GetStatusRoute,
+			PostMessageRoute,
+			PostProposalRoute,
+		]) {
 			this.app.bind(Identifiers.P2P.WebSocket.Routes).to(route).inSingletonScope();
 		}
 
