@@ -7,12 +7,17 @@ import { once } from "node:events";
 import WebSocket from "ws";
 
 import type { Direction } from "./enums.js";
-import type { RouteDefinition } from "./interfaces.js";
-import type { Sender } from "./sender.js";
+import type {
+	Connection as ConnectionInterface,
+	RequestHandler,
+	Response,
+	RouteDefinition,
+	RouteSender,
+} from "./interfaces/index.js";
 
 import { CloseReason, ConnectionState } from "./enums.js";
 import { ConnectionError } from "./errors.js";
-import { Handshake, RequestTable, type Response } from "./handlers/index.js";
+import { Handshake, RequestTable } from "./handlers/index.js";
 import { decode, encode, type Message, type RequestMessage } from "./message.js";
 
 export type ConnectionOptions = {
@@ -22,17 +27,14 @@ export type ConnectionOptions = {
 
 export type ConnectionFactory = (ws: WebSocket, options: ConnectionOptions) => Connection;
 
-// Set by the owner; answers requests from the peer. Throwing yields a 500 with an empty payload.
-export type RequestHandler = (path: string, payload: Buffer) => Promise<Response>;
-
 // One per socket, created through Identifiers.P2P.WebSocket.Connection.Factory and set up with init().
 @injectable()
-export class Connection {
+export class Connection implements ConnectionInterface {
 	@inject(Identifiers.P2P.WebSocket.Logger)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.P2P.WebSocket.Sender)
-	private readonly sender!: Sender;
+	private readonly sender!: RouteSender;
 
 	public onRequest?: RequestHandler;
 

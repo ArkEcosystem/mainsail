@@ -1,10 +1,9 @@
+import type { Response } from "../interfaces/index.js";
 import type { ResponseMessage } from "../message.js";
 
 import { constants } from "../constants.js";
 import { CloseReason } from "../enums.js";
 import { ConnectionError } from "../errors.js";
-
-type Response = { statusCode: number; payload: Buffer };
 
 type Pending = {
 	resolve: (response: Response) => void;
@@ -65,4 +64,4 @@ class RequestTable {
 	}
 }
 
-export { RequestTable, type Response };
+export { RequestTable };
