@@ -246,6 +246,8 @@ export const Identifiers = {
 			Middleware: Symbol("P2P<WebSocket.Middleware>"),
 			Router: Symbol("P2P<WebSocket.Router>"),
 			Routes: Symbol("P2P<WebSocket.Routes>"),
+			SendMiddleware: Symbol("P2P<WebSocket.SendMiddleware>"),
+			Sender: Symbol("P2P<WebSocket.Sender>"),
 			Server: Symbol("P2P<WebSocket.Server>"),
 			Service: Symbol("P2P<WebSocket.Service>"),
 		},
