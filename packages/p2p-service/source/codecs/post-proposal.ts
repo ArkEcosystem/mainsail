@@ -3,11 +3,10 @@ import { packHeadersBitmaps, unpackHeadersBitmaps, type WithUnpackedHeaders } fr
 
 export const postProposal = {
 	request: {
-		deserialize: (payload: Buffer): proto.PostProposalRequest.$Properties => {
+		deserialize: (payload: Buffer): WithUnpackedHeaders<proto.PostProposalRequest.$Properties> => {
 			const decoded = proto.PostProposalRequest.decode(payload);
-			unpackHeadersBitmaps(decoded);
 			return {
-				...decoded,
+				...unpackHeadersBitmaps(decoded),
 				proposal: Buffer.from(decoded.proposal),
 			};
 		},
@@ -15,12 +14,11 @@ export const postProposal = {
 			Buffer.from(proto.PostProposalRequest.encode(packHeadersBitmaps(object)).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): proto.PostProposalResponse.$Properties => {
+		deserialize: (payload: Buffer): WithUnpackedHeaders<proto.PostProposalResponse.$Properties> => {
 			const decoded = proto.PostProposalResponse.toObject(proto.PostProposalResponse.decode(payload), {
 				defaults: true,
 			});
-			unpackHeadersBitmaps(decoded);
-			return decoded;
+			return unpackHeadersBitmaps(decoded);
 		},
 		serialize: (object: WithUnpackedHeaders<proto.PostProposalResponse.$Properties>): Buffer =>
 			Buffer.from(proto.PostProposalResponse.encode(packHeadersBitmaps(object)).finish()),
