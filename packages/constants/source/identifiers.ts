@@ -188,9 +188,6 @@ export const Identifiers = {
 	Forger: {
 		Block: Symbol("Forger<Block>"),
 	},
-	P2PService: {
-		Service: Symbol("P2PService<Service>"),
-	},
 	P2P: {
 		ApiNode: {
 			Discoverer: Symbol("P2P<ApiNode.Discoverer>"),
@@ -251,6 +248,9 @@ export const Identifiers = {
 			Server: Symbol("P2P<WebSocket.Server>"),
 			Service: Symbol("P2P<WebSocket.Service>"),
 		},
+	},
+	P2PService: {
+		Service: Symbol("P2PService<Service>"),
 	},
 	Processor: {
 		BlockProcessor: Symbol("Processor<Block.Processor>"),
