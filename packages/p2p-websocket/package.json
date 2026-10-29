@@ -22,14 +22,13 @@
 	"dependencies": {
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/utils": "workspace:*",
 		"joi": "18.2.5",
 		"ws": "8.21.3"
 	},
 	"devDependencies": {
-		"@mainsail/test-runner": "workspace:*",
+		"@mainsail/contracts": "workspace:*",
 		"@types/ws": "8.18.1",
 		"uvu": "0.5.6"
 	},
