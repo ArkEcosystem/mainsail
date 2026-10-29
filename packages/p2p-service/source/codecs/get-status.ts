@@ -3,21 +3,19 @@ import { packHeadersBitmaps, unpackHeadersBitmaps, type WithUnpackedHeaders } fr
 
 export const getStatus = {
 	request: {
-		deserialize: (payload: Buffer): proto.GetStatusRequest.$Properties => {
+		deserialize: (payload: Buffer): WithUnpackedHeaders<proto.GetStatusRequest.$Properties> => {
 			const decoded = proto.GetStatusRequest.decode(payload);
-			unpackHeadersBitmaps(decoded);
-			return decoded;
+			return unpackHeadersBitmaps(decoded);
 		},
 		serialize: (object: WithUnpackedHeaders<proto.GetStatusRequest.$Properties>): Buffer =>
 			Buffer.from(proto.GetStatusRequest.encode(packHeadersBitmaps(object)).finish()),
 	},
 	response: {
-		deserialize: (payload: Buffer): proto.GetStatusResponse.$Properties => {
+		deserialize: (payload: Buffer): WithUnpackedHeaders<proto.GetStatusResponse.$Properties> => {
 			const decoded = proto.GetStatusResponse.toObject(proto.GetStatusResponse.decode(payload), {
 				defaults: true,
 			});
-			unpackHeadersBitmaps(decoded);
-			return decoded;
+			return unpackHeadersBitmaps(decoded);
 		},
 		serialize: (object: WithUnpackedHeaders<proto.GetStatusResponse.$Properties>): Buffer =>
 			Buffer.from(proto.GetStatusResponse.encode(packHeadersBitmaps(object)).finish()),

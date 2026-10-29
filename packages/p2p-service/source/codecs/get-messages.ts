@@ -14,11 +14,10 @@ type GetMessagesRequest = Omit<WithUnpackedHeaders<proto.GetMessagesRequest.$Pro
 
 export const getMessages = {
 	request: {
-		deserialize: (payload: Buffer): proto.GetMessagesRequest.$Properties => {
+		deserialize: (payload: Buffer): WithUnpackedHeaders<proto.GetMessagesRequest.$Properties> => {
 			const decoded = proto.GetMessagesRequest.decode(payload);
-			unpackHeadersBitmaps(decoded);
 			unpackBitmapsInPlace(decoded.query);
-			return decoded;
+			return unpackHeadersBitmaps(decoded);
 		},
 		serialize: (object: GetMessagesRequest): Buffer =>
 			Buffer.from(
@@ -31,12 +30,11 @@ export const getMessages = {
 			),
 	},
 	response: {
-		deserialize: (payload: Buffer): proto.GetMessagesResponse.$Properties => {
+		deserialize: (payload: Buffer): WithUnpackedHeaders<proto.GetMessagesResponse.$Properties> => {
 			const decoded = proto.GetMessagesResponse.toObject(proto.GetMessagesResponse.decode(payload), {
 				defaults: true,
 			});
-			unpackHeadersBitmaps(decoded);
-			return decoded;
+			return unpackHeadersBitmaps(decoded);
 		},
 		serialize: (object: WithUnpackedHeaders<proto.GetMessagesResponse.$Properties>): Buffer =>
 			Buffer.from(proto.GetMessagesResponse.encode(packHeadersBitmaps(object)).finish()),
