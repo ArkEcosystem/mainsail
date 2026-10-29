@@ -11,6 +11,7 @@ export * from "./interfaces.js";
 export * from "./listener.js";
 export * from "./logger.js";
 export * from "./message.js";
+export * from "./middleware/index.js";
 export * from "./router.js";
 export * from "./server.js";
 export * from "./service-provider.js";
