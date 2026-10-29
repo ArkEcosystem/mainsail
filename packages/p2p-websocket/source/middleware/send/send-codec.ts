@@ -1,6 +1,6 @@
 import { injectable } from "@mainsail/container";
 
-import type { SendContext, SendMiddleware } from "../../interfaces.js";
+import type { SendContext, SendMiddleware } from "../../interfaces/index.js";
 
 import { RequestError } from "../../errors.js";
 

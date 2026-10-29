@@ -1,5 +1,5 @@
 import type { Contracts } from "@mainsail/contracts";
-import type { Connection, Service as WebSocketService } from "@mainsail/p2p-websocket";
+import type { Interfaces, Service as WebSocketService } from "@mainsail/p2p-websocket";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
@@ -24,7 +24,7 @@ export class Service {
 	@inject(Identifiers.P2P.WebSocket.Service)
 	private readonly websocket!: WebSocketService;
 
-	readonly #connections = new Map<string, Connection>();
+	readonly #connections = new Map<string, Interfaces.Connection>();
 
 	#seeds: Seed[] = [];
 	#timer?: NodeJS.Timeout;
@@ -67,7 +67,7 @@ export class Service {
 		}
 	}
 
-	#track(connection: Connection): void {
+	#track(connection: Interfaces.Connection): void {
 		this.#connections.set(connection.remoteAddress, connection);
 		connection.onClose(() => {
 			if (this.#connections.get(connection.remoteAddress) === connection) {
@@ -76,7 +76,7 @@ export class Service {
 		});
 	}
 
-	async #getStatus(connection: Connection): Promise<void> {
+	async #getStatus(connection: Interfaces.Connection): Promise<void> {
 		const started = Date.now();
 
 		try {
