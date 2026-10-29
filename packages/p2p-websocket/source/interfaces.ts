@@ -34,18 +34,18 @@ export interface Route<TRequest = Buffer, TResponse = Buffer> {
 // so one definition drives both the handler and the typed client call.
 export type RouteDefinition<TRequest = Buffer, TResponse = Buffer> = Pick<Route<TRequest, TResponse>, "path" | "codec">;
 
-export interface RequestContext {
+export interface ReceiveContext {
 	readonly connection: Connection;
 	readonly route: Route<unknown, unknown>;
 	readonly request: { readonly payload: Buffer; data: unknown };
 	readonly response: { payload: Buffer; data: unknown };
 }
 
-// A step around the route handler. `before` steps run in binding order, `after` steps in reverse.
+// A step around the route handler on the receiving side. `before` steps run in binding order, `after` steps in reverse.
 // Throwing a RequestError ends the request with that status code.
-export interface Middleware {
-	before?(context: RequestContext): Promise<void>;
-	after?(context: RequestContext): Promise<void>;
+export interface ReceiveMiddleware {
+	before?(context: ReceiveContext): Promise<void>;
+	after?(context: ReceiveContext): Promise<void>;
 }
 
 export interface SendContext {
