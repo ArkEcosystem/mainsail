@@ -4,15 +4,11 @@ import type { ReceiveContext, ReceiveMiddleware } from "../../interfaces.js";
 
 import { RequestError } from "../../errors.js";
 
-// Decodes the request with the route's codec and encodes the response with it. Routes without a
-// codec are passed through untouched.
+// Decodes the request with the route's codec and encodes the response with it.
 @injectable()
 export class ReceiveCodecMiddleware implements ReceiveMiddleware {
 	public async before(context: ReceiveContext): Promise<void> {
 		const { codec } = context.route;
-		if (!codec) {
-			return;
-		}
 
 		try {
 			context.request.data = codec.request.deserialize(context.request.payload);
@@ -22,11 +18,6 @@ export class ReceiveCodecMiddleware implements ReceiveMiddleware {
 	}
 
 	public async after(context: ReceiveContext): Promise<void> {
-		const { codec } = context.route;
-		if (!codec) {
-			return;
-		}
-
-		context.response.payload = codec.response.serialize(context.response.data);
+		context.response.payload = context.route.codec.response.serialize(context.response.data);
 	}
 }

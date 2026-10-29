@@ -50,13 +50,7 @@ export class Router {
 			return { payload: Buffer.alloc(0), statusCode: 404 };
 		}
 
-		// Without middleware the handler sees the raw payload and must answer with a buffer.
-		const context: ReceiveContext = {
-			connection,
-			request: { data: payload, payload },
-			response: { data: undefined, payload: Buffer.alloc(0) },
-			route,
-		};
+		const context: ReceiveContext = { connection, request: { payload }, response: {}, route };
 
 		try {
 			for (const step of this.middleware) {
@@ -64,12 +58,13 @@ export class Router {
 			}
 
 			context.response.data = await route.handle(connection, context.request.data);
-			if (Buffer.isBuffer(context.response.data)) {
-				context.response.payload = context.response.data;
-			}
 
 			for (const step of [...this.middleware].reverse()) {
 				await step.after?.(context);
+			}
+
+			if (!context.response.payload) {
+				throw new Error(`No middleware encoded the ${path} response; is the codec middleware registered?`);
 			}
 		} catch (rawError) {
 			const error = ensureError(rawError);

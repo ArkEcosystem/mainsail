@@ -19,11 +19,10 @@ export class Sender {
 		route: RouteDefinition<TRequest, TResponse>,
 		data: TRequest,
 	): Promise<TResponse> {
-		// Without middleware the data must already be a buffer and the response stays one.
 		const context: SendContext = {
 			connection,
-			request: { data, payload: Buffer.isBuffer(data) ? data : Buffer.alloc(0) },
-			response: { data: undefined, payload: Buffer.alloc(0), statusCode: 0 },
+			request: { data },
+			response: { payload: Buffer.alloc(0), statusCode: 0 },
 			route,
 		};
 
@@ -31,10 +30,13 @@ export class Sender {
 			await step.before?.(context);
 		}
 
+		if (!context.request.payload) {
+			throw new Error(`No middleware encoded the ${route.path} request; is the codec middleware registered?`);
+		}
+
 		const response = await connection.request(route.path, context.request.payload);
 		context.response.statusCode = response.statusCode;
 		context.response.payload = response.payload;
-		context.response.data = response.payload;
 
 		if (response.statusCode !== 200) {
 			throw new RequestError(
