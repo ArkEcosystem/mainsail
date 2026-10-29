@@ -2670,6 +2670,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       protobufjs-cli:
         specifier: 2.6.2
         version: 2.6.2(protobufjs@8.7.2)
