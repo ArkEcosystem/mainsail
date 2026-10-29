@@ -5,13 +5,13 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
-import { GetStatus, Hello } from "./routes/index.js";
+import { GetStatus } from "./routes/index.js";
 
 const HELLO_INTERVAL = 1000;
 
 type Seed = { ip: string; port: number };
 
-// Keeps a connection to every seed in peers.json and, every second, says hello to each one and asks for its status.
+// Keeps a connection to every seed in peers.json and asks each one for its status every second.
 // Enough to watch the transport work between two real nodes; discovery and peers come later.
 @injectable()
 export class Service {
@@ -28,7 +28,6 @@ export class Service {
 
 	#seeds: Seed[] = [];
 	#timer?: NodeJS.Timeout;
-	#counter = 0;
 
 	public async boot(): Promise<void> {
 		// TEMPORARY: the same seeds as the old p2p, shifted to the port the new transport listens on.
@@ -51,9 +50,7 @@ export class Service {
 	async #tick(): Promise<void> {
 		await Promise.all(this.#seeds.map((seed) => this.#dialIfMissing(seed)));
 
-		this.#counter += 1;
 		for (const connection of this.#connections.values()) {
-			void this.#hello(connection);
 			void this.#getStatus(connection);
 		}
 	}
@@ -77,20 +74,6 @@ export class Service {
 				this.#connections.delete(connection.remoteAddress);
 			}
 		});
-	}
-
-	async #hello(connection: Connection): Promise<void> {
-		const started = Date.now();
-
-		try {
-			const response = await connection.send(Hello, Buffer.from(`hello #${this.#counter}`));
-			this.logger.info(
-				`${connection.direction} ${connection.remoteAddress}: "${response.toString()}" in ${Date.now() - started} ms`,
-				"p2p",
-			);
-		} catch (rawError) {
-			this.logger.warn(`hello to ${connection.remoteAddress} failed: ${ensureError(rawError).message}`, "p2p");
-		}
 	}
 
 	async #getStatus(connection: Connection): Promise<void> {
