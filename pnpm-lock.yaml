@@ -2663,6 +2663,9 @@ importers:
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
+      long:
+        specifier: 5.3.2
+        version: 5.3.2
       protobufjs:
         specifier: 8.7.2
         version: 8.7.2

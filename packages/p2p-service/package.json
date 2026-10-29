@@ -29,6 +29,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/p2p-websocket": "workspace:*",
 		"@mainsail/utils": "workspace:*",
+		"long": "5.3.2",
 		"protobufjs": "8.7.2"
 	},
 	"devDependencies": {
