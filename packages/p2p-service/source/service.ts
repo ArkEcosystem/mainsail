@@ -5,7 +5,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
-import { Codecs } from "./codecs/index.js";
+import { GetStatus, Hello } from "./routes/index.js";
 
 const HELLO_INTERVAL = 1000;
 
@@ -83,9 +83,9 @@ export class Service {
 		const started = Date.now();
 
 		try {
-			const response = await connection.request("hello", Buffer.from(`hello #${this.#counter}`));
+			const response = await connection.send(Hello, Buffer.from(`hello #${this.#counter}`));
 			this.logger.info(
-				`${connection.direction} ${connection.remoteAddress}: ${response.statusCode} "${response.payload.toString()}" in ${Date.now() - started} ms`,
+				`${connection.direction} ${connection.remoteAddress}: "${response.toString()}" in ${Date.now() - started} ms`,
 				"p2p",
 			);
 		} catch (rawError) {
@@ -97,13 +97,7 @@ export class Service {
 		const started = Date.now();
 
 		try {
-			const response = await connection.request("getStatus", Codecs.getStatus.request.serialize({}));
-			if (response.statusCode !== 200) {
-				this.logger.warn(`getStatus from ${connection.remoteAddress} answered ${response.statusCode}`, "p2p");
-				return;
-			}
-
-			const { state } = Codecs.getStatus.response.deserialize(response.payload);
+			const { state } = await connection.send(GetStatus, {});
 			this.logger.info(
 				`${connection.direction} ${connection.remoteAddress}: block ${state?.blockNumber} ${state?.blockHash} in ${Date.now() - started} ms`,
 				"p2p",

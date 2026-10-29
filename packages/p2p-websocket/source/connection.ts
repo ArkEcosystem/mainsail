@@ -7,6 +7,8 @@ import { once } from "node:events";
 import WebSocket from "ws";
 
 import type { Direction } from "./enums.js";
+import type { RouteDefinition } from "./interfaces.js";
+import type { Sender } from "./sender.js";
 
 import { CloseReason, ConnectionState } from "./enums.js";
 import { ConnectionError } from "./errors.js";
@@ -28,6 +30,9 @@ export type RequestHandler = (path: string, payload: Buffer) => Promise<Response
 export class Connection {
 	@inject(Identifiers.P2P.WebSocket.Logger)
 	private readonly logger!: Contracts.Kernel.Logger;
+
+	@inject(Identifiers.P2P.WebSocket.Sender)
+	private readonly sender!: Sender;
 
 	public onRequest?: RequestHandler;
 
@@ -111,7 +116,15 @@ export class Connection {
 		await this.#closed;
 	}
 
-	// Sends a request and resolves with the peer's response, or rejects on timeout or close.
+	// Typed request through the send middleware; see Sender.
+	public async send<TRequest, TResponse>(
+		route: RouteDefinition<TRequest, TResponse>,
+		data: TRequest,
+	): Promise<TResponse> {
+		return this.sender.send(this, route, data);
+	}
+
+	// Raw request: sends a frame and resolves with the peer's response, or rejects on timeout or close.
 	public async request(path: string, payload: Buffer): Promise<Response> {
 		if (this.#state !== ConnectionState.Open) {
 			throw new ConnectionError(CloseReason.NotOpen, `Connection is ${this.#state}`);

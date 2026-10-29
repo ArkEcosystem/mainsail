@@ -30,6 +30,10 @@ export interface Route<TRequest = Buffer, TResponse = Buffer> {
 	handle(connection: Connection, data: TRequest): Promise<TResponse>;
 }
 
+// What `send` needs from a route: the same object a Route implementation can spread into itself,
+// so one definition drives both the handler and the typed client call.
+export type RouteDefinition<TRequest = Buffer, TResponse = Buffer> = Pick<Route<TRequest, TResponse>, "path" | "codec">;
+
 export interface RequestContext {
 	readonly connection: Connection;
 	readonly route: Route<unknown, unknown>;
@@ -42,4 +46,20 @@ export interface RequestContext {
 export interface Middleware {
 	before?(context: RequestContext): Promise<void>;
 	after?(context: RequestContext): Promise<void>;
+}
+
+export interface SendContext {
+	readonly connection: Connection;
+	// `any`: a Codec is invariant in its type parameters, so no single concrete instantiation fits every route.
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	readonly route: RouteDefinition<any, any>;
+	readonly request: { data: unknown; payload: Buffer };
+	readonly response: { statusCode: number; payload: Buffer; data: unknown };
+}
+
+// A step around an outgoing request. `before` steps run in binding order before the frame is sent,
+// `after` steps in reverse once a 200 response is back. Throwing fails the send.
+export interface SendMiddleware {
+	before?(context: SendContext): Promise<void>;
+	after?(context: SendContext): Promise<void>;
 }
