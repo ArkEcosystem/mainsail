@@ -1,6 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
+import Joi from "joi";
 
 import { Logger } from "./logger.js";
 import { GetStatusRoute } from "./routes/index.js";
@@ -27,5 +28,27 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async dispose(): Promise<void> {
 		await this.app.get<Service>(Identifiers.P2PService.Service).dispose();
+	}
+
+	// Mirrors defaults.ts; the listening address is validated by @mainsail/p2p-websocket.
+	public configSchema(): Joi.AnySchema {
+		return Joi.object({
+			blacklist: Joi.array().items(Joi.string()).required(),
+			disableDiscovery: Joi.bool(),
+			getBlocksTimeout: Joi.number().integer().min(0).required(),
+			ignoreMinimumNetworkReach: Joi.bool(),
+			maxPeersBroadcast: Joi.number().integer().min(0).required(),
+			maxSameSubnetPeers: Joi.number().integer().min(0).required(),
+			minimumNetworkReach: Joi.number().integer().min(0).required(),
+			minimumVersions: Joi.array().items(Joi.string()).required(),
+			peerBanTime: Joi.number().integer().min(0).required(),
+			remoteAccess: Joi.array()
+				.items(Joi.string().ip({ version: ["ipv4", "ipv6"] }))
+				.required(),
+			skipPeerStateVerification: Joi.bool(),
+			txPoolPort: Joi.number().integer().min(0).required(),
+			verifyTimeout: Joi.number().integer().min(0).required(),
+			whitelist: Joi.array().items(Joi.string()).required(),
+		}).unknown(true);
 	}
 }
