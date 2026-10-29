@@ -2,13 +2,17 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject, optional, postConstruct } from "@mainsail/container";
+import { ensureError } from "@mainsail/utils";
 
 import type { Connection } from "./connection.js";
 import type { Response } from "./handlers/request-table.js";
-import type { Route } from "./interfaces.js";
+import type { Middleware, RequestContext, Route } from "./interfaces.js";
 
-// Maps request paths to routes. Any package can contribute a route by binding it under
-// Identifiers.P2P.WebSocket.Routes before the router is first resolved.
+import { RequestError } from "./errors.js";
+
+// Maps request paths to routes and runs each request through the middleware chain. Any package can
+// contribute routes and middleware by binding them under Identifiers.P2P.WebSocket.Routes and
+// Identifiers.P2P.WebSocket.Middleware before the router is first resolved.
 @injectable()
 export class Router {
 	@inject(Identifiers.P2P.WebSocket.Logger)
@@ -16,9 +20,13 @@ export class Router {
 
 	@multiInject(Identifiers.P2P.WebSocket.Routes)
 	@optional()
-	private readonly routes: Route[] = [];
+	private readonly routes: Route<unknown, unknown>[] = [];
 
-	readonly #byPath = new Map<string, Route>();
+	@multiInject(Identifiers.P2P.WebSocket.Middleware)
+	@optional()
+	private readonly middleware: Middleware[] = [];
+
+	readonly #byPath = new Map<string, Route<unknown, unknown>>();
 
 	@postConstruct()
 	public initialize(): void {
@@ -42,6 +50,37 @@ export class Router {
 			return { payload: Buffer.alloc(0), statusCode: 404 };
 		}
 
-		return route.handle(connection, payload);
+		// Without middleware the handler sees the raw payload and must answer with a buffer.
+		const context: RequestContext = {
+			connection,
+			request: { data: payload, payload },
+			response: { data: undefined, payload: Buffer.alloc(0) },
+			route,
+		};
+
+		try {
+			for (const step of this.middleware) {
+				await step.before?.(context);
+			}
+
+			context.response.data = await route.handle(connection, context.request.data);
+			if (Buffer.isBuffer(context.response.data)) {
+				context.response.payload = context.response.data;
+			}
+
+			for (const step of [...this.middleware].reverse()) {
+				await step.after?.(context);
+			}
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			const statusCode = error instanceof RequestError ? error.statusCode : 500;
+			this.logger.debug(
+				`${path} from ${connection.remoteAddress} failed (${statusCode}): ${error.message}`,
+				"p2p",
+			);
+			return { payload: Buffer.alloc(0), statusCode };
+		}
+
+		return { payload: context.response.payload, statusCode: 200 };
 	}
 }
