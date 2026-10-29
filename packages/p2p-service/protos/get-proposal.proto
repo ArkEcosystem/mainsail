@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+import "shared.proto";
+
+package getProposal;
+
+message GetProposalQuery {
+    uint32 blockNumber = 1;
+    uint32 round = 2;
+}
+
+message GetProposalRequest {
+    shared.Headers headers = 1;
+    GetProposalQuery query = 2;
+}
+
+message GetProposalResponse {
+	shared.Headers headers = 1;
+    bytes proposal = 2;
+}
