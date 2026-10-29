@@ -1,0 +1,80 @@
+import type { Contracts } from "@mainsail/contracts";
+
+import { Enums, Events, Identifiers } from "@mainsail/constants";
+import { inject, injectable } from "@mainsail/container";
+import { assert } from "@mainsail/utils";
+import dayjs from "dayjs";
+
+import { getPeerUrl } from "./utils/get-peer-url.js";
+
+@injectable()
+export class Peer implements Contracts.P2P.Peer {
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly events!: Contracts.Kernel.EventDispatcher;
+
+	public ip!: string;
+
+	public port!: number;
+
+	public protocol!: Contracts.P2P.PeerProtocol;
+
+	public readonly ports: Contracts.P2P.PeerPorts = {};
+
+	public version: string | undefined;
+
+	public latency: number | undefined;
+
+	public lastPinged: number | undefined;
+
+	public plugins: Contracts.P2P.PeerPlugins = {};
+
+	#header: Contracts.P2P.HeaderData | undefined;
+
+	public init(ip: string, port: number): Peer {
+		this.ip = ip;
+		this.port = port;
+		this.protocol = Enums.Api.Protocol.Http;
+
+		return this;
+	}
+
+	public get url(): string {
+		return getPeerUrl(this);
+	}
+
+	public get header(): Contracts.P2P.HeaderData {
+		// State can be undefined when the peer is not yet verified.
+		assert.defined(this.#header);
+
+		return this.#header;
+	}
+
+	public set header(header: Contracts.P2P.HeaderData) {
+		const previousHeader = this.#header;
+
+		this.#header = header;
+
+		if (previousHeader === undefined) {
+			return;
+		}
+
+		const changed =
+			previousHeader.blockNumber !== this.#header.blockNumber || previousHeader.version !== this.#header.version;
+		if (changed) {
+			void this.events.dispatch(Events.PeerEvent.Updated, this);
+		}
+	}
+
+	public setPinged(latency: number): void {
+		this.lastPinged = dayjs().valueOf();
+		this.latency = latency;
+	}
+
+	public toBroadcast(): Contracts.P2P.PeerBroadcast {
+		return {
+			ip: this.ip,
+			port: this.port,
+			protocol: this.protocol,
+		};
+	}
+}

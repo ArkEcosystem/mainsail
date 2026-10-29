@@ -1,17 +1,39 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
+import { assert, IpAddress } from "@mainsail/utils";
 import Joi from "joi";
 
+import { Header } from "./header.js";
 import { Logger } from "./logger.js";
+import { PeerRepository } from "./peer-repository.js";
+import { Peer } from "./peer.js";
+import { PendingCommits } from "./pending-commits.js";
 import { GetStatusRoute } from "./routes/index.js";
 import { Service } from "./service.js";
+import { State } from "./state.js";
 
 // Requires the @mainsail/p2p-websocket service provider to be registered first.
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.P2P.Logger).to(Logger).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Repository).to(PeerRepository).inSingletonScope();
+		this.app.bind(Identifiers.P2P.State).to(State).inSingletonScope();
+		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
+		this.app.bind<() => Header>(Identifiers.P2P.Header.Factory).toFactory(() => () => this.app.resolve(Header));
+
+		// Peers are assumed to listen on the same port we do; it is configured on the transport.
+		this.app.bind<(ip: string) => Peer>(Identifiers.P2P.Peer.Factory).toFactory(() => (ip: string) => {
+			const sanitizedIp = IpAddress.sanitizeRemoteAddress(ip);
+			assert.string(sanitizedIp);
+
+			return this.app
+				.resolve(Peer)
+				.init(sanitizedIp, Number(this.#transportConfiguration().getRequired<number>("server.port")));
+		});
 
 		for (const route of [GetStatusRoute]) {
 			this.app.bind(Identifiers.P2P.WebSocket.Routes).to(route).inSingletonScope();
@@ -28,6 +50,14 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	public async dispose(): Promise<void> {
 		await this.app.get<Service>(Identifiers.P2PService.Service).dispose();
+	}
+
+	#transportConfiguration(): Contracts.Kernel.PluginConfiguration {
+		return this.app.getTagged<Contracts.Kernel.PluginConfiguration>(
+			Identifiers.ServiceProvider.Configuration,
+			"plugin",
+			"p2p-websocket",
+		);
 	}
 
 	// Mirrors defaults.ts; the listening address is validated by @mainsail/p2p-websocket.
