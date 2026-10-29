@@ -6,13 +6,13 @@ import { ensureError } from "@mainsail/utils";
 
 import type { Connection } from "./connection.js";
 import type { Response } from "./handlers/request-table.js";
-import type { Middleware, RequestContext, Route } from "./interfaces.js";
+import type { ReceiveContext, ReceiveMiddleware, Route } from "./interfaces.js";
 
 import { RequestError } from "./errors.js";
 
 // Maps request paths to routes and runs each request through the middleware chain. Any package can
 // contribute routes and middleware by binding them under Identifiers.P2P.WebSocket.Routes and
-// Identifiers.P2P.WebSocket.Middleware before the router is first resolved.
+// Identifiers.P2P.WebSocket.ReceiveMiddleware before the router is first resolved.
 @injectable()
 export class Router {
 	@inject(Identifiers.P2P.WebSocket.Logger)
@@ -22,9 +22,9 @@ export class Router {
 	@optional()
 	private readonly routes: Route<unknown, unknown>[] = [];
 
-	@multiInject(Identifiers.P2P.WebSocket.Middleware)
+	@multiInject(Identifiers.P2P.WebSocket.ReceiveMiddleware)
 	@optional()
-	private readonly middleware: Middleware[] = [];
+	private readonly middleware: ReceiveMiddleware[] = [];
 
 	readonly #byPath = new Map<string, Route<unknown, unknown>>();
 
@@ -51,7 +51,7 @@ export class Router {
 		}
 
 		// Without middleware the handler sees the raw payload and must answer with a buffer.
-		const context: RequestContext = {
+		const context: ReceiveContext = {
 			connection,
 			request: { data: payload, payload },
 			response: { data: undefined, payload: Buffer.alloc(0) },
