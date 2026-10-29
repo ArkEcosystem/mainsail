@@ -13,6 +13,7 @@ export * from "./logger.js";
 export * from "./message.js";
 export * from "./middleware/index.js";
 export * from "./router.js";
+export * from "./sender.js";
 export * from "./server.js";
 export * from "./service-provider.js";
 export * from "./service.js";

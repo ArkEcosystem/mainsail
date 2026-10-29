@@ -1,18 +1,20 @@
-import type { Connection, Route } from "@mainsail/p2p-websocket";
+import type { Connection, Route, RouteDefinition } from "@mainsail/p2p-websocket";
 
 import { injectable } from "@mainsail/container";
 
 import { Codecs } from "../codecs/index.js";
 
 type Request = ReturnType<typeof Codecs.getStatus.request.deserialize>;
-type Response = Parameters<typeof Codecs.getStatus.response.serialize>[0];
+type Response = ReturnType<typeof Codecs.getStatus.response.deserialize>;
+
+export const GetStatus: RouteDefinition<Request, Response> = { codec: Codecs.getStatus, path: "getStatus" };
 
 // Same wire shape as the old p2p endpoint. State and config are fixed until the state store and
 // peer config are wired in; enough for peers to exchange a real protobuf message.
 @injectable()
 export class GetStatusRoute implements Route<Request, Response> {
-	public readonly path = "getStatus";
-	public readonly codec = Codecs.getStatus;
+	public readonly path = GetStatus.path;
+	public readonly codec = GetStatus.codec;
 
 	public async handle(_: Connection, __: Request): Promise<Response> {
 		return {
