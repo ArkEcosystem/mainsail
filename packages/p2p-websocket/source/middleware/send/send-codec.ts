@@ -1,8 +1,8 @@
 import { injectable } from "@mainsail/container";
 
-import type { SendContext, SendMiddleware } from "../interfaces.js";
+import type { SendContext, SendMiddleware } from "../../interfaces.js";
 
-import { RequestError } from "../errors.js";
+import { RequestError } from "../../errors.js";
 
 // Encodes an outgoing request with the route's codec and decodes the response with it.
 @injectable()

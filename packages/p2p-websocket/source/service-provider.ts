@@ -11,7 +11,7 @@ import { Connection, type ConnectionFactory, type ConnectionOptions } from "./co
 import { Dialer } from "./dialer.js";
 import { Listener } from "./listener.js";
 import { Logger } from "./logger.js";
-import { CodecMiddleware, SendCodecMiddleware } from "./middleware/index.js";
+import { ReceiveCodecMiddleware, SendCodecMiddleware } from "./middleware/index.js";
 import { Router } from "./router.js";
 import { Sender } from "./sender.js";
 import { Server } from "./server.js";
@@ -37,7 +37,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 				() => (ws: WebSocket, options: ConnectionOptions) => this.app.resolve(Connection).init(ws, options),
 			);
 		// Middleware runs in binding order; other packages may add steps under the same identifier.
-		this.app.bind(Identifiers.P2P.WebSocket.Middleware).to(CodecMiddleware).inSingletonScope();
+		this.app.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware).to(ReceiveCodecMiddleware).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.SendMiddleware).to(SendCodecMiddleware).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Router).to(Router).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Sender).to(Sender).inSingletonScope();
