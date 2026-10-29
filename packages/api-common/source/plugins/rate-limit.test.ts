@@ -125,6 +125,28 @@ describe<{
 		assert.defined(second.headers["retry-after"]);
 	});
 
+	it("should limit a request before the onRequest extensions registered after it and before routing", async () => {
+		const server = await makeServer({
+			blacklist: [],
+			duration: 60,
+			enabled: true,
+			points: 1,
+			trustProxy: false,
+			whitelist: [],
+		});
+
+		let checks = 0;
+		server.ext("onRequest", (_request, h) => {
+			checks++;
+			return h.continue;
+		});
+
+		assert.is((await server.inject({ method: "GET", remoteAddress: REMOTE, url: "/" })).statusCode, 200);
+		assert.is((await server.inject({ method: "GET", remoteAddress: REMOTE, url: "/" })).statusCode, 429);
+		assert.is((await server.inject({ method: "GET", remoteAddress: REMOTE, url: "/unknown" })).statusCode, 429);
+		assert.is(checks, 1);
+	});
+
 	it("should block a blacklisted IP with 429", async () => {
 		const server = await makeServer({
 			blacklist: [REMOTE],

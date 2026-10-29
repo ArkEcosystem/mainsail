@@ -4,22 +4,40 @@ import type { Criteria, Options, Pagination, ResultsPage, SortFragment, Sorting 
 import { Wallet } from "../models/wallet.js";
 import { WalletFilter } from "../search/filters/index.js";
 import { ValidatorFilter } from "../search/filters/validator-filter.js";
-import { makeExtendedRepository } from "./repository-extension.js";
+import { breakTies, makeExtendedRepository } from "./repository-extension.js";
 
-const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting): Sorting => {
+const columns = new Set(["address", "balance", "nonce", "publicKey"]);
+
+const validatorAttributes = new Map([
+	["blocks.last.hash", "validatorLastBlock.hash"],
+	["blocks.last.number", "validatorLastBlock.number"],
+	["blocks.produced", "validatorProducedBlocks"],
+	["forged.fees", "validatorForgedFees"],
+	["forged.rewards", "validatorForgedRewards"],
+	["forged.total", "validatorForgedTotal"],
+	["isResigned", "validatorResigned"],
+	["production.approval", "validatorApproval"],
+	["rank", "validatorRank"],
+	["votes", "validatorVoteBalance"],
+]);
+
+const convertToJsonbSorting = (sorting: Sorting, defaultSort: Sorting, validators: boolean = false): Sorting => {
 	if (sorting.length === 0) {
 		return defaultSort;
 	}
 
-	return sorting.map((item): SortFragment => ({
-		direction: item.direction,
-		jsonFieldAccessor: {
-			cast: "numeric",
-			fieldName: item.property.replace("attributes.", ""),
-			operator: "->>",
-		},
-		property: "attributes",
-	}));
+	return sorting.map(({ direction, property }): SortFragment =>
+		columns.has(property)
+			? { direction, property }
+			: {
+					direction,
+					jsonFieldAccessor: WalletFilter.getAttributeAccessor(
+						validatorAttributes.get(property) ?? property.replace(/^attributes\./, ""),
+						validators,
+					),
+					property: "attributes",
+				},
+	);
 };
 
 export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRepository =>
@@ -33,13 +51,7 @@ export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRe
 			const walletExpression = await WalletFilter.getExpression(walletCriteria);
 			return this.listByExpression(
 				walletExpression,
-				convertToJsonbSorting(sorting, [
-					{
-						direction: "desc",
-						jsonFieldAccessor: { cast: "numeric", fieldName: "balance", operator: "->>" },
-						property: "attributes",
-					},
-				]),
+				breakTies(convertToJsonbSorting(sorting, [{ direction: "desc", property: "balance" }]), "address"),
 				pagination,
 				options,
 			);
@@ -54,13 +66,22 @@ export const makeWalletRepository = (dataSource: RepositoryDataSource): WalletRe
 			const walletExpression = await ValidatorFilter.getExpression(validatorCriteria);
 			return this.listByExpression(
 				walletExpression,
-				convertToJsonbSorting(sorting, [
-					{
-						direction: "asc",
-						jsonFieldAccessor: { cast: "bigint", fieldName: "validatorRank", operator: "->>" },
-						property: "attributes",
-					},
-				]),
+				// the validator ranks break ties on the address in ascending order too
+				breakTies(
+					convertToJsonbSorting(
+						sorting,
+						[
+							{
+								direction: "asc",
+								jsonFieldAccessor: WalletFilter.getAttributeAccessor("validatorRank", true),
+								property: "attributes",
+							},
+						],
+						true,
+					),
+					"address",
+					"asc",
+				),
 				pagination,
 				options,
 			);

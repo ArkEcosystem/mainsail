@@ -9,6 +9,7 @@ import validators from "../config/validators.json" with { type: "json" };
 import { assertBlockHash, assertBlockNumber, assertCommitRound } from "./asserts.js";
 import type { Validator } from "./contracts.js";
 import { skipPrecommitInRound, skipPrevoteInRound } from "./faults.js";
+import type { Message } from "./p2p.js";
 import { P2PRegistry } from "./p2p.js";
 import { bootMany, bootstrapMany, restart, runMany, setup, stopMany } from "./setup.js";
 import {
@@ -56,6 +57,17 @@ describe<Context>("DoubleSign", ({ beforeEach, afterEach, it, assert, stub }) =>
 			.getMilestone().timeouts;
 
 		await new Promise((resolve) => setTimeout(resolve, blockPrepareTime + 2 * stageTimeout));
+	};
+
+	const snoozeUntilAcceptedByAll = async (p2p: P2PRegistry, messages: Message[]): Promise<void> => {
+		await snoozeUntil(() =>
+			messages.every(
+				(message) =>
+					p2p.results.get(message).filter((result) => result === Enums.Consensus.ProcessorResult.Accepted)
+						.length ===
+					totalNodes - 1,
+			),
+		);
 	};
 
 	const restartValidator = async (
@@ -128,6 +140,7 @@ describe<Context>("DoubleSign", ({ beforeEach, afterEach, it, assert, stub }) =>
 
 		await runMany(nodes);
 		await snoozeUntil(() => p2p.prevotes.getMessages(1, 0).length === 3);
+		await snoozeUntilAcceptedByAll(p2p, p2p.prevotes.getMessages(1, 0));
 
 		const [proposal] = p2p.proposals.getMessages(1, 0);
 		assert.defined(proposal);
@@ -166,6 +179,7 @@ describe<Context>("DoubleSign", ({ beforeEach, afterEach, it, assert, stub }) =>
 
 		await runMany(nodes);
 		await snoozeUntil(() => p2p.precommits.getMessages(1, 0).length === 3);
+		await snoozeUntilAcceptedByAll(p2p, p2p.precommits.getMessages(1, 0));
 
 		const [proposal] = p2p.proposals.getMessages(1, 0);
 		assert.defined(proposal);
@@ -202,6 +216,7 @@ describe<Context>("DoubleSign", ({ beforeEach, afterEach, it, assert, stub }) =>
 
 		await runMany(nodes);
 		await snoozeUntil(() => p2p.prevotes.getMessages(1, 0).length === 3);
+		await snoozeUntilAcceptedByAll(p2p, p2p.prevotes.getMessages(1, 0));
 
 		const [proposal] = p2p.proposals.getMessages(1, 0);
 		assert.defined(proposal);

@@ -1,4 +1,4 @@
-import type { FunctionReturning } from "./internal/index.js";
+import type { FunctionReturning } from "./types.js";
 
 export const groupBy = <T, K extends PropertyKey>(
 	iterable: T[],

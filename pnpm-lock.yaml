@@ -198,9 +198,6 @@ importers:
       '@hapi/hapi':
         specifier: 21.4.10
         version: 21.4.10
-      '@hapi/hoek':
-        specifier: 11.0.7
-        version: 11.0.7
       '@mainsail/api-database':
         specifier: workspace:*
         version: link:../api-database
@@ -2765,6 +2762,12 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
+      '@mainsail/crypto-hash-bcrypto':
+        specifier: workspace:*
+        version: link:../crypto-hash-bcrypto
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -2814,9 +2817,24 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-address-base58':
+        specifier: workspace:*
+        version: link:../crypto-address-base58
+      '@mainsail/crypto-address-keccak256':
+        specifier: workspace:*
+        version: link:../crypto-address-keccak256
+      '@mainsail/crypto-hash-bcrypto':
+        specifier: workspace:*
+        version: link:../crypto-hash-bcrypto
+      '@mainsail/crypto-key-pair-ecdsa':
+        specifier: workspace:*
+        version: link:../crypto-key-pair-ecdsa
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -3050,9 +3068,6 @@ importers:
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
-      '@mainsail/state':
-        specifier: workspace:*
-        version: link:../state
       '@mainsail/utils':
         specifier: workspace:*
         version: link:../utils
@@ -3062,6 +3077,9 @@ importers:
       fs-extra:
         specifier: 11.4.0
         version: 11.4.0
+      heap-js:
+        specifier: 2.7.1
+        version: 2.7.1
       joi:
         specifier: 18.2.5
         version: 18.2.5
@@ -3069,9 +3087,6 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
-      '@mainsail/crypto-config':
-        specifier: workspace:*
-        version: link:../crypto-config
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
@@ -7739,6 +7754,10 @@ packages:
   hasown@2.0.4:
     resolution: {integrity: sha512-T2UbfbBEF32wiepXIsMlTW9+dDYC6wMh/t/vYA4tuOMKqWz/n3vr1NFSxQiyP+zk2mXsoMA/i/7qV6LKut1t1A==}
     engines: {node: '>= 0.4'}
+
+  heap-js@2.7.1:
+    resolution: {integrity: sha512-EQfezRg0NCZGNlhlDR3Evrw1FVL2G3LhU7EgPoxufQKruNBSYA8MiRPHeWbU+36o+Fhel0wMwM+sLEiBAlNLJA==}
+    engines: {node: '>=10.0.0'}
 
   help-me@5.0.0:
     resolution: {integrity: sha512-7xgomUX6ADmcYzFik0HzAxh/73YlKR9bmFzf51CZwR+b6YtzU2m0u49hQCqV6SvlqIqsaxovfwdvbnsw3b/zpg==}
@@ -14550,6 +14569,8 @@ snapshots:
   hasown@2.0.4:
     dependencies:
       function-bind: 1.1.2
+
+  heap-js@2.7.1: {}
 
   help-me@5.0.0: {}
 

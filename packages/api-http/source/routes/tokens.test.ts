@@ -130,7 +130,7 @@ describe<{
 		await server.inject({ method: "GET", url: `/api/tokens/transfers?blacklist=${ADDRESS_A}` });
 
 		const blacklisted = (repos.tokenAction.qb.calls.andWhere ?? []).find(
-			([condition]) => condition === "tok.address NOT IN (:...customBlacklist)",
+			([condition]) => condition === "tf.address NOT IN (:...customBlacklist)",
 		);
 		assert.defined(blacklisted);
 		assert.equal(blacklisted![1], { customBlacklist: [ADDRESS_A] });
@@ -160,10 +160,8 @@ describe<{
 
 	it("GET /api/tokens/{address}/holders - lists the holders of the token", async ({ server, repos }) => {
 		repos.token.data.one = makeToken();
-		repos.tokenHolder.data.manyAndCount = [
-			[{ address: ADDRESS_A, balance: "12000000", tokenAddress: TOKEN_ADDRESS }],
-			1,
-		];
+		repos.tokenHolder.data.many = [{ address: ADDRESS_A, balance: "12000000", tokenAddress: TOKEN_ADDRESS }];
+		repos.dataSource.data.rawOne = { cnt: "1" };
 
 		const response = await server.inject({ method: "GET", url: `/api/tokens/${TOKEN_ADDRESS}/holders?limit=10` });
 
@@ -176,7 +174,7 @@ describe<{
 		// The holder listing is ordered and windowed by the query pagination.
 		assert.equal(repos.tokenHolder.qb.calls.orderBy, [["balance", "DESC"]]);
 		assert.equal(repos.tokenHolder.qb.calls.offset, [[0]]);
-		assert.equal(repos.tokenHolder.qb.calls.limit, [[10]]);
+		assert.equal(repos.tokenHolder.qb.calls.limit, [[10], [10_001]]);
 	});
 
 	it("GET /api/tokens/{address}/holders - responds 404 for an unknown token", async ({ server }) => {
@@ -186,8 +184,8 @@ describe<{
 	});
 
 	it("GET /api/tokens/transfers - lists transfer actions with token metadata", async ({ server, repos }) => {
-		repos.tokenAction.data.rawMany = [makeTransferRow()];
-		repos.tokenAction.data.rawOne = { cnt: "1" };
+		repos.dataSource.data.rawMany = [makeTransferRow()];
+		repos.dataSource.data.rawOne = { cnt: "1" };
 
 		const response = await server.inject({ method: "GET", url: "/api/tokens/transfers" });
 
@@ -227,8 +225,8 @@ describe<{
 
 		const flat = (repos.tokenAction.qb.calls.andWhere ?? []).map(([condition]) => condition);
 		assert.true(flat.includes("tf.transaction_hash = :transactionHash"));
-		// The addresses filter is applied as a bracketed from/to OR condition.
-		assert.true(flat.some((condition) => typeof condition === "object"));
+		assert.true(flat.includes('tf."from" = addresses.address'));
+		assert.true(flat.includes('tf."to" = addresses.address'));
 	});
 
 	it("GET /api/tokens/transfers - filters by from and to lists", async ({ server, repos }) => {
@@ -251,25 +249,7 @@ describe<{
 			url: `/api/tokens/transfers?addresses=${ADDRESS_A},${ADDRESS_B}`,
 		});
 
-		// The addresses filter is a bracketed from-or-to condition; replay it to see its parameters.
-		const [bracket] = repos.tokenAction.qb.calls.andWhere.at(-1)!;
-		const replayed: any[][] = [];
-		const recorder: any = {
-			orWhere: (...args: any[]) => {
-				replayed.push(args);
-				return recorder;
-			},
-			where: (...args: any[]) => {
-				replayed.push(args);
-				return recorder;
-			},
-		};
-		bracket.whereFactory(recorder);
-
-		assert.equal(replayed, [
-			["tf.from IN (:...addresses)", { addresses: [ADDRESS_A, ADDRESS_B] }],
-			["tf.to IN (:...addresses)", { addresses: [ADDRESS_A, ADDRESS_B] }],
-		]);
+		assert.equal(repos.tokenAction.qb.calls.setParameters[0][0].addresses, [ADDRESS_A, ADDRESS_B]);
 	});
 
 	it("GET /api/tokens/transfers - accepts comma separated from and to lists", async ({ server, repos }) => {
@@ -285,8 +265,8 @@ describe<{
 
 	it("GET /api/tokens/{address}/transfers - scopes the actions to the token", async ({ server, repos }) => {
 		repos.token.data.one = makeToken();
-		repos.tokenAction.data.rawMany = [makeTransferRow()];
-		repos.tokenAction.data.rawOne = { cnt: "1" };
+		repos.dataSource.data.rawMany = [makeTransferRow()];
+		repos.dataSource.data.rawOne = { cnt: "1" };
 
 		const response = await server.inject({ method: "GET", url: `/api/tokens/${TOKEN_ADDRESS}/transfers` });
 

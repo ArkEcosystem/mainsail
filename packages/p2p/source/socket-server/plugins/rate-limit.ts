@@ -6,6 +6,7 @@ import { inject, injectable, multiInject, tagged } from "@mainsail/container";
 
 import { RateLimiter } from "../../rate-limiter.js";
 import { buildRateLimiter } from "../../utils/build-rate-limiter.js";
+import { getPeerIp } from "../../utils/get-peer-ip.js";
 
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/typedef */
@@ -41,7 +42,7 @@ export class RateLimitPlugin {
 			method: async (request, h) => {
 				const endpoint = allRoutesConfigByPath[request.path].id;
 
-				if (await this.rateLimiter.hasExceededRateLimit(request.info.remoteAddress, endpoint)) {
+				if (await this.rateLimiter.hasExceededRateLimit(getPeerIp(request), endpoint)) {
 					return Boom.tooManyRequests("Rate limit exceeded");
 				}
 				return h.continue;

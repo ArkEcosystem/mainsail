@@ -33,6 +33,14 @@ describe<{
 		}
 	});
 
+	it("#toLegacySecondSignatureHash - should be ok", ({ hasher }) => {
+		const hash = hasher.toLegacySecondSignatureHash(
+			Buffer.from("64ff1ac71a06deb6a2d544786f8751b534c1c38284ccfa5faf2565d19b9f5151", "hex"),
+		);
+
+		assert.equal(hash.toString("hex"), "b5c9157468c8204f03389b61407f3caa91b76b28bcc158c9ab347984feb4c331");
+	});
+
 	it("#toHashUnsigned - should be ok", async ({ hasher }) => {
 		for (const [tx, expectedHash] of [
 			[Deserialized.transactionContractCall, "a037cecd15ad24cbccd89b7610f6d7e80482b935798230d3b22c897c91bddc51"],

@@ -6,6 +6,8 @@
     BSD Licensed
 */
 
+import type { Contracts } from "@mainsail/contracts";
+
 import WebSocket from "ws";
 
 import { parseNesMessage, stringifyNesMessage } from "./utilities.js";
@@ -23,21 +25,8 @@ const nextTick = function (callback) {
 	};
 };
 
-const NesError = function (err, type) {
-	if (typeof err === "string") {
-		err = new Error(err);
-	}
-
-	err.type = type;
-	err.isNes = true;
-
-	try {
-		throw err; // ensure stack trace for IE11
-	} catch (rawError) {
-		const error = ensureError(rawError);
-		return error;
-	}
-};
+export const NesError = (error: Error | string, type: string): Contracts.P2P.NesError =>
+	Object.assign(typeof error === "string" ? new Error(error) : error, { isNes: true as const, type });
 
 // Error codes
 
@@ -212,6 +201,8 @@ export class Client {
 		this._reconnectionTimer = null;
 
 		const reconnect = (event) => {
+			clearTimeout(timeout);
+
 			if (ws.onopen) {
 				finalize(NesError("Connection terminated while waiting to connect", errorTypes.WS));
 			}
@@ -254,21 +245,25 @@ export class Client {
 			}
 		};
 
-		const timeout = options.timeout ? setTimeout(timeoutHandler, options.timeout) : null;
+		const timeout = options.timeout ? setTimeout(timeoutHandler, options.timeout) : undefined;
 
 		ws.addEventListener("open", () => {
-			if (timeout) {
-				clearTimeout(timeout);
-			}
 			ws.onopen = null;
 
 			this._hello(options.auth)
 				.then(() => {
+					clearTimeout(timeout);
 					this.onConnect();
 					finalize(undefined);
 				})
 				.catch((error) => {
-					this._disconnect(() => nextTick(finalize)(error), true); // Stop reconnection when the hello message returns error
+					clearTimeout(timeout);
+
+					if (!next) {
+						return; // the connect timeout already finalized and its cleanup rejected the hello
+					}
+
+					this._disconnect(() => nextTick(finalize)(error), true, true);
 				});
 		});
 
@@ -326,7 +321,7 @@ export class Client {
 			this._ws = null;
 
 			if (ws.readyState !== WebSocket.CLOSED && ws.readyState !== WebSocket.CLOSING) {
-				ws.close();
+				ws.terminate();
 			}
 
 			ws.onopen = null;

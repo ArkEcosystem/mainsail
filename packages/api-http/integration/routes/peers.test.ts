@@ -38,7 +38,15 @@ describe<{
 		await apiContext.peerRepository.save(peers);
 
 		({ statusCode, data } = await request("/peers", options));
-		assert.equal(data.data, peers);
+		assert.equal(data.data, [peers[1], peers[0], peers[2]]);
+	});
+
+	it("/peers?orderBy", async () => {
+		await apiContext.peerRepository.save(peers);
+
+		const { statusCode, data } = await request("/peers?orderBy=blockNumber:asc", options);
+		assert.equal(statusCode, 200);
+		assert.equal(data.data, [peers[1], peers[2], peers[0]]);
 	});
 
 	it("/peers/{ip}", async () => {

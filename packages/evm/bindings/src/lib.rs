@@ -208,23 +208,21 @@ impl EvmInner {
         }
     }
 
-    pub fn initialize_genesis(
-        &mut self,
-        genesis_ctx: GenesisContext,
-    ) -> std::result::Result<(), EVMError<String>> {
-        match self.persistent_db.set_genesis_info(GenesisInfo {
+    pub fn initialize_genesis(&mut self, genesis_ctx: GenesisContext) {
+        self.persistent_db.set_genesis_info(GenesisInfo {
             account: genesis_ctx.account,
             deployer_account: genesis_ctx.deployer_account,
             validator_contract: genesis_ctx.validator_contract,
             username_contract: genesis_ctx.username_contract,
             initial_block_number: genesis_ctx.initial_block_number,
             initial_supply: genesis_ctx.initial_supply,
-        }) {
-            Ok(_) => Ok(()),
-            Err(err) => Err(EVMError::Database(
-                format!("set_genesis_info failed: {}", err).into(),
-            )),
-        }
+        });
+    }
+
+    pub fn seed_genesis_account(&self) -> std::result::Result<(), EVMError<String>> {
+        self.persistent_db.seed_genesis_account().map_err(|err| {
+            EVMError::Database(format!("seed_genesis_account failed: {}", err).into())
+        })
     }
 
     fn consensus_system_call(
@@ -464,18 +462,16 @@ impl EvmInner {
 
         let mut legacy_attributes = Default::default();
         if let Some(legacy_address) = legacy_address {
-            match self
+            if let Some(legacy_cold_wallet) = self
                 .persistent_db
-                .get_legacy_cold_wallet(legacy_address)
+                .get_mergeable_legacy_cold_wallet(address, legacy_address)
                 .map_err(|err| {
                     EVMError::Database(format!("legacy cold wallet lookup failed: {}", err).into())
-                })? {
-                Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
-                    // Merge cold wallet with account
-                    info.balance = info.balance.saturating_add(legacy_cold_wallet.balance);
-                    legacy_attributes = Some(legacy_cold_wallet.legacy_attributes);
-                }
-                _ => (),
+                })?
+            {
+                // Merge cold wallet with account
+                info.balance = info.balance.saturating_add(legacy_cold_wallet.balance);
+                legacy_attributes = Some(legacy_cold_wallet.legacy_attributes);
             }
         }
 
@@ -608,7 +604,7 @@ impl EvmInner {
             Some(legacy_address) => {
                 match self
                     .persistent_db
-                    .get_legacy_cold_wallet(legacy_address)
+                    .get_mergeable_legacy_cold_wallet(address, legacy_address)
                     .map_err(|err| {
                         EVMError::Database(
                             format!("legacy cold wallet attributes lookup failed: {}", err).into(),
@@ -821,13 +817,13 @@ impl EvmInner {
                     // Make legacy balance available to account in pending commit
                     match self
                         .persistent_db
-                        .get_legacy_cold_wallet(legacy_address)
+                        .get_mergeable_legacy_cold_wallet(tx_ctx.from, legacy_address)
                         .map_err(|err| {
                             EVMError::Database(
                                 format!("failed reading legacy cold wallet: {}", err).into(),
                             )
                         })? {
-                        Some(legacy_cold_wallet) if legacy_cold_wallet.merge_info.is_none() => {
+                        Some(legacy_cold_wallet) => {
                             // Snapshot before the merge so a later transaction failure can
                             // undo it. (An `apply_rewards` error is already self-healing: it
                             // restores the prestate cache and never sets the bookkeeping.)
@@ -859,7 +855,7 @@ impl EvmInner {
                                 .merged_legacy_cold_wallets
                                 .insert(tx_ctx.from, Some((tx_ctx.tx_hash, legacy_address)));
                         }
-                        _ => {
+                        None => {
                             // Prevent subsequent look ups for same sender in same commit
                             pending.merged_legacy_cold_wallets.insert(tx_ctx.from, None);
                         }
@@ -1527,7 +1523,19 @@ impl JsEvmWrapper {
     ) -> Result<PromiseRaw<'env, ()>> {
         let ctx = GenesisContext::try_from(genesis_ctx)?;
 
-        self.write(env, move |evm| evm.initialize_genesis(ctx), |_, _| Ok(()))
+        self.write(
+            env,
+            move |evm| {
+                evm.initialize_genesis(ctx);
+                Ok::<(), EVMError<String>>(())
+            },
+            |_, _| Ok(()),
+        )
+    }
+
+    #[napi]
+    pub fn seed_genesis_account<'env>(&mut self, env: &'env Env) -> Result<PromiseRaw<'env, ()>> {
+        self.write(env, move |evm| evm.seed_genesis_account(), |_, _| Ok(()))
     }
 
     #[napi]

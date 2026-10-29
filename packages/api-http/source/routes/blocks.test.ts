@@ -63,10 +63,17 @@ describe<{
 		assert.undefined(repos.wallet.qb.calls.getMany);
 	});
 
-	it("GET /api/blocks - rejects an unknown orderBy property", async ({ server }) => {
-		const response = await server.inject({ method: "GET", url: "/api/blocks?orderBy=nope:desc" });
+	it("GET /api/blocks - rejects criteria and orderBy properties blocks do not have", async ({ server }) => {
+		for (const url of [
+			"/api/blocks?orderBy=nope:desc",
+			"/api/blocks?orderBy=amount:desc",
+			"/api/blocks?amount=1",
+			"/api/blocks?payloadHash=ab",
+		]) {
+			const response = await server.inject({ method: "GET", url });
 
-		assert.is(response.statusCode, 422);
+			assert.is(response.statusCode, 422);
+		}
 	});
 
 	it("GET /api/blocks - rejects a limit above the configured maximum", async ({ server }) => {

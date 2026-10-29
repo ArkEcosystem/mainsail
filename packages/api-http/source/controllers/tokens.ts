@@ -30,6 +30,14 @@ type TokenTransferRaw = {
 	tokenDecimals: number;
 };
 
+const toStringArray = (value: unknown): string[] => {
+	if (!value) {
+		return [];
+	}
+
+	return (Array.isArray(value) ? value : String(value).split(",")).map((v) => String(v).trim()).filter(Boolean);
+};
+
 @injectable()
 export class TokensController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TokenRepositoryFactory)
@@ -88,19 +96,34 @@ export class TokensController extends Controller {
 
 		const pagination = this.getQueryPagination(request.query);
 
-		const [tokenHolders, totalCount] = await this.tokenHolderRepositoryFactory()
+		const tokenHoldersQuery = this.tokenHolderRepositoryFactory()
 			.createQueryBuilder()
 			.select()
-			.where("token_address = :address", { address: request.params.address })
-			.orderBy("balance", "DESC")
-			.addOrderBy("address", "ASC")
-			.offset(pagination.offset)
-			.limit(pagination.limit)
-			.getManyAndCount();
+			.where("token_address = :address", { address: request.params.address });
+
+		const [tokenHolders, totalCountRow] = await Promise.all([
+			tokenHoldersQuery
+				.clone()
+				.orderBy("balance", "DESC")
+				.addOrderBy("address", "ASC")
+				.offset(pagination.offset)
+				.limit(pagination.limit)
+				.getMany(),
+
+			this.dataSource
+				.createQueryBuilder()
+				.addCommonTableExpression(tokenHoldersQuery.clone().select("1").limit(10_001).getQuery(), "matching")
+				.select("COUNT(*)", "cnt")
+				.from("matching", "m")
+				.setParameters(tokenHoldersQuery.getParameters())
+				.getRawOne<{ cnt: string }>(),
+		]);
+
+		const totalCount = Number(totalCountRow?.cnt ?? 0);
 
 		return this.toPagination(
 			{
-				meta: { totalCountIsEstimate: false },
+				meta: { totalCountIsEstimate: totalCount > 10_000 },
 				results: tokenHolders,
 				totalCount,
 			},
@@ -148,10 +171,11 @@ export class TokensController extends Controller {
 		const pagination = this.getListingPage(request);
 		const tokenActionsQuery = this.tokenActionRepositoryFactory()
 			.createQueryBuilder("tf")
-			.innerJoin(Models.Token, "tok", "tok.address = tf.address")
 			.where("tf.action = :action", { action });
 
-		TokensController.andWhereWhitelisted(tokenActionsQuery, request);
+		if (!request.query.addresses) {
+			TokensController.andWhereTokenWhitelisted(tokenActionsQuery, request, "tf.address");
+		}
 
 		if (request.params.address) {
 			const token = await this.getToken(request.params.address);
@@ -173,13 +197,11 @@ export class TokensController extends Controller {
 				? request.query.addresses
 				: [request.query.addresses];
 
-			tokenActionsQuery.andWhere(
-				new TypeOrm.Brackets((b) => {
-					b.where("tf.from IN (:...addresses)", { addresses }).orWhere("tf.to IN (:...addresses)", {
-						addresses,
-					});
-				}),
-			);
+			tokenActionsQuery.setParameters({
+				addresses,
+				customBlacklist: toStringArray(request.query.blacklist),
+				customWhitelist: toStringArray(request.query.whitelist),
+			});
 		} else {
 			if (request.query.from) {
 				const from = Array.isArray(request.query.from) ? request.query.from : [request.query.from];
@@ -192,9 +214,41 @@ export class TokensController extends Controller {
 			}
 		}
 
+		// the actions of an address list are read per address, listed token and direction, each from its own index
+		// range, as the planner can only sort all of them when they are matched at once
+		const getAddressActions = (direction: "from" | "to", depth: number): string => {
+			const actions = tokenActionsQuery.clone().select("tf.*").andWhere(`tf."${direction}" = addresses.address`);
+			let listed = "";
+
+			if (!request.query.ignoreWhitelist) {
+				actions.andWhere("tf.address = listed.address");
+				listed = `CROSS JOIN (
+					SELECT address FROM token_whitelist
+					UNION SELECT unnest(CAST(:customWhitelist AS citext[]))
+					EXCEPT SELECT unnest(CAST(:customBlacklist AS citext[]))
+				) listed`;
+			}
+
+			if (direction === "to") {
+				actions.andWhere(`tf."from" <> ALL(CAST(:addresses AS citext[]))`);
+			}
+
+			return `SELECT x.* FROM (SELECT DISTINCT unnest(CAST(:addresses AS citext[])) AS address) addresses ${listed}
+				CROSS JOIN LATERAL (${actions.orderBy("tf.block_number", "DESC").addOrderBy("tf.index", "DESC").limit(depth).getQuery()}) x`;
+		};
+
+		const getActions = (depth: number): string =>
+			request.query.addresses
+				? `${getAddressActions("from", depth)} UNION ALL ${getAddressActions("to", depth)}`
+				: tokenActionsQuery.clone().select("tf.*").getQuery();
+
+		const page = `SELECT * FROM (${getActions(pagination.offset + pagination.limit)}) tf
+			ORDER BY tf.block_number DESC, tf.index DESC LIMIT ${pagination.limit} OFFSET ${pagination.offset}`;
+
 		const [tokenActionsRows, totalCountRow] = await Promise.all([
-			tokenActionsQuery
-				.clone()
+			this.dataSource
+				.createQueryBuilder()
+				.addCommonTableExpression(page, "page")
 				.select([
 					'tf."from" AS "from"',
 					'tf."to" AS "to"',
@@ -209,21 +263,28 @@ export class TokensController extends Controller {
 					'tok."symbol" AS "tokenSymbol"',
 					'tok."decimals" AS "tokenDecimals"',
 				])
+				.from("page", "tf")
+				.innerJoin(Models.Token, "tok", "tok.address = tf.address")
 				.innerJoin(Models.Transaction, "t", "t.hash = tf.transaction_hash")
-				.orderBy("tf.block_number", "DESC")
-				.addOrderBy("tf.index", "DESC")
-				.limit(pagination.limit)
-				.offset(pagination.offset)
+				.orderBy('tf."block_number"', "DESC")
+				.addOrderBy('tf."index"', "DESC")
+				.setParameters(tokenActionsQuery.getParameters())
 				.getRawMany<TokenTransferRaw>(),
 
-			tokenActionsQuery.clone().select("COUNT(1)", "cnt").getRawOne<{ cnt: string }>(),
+			this.dataSource
+				.createQueryBuilder()
+				.addCommonTableExpression(`SELECT 1 FROM (${getActions(10_001)}) tf LIMIT 10001`, "matching")
+				.select("COUNT(*)", "cnt")
+				.from("matching", "m")
+				.setParameters(tokenActionsQuery.getParameters())
+				.getRawOne<{ cnt: string }>(),
 		]);
 
 		const totalCount = Number(totalCountRow?.cnt ?? 0);
 
 		return this.toPagination(
 			{
-				meta: { totalCountIsEstimate: false },
+				meta: { totalCountIsEstimate: totalCount > 10_000 },
 				results: tokenActionsRows.map((row) => ({
 					/* eslint-disable perfectionist/sort-objects */
 					transactionHash: row.transactionHash,
@@ -255,6 +316,38 @@ export class TokensController extends Controller {
 			.getOne();
 	}
 
+	// Subqueries instead of joining tokens, which misleads the planner about the number of actions per token.
+	public static andWhereTokenWhitelisted(
+		queryBuilder: TypeOrm.SelectQueryBuilder<TypeOrm.ObjectLiteral>,
+		request: Types.HapiRequest,
+		column: string,
+	): void {
+		if (request.query.ignoreWhitelist) {
+			return;
+		}
+
+		const customWhitelist = toStringArray(request.query.whitelist);
+		const customBlacklist = toStringArray(request.query.blacklist);
+		const whitelisted = `${column} IN (SELECT address FROM token_whitelist)`;
+
+		if (customWhitelist.length === 0 && customBlacklist.length === 0) {
+			queryBuilder.andWhere(whitelisted);
+			return;
+		}
+
+		if (customWhitelist.length > 0) {
+			queryBuilder.andWhere(
+				new TypeOrm.Brackets((qb) => {
+					qb.where(whitelisted).orWhere(`${column} IN (:...customWhitelist)`, { customWhitelist });
+				}),
+			);
+		}
+
+		if (customBlacklist.length > 0) {
+			queryBuilder.andWhere(`${column} NOT IN (:...customBlacklist)`, { customBlacklist });
+		}
+	}
+
 	public static andWhereWhitelisted(
 		queryBuilder: TypeOrm.SelectQueryBuilder<TypeOrm.ObjectLiteral>,
 		request: Types.HapiRequest,
@@ -262,16 +355,6 @@ export class TokensController extends Controller {
 		if (request.query.ignoreWhitelist) {
 			return;
 		}
-
-		const toStringArray = (value: unknown): string[] => {
-			if (!value) {
-				return [];
-			}
-
-			return (Array.isArray(value) ? value : String(value).split(","))
-				.map((v) => String(v).trim())
-				.filter(Boolean);
-		};
 
 		const customWhitelist = toStringArray(request.query.whitelist);
 		const customBlacklist = toStringArray(request.query.blacklist);

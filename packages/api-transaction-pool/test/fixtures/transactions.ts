@@ -27,8 +27,8 @@ export const makeTransaction = (n: number) => {
 };
 
 // Mirrors the pool's QueryIterable semantics (see transaction-pool-service/source/query.ts):
-// predicates are AND-chained, first() and has() evaluate all(), first() throws when empty
-// and whereHash() is an exact-match predicate on the hash.
+// predicates are AND-chained, first() throws when empty and whereHash() is an exact-match
+// predicate on the hash.
 export const makeQueryIterable = (transactions: unknown[]) => {
 	const predicates: Array<(t: unknown) => Promise<boolean>> = [];
 	const iterable = {

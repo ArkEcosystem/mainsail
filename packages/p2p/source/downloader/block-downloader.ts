@@ -288,6 +288,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		// Skip if blockNumberFrom is higher than blockNumberTo
 		if (isFirstJob && blockNumberFrom > blockNumberTo) {
 			this.#downloadJobs.shift();
+			this.#processNextJob();
 			return;
 		}
 

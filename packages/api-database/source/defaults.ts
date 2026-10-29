@@ -4,6 +4,8 @@ import { Environment } from "@mainsail/kernel";
 export const defaults = {
 	database: {
 		applicationName: "mainsail/api-http",
+		// also bounds the wait for a pooled connection (pg-pool connectionTimeoutMillis)
+		connectTimeoutMS: 2000,
 		database: Environment.get(EnvironmentVariables.MAINSAIL_DB_DATABASE),
 		entityPrefix: "public.",
 		extra: {
@@ -17,6 +19,8 @@ export const defaults = {
 		logging: Environment.isTrue(EnvironmentVariables.MAINSAIL_DB_LOGGING_ENABLED),
 
 		password: Environment.get(EnvironmentVariables.MAINSAIL_DB_PASSWORD, "password"),
+
+		poolSize: 10,
 
 		port: Environment.get(EnvironmentVariables.MAINSAIL_DB_PORT, 5432),
 

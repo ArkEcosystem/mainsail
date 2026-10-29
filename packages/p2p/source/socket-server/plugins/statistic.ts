@@ -4,6 +4,8 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { performance } from "perf_hooks";
 
+import { getPeerIp } from "../../utils/get-peer-ip.js";
+
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/typedef */
 
@@ -29,7 +31,7 @@ export class StatisticPlugin {
 				}
 
 				const duration = Math.round(performance.now() - request.start);
-				this.statisticService.getCurrentRoundStatistic().addPing(request.info.remoteAddress, endpoint, {
+				this.statisticService.getCurrentRoundStatistic().addPing(getPeerIp(request), endpoint, {
 					responseTime: duration,
 					success: !request.response.isBoom,
 				});

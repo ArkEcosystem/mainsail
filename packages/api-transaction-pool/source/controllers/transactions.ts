@@ -9,8 +9,11 @@ import { inject, injectable } from "@mainsail/container";
 import { TransactionResource } from "../resources/index.js";
 
 // Pool addresses are EIP-55 checksummed while queries may use any casing.
-const matchesAddress = (value: string | undefined, parameter: string): boolean =>
-	value !== undefined && parameter.toLowerCase() === value.toLowerCase();
+const toAddresses = (parameter: string | string[]): Set<string> =>
+	new Set([parameter].flat().map((address) => address.toLowerCase()));
+
+const matchesAddress = (addresses: Set<string>, value: string | undefined): boolean =>
+	value !== undefined && addresses.has(value.toLowerCase());
 
 @injectable()
 export class TransactionsController extends AbstractController {
@@ -41,32 +44,19 @@ export class TransactionsController extends AbstractController {
 
 		const poolQuery = this.poolQuery.getFromHighestPriority();
 
-		const makePredicate = async (
-			transaction: Contracts.Crypto.Transaction,
-			key: Extract<keyof Contracts.Crypto.TransactionData, "to" | "from">,
-			parameter: string | string[],
-		): Promise<boolean> =>
-			Array.isArray(parameter)
-				? parameter.some((item) => matchesAddress(transaction[key], item))
-				: matchesAddress(transaction[key], parameter);
-
 		if (request.query.from) {
-			poolQuery.wherePredicate(async (t) => makePredicate(t, "from", request.query.from));
+			const from = toAddresses(request.query.from);
+			poolQuery.wherePredicate(async (t) => matchesAddress(from, t.from));
 		}
 
 		if (request.query.to) {
-			poolQuery.wherePredicate(async (t) => makePredicate(t, "to", request.query.to));
+			const to = toAddresses(request.query.to);
+			poolQuery.wherePredicate(async (t) => matchesAddress(to, t.to));
 		}
 
 		if (request.query.address) {
-			poolQuery.wherePredicate(async (t) => {
-				const [isFrom, isTo] = await Promise.all([
-					makePredicate(t, "from", request.query.address),
-					makePredicate(t, "to", request.query.address),
-				]);
-
-				return isFrom || isTo;
-			});
+			const addresses = toAddresses(request.query.address);
+			poolQuery.wherePredicate(async (t) => matchesAddress(addresses, t.from) || matchesAddress(addresses, t.to));
 		}
 
 		const all = await poolQuery.all();
@@ -80,7 +70,7 @@ export class TransactionsController extends AbstractController {
 	}
 
 	public async showUnconfirmed(request: Types.HapiRequest): Promise<object> {
-		const transactionQuery = this.poolQuery.getFromHighestPriority().whereHash(request.params.hash);
+		const transactionQuery = this.poolQuery.getAll().whereHash(request.params.hash);
 
 		if ((await transactionQuery.has()) === false) {
 			return notFound("Transaction not found");

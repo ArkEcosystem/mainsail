@@ -6,7 +6,7 @@ import { getPeerUrl } from "./get-peer-url";
 describe("getPeerUrl", ({ each, assert }) => {
 	each(
 		"should return peer url",
-		({ dataset, context }) => {
+		({ dataset }) => {
 			assert.equal(getPeerUrl(dataset[0]), dataset[1]);
 		},
 		[
@@ -18,6 +18,14 @@ describe("getPeerUrl", ({ each, assert }) => {
 			[{ ip: "127.0.0.1", port: 443, protocol: Enums.Api.Protocol.Http }, "https://127.0.0.1:443"],
 			// defaults to HTTP if unknown protocol
 			[{ ip: "127.0.0.1", port: 80, protocol: 5 }, "http://127.0.0.1:80"],
+			[
+				{ ip: "2001:3984:3989::104", port: 4003, protocol: Enums.Api.Protocol.Http },
+				"http://[2001:3984:3989::104]:4003",
+			],
+			[
+				{ ip: "2001:3984:3989::104", port: 443, protocol: Enums.Api.Protocol.Https },
+				"https://[2001:3984:3989::104]:443",
+			],
 		],
 	);
 });

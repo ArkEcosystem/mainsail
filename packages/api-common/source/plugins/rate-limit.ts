@@ -83,7 +83,7 @@ export const rateLimit = {
 
 				return h.continue;
 			},
-			type: "onPostAuth",
+			type: "onRequest",
 		});
 
 		server.ext({

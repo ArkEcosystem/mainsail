@@ -50,12 +50,16 @@ export class QueryHelper<TEntity> {
 				fullFieldPath = `${column.databaseName}${fullFieldPath}`;
 			}
 
+			if (jsonFieldAccessor.fallback !== undefined) {
+				fullFieldPath = `COALESCE(${fullFieldPath}, ${escapeLiteral(jsonFieldAccessor.fallback)})`;
+			}
+
 			if (jsonFieldAccessor.cast) {
 				// (column->'validatorBlock'->'last'->>'number')::bigint
 				fullFieldPath = `(${fullFieldPath})::${jsonFieldAccessor.cast}`;
 			}
 
-			return { isNullable: true, name: fullFieldPath };
+			return { isNullable: jsonFieldAccessor.fallback === undefined, name: fullFieldPath };
 		}
 
 		// Escape reserved keyword
@@ -79,7 +83,24 @@ export class QueryHelper<TEntity> {
 				const parameter = `p${this.paramNo++}`;
 				const query = `${column.name} = :${parameter}`;
 				const parameters = { [parameter]: expression.value };
-				return { parameters, query };
+
+				// an indexed field has statistics of its own, whose estimates a containment next to it would throw off
+				const accessor = expression.jsonFieldAccessor;
+				if (!accessor || accessor.indexed || this.mayMatchFallback(accessor, expression.value)) {
+					return { parameters, query };
+				}
+
+				const containment = this.getContainmentSql(metadata, expression.property, accessor, expression.value);
+
+				// the COALESCE of a fallback has no statistics, which would throw off the estimates of the containment
+				if (accessor.fallback !== undefined && this.containmentImpliesEquality(expression.value)) {
+					return containment;
+				}
+
+				return {
+					parameters: { ...parameters, ...containment.parameters },
+					query: `${containment.query} AND ${query}`,
+				};
 			}
 			case "notEqual": {
 				const column = this.getColumnName(metadata, expression.property, expression.jsonFieldAccessor);
@@ -127,20 +148,20 @@ export class QueryHelper<TEntity> {
 			case "and": {
 				const built = expression.expressions.map((e) => this.getWhereExpressionSql(metadata, e));
 				const query = `(${built.map((b) => b.query).join(" AND ")})`;
-				let parameters = {};
+				const parameters = {};
 
 				for (const b of built) {
-					parameters = Object.assign({}, parameters, b.parameters);
+					Object.assign(parameters, b.parameters);
 				}
 				return { parameters, query };
 			}
 			case "or": {
 				const built = expression.expressions.map((e) => this.getWhereExpressionSql(metadata, e));
 				const query = `(${built.map((b) => b.query).join(" OR ")})`;
-				let parameters = {};
+				const parameters = {};
 
 				for (const b of built) {
-					parameters = Object.assign({}, parameters, b.parameters);
+					Object.assign(parameters, b.parameters);
 				}
 				return { parameters, query };
 			}
@@ -164,14 +185,64 @@ export class QueryHelper<TEntity> {
 			}
 			case "multiPayment": {
 				const parameter = `p${this.paramNo++}`;
-				const query = `multi_payment_recipients @> ARRAY[:${parameter}]::citext[]`;
-
-				const parameters = { [parameter]: expression.value.join(",") };
+				const query = `multi_payment_recipients && ARRAY[:...${parameter}]::citext[]`;
+				const parameters = { [parameter]: expression.value };
+				return { parameters, query };
+			}
+			case "in": {
+				// one parameter per value, so each is typed from the column and its index stays usable
+				const column = this.getColumnName(metadata, expression.property);
+				const parameter = `p${this.paramNo++}`;
+				const query = `${column.name} IN (:...${parameter})`;
+				const parameters = { [parameter]: expression.values };
 				return { parameters, query };
 			}
 			default: {
 				throw new Error(`Unexpected expression`);
 			}
 		}
+	}
+
+	// containment leaves out the rows that lack the field, and a cast spells the fallback in more ways than one
+	private mayMatchFallback({ cast, fallback }: JsonFieldAccessor, value: unknown): boolean {
+		return fallback !== undefined && (cast !== undefined || String(value) === fallback);
+	}
+
+	// jsonb compares numbers by value, and pg binds a list as an array instead of its String()
+	private containmentImpliesEquality(value: unknown): boolean {
+		return (typeof value === "string" || typeof value === "boolean") && !/^-?\d+(\.\d+)?$/.test(String(value));
+	}
+
+	// Containment lets the GIN index narrow the rows down. The field may hold the value as a string, number or boolean.
+	private getContainmentSql(
+		metadata: EntityMetadata,
+		property: keyof TEntity,
+		{ fieldName }: JsonFieldAccessor,
+		rawValue: unknown,
+	): SqlExpression {
+		const column = this.getColumnName(metadata, property);
+		const value = String(rawValue);
+
+		const scalars = new Set([JSON.stringify(value)]);
+		if (/^-?\d+$/.test(value)) {
+			const integer = BigInt(value).toString();
+			scalars.add(integer).add(JSON.stringify(integer));
+		} else if (/^(-?\d+\.\d+|true|false)$/.test(value)) {
+			scalars.add(value);
+		}
+
+		const parameters: Record<string, string> = {};
+		const containments = [...scalars].map((scalar) => {
+			let json = scalar;
+			for (const key of fieldName.split(".").toReversed()) {
+				json = `{${JSON.stringify(key)}:${json}}`;
+			}
+
+			const parameter = `p${this.paramNo++}`;
+			parameters[parameter] = json;
+			return `${column.name} @> CAST(:${parameter} AS jsonb)`;
+		});
+
+		return { parameters, query: `(${containments.join(" OR ")})` };
 	}
 }

@@ -6,7 +6,7 @@ import { inject, injectable } from "@mainsail/container";
 import { pluralize } from "@mainsail/utils";
 
 import { constants } from "../../constants.js";
-import { mapAddr } from "../utils/map-addr.js";
+import { getPeerIp } from "../../utils/index.js";
 
 @injectable()
 export class GetBlocksController implements Contracts.P2P.Controller {
@@ -48,8 +48,8 @@ export class GetBlocksController implements Contracts.P2P.Controller {
 			maxBytes,
 		);
 
-		this.logger.info(
-			`${mapAddr(request.info.remoteAddress)} has downloaded ${pluralize(
+		this.logger.debug(
+			`${getPeerIp(request)} has downloaded ${pluralize(
 				"block",
 				blocks.length,
 				true,

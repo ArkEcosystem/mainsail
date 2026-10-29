@@ -1,5 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 import { describe } from "@mainsail/test-runner";
+import { encodeAbiParameters } from "viem";
 import { parseTransactionError } from "./transaction-error";
 
 describe("TransactionError", ({ it, assert }) => {
@@ -114,6 +115,23 @@ describe("TransactionError", ({ it, assert }) => {
 			} else {
 				assert.undefined(parsed);
 			}
+		}
+	});
+
+	it("should not decode a reason string that contains a NUL byte", () => {
+		for (const reason of ["a\u0000b", "\u0000", "a\u0000"]) {
+			const parsed = parseTransactionError(
+				{ gasLimit: 21000 } as Contracts.Crypto.Transaction,
+				{
+					output: Buffer.from(
+						`08c379a0${encodeAbiParameters([{ type: "string" }], [reason]).slice(2)}`,
+						"hex",
+					),
+					status: 0,
+				} as Contracts.Evm.TransactionReceipt,
+			);
+
+			assert.equal(parsed, "execution reverted");
 		}
 	});
 });

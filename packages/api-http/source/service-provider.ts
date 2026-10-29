@@ -30,6 +30,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 			trustProxy: boolean;
 			whitelist: string[];
 			socketTimeout: number;
+			pagination: { maxDepth?: number };
 			rateLimit: {
 				blacklist: string[];
 				duration: number;
@@ -57,7 +58,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 			{ plugin: Plugins.commaArrayQuery },
 			{ plugin: Plugins.dotSeparatedQuery },
 			{ plugin: Plugins.databaseReady },
-			{ plugin: Plugins.pagination },
+			{ options: { maxDepth: config.pagination.maxDepth }, plugin: Plugins.pagination },
 			{ plugin: Plugins.responseHeaders },
 		] as unknown as Plugin<unknown>[];
 	}
@@ -80,6 +81,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 					}).required(),
 					pagination: Joi.object({
 						limit: Joi.number().integer().min(0).required(),
+						maxDepth: Joi.number().integer().min(1),
 					}).required(),
 					rateLimit: Joi.object({
 						blacklist: Joi.array().items(Joi.string()).required(),

@@ -1,6 +1,7 @@
 import { describe } from "@mainsail/test-runner";
 
 import { QueryHelper } from "./query-helper";
+import { optimizeExpression } from "./search";
 
 const makeMetadata = (columns: any[]) => ({ columns }) as any;
 
@@ -147,7 +148,7 @@ describe<{
 		});
 	});
 
-	it("op equal uses jsonFieldAccessor when provided", ({ helper, metadata }) => {
+	it("op equal uses jsonFieldAccessor when provided, narrowed down by containment", ({ helper, metadata }) => {
 		assert.equal(
 			helper.getWhereExpressionSql(metadata, {
 				jsonFieldAccessor: { fieldName: "number", operator: "->>" },
@@ -155,8 +156,62 @@ describe<{
 				property: "data",
 				value: 5,
 			} as any),
-			{ parameters: { p1: 5 }, query: `data->>'number' = :p1` },
+			{
+				parameters: { p1: 5, p2: `{"number":"5"}`, p3: `{"number":5}` },
+				query: `(data @> CAST(:p2 AS jsonb) OR data @> CAST(:p3 AS jsonb)) AND data->>'number' = :p1`,
+			},
 		);
+	});
+
+	it("op equal on a json field contains the value as each form it can take", ({ helper, metadata }) => {
+		const containments = (value: unknown, fieldName = "a") => {
+			const { parameters } = helper.getWhereExpressionSql(metadata, {
+				jsonFieldAccessor: { cast: "numeric", fieldName, operator: "->>" },
+				op: "equal",
+				property: "data",
+				value,
+			} as any);
+			return Object.values(parameters).slice(1);
+		};
+
+		assert.equal(containments("x", "b.c"), [`{"b":{"c":"x"}}`]);
+		assert.equal(containments(true), [`{"a":"true"}`, `{"a":true}`]);
+		assert.equal(containments("1.5"), [`{"a":"1.5"}`, `{"a":1.5}`]);
+		assert.equal(containments("007"), [`{"a":"007"}`, `{"a":7}`, `{"a":"7"}`]);
+		assert.equal(containments("123456789012345678901234567890"), [
+			`{"a":"123456789012345678901234567890"}`,
+			`{"a":123456789012345678901234567890}`,
+		]);
+	});
+
+	it("op equal on a json field with a fallback is narrowed down by containment unless it may match the fallback", ({
+		metadata,
+	}) => {
+		const sql = (value: unknown, accessor: object) =>
+			new QueryHelper().getWhereExpressionSql(metadata, {
+				jsonFieldAccessor: { fieldName: "a", operator: "->>", ...accessor },
+				op: "equal",
+				property: "data",
+				value,
+			} as any).query;
+
+		const flag = { fallback: "false" };
+		const counter = { cast: "numeric", fallback: "0" };
+
+		assert.equal(sql("true", flag), "(data @> CAST(:p2 AS jsonb) OR data @> CAST(:p3 AS jsonb))");
+		assert.equal(sql(true, flag), "(data @> CAST(:p2 AS jsonb) OR data @> CAST(:p3 AS jsonb))");
+
+		assert.equal(
+			sql("7", flag),
+			"(data @> CAST(:p2 AS jsonb) OR data @> CAST(:p3 AS jsonb)) AND COALESCE(data->>'a', 'false') = :p1",
+		);
+		assert.equal(sql(["true", "x"], flag), "(data @> CAST(:p2 AS jsonb)) AND COALESCE(data->>'a', 'false') = :p1");
+		assert.equal(sql("x", {}), "(data @> CAST(:p2 AS jsonb)) AND data->>'a' = :p1");
+
+		assert.equal(sql("false", flag), "COALESCE(data->>'a', 'false') = :p1");
+		assert.equal(sql(false, flag), "COALESCE(data->>'a', 'false') = :p1");
+		assert.equal(sql("00", counter), "(COALESCE(data->>'a', '0'))::numeric = :p1");
+		assert.equal(sql("5", counter), "(COALESCE(data->>'a', '0'))::numeric = :p1");
 	});
 
 	it("op notEqual -> column <> :p1", ({ helper, metadata }) => {
@@ -226,10 +281,17 @@ describe<{
 		);
 	});
 
-	it("op multiPayment -> ARRAY citext with comma-joined value", ({ helper, metadata }) => {
+	it("op multiPayment -> overlap with a citext array of the recipients", ({ helper, metadata }) => {
 		assert.equal(helper.getWhereExpressionSql(metadata, { op: "multiPayment", value: ["a", "b"] } as any), {
-			parameters: { p1: "a,b" },
-			query: "multi_payment_recipients @> ARRAY[:p1]::citext[]",
+			parameters: { p1: ["a", "b"] },
+			query: "multi_payment_recipients && ARRAY[:...p1]::citext[]",
+		});
+	});
+
+	it("op in -> column IN expanded parameters, quoting reserved names", ({ helper, metadata }) => {
+		assert.equal(helper.getWhereExpressionSql(metadata, { op: "in", property: "to", values: ["a", "b"] } as any), {
+			parameters: { p1: ["a", "b"] },
+			query: '"to" IN (:...p1)',
 		});
 	});
 
@@ -263,6 +325,24 @@ describe<{
 			} as any),
 			{ parameters: { p1: 1, p2: 2 }, query: "(id = :p1 OR amount = :p2)" },
 		);
+	});
+
+	it("builds a long or-list in linear time", ({ helper, metadata }) => {
+		const values = Array.from({ length: 20_000 }, (_, index) => index);
+		const expression = optimizeExpression({
+			expressions: values.map((value) => ({
+				expressions: [{ op: "equal", property: "id", value }],
+				op: "or",
+			})),
+			op: "or",
+		} as any);
+
+		const started = performance.now();
+		const { parameters } = helper.getWhereExpressionSql(metadata, expression as any);
+
+		assert.length(Object.keys(parameters), values.length);
+		assert.equal(parameters["p20000"], 19_999);
+		assert.true(performance.now() - started < 1000);
 	});
 
 	it("nested and/or nest parentheses and keep a single monotonic parameter counter", ({ helper, metadata }) => {

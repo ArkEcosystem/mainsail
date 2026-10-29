@@ -16,7 +16,7 @@ export class PostMessageRoute extends Route {
 			"/postMessage": {
 				codec: Codecs.postMessage,
 				id: Routes.PostMessage,
-				maxBytes: constants.MAX_PAYLOAD_SERVER,
+				maxBytes: constants.MAX_PAYLOAD_POST_MESSAGE,
 				validation: Schemas.postMessage(this.cryptoConfiguration),
 			},
 		};

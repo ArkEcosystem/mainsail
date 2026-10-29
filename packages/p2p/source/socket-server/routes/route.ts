@@ -4,6 +4,8 @@ import Hapi from "@hapi/hapi";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 
+import { getPeerIp } from "../../utils/index.js";
+
 @injectable()
 export abstract class Route implements Contracts.P2P.Route {
 	@inject(Identifiers.Application.Instance)
@@ -27,6 +29,15 @@ export abstract class Route implements Contracts.P2P.Route {
 					id: config.id,
 					isInternal: !this.configuration.getRequired("developmentMode.enabled"), // Routes are exposed when developmentMode is enabled
 					payload: {
+						// A payload over maxBytes is rejected (413) while it is parsed, before the codec and
+						// validation plugins run, so none of them gets to ban the peer.
+						failAction: (request: Hapi.Request, _, error = new Error("Invalid payload")) => {
+							this.app
+								.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer)
+								.banPeer(getPeerIp(request as Contracts.P2P.Request), error);
+
+							throw error;
+						},
 						maxBytes: config.maxBytes,
 					},
 					validate: {

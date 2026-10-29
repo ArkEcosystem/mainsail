@@ -34,7 +34,6 @@ export const blockQueryLevelOptions = [
 	{ allowSecondOrderBy: true, asc: true, desc: true, diverse: true, field: "timestamp" },
 	{ allowSecondOrderBy: true, asc: true, desc: true, diverse: true, field: "number" },
 	{ allowSecondOrderBy: false, asc: true, desc: false, diverse: false, field: "transactionsCount" },
-	{ allowSecondOrderBy: false, asc: true, desc: false, diverse: false, field: "amount" },
 	{ allowSecondOrderBy: false, asc: true, desc: false, diverse: false, field: "fee" },
 	{ allowSecondOrderBy: false, asc: true, desc: true, diverse: false, field: "reward" },
 	{ allowSecondOrderBy: false, asc: false, desc: false, diverse: true, field: "hash" },

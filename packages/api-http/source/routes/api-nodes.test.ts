@@ -45,15 +45,21 @@ describe<{
 		assert.equal(JSON.parse(response.payload).data, []);
 	});
 
-	it("GET /api/api-nodes - forwards the ip filter as criteria", async ({ server, repos }) => {
-		await server.inject({ method: "GET", url: "/api/api-nodes?ip=127.0.0.1" });
+	it("GET /api/api-nodes - forwards the url filter as criteria", async ({ server, repos }) => {
+		await server.inject({ method: "GET", url: "/api/api-nodes?url=http://127.0.0.1:4003" });
 
 		const [criteria] = repos.apiNode.calls.findManyByCriteria[0];
-		assert.equal(criteria.ip, "127.0.0.1");
+		assert.equal(criteria.url, "http://127.0.0.1:4003");
 	});
 
-	it("GET /api/api-nodes - rejects a malformed ip filter", async ({ server }) => {
-		const response = await server.inject({ method: "GET", url: "/api/api-nodes?ip=not-an-ip" });
+	it("GET /api/api-nodes - rejects orderBy properties api nodes do not have", async ({ server }) => {
+		const response = await server.inject({ method: "GET", url: "/api/api-nodes?orderBy=unknown:asc" });
+
+		assert.is(response.statusCode, 422);
+	});
+
+	it("GET /api/api-nodes - rejects a malformed url filter", async ({ server }) => {
+		const response = await server.inject({ method: "GET", url: "/api/api-nodes?url=not-a-url" });
 
 		assert.is(response.statusCode, 422);
 	});

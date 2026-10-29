@@ -8,7 +8,7 @@ import type {
 	ValidatorProduction,
 	ValidatorResourceLastBlock,
 } from "../types/criteria.js";
-import type { Expression, JsonFieldCastType } from "../types/expressions.js";
+import type { Expression } from "../types/expressions.js";
 
 import { handleAndCriteria, handleComparisonCriteria, handleOrCriteria, optimizeExpression } from "../search.js";
 import { WalletFilter } from "./wallet-filter.js";
@@ -59,19 +59,10 @@ export class ValidatorFilter {
 				}
 
 				case "votes": {
-					return handleOrCriteria(criteria.votes, async (c) =>
-						// @ts-ignore
-						handleComparisonCriteria("attributes", c, {
-							fieldName: "validatorVoteBalance",
-							operator: "->>",
-						}),
-					);
+					return this.handleAttributeCriteria(criteria.votes, "validatorVoteBalance");
 				}
 				case "rank": {
-					return handleOrCriteria(criteria.rank, async (c) =>
-						// @ts-ignore
-						handleComparisonCriteria("attributes", c, { fieldName: "validatorRank", operator: "->>" }),
-					);
+					return this.handleAttributeCriteria(criteria.rank, "validatorRank");
 				}
 
 				case "isResigned": {
@@ -80,6 +71,14 @@ export class ValidatorFilter {
 						op: "equal",
 						property: "attributes",
 						value: c,
+					}));
+				}
+
+				case "username": {
+					return handleOrCriteria(criteria.username, async (c) => ({
+						op: "contains",
+						property: "attributes",
+						value: { username: c },
 					}));
 				}
 
@@ -97,7 +96,7 @@ export class ValidatorFilter {
 				case "attributes": {
 					return handleOrCriteria(criteria.attributes, async (c) =>
 						// @ts-ignore
-						WalletFilter.handleAttributesCriteria(c),
+						WalletFilter.handleAttributesCriteria(c, true),
 					);
 				}
 				default: {
@@ -107,31 +106,34 @@ export class ValidatorFilter {
 		});
 	}
 
+	private static async handleAttributeCriteria(
+		criteria: OrNumericCriteria<string | number> | undefined,
+		fieldName: string,
+	): Promise<Expression<Wallet>> {
+		return handleOrCriteria(criteria, async (c) =>
+			// @ts-ignore
+			handleComparisonCriteria("attributes", c, WalletFilter.getAttributeAccessor(fieldName, true)),
+		);
+	}
+
 	private static async handleForgedCriteria(criteria?: ValidatorForged): Promise<Expression<Wallet>> {
 		if (!criteria) {
 			return { op: "false" };
 		}
 
 		const expressions: Promise<Expression<Wallet>>[] = [];
-		const addExpression = (criteria: OrNumericCriteria<string>, fieldName: string) =>
-			expressions.push(
-				handleOrCriteria(criteria, async (c) =>
-					// @ts-ignore
-					handleComparisonCriteria("attributes", c, { fieldName, operator: "->>" }),
-				),
-			);
 
 		for (const item of criteria as ValidatorForged[]) {
 			if (item.fees) {
-				addExpression(item.fees, "validatorForgedFees");
+				expressions.push(this.handleAttributeCriteria(item.fees, "validatorForgedFees"));
 			}
 
 			if (item.rewards) {
-				addExpression(item.rewards, "validatorForgedRewards");
+				expressions.push(this.handleAttributeCriteria(item.rewards, "validatorForgedRewards"));
 			}
 
 			if (item.total) {
-				addExpression(item.total, "validatorForgedTotal");
+				expressions.push(this.handleAttributeCriteria(item.total, "validatorForgedTotal"));
 			}
 		}
 
@@ -144,17 +146,10 @@ export class ValidatorFilter {
 		}
 
 		const expressions: Promise<Expression<Wallet>>[] = [];
-		const addExpression = (criteria: OrNumericCriteria<string | number>, fieldName: string) =>
-			expressions.push(
-				handleOrCriteria(criteria, async (c) =>
-					// @ts-ignore
-					handleComparisonCriteria("attributes", c, { fieldName, operator: "->>" }),
-				),
-			);
 
 		for (const item of criteria as ValidatorBlocks[]) {
 			if (item.produced) {
-				addExpression(item.produced, "validatorProducedBlocks");
+				expressions.push(this.handleAttributeCriteria(item.produced, "validatorProducedBlocks"));
 			}
 
 			if (item.last) {
@@ -171,25 +166,14 @@ export class ValidatorFilter {
 		}
 
 		const expressions: Promise<Expression<Wallet>>[] = [];
-		const addExpression = (
-			criteria: OrNumericCriteria<string | number>,
-			fieldName: string,
-			cast?: JsonFieldCastType,
-		) =>
-			expressions.push(
-				handleOrCriteria(criteria, async (c) =>
-					// @ts-ignore
-					handleComparisonCriteria("attributes", c, { cast, fieldName, operator: "->>" }),
-				),
-			);
 
 		for (const item of criteria as ValidatorResourceLastBlock[]) {
 			if (item.hash) {
-				addExpression(item.hash, "validatorLastBlock.hash");
+				expressions.push(this.handleAttributeCriteria(item.hash, "validatorLastBlock.hash"));
 			}
 
 			if (item.number) {
-				addExpression(item.number, "validatorLastBlock.number", "bigint");
+				expressions.push(this.handleAttributeCriteria(item.number, "validatorLastBlock.number"));
 			}
 		}
 
@@ -202,17 +186,10 @@ export class ValidatorFilter {
 		}
 
 		const expressions: Promise<Expression<Wallet>>[] = [];
-		const addExpression = (criteria: OrNumericCriteria<string | number>, fieldName: string) =>
-			expressions.push(
-				handleOrCriteria(criteria, async (c) =>
-					// @ts-ignore
-					handleComparisonCriteria("attributes", c, { fieldName, operator: "->>" }),
-				),
-			);
 
 		for (const item of criteria as ValidatorProduction[]) {
 			if (item.approval) {
-				addExpression(item.approval, "validatorApproval");
+				expressions.push(this.handleAttributeCriteria(item.approval, "validatorApproval"));
 			}
 		}
 
