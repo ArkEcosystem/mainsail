@@ -67,6 +67,8 @@ export const unpackBitmapsInPlace = (object: BitmapFields | null | undefined): v
 	}
 };
 
-export const unpackHeadersBitmaps = (object: { headers?: unknown }): void => {
+// Unpacks in place and returns the same object with the honest type: the bitmaps are boolean arrays now.
+export const unpackHeadersBitmaps = <T extends { headers?: unknown }>(object: T): WithUnpackedHeaders<T> => {
 	unpackBitmapsInPlace(object.headers as BitmapFields | null | undefined);
+	return object as unknown as WithUnpackedHeaders<T>;
 };
