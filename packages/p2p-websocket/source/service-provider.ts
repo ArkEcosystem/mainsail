@@ -5,9 +5,11 @@ import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
+import type { ConnectionFactory, ConnectionOptions } from "./interfaces/index.js";
+
 import { BanList } from "./ban-list.js";
 import { ConnectionRepository } from "./connection-repository.js";
-import { Connection, type ConnectionFactory, type ConnectionOptions } from "./connection.js";
+import { Connection } from "./connection.js";
 import { Dialer } from "./dialer.js";
 import { Listener } from "./listener.js";
 import { Logger } from "./logger.js";
