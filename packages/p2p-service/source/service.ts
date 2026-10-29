@@ -5,11 +5,13 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
+import { Codecs } from "./codecs/index.js";
+
 const HELLO_INTERVAL = 1000;
 
 type Seed = { ip: string; port: number };
 
-// Keeps a connection to every seed in peers.json and says hello to each one every second.
+// Keeps a connection to every seed in peers.json and, every second, says hello to each one and asks for its status.
 // Enough to watch the transport work between two real nodes; discovery and peers come later.
 @injectable()
 export class Service {
@@ -52,6 +54,7 @@ export class Service {
 		this.#counter += 1;
 		for (const connection of this.#connections.values()) {
 			void this.#hello(connection);
+			void this.#getStatus(connection);
 		}
 	}
 
@@ -77,17 +80,39 @@ export class Service {
 	}
 
 	async #hello(connection: Connection): Promise<void> {
-		const payload = Buffer.from(`hello #${this.#counter}`);
 		const started = Date.now();
 
 		try {
-			const response = await connection.request("hello", payload);
+			const response = await connection.request("hello", Buffer.from(`hello #${this.#counter}`));
 			this.logger.info(
 				`${connection.direction} ${connection.remoteAddress}: ${response.statusCode} "${response.payload.toString()}" in ${Date.now() - started} ms`,
 				"p2p",
 			);
 		} catch (rawError) {
 			this.logger.warn(`hello to ${connection.remoteAddress} failed: ${ensureError(rawError).message}`, "p2p");
+		}
+	}
+
+	async #getStatus(connection: Connection): Promise<void> {
+		const started = Date.now();
+
+		try {
+			const response = await connection.request("getStatus", Codecs.getStatus.request.serialize({}));
+			if (response.statusCode !== 200) {
+				this.logger.warn(`getStatus from ${connection.remoteAddress} answered ${response.statusCode}`, "p2p");
+				return;
+			}
+
+			const { state } = Codecs.getStatus.response.deserialize(response.payload);
+			this.logger.info(
+				`${connection.direction} ${connection.remoteAddress}: block ${state?.blockNumber} ${state?.blockHash} in ${Date.now() - started} ms`,
+				"p2p",
+			);
+		} catch (rawError) {
+			this.logger.warn(
+				`getStatus from ${connection.remoteAddress} failed: ${ensureError(rawError).message}`,
+				"p2p",
+			);
 		}
 	}
 }
