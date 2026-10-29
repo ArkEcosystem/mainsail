@@ -109,10 +109,8 @@ export class GenesisBlockGenerator {
 			options.premine = transactions.reduce((accumulator, current) => accumulator + current.value, 0n).toString();
 		}
 
-		const validatorTransactions = presignedRegistrations ?? [
-			...(await this.#buildValidatorTransactions(validators, options.chainId, "0")),
-			...(await this.#buildVoteTransactions(validators, options.chainId)),
-		];
+		const validatorTransactions =
+			presignedRegistrations ?? (await this.#buildValidatorSetTransactions(validators, options));
 
 		transactions = [...transactions, ...validatorTransactions];
 
@@ -223,10 +221,58 @@ export class GenesisBlockGenerator {
 		return transactions;
 	}
 
+	// Validators whose address already exists in the legacy snapshot were added by the snapshot
+	// importer (without a BLS key), so they are updated in place instead of registered again. Their
+	// votes come from the snapshot as well; a self-vote would revert with VoteSameValidator.
+	async #buildValidatorSetTransactions(
+		validators: Wallet[],
+		options: Contracts.NetworkGenerator.InternalOptions,
+	): Promise<Contracts.Crypto.Transaction[]> {
+		const snapshotValidators = new Map<string, Contracts.Snapshot.ImportedLegacyValidator>();
+		if (options.snapshot) {
+			for (const validator of this.snapshotLegacyImporter.validators) {
+				snapshotValidators.set(validator.ethAddress.toLowerCase(), validator);
+			}
+		}
+
+		const newValidators: Wallet[] = [];
+		const existingValidators: Wallet[] = [];
+
+		for (const validator of validators) {
+			const snapshotValidator = snapshotValidators.get(validator.address.toLowerCase());
+
+			if (!snapshotValidator) {
+				newValidators.push(validator);
+				continue;
+			}
+
+			if (snapshotValidator.isResigned) {
+				throw new Error(
+					`validator ${validator.address} (${snapshotValidator.username}) is resigned in the snapshot and cannot become active`,
+				);
+			}
+
+			existingValidators.push(validator);
+		}
+
+		if (existingValidators.length > 0) {
+			this.logger.info(
+				`${existingValidators.length} of ${validators.length} validators already exist in the snapshot and are updated instead of registered`,
+			);
+		}
+
+		return [
+			...(await this.#buildValidatorTransactions(newValidators, options.chainId, "0", "registerValidator")),
+			...(await this.#buildValidatorTransactions(existingValidators, options.chainId, "0", "updateValidator")),
+			...(await this.#buildVoteTransactions(newValidators, options.chainId)),
+		];
+	}
+
 	async #buildValidatorTransactions(
 		senders: Wallet[],
 		chainId: number,
 		value: string,
+		functionName: "registerValidator" | "updateValidator",
 	): Promise<Contracts.Crypto.Transaction[]> {
 		const result: Contracts.Crypto.Transaction[] = [];
 
@@ -238,7 +284,7 @@ export class GenesisBlockGenerator {
 			const data = encodeFunctionData({
 				abi: ConsensusAbi.abi,
 				args: [`0x${sender.consensusKeys.publicKey}`, bytesToHex(pop)],
-				functionName: "registerValidator",
+				functionName,
 			});
 
 			result[index] = await (
@@ -246,7 +292,7 @@ export class GenesisBlockGenerator {
 					.resolve(TransactionBuilder)
 					.network(chainId)
 					.recipientAddress(this.app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus))
-					.nonce("0") // validator registration tx is always the first one from sender
+					.nonce("0") // validator registration/update tx is always the first one from sender
 					.payload(data)
 					.value(value)
 					.gasPrice(0)
