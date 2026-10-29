@@ -5,8 +5,7 @@ import { inject, injectable, multiInject, optional, postConstruct } from "@mains
 import { ensureError } from "@mainsail/utils";
 
 import type { Connection } from "./connection.js";
-import type { Response } from "./handlers/request-table.js";
-import type { ReceiveContext, ReceiveMiddleware, Route } from "./interfaces.js";
+import type { ReceiveContext, ReceiveMiddleware, Response, Route } from "./interfaces/index.js";
 
 import { RequestError } from "./errors.js";
 

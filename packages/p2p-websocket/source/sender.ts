@@ -1,15 +1,14 @@
 import { Identifiers } from "@mainsail/constants";
 import { injectable, multiInject, optional } from "@mainsail/container";
 
-import type { Connection } from "./connection.js";
-import type { RouteDefinition, SendContext, SendMiddleware } from "./interfaces.js";
+import type { Connection, RouteDefinition, RouteSender, SendContext, SendMiddleware } from "./interfaces/index.js";
 
 import { RequestError } from "./errors.js";
 
 // Typed client side of a route: runs the send middleware, sends the frame and hands back the
 // decoded response. A non-200 answer becomes a RequestError with that status code.
 @injectable()
-export class Sender {
+export class Sender implements RouteSender {
 	@multiInject(Identifiers.P2P.WebSocket.SendMiddleware)
 	@optional()
 	private readonly middleware: SendMiddleware[] = [];

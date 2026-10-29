@@ -1,6 +1,6 @@
 import { injectable } from "@mainsail/container";
 
-import type { ConnectionVerifier } from "./interfaces.js";
+import type { ConnectionVerifier } from "./interfaces/index.js";
 
 import { CloseReason } from "./enums.js";
 

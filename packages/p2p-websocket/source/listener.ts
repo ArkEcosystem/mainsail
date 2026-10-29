@@ -8,7 +8,7 @@ import { WebSocketServer } from "ws";
 
 import type { ConnectionRepository } from "./connection-repository.js";
 import type { Connection, ConnectionFactory } from "./connection.js";
-import type { ConnectionVerifier } from "./interfaces.js";
+import type { ConnectionVerifier } from "./interfaces/index.js";
 import type { Router } from "./router.js";
 
 import { constants } from "./constants.js";
