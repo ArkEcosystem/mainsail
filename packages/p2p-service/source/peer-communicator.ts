@@ -10,7 +10,7 @@ import { setTimeout as sleep } from "node:timers/promises";
 import type { Peer } from "./interfaces/index.js";
 
 import { constants } from "./constants.js";
-import { GetBlocks, GetMessages, GetProposal, GetStatus, PostMessage, PostProposal } from "./routes/index.js";
+import { GetBlocks, GetMessages, GetPeers, GetProposal, GetStatus, PostMessage, PostProposal } from "./routes/index.js";
 
 const DIAL_SPACING = 10_000;
 
@@ -29,6 +29,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	@inject(Identifiers.P2P.Header.Service)
 	private readonly headerService!: Contracts.P2P.HeaderService;
+
+	@inject(Identifiers.P2P.Logger)
+	private readonly logger!: Contracts.P2P.Logger;
 
 	public async postProposal(peer: Peer, proposal: Buffer): Promise<void> {
 		try {
@@ -76,8 +79,10 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return (await this.#emit(peer, GetMessages, { query })) as unknown as Contracts.P2P.GetMessagesResponse;
 	}
 
-	public async getPeers(): Promise<Contracts.P2P.GetPeersResponse> {
-		throw new Error("getPeers is not ported to @mainsail/p2p-service yet");
+	public async getPeers(peer: Peer): Promise<Contracts.P2P.GetPeersResponse> {
+		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`, "p2p");
+
+		return (await this.#emit(peer, GetPeers, {})) as unknown as Contracts.P2P.GetPeersResponse;
 	}
 
 	public async getApiNodes(): Promise<Contracts.P2P.GetApiNodesResponse> {
