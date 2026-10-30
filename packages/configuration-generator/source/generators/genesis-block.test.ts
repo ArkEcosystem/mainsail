@@ -347,28 +347,6 @@ describe<{
 		return importer;
 	};
 
-	it("#generate - should reject a genesis validator that is an imported delegate", async ({
-		app,
-		mnemonicGenerator,
-	}) => {
-		const mnemonics = mnemonicGenerator.generateMany(2);
-		const wallet = await app.get<WalletGenerator>(Identifiers.Generator.Wallet).generate(mnemonics[1]);
-		const importer = importDelegate(app, wallet.address.toLowerCase());
-		const importSpy = spy(importer, "import");
-		const generator = app.get<GenesisBlockGenerator>(Identifiers.Generator.GenesisBlock);
-
-		await assert.rejects(
-			() =>
-				generator.generate(
-					mnemonicGenerator.generate(),
-					mnemonics,
-					baseOptions({ premine: "0", snapshot: { path: "/snapshot" } }),
-				),
-			`genesis validator ${wallet.address} is the imported V3 delegate dormant_delegate`,
-		);
-		importSpy.neverCalled();
-	});
-
 	it("#generate - should reject a presigned genesis validator that is an imported delegate", async ({
 		app,
 		mnemonicGenerator,

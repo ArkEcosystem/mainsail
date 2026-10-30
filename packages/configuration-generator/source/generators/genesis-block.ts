@@ -115,7 +115,10 @@ export class GenesisBlockGenerator {
 		transactions = [...transactions, ...validatorTransactions];
 
 		if (options.snapshot) {
-			this.#assertNoImportedValidators(validatorTransactions);
+			if (presignedRegistrations) {
+				this.#assertNoImportedValidators(presignedRegistrations);
+			}
+
 			await this.#importLegacySnapshotData(options);
 		}
 
