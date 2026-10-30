@@ -1,5 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
+import { CloseReason } from "@mainsail/p2p-websocket";
 import { describe } from "@mainsail/test-runner";
 import dayjs from "dayjs";
 
@@ -27,12 +28,17 @@ describe<{
 }>("Service", ({ it, beforeEach, assert, clock, spy, stub }) => {
 	beforeEach((context) => {
 		context.logger = { debug: () => {}, error: () => {}, info: () => {}, warn: () => {} };
-		context.repository = { getPeers: () => [], hasMinimumPeers: () => true };
+		context.repository = { getPeers: () => [], hasMinimumPeers: () => true, hasPeer: () => false };
 		context.peerVerifier = { verify: async () => true };
 		context.state = { getLastMessageTime: () => dayjs() };
 		context.peerDiscoverer = { discoverPeers: async () => {}, populateSeedPeers: async () => {} };
-		context.peerProcessor = { validateAndAcceptPeer: async () => {} };
-		context.websocketService = { boot: async () => {}, dispose: async () => {}, onConnection: undefined };
+		context.peerProcessor = { validateAndAcceptPeer: async () => {}, validatePeerIp: () => true };
+		context.websocketService = {
+			accept: undefined,
+			boot: async () => {},
+			dispose: async () => {},
+			onConnection: undefined,
+		};
 		context.configuration = { getRequired: (key: string) => ({ verifyTimeout: 60_000 })[key] };
 
 		const app = new Application();
@@ -492,7 +498,12 @@ describe<{
 			info.calledWith("Discovered 2 peers with v0.0.1.", "p2p");
 			info.calledWith("Discovered 1 peer with v0.0.2.", "p2p");
 
-			// Inbound connections are handed to the processor.
+			// Inbound sockets are checked by the processor unless the peer is known; connections are handed to it.
+			assert.undefined(websocketService.accept("5.5.5.5"));
+			peerProcessor.validatePeerIp = () => false;
+			assert.equal(websocketService.accept("5.5.5.5"), CloseReason.Rejected);
+			repository.hasPeer = () => true;
+			assert.undefined(websocketService.accept("5.5.5.5"));
 			websocketService.onConnection({ remoteAddress: "5.5.5.5" });
 			validateAndAcceptPeer.calledWith("5.5.5.5");
 
@@ -502,6 +513,7 @@ describe<{
 			await service.dispose();
 			assert.equal(fakeTimers.countTimers(), 0);
 			dispose.calledOnce();
+			assert.undefined(websocketService.accept);
 			assert.undefined(websocketService.onConnection);
 		} finally {
 			await service.dispose();
