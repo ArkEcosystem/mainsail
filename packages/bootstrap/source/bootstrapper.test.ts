@@ -22,7 +22,6 @@ describe<{
 	evmWorker: any;
 	consensus: any;
 	consensusBootstrapper: any;
-	p2pServer: any;
 	p2pService: any;
 	apiSync: any;
 }>("Bootstrapper", ({ beforeEach, it, assert, spy, stub }) => {
@@ -106,10 +105,6 @@ describe<{
 			bootstrap: async () => consensusState,
 		};
 
-		context.p2pServer = {
-			boot: () => {},
-		};
-
 		context.p2pService = {
 			boot: () => {},
 		};
@@ -126,7 +121,6 @@ describe<{
 		app.bind(Identifiers.State.State).toConstantValue(context.state);
 		app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 		app.bind(Identifiers.Validator.Repository).toConstantValue(context.validatorRepository);
-		app.bind(Identifiers.P2P.Server).toConstantValue(context.p2pServer);
 		app.bind(Identifiers.P2P.Service).toConstantValue(context.p2pService);
 		app.bind(Identifiers.Cryptography.Commit.Factory).toConstantValue(context.commitFactory);
 		app.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
@@ -153,7 +147,6 @@ describe<{
 		evmWorker,
 		consensus,
 		consensusBootstrapper,
-		p2pServer,
 		p2pService,
 		apiSync,
 	}) => {
@@ -190,7 +183,6 @@ describe<{
 		const spyEvmWorkerStart = spy(evmWorker, "start");
 		const spyConsensusBootstrap = spy(consensusBootstrapper, "bootstrap");
 		const spyConsensusRun = spy(consensus, "run");
-		const spyP2PServerBoot = spy(p2pServer, "boot");
 		const spyP2PServiceBoot = spy(p2pService, "boot");
 		const spyApiSyncBootstrap = spy(apiSync, "bootstrap");
 
@@ -223,7 +215,6 @@ describe<{
 		spyConsensusBootstrap.calledOnce();
 		spyConsensusRun.calledOnce();
 		spyConsensusRun.calledWith(consensusState);
-		spyP2PServerBoot.calledOnce();
 		spyP2PServiceBoot.calledOnce();
 	});
 
@@ -239,7 +230,6 @@ describe<{
 		evmWorker,
 		consensus,
 		consensusBootstrapper,
-		p2pServer,
 		p2pService,
 		apiSync,
 	}) => {
@@ -273,7 +263,6 @@ describe<{
 		const spyEvmWorkerStart = spy(evmWorker, "start");
 		const spyConsensusBootstrap = spy(consensusBootstrapper, "bootstrap");
 		const spyConsensusRun = spy(consensus, "run");
-		const spyP2PServerBoot = spy(p2pServer, "boot");
 		const spyP2PServiceBoot = spy(p2pService, "boot");
 		const spyApiSyncBootstrap = spy(apiSync, "bootstrap");
 
@@ -306,7 +295,6 @@ describe<{
 		spyConsensusBootstrap.calledOnce();
 		spyConsensusRun.calledOnce();
 		spyConsensusRun.calledWith(consensusState);
-		spyP2PServerBoot.calledOnce();
 		spyP2PServiceBoot.calledOnce();
 	});
 
@@ -325,7 +313,6 @@ describe<{
 		evmWorker,
 		consensus,
 		consensusBootstrapper,
-		p2pServer,
 		p2pService,
 	}) => {
 		const milestone = {};
@@ -348,7 +335,6 @@ describe<{
 		const spyEvmWorkerStart = spy(evmWorker, "start");
 		const spyConsensusBootstrap = spy(consensusBootstrapper, "bootstrap");
 		const spyConsensusRun = spy(consensus, "run");
-		const spyP2PServerBoot = spy(p2pServer, "boot");
 		const spyP2PServiceBoot = spy(p2pService, "boot");
 
 		await bootstrapper.bootstrap();
@@ -379,7 +365,6 @@ describe<{
 		spyConsensusBootstrap.calledOnce();
 		spyConsensusRun.calledOnce();
 		spyConsensusRun.calledWith(consensusState);
-		spyP2PServerBoot.calledOnce();
 		spyP2PServiceBoot.calledOnce();
 	});
 
@@ -398,7 +383,6 @@ describe<{
 		evmWorker,
 		consensus,
 		consensusBootstrapper,
-		p2pServer,
 		p2pService,
 	}) => {
 		const genesisCommit = {
@@ -435,7 +419,6 @@ describe<{
 		const spyEvmWorkerStart = spy(evmWorker, "start");
 		const spyConsensusBootstrap = spy(consensusBootstrapper, "bootstrap");
 		const spyConsensusRun = spy(consensus, "run");
-		const spyP2PServerBoot = spy(p2pServer, "boot");
 		const spyP2PServiceBoot = spy(p2pService, "boot");
 
 		await bootstrapper.bootstrap();
@@ -467,7 +450,6 @@ describe<{
 		spyConsensusBootstrap.calledOnce();
 		spyConsensusRun.calledOnce();
 		spyConsensusRun.calledWith(consensusState);
-		spyP2PServerBoot.calledOnce();
 		spyP2PServiceBoot.calledOnce();
 	});
 
@@ -476,7 +458,6 @@ describe<{
 		databaseService,
 		consensus,
 		consensusBootstrapper,
-		p2pServer,
 		p2pService,
 	}) => {
 		// Restored before P2P is up, no proposal or message can reach the rules on the default state.
@@ -492,16 +473,13 @@ describe<{
 		stub(consensus, "run").callsFake(async () => {
 			calls.push("run");
 		});
-		stub(p2pServer, "boot").callsFake(async () => {
-			calls.push("p2pServer");
-		});
 		stub(p2pService, "boot").callsFake(async () => {
 			calls.push("p2pService");
 		});
 
 		await bootstrapper.bootstrap();
 
-		assert.equal(calls, ["bootstrap", "run", "p2pServer", "p2pService"]);
+		assert.equal(calls, ["bootstrap", "run", "p2pService"]);
 	});
 
 	it("should throw if stored genesis block doesn't match genesis block from config", async ({
