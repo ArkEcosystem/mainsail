@@ -19,7 +19,7 @@ const DIAL_SPACING = 10_000;
 @injectable()
 export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.P2P.WebSocket.Service)
-	private readonly websocket!: WebSocketService;
+	private readonly websocketService!: WebSocketService;
 
 	@inject(Identifiers.P2P.WebSocket.Connection.Repository)
 	private readonly connections!: ConnectionRepository;
@@ -114,7 +114,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 
 		peer.lastDialAt = Date.now();
-		const connection = await this.websocket.dial(`ws://${IpAddress.normalizeAddress(peer.ip)}:${peer.port}`);
+		const connection = await this.websocketService.dial(`ws://${IpAddress.normalizeAddress(peer.ip)}:${peer.port}`);
 		this.#attach(peer, connection);
 
 		return connection;

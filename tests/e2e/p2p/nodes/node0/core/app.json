@@ -85,9 +85,6 @@
 			"package": "@mainsail/crypto-commit"
 		},
 		{
-			"package": "@mainsail/p2p"
-		},
-		{
 			"package": "@mainsail/p2p-websocket"
 		},
 		{
@@ -113,9 +110,6 @@
 		},
 		{
 			"package": "@mainsail/consensus"
-		},
-		{
-			"package": "@mainsail/api-development"
 		},
 		{
 			"package": "@mainsail/webhooks"
