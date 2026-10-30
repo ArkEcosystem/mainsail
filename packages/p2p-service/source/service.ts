@@ -2,29 +2,46 @@ import type { Contracts } from "@mainsail/contracts";
 import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
-import { pluralize } from "@mainsail/utils";
+import { inject, injectable, tagged } from "@mainsail/container";
+import { ensureError, groupBy, pluralize, shuffle } from "@mainsail/utils";
+import dayjs from "dayjs";
 
+import { constants } from "./constants.js";
 import { percentile } from "./utils/index.js";
 
-// Minimal port of the @mainsail/p2p service: seeds and inbound peers go through the processor, which
-// verifies them and discovers further peers. No main loop, cleansing or API nodes yet.
+// Port of the @mainsail/p2p service without API nodes. It also owns the transport lifecycle, which the
+// old service left to the hapi server.
 @injectable()
 export class Service implements Contracts.P2P.Service {
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "p2p-service")
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
+
 	@inject(Identifiers.P2P.WebSocket.Service)
 	private readonly websocketService!: WebSocketService;
 
-	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly repository!: Contracts.P2P.PeerRepository;
-
-	@inject(Identifiers.P2P.Peer.Processor)
-	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
+	@inject(Identifiers.P2P.State)
+	private readonly state!: Contracts.P2P.State;
 
 	@inject(Identifiers.P2P.Peer.Discoverer)
 	private readonly peerDiscoverer!: Contracts.P2P.PeerDiscoverer;
 
-	@inject(Identifiers.P2P.Logger)
-	private readonly logger!: Contracts.P2P.Logger;
+	@inject(Identifiers.P2P.Peer.Processor)
+	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
+
+	@inject(Identifiers.P2P.Peer.Verifier)
+	private readonly peerVerifier!: Contracts.P2P.PeerVerifier;
+
+	@inject(Identifiers.P2P.Peer.Repository)
+	private readonly repository!: Contracts.P2P.PeerRepository;
+
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
+	#lastMinPeerCheck: dayjs.Dayjs = dayjs();
+	#verifyingPeers = new Set<string>();
+	#disposed = false;
+	#mainLoopTimeout?: NodeJS.Timeout = undefined;
 
 	public async boot(): Promise<void> {
 		if (process.env[EnvironmentVariables.MAINSAIL_ENV] === "test") {
@@ -39,12 +56,111 @@ export class Service implements Contracts.P2P.Service {
 
 		await this.peerDiscoverer.populateSeedPeers();
 
-		this.logger.info(`Discovered ${pluralize("peer", this.repository.getPeers().length, true)}.`, "p2p");
+		for (const [version, peers] of Object.entries(
+			groupBy(this.repository.getPeers(), (peer) => peer.version ?? "unknown"),
+		)) {
+			this.logger.info(`Discovered ${pluralize("peer", peers.length, true)} with v${version}.`, "p2p");
+		}
+
+		void this.mainLoop();
+	}
+
+	public async mainLoop(): Promise<void> {
+		try {
+			await this.#checkMinPeers();
+			await this.#checkReceivedMessages();
+		} catch (rawError) {
+			this.logger.error(`P2P main loop failed: ${ensureError(rawError).message}`, "p2p");
+		} finally {
+			if (!this.#disposed) {
+				this.#mainLoopTimeout = setTimeout(() => {
+					void this.mainLoop();
+				}, 2000);
+			}
+		}
 	}
 
 	public async dispose(): Promise<void> {
+		this.#disposed = true;
+		clearTimeout(this.#mainLoopTimeout);
+
 		this.websocketService.onConnection = undefined;
 		await this.websocketService.dispose();
+	}
+
+	async #checkMinPeers(): Promise<void> {
+		if (this.#lastMinPeerCheck.isAfter(dayjs().subtract(1, "minute"))) {
+			return;
+		}
+		this.#lastMinPeerCheck = dayjs();
+
+		if (!this.repository.hasMinimumPeers()) {
+			this.logger.info(`Couldn't find enough peers. Falling back to seed peers.`, "p2p");
+
+			await this.peerDiscoverer.populateSeedPeers();
+
+			for (const peer of shuffle(this.repository.getPeers()).slice(0, 8)) {
+				await this.peerDiscoverer.discoverPeers(peer);
+			}
+		}
+	}
+
+	async #checkReceivedMessages(): Promise<void> {
+		if (this.state.getLastMessageTime().isBefore(dayjs().subtract(8, "seconds"))) {
+			const peersCount = Math.max(Math.ceil(this.repository.getPeers().length * 0.2), 5);
+
+			await this.cleansePeers({
+				fast: true,
+				peerCount: peersCount,
+			});
+		}
+	}
+
+	public async cleansePeers({ fast, peerCount }: { fast: boolean; peerCount: number }): Promise<void> {
+		const peers = shuffle(this.repository.getPeers().filter((peer) => !this.#verifyingPeers.has(peer.ip))).slice(
+			0,
+			peerCount,
+		);
+
+		if (peers.length === 0) {
+			return;
+		}
+
+		let unresponsivePeers = 0;
+		const verifyTimeout = fast
+			? constants.FAST_VERIFY_TIMEOUT
+			: this.configuration.getRequired<number>("verifyTimeout");
+
+		this.logger.info(`Checking ${pluralize("peer", peers.length, true)}`, "p2p");
+
+		const verifications = Promise.all(
+			peers.map(async (peer) => {
+				this.#verifyingPeers.add(peer.ip);
+
+				try {
+					if (!(await this.peerVerifier.verify(peer))) {
+						unresponsivePeers++;
+					}
+				} finally {
+					this.#verifyingPeers.delete(peer.ip);
+				}
+			}),
+		).catch((rawError) => {
+			this.logger.error(`Peer verification failed: ${ensureError(rawError).message}`, "p2p");
+		});
+
+		let cutoff: NodeJS.Timeout | undefined;
+		await Promise.race([
+			verifications,
+			new Promise<void>((resolve) => {
+				cutoff = setTimeout(resolve, verifyTimeout);
+			}),
+		]);
+		clearTimeout(cutoff);
+
+		if (unresponsivePeers > 0) {
+			this.logger.debug(`Removed ${pluralize("peer", unresponsivePeers, true)}`, "p2p");
+		}
 	}
 
 	public getNetworkBlockNumberPercentile(p: number): number {
