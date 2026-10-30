@@ -23,6 +23,7 @@ describe<{
 	logger: any;
 	peerDiscoverer: any;
 	peerProcessor: any;
+	peerDisposer: any;
 	websocketService: any;
 	configuration: any;
 }>("Service", ({ it, beforeEach, assert, clock, spy, stub }) => {
@@ -33,6 +34,7 @@ describe<{
 		context.state = { getLastMessageTime: () => dayjs() };
 		context.peerDiscoverer = { discoverPeers: async () => {}, populateSeedPeers: async () => {} };
 		context.peerProcessor = { validateAndAcceptPeer: async () => {}, validatePeerIp: () => true };
+		context.peerDisposer = { disposePeers: async () => {} };
 		context.websocketService = {
 			accept: undefined,
 			boot: async () => {},
@@ -48,6 +50,7 @@ describe<{
 		app.bind(Identifiers.P2P.State).toConstantValue(context.state);
 		app.bind(Identifiers.P2P.Peer.Discoverer).toConstantValue(context.peerDiscoverer);
 		app.bind(Identifiers.P2P.Peer.Processor).toConstantValue(context.peerProcessor);
+		app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue(context.peerDisposer);
 		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
 		app.bind(Identifiers.P2P.Peer.Verifier).toConstantValue(context.peerVerifier);
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
@@ -471,6 +474,7 @@ describe<{
 		service,
 		websocketService,
 		peerProcessor,
+		peerDisposer,
 		peerDiscoverer,
 		repository,
 		logger,
@@ -507,12 +511,14 @@ describe<{
 			websocketService.onConnection({ remoteAddress: "5.5.5.5" });
 			validateAndAcceptPeer.calledWith("5.5.5.5");
 
-			// The loop timer is pending; dispose cancels it and stops the transport.
-			const dispose = spy(websocketService, "dispose");
+			// The loop timer is pending; dispose cancels it, disconnects the peers and then stops the transport.
+			const calls: string[] = [];
+			peerDisposer.disposePeers = async () => void calls.push("disposePeers");
+			websocketService.dispose = async () => void calls.push("transport");
 			assert.equal(fakeTimers.countTimers(), 1);
 			await service.dispose();
 			assert.equal(fakeTimers.countTimers(), 0);
-			dispose.calledOnce();
+			assert.equal(calls, ["disposePeers", "transport"]);
 			assert.undefined(websocketService.accept);
 			assert.undefined(websocketService.onConnection);
 		} finally {
