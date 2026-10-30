@@ -6,6 +6,7 @@ export * from "./header-service.js";
 export * from "./header.js";
 export * as Interfaces from "./interfaces/index.js";
 export * from "./logger.js";
+export * from "./middleware/index.js";
 export * from "./peer-communicator.js";
 export * from "./peer-disposer.js";
 export * from "./peer-repository.js";
