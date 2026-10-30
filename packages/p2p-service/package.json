@@ -26,7 +26,6 @@
 	"dependencies": {
 		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
-		"@mainsail/contracts": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/p2p-websocket": "workspace:*",
 		"@mainsail/utils": "workspace:*",

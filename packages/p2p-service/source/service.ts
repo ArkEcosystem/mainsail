@@ -1,95 +1,85 @@
 import type { Contracts } from "@mainsail/contracts";
-import type { Interfaces, Service as WebSocketService } from "@mainsail/p2p-websocket";
+import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
-import { Identifiers } from "@mainsail/constants";
+import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { ensureError } from "@mainsail/utils";
+import { IpAddress, pluralize } from "@mainsail/utils";
 
-import { GetStatus } from "./routes/index.js";
+import { percentile } from "./utils/index.js";
 
-const HELLO_INTERVAL = 1000;
-
-type Seed = { ip: string; port: number };
-
-// Keeps a connection to every seed in peers.json and asks each one for its status every second.
-// Enough to watch the transport work between two real nodes; discovery and peers come later.
+// Minimal port of the @mainsail/p2p service: seeds from peers.json and every peer that connects to us
+// are accepted as they are. No discovery, verification, cleansing or API nodes yet.
 @injectable()
-export class Service {
+export class Service implements Contracts.P2P.Service {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
-	@inject(Identifiers.Services.Log.Service)
-	private readonly logger!: Contracts.Kernel.Logger;
-
 	@inject(Identifiers.P2P.WebSocket.Service)
-	private readonly websocket!: WebSocketService;
+	private readonly websocketService!: WebSocketService;
 
-	readonly #connections = new Map<string, Interfaces.Connection>();
+	@inject(Identifiers.P2P.Peer.Repository)
+	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	#seeds: Seed[] = [];
-	#timer?: NodeJS.Timeout;
+	@inject(Identifiers.P2P.Peer.Factory)
+	private readonly peerFactory!: Contracts.P2P.PeerFactory;
+
+	@inject(Identifiers.P2P.Logger)
+	private readonly logger!: Contracts.P2P.Logger;
 
 	public async boot(): Promise<void> {
-		// TEMPORARY: the same seeds as the old p2p, shifted to the port the new transport listens on.
-		this.#seeds = (this.app.config<{ list: Seed[] }>("peers")?.list ?? []).map((seed) => ({
-			ip: seed.ip,
-			port: Number(seed.port) + 1,
-		}));
+		if (process.env[EnvironmentVariables.MAINSAIL_ENV] === "test") {
+			this.logger.info("Skipping P2P service boot, because test environment is used", "p2p");
 
-		this.websocket.onConnection = (connection) => this.#track(connection);
-		await this.websocket.boot();
-
-		this.#timer = setInterval(() => void this.#tick(), HELLO_INTERVAL);
-	}
-
-	public async dispose(): Promise<void> {
-		clearInterval(this.#timer);
-		await this.websocket.dispose();
-	}
-
-	async #tick(): Promise<void> {
-		await Promise.all(this.#seeds.map((seed) => this.#dialIfMissing(seed)));
-
-		for (const connection of this.#connections.values()) {
-			void this.#getStatus(connection);
-		}
-	}
-
-	async #dialIfMissing(seed: Seed): Promise<void> {
-		if (this.#connections.has(seed.ip)) {
 			return;
 		}
 
-		try {
-			this.#track(await this.websocket.dial(`ws://${seed.ip}:${seed.port}`));
-		} catch (rawError) {
-			this.logger.info(`Dial to ${seed.ip}:${seed.port} failed: ${ensureError(rawError).message}`, "p2p");
+		this.websocketService.onConnection = (connection) => this.#acceptPeer(connection.remoteAddress);
+		await this.websocketService.boot();
+
+		await this.#populateSeedPeers();
+
+		this.logger.info(`Discovered ${pluralize("peer", this.repository.getPeers().length, true)}.`, "p2p");
+	}
+
+	public async dispose(): Promise<void> {
+		this.websocketService.onConnection = undefined;
+		await this.websocketService.dispose();
+	}
+
+	public getNetworkBlockNumberPercentile(p: number): number {
+		// Headers are set by verification, which this package does not do yet; peers without one are skipped.
+		const blockNumbers: number[] = [];
+		for (const peer of this.repository.getPeers()) {
+			try {
+				blockNumbers.push(peer.header.blockNumber);
+			} catch {}
+		}
+
+		return percentile(blockNumbers, p);
+	}
+
+	async #populateSeedPeers(): Promise<void> {
+		const peerList = this.app.config<{ list: Contracts.P2P.PeerData[] }>("peers")?.list ?? [];
+
+		if (peerList.length === 0) {
+			await this.app.terminate("No seed peers defined in peers.json");
+		}
+
+		for (const { ip } of peerList) {
+			this.#acceptPeer(ip);
 		}
 	}
 
-	#track(connection: Interfaces.Connection): void {
-		this.#connections.set(connection.remoteAddress, connection);
-		connection.onClose(() => {
-			if (this.#connections.get(connection.remoteAddress) === connection) {
-				this.#connections.delete(connection.remoteAddress);
-			}
-		});
-	}
-
-	async #getStatus(connection: Interfaces.Connection): Promise<void> {
-		const started = Date.now();
-
-		try {
-			const { state } = await connection.send(GetStatus, {});
-			this.logger.info(
-				`${connection.direction} ${connection.remoteAddress}: block ${state?.blockNumber} ${state?.blockHash} in ${Date.now() - started} ms`,
-				"p2p",
-			);
-		} catch (rawError) {
-			this.logger.warn(
-				`getStatus from ${connection.remoteAddress} failed: ${ensureError(rawError).message}`,
-				"p2p",
-			);
+	// Own and loopback addresses are skipped as in @mainsail/p2p; everything else is trusted for now.
+	#acceptPeer(ip: string): void {
+		if (!IpAddress.isValidPeerIp(ip) || this.repository.hasPeer(ip)) {
+			return;
 		}
+
+		const peer = this.peerFactory(ip);
+		peer.version = this.app.version();
+
+		this.repository.setPeer(peer);
+		this.logger.debug(`Accepted peer ${peer.ip}:${peer.port}`, "p2p");
 	}
 }
