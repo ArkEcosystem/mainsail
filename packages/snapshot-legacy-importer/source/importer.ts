@@ -5,6 +5,7 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { ConsensusAbi, parseTransactionError, UsernamesAbi } from "@mainsail/evm-contracts";
 import { Interfaces } from "@mainsail/snapshot-legacy-exporter";
 import { assert, chunk, ensureError } from "@mainsail/utils";
+import { base58 } from "bstring";
 import { createHash } from "node:crypto";
 import { promisify } from "node:util";
 import { brotliDecompress } from "node:zlib";
@@ -64,6 +65,10 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		return this.#data.previousGenesisBlockHash;
 	}
 
+	public get pubKeyHash(): number | undefined {
+		return this.#data.pubKeyHash;
+	}
+
 	#nonce = 0n;
 
 	public async run(genesisCommit: Contracts.Crypto.Commit): Promise<Contracts.Snapshot.LegacyImportResult> {
@@ -112,6 +117,11 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 				`snapshot hash ${this.snapshotHash} does not match milestone snapshot ${milestone.snapshot.snapshotHash}`,
 			);
 		}
+
+		const { pubKeyHash } = this.configuration.getNetwork();
+		if (this.pubKeyHash !== pubKeyHash) {
+			throw new Error(`snapshot pubKeyHash ${this.pubKeyHash} does not match network pubKeyHash ${pubKeyHash}`);
+		}
 	}
 
 	public async prepare(snapshotPath: string): Promise<void> {
@@ -132,6 +142,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		let foundColdWallets = 0;
 
 		let totalSupply = 0n;
+		let pubKeyHash: number | undefined;
 
 		const publicKeyLookup: Record<string, Contracts.Snapshot.ImportedLegacyWallet> = snapshot.wallets.reduce(
 			(accumulator, current) => {
@@ -175,6 +186,16 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 			if (wallet.publicKey) {
 				assert.defined(wallet.ethAddress);
 				ethAddress = wallet.ethAddress;
+
+				// Only hot wallets: V3 accepted transfers to cold addresses of other networks
+				const networkByte: number = base58.decode(wallet.arkAddress)[0];
+				if (pubKeyHash === undefined) {
+					pubKeyHash = networkByte;
+				} else if (networkByte !== pubKeyHash) {
+					throw new Error(
+						`snapshot wallet ${wallet.arkAddress} has network byte ${networkByte}, expected ${pubKeyHash}`,
+					);
+				}
 			}
 
 			wallets.push({
@@ -250,6 +271,7 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		this.#data = {
 			genesisBlockNumber,
 			previousGenesisBlockHash: snapshot.chainTip.hash,
+			pubKeyHash,
 			snapshotHash: calculatedHash,
 			totalSupply,
 			validators,
@@ -327,11 +349,13 @@ export class Importer implements Contracts.Snapshot.LegacyImporter {
 		snapshotHash: string;
 		genesisBlockNumber: bigint;
 		previousGenesisBlockHash: string;
+		pubKeyHash: number | undefined;
 		totalSupply: bigint;
 	} {
 		return {
 			genesisBlockNumber: 0n,
 			previousGenesisBlockHash: "",
+			pubKeyHash: undefined,
 			snapshotHash: "",
 			totalSupply: 0n,
 			validators: [],

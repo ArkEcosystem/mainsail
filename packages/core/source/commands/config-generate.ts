@@ -20,9 +20,14 @@ type Flag = {
 	default?: string | number | boolean | Date;
 };
 
-type Flags = Omit<AppContracts.NetworkGenerator.Options, "peers" | "rewardAmount"> & {
+type Flags = Omit<
+	AppContracts.NetworkGenerator.Options,
+	"peers" | "rewardAmount" | "snapshot" | "validatorRegistrationFee"
+> & {
 	peers: string;
 	rewardAmount: number | string;
+	snapshot?: string;
+	validatorRegistrationFee: number | string;
 	validatorsFile?: string;
 };
 
@@ -100,8 +105,14 @@ export class Command extends Commands.Command {
 			default: "2000000000000000000",
 		},
 		{
+			name: "validatorRegistrationFee",
+			description: "The fee to register a validator (in wei).",
+			schema: Joi.alternatives().try(Joi.string(), Joi.number()),
+			default: "250000000000000000000",
+		},
+		{
 			name: "pubKeyHash",
-			description: "The public key hash.",
+			description: "The public key hash. Inferred from the snapshot addresses when --snapshot is given.",
 			schema: Joi.number(),
 			promptType: "number",
 			default: 30,
@@ -161,6 +172,14 @@ export class Command extends Commands.Command {
 			schema: Joi.string(),
 		},
 
+		// Legacy snapshot
+		{
+			name: "snapshot",
+			description:
+				"Path to a legacy snapshot (.compressed) to start the network from. The genesis block continues the legacy chain and the premine is ignored.",
+			schema: Joi.string(),
+		},
+
 		// General
 		{ name: "configPath", description: "Configuration path.", schema: Joi.string() },
 		{
@@ -190,9 +209,11 @@ export class Command extends Commands.Command {
 	public async execute(): Promise<void> {
 		const flags: Contracts.Cli.AnyObject = this.getFlags();
 
-		const allFlagsSet = !this.#flagSettings
-			.filter((flag) => flag.promptType)
-			.some((flag) => flags[flag.name] === undefined);
+		const promptFlags = this.#flagSettings.filter(
+			(flag) => flag.promptType && !(flag.name === "pubKeyHash" && flags.snapshot),
+		);
+
+		const allFlagsSet = !promptFlags.some((flag) => flags[flag.name] === undefined);
 
 		const defaults = this.#flagSettings.reduce((accumulator: Record<string, Flag["default"]>, flag: Flag) => {
 			accumulator[flag.name] = flag.default;
@@ -213,21 +234,19 @@ export class Command extends Commands.Command {
 			if (flags.force || allFlagsSet) {
 				return await configurationApp
 					.get<ConfigurationGenerator>(Identifiers.ConfigurationGenerator)
-					.generate(this.#convertFlags(options, flags.validators !== undefined));
+					.generate(this.#convertFlags(options, (flag) => flags[flag] !== undefined));
 			}
 
 			const response = await prompts([
-				...this.#flagSettings
-					.filter((flag) => flag.promptType) // Show prompt only for flags with defined promptType
-					.map(
-						(flag) =>
-							({
-								initial: flags[flag.name] ? `${flags[flag.name]}` : flag.default || "undefined",
-								message: flag.description,
-								name: flag.name,
-								type: flag.promptType,
-							}) as prompts.PromptObject<string>,
-					),
+				...promptFlags.map(
+					(flag) =>
+						({
+							initial: flags[flag.name] ? `${flags[flag.name]}` : flag.default || "undefined",
+							message: flag.description,
+							name: flag.name,
+							type: flag.promptType,
+						}) as prompts.PromptObject<string>,
+				),
 				{
 					message: "Can you confirm?",
 					name: "confirm",
@@ -249,7 +268,7 @@ export class Command extends Commands.Command {
 				throw new Error("You'll need to confirm the input to continue.");
 			}
 
-			for (const flag of this.#flagSettings.filter((flag) => flag.promptType)) {
+			for (const flag of promptFlags) {
 				if (flag.promptType === "text" && options[flag.name] !== "undefined") {
 					continue;
 				}
@@ -267,7 +286,7 @@ export class Command extends Commands.Command {
 
 			await configurationApp
 				.get<ConfigurationGenerator>(Identifiers.ConfigurationGenerator)
-				.generate(this.#convertFlags(options, true));
+				.generate(this.#convertFlags(options, (flag) => flags[flag] !== undefined || flag in response));
 		} finally {
 			// The genesis generation boots the Rust EVM, whose native runtime keeps the
 			// event loop alive until the instance is disposed — without this, the process
@@ -278,7 +297,7 @@ export class Command extends Commands.Command {
 		}
 	}
 
-	#convertFlags(options: Flags, validatorsExplicit: boolean): AppContracts.NetworkGenerator.Options {
+	#convertFlags(options: Flags, isExplicit: (flag: string) => boolean): AppContracts.NetworkGenerator.Options {
 		const external = this.#readValidatorsFile(options);
 
 		// When the validators come from a file and no explicit --validators was given, the
@@ -287,7 +306,7 @@ export class Command extends Commands.Command {
 		// registrations the count is derived by the generator itself (it requires deserializing
 		// them), so pass undefined instead of the flag default.
 		let validators: number | undefined = options.validators;
-		if (!validatorsExplicit) {
+		if (!isExplicit("validators")) {
 			if (external.validatorMnemonics) {
 				validators = external.validatorMnemonics.length;
 			} else if (external.validatorRegistrations) {
@@ -304,9 +323,25 @@ export class Command extends Commands.Command {
 				.split(",")
 				.map((peer) => peer.trim())
 				.filter((peer) => peer.length > 0),
+			pubKeyHash: options.snapshot && !isExplicit("pubKeyHash") ? undefined : options.pubKeyHash,
 			rewardAmount: options.rewardAmount.toString(),
+			snapshot: this.#resolveSnapshot(options),
+			validatorRegistrationFee: options.validatorRegistrationFee.toString(),
 			validators,
 		};
+	}
+
+	#resolveSnapshot(options: Flags): AppContracts.NetworkGenerator.SnapshotOptions | undefined {
+		if (!options.snapshot) {
+			return undefined;
+		}
+
+		const resolved = path.resolve(options.snapshot);
+		if (!existsSync(resolved)) {
+			throw new Error(`Snapshot file not found: ${resolved}`);
+		}
+
+		return { path: resolved };
 	}
 
 	#readValidatorsFile(options: Flags): {

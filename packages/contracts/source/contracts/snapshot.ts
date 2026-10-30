@@ -13,6 +13,7 @@ export interface LegacyImporter {
 	snapshotHash: string;
 	genesisBlockNumber: bigint;
 	previousGenesisBlockHash: string;
+	pubKeyHash: number | undefined;
 }
 
 export interface LegacyImportOptions {

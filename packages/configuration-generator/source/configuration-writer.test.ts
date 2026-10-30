@@ -97,12 +97,12 @@ describe<{
 	});
 
 	it("#writeSnapshot - should copy the snapshot into the snapshot directory", ({ dataPath, networkWriter }) => {
-		const source = join(dataPath, "1da14326.compressed");
+		const source = join(dataPath, "mainnet.compressed");
 		writeFileSync(source, "snapshot-bytes");
 		// The orchestrator creates this directory before calling writeSnapshot.
 		ensureDirSync(join(dataPath, "snapshot"));
 
-		networkWriter.writeSnapshot(source);
+		networkWriter.writeSnapshot(source, "1da14326");
 
 		const target = join(dataPath, "snapshot", "1da14326.compressed");
 		assert.true(existsSync(target));

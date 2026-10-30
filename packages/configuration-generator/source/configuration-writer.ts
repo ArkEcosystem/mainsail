@@ -71,8 +71,10 @@ export class ConfigurationWriter {
 		);
 	}
 
-	writeSnapshot(snapshotPath: string): void {
-		snapshotPath = resolve(snapshotPath);
-		copyFileSync(snapshotPath, path.join(this.configurationPath, "snapshot", path.basename(snapshotPath)));
+	writeSnapshot(snapshotPath: string, snapshotHash: string): void {
+		copyFileSync(
+			resolve(snapshotPath),
+			path.join(this.configurationPath, "snapshot", `${snapshotHash}.compressed`),
+		);
 	}
 }

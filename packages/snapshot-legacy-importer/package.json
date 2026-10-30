@@ -26,6 +26,7 @@
 		"@mainsail/kernel": "workspace:*",
 		"@mainsail/snapshot-legacy-exporter": "workspace:*",
 		"@mainsail/utils": "workspace:*",
+		"bstring": "0.3.9",
 		"viem": "2.55.19"
 	},
 	"devDependencies": {

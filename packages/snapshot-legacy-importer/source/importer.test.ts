@@ -173,6 +173,7 @@ describe<Context>("Importer", ({ it, assert, beforeEach, each, spy }) => {
 		assert.equal(importer.snapshotHash, "");
 		assert.equal(importer.previousGenesisBlockHash, "");
 		assert.equal(importer.genesisBlockNumber, 0n);
+		assert.equal(importer.pubKeyHash, undefined);
 		assert.equal(importer.validators, []);
 	});
 
@@ -192,6 +193,27 @@ describe<Context>("Importer", ({ it, assert, beforeEach, each, spy }) => {
 		await prepare(context, [wallet], { ...chainTip, number: "0" });
 
 		assert.equal(importer.genesisBlockNumber, 0n);
+	});
+
+	it("should read the network byte from the hot wallets", async (context) => {
+		const { app, configuration, importer, wallet } = context;
+		configuration.getNetwork = () => ({ pubKeyHash: 23 });
+		const foreignColdWallet = await coldWallet(app, "foreign cold wallet");
+
+		await prepare(context, [foreignColdWallet, wallet]);
+
+		assert.equal(importer.pubKeyHash, 30);
+	});
+
+	it("should reject hot wallets of different networks", async (context) => {
+		const { app, configuration, wallet } = context;
+		configuration.getNetwork = () => ({ pubKeyHash: 23 });
+		const foreignWallet = await hotWallet(app, "foreign hot wallet");
+
+		await assert.rejects(
+			() => prepare(context, [wallet, foreignWallet]),
+			new Error(`snapshot wallet ${foreignWallet.arkAddress} has network byte 23, expected 30`),
+		);
 	});
 
 	it("should log the snapshot stats", async (context) => {
@@ -701,6 +723,23 @@ describe<Context>("Importer", ({ it, assert, beforeEach, each, spy }) => {
 		await assert.rejects(
 			() => importer.prepareRestore(),
 			new Error(`snapshot hash ${snapshot.hash} does not match milestone snapshot ${"f".repeat(64)}`),
+		);
+	});
+
+	it("should reject a restore whose snapshot is for another network", async ({
+		configuration,
+		fileSystem,
+		importer,
+		wallet,
+	}) => {
+		const snapshot = makeSnapshot([wallet]);
+		configuration.getMilestone = () => ({ snapshot: { snapshotHash: snapshot.hash } });
+		configuration.getNetwork = () => ({ pubKeyHash: 23 });
+		fileSystem.get = async () => compress(snapshot);
+
+		await assert.rejects(
+			() => importer.prepareRestore(),
+			new Error("snapshot pubKeyHash 30 does not match network pubKeyHash 23"),
 		);
 	});
 
