@@ -1,14 +1,8 @@
-import type { HelloMessage, Message, RejectMessage } from "../message.js";
+import type { HandshakeOptions, HelloMessage, RejectMessage } from "../interfaces/index.js";
 
 import { constants } from "../constants.js";
 import { CloseReason, Direction } from "../enums.js";
 import { ConnectionError } from "../errors.js";
-
-export type HandshakeOptions = {
-	direction: Direction;
-	send: (message: Message) => void;
-	reject: (reason: CloseReason) => void;
-};
 
 // The dialer sends hello and waits for the acceptor's hello back. The acceptor waits for the
 // dialer's hello, checks it, and either echoes hello or sends reject and closes. Both sides give
