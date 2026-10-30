@@ -1,14 +1,17 @@
 import type { Contracts } from "@mainsail/contracts";
+import type { Interfaces } from "@mainsail/p2p-websocket";
 
 import { Enums, Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { assert } from "@mainsail/utils";
 import dayjs from "dayjs";
 
+import type { Peer as PeerInterface } from "./interfaces/index.js";
+
 import { getPeerUrl } from "./utils/get-peer-url.js";
 
 @injectable()
-export class Peer implements Contracts.P2P.Peer {
+export class Peer implements PeerInterface {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -27,6 +30,10 @@ export class Peer implements Contracts.P2P.Peer {
 	public lastPinged: number | undefined;
 
 	public plugins: Contracts.P2P.PeerPlugins = {};
+
+	public connection?: Interfaces.Connection;
+
+	public lastDialAt?: number;
 
 	#header: Contracts.P2P.HeaderData | undefined;
 
