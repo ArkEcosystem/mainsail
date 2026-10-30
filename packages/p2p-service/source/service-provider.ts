@@ -12,6 +12,7 @@ import { BlockDownloader, MessageDownloader, ProposalDownloader } from "./downlo
 import { HeaderService } from "./header-service.js";
 import { Header } from "./header.js";
 import { Logger } from "./logger.js";
+import { HeaderIncludeReceiveMiddleware, HeaderIncludeSendMiddleware } from "./middleware/index.js";
 import { PeerCommunicator } from "./peer-communicator.js";
 import { PeerDisposer } from "./peer-disposer.js";
 import { PeerRepository } from "./peer-repository.js";
@@ -40,6 +41,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
 		this.app.bind<() => Header>(Identifiers.P2P.Header.Factory).toFactory(() => () => this.app.resolve(Header));
 		this.app.bind(Identifiers.P2P.Header.Service).to(HeaderService).inSingletonScope();
+		this.app
+			.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware)
+			.to(HeaderIncludeReceiveMiddleware)
+			.inSingletonScope();
+		this.app.bind(Identifiers.P2P.WebSocket.SendMiddleware).to(HeaderIncludeSendMiddleware).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Downloader.Block).to(BlockDownloader).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Downloader.Proposal).to(ProposalDownloader).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Downloader.Message).to(MessageDownloader).inSingletonScope();

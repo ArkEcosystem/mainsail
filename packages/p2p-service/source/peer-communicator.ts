@@ -27,9 +27,6 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
 
-	@inject(Identifiers.P2P.Header.Factory)
-	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
-
 	@inject(Identifiers.P2P.Header.Service)
 	private readonly headerService!: Contracts.P2P.HeaderService;
 
@@ -98,11 +95,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	): Promise<TResponse> {
 		const connection = await this.#connect(peer);
 
+		// The request headers are added by HeaderIncludeSendMiddleware.
 		const started = performance.now();
-		const response = await connection.send(route, {
-			...payload,
-			headers: this.headerFactory().toData(),
-		} as TRequest);
+		const response = await connection.send(route, payload as TRequest);
 		peer.setPinged(Math.floor(performance.now() - started));
 
 		// The wire type of the headers is the protobuf shape; the contract shape is what the codec unpacks.
