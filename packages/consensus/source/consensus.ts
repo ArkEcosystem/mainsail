@@ -43,9 +43,6 @@ export class Consensus implements Contracts.Consensus.Service {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.P2P.Statistic.Service)
-	private readonly statisticService!: Contracts.P2P.StatisticService;
-
 	@inject(Identifiers.P2P.PendingCommits)
 	private readonly pendingCommits!: Contracts.P2P.PendingCommits;
 
@@ -231,7 +228,6 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.#proposalPromise = undefined;
 
 		this.scheduler.clear();
-		this.statisticService.newRound(this.#blockNumber, this.#round);
 
 		if (this.#isDisposed) {
 			return;
