@@ -33,6 +33,9 @@ export class Service implements Contracts.P2P.Service {
 	@inject(Identifiers.P2P.Peer.Verifier)
 	private readonly peerVerifier!: Contracts.P2P.PeerVerifier;
 
+	@inject(Identifiers.P2P.Peer.Disposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
@@ -84,12 +87,15 @@ export class Service implements Contracts.P2P.Service {
 		}
 	}
 
+	// Same order as the old provider: stop the loop, say goodbye to the peers, then stop the transport.
 	public async dispose(): Promise<void> {
 		this.#disposed = true;
 		clearTimeout(this.#mainLoopTimeout);
 
 		this.websocketService.accept = undefined;
 		this.websocketService.onConnection = undefined;
+
+		await this.peerDisposer.disposePeers();
 		await this.websocketService.dispose();
 	}
 

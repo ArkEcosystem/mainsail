@@ -95,7 +95,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).disposePeers();
 		await this.app.get<Contracts.P2P.Service>(Identifiers.P2P.Service).dispose();
 	}
 
