@@ -50,6 +50,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		return (await this.#emit(peer, GetStatus, {})) as unknown as Contracts.P2P.GetStatusResponse;
 	}
 
+	// TODO: getBlocks needs the longer `getBlocksTimeout` from the configuration (30 s) instead of the
+	// transport's REQUEST_TIMEOUT (10 s); `send` has no per-request timeout yet.
 	public async getBlocks(
 		peer: Peer,
 		{ fromBlockNumber, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromBlockNumber: number; limit?: number },
