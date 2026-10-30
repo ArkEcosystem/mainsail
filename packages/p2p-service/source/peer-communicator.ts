@@ -15,7 +15,7 @@ import { GetBlocks, GetMessages, GetProposal, GetStatus, PostMessage, PostPropos
 const DIAL_SPACING = 10_000;
 
 // Minimal port of the @mainsail/p2p communicator over the new transport: no timeouts per route,
-// no reply validation, no throttling, no banning. Peers are trusted for now.
+// no reply validation, no throttling.
 @injectable()
 export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.P2P.WebSocket.Service)
@@ -24,17 +24,17 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	@inject(Identifiers.P2P.WebSocket.Connection.Repository)
 	private readonly connections!: ConnectionRepository;
 
+	@inject(Identifiers.P2P.Peer.Disposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+
 	@inject(Identifiers.P2P.Header.Factory)
 	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
-
-	@inject(Identifiers.P2P.Logger)
-	private readonly logger!: Contracts.P2P.Logger;
 
 	public async postProposal(peer: Peer, proposal: Buffer): Promise<void> {
 		try {
 			await this.#emit(peer, PostProposal, { proposal });
 		} catch (rawError) {
-			this.logger.debug(`postProposal to ${peer.ip} failed: ${ensureError(rawError).message}`, "p2p");
+			this.peerDisposer.banPeer(peer.ip, ensureError(rawError));
 		}
 	}
 
@@ -42,7 +42,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		try {
 			await this.#emit(peer, PostMessage, { message });
 		} catch (rawError) {
-			this.logger.debug(`postMessage to ${peer.ip} failed: ${ensureError(rawError).message}`, "p2p");
+			this.peerDisposer.banPeer(peer.ip, ensureError(rawError));
 		}
 	}
 
