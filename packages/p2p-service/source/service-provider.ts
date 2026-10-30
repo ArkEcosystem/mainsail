@@ -8,6 +8,7 @@ import { assert, IpAddress } from "@mainsail/utils";
 import Joi from "joi";
 
 import { Broadcaster } from "./broadcaster.js";
+import { BlockDownloader, MessageDownloader, ProposalDownloader } from "./downloader/index.js";
 import { HeaderService } from "./header-service.js";
 import { Header } from "./header.js";
 import { Logger } from "./logger.js";
@@ -39,6 +40,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
 		this.app.bind<() => Header>(Identifiers.P2P.Header.Factory).toFactory(() => () => this.app.resolve(Header));
 		this.app.bind(Identifiers.P2P.Header.Service).to(HeaderService).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Downloader.Block).to(BlockDownloader).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Downloader.Proposal).to(ProposalDownloader).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Downloader.Message).to(MessageDownloader).inSingletonScope();
 
 		// Peers are assumed to listen on the same port we do; it is configured on the transport.
 		this.app.bind<(ip: string) => Peer>(Identifiers.P2P.Peer.Factory).toFactory(() => (ip: string) => {
