@@ -1,0 +1,38 @@
+# Two nodes with fixed addresses so the per-IP rules of the new transport behave as in production.
+# Old p2p on 4000, new transport on 4001 (port + 1) inside each container.
+#   pnpm run e2e:p2p        start both and follow the logs
+#   pnpm run e2e:p2p:down   stop and remove them
+
+x-node: &node
+    build: ../consensus/nodes
+    volumes:
+        - ../../../:/mainsail
+    command:
+        - /bin/sh
+        - -c
+        - /mainsail/packages/core/bin/run.js core:run --network=devnet
+
+services:
+    node0:
+        <<: *node
+        environment:
+            MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/p2p/nodes/node0
+            MAINSAIL_PATH_DATA: /home/ubuntu/data
+        networks:
+            p2p:
+                ipv4_address: 172.30.0.10
+
+    node1:
+        <<: *node
+        environment:
+            MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/p2p/nodes/node1
+            MAINSAIL_PATH_DATA: /home/ubuntu/data
+        networks:
+            p2p:
+                ipv4_address: 172.30.0.11
+
+networks:
+    p2p:
+        ipam:
+            config:
+                - subnet: 172.30.0.0/24

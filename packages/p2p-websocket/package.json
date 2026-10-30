@@ -1,0 +1,38 @@
+{
+	"name": "@mainsail/p2p-websocket",
+	"version": "0.0.1-rc.9",
+	"description": "WebSocket transport for the Mainsail P2P layer",
+	"license": "GPL-3.0-only",
+	"contributors": [],
+	"type": "module",
+	"main": "distribution/index.js",
+	"types": "distribution/index.d.ts",
+	"files": [
+		"/distribution"
+	],
+	"scripts": {
+		"build": "tsc -b",
+		"build:watch": "pnpm run clean && tsc -w",
+		"release": "pnpm publish --access public",
+		"test": "pnpm run uvu source .test.ts",
+		"test:coverage": "c8 --experimental-monocart -r=text -r=lcov --all pnpm run test",
+		"test:file": "pnpm run uvu source",
+		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
+	},
+	"dependencies": {
+		"@mainsail/constants": "workspace:*",
+		"@mainsail/container": "workspace:*",
+		"@mainsail/kernel": "workspace:*",
+		"@mainsail/utils": "workspace:*",
+		"joi": "18.2.5",
+		"ws": "8.21.3"
+	},
+	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
+		"@types/ws": "8.18.1",
+		"uvu": "0.5.6"
+	},
+	"engines": {
+		"node": ">=24"
+	}
+}
