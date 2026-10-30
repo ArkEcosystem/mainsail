@@ -8,6 +8,7 @@ export * as Interfaces from "./interfaces/index.js";
 export * from "./logger.js";
 export * from "./middleware/index.js";
 export * from "./peer-communicator.js";
+export * from "./peer-discoverer.js";
 export * from "./peer-disposer.js";
 export * from "./peer-repository.js";
 export * from "./peer.js";
