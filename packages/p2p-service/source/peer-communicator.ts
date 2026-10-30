@@ -4,7 +4,7 @@ import type { ConnectionRepository, Interfaces, Service as WebSocketService } fr
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ConnectionState } from "@mainsail/p2p-websocket";
-import { ensureError, IpAddress } from "@mainsail/utils";
+import { assert, ensureError, IpAddress } from "@mainsail/utils";
 import { setTimeout as sleep } from "node:timers/promises";
 
 import type { Peer } from "./interfaces/index.js";
@@ -29,6 +29,9 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 
 	@inject(Identifiers.P2P.Header.Factory)
 	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
+
+	@inject(Identifiers.P2P.Header.Service)
+	private readonly headerService!: Contracts.P2P.HeaderService;
 
 	public async postProposal(peer: Peer, proposal: Buffer): Promise<void> {
 		try {
@@ -88,14 +91,24 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		throw new Error("pingPorts is not ported to @mainsail/p2p-service yet");
 	}
 
-	async #emit<TRequest extends { headers?: unknown }, TResponse>(
+	async #emit<TRequest extends { headers?: unknown }, TResponse extends { headers?: Contracts.P2P.HeaderData }>(
 		peer: Peer,
 		route: Interfaces.RouteDefinition<TRequest, TResponse>,
 		payload: Omit<TRequest, "headers">,
 	): Promise<TResponse> {
 		const connection = await this.#connect(peer);
 
-		return connection.send(route, { ...payload, headers: this.headerFactory().toData() } as TRequest);
+		const started = performance.now();
+		const response = await connection.send(route, {
+			...payload,
+			headers: this.headerFactory().toData(),
+		} as TRequest);
+		peer.setPinged(Math.floor(performance.now() - started));
+
+		assert.defined(response.headers);
+		void this.headerService.handle(peer, response.headers);
+
+		return response;
 	}
 
 	// Reuses the peer's connection in either direction; dials only when there is none, at most once per DIAL_SPACING.
