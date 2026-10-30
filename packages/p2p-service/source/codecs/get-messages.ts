@@ -14,10 +14,10 @@ type GetMessagesRequest = Omit<WithUnpackedHeaders<proto.GetMessagesRequest.$Pro
 
 export const getMessages = {
 	request: {
-		deserialize: (payload: Buffer): WithUnpackedHeaders<proto.GetMessagesRequest.$Properties> => {
+		deserialize: (payload: Buffer): GetMessagesRequest => {
 			const decoded = proto.GetMessagesRequest.decode(payload);
 			unpackBitmapsInPlace(decoded.query);
-			return unpackHeadersBitmaps(decoded);
+			return unpackHeadersBitmaps(decoded) as GetMessagesRequest;
 		},
 		serialize: (object: GetMessagesRequest): Buffer =>
 			Buffer.from(

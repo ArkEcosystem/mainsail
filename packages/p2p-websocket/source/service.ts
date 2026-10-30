@@ -4,19 +4,23 @@ import { inject, injectable } from "@mainsail/container";
 import type { BanList } from "./ban-list.js";
 import type { ConnectionRepository } from "./connection-repository.js";
 import type { Dialer } from "./dialer.js";
-import type { Connection } from "./interfaces/index.js";
+import type { Connection, Route } from "./interfaces/index.js";
 import type { Listener } from "./listener.js";
+import type { Router } from "./router.js";
 import type { Server } from "./server.js";
 
 import { CloseReason } from "./enums.js";
 
-// The one object the p2p layer talks to. It only delegates: lifecycle to the server, inbound
-// sockets to the listener, outbound ones to the dialer, bans to the ban list. Deciding whom to
-// accept or ban stays with the caller through `accept` and `ban`.
+// The one object the p2p layer talks to. It only delegates: lifecycle to the server, routes to the
+// router, inbound sockets to the listener, outbound ones to the dialer, bans to the ban list.
+// Deciding whom to accept or ban stays with the caller through `accept` and `ban`.
 @injectable()
 export class Service {
 	@inject(Identifiers.P2P.WebSocket.Server)
 	private readonly server!: Server;
+
+	@inject(Identifiers.P2P.WebSocket.Router)
+	private readonly router!: Router;
 
 	@inject(Identifiers.P2P.WebSocket.Listener)
 	private readonly listener!: Listener;
@@ -42,6 +46,13 @@ export class Service {
 
 	public async dispose(): Promise<void> {
 		await this.server.dispose();
+	}
+
+	// Routes
+
+	// Register before boot(); requests for unknown paths are answered with 404.
+	public registerRoute<TRequest, TResponse>(route: Route<TRequest, TResponse>): void {
+		this.router.register(route as Route<unknown, unknown>);
 	}
 
 	// Inbound

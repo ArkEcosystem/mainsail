@@ -1,24 +1,20 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable, multiInject, optional, postConstruct } from "@mainsail/container";
+import { inject, injectable, multiInject, optional } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
 import type { Connection, ReceiveContext, ReceiveMiddleware, Response, Route } from "./interfaces/index.js";
 
 import { RequestError } from "./errors.js";
 
-// Maps request paths to routes and runs each request through the middleware chain. Any package can
-// contribute routes and middleware by binding them under Identifiers.P2P.WebSocket.Routes and
-// Identifiers.P2P.WebSocket.ReceiveMiddleware before the router is first resolved.
+// Maps request paths to routes and runs each request through the middleware chain. Middleware is
+// bound under Identifiers.P2P.WebSocket.ReceiveMiddleware; routes are registered by the package that
+// owns them when it boots, since they depend on services (consensus) that depend on the transport.
 @injectable()
 export class Router {
 	@inject(Identifiers.P2P.WebSocket.Logger)
 	private readonly logger!: Contracts.Kernel.Logger;
-
-	@multiInject(Identifiers.P2P.WebSocket.Routes)
-	@optional()
-	private readonly routes: Route<unknown, unknown>[] = [];
 
 	@multiInject(Identifiers.P2P.WebSocket.ReceiveMiddleware)
 	@optional()
@@ -26,15 +22,12 @@ export class Router {
 
 	readonly #byPath = new Map<string, Route<unknown, unknown>>();
 
-	@postConstruct()
-	public initialize(): void {
-		for (const route of this.routes) {
-			if (this.#byPath.has(route.path)) {
-				throw new Error(`Duplicate route: ${route.path}`);
-			}
-
-			this.#byPath.set(route.path, route);
+	public register(route: Route<unknown, unknown>): void {
+		if (this.#byPath.has(route.path)) {
+			throw new Error(`Duplicate route: ${route.path}`);
 		}
+
+		this.#byPath.set(route.path, route);
 	}
 
 	public get paths(): string[] {
