@@ -2648,6 +2648,9 @@ importers:
 
   packages/p2p-service:
     dependencies:
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/constants':
         specifier: workspace:*
         version: link:../constants
@@ -2666,6 +2669,9 @@ importers:
       dayjs:
         specifier: 1.11.23
         version: 1.11.23
+      fs-extra:
+        specifier: 11.4.0
+        version: 11.4.0
       ipaddr.js:
         specifier: 2.5.0
         version: 2.5.0
@@ -2688,6 +2694,9 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
+      '@types/fs-extra':
+        specifier: 11.0.4
+        version: 11.0.4
       '@types/semver':
         specifier: 7.8.0
         version: 7.8.0
@@ -12379,7 +12388,7 @@ snapshots:
   '@types/fs-extra@11.0.4':
     dependencies:
       '@types/jsonfile': 6.1.4
-      '@types/node': 26.2.0
+      '@types/node': 24.13.3
 
   '@types/hapi__sntp@3.1.4': {}
 

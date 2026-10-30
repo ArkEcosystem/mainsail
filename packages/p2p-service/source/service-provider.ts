@@ -8,15 +8,23 @@ import { assert, IpAddress } from "@mainsail/utils";
 import Joi from "joi";
 
 import { Broadcaster } from "./broadcaster.js";
+import { BlockDownloader, MessageDownloader, ProposalDownloader } from "./downloader/index.js";
+import { HeaderService } from "./header-service.js";
 import { Header } from "./header.js";
 import { Logger } from "./logger.js";
+import { HeaderIncludeReceiveMiddleware, HeaderIncludeSendMiddleware } from "./middleware/index.js";
 import { PeerCommunicator } from "./peer-communicator.js";
+import { PeerDiscoverer } from "./peer-discoverer.js";
+import { PeerDisposer } from "./peer-disposer.js";
+import { PeerProcessor } from "./peer-processor.js";
 import { PeerRepository } from "./peer-repository.js";
+import { PeerVerifier } from "./peer-verifier.js";
 import { Peer } from "./peer.js";
 import { PendingCommits } from "./pending-commits.js";
 import {
 	GetBlocksRoute,
 	GetMessagesRoute,
+	GetPeersRoute,
 	GetProposalRoute,
 	GetStatusRoute,
 	PostMessageRoute,
@@ -33,8 +41,21 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.Peer.Repository).to(PeerRepository).inSingletonScope();
 		this.app.bind(Identifiers.P2P.State).to(State).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Communicator).to(PeerCommunicator).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Disposer).to(PeerDisposer).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Discoverer).to(PeerDiscoverer).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Processor).to(PeerProcessor).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Verifier).to(PeerVerifier).inSingletonScope();
 		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
 		this.app.bind<() => Header>(Identifiers.P2P.Header.Factory).toFactory(() => () => this.app.resolve(Header));
+		this.app.bind(Identifiers.P2P.Header.Service).to(HeaderService).inSingletonScope();
+		this.app
+			.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware)
+			.to(HeaderIncludeReceiveMiddleware)
+			.inSingletonScope();
+		this.app.bind(Identifiers.P2P.WebSocket.SendMiddleware).to(HeaderIncludeSendMiddleware).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Downloader.Block).to(BlockDownloader).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Downloader.Proposal).to(ProposalDownloader).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Downloader.Message).to(MessageDownloader).inSingletonScope();
 
 		// Peers are assumed to listen on the same port we do; it is configured on the transport.
 		this.app.bind<(ip: string) => Peer>(Identifiers.P2P.Peer.Factory).toFactory(() => (ip: string) => {
@@ -61,6 +82,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const routes: Contracts.Kernel.Container.Newable<Interfaces.Route<any, any>>[] = [
 			GetBlocksRoute,
 			GetMessagesRoute,
+			GetPeersRoute,
 			GetProposalRoute,
 			GetStatusRoute,
 			PostMessageRoute,

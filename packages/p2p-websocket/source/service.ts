@@ -73,10 +73,23 @@ export class Service {
 		return this.dialer.dial(url);
 	}
 
+	// Graceful close of the connection to an address, if there is one.
+	public async disconnect(ip: string): Promise<void> {
+		await this.repository.get(ip)?.close(CloseReason.LocalClose);
+	}
+
 	// Bans
 
 	public ban(ip: string, until: number): void {
 		this.banList.ban(ip, until);
 		this.repository.get(ip)?.terminate(CloseReason.Banned);
+	}
+
+	public isBanned(ip: string): boolean {
+		return this.banList.isBanned(ip);
+	}
+
+	public bans(): { ip: string; until: number }[] {
+		return this.banList.all();
 	}
 }
