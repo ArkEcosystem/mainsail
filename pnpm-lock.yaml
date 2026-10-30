@@ -2648,6 +2648,9 @@ importers:
 
   packages/p2p-service:
     dependencies:
+      '@mainsail/blockchain-utils':
+        specifier: workspace:*
+        version: link:../blockchain-utils
       '@mainsail/constants':
         specifier: workspace:*
         version: link:../constants
