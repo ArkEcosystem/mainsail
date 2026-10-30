@@ -1,0 +1,108 @@
+import type { Contracts } from "@mainsail/contracts";
+
+import { Identifiers } from "@mainsail/constants";
+import { inject, injectable, tagged } from "@mainsail/container";
+import { assert, ensureError } from "@mainsail/utils";
+
+import { isValidVersion } from "./utils/index.js";
+
+@injectable()
+export class PeerVerifier implements Contracts.P2P.PeerVerifier {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
+	@inject(Identifiers.P2P.Peer.Communicator)
+	private readonly communicator!: Contracts.P2P.PeerCommunicator;
+
+	@inject(Identifiers.P2P.Peer.Disposer)
+	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
+
+	@inject(Identifiers.State.Store)
+	private readonly stateStore!: Contracts.State.Store;
+
+	@inject(Identifiers.Database.Service)
+	private readonly database!: Contracts.Database.DatabaseService;
+
+	@inject(Identifiers.Cryptography.Commit.Factory)
+	private readonly commitFactory!: Contracts.Crypto.CommitFactory;
+
+	@inject(Identifiers.P2P.Logger)
+	private readonly logger!: Contracts.P2P.Logger;
+
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "p2p-service")
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
+
+	public async verify(peer: Contracts.P2P.Peer): Promise<boolean> {
+		if (this.configuration.getRequired<boolean>("skipPeerStateVerification")) {
+			return true;
+		}
+
+		try {
+			const status = await this.communicator.getStatus(peer);
+			peer.version = status.config.version;
+
+			this.#verifyConfig(status.config);
+
+			this.#verifyVersion(status.config);
+
+			await this.#verifyHighestCommonBlock(peer, status.state);
+
+			peer.plugins = status.config.plugins;
+
+			return true;
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			this.logger.debugExtra(`Peer ${peer.ip} verification failed: ${error.message}`, "p2p");
+
+			this.peerDisposer.banPeer(peer.ip, error);
+
+			return false;
+		}
+	}
+
+	#verifyConfig(config: Contracts.P2P.PeerConfig): void {
+		if (config.network.nethash !== this.cryptoConfiguration.getNetwork().nethash) {
+			throw new Error("Invalid nethash");
+		}
+
+		// TODO: Verify genesis block id
+	}
+
+	#verifyVersion(config: Contracts.P2P.PeerConfig): void {
+		if (!isValidVersion(this.app, config.version)) {
+			throw new Error("Invalid version");
+		}
+	}
+
+	async #verifyHighestCommonBlock(peer: Contracts.P2P.Peer, state: Contracts.P2P.PeerState): Promise<void> {
+		const block = this.stateStore.getLastBlock();
+
+		const blockNumberToRequest = state.blockNumber < block.number ? state.blockNumber : block.number;
+
+		const { blocks } = await this.communicator.getBlocks(peer, { fromBlockNumber: blockNumberToRequest, limit: 1 });
+
+		if (blocks.length !== 1) {
+			throw new Error("Failed to get blocks from peer");
+		}
+
+		// TODO: Support header only requests
+		const receivedCommit = await this.commitFactory.fromBytes(blocks[0]);
+
+		const blockToCompare =
+			block.number === blockNumberToRequest ? block : await this.database.getBlock(blockNumberToRequest);
+
+		assert.defined(blockToCompare);
+
+		if (receivedCommit.block.number !== blockToCompare.number) {
+			throw new Error("Received block does not match the requested block number");
+		}
+
+		if (receivedCommit.block.hash !== blockToCompare.hash) {
+			throw new Error("Received block does not match the requested hash. Peer is on a different chain.");
+		}
+	}
+}

@@ -18,6 +18,7 @@ import { PeerDiscoverer } from "./peer-discoverer.js";
 import { PeerDisposer } from "./peer-disposer.js";
 import { PeerProcessor } from "./peer-processor.js";
 import { PeerRepository } from "./peer-repository.js";
+import { PeerVerifier } from "./peer-verifier.js";
 import { Peer } from "./peer.js";
 import { PendingCommits } from "./pending-commits.js";
 import {
@@ -43,6 +44,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.Peer.Disposer).to(PeerDisposer).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Discoverer).to(PeerDiscoverer).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Processor).to(PeerProcessor).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Verifier).to(PeerVerifier).inSingletonScope();
 		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
 		this.app.bind<() => Header>(Identifiers.P2P.Header.Factory).toFactory(() => () => this.app.resolve(Header));
 		this.app.bind(Identifiers.P2P.Header.Service).to(HeaderService).inSingletonScope();
