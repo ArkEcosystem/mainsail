@@ -21,6 +21,7 @@ import { PendingCommits } from "./pending-commits.js";
 import {
 	GetBlocksRoute,
 	GetMessagesRoute,
+	GetPeersRoute,
 	GetProposalRoute,
 	GetStatusRoute,
 	PostMessageRoute,
@@ -75,6 +76,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const routes: Contracts.Kernel.Container.Newable<Interfaces.Route<any, any>>[] = [
 			GetBlocksRoute,
 			GetMessagesRoute,
+			GetPeersRoute,
 			GetProposalRoute,
 			GetStatusRoute,
 			PostMessageRoute,
