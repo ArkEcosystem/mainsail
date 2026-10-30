@@ -47,13 +47,10 @@ export class Service implements Contracts.P2P.Service {
 	}
 
 	public getNetworkBlockNumberPercentile(p: number): number {
-		// Headers are set by verification, which this package does not do yet; peers without one are skipped.
-		const blockNumbers: number[] = [];
-		for (const peer of this.repository.getPeers()) {
-			try {
-				blockNumbers.push(peer.header.blockNumber);
-			} catch {}
-		}
+		const blockNumbers = this.repository
+			.getPeers()
+			.filter((peer) => peer.header.blockNumber)
+			.map((peer) => peer.header.blockNumber);
 
 		return percentile(blockNumbers, p);
 	}
