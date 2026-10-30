@@ -11,6 +11,7 @@ import { Broadcaster } from "./broadcaster.js";
 import { Header } from "./header.js";
 import { Logger } from "./logger.js";
 import { PeerCommunicator } from "./peer-communicator.js";
+import { PeerDisposer } from "./peer-disposer.js";
 import { PeerRepository } from "./peer-repository.js";
 import { Peer } from "./peer.js";
 import { PendingCommits } from "./pending-commits.js";
@@ -33,6 +34,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.Peer.Repository).to(PeerRepository).inSingletonScope();
 		this.app.bind(Identifiers.P2P.State).to(State).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Communicator).to(PeerCommunicator).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Disposer).to(PeerDisposer).inSingletonScope();
 		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
 		this.app.bind<() => Header>(Identifiers.P2P.Header.Factory).toFactory(() => () => this.app.resolve(Header));
 
@@ -73,6 +75,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async dispose(): Promise<void> {
+		await this.app.get<Contracts.P2P.PeerDisposer>(Identifiers.P2P.Peer.Disposer).disposePeers();
 		await this.app.get<Contracts.P2P.Service>(Identifiers.P2P.Service).dispose();
 	}
 
