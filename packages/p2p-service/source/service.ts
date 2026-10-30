@@ -3,7 +3,7 @@ import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { IpAddress, pluralize } from "@mainsail/utils";
+import { pluralize } from "@mainsail/utils";
 
 import { percentile } from "./utils/index.js";
 
@@ -20,8 +20,8 @@ export class Service implements Contracts.P2P.Service {
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2P.PeerRepository;
 
-	@inject(Identifiers.P2P.Peer.Factory)
-	private readonly peerFactory!: Contracts.P2P.PeerFactory;
+	@inject(Identifiers.P2P.Peer.Processor)
+	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
 
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2P.Logger;
@@ -33,7 +33,8 @@ export class Service implements Contracts.P2P.Service {
 			return;
 		}
 
-		this.websocketService.onConnection = (connection) => this.#acceptPeer(connection.remoteAddress);
+		this.websocketService.onConnection = (connection) =>
+			void this.peerProcessor.validateAndAcceptPeer(connection.remoteAddress);
 		await this.websocketService.boot();
 
 		await this.#populateSeedPeers();
@@ -62,21 +63,6 @@ export class Service implements Contracts.P2P.Service {
 			await this.app.terminate("No seed peers defined in peers.json");
 		}
 
-		for (const { ip } of peerList) {
-			this.#acceptPeer(ip);
-		}
-	}
-
-	// Own and loopback addresses are skipped as in @mainsail/p2p; everything else is trusted for now.
-	#acceptPeer(ip: string): void {
-		if (!IpAddress.isValidPeerIp(ip) || this.repository.hasPeer(ip)) {
-			return;
-		}
-
-		const peer = this.peerFactory(ip);
-		peer.version = this.app.version();
-
-		this.repository.setPeer(peer);
-		this.logger.debug(`Accepted peer ${peer.ip}:${peer.port}`, "p2p");
+		await Promise.all(peerList.map(({ ip }) => this.peerProcessor.validateAndAcceptPeer(ip, { seed: true })));
 	}
 }
