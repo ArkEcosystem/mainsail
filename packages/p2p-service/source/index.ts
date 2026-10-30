@@ -1,6 +1,7 @@
 export * from "./broadcaster.js";
 export * from "./codecs/index.js";
 export * from "./defaults.js";
+export * from "./header-service.js";
 export * from "./header.js";
 export * as Interfaces from "./interfaces/index.js";
 export * from "./logger.js";
