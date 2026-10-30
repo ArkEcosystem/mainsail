@@ -12,6 +12,7 @@ export * from "./peer-discoverer.js";
 export * from "./peer-disposer.js";
 export * from "./peer-processor.js";
 export * from "./peer-repository.js";
+export * from "./peer-verifier.js";
 export * from "./peer.js";
 export * from "./pending-commits.js";
 export * from "./routes/index.js";
