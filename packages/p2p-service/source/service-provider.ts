@@ -8,6 +8,7 @@ import Joi from "joi";
 
 import { Header } from "./header.js";
 import { Logger } from "./logger.js";
+import { PeerCommunicator } from "./peer-communicator.js";
 import { PeerRepository } from "./peer-repository.js";
 import { Peer } from "./peer.js";
 import { PendingCommits } from "./pending-commits.js";
@@ -29,6 +30,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.Logger).to(Logger).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Repository).to(PeerRepository).inSingletonScope();
 		this.app.bind(Identifiers.P2P.State).to(State).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Communicator).to(PeerCommunicator).inSingletonScope();
 		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
 		this.app.bind<() => Header>(Identifiers.P2P.Header.Factory).toFactory(() => () => this.app.resolve(Header));
 
