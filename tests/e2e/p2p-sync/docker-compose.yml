@@ -1,0 +1,52 @@
+# Sync test for the new transport: two validators (3 + 2 validators) start together, a third node without
+# validators starts 60 seconds later and must download the chain through the block downloader.
+#   pnpm run e2e:p2p-sync        start all three and follow the logs
+#   pnpm run e2e:p2p-sync:down   stop and remove them
+# To test a restart: docker compose -f tests/e2e/p2p-sync/docker-compose.yml restart node1
+
+x-node: &node
+    build: ../consensus/nodes
+    volumes:
+        - ../../../:/mainsail
+    command:
+        - /bin/sh
+        - -c
+        - /mainsail/packages/core/bin/run.js core:run --network=devnet
+
+services:
+    node0:
+        <<: *node
+        environment:
+            MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/p2p-sync/nodes/node0
+            MAINSAIL_PATH_DATA: /home/ubuntu/data
+        networks:
+            p2p-sync:
+                ipv4_address: 172.30.1.10
+
+    node1:
+        <<: *node
+        environment:
+            MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/p2p-sync/nodes/node1
+            MAINSAIL_PATH_DATA: /home/ubuntu/data
+        networks:
+            p2p-sync:
+                ipv4_address: 172.30.1.11
+
+    node2:
+        <<: *node
+        command:
+            - /bin/sh
+            - -c
+            - sleep 60 && /mainsail/packages/core/bin/run.js core:run --network=devnet
+        environment:
+            MAINSAIL_PATH_CONFIG: /mainsail/tests/e2e/p2p-sync/nodes/node2
+            MAINSAIL_PATH_DATA: /home/ubuntu/data
+        networks:
+            p2p-sync:
+                ipv4_address: 172.30.1.12
+
+networks:
+    p2p-sync:
+        ipam:
+            config:
+                - subnet: 172.30.1.0/24
