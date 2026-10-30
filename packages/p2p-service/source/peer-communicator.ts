@@ -91,7 +91,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		throw new Error("pingPorts is not ported to @mainsail/p2p-service yet");
 	}
 
-	async #emit<TRequest extends { headers?: unknown }, TResponse extends { headers?: Contracts.P2P.HeaderData }>(
+	async #emit<TRequest extends { headers?: unknown }, TResponse>(
 		peer: Peer,
 		route: Interfaces.RouteDefinition<TRequest, TResponse>,
 		payload: Omit<TRequest, "headers">,
@@ -105,8 +105,10 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		} as TRequest);
 		peer.setPinged(Math.floor(performance.now() - started));
 
-		assert.defined(response.headers);
-		void this.headerService.handle(peer, response.headers);
+		// The wire type of the headers is the protobuf shape; the contract shape is what the codec unpacks.
+		const { headers } = response as { headers?: Contracts.P2P.HeaderData };
+		assert.defined(headers);
+		void this.headerService.handle(peer, headers);
 
 		return response;
 	}
