@@ -2654,9 +2654,6 @@ importers:
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
-      '@mainsail/contracts':
-        specifier: workspace:*
-        version: link:../contracts
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
@@ -2685,6 +2682,9 @@ importers:
         specifier: 7.8.0
         version: 7.8.0
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
