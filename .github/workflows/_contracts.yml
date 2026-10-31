@@ -16,7 +16,7 @@ env:
 jobs:
     check:
         name: contracts
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
 
         defaults:
             run:
