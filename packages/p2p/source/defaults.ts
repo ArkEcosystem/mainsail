@@ -10,6 +10,7 @@ export const defaults = {
 		enabled: Environment.isTrue(EnvironmentVariables.MAINSAIL_P2P_DEVELOPMENT_MODE_ENABLED),
 	},
 	getBlocksTimeout: 30_000,
+	maxConnections: Environment.get(EnvironmentVariables.MAINSAIL_P2P_MAX_CONNECTIONS, 500),
 	maxPeersBroadcast: Environment.get(EnvironmentVariables.MAINSAIL_P2P_MAX_PEERS_BROADCAST, 4),
 	maxSameSubnetPeers: Environment.get(EnvironmentVariables.MAINSAIL_P2P_MAX_PEERS_SAME_SUBNET, 5),
 	minimumNetworkReach: Environment.get(EnvironmentVariables.MAINSAIL_P2P_MIN_NETWORK_REACH, 20),
