@@ -441,6 +441,25 @@ describe<{
 		}
 	});
 
+	it("/tokens/transfers?addresses lists a transfer to its sender once", async () => {
+		const [action] = tokenActions;
+		await apiContext.tokenRepository.save(tokenTransferTokens);
+		await apiContext.transactionRepository.save(tokenTransferTransactions);
+		await apiContext.tokenActionRepository.save([
+			...tokenActions,
+			{ ...action, blockNumber: "1300", to: action.from },
+		]);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
+
+		const { statusCode, data } = await request(`/tokens/transfers?addresses=${action.from}`, options);
+
+		assert.equal(statusCode, 200);
+		assert.equal(
+			data.data.filter((transfer) => transfer.from === transfer.to).map((transfer) => transfer.to),
+			[action.from],
+		);
+	});
+
 	it("/tokens/{}/transfers", async () => {
 		await apiContext.tokenRepository.save(tokenTransferTokens);
 		await apiContext.transactionRepository.save(tokenTransferTransactions);

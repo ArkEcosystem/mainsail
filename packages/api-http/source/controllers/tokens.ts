@@ -218,8 +218,11 @@ export class TokensController extends Controller {
 
 		// the actions of an address list are read per address, listed token and direction, each from its own index
 		// range, as the planner can only sort all of them when they are matched at once
-		const getAddressActions = (direction: "from" | "to", depth: number): string => {
-			const actions = tokenActionsQuery.clone().select("tf.*").andWhere(`tf."${direction}" = addresses.address`);
+		const getAddressActions = (direction: "from" | "to", depth: number, keys = false): string => {
+			const actions = tokenActionsQuery
+				.clone()
+				.select(keys ? ['tf."block_number"', 'tf."index"'] : ["tf.*"])
+				.andWhere(`tf."${direction}" = addresses.address`);
 			let listed = "";
 
 			if (!request.query.ignoreWhitelist) {
@@ -231,7 +234,7 @@ export class TokensController extends Controller {
 				) listed`;
 			}
 
-			if (direction === "to") {
+			if (direction === "to" && !keys) {
 				actions.andWhere(`tf."from" <> ALL(CAST(:addresses AS citext[]))`);
 			}
 
@@ -244,7 +247,16 @@ export class TokensController extends Controller {
 				? `${getAddressActions("from", depth)} UNION ALL ${getAddressActions("to", depth)}`
 				: tokenActionsQuery.clone().select("tf.*").getQuery();
 
-		const page = `SELECT * FROM (${getActions(pagination.offset + pagination.limit)}) tf
+		const depth = pagination.offset + pagination.limit;
+
+		const page = request.query.addresses
+			? `SELECT tf.* FROM (
+				SELECT DISTINCT k.* FROM (${getAddressActions("from", depth, true)} UNION ALL ${getAddressActions("to", depth, true)}) k
+				ORDER BY k.block_number DESC, k.index DESC LIMIT ${pagination.limit} OFFSET ${pagination.offset}
+			) k
+			INNER JOIN "public"."token_actions" tf
+			ON tf.action = :action AND tf.block_number = k.block_number AND tf.index = k.index`
+			: `SELECT * FROM (${getActions(depth)}) tf
 			ORDER BY tf.block_number DESC, tf.index DESC LIMIT ${pagination.limit} OFFSET ${pagination.offset}`;
 
 		const [tokenActionsRows, totalCountRow] = await Promise.all([
