@@ -82,6 +82,22 @@ describe<{
 		assert.is(response.statusCode, 422);
 	});
 
+	it("GET /api/blocks - rejects the fee and transactions count as criteria and orderBy properties", async ({
+		server,
+	}) => {
+		for (const url of [
+			"/api/blocks?fee=0",
+			"/api/blocks?fee.from=1",
+			"/api/blocks?transactionsCount=1",
+			"/api/blocks?orderBy=fee:desc",
+			"/api/blocks?orderBy=transactionsCount:desc",
+		]) {
+			const response = await server.inject({ method: "GET", url });
+
+			assert.is(response.statusCode, 422);
+		}
+	});
+
 	it("GET /api/blocks/first - enriches the genesis block with defaults for unknown generators", async ({
 		server,
 		repos,
@@ -204,6 +220,24 @@ describe<{
 		// The criteria passed to the repository are scoped to the block.
 		const [, criteria] = repos.transaction.calls.findManyByCriteria[0];
 		assert.equal(criteria.blockHash, BLOCK_HASH);
+	});
+
+	it("GET /api/blocks/{id}/transactions - sorts the transactions of a block by their index", async ({
+		server,
+		repos,
+	}) => {
+		repos.block.data.one = makeBlock();
+		repos.state.data.one = makeState({ blockNumber: "100" });
+		repos.transaction.data.page = makePage([makeTransaction()]);
+
+		const response = await server.inject({
+			method: "GET",
+			url: "/api/blocks/90/transactions?orderBy=transactionIndex:asc",
+		});
+
+		assert.is(response.statusCode, 200);
+		const [, , sorting] = repos.transaction.calls.findManyByCriteria[0];
+		assert.equal(sorting, [{ direction: "asc", property: "transactionIndex" }]);
 	});
 
 	it("GET /api/blocks/{id}/transactions - responds 404 for an unknown block", async ({ server }) => {

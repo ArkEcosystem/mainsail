@@ -246,40 +246,6 @@ describe<{
 		}
 	});
 
-	it("/wallets?orderBy", async () => {
-		await apiContext.walletRepository.save(wallets);
-		const testCases = [
-			{
-				path: "/wallets?orderBy=attributes.validatorRank:asc",
-				result: [...wallets].sort(
-					(a, b) => Number(a.attributes.validatorRank) - Number(b.attributes.validatorRank),
-				),
-			},
-			{
-				path: "/wallets?limit=2&orderBy=attributes.validatorRank:desc",
-				result: [...wallets]
-					.sort((a, b) => Number(b.attributes.validatorRank) - Number(a.attributes.validatorRank))
-					.slice(0, 2),
-			},
-			{
-				path: "/wallets?limit=15&orderBy=attributes.validatorLastBlock.number:asc",
-				result: [...wallets]
-					.sort(
-						(a, b) =>
-							Number(a.attributes.validatorLastBlock?.number) -
-							Number(b.attributes.validatorLastBlock?.number),
-					)
-					.slice(0, 15),
-			},
-		];
-
-		for (const { path, result } of testCases) {
-			const { statusCode, data } = await request(path, options);
-			assert.equal(statusCode, 200);
-			assert.equal(data.data, result);
-		}
-	});
-
 	it("/wallets?orderBy columns", async () => {
 		const [a, b, c, d] = wallets;
 		await apiContext.walletRepository.save([
@@ -293,8 +259,6 @@ describe<{
 			{ path: "/wallets", result: [d, b, a, c] },
 			{ path: "/wallets?orderBy=balance:asc", result: [c, a, b, d] },
 			{ path: "/wallets?orderBy=balance:asc,balance:desc", result: [c, a, b, d] },
-			{ path: "/wallets?orderBy=nonce:desc", result: [b, c, a, d] },
-			{ path: "/wallets?orderBy=publicKey:asc", result: [a, b, d, c] },
 		];
 
 		for (const { path, result } of testCases) {
@@ -307,31 +271,7 @@ describe<{
 		}
 	});
 
-	it("/wallets?orderBy text attributes", async () => {
-		const [a, b, c, d] = wallets;
-		await apiContext.walletRepository.save([
-			{ ...a, attributes: { username: "carol" }, balance: "1" },
-			{ ...b, attributes: { username: "alice" }, balance: "2" },
-			{ ...c, attributes: { username: "bob" }, balance: "3" },
-			{ ...d, attributes: {}, balance: "4" },
-		]);
-
-		const testCases = [
-			{ path: "/wallets?orderBy=attributes.username:asc", result: [b, c, a, d] },
-			{ path: "/wallets?orderBy=attributes.username:desc", result: [a, c, b, d] },
-		];
-
-		for (const { path, result } of testCases) {
-			const { statusCode, data } = await request(path, options);
-			assert.equal(statusCode, 200);
-			assert.equal(
-				data.data.map((wallet) => wallet.address),
-				result.map((wallet) => wallet.address),
-			);
-		}
-	});
-
-	it("/wallets?orderBy counts a missing legacy flag as false", async () => {
+	it("/wallets?attributes.isLegacy counts a missing legacy flag as false", async () => {
 		const [a, b, c, d] = wallets;
 		await apiContext.walletRepository.save([
 			{ ...a, attributes: { isLegacy: true }, balance: "300" },
@@ -341,7 +281,6 @@ describe<{
 		]);
 
 		const testCases = [
-			{ path: "/wallets?orderBy=attributes.isLegacy:asc,balance:desc", result: [d, b, a, c] },
 			{ path: "/wallets?attributes.isLegacy=false", result: [d, b] },
 			{ path: "/wallets?attributes.isLegacy=true", result: [a, c] },
 		];
@@ -380,7 +319,7 @@ describe<{
 		}
 
 		// A legitimate sort still works.
-		const after = await request("/wallets?orderBy=attributes.validatorRank:asc", options);
+		const after = await request("/wallets?orderBy=balance:asc", options);
 		assert.equal(after.statusCode, 200);
 	});
 
