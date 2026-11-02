@@ -116,9 +116,6 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX blocks_validator_round;
             DROP INDEX blocks_proposer_number;
 
-            DROP INDEX receipts_block_height;
-            DROP INDEX receipts_contracts;
-
             DROP INDEX wallets_balance_address;
             DROP INDEX wallets_attributes;
             DROP INDEX wallets_validators;
