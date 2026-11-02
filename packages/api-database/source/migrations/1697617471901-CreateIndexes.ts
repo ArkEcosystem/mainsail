@@ -4,7 +4,6 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 	public async up(queryRunner: QueryRunner): Promise<void> {
 		// language=postgresql
 		await queryRunner.query(`
-            CREATE UNIQUE INDEX transactions_sender_nonce ON transactions(sender_public_key, nonce);
             CREATE INDEX transactions_to_timestamp_tx_index ON transactions("to", timestamp, transaction_index);
             CREATE INDEX transactions_from_timestamp_tx_index ON transactions("from", timestamp, transaction_index);
             CREATE INDEX transactions_sender_timestamp_tx_index ON transactions(sender_public_key, timestamp, transaction_index);
@@ -87,7 +86,6 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 	public async down(queryRunner: QueryRunner): Promise<void> {
 		// language=postgresql
 		await queryRunner.query(`
-            DROP INDEX transactions_sender_nonce;
             DROP INDEX transactions_to_timestamp_tx_index;
             DROP INDEX transactions_sender_timestamp_tx_index;
             DROP INDEX transactions_from_timestamp_tx_index;
