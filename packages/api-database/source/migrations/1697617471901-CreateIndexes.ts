@@ -20,8 +20,6 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
                 ALTER COLUMN block_hash SET STATISTICS 1000;
 
             CREATE INDEX transactions_value_timestamp_tx_index ON transactions(value, timestamp, transaction_index);
-            CREATE INDEX transactions_gas_price_timestamp_tx_index ON transactions(gas_price, timestamp, transaction_index);
-            CREATE INDEX transactions_nonce_timestamp_tx_index ON transactions(nonce, timestamp, transaction_index);
             CREATE INDEX transactions_timestamp_transaction_index ON transactions(timestamp, transaction_index);
             CREATE INDEX transactions_timestamp_asc_transaction_index_desc ON transactions(timestamp ASC, transaction_index DESC) INCLUDE (gas_price);
 
@@ -98,8 +96,6 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX transactions_block_hash;
 
             DROP INDEX transactions_value_timestamp_tx_index;
-            DROP INDEX transactions_gas_price_timestamp_tx_index;
-            DROP INDEX transactions_nonce_timestamp_tx_index;
             DROP INDEX transactions_timestamp_transaction_index;
             DROP INDEX transactions_timestamp_asc_transaction_index_desc;
             DROP INDEX transactions_function_sig_address;
