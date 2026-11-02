@@ -42,7 +42,6 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             WHERE deployed_contract_address IS NOT NULL;
 
             CREATE INDEX blocks_transactions_count ON blocks(transactions_count, number);
-            CREATE INDEX blocks_reward ON blocks(reward, number);
             CREATE INDEX blocks_fee ON blocks(fee, number);
             CREATE INDEX blocks_validator_round ON blocks(validator_round);
             CREATE INDEX blocks_proposer_number ON blocks(proposer, number);
@@ -120,7 +119,6 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX multi_payments_to;
 
             DROP INDEX blocks_transactions_count;
-            DROP INDEX blocks_reward;
             DROP INDEX blocks_fee;
             DROP INDEX blocks_validator_round;
             DROP INDEX blocks_proposer_number;

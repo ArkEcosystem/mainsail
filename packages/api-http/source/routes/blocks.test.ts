@@ -76,6 +76,27 @@ describe<{
 		}
 	});
 
+	it("GET /api/blocks - rejects the parent hash, payload size, reward and round as criteria and orderBy properties", async ({
+		server,
+	}) => {
+		for (const url of [
+			"/api/blocks?parentHash=" + "ab".repeat(32),
+			"/api/blocks?payloadSize=188",
+			"/api/blocks?payloadSize.from=1000",
+			"/api/blocks?reward=0",
+			"/api/blocks?reward.from=1",
+			"/api/blocks?round=1",
+			"/api/blocks?orderBy=parentHash:asc",
+			"/api/blocks?orderBy=payloadSize:desc",
+			"/api/blocks?orderBy=reward:desc",
+			"/api/blocks?orderBy=round:desc",
+		]) {
+			const response = await server.inject({ method: "GET", url });
+
+			assert.is(response.statusCode, 422);
+		}
+	});
+
 	it("GET /api/blocks - rejects a limit above the configured maximum", async ({ server }) => {
 		const response = await server.inject({ method: "GET", url: "/api/blocks?limit=101" });
 
