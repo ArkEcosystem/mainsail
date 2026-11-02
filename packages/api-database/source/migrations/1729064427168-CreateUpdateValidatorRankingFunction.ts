@@ -31,7 +31,13 @@ export class CreateUpdateValidatorRankingFunction1729064427168 implements Migrat
                     )
                 FROM ranking
                 CROSS JOIN state
-                WHERE wallets.address = ranking.address;
+                WHERE wallets.address = ranking.address
+                    AND (
+                        wallets.attributes->'validatorRank' IS DISTINCT FROM to_jsonb(ranking.rank)
+                        OR wallets.attributes->'validatorApproval' IS DISTINCT FROM to_jsonb(
+                            ROUND(COALESCE(ranking.vote_balance::numeric / NULLIF(state.supply::numeric, 0), 0), 4)
+                        )
+                    );
             END;
             $$
             LANGUAGE plpgsql;
