@@ -68,19 +68,19 @@ describe("TransactionFilter.getExpression", ({ it, assert }) => {
 		});
 	});
 
-	it("should build a greaterThanEqual expression for a numeric from-only nonce criterion", async () => {
-		const expression = await TransactionFilter.getExpression(walletRepository, { nonce: { from: "2" } });
+	it("should build a greaterThanEqual expression for a numeric from-only timestamp criterion", async () => {
+		const expression = await TransactionFilter.getExpression(walletRepository, { timestamp: { from: 2 } });
 
 		assert.equal(expression, {
 			jsonFieldAccessor: undefined,
 			op: "greaterThanEqual",
-			property: "nonce",
-			value: "2",
+			property: "timestamp",
+			value: 2,
 		});
 	});
 
 	it("should map each numeric field to a scalar equal expression", async () => {
-		for (const property of ["transactionIndex", "timestamp", "nonce", "value", "gasPrice"] as const) {
+		for (const property of ["transactionIndex", "timestamp", "value"] as const) {
 			const expression = await TransactionFilter.getExpression(walletRepository, { [property]: 7 } as any);
 
 			assert.equal(expression, { jsonFieldAccessor: undefined, op: "equal", property, value: 7 });

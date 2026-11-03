@@ -32,24 +32,10 @@ export class BlockFilter {
 						handleComparisonCriteria("timestamp", c),
 					);
 				}
-				case "parentHash": {
-					return handleOrCriteria(criteria.parentHash, async (c) => ({
-						op: "equal",
-						property: "parentHash",
-						value: c,
-					}));
-				}
 				case "number": {
 					return handleOrCriteria(criteria.number, async (c) =>
 						// @ts-ignore
 						handleComparisonCriteria("number", c),
-					);
-				}
-
-				case "round": {
-					return handleOrCriteria(criteria.round, async (c) =>
-						// @ts-ignore
-						handleComparisonCriteria("round", c),
 					);
 				}
 
@@ -63,18 +49,6 @@ export class BlockFilter {
 					return handleOrCriteria(criteria.fee, async (c) =>
 						// @ts-ignore
 						handleComparisonCriteria("fee", c),
-					);
-				}
-				case "reward": {
-					return handleOrCriteria(criteria.reward, async (c) =>
-						// @ts-ignore
-						handleComparisonCriteria("reward", c),
-					);
-				}
-				case "payloadSize": {
-					return handleOrCriteria(criteria.payloadSize, async (c) =>
-						// @ts-ignore
-						handleComparisonCriteria("payloadSize", c),
 					);
 				}
 				case "transactionsRoot": {
