@@ -86,15 +86,15 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			const removedTransactions = await this.mempool.reAddTransactions(sendersAddresses);
 
-			this.storage.removeTransactions(removedTransactions.map(({ hash }) => hash));
-
 			for (const transaction of removedTransactions) {
 				this.#txRebroadcastCooldowns.delete(transaction.hash);
 				this.logger.debug(`Removed tx ${transaction.hash}`);
 				void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.toData());
 			}
 
-			await this.#cleanUp();
+			const cleanedUpHashes = await this.#cleanUp();
+
+			this.storage.removeTransactions([...removedTransactions.map(({ hash }) => hash), ...cleanedUpHashes]);
 
 			if (!isSyncing) {
 				await this.#rebroadcastMempoolTransactions(consumedGas);
@@ -152,6 +152,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
 			const lastBlockNumber: number = this.stateStore.getBlockNumber();
 			const expiredBlockNumber: number = lastBlockNumber - maxTransactionAge;
+			const removedHashes: string[] = [];
 
 			for (const { blockNumber, hash, serialized } of this.storage.getAllTransactions()) {
 				if (blockNumber > expiredBlockNumber) {
@@ -167,19 +168,21 @@ export class Service implements Contracts.TransactionPool.Service {
 						previouslyStoredSuccesses++;
 					} catch (rawError) {
 						const error = ensureError(rawError);
-						this.storage.removeTransaction(hash);
+						removedHashes.push(hash);
 						this.#txRebroadcastCooldowns.delete(hash);
 						this.logger.debug(`Failed to re-add previously stored tx ${hash}: ${error.message}`);
 
 						previouslyStoredFailures++;
 					}
 				} else {
-					this.storage.removeTransaction(hash);
+					removedHashes.push(hash);
 					this.#txRebroadcastCooldowns.delete(hash);
 					this.logger.debug(`Not re-adding previously stored expired tx ${hash}`);
 					previouslyStoredExpirations++;
 				}
 			}
+
+			this.storage.removeTransactions(removedHashes);
 
 			if (previouslyStoredSuccesses >= 1) {
 				this.logger.info(`${previouslyStoredSuccesses} previously stored transactions re-added`);
@@ -205,15 +208,18 @@ export class Service implements Contracts.TransactionPool.Service {
 		});
 	}
 
-	async #cleanUp(): Promise<void> {
-		await this.#removeOldTransactions();
-		await this.#removeLowestPriorityTransactions();
+	async #cleanUp(): Promise<string[]> {
+		const expiredHashes = await this.#removeOldTransactions();
+		const evictedHashes = await this.#removeLowestPriorityTransactions();
+
+		return [...expiredHashes, ...evictedHashes];
 	}
 
-	async #removeOldTransactions(): Promise<void> {
+	async #removeOldTransactions(): Promise<Set<string>> {
 		const maxTransactionAge: number = this.pluginConfiguration.getRequired<number>("maxTransactionAge");
 		const lastBlockNumber: number = this.stateStore.getBlockNumber();
 		const expiredBlockNumber: number = lastBlockNumber - maxTransactionAge;
+		const removedHashes = new Set<string>();
 
 		for (const { hash, senderPublicKey } of this.storage.getOldTransactions(expiredBlockNumber)) {
 			const removedTransactions = await this.mempool.removeTransaction(
@@ -225,7 +231,7 @@ export class Service implements Contracts.TransactionPool.Service {
 			removedTransactionHashes.add(hash);
 
 			for (const removedTransactionHash of removedTransactionHashes) {
-				this.storage.removeTransaction(removedTransactionHash);
+				removedHashes.add(removedTransactionHash);
 				this.#txRebroadcastCooldowns.delete(removedTransactionHash);
 				this.logger.debug(`Removed old tx ${removedTransactionHash}`);
 			}
@@ -234,11 +240,13 @@ export class Service implements Contracts.TransactionPool.Service {
 				void this.events.dispatch(Events.TransactionEvent.Expired, removedTransaction.toData());
 			}
 		}
+
+		return removedHashes;
 	}
 
-	async #removeLowestPriorityTransaction(): Promise<void> {
+	async #removeLowestPriorityTransaction(): Promise<string[]> {
 		if (this.getPoolSize() === 0) {
-			return;
+			return [];
 		}
 
 		const transaction = await this.poolQuery.getFromLowestPriority().first();
@@ -246,26 +254,30 @@ export class Service implements Contracts.TransactionPool.Service {
 		const removedTransactions = await this.mempool.removeTransaction(transaction.from, transaction.hash);
 
 		for (const removedTransaction of removedTransactions) {
-			this.storage.removeTransaction(removedTransaction.hash);
 			this.#txRebroadcastCooldowns.delete(removedTransaction.hash);
 			this.logger.debug(`Removed lowest priority tx ${removedTransaction.hash}`);
 			void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, removedTransaction.toData());
 		}
+
+		return removedTransactions.map(({ hash }) => hash);
 	}
 
-	async #removeLowestPriorityTransactions(): Promise<void> {
+	async #removeLowestPriorityTransactions(): Promise<string[]> {
 		const maxTransactionsInPool: number = this.pluginConfiguration.getRequired<number>("maxTransactionsInPool");
+		const removedHashes: string[] = [];
 
 		while (this.getPoolSize() > maxTransactionsInPool) {
-			await this.#removeLowestPriorityTransaction();
+			removedHashes.push(...(await this.#removeLowestPriorityTransaction()));
 		}
+
+		return removedHashes;
 	}
 
 	async #addTransactionToMempool(transaction: Contracts.Crypto.Transaction): Promise<void> {
 		const maxTransactionsInPool: number = this.pluginConfiguration.getRequired<number>("maxTransactionsInPool");
 
 		if (this.getPoolSize() >= maxTransactionsInPool) {
-			await this.#cleanUp();
+			this.storage.removeTransactions(await this.#cleanUp());
 		}
 
 		if (this.getPoolSize() >= maxTransactionsInPool) {
@@ -274,7 +286,7 @@ export class Service implements Contracts.TransactionPool.Service {
 				throw new TransactionPoolFullError(transaction, lowest.gasPrice);
 			}
 
-			await this.#removeLowestPriorityTransaction();
+			this.storage.removeTransactions(await this.#removeLowestPriorityTransaction());
 		}
 
 		await this.mempool.addTransaction(transaction);

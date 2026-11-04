@@ -208,16 +208,15 @@ describe<{
 		const [oldTransaction, laterTransaction] = [makeTransaction(alice, 0n), makeTransaction(alice, 1n)];
 		stub(storage, "getOldTransactions").returnValue([toStoredTransaction(oldTransaction, 1)]);
 		const removeFromMempool = stub(mempool, "removeTransaction").resolvedValue([oldTransaction, laterTransaction]);
-		const removeFromStorage = spy(storage, "removeTransaction");
+		const removeFromStorage = spy(storage, "removeTransactions");
 		const dispatch = spy(events, "dispatch");
 
 		await service.commit([], 0, true);
 
 		removeFromMempool.calledOnce();
 		removeFromMempool.calledWith(alice.address, oldTransaction.hash);
-		removeFromStorage.calledTimes(2);
-		removeFromStorage.calledWith(oldTransaction.hash);
-		removeFromStorage.calledWith(laterTransaction.hash);
+		removeFromStorage.calledOnce();
+		removeFromStorage.calledWith([oldTransaction.hash, laterTransaction.hash]);
 		dispatch.calledTimes(2);
 		dispatch.calledWith(Events.TransactionEvent.Expired, oldTransaction.toData());
 		dispatch.calledWith(Events.TransactionEvent.Expired, laterTransaction.toData());
@@ -230,12 +229,12 @@ describe<{
 	}) => {
 		const transaction = makeTransaction(alice, 0n);
 		stub(storage, "getOldTransactions").returnValue([toStoredTransaction(transaction, 1)]);
-		const removeTransaction = spy(storage, "removeTransaction");
+		const removeTransactions = spy(storage, "removeTransactions");
 		const dispatch = spy(events, "dispatch");
 
 		await service.commit([], 0, true);
 
-		removeTransaction.calledWith(transaction.hash);
+		removeTransactions.calledWith([transaction.hash]);
 		dispatch.neverCalled();
 	});
 
@@ -253,18 +252,45 @@ describe<{
 			makeTransaction(alice, 1n),
 		];
 		poolTransactions.push(first, second, third);
-		const removeFromStorage = spy(storage, "removeTransaction");
+		const removeFromStorage = spy(storage, "removeTransactions");
 		const dispatch = spy(events, "dispatch");
 
 		await service.commit([], 0, true);
 
 		assert.equal(poolTransactions, [first]);
-		removeFromStorage.calledTimes(2);
-		removeFromStorage.calledNthWith(0, third.hash);
-		removeFromStorage.calledNthWith(1, second.hash);
+		removeFromStorage.calledOnce();
+		removeFromStorage.calledWith([third.hash, second.hash]);
 		dispatch.calledTimes(2);
 		dispatch.calledWith(Events.TransactionEvent.RemovedFromPool, third.toData());
 		dispatch.calledWith(Events.TransactionEvent.RemovedFromPool, second.toData());
+	});
+
+	it("commit - should delete the dropped, expired and evicted transactions from storage in one call", async ({
+		service,
+		config,
+		mempool,
+		poolTransactions,
+		storage,
+	}) => {
+		config.maxTransactionsInPool = 1;
+		const [dropped, expired, kept, evicted] = [
+			makeTransaction(alice, 0n),
+			makeTransaction(bob, 0n),
+			makeTransaction(alice, 1n),
+			makeTransaction(bob, 1n),
+		];
+		poolTransactions.push(kept, expired, evicted);
+		stub(mempool, "reAddTransactions").resolvedValue([dropped]);
+		stub(storage, "getOldTransactions").returnValue([toStoredTransaction(expired, 1)]);
+		const removeTransaction = spy(storage, "removeTransaction");
+		const removeTransactions = spy(storage, "removeTransactions");
+
+		await service.commit([alice.address], 0, true);
+
+		assert.equal(poolTransactions, [kept]);
+		removeTransaction.neverCalled();
+		removeTransactions.calledOnce();
+		removeTransactions.calledWith([dropped.hash, expired.hash, evicted.hash]);
 	});
 
 	it("commit - should rebroadcast pool transactions when the block is not full", async ({
@@ -501,7 +527,7 @@ describe<{
 		const lowest = makeTransaction(bob, 0n, 5);
 		poolTransactions.push(lowest);
 		const removeFromMempool = spy(mempool, "removeTransaction");
-		const removeFromStorage = spy(storage, "removeTransaction");
+		const removeFromStorage = spy(storage, "removeTransactions");
 		const dispatch = spy(events, "dispatch");
 		const transaction = makeTransaction(alice, 0n, 6);
 
@@ -510,8 +536,7 @@ describe<{
 		assert.equal(poolTransactions, [transaction]);
 		removeFromMempool.calledOnce();
 		removeFromMempool.calledWith(bob.address, lowest.hash);
-		removeFromStorage.calledOnce();
-		removeFromStorage.calledWith(lowest.hash);
+		removeFromStorage.calledWith([lowest.hash]);
 		dispatch.calledWith(Events.TransactionEvent.RemovedFromPool, lowest.toData());
 		dispatch.calledWith(Events.TransactionEvent.AddedToPool, transaction.toData());
 	});
@@ -593,7 +618,7 @@ describe<{
 			toStoredTransaction(storedTransaction, 91),
 		]);
 		const fromBytes = stub(transactionFactory, "fromBytes").resolvedValue(storedTransaction);
-		const removeFromStorage = spy(storage, "removeTransaction");
+		const removeFromStorage = spy(storage, "removeTransactions");
 
 		await service.reAddTransactions();
 
@@ -601,7 +626,7 @@ describe<{
 		fromBytes.calledWith(storedTransaction.serialized);
 		assert.equal(poolTransactions, [storedTransaction]);
 		removeFromStorage.calledOnce();
-		removeFromStorage.calledWith(expiredTransaction.hash);
+		removeFromStorage.calledWith([expiredTransaction.hash]);
 	});
 
 	it("reAddTransactions - should remove a stored transaction from storage when the mempool rejects it", async ({
@@ -614,12 +639,12 @@ describe<{
 		stub(storage, "getAllTransactions").returnValue([toStoredTransaction(transaction, 99)]);
 		stub(transactionFactory, "fromBytes").resolvedValue(transaction);
 		stub(mempool, "addTransaction").rejectedValue(new Error("invalid"));
-		const removeFromStorage = spy(storage, "removeTransaction");
+		const removeFromStorage = spy(storage, "removeTransactions");
 
 		await service.reAddTransactions();
 
 		removeFromStorage.calledOnce();
-		removeFromStorage.calledWith(transaction.hash);
+		removeFromStorage.calledWith([transaction.hash]);
 	});
 
 	it("reAddTransactions - should clear cooldowns of transactions that are not re-added", async ({
