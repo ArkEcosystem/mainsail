@@ -4,6 +4,8 @@ import { Events, Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { http } from "@mainsail/utils";
 import esmock from "esmock";
+import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 
 import { describe } from "@mainsail/test-runner";
 import { Peer } from "./peer";
@@ -21,7 +23,7 @@ describe<{
 	app: Application;
 	peerCommunicator: PeerCommunicator;
 	peer: Peer;
-}>("PeerCommunicator", ({ it, assert, beforeEach, stub, spyFn }) => {
+}>("PeerCommunicator", ({ it, assert, beforeEach, stub, spyFn, nock }) => {
 	const ip = "167.184.53.78";
 	const port = 4007;
 
@@ -58,7 +60,53 @@ describe<{
 		spyPost.calledOnce();
 		spyPost.calledWith(`http://${ip}:${port}/api/transactions`, {
 			body: { transactions: ["deadbeef", "c0ffee"] },
+			maxContentLength: 128 * 1024,
 		});
+	});
+
+	it("#postTransactions - should accept a response of 128 KiB", async ({ app, peerCommunicator }) => {
+		const server = createServer((request, response) => {
+			request.resume();
+			request.on("end", () => response.end("x".repeat(128 * 1024)));
+		});
+		await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+		const peer = app.resolve(Peer).init("127.0.0.1", (server.address() as AddressInfo).port);
+		nock.enableNetConnect("127.0.0.1");
+
+		try {
+			await peerCommunicator.postTransactions(peer, transactions);
+		} finally {
+			nock.disableNetConnect();
+			server.close();
+		}
+
+		assert.equal(peer.errorCount, 0);
+		assert.defined(peer.lastPinged);
+	});
+
+	it("#postTransactions - should stop reading a response larger than 128 KiB and count it as a failed post", async ({
+		app,
+		peerCommunicator,
+	}) => {
+		const server = createServer((request, response) => {
+			request.resume();
+			request.on("end", () => response.end("x".repeat(128 * 1024 + 1)));
+		});
+		await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+		const peer = app.resolve(Peer).init("127.0.0.1", (server.address() as AddressInfo).port);
+		stub(configuration, "getRequired").returnValue(5);
+		const spyDebug = stub(logger, "debug");
+		nock.enableNetConnect("127.0.0.1");
+
+		try {
+			await peerCommunicator.postTransactions(peer, transactions);
+		} finally {
+			nock.disableNetConnect();
+			server.close();
+		}
+
+		assert.equal(peer.errorCount, 1);
+		spyDebug.calledWith("socket error 127.0.0.1: response too large");
 	});
 
 	it("#postTransactions - should reset errorCount and set lastPinged on success", async ({
