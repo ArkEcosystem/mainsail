@@ -77,13 +77,7 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 		const removedTransactions: Contracts.Crypto.Transaction[] = [];
 
 		for (const address of addresses) {
-			const senderMempool = this.#senderMempools.get(address);
-			if (!senderMempool) {
-				continue;
-			}
-
-			removedTransactions.push(...(await senderMempool.reAddTransactions()));
-			this.#removeDisposableMempool(address);
+			removedTransactions.push(...(await this.#reAddSenderTransactions(address)));
 		}
 
 		return removedTransactions;
@@ -110,6 +104,18 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 
 	public flush(): void {
 		this.#senderMempools.clear();
+	}
+
+	async #reAddSenderTransactions(address: string): Promise<Contracts.Crypto.Transaction[]> {
+		const senderMempool = this.#senderMempools.get(address);
+		if (!senderMempool) {
+			return [];
+		}
+
+		const removedTransactions = await senderMempool.reAddTransactions();
+		this.#removeDisposableMempool(address);
+
+		return removedTransactions;
 	}
 
 	#removeDisposableMempool(address: string): boolean {
