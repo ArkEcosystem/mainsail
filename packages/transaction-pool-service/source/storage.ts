@@ -17,6 +17,7 @@ export class Storage implements Contracts.TransactionPool.Storage {
 	#getAllTransactionsStmt!: BetterSqlite3.Statement;
 	#getOldTransactionsStmt!: BetterSqlite3.Statement<{ blockNumber: number; limit: number }>;
 	#removeTransactionStmt!: BetterSqlite3.Statement<{ hash: string }>;
+	#removeTransactions!: BetterSqlite3.Transaction<(hashes: string[]) => void>;
 	#flushStmt!: BetterSqlite3.Statement;
 
 	public boot(): void {
@@ -64,6 +65,11 @@ export class Storage implements Contracts.TransactionPool.Storage {
 		);
 
 		this.#removeTransactionStmt = this.#database.prepare(`DELETE FROM ${table} WHERE hash = :hash`);
+		this.#removeTransactions = this.#database.transaction((hashes: string[]) => {
+			for (const hash of hashes) {
+				this.#removeTransactionStmt.run({ hash });
+			}
+		});
 
 		this.#flushStmt = this.#database.prepare(`DELETE FROM ${table}`);
 	}
@@ -96,6 +102,10 @@ export class Storage implements Contracts.TransactionPool.Storage {
 
 	public removeTransaction(hash: string): void {
 		this.#removeTransactionStmt.run({ hash });
+	}
+
+	public removeTransactions(hashes: string[]): void {
+		this.#removeTransactions(hashes);
 	}
 
 	public flush(): void {

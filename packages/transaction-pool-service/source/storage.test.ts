@@ -121,6 +121,42 @@ describe<{
 		assert.false(storage.hasTransaction(storedTransaction1.hash));
 	});
 
+	it("removeTransactions - should remove every given transaction and keep the others", ({ storage }) => {
+		storage.addTransaction(storedTransaction1);
+		storage.addTransaction(storedTransaction2);
+
+		storage.removeTransactions([storedTransaction1.hash, "0".repeat(64)]);
+
+		assert.false(storage.hasTransaction(storedTransaction1.hash));
+		assert.true(storage.hasTransaction(storedTransaction2.hash));
+	});
+
+	it("removeTransactions - should accept an empty list", ({ storage }) => {
+		storage.addTransaction(storedTransaction1);
+
+		storage.removeTransactions([]);
+
+		assert.true(storage.hasTransaction(storedTransaction1.hash));
+	});
+
+	it("removeTransactions - should remove nothing when one of the deletes fails", ({ storage }) => {
+		storage.addTransaction(storedTransaction1);
+		storage.addTransaction(storedTransaction2);
+		storage
+			.getDatabase()
+			.exec(
+				`CREATE TRIGGER fail_delete BEFORE DELETE ON pool_20201204 WHEN old.hash = '${storedTransaction2.hash}' BEGIN SELECT RAISE(ABORT, 'delete failed'); END;`,
+			);
+
+		assert.throws(
+			() => storage.removeTransactions([storedTransaction1.hash, storedTransaction2.hash]),
+			"delete failed",
+		);
+
+		assert.true(storage.hasTransaction(storedTransaction1.hash));
+		assert.true(storage.hasTransaction(storedTransaction2.hash));
+	});
+
 	it("flush - should remove all previously added transactions", ({ storage }) => {
 		storage.addTransaction(storedTransaction1);
 		storage.addTransaction(storedTransaction2);

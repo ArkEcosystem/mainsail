@@ -86,8 +86,9 @@ export class Service implements Contracts.TransactionPool.Service {
 
 			const removedTransactions = await this.mempool.reAddTransactions(sendersAddresses);
 
+			this.storage.removeTransactions(removedTransactions.map(({ hash }) => hash));
+
 			for (const transaction of removedTransactions) {
-				this.storage.removeTransaction(transaction.hash);
 				this.#txRebroadcastCooldowns.delete(transaction.hash);
 				this.logger.debug(`Removed tx ${transaction.hash}`);
 				void this.events.dispatch(Events.TransactionEvent.RemovedFromPool, transaction.toData());

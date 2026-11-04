@@ -129,6 +129,7 @@ describe<{
 			getOldTransactions: () => [],
 			hasTransaction: () => false,
 			removeTransaction: () => {},
+			removeTransactions: () => {},
 		};
 
 		context.transactionFactory = {
@@ -178,12 +179,13 @@ describe<{
 	}) => {
 		const transaction = makeTransaction(alice, 0n);
 		stub(mempool, "reAddTransactions").resolvedValue([transaction]);
-		const removeTransaction = spy(storage, "removeTransaction");
+		const removeTransactions = spy(storage, "removeTransactions");
 		const dispatch = spy(events, "dispatch");
 
 		await service.commit([transaction.from], 0, true);
 
-		removeTransaction.calledWith(transaction.hash);
+		removeTransactions.calledOnce();
+		removeTransactions.calledWith([transaction.hash]);
 		dispatch.calledWith(Events.TransactionEvent.RemovedFromPool, transaction.toData());
 	});
 

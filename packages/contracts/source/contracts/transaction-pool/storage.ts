@@ -11,5 +11,6 @@ export interface Storage {
 	getAllTransactions(): Iterable<StoredTransaction>;
 	getOldTransactions(blockNumber: number, limit?: number): Iterable<StoredTransaction>;
 	removeTransaction(hash: string): void;
+	removeTransactions(hashes: string[]): void;
 	flush(): void;
 }
