@@ -23,13 +23,14 @@ describe<{
 	app: Application;
 	peerCommunicator: PeerCommunicator;
 	peer: Peer;
-}>("PeerCommunicator", ({ it, assert, beforeEach, stub, spyFn, nock }) => {
+}>("PeerCommunicator", ({ it, assert, beforeEach, match, stub, spyFn, nock }) => {
 	const ip = "167.184.53.78";
 	const port = 4007;
 
 	const logger = { debug: () => {} };
 	const repository = { forgetPeer: () => {} };
-	const configuration = { getRequired: () => {} };
+	const config: Record<string, number> = { postTimeout: 5000 };
+	const configuration = { getRequired: (key: string) => config[key] };
 
 	const transactions = [
 		{ serialized: Buffer.from("deadbeef", "hex") },
@@ -61,6 +62,7 @@ describe<{
 		spyPost.calledWith(`http://${ip}:${port}/api/transactions`, {
 			body: { transactions: ["deadbeef", "c0ffee"] },
 			maxContentLength: 128 * 1024,
+			signal: match.instanceOf(AbortSignal),
 		});
 	});
 
@@ -94,7 +96,6 @@ describe<{
 		});
 		await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
 		const peer = app.resolve(Peer).init("127.0.0.1", (server.address() as AddressInfo).port);
-		stub(configuration, "getRequired").returnValue(5);
 		const spyDebug = stub(logger, "debug");
 		nock.enableNetConnect("127.0.0.1");
 
@@ -107,6 +108,42 @@ describe<{
 
 		assert.equal(peer.errorCount, 1);
 		spyDebug.calledWith("socket error 127.0.0.1: response too large");
+	});
+
+	it("#postTransactions - should give up on a response still arriving after postTimeout and count it as a failed post", async ({
+		app,
+		peerCommunicator,
+	}) => {
+		let responseClosed = false;
+		const server = createServer((request, response) => {
+			request.resume();
+			request.on("end", () => {
+				const drip = setInterval(() => response.write("x"), 10);
+				const end = setTimeout(() => response.end(), 1000);
+				response.on("close", () => {
+					clearInterval(drip);
+					clearTimeout(end);
+					responseClosed = true;
+				});
+			});
+		});
+		await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+		const peer = app.resolve(Peer).init("127.0.0.1", (server.address() as AddressInfo).port);
+		stub(configuration, "getRequired").callsFake((key: string) => ({ ...config, postTimeout: 50 })[key]);
+		const spyDebug = stub(logger, "debug");
+		nock.enableNetConnect("127.0.0.1");
+
+		try {
+			await peerCommunicator.postTransactions(peer, transactions);
+			await new Promise((resolve) => setTimeout(resolve, 100));
+		} finally {
+			nock.disableNetConnect();
+			server.close();
+		}
+
+		assert.equal(peer.errorCount, 1);
+		spyDebug.calledWith("socket error 127.0.0.1: The operation was aborted");
+		assert.true(responseClosed);
 	});
 
 	it("#postTransactions - should reset errorCount and set lastPinged on success", async ({

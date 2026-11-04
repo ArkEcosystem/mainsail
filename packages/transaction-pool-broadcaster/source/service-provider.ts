@@ -26,6 +26,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		return Joi.object({
 			maxPeersBroadcast: Joi.number().min(0).required(),
 			maxSequentialErrors: Joi.number().min(0).required(),
+			postTimeout: Joi.number().integer().min(1).required(),
 			txPoolPort: Joi.number().min(0).required(),
 		}).unknown(true);
 	}

@@ -68,6 +68,7 @@ describe<{
 		assert.undefined(result.error);
 		assert.number(result.value.maxPeersBroadcast);
 		assert.number(result.value.maxSequentialErrors);
+		assert.equal(result.value.postTimeout, 5000);
 		assert.number(result.value.txPoolPort);
 	});
 
@@ -113,6 +114,28 @@ describe<{
 		result = (serviceProvider.configSchema() as Joi.AnySchema).validate(config);
 
 		assert.equal(result.error?.message, '"maxSequentialErrors" is required');
+	});
+
+	it("postTimeout is required && is integer && >= 1", ({ serviceProvider }) => {
+		const config: any = { ...defaults, postTimeout: false };
+		let result = (serviceProvider.configSchema() as Joi.AnySchema).validate(config);
+
+		assert.equal(result.error?.message, '"postTimeout" must be a number');
+
+		config.postTimeout = 1.5;
+		result = (serviceProvider.configSchema() as Joi.AnySchema).validate(config);
+
+		assert.equal(result.error?.message, '"postTimeout" must be an integer');
+
+		config.postTimeout = 0;
+		result = (serviceProvider.configSchema() as Joi.AnySchema).validate(config);
+
+		assert.equal(result.error?.message, '"postTimeout" must be greater than or equal to 1');
+
+		delete config.postTimeout;
+		result = (serviceProvider.configSchema() as Joi.AnySchema).validate(config);
+
+		assert.equal(result.error?.message, '"postTimeout" is required');
 	});
 
 	it("txPoolPort is required && is number && >= 0", ({ serviceProvider }) => {
@@ -170,6 +193,26 @@ describe<{
 
 		assert.defined(result.error);
 		assert.equal(result.error?.message, '"maxSequentialErrors" must be a number');
+	});
+
+	it("should parse process.env.MAINSAIL_TRANSACTION_POOL_PEER_POST_TIMEOUT", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_TRANSACTION_POOL_PEER_POST_TIMEOUT = "2000";
+
+		const result = (serviceProvider.configSchema() as Joi.AnySchema).validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.postTimeout, 2000);
+	});
+
+	it("should throw if process.env.MAINSAIL_TRANSACTION_POOL_PEER_POST_TIMEOUT is not number", async ({
+		serviceProvider,
+	}) => {
+		process.env.MAINSAIL_TRANSACTION_POOL_PEER_POST_TIMEOUT = "false";
+
+		const result = (serviceProvider.configSchema() as Joi.AnySchema).validate(await importDefaults());
+
+		assert.defined(result.error);
+		assert.equal(result.error?.message, '"postTimeout" must be a number');
 	});
 
 	it("should parse process.env.MAINSAIL_API_TRANSACTION_POOL_PORT", async ({ serviceProvider }) => {

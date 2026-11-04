@@ -28,6 +28,7 @@ export class PeerCommunicator implements Contracts.TransactionPool.PeerCommunica
 			await http.post(`${peer.url}/api/transactions`, {
 				body: { transactions: transactions.map((transaction) => transaction.serialized.toString("hex")) },
 				maxContentLength: MAX_RESPONSE_BYTES,
+				signal: AbortSignal.timeout(this.configuration.getRequired<number>("postTimeout")),
 			});
 
 			peer.errorCount = 0;
