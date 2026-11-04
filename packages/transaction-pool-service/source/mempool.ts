@@ -3,6 +3,8 @@ import type { Contracts } from "@mainsail/contracts";
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
+const RE_ADD_CONCURRENCY = 64;
+
 @injectable()
 export class Mempool implements Contracts.TransactionPool.Mempool {
 	@inject(Identifiers.Services.Log.Service)
@@ -74,13 +76,31 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	}
 
 	public async reAddTransactions(addresses: string[]): Promise<Contracts.Crypto.Transaction[]> {
-		const removedTransactions: Contracts.Crypto.Transaction[] = [];
+		const senders = [...new Set(addresses)];
+		const removedTransactions: Contracts.Crypto.Transaction[][] = [];
+		let next = 0;
+		let failure: { error: unknown } | undefined;
 
-		for (const address of addresses) {
-			removedTransactions.push(...(await this.#reAddSenderTransactions(address)));
+		const reAddNextSenders = async (): Promise<void> => {
+			while (!failure && next < senders.length) {
+				const index = next++;
+				try {
+					removedTransactions[index] = await this.#reAddSenderTransactions(senders[index]);
+				} catch (error) {
+					failure ??= { error };
+				}
+			}
+		};
+
+		await Promise.all(
+			Array.from({ length: Math.min(RE_ADD_CONCURRENCY, senders.length) }, () => reAddNextSenders()),
+		);
+
+		if (failure) {
+			throw failure.error;
 		}
 
-		return removedTransactions;
+		return removedTransactions.flat();
 	}
 
 	async #tryReplaceTransaction(

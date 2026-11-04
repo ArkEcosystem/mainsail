@@ -28,10 +28,12 @@ const makeSenderMempool = () => ({
 	getNonce: () => 0n,
 	getSize: () => 0,
 	isDisposable: () => false,
-	reAddTransactions: async () => [],
+	reAddTransactions: async (): Promise<Contracts.Crypto.Transaction[]> => [],
 	removeTransaction: () => [],
 	replaceTransaction: async () => [],
 });
+
+const tick = () => new Promise((resolve) => setImmediate(resolve));
 
 describe<{
 	app: Application;
@@ -252,6 +254,108 @@ describe<{
 
 		assert.false(mempool.hasSenderMempool(alice));
 		assert.true(mempool.hasSenderMempool(bob));
+	});
+
+	it("reAddTransactions - should return the dropped transactions in sender order when senders finish out of order", async ({
+		mempool,
+		senderMempools,
+	}) => {
+		await mempool.addTransaction(makeTransaction(alice, 0n));
+		await mempool.addTransaction(makeTransaction(bob, 0n));
+		const aliceDropped = [makeTransaction(alice, 0n)];
+		const bobDropped = [makeTransaction(bob, 0n)];
+		senderMempools[alice].reAddTransactions = async () => {
+			await tick();
+			return aliceDropped;
+		};
+		stub(senderMempools[bob], "reAddTransactions").resolvedValue(bobDropped);
+
+		assert.equal(await mempool.reAddTransactions([alice, bob]), [...aliceDropped, ...bobDropped]);
+	});
+
+	it("reAddTransactions - should re-add a sender listed twice only once", async ({ mempool, senderMempools }) => {
+		await mempool.addTransaction(makeTransaction(alice, 0n));
+		await mempool.addTransaction(makeTransaction(bob, 0n));
+		const aliceDropped = [makeTransaction(alice, 0n)];
+		const reAdd = stub(senderMempools[alice], "reAddTransactions").resolvedValue(aliceDropped);
+		const bobReAdd = spy(senderMempools[bob], "reAddTransactions");
+
+		assert.equal(await mempool.reAddTransactions([alice, bob, alice]), aliceDropped);
+
+		reAdd.calledOnce();
+		bobReAdd.calledOnce();
+	});
+
+	it("reAddTransactions - should re-add at most 64 senders at a time", async ({ mempool, senderMempools }) => {
+		const addresses = Array.from({ length: 72 }, (_, index) => `0x${index.toString(16).padStart(40, "0")}`);
+		let running = 0;
+		let mostRunning = 0;
+		for (const address of addresses) {
+			senderMempools[address] = makeSenderMempool();
+			senderMempools[address].reAddTransactions = async () => {
+				mostRunning = Math.max(mostRunning, ++running);
+				await tick();
+				running--;
+				return [];
+			};
+			await mempool.addTransaction(makeTransaction(address, 0n));
+		}
+		const reAdds = addresses.map((address) => spy(senderMempools[address], "reAddTransactions"));
+
+		await mempool.reAddTransactions(addresses);
+
+		assert.equal(mostRunning, 64);
+		for (const reAdd of reAdds) {
+			reAdd.calledOnce();
+		}
+	});
+
+	it("reAddTransactions - should start no more senders after one fails and rethrow once the running ones finish", async ({
+		mempool,
+		senderMempools,
+	}) => {
+		const addresses = Array.from({ length: 72 }, (_, index) => `0x${index.toString(16).padStart(40, "0")}`);
+		let finished = 0;
+		for (const [index, address] of addresses.entries()) {
+			senderMempools[address] = makeSenderMempool();
+			senderMempools[address].reAddTransactions = async () => {
+				await tick();
+				if (index === 0) {
+					throw new Error("evm unavailable");
+				}
+				await tick();
+				finished++;
+				return [];
+			};
+			await mempool.addTransaction(makeTransaction(address, 0n));
+		}
+		const reAdds = addresses.map((address) => spy(senderMempools[address], "reAddTransactions"));
+
+		await assert.rejects(() => mempool.reAddTransactions(addresses), "evm unavailable");
+
+		assert.equal(finished, 63);
+		for (const reAdd of reAdds.slice(64)) {
+			reAdd.neverCalled();
+		}
+	});
+
+	it("reAddTransactions - should rethrow the first failure when several senders fail", async ({
+		mempool,
+		senderMempools,
+	}) => {
+		await mempool.addTransaction(makeTransaction(alice, 0n));
+		await mempool.addTransaction(makeTransaction(bob, 0n));
+		senderMempools[alice].reAddTransactions = async () => {
+			await tick();
+			throw new Error("first failure");
+		};
+		senderMempools[bob].reAddTransactions = async () => {
+			await tick();
+			await tick();
+			throw new Error("later failure");
+		};
+
+		await assert.rejects(() => mempool.reAddTransactions([alice, bob]), "first failure");
 	});
 
 	it("flush - should drop every sender mempool", async ({ mempool }) => {
