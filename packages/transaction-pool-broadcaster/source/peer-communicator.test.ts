@@ -29,8 +29,10 @@ describe<{
 
 	const logger = { debug: () => {} };
 	const repository = { forgetPeer: () => {} };
-	const config: Record<string, number> = { postTimeout: 5000 };
+	const config: Record<string, number> = { maxSequentialErrors: 2, postTimeout: 5000 };
 	const configuration = { getRequired: (key: string) => config[key] };
+	const withConfig = (overrides: Record<string, number>) =>
+		stub(configuration, "getRequired").callsFake((key: string) => ({ ...config, ...overrides })[key]);
 
 	const transactions = [
 		{ serialized: Buffer.from("deadbeef", "hex") },
@@ -129,7 +131,7 @@ describe<{
 		});
 		await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
 		const peer = app.resolve(Peer).init("127.0.0.1", (server.address() as AddressInfo).port);
-		stub(configuration, "getRequired").callsFake((key: string) => ({ ...config, postTimeout: 50 })[key]);
+		withConfig({ postTimeout: 50 });
 		const spyDebug = stub(logger, "debug");
 		nock.enableNetConnect("127.0.0.1");
 
@@ -167,7 +169,7 @@ describe<{
 		stub(http, "post").callsFake(() => {
 			throw new Error("boom");
 		});
-		stub(configuration, "getRequired").returnValue(5);
+		withConfig({ maxSequentialErrors: 5 });
 		const spyDebug = stub(logger, "debug");
 		const spyForget = stub(repository, "forgetPeer");
 
@@ -186,7 +188,7 @@ describe<{
 		stub(http, "post").callsFake(() => {
 			throw new Error("boom");
 		});
-		stub(configuration, "getRequired").returnValue(2);
+		withConfig({ maxSequentialErrors: 2 });
 		const spyForget = stub(repository, "forgetPeer");
 		const spyEmit = spyFn();
 		emit = spyEmit.toFunction();
@@ -206,7 +208,7 @@ describe<{
 
 	it("#postTransactions - should reset errorCount after a successful retry", async ({ peerCommunicator, peer }) => {
 		const spyPost = stub(http, "post");
-		stub(configuration, "getRequired").returnValue(5);
+		withConfig({ maxSequentialErrors: 5 });
 
 		spyPost.callsFakeNth(0, () => {
 			throw new Error("boom");
