@@ -441,6 +441,7 @@ describe<{
 		stub(storage, "hasTransaction").returnValue(true);
 		const addToStorage = spy(storage, "addTransaction");
 		const removeFromStorage = spy(storage, "removeTransaction");
+		const removeBatchFromStorage = spy(storage, "removeTransactions");
 		const addToMempool = spy(mempool, "addTransaction");
 		const dispatch = spy(events, "dispatch");
 		const transaction = makeTransaction(alice, 0n);
@@ -449,6 +450,7 @@ describe<{
 
 		addToStorage.neverCalled();
 		removeFromStorage.neverCalled();
+		removeBatchFromStorage.neverCalled();
 		addToMempool.neverCalled();
 		dispatch.neverCalled();
 	});
