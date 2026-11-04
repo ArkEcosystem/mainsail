@@ -541,6 +541,29 @@ describe<{
 		dispatch.calledWith(Events.TransactionEvent.AddedToPool, transaction.toData());
 	});
 
+	it("addTransaction - should delete the transactions that the clean-up of a full pool expires", async ({
+		service,
+		config,
+		poolTransactions,
+		storage,
+		events,
+	}) => {
+		config.maxTransactionsInPool = 1;
+		const expired = makeTransaction(bob, 0n);
+		poolTransactions.push(expired);
+		stub(storage, "getOldTransactions").returnValue([toStoredTransaction(expired, 1)]);
+		const removeTransactions = spy(storage, "removeTransactions");
+		const dispatch = spy(events, "dispatch");
+		const transaction = makeTransaction(alice, 0n);
+
+		await service.addTransaction(transaction);
+
+		assert.equal(poolTransactions, [transaction]);
+		removeTransactions.calledOnce();
+		removeTransactions.calledWith([expired.hash]);
+		dispatch.calledWith(Events.TransactionEvent.Expired, expired.toData());
+	});
+
 	it("addTransaction - should hold back rebroadcast of a just-added transaction until the next block", async ({
 		service,
 		broadcaster,
@@ -645,6 +668,29 @@ describe<{
 
 		removeFromStorage.calledOnce();
 		removeFromStorage.calledWith([transaction.hash]);
+	});
+
+	it("reAddTransactions - should delete the expired and the rejected transactions in one call", async ({
+		service,
+		config,
+		mempool,
+		storage,
+		transactionFactory,
+	}) => {
+		config.maxTransactionAge = 10;
+		const [expiredTransaction, rejectedTransaction] = [makeTransaction(alice, 0n), makeTransaction(bob, 0n)];
+		stub(storage, "getAllTransactions").returnValue([
+			toStoredTransaction(expiredTransaction, 90),
+			toStoredTransaction(rejectedTransaction, 91),
+		]);
+		stub(transactionFactory, "fromBytes").resolvedValue(rejectedTransaction);
+		stub(mempool, "addTransaction").rejectedValue(new Error("invalid"));
+		const removeTransactions = spy(storage, "removeTransactions");
+
+		await service.reAddTransactions();
+
+		removeTransactions.calledOnce();
+		removeTransactions.calledWith([expiredTransaction.hash, rejectedTransaction.hash]);
 	});
 
 	it("reAddTransactions - should clear cooldowns of transactions that are not re-added", async ({
