@@ -12,13 +12,13 @@ export class Storage implements Contracts.TransactionPool.Storage {
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	#database!: BetterSqlite3.Database;
-	#addTransactionStmt!: BetterSqlite3.Statement<Contracts.TransactionPool.StoredTransaction>;
-	#hasTransactionStmt!: BetterSqlite3.Statement<{ hash: string }>;
-	#getAllTransactionsStmt!: BetterSqlite3.Statement;
-	#getOldTransactionsStmt!: BetterSqlite3.Statement<{ blockNumber: number; limit: number }>;
-	#removeTransactionStmt!: BetterSqlite3.Statement<{ hash: string }>;
-	#removeTransactions!: BetterSqlite3.Transaction<(hashes: string[]) => void>;
-	#flushStmt!: BetterSqlite3.Statement;
+	#addTransactionStatement!: BetterSqlite3.Statement<Contracts.TransactionPool.StoredTransaction>;
+	#hasTransactionStatement!: BetterSqlite3.Statement<{ hash: string }>;
+	#getAllTransactionsStatement!: BetterSqlite3.Statement;
+	#getOldTransactionsStatement!: BetterSqlite3.Statement<{ blockNumber: number; limit: number }>;
+	#removeTransactionStatement!: BetterSqlite3.Statement<{ hash: string }>;
+	#removeTransactionsTransaction!: BetterSqlite3.Transaction<(hashes: string[]) => void>;
+	#flushStatement!: BetterSqlite3.Statement;
 
 	public boot(): void {
 		const filename = this.configuration.getRequired<string>("storage");
@@ -48,30 +48,30 @@ export class Storage implements Contracts.TransactionPool.Storage {
             CREATE INDEX IF NOT EXISTS ${table}_blockNumber ON ${table} (blockNumber);
         `);
 
-		this.#addTransactionStmt = this.#database.prepare(
+		this.#addTransactionStatement = this.#database.prepare(
 			`INSERT INTO ${table} (blockNumber, hash, senderPublicKey, serialized) VALUES (:blockNumber, :hash, :senderPublicKey, :serialized)`,
 		);
 
-		this.#hasTransactionStmt = this.#database
+		this.#hasTransactionStatement = this.#database
 			.prepare(`SELECT COUNT(*) FROM ${table} WHERE hash = :hash`)
 			.pluck(true);
 
-		this.#getAllTransactionsStmt = this.#database.prepare(
+		this.#getAllTransactionsStatement = this.#database.prepare(
 			`SELECT blockNumber, hash, senderPublicKey, serialized FROM ${table} ORDER BY n`,
 		);
 
-		this.#getOldTransactionsStmt = this.#database.prepare(
+		this.#getOldTransactionsStatement = this.#database.prepare(
 			`SELECT blockNumber, hash, senderPublicKey, serialized FROM ${table} WHERE blockNumber <= :blockNumber ORDER BY n DESC LIMIT :limit`,
 		);
 
-		this.#removeTransactionStmt = this.#database.prepare(`DELETE FROM ${table} WHERE hash = :hash`);
-		this.#removeTransactions = this.#database.transaction((hashes: string[]) => {
+		this.#removeTransactionStatement = this.#database.prepare(`DELETE FROM ${table} WHERE hash = :hash`);
+		this.#removeTransactionsTransaction = this.#database.transaction((hashes: string[]) => {
 			for (const hash of hashes) {
-				this.#removeTransactionStmt.run({ hash });
+				this.#removeTransactionStatement.run({ hash });
 			}
 		});
 
-		this.#flushStmt = this.#database.prepare(`DELETE FROM ${table}`);
+		this.#flushStatement = this.#database.prepare(`DELETE FROM ${table}`);
 	}
 
 	public dispose(): void {
@@ -79,37 +79,37 @@ export class Storage implements Contracts.TransactionPool.Storage {
 	}
 
 	public addTransaction(storedTransaction: Contracts.TransactionPool.StoredTransaction): void {
-		this.#addTransactionStmt.run(storedTransaction);
+		this.#addTransactionStatement.run(storedTransaction);
 	}
 
 	public hasTransaction(hash: string): boolean {
-		return !!this.#hasTransactionStmt.get({ hash });
+		return !!this.#hasTransactionStatement.get({ hash });
 	}
 
 	public getAllTransactions(): Iterable<Contracts.TransactionPool.StoredTransaction> {
-		return this.#getAllTransactionsStmt.all() as Iterable<Contracts.TransactionPool.StoredTransaction>;
+		return this.#getAllTransactionsStatement.all() as Iterable<Contracts.TransactionPool.StoredTransaction>;
 	}
 
 	public getOldTransactions(
 		blockNumber: number,
 		limit: number = -1,
 	): Iterable<Contracts.TransactionPool.StoredTransaction> {
-		return this.#getOldTransactionsStmt.all({
+		return this.#getOldTransactionsStatement.all({
 			blockNumber,
 			limit: limit === -1 ? Number.MAX_SAFE_INTEGER : limit,
 		}) as Iterable<Contracts.TransactionPool.StoredTransaction>;
 	}
 
 	public removeTransaction(hash: string): void {
-		this.#removeTransactionStmt.run({ hash });
+		this.#removeTransactionStatement.run({ hash });
 	}
 
 	public removeTransactions(hashes: string[]): void {
-		this.#removeTransactions(hashes);
+		this.#removeTransactionsTransaction(hashes);
 	}
 
 	public flush(): void {
-		this.#flushStmt.run();
+		this.#flushStatement.run();
 	}
 
 	public getDatabase(): BetterSqlite3.Database {
