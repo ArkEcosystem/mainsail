@@ -6,6 +6,8 @@ import { Ipc } from "@mainsail/kernel";
 import { ensureError, http } from "@mainsail/utils";
 import dayjs from "dayjs";
 
+const MAX_RESPONSE_BYTES = 128 * 1024;
+
 @injectable()
 export class PeerCommunicator implements Contracts.TransactionPool.PeerCommunicator {
 	@inject(Identifiers.TransactionPool.Peer.Repository)
@@ -25,6 +27,8 @@ export class PeerCommunicator implements Contracts.TransactionPool.PeerCommunica
 		try {
 			await http.post(`${peer.url}/api/transactions`, {
 				body: { transactions: transactions.map((transaction) => transaction.serialized.toString("hex")) },
+				maxContentLength: MAX_RESPONSE_BYTES,
+				signal: AbortSignal.timeout(this.configuration.getRequired<number>("postTimeout")),
 			});
 
 			peer.errorCount = 0;
