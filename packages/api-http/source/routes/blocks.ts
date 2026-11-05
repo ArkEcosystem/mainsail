@@ -10,9 +10,9 @@ import {
 	blockHash,
 	blocksOrderBy,
 	blockSortingSchema,
+	blockTransactionSortingSchema,
 	transactionCriteriaSchemas,
 	transactionsOrderBy,
-	transactionSortingSchema,
 } from "../schemas/index.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
@@ -95,7 +95,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					includeTokens: Joi.bool().default(false),
 					orderBy: transactionsOrderBy,
 				})
-					.concat(transactionSortingSchema)
+					.concat(blockTransactionSortingSchema)
 					.concat(Schemas.pagination),
 			},
 		},

@@ -72,7 +72,7 @@ export class TokenWhitelist {
 		this.logger.debug(`updating token whitelist (size: ${sanitizedWhitelist.length})`);
 
 		await this.dataSource.transaction(async (entityManager) => {
-			await entityManager.clear(Models.TokenWhitelist);
+			await entityManager.deleteAll(Models.TokenWhitelist);
 			await entityManager.save(Models.TokenWhitelist, sanitizedWhitelist, { chunk: 1000 });
 		});
 	}

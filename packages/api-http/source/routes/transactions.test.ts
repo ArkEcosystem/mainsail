@@ -140,6 +140,27 @@ describe<{
 		}
 	});
 
+	it("GET /api/transactions - only accepts indexed columns as the first orderBy property", async ({ server }) => {
+		for (const [url, statusCode] of [
+			["/api/transactions?blockHash=" + "ab".repeat(32), 422],
+			["/api/transactions?value=1", 422],
+			["/api/transactions?value.from=1", 422],
+			["/api/transactions?orderBy=blockHash:asc", 422],
+			["/api/transactions?orderBy=value:desc", 422],
+			["/api/transactions?orderBy=data:asc", 422],
+			["/api/transactions?orderBy=transactionIndex:asc", 422],
+			["/api/transactions?orderBy=transactionIndex:desc,timestamp:desc", 422],
+			["/api/transactions?orderBy=to:desc", 422],
+			["/api/transactions?orderBy=to:asc", 200],
+			["/api/transactions?orderBy=timestamp:desc,transactionIndex:desc", 200],
+			["/api/transactions?orderBy=timestamp:asc,data:desc", 200],
+		] as const) {
+			const response = await server.inject({ method: "GET", url });
+
+			assert.is(response.statusCode, statusCode);
+		}
+	});
+
 	it("GET /api/transactions/{hash} - returns the enriched transaction", async ({ server, repos }) => {
 		repos.transaction.data.one = makeTransaction({ decodedError: "out of gas", status: 0 });
 		repos.state.data.one = makeState();

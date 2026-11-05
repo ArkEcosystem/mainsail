@@ -18,7 +18,6 @@ export const walletCriteriaSchemaObject = {
 	address: Schemas.orEqualCriteria(walletAddressSchema),
 	attributes: Joi.object(),
 	balance: Schemas.createRangeCriteriaSchema(Schemas.amountSchema),
-	nonce: Schemas.createRangeCriteriaSchema(Joi.number().integer().min(0)),
 	publicKey: Joi.alternatives(
 		walletPublicKeySchema,
 		Joi.string()
@@ -32,7 +31,7 @@ export const walletCriteriaSchema = Schemas.createCriteriaSchema({
 	...walletCriteriaSchemaObject,
 	address: walletAddressSchema,
 });
-export const walletSortingSchema = Schemas.createSortingSchema(
-	{ ...walletCriteriaSchemaObject, address: walletAddressSchema },
-	["attributes"],
-);
+export const walletSortingSchema = Schemas.createSortingSchema({
+	address: walletAddressSchema,
+	balance: walletCriteriaSchemaObject.balance,
+});

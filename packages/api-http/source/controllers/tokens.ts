@@ -38,6 +38,8 @@ const toStringArray = (value: unknown): string[] => {
 	return (Array.isArray(value) ? value : String(value).split(",")).map((v) => String(v).trim()).filter(Boolean);
 };
 
+const escapeLike = (value: string): string => value.replaceAll(/[%\\_]/g, "\\$&");
+
 @injectable()
 export class TokensController extends Controller {
 	@inject(ApiDatabaseIdentifiers.TokenRepositoryFactory)
@@ -216,8 +218,11 @@ export class TokensController extends Controller {
 
 		// the actions of an address list are read per address, listed token and direction, each from its own index
 		// range, as the planner can only sort all of them when they are matched at once
-		const getAddressActions = (direction: "from" | "to", depth: number): string => {
-			const actions = tokenActionsQuery.clone().select("tf.*").andWhere(`tf."${direction}" = addresses.address`);
+		const getAddressActions = (direction: "from" | "to", depth: number, keys = false): string => {
+			const actions = tokenActionsQuery
+				.clone()
+				.select(keys ? ['tf."block_number"', 'tf."index"'] : ["tf.*"])
+				.andWhere(`tf."${direction}" = addresses.address`);
 			let listed = "";
 
 			if (!request.query.ignoreWhitelist) {
@@ -229,7 +234,7 @@ export class TokensController extends Controller {
 				) listed`;
 			}
 
-			if (direction === "to") {
+			if (direction === "to" && !keys) {
 				actions.andWhere(`tf."from" <> ALL(CAST(:addresses AS citext[]))`);
 			}
 
@@ -242,7 +247,16 @@ export class TokensController extends Controller {
 				? `${getAddressActions("from", depth)} UNION ALL ${getAddressActions("to", depth)}`
 				: tokenActionsQuery.clone().select("tf.*").getQuery();
 
-		const page = `SELECT * FROM (${getActions(pagination.offset + pagination.limit)}) tf
+		const depth = pagination.offset + pagination.limit;
+
+		const page = request.query.addresses
+			? `SELECT tf.* FROM (
+				SELECT DISTINCT k.* FROM (${getAddressActions("from", depth, true)} UNION ALL ${getAddressActions("to", depth, true)}) k
+				ORDER BY k.block_number DESC, k.index DESC LIMIT ${pagination.limit} OFFSET ${pagination.offset}
+			) k
+			INNER JOIN "public"."token_actions" tf
+			ON tf.action = :action AND tf.block_number = k.block_number AND tf.index = k.index`
+			: `SELECT * FROM (${getActions(depth)}) tf
 			ORDER BY tf.block_number DESC, tf.index DESC LIMIT ${pagination.limit} OFFSET ${pagination.offset}`;
 
 		const [tokenActionsRows, totalCountRow] = await Promise.all([
@@ -383,30 +397,28 @@ export class TokensController extends Controller {
 
 	public static andWhereNameSearch(
 		queryBuilder: TypeOrm.SelectQueryBuilder<Models.TokenHolder | Models.Token>,
-		nameQuery?: string,
+		nameQuery?: string | string[],
 	): void {
-		const nameSearch = ((nameQuery as string) ?? "").trim();
-		if (!nameSearch) {
+		const terms = toStringArray(nameQuery);
+		if (terms.length === 0) {
 			return;
 		}
 
-		const nameSearchLower = nameSearch.toLowerCase();
-		const isShort = nameSearch.length > 0 && nameSearch.length <= 2;
-
 		queryBuilder.andWhere(
 			new TypeOrm.Brackets((b) => {
-				if (isShort) {
-					// For short queries, use the faster prefix index
-					b.where("lower(tok.symbol) LIKE :prefix", { prefix: `${nameSearchLower}%` }).orWhere(
-						"lower(tok.name) LIKE :prefix",
-						{ prefix: `${nameSearchLower}%` },
-					);
-				} else {
-					// Otherwise trigram index
-					b.where("tok.symbol ILIKE :like", { like: `%${nameSearchLower}%` }).orWhere(
-						"tok.name ILIKE :like",
-						{ like: `%${nameSearchLower}%` },
-					);
+				for (const [index, term] of terms.entries()) {
+					if (term.length <= 2) {
+						// For short queries, use the faster prefix index
+						const prefix = { [`prefix${index}`]: `${escapeLike(term)}%` };
+						b.orWhere(`casefold(tok.symbol) LIKE casefold(:prefix${index})`, prefix).orWhere(
+							`casefold(tok.name) LIKE casefold(:prefix${index})`,
+							prefix,
+						);
+					} else {
+						// Otherwise trigram index
+						const like = { [`like${index}`]: `%${escapeLike(term)}%` };
+						b.orWhere(`tok.symbol ILIKE :like${index}`, like).orWhere(`tok.name ILIKE :like${index}`, like);
+					}
 				}
 			}),
 		);
@@ -414,24 +426,27 @@ export class TokensController extends Controller {
 
 	public static optionallyOrderedByName(
 		queryBuilder: TypeOrm.SelectQueryBuilder<Models.TokenHolder | Models.Token>,
-		nameQuery?: string,
+		nameQuery?: string | string[],
 	): TypeOrm.SelectQueryBuilder<Models.TokenHolder | Models.Token> {
-		const nameSearch = ((nameQuery as string) ?? "").trim();
-		if (!nameSearch) {
+		const terms = toStringArray(nameQuery);
+		if (terms.length === 0) {
 			return queryBuilder;
 		}
 
 		queryBuilder
 			.addSelect(
 				`CASE
-			WHEN LOWER(tok.symbol) LIKE :orderByPrefix THEN 0
-			WHEN LOWER(tok.name) LIKE :orderByPrefix THEN 1
+			WHEN casefold(tok.symbol) LIKE ANY(ARRAY(SELECT casefold(prefix) FROM unnest(CAST(:orderByPrefixes AS text[])) prefix)) THEN 0
+			WHEN casefold(tok.name) LIKE ANY(ARRAY(SELECT casefold(prefix) FROM unnest(CAST(:orderByPrefixes AS text[])) prefix)) THEN 1
 			ELSE 2
     		END`,
 				"search_rank",
 			)
 			.addOrderBy("search_rank", "ASC")
-			.setParameter("orderByPrefix", `${nameSearch.toLowerCase()}%`);
+			.setParameter(
+				"orderByPrefixes",
+				terms.map((term) => `${escapeLike(term)}%`),
+			);
 
 		return queryBuilder;
 	}

@@ -279,6 +279,42 @@ describe<{
 		);
 	});
 
+	it("update_validator_ranks rewrites only the validators whose rank or approval changed", async () => {
+		await apiContext.walletRepository.save(validators);
+		await apiContext.stateRepository.save({ blockNumber: "0", id: 0, supply: "1000" });
+
+		const rank = () => apiContext.dataSource.query("SELECT update_validator_ranks()");
+		const rows = (): Promise<{ address: string; approval: number; rank: number; version: string }[]> =>
+			apiContext.dataSource.query(`
+				SELECT address, xmin::text AS version, (attributes->>'validatorRank')::int AS rank,
+					(attributes->>'validatorApproval')::float AS approval
+				FROM wallets ORDER BY rank`);
+
+		await rank();
+		const ranked = await rows();
+		await rank();
+
+		assert.equal(await rows(), ranked);
+		assert.equal(
+			ranked.map((row) => row.rank),
+			validators.map((_, index) => index + 1),
+		);
+
+		const [first, ...others] = ranked;
+		await apiContext.dataSource.query(
+			`UPDATE wallets SET attributes = attributes || '{"validatorVoteBalance": "500"}' WHERE address = $1`,
+			[first.address],
+		);
+		const [voted] = await rows();
+		await rank();
+		const [reranked, ...unchanged] = await rows();
+
+		assert.equal(unchanged, others);
+		assert.is(reranked.address, first.address);
+		assert.is(reranked.approval, 0.5);
+		assert.not.equal(reranked.version, voted.version);
+	});
+
 	it("/validators/{id}", async () => {
 		await apiContext.walletRepository.save(validators);
 

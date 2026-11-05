@@ -98,6 +98,27 @@ describe<{
 					statusCode: 200,
 				},
 			},
+			{
+				query: "?name=%25",
+				result: {
+					data: [],
+					statusCode: 200,
+				},
+			},
+			{
+				query: "?name=DARK20,DARK21",
+				result: {
+					data: [tokens[0], tokens[1]],
+					statusCode: 200,
+				},
+			},
+			{
+				query: "?name=DARK21&name=DARK20",
+				result: {
+					data: [tokens[0], tokens[1]],
+					statusCode: 200,
+				},
+			},
 		];
 
 		for (const { query, result } of testCases) {
@@ -109,6 +130,30 @@ describe<{
 				assert.equal(statusCode, result.statusCode);
 				assert.equal(data.data, result.data);
 			}
+		}
+	});
+
+	it("/tokens?name beyond ascii", async () => {
+		const [first, second, third] = tokens;
+		await apiContext.tokenRepository.save([
+			{ ...first, name: "ΜΑΣ", symbol: "QQQ" },
+			{ ...second, name: "Other", symbol: "ΜΑΣ" },
+			{ ...third, name: "İAX", symbol: "İAX" },
+		]);
+
+		for (const [name, addresses] of [
+			["İA", [third.address]],
+			["ΜΑΣ", [second.address, first.address]],
+		] as const) {
+			const { statusCode, data } = await request(
+				`/tokens?ignoreWhitelist=true&name=${encodeURIComponent(name)}`,
+				options,
+			);
+			assert.equal(statusCode, 200);
+			assert.equal(
+				data.data.map((token) => token.address),
+				addresses,
+			);
 		}
 	});
 
@@ -394,6 +439,25 @@ describe<{
 				assert.equal(data.data, result.data);
 			}
 		}
+	});
+
+	it("/tokens/transfers?addresses lists a transfer to its sender once", async () => {
+		const [action] = tokenActions;
+		await apiContext.tokenRepository.save(tokenTransferTokens);
+		await apiContext.transactionRepository.save(tokenTransferTransactions);
+		await apiContext.tokenActionRepository.save([
+			...tokenActions,
+			{ ...action, blockNumber: "1300", to: action.from },
+		]);
+		await apiContext.tokenWhitelistRepository.save(tokenWhitelist);
+
+		const { statusCode, data } = await request(`/tokens/transfers?addresses=${action.from}`, options);
+
+		assert.equal(statusCode, 200);
+		assert.equal(
+			data.data.filter((transfer) => transfer.from === transfer.to).map((transfer) => transfer.to),
+			[action.from],
+		);
 	});
 
 	it("/tokens/{}/transfers", async () => {

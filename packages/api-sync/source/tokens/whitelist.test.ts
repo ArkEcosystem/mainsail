@@ -22,7 +22,7 @@ const response = (data: unknown) => ({
 type Ctx = {
 	app: Application;
 	whitelist: TokenWhitelist;
-	entityManager: { clear: any; save: any };
+	entityManager: { deleteAll: any; save: any };
 	dataSource: { transaction: any };
 	logger: Record<string, any>;
 	addressFactory: { validate: any };
@@ -32,7 +32,7 @@ type Ctx = {
 describe<Ctx>("TokenWhitelist", ({ it, beforeEach, afterEach, assert, spy, stub }) => {
 	beforeEach((context) => {
 		context.remoteUrl = REMOTE_URL;
-		context.entityManager = { clear: async () => {}, save: async () => {} };
+		context.entityManager = { deleteAll: async () => {}, save: async () => {} };
 		context.dataSource = {
 			transaction: async (callback: any) => callback(context.entityManager),
 		};
@@ -82,7 +82,7 @@ describe<Ctx>("TokenWhitelist", ({ it, beforeEach, afterEach, assert, spy, stub 
 		);
 
 		const info = spy(logger, "info");
-		const clear = spy(entityManager, "clear");
+		const deleteAll = spy(entityManager, "deleteAll");
 		const save = spy(entityManager, "save");
 
 		await whitelist.bootstrap();
@@ -90,7 +90,7 @@ describe<Ctx>("TokenWhitelist", ({ it, beforeEach, afterEach, assert, spy, stub 
 
 		info.calledWith(`Starting TokenWhitelist using remote: ${REMOTE_URL}`);
 		get.calledWith(REMOTE_URL, { maxContentLength: 16 * 1024, timeout: 2500 });
-		clear.calledWith(Models.TokenWhitelist);
+		deleteAll.calledWith(Models.TokenWhitelist);
 		save.calledOnce();
 		assert.equal(save.getCallArgs(0), [
 			Models.TokenWhitelist,

@@ -136,8 +136,8 @@ describe<{
 		);
 
 		for (const [orderBy, result] of [
-			["value:desc", [4, 3, 1, 2]],
-			["value:asc", [2, 1, 3, 4]],
+			["senderPublicKey:desc", [3, 1, 2, 4]],
+			["senderPublicKey:asc", [4, 2, 1, 3]],
 			["timestamp:desc", [3, 1, 2, 4]],
 			["from:asc", [4, 2, 1, 3]],
 		] as const) {

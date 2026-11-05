@@ -20,4 +20,19 @@ export const transactionCriteriaSchemaObject = {
 };
 
 export const transactionParamSchema = transactionHashSchema;
-export const transactionSortingSchema = Schemas.createSortingSchema(transactionSortingSchemaObject, []);
+export const blockTransactionSortingSchema = Schemas.createSortingSchema(transactionSortingSchemaObject, []);
+export const transactionSortingSchema = blockTransactionSortingSchema.concat(
+	Joi.object({
+		orderBy: Joi.custom((value, helpers) => {
+			const [property, direction = "asc"] = String([value].flat()[0] ?? "")
+				.split(",")[0]
+				.split(":");
+
+			if (property === "data" || property === "transactionIndex" || (property === "to" && direction === "desc")) {
+				return helpers.message({ custom: `orderBy cannot start with '${property}:${direction}'` });
+			}
+
+			return value;
+		}),
+	}),
+);

@@ -55,6 +55,27 @@ describe<{
 		assert.equal(JSON.parse(response.payload).data[0].balance, "1000");
 	});
 
+	it("GET /api/wallets - only sorts by address or balance and does not filter by nonce", async ({
+		server,
+		repos,
+	}) => {
+		repos.wallet.data.page = makePage([makeWallet()]);
+
+		for (const [url, statusCode] of [
+			["/api/wallets?nonce=1", 422],
+			["/api/wallets?orderBy=nonce:desc", 422],
+			["/api/wallets?orderBy=publicKey:asc", 422],
+			["/api/wallets?orderBy=attributes.validatorRank:asc", 422],
+			["/api/wallets/top?orderBy=attributes.username:desc", 422],
+			["/api/wallets?orderBy=balance:desc,address:asc", 200],
+			["/api/wallets?attributes.validatorPublicKey=" + "ab".repeat(48), 200],
+		] as const) {
+			const response = await server.inject({ method: "GET", url });
+
+			assert.is(response.statusCode, statusCode);
+		}
+	});
+
 	it("GET /api/wallets/{id} - returns the wallet", async ({ server, repos }) => {
 		repos.wallet.data.one = makeWallet();
 

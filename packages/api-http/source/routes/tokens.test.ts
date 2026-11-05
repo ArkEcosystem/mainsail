@@ -111,19 +111,34 @@ describe<{
 
 		// Queries of up to two characters use the prefix index ...
 		assert.equal(replayBrackets(repos.token.qb.calls.andWhere[0][0]), [
-			["lower(tok.symbol) LIKE :prefix", { prefix: "te%" }],
-			["lower(tok.name) LIKE :prefix", { prefix: "te%" }],
+			["casefold(tok.symbol) LIKE casefold(:prefix0)", { prefix0: "te%" }],
+			["casefold(tok.name) LIKE casefold(:prefix0)", { prefix0: "te%" }],
 		]);
 		// ... longer queries the trigram index.
 		assert.equal(replayBrackets(repos.token.qb.calls.andWhere[1][0]), [
-			["tok.symbol ILIKE :like", { like: "%tes%" }],
-			["tok.name ILIKE :like", { like: "%tes%" }],
+			["tok.symbol ILIKE :like0", { like0: "%tes%" }],
+			["tok.name ILIKE :like0", { like0: "%tes%" }],
 		]);
 
 		// Both name searches rank prefix matches first.
 		assert.length(repos.token.qb.calls.addSelect, 2);
-		assert.equal(repos.token.qb.calls.setParameter[0], ["orderByPrefix", "te%"]);
-		assert.equal(repos.token.qb.calls.setParameter[1], ["orderByPrefix", "tes%"]);
+		assert.equal(repos.token.qb.calls.setParameter[0], ["orderByPrefixes", ["te%"]]);
+		assert.equal(repos.token.qb.calls.setParameter[1], ["orderByPrefixes", ["tes%"]]);
+	});
+
+	it("GET /api/tokens - searches several names and matches LIKE wildcards literally", async ({ server, repos }) => {
+		repos.token.data.manyAndCount = [[makeToken()], 1];
+
+		const response = await server.inject({ method: "GET", url: "/api/tokens?name=%25&name=a_b%5C" });
+
+		assert.is(response.statusCode, 200);
+		assert.equal(replayBrackets(repos.token.qb.calls.andWhere[0][0]), [
+			["casefold(tok.symbol) LIKE casefold(:prefix0)", { prefix0: "\\%%" }],
+			["casefold(tok.name) LIKE casefold(:prefix0)", { prefix0: "\\%%" }],
+			["tok.symbol ILIKE :like1", { like1: "%a\\_b\\\\%" }],
+			["tok.name ILIKE :like1", { like1: "%a\\_b\\\\%" }],
+		]);
+		assert.equal(repos.token.qb.calls.setParameter[0], ["orderByPrefixes", ["\\%%", "a\\_b\\\\%"]]);
 	});
 
 	it("GET /api/tokens/transfers - excludes custom blacklisted tokens", async ({ server, repos }) => {
