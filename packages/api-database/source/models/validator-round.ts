@@ -13,7 +13,6 @@ export class ValidatorRound {
 
 	@Column({
 		type: "bigint",
-		unique: true,
 	})
 	public readonly roundHeight!: number;
 

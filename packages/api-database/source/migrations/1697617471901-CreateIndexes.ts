@@ -4,7 +4,6 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 	public async up(queryRunner: QueryRunner): Promise<void> {
 		// language=postgresql
 		await queryRunner.query(`
-            CREATE UNIQUE INDEX transactions_sender_nonce ON transactions(sender_public_key, nonce);
             CREATE INDEX transactions_to_timestamp_tx_index ON transactions("to", timestamp, transaction_index);
             CREATE INDEX transactions_from_timestamp_tx_index ON transactions("from", timestamp, transaction_index);
             CREATE INDEX transactions_sender_timestamp_tx_index ON transactions(sender_public_key, timestamp, transaction_index);
@@ -20,8 +19,6 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
                 ALTER COLUMN block_hash SET STATISTICS 1000;
 
             CREATE INDEX transactions_value_timestamp_tx_index ON transactions(value, timestamp, transaction_index);
-            CREATE INDEX transactions_gas_price_timestamp_tx_index ON transactions(gas_price, timestamp, transaction_index);
-            CREATE INDEX transactions_nonce_timestamp_tx_index ON transactions(nonce, timestamp, transaction_index);
             CREATE INDEX transactions_timestamp_transaction_index ON transactions(timestamp, transaction_index);
             CREATE INDEX transactions_timestamp_asc_transaction_index_desc ON transactions(timestamp ASC, transaction_index DESC) INCLUDE (gas_price);
 
@@ -42,7 +39,6 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             WHERE deployed_contract_address IS NOT NULL;
 
             CREATE INDEX blocks_transactions_count ON blocks(transactions_count, number);
-            CREATE INDEX blocks_reward ON blocks(reward, number);
             CREATE INDEX blocks_fee ON blocks(fee, number);
             CREATE INDEX blocks_validator_round ON blocks(validator_round);
             CREATE INDEX blocks_proposer_number ON blocks(proposer, number);
@@ -72,7 +68,6 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             CREATE INDEX token_actions_all ON token_actions (action, "block_number" DESC, "index" DESC);
             CREATE INDEX token_actions_all_from ON token_actions (action, "from", "block_number" DESC, "index" DESC);
             CREATE INDEX token_actions_all_to ON token_actions (action, "to", "block_number" DESC, "index" DESC);
-            CREATE INDEX token_actions_address ON token_actions (action, "address", "block_number" DESC, "index" DESC);
             CREATE INDEX token_actions_address_from ON token_actions (action, "address", "from", "block_number" DESC, "index" DESC);
             CREATE INDEX token_actions_address_to ON token_actions (action, "address", "to", "block_number" DESC, "index" DESC );
             CREATE INDEX token_actions_tx_hash ON token_actions ("transaction_hash");
@@ -90,7 +85,6 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
 	public async down(queryRunner: QueryRunner): Promise<void> {
 		// language=postgresql
 		await queryRunner.query(`
-            DROP INDEX transactions_sender_nonce;
             DROP INDEX transactions_to_timestamp_tx_index;
             DROP INDEX transactions_sender_timestamp_tx_index;
             DROP INDEX transactions_from_timestamp_tx_index;
@@ -99,8 +93,6 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX transactions_block_hash;
 
             DROP INDEX transactions_value_timestamp_tx_index;
-            DROP INDEX transactions_gas_price_timestamp_tx_index;
-            DROP INDEX transactions_nonce_timestamp_tx_index;
             DROP INDEX transactions_timestamp_transaction_index;
             DROP INDEX transactions_timestamp_asc_transaction_index_desc;
             DROP INDEX transactions_function_sig_address;
@@ -120,13 +112,9 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX multi_payments_to;
 
             DROP INDEX blocks_transactions_count;
-            DROP INDEX blocks_reward;
             DROP INDEX blocks_fee;
             DROP INDEX blocks_validator_round;
             DROP INDEX blocks_proposer_number;
-
-            DROP INDEX receipts_block_height;
-            DROP INDEX receipts_contracts;
 
             DROP INDEX wallets_balance_address;
             DROP INDEX wallets_attributes;
@@ -148,7 +136,6 @@ export class CreateIndexes1697617471901 implements MigrationInterface {
             DROP INDEX token_actions_all;
             DROP INDEX token_actions_all_from;
             DROP INDEX token_actions_all_to;
-            DROP INDEX token_actions_address;
             DROP INDEX token_actions_address_from;
             DROP INDEX token_actions_address_to;
             DROP INDEX token_actions_tx_hash;

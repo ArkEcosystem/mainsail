@@ -63,11 +63,7 @@ export const transactionsOrderBy = orderBy.default(["timestamp:desc", "transacti
 export const blockCriteriaSchemas = {
 	hash: Schemas.orEqualCriteria(blockHash),
 	number: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
-	parentHash: Schemas.orEqualCriteria(blockHash),
-	payloadSize: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	proposer: Schemas.orEqualCriteria(address),
-	reward: Schemas.orNumericCriteria(Schemas.amountSchema),
-	round: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	timestamp: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 };
 
@@ -77,9 +73,7 @@ export const transactionCriteriaSchemas = {
 		Joi.alternatives().try(Joi.string().valid("", "0x"), Joi.string().hex({ prefix: "optional" }).max(10)),
 	),
 	from: Schemas.orEqualCriteria(address),
-	gasPrice: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	hash: Schemas.orEqualCriteria(Joi.string().hex().length(64)),
-	nonce: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	senderPublicKey: Schemas.orEqualCriteria(Joi.string().hex().length(66)),
 	timestamp: Schemas.orNumericCriteria(Joi.number().integer().min(0)),
 	to: Schemas.orEqualCriteria(address),
