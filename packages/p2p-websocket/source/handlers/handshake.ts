@@ -8,6 +8,9 @@ import { ConnectionError } from "../errors.js";
 // dialer's hello, checks it, and either echoes hello or sends reject and closes. Both sides give
 // the other HANDSHAKE_TIMEOUT from start(). The dialer's hello may reach the acceptor before its
 // start() runs (same TCP chunk as the upgrade), so the result promise exists from construction.
+// The connection is opened through the `open` callback, not by awaiting start(): the acceptor's
+// first request may arrive in the same TCP chunk as its hello, and ws emits both messages in one
+// tick, before a promise continuation would have run.
 export class Handshake {
 	readonly #options: HandshakeOptions;
 	readonly #done: Promise<void>;
@@ -66,6 +69,7 @@ export class Handshake {
 		}
 
 		this.#settle();
+		this.#options.open();
 		this.#resolve();
 	}
 

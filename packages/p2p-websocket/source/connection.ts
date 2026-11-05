@@ -54,6 +54,7 @@ export class Connection implements ConnectionInterface {
 
 		this.#handshake = new Handshake({
 			direction: options.direction,
+			open: () => this.#open(),
 			reject: (reason) => this.reject(reason),
 			send: (message) => this.#send(message),
 		});
@@ -83,7 +84,7 @@ export class Connection implements ConnectionInterface {
 	}
 
 	// Waits for the socket to open if it is still connecting, then runs the handshake.
-	// Rejects and closes the connection on failure.
+	// Rejects and closes the connection on failure. The state becomes Open inside the handshake.
 	public async open(): Promise<void> {
 		try {
 			await this.#waitForOpen();
@@ -91,10 +92,6 @@ export class Connection implements ConnectionInterface {
 		} catch (error) {
 			this.terminate(error instanceof ConnectionError ? error.reason : CloseReason.ProtocolError, error as Error);
 			throw error;
-		}
-
-		if (this.#state === ConnectionState.Handshaking) {
-			this.#state = ConnectionState.Open;
 		}
 	}
 
@@ -210,6 +207,13 @@ export class Connection implements ConnectionInterface {
 		}
 
 		this.#send({ id: message.id, payload: response.payload, statusCode: response.statusCode, type: "response" });
+	}
+
+	// A close that began during the handshake wins; only an untouched connection opens.
+	#open(): void {
+		if (this.#state === ConnectionState.Handshaking) {
+			this.#state = ConnectionState.Open;
+		}
 	}
 
 	#onError(error: Error): void {
