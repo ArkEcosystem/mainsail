@@ -199,17 +199,16 @@ export class WalletsController extends Controller {
 
 		const tokenPaginatedQuery = this.tokenRepositoryFactory()
 			.createQueryBuilder("tok")
-			.where(
-				`EXISTS (
-					SELECT 1
-					FROM token_holders th
-					WHERE th.token_address = tok.address
-						AND th.address IN (:...addresses)
-						AND th.balance / POW(10, tok.decimals) >= :minBalance
-					LIMIT 1
-	    	)`,
-				{ addresses: walletAddresses, minBalance },
-			);
+			.addCommonTableExpression(
+				`SELECT th.token_address
+				FROM token_holders th
+				INNER JOIN tokens holder_token ON holder_token.address = th.token_address
+				WHERE th.address IN (:...addresses)
+					AND th.balance / POW(10, holder_token.decimals) >= :minBalance`,
+				"held",
+				{ materialized: true },
+			)
+			.where("tok.address IN (SELECT token_address FROM held)", { addresses: walletAddresses, minBalance });
 
 		TokensController.andWhereWhitelisted(tokenPaginatedQuery, request);
 		TokensController.andWhereNameSearch(tokenPaginatedQuery, request.query.name);

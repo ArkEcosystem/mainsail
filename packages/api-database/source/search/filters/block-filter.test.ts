@@ -29,7 +29,7 @@ describe("BlockFilter", ({ it, assert }) => {
 	});
 
 	it("should map each string-valued field to an equal expression", async () => {
-		for (const property of ["version", "parentHash", "transactionsRoot"] as const) {
+		for (const property of ["version", "transactionsRoot"] as const) {
 			const expression = await BlockFilter.getExpression({ [property]: "x" } as any);
 
 			assert.equal(expression, { op: "equal", property, value: "x" });
@@ -37,7 +37,7 @@ describe("BlockFilter", ({ it, assert }) => {
 	});
 
 	it("should map each numeric field to a comparison expression", async () => {
-		for (const property of ["timestamp", "round", "transactionsCount", "fee", "reward", "payloadSize"] as const) {
+		for (const property of ["timestamp", "transactionsCount", "fee"] as const) {
 			const expression = await BlockFilter.getExpression({ [property]: 9 } as any);
 
 			assert.equal(expression, { jsonFieldAccessor: undefined, op: "equal", property, value: 9 });
@@ -74,12 +74,12 @@ describe("BlockFilter", ({ it, assert }) => {
 	});
 
 	it("should build a lessThanEqual expression for to only", async () => {
-		const expression = await BlockFilter.getExpression({ round: { to: 7 } });
+		const expression = await BlockFilter.getExpression({ number: { to: 7 } });
 
 		assert.equal(expression, {
 			jsonFieldAccessor: undefined,
 			op: "lessThanEqual",
-			property: "round",
+			property: "number",
 			value: 7,
 		});
 	});

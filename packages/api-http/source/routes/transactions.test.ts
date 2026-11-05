@@ -108,22 +108,39 @@ describe<{
 	}) => {
 		await server.inject({
 			method: "GET",
-			url: `/api/transactions?from=${makeTransaction().from}&limit=25&orderBy=nonce:asc`,
+			url: `/api/transactions?from=${makeTransaction().from}&limit=25&orderBy=timestamp:asc`,
 		});
 
 		const [, criteria, sorting, pagination, options] = repos.transaction.calls.findManyByCriteria[0];
 		assert.equal(criteria.from, makeTransaction().from);
-		assert.equal(sorting, [{ direction: "asc", property: "nonce" }]);
+		assert.equal(sorting, [{ direction: "asc", property: "timestamp" }]);
 		assert.equal(pagination, { limit: 25, offset: 0 });
 		assert.equal(options, { estimateTotalCount: true, fullReceipt: false });
 	});
 
-	it("GET /api/transactions - accepts a zero nonce and transaction index", async ({ server, repos }) => {
-		const response = await server.inject({ method: "GET", url: "/api/transactions?nonce=0&transactionIndex=0" });
+	it("GET /api/transactions - accepts a zero transaction index", async ({ server, repos }) => {
+		const response = await server.inject({ method: "GET", url: "/api/transactions?transactionIndex=0" });
 
 		assert.is(response.statusCode, 200);
 		const [, criteria] = repos.transaction.calls.findManyByCriteria[0];
-		assert.equal([criteria.nonce, criteria.transactionIndex], [0, 0]);
+		assert.is(criteria.transactionIndex, 0);
+	});
+
+	it("GET /api/transactions - rejects the gas price and nonce as criteria and orderBy properties", async ({
+		server,
+	}) => {
+		for (const url of [
+			"/api/transactions?gasPrice=5",
+			"/api/transactions?gasPrice.from=1",
+			"/api/transactions?nonce=0",
+			"/api/transactions?nonce.to=10",
+			"/api/transactions?orderBy=gasPrice:desc",
+			"/api/transactions?orderBy=nonce:asc",
+		]) {
+			const response = await server.inject({ method: "GET", url });
+
+			assert.is(response.statusCode, 422);
+		}
 	});
 
 	it("GET /api/transactions - rejects criteria and orderBy properties transactions do not have", async ({
@@ -137,6 +154,27 @@ describe<{
 			const response = await server.inject({ method: "GET", url });
 
 			assert.is(response.statusCode, 422);
+		}
+	});
+
+	it("GET /api/transactions - only accepts indexed columns as the first orderBy property", async ({ server }) => {
+		for (const [url, statusCode] of [
+			["/api/transactions?blockHash=" + "ab".repeat(32), 422],
+			["/api/transactions?value=1", 422],
+			["/api/transactions?value.from=1", 422],
+			["/api/transactions?orderBy=blockHash:asc", 422],
+			["/api/transactions?orderBy=value:desc", 422],
+			["/api/transactions?orderBy=data:asc", 422],
+			["/api/transactions?orderBy=transactionIndex:asc", 422],
+			["/api/transactions?orderBy=transactionIndex:desc,timestamp:desc", 422],
+			["/api/transactions?orderBy=to:desc", 422],
+			["/api/transactions?orderBy=to:asc", 200],
+			["/api/transactions?orderBy=timestamp:desc,transactionIndex:desc", 200],
+			["/api/transactions?orderBy=timestamp:asc,data:desc", 200],
+		] as const) {
+			const response = await server.inject({ method: "GET", url });
+
+			assert.is(response.statusCode, statusCode);
 		}
 	});
 

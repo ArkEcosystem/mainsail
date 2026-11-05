@@ -136,8 +136,8 @@ describe<{
 		);
 
 		for (const [orderBy, result] of [
-			["value:desc", [4, 3, 1, 2]],
-			["value:asc", [2, 1, 3, 4]],
+			["senderPublicKey:desc", [3, 1, 2, 4]],
+			["senderPublicKey:asc", [4, 2, 1, 3]],
 			["timestamp:desc", [3, 1, 2, 4]],
 			["from:asc", [4, 2, 1, 3]],
 		] as const) {
@@ -151,17 +151,17 @@ describe<{
 	});
 
 	it("/transactions rejects more than 50 values for one parameter", async () => {
-		const nonces = Array.from({ length: 51 }, (_, index) => index + 1);
+		const indexes = Array.from({ length: 51 }, (_, index) => index + 1);
 
 		let statusCode;
 		try {
-			statusCode = (await request(`/transactions?nonce=${nonces.join(",")}`, options)).statusCode;
+			statusCode = (await request(`/transactions?transactionIndex=${indexes.join(",")}`, options)).statusCode;
 		} catch (ex) {
 			statusCode = ex.response?.statusCode;
 		}
 		assert.equal(statusCode, 422);
 
-		({ statusCode } = await request(`/transactions?nonce=${nonces.slice(0, 50).join(",")}`, options));
+		({ statusCode } = await request(`/transactions?transactionIndex=${indexes.slice(0, 50).join(",")}`, options));
 		assert.equal(statusCode, 200);
 	});
 

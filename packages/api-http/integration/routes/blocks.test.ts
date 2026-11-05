@@ -40,28 +40,12 @@ describe<{
 		assert.equal(statusCode, 200);
 	});
 
-	it("/blocks?reward beyond the safe integers", async () => {
-		const [first, second] = blocks;
-		await apiContext.blockRepository.save([
-			{ ...first, reward: "2000000000000000000" },
-			{ ...second, reward: "1000000000000000000" },
-		]);
-
-		const { statusCode, data } = await request("/blocks?reward.from=1500000000000000000", options);
-		assert.equal(statusCode, 200);
-		assert.equal(
-			data.data.map((block) => block.hash),
-			[first.hash],
-		);
-	});
-
 	it("/blocks breaks sort ties on the number", async () => {
-		await apiContext.blockRepository.save(blocks);
+		await apiContext.blockRepository.save(blocks.map((block) => ({ ...block, proposer: blocks[0].proposer })));
 
 		for (const [orderBy, numbers] of [
-			["reward:asc", [0, 1, 2]],
-			["reward:desc", [46, 45, 44]],
-			["fee:asc", [0, 1, 2]],
+			["proposer:asc", [0, 1, 2]],
+			["proposer:desc", [46, 45, 44]],
 		] as const) {
 			const { statusCode, data } = await request(`/blocks?limit=3&orderBy=${orderBy}`, options);
 			assert.equal(statusCode, 200);

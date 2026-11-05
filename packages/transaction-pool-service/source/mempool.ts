@@ -3,6 +3,8 @@ import type { Contracts } from "@mainsail/contracts";
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
+const RE_ADD_CONCURRENCY = 64;
+
 @injectable()
 export class Mempool implements Contracts.TransactionPool.Mempool {
 	@inject(Identifiers.Services.Log.Service)
@@ -74,19 +76,31 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 	}
 
 	public async reAddTransactions(addresses: string[]): Promise<Contracts.Crypto.Transaction[]> {
-		const removedTransactions: Contracts.Crypto.Transaction[] = [];
+		const senders = [...new Set(addresses)];
+		const removedTransactions: Contracts.Crypto.Transaction[][] = [];
+		let next = 0;
+		let failure: { error: unknown } | undefined;
 
-		for (const address of addresses) {
-			const senderMempool = this.#senderMempools.get(address);
-			if (!senderMempool) {
-				continue;
+		const reAddNextSenders = async (): Promise<void> => {
+			while (!failure && next < senders.length) {
+				const index = next++;
+				try {
+					removedTransactions[index] = await this.#reAddSenderTransactions(senders[index]);
+				} catch (error) {
+					failure ??= { error };
+				}
 			}
+		};
 
-			removedTransactions.push(...(await senderMempool.reAddTransactions()));
-			this.#removeDisposableMempool(address);
+		await Promise.all(
+			Array.from({ length: Math.min(RE_ADD_CONCURRENCY, senders.length) }, () => reAddNextSenders()),
+		);
+
+		if (failure) {
+			throw failure.error;
 		}
 
-		return removedTransactions;
+		return removedTransactions.flat();
 	}
 
 	async #tryReplaceTransaction(
@@ -110,6 +124,18 @@ export class Mempool implements Contracts.TransactionPool.Mempool {
 
 	public flush(): void {
 		this.#senderMempools.clear();
+	}
+
+	async #reAddSenderTransactions(address: string): Promise<Contracts.Crypto.Transaction[]> {
+		const senderMempool = this.#senderMempools.get(address);
+		if (!senderMempool) {
+			return [];
+		}
+
+		const removedTransactions = await senderMempool.reAddTransactions();
+		this.#removeDisposableMempool(address);
+
+		return removedTransactions;
 	}
 
 	#removeDisposableMempool(address: string): boolean {

@@ -57,12 +57,6 @@ export class TransactionFilter {
 						handleComparisonCriteria("timestamp", c),
 					);
 				}
-				case "nonce": {
-					return handleOrCriteria(criteria.nonce, async (c) =>
-						// @ts-ignore
-						handleComparisonCriteria("nonce", c),
-					);
-				}
 				case "senderPublicKey": {
 					return handleOrCriteria(criteria.senderPublicKey, async (c) =>
 						// @ts-ignore
@@ -79,12 +73,6 @@ export class TransactionFilter {
 					return handleOrCriteria(criteria.value, async (c) =>
 						// @ts-ignore
 						handleComparisonCriteria("value", c),
-					);
-				}
-				case "gasPrice": {
-					return handleOrCriteria(criteria.gasPrice, async (c) =>
-						// @ts-ignore
-						handleComparisonCriteria("gasPrice", c),
 					);
 				}
 				case "data": {

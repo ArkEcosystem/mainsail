@@ -16,13 +16,9 @@ export type BlockCriteria = {
 	hash?: OrEqualCriteria<string>;
 	version?: OrEqualCriteria<number>;
 	timestamp?: OrNumericCriteria<number>;
-	parentHash?: OrEqualCriteria<string>;
 	number?: OrNumericCriteria<number | string>;
-	round?: OrEqualCriteria<number>;
 	transactionsCount?: OrNumericCriteria<number>;
 	fee?: OrNumericCriteria<number | string>;
-	reward?: OrNumericCriteria<number | string>;
-	payloadSize?: OrNumericCriteria<number>;
 	transactionsRoot?: OrEqualCriteria<string>;
 	proposer?: OrEqualCriteria<string>;
 };
@@ -42,11 +38,9 @@ export type TransactionCriteria = {
 	blockHash?: OrEqualCriteria<string>;
 	transactionIndex?: OrNumericCriteria<number>;
 	timestamp?: OrNumericCriteria<number>;
-	nonce?: OrNumericCriteria<string>;
 	senderPublicKey?: OrEqualCriteria<string>;
 	from?: OrEqualCriteria<string>;
 	value?: OrNumericCriteria<string>;
-	gasPrice?: OrNumericCriteria<number>;
 	data?: OrEqualCriteria<string>;
 	deployedContractAddress?: OrEqualCriteria<boolean>;
 };
