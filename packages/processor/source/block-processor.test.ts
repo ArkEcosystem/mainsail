@@ -872,7 +872,6 @@ describe<{
 			{ event: "Unvoted", txHash: "tx-4", txIndex: 3, validator: "validator-2", voter: "voter-3" },
 			{ addr: "validator-2", blsPublicKey: "bls-2", event: "ValidatorUpdated", txHash: "tx-5", txIndex: 4 },
 			{ addr: "validator-3", event: "ValidatorResigned", txHash: "tx-6", txIndex: 5 },
-			{ addr: "voter-1", event: "UsernameRegistered", txHash: "tx-7", txIndex: 6, username: "name" },
 		];
 		const dispatch = spy(events, "dispatch");
 
@@ -908,6 +907,40 @@ describe<{
 			unvotes: [{ txHash: "tx-4", txIndex: 3, validator: "validator-2", voter: "voter-3" }],
 		});
 		dispatch.calledNthWith(5, Events.BlockEvent.Applied, { ...blockData, contractEvents });
+	});
+
+	it("#commit - should emit the username changes of the block once per kind", async ({ events, processor }) => {
+		const contractEvents = [
+			{ addr: "wallet-1", event: "UsernameRegistered", txHash: "tx-1", txIndex: 0, username: "first" },
+			{
+				addr: "wallet-2",
+				event: "UsernameRegistered",
+				previousUsername: "old",
+				txHash: "tx-2",
+				txIndex: 1,
+				username: "second",
+			},
+			{ addr: "wallet-3", event: "UsernameResigned", txHash: "tx-3", txIndex: 2, username: "third" },
+		];
+		const dispatch = spy(events, "dispatch");
+
+		await processor.commit(makeUnit(makeBlock(), { getContractEvents: () => contractEvents }));
+
+		dispatch.calledTimes(3);
+		dispatch.calledNthWith(0, Events.UsernameEvent.Registered, {
+			addresses: ["wallet-1", "wallet-2"],
+			blockNumber,
+			usernames: [
+				{ address: "wallet-1", txHash: "tx-1", txIndex: 0, username: "first" },
+				{ address: "wallet-2", previousUsername: "old", txHash: "tx-2", txIndex: 1, username: "second" },
+			],
+		});
+		dispatch.calledNthWith(1, Events.UsernameEvent.Resigned, {
+			addresses: ["wallet-3"],
+			blockNumber,
+			usernames: [{ address: "wallet-3", txHash: "tx-3", txIndex: 2, username: "third" }],
+		});
+		dispatch.calledNthWith(2, Events.BlockEvent.Applied, { ...blockData, contractEvents });
 	});
 
 	it("#commit - should report both a vote and an unvote of one wallet in the same block", async ({

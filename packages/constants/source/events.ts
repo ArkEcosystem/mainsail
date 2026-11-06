@@ -36,6 +36,11 @@ export enum VoteEvent {
 	Unvoted = "wallet.unvoted",
 }
 
+export enum UsernameEvent {
+	Registered = "username.registered",
+	Resigned = "username.resigned",
+}
+
 export enum PeerEvent {
 	Added = "peer.added",
 	Removed = "peer.removed",
