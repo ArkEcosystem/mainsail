@@ -7,8 +7,16 @@ import { InvalidFee, InvalidGasUsed, InvalidLogsBloom, InvalidStateRoot } from "
 import { ensureError, sleep } from "@mainsail/utils";
 
 type MissedRound = { address: string; round: number };
+type ValidatorChange = { address: string; blsPublicKey?: string; txHash: string; txIndex: number };
+type VoteChange = { txHash: string; txIndex: number; validator: string; voter: string };
+type ContractChanges = {
+	unvotes: VoteChange[];
+	validators: { registered: ValidatorChange[]; resigned: ValidatorChange[]; updated: ValidatorChange[] };
+	votes: VoteChange[];
+};
 
 const addressOf = ({ address }: { address: string }): string[] => [address];
+const voteAddresses = ({ validator, voter }: VoteChange): string[] => [voter, validator];
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
@@ -175,6 +183,13 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			this.#emit(Events.TransactionEvent.Applied, transaction);
 		}
 
+		const { unvotes, validators, votes } = this.#getContractChanges(unit);
+		this.#emitBatch(Events.ValidatorEvent.Registered, block.number, "validators", validators.registered, addressOf);
+		this.#emitBatch(Events.ValidatorEvent.Updated, block.number, "validators", validators.updated, addressOf);
+		this.#emitBatch(Events.ValidatorEvent.Resigned, block.number, "validators", validators.resigned, addressOf);
+		this.#emitBatch(Events.VoteEvent.Voted, block.number, "votes", votes, voteAddresses);
+		this.#emitBatch(Events.VoteEvent.Unvoted, block.number, "unvotes", unvotes, voteAddresses);
+
 		this.#emitBatch(Events.BlockEvent.Missed, block.number, "rounds", missedRounds, addressOf);
 		this.#emit(Events.BlockEvent.Applied, { ...block.toData(), contractEvents: unit.getContractEvents() });
 	}
@@ -195,6 +210,47 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			blockNumber,
 			[key]: entries,
 		});
+	}
+
+	#getContractChanges(unit: Contracts.Processor.ProcessableUnit): ContractChanges {
+		const changes: ContractChanges = {
+			unvotes: [],
+			validators: { registered: [], resigned: [], updated: [] },
+			votes: [],
+		};
+
+		for (const contractEvent of unit.getContractEvents()) {
+			const { txHash, txIndex } = contractEvent;
+
+			switch (contractEvent.event) {
+				case "ValidatorRegistered": {
+					const { addr, blsPublicKey } = contractEvent;
+					changes.validators.registered.push({ address: addr, blsPublicKey, txHash, txIndex });
+					break;
+				}
+				case "ValidatorUpdated": {
+					const { addr, blsPublicKey } = contractEvent;
+					changes.validators.updated.push({ address: addr, blsPublicKey, txHash, txIndex });
+					break;
+				}
+				case "ValidatorResigned": {
+					changes.validators.resigned.push({ address: contractEvent.addr, txHash, txIndex });
+					break;
+				}
+				case "Voted": {
+					const { validator, voter } = contractEvent;
+					changes.votes.push({ txHash, txIndex, validator, voter });
+					break;
+				}
+				case "Unvoted": {
+					const { validator, voter } = contractEvent;
+					changes.unvotes.push({ txHash, txIndex, validator, voter });
+					break;
+				}
+			}
+		}
+
+		return changes;
 	}
 
 	#getMissedRounds(unit: Contracts.Processor.ProcessableUnit): MissedRound[] {

@@ -861,6 +861,106 @@ describe<{
 		assert.equal(calls, ["getValidator", "stateStore", "validatorSet"]);
 	});
 
+	it("#commit - should emit the validator and vote changes of the block once per kind", async ({
+		events,
+		processor,
+	}) => {
+		const contractEvents = [
+			{ addr: "validator-1", blsPublicKey: "bls-1", event: "ValidatorRegistered", txHash: "tx-1", txIndex: 0 },
+			{ event: "Voted", txHash: "tx-2", txIndex: 1, validator: "validator-1", voter: "voter-1" },
+			{ event: "Voted", txHash: "tx-3", txIndex: 2, validator: "validator-1", voter: "voter-2" },
+			{ event: "Unvoted", txHash: "tx-4", txIndex: 3, validator: "validator-2", voter: "voter-3" },
+			{ addr: "validator-2", blsPublicKey: "bls-2", event: "ValidatorUpdated", txHash: "tx-5", txIndex: 4 },
+			{ addr: "validator-3", event: "ValidatorResigned", txHash: "tx-6", txIndex: 5 },
+			{ addr: "voter-1", event: "UsernameRegistered", txHash: "tx-7", txIndex: 6, username: "name" },
+		];
+		const dispatch = spy(events, "dispatch");
+
+		await processor.commit(makeUnit(makeBlock(), { getContractEvents: () => contractEvents }));
+
+		dispatch.calledTimes(6);
+		dispatch.calledNthWith(0, Events.ValidatorEvent.Registered, {
+			addresses: ["validator-1"],
+			blockNumber,
+			validators: [{ address: "validator-1", blsPublicKey: "bls-1", txHash: "tx-1", txIndex: 0 }],
+		});
+		dispatch.calledNthWith(1, Events.ValidatorEvent.Updated, {
+			addresses: ["validator-2"],
+			blockNumber,
+			validators: [{ address: "validator-2", blsPublicKey: "bls-2", txHash: "tx-5", txIndex: 4 }],
+		});
+		dispatch.calledNthWith(2, Events.ValidatorEvent.Resigned, {
+			addresses: ["validator-3"],
+			blockNumber,
+			validators: [{ address: "validator-3", txHash: "tx-6", txIndex: 5 }],
+		});
+		dispatch.calledNthWith(3, Events.VoteEvent.Voted, {
+			addresses: ["voter-1", "validator-1", "voter-2"],
+			blockNumber,
+			votes: [
+				{ txHash: "tx-2", txIndex: 1, validator: "validator-1", voter: "voter-1" },
+				{ txHash: "tx-3", txIndex: 2, validator: "validator-1", voter: "voter-2" },
+			],
+		});
+		dispatch.calledNthWith(4, Events.VoteEvent.Unvoted, {
+			addresses: ["voter-3", "validator-2"],
+			blockNumber,
+			unvotes: [{ txHash: "tx-4", txIndex: 3, validator: "validator-2", voter: "voter-3" }],
+		});
+		dispatch.calledNthWith(5, Events.BlockEvent.Applied, { ...blockData, contractEvents });
+	});
+
+	it("#commit - should report both a vote and an unvote of one wallet in the same block", async ({
+		events,
+		processor,
+	}) => {
+		const contractEvents = [
+			{ event: "Voted", txHash: "tx-1", txIndex: 0, validator: "validator-1", voter: "voter-1" },
+			{ event: "Unvoted", txHash: "tx-2", txIndex: 1, validator: "validator-1", voter: "voter-1" },
+		];
+		const dispatch = spy(events, "dispatch");
+
+		await processor.commit(makeUnit(makeBlock(), { getContractEvents: () => contractEvents }));
+
+		dispatch.calledTimes(3);
+		dispatch.calledNthWith(0, Events.VoteEvent.Voted, {
+			addresses: ["voter-1", "validator-1"],
+			blockNumber,
+			votes: [{ txHash: "tx-1", txIndex: 0, validator: "validator-1", voter: "voter-1" }],
+		});
+		dispatch.calledNthWith(1, Events.VoteEvent.Unvoted, {
+			addresses: ["voter-1", "validator-1"],
+			blockNumber,
+			unvotes: [{ txHash: "tx-2", txIndex: 1, validator: "validator-1", voter: "voter-1" }],
+		});
+	});
+
+	it("#commit - should announce the block after the events of its contents", async ({
+		events,
+		processor,
+		validatorSet,
+	}) => {
+		validatorSet.getValidator = (index: number) => ({ address: ["missed-proposer", "proposer"][index] });
+		const contractEvents = [
+			{ event: "Voted", txHash: "hash-1", txIndex: 0, validator: "validator", voter: "voter" },
+		];
+		const block = makeBlock({ transactions: [makeTransaction(1)], transactionsCount: 1 });
+		const dispatch = spy(events, "dispatch");
+
+		await processor.commit(makeUnit(block, { getContractEvents: () => contractEvents }));
+
+		dispatch.calledTimes(4);
+		assert.equal(
+			[0, 1, 2, 3].map((index) => dispatch.getCallArgs(index)[0]),
+			[
+				Events.TransactionEvent.Applied,
+				Events.VoteEvent.Voted,
+				Events.BlockEvent.Missed,
+				Events.BlockEvent.Applied,
+			],
+		);
+	});
+
 	it("#commit - should log the start of a new validator round", async ({ logger, processor, roundCalculator }) => {
 		roundCalculator.isNewRound = (height: number) => height === blockNumber + 1;
 		const calculateRound = spy(roundCalculator, "calculateRound");

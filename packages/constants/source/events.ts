@@ -28,11 +28,12 @@ export enum BlockEvent {
 export enum ValidatorEvent {
 	Registered = "validator.registered",
 	Resigned = "validator.resigned",
+	Updated = "validator.updated",
 }
 
 export enum VoteEvent {
-	Vote = "wallet.vote",
-	Unvote = "wallet.unvote",
+	Voted = "wallet.voted",
+	Unvoted = "wallet.unvoted",
 }
 
 export enum PeerEvent {
