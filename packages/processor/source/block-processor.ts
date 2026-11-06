@@ -148,17 +148,22 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			throw new AggregateError(failures, "one or more commit handlers failed");
 		}
 
-		for (const transaction of commit.block.transactions) {
-			this.#emit(Events.TransactionEvent.Applied, transaction);
-		}
-
 		this.#logBlockCommitted(unit);
 		this.#logNewRound(unit);
 
-		this.#emit(Events.BlockEvent.Applied, {
-			...commit.block.toData(),
-			contractEvents: unit.getContractEvents(),
-		});
+		this.#emitCommitEvents(unit, commit.block);
+	}
+
+	#emitCommitEvents(unit: Contracts.Processor.ProcessableUnit, block: Contracts.Crypto.Block): void {
+		if (this.state.isBootstrap()) {
+			return;
+		}
+
+		for (const transaction of block.transactions) {
+			this.#emit(Events.TransactionEvent.Applied, transaction);
+		}
+
+		this.#emit(Events.BlockEvent.Applied, { ...block.toData(), contractEvents: unit.getContractEvents() });
 	}
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {
