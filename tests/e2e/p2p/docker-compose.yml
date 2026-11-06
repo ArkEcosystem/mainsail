@@ -1,5 +1,5 @@
 # Two nodes with fixed addresses so the per-IP rules of the new transport behave as in production.
-# Old p2p on 4000, new transport on 4001 (port + 1) inside each container.
+# Only @mainsail/p2p-websocket and @mainsail/p2p-service are registered; the transport listens on 4000.
 #   pnpm run e2e:p2p        start both and follow the logs
 #   pnpm run e2e:p2p:down   stop and remove them
 
