@@ -1,6 +1,4 @@
 export enum KernelEvent {
-	Booted = "kernel.booted",
-	Booting = "kernel.booting",
 	Bootstrapped = "kernel.bootstrapper.bootstrapped",
 	Bootstrapping = "kernel.bootstrapper.bootstrapping",
 	ServiceProviderBooted = "kernel.serviceProvider.booted",
@@ -38,9 +36,6 @@ export enum VoteEvent {
 
 export enum PeerEvent {
 	Added = "peer.added",
-	Disconnect = "peer.disconnect",
-	Disconnected = "peer.disconnected",
-	Disconnecting = "peer.disconnecting",
 	Removed = "peer.removed",
 	Updated = "peer.updated",
 }
@@ -64,12 +59,6 @@ export enum DeployerEvent {
 export enum ApiNodeEvent {
 	Added = "apiNode.added",
 	Removed = "apiNode.removed",
-}
-
-export enum StateEvent {
-	BuilderFinished = "state.builder.finished",
-	Started = "state.started",
-	Starting = "state.starting",
 }
 
 export enum TransactionEvent {
