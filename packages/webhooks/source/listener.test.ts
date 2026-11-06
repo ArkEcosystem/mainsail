@@ -231,6 +231,42 @@ describe<{
 		spyOnPost.neverCalled();
 	});
 
+	it("should broadcast when an address list contains the condition value", async ({ database, listener }) => {
+		const spyOnPost = stub(http, "post").resolvedValue({
+			statusCode: 200,
+		});
+
+		webhook.conditions = [
+			{
+				condition: "contains",
+				key: "addresses",
+				value: "0xB",
+			},
+		];
+		database.create(webhook);
+
+		await listener.handle({ data: { addresses: ["0xA", "0xB"] }, name: "event" });
+
+		spyOnPost.calledOnce();
+	});
+
+	it("should not broadcast when an address list lacks the condition value", async ({ database, listener }) => {
+		const spyOnPost = stub(http, "post");
+
+		webhook.conditions = [
+			{
+				condition: "contains",
+				key: "addresses",
+				value: "0xA",
+			},
+		];
+		database.create(webhook);
+
+		await listener.handle({ data: { addresses: ["0xAB", "0xC"] }, name: "event" });
+
+		spyOnPost.neverCalled();
+	});
+
 	it("should not broadcast if webhook condition throws error", async ({ database, listener }) => {
 		const spyOnEq = stub(conditions, "eq").callsFake(() => {
 			throw new Error("dummy error");

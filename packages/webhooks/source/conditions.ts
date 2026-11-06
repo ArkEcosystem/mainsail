@@ -30,7 +30,7 @@ const compareBigNumber = (
 	}
 };
 
-const contains = (actual: string, expected: string): boolean => actual.includes(expected);
+const contains = (actual: string | string[], expected: string): boolean => actual.includes(expected);
 
 const eq = (actual: Contracts.Webhooks.ConditionPrimitive, expected: Contracts.Webhooks.ConditionPrimitive): boolean =>
 	JSON.stringify(actual) === JSON.stringify(expected);
