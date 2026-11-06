@@ -48,6 +48,9 @@ describe<{
 		app.bind<Database>(Identifiers.Webhooks.Database).to(Database).inSingletonScope();
 
 		app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({
+			getRequired: (key: string) => ({ timeout: 2500 })[key],
+		});
 		app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 
 		context.database = app.get<Database>(Identifiers.Webhooks.Database);
@@ -81,6 +84,17 @@ describe<{
 		spyOnDebug.calledOnce();
 		spyOnDispatch.calledOnce();
 		spyOnDispatch.calledWith(Events.WebhookEvent.Broadcasted);
+	});
+
+	it("should send with the configured timeout", async ({ database, listener }) => {
+		const spyOnPost = stub(http, "post").resolvedValue({ statusCode: 200 });
+
+		database.create(webhook);
+
+		await listener.handle({ data: "dummy_data", name: "event" });
+
+		spyOnPost.calledOnce();
+		assert.equal(spyOnPost.getCallArgs(0)[1].timeout, 2500);
 	});
 
 	it("should not wait for the webhook to be delivered", async ({ database, listener }) => {
