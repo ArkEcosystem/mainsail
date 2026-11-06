@@ -91,11 +91,11 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 		const submission = `${this.#blockString(blockHeader, round)} as ${ownRound?.address ?? blockHeader.proposer}`;
 
 		if (validRound === undefined) {
-			this.logger.notice(`📦 Proposing block ${submission}`, "consensus");
+			this.logger.notice(`Proposing block ${submission} 📦`, "consensus");
 			return;
 		}
 
-		this.logger.notice(`📦 Re-proposing block ${submission}, forged by ${blockHeader.proposer}`, "consensus");
+		this.logger.notice(`Re-proposing block ${submission}, forged by ${blockHeader.proposer} 📦`, "consensus");
 	}
 
 	#onBlockApplied(block: Contracts.Crypto.BlockData): void {
@@ -115,7 +115,7 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 		// Whichever of our rounds it came from, and whoever ended up proposing it: the block is ours.
 		if (ownRounds.some((ownRound) => ownRound.address === block.proposer)) {
 			this.logger.notice(
-				`✅ Committed our block ${this.#position(block.number, block.round)} as ${block.proposer}`,
+				`Committed block ${this.#position(block.number, block.round)} as ${block.proposer} ✅`,
 				"consensus",
 			);
 		}
@@ -126,10 +126,7 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 
 		for (const { address, round } of rounds) {
 			if (ownRounds.some((ownRound) => ownRound.address === address && ownRound.round === round)) {
-				this.logger.notice(
-					`❌ Missed our round ${this.#position(blockNumber, round)} as ${address}`,
-					"consensus",
-				);
+				this.logger.notice(`Missed round ${this.#position(blockNumber, round)} as ${address} ❌`, "consensus");
 			}
 		}
 	}

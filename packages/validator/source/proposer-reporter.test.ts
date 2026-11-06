@@ -118,7 +118,7 @@ describe<{
 		await proposed(reporter, block, 0);
 
 		notice.calledOnce();
-		notice.calledWith(`📦 Proposing block ${1}/${0}/${block.hash} as ${OURS.address}`);
+		notice.calledWith(`Proposing block ${1}/${0}/${block.hash} as ${OURS.address} 📦`);
 	});
 
 	it("#handle - should report a re-proposal with the validator proposing it and the forger of its block", async ({
@@ -135,7 +135,7 @@ describe<{
 		await proposed(reporter, { ...block, proposer: THEIRS.address }, 1, 0);
 
 		notice.calledWith(
-			`📦 Re-proposing block ${1}/${1}(${0})/${block.hash} as ${OURS.address}, forged by ${THEIRS.address}`,
+			`Re-proposing block ${1}/${1}(${0})/${block.hash} as ${OURS.address}, forged by ${THEIRS.address} 📦`,
 		);
 	});
 
@@ -152,7 +152,7 @@ describe<{
 		await proposed(reporter, block, 1, 0);
 
 		notice.calledWith(
-			`📦 Re-proposing block ${1}/${1}(${0})/${block.hash} as ${OUR_SECOND.address}, forged by ${OURS.address}`,
+			`Re-proposing block ${1}/${1}(${0})/${block.hash} as ${OUR_SECOND.address}, forged by ${OURS.address} 📦`,
 		);
 	});
 
@@ -165,7 +165,7 @@ describe<{
 
 		await proposed(reporter, block, 0);
 
-		notice.calledWith(`📦 Proposing block ${1}/${0}/${block.hash} as ${block.proposer}`);
+		notice.calledWith(`Proposing block ${1}/${0}/${block.hash} as ${block.proposer} 📦`);
 	});
 
 	it("#handle - should report our own block being committed", async ({ reporter, logger, block }) => {
@@ -175,7 +175,7 @@ describe<{
 		await blockApplied(reporter, block);
 
 		notice.calledOnce();
-		notice.calledWith(`✅ Committed our block ${1}/${0} as ${OURS.address}`);
+		notice.calledWith(`Committed block ${1}/${0} as ${OURS.address} ✅`);
 	});
 
 	it("#handle - should still count our block as ours when it is committed after the round moved on", async ({
@@ -191,7 +191,7 @@ describe<{
 		await blockApplied(reporter, block);
 
 		notice.calledOnce();
-		notice.calledWith(`✅ Committed our block ${1}/${0} as ${OURS.address}`);
+		notice.calledWith(`Committed block ${1}/${0} as ${OURS.address} ✅`);
 	});
 
 	it("#handle - should report a round we lost to another validator", async ({ reporter, logger, block }) => {
@@ -202,7 +202,7 @@ describe<{
 		await blockApplied(reporter, { ...block, proposer: THEIRS.address, round: 1 });
 
 		notice.calledOnce();
-		notice.calledWith(`❌ Missed our round ${1}/${0} as ${OURS.address}`);
+		notice.calledWith(`Missed round ${1}/${0} as ${OURS.address} ❌`);
 	});
 
 	it("#handle - should not report a round of ours that block.missed does not report", async ({
@@ -241,8 +241,8 @@ describe<{
 		await blockApplied(reporter, { ...block, round: 2 });
 
 		notice.calledTimes(2);
-		notice.calledWith(`❌ Missed our round ${1}/${0} as ${OURS.address}`);
-		notice.calledWith(`✅ Committed our block ${1}/${2} as ${OURS.address}`);
+		notice.calledWith(`Missed round ${1}/${0} as ${OURS.address} ❌`);
+		notice.calledWith(`Committed block ${1}/${2} as ${OURS.address} ✅`);
 	});
 
 	it("#handle - should report nothing while a round of ours is still in play", async ({
@@ -276,7 +276,7 @@ describe<{
 		await blockApplied(reporter, block);
 
 		notice.calledOnce();
-		notice.calledWith(`✅ Committed our block ${1}/${0} as ${OURS.address}`);
+		notice.calledWith(`Committed block ${1}/${0} as ${OURS.address} ✅`);
 	});
 
 	it("#handle - should report every round of ours when another validator wins the block number", async ({
@@ -297,8 +297,8 @@ describe<{
 		await blockApplied(reporter, { ...block, proposer: THEIRS.address, round: 2 });
 
 		notice.calledTimes(2);
-		notice.calledWith(`❌ Missed our round ${1}/${0} as ${OURS.address}`);
-		notice.calledWith(`❌ Missed our round ${1}/${1} as ${OUR_SECOND.address}`);
+		notice.calledWith(`Missed round ${1}/${0} as ${OURS.address} ❌`);
+		notice.calledWith(`Missed round ${1}/${1} as ${OUR_SECOND.address} ❌`);
 	});
 
 	it("#handle - should report nothing when this node runs no validators", async ({
@@ -407,7 +407,7 @@ describe<{
 		await blockApplied(reporter, { ...block, number: 2 });
 
 		notice.calledTimes(2);
-		notice.calledWith(`❌ Missed our round ${1}/${0} as ${OURS.address}`);
-		notice.calledWith(`✅ Committed our block ${2}/${0} as ${OURS.address}`);
+		notice.calledWith(`Missed round ${1}/${0} as ${OURS.address} ❌`);
+		notice.calledWith(`Committed block ${2}/${0} as ${OURS.address} ✅`);
 	});
 });
