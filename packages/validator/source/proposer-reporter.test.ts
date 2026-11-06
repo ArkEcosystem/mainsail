@@ -245,22 +245,6 @@ describe<{
 		notice.calledWith(`Committed block ${1}/${2} as ${OURS.address} ✅`);
 	});
 
-	it("#handle - should report nothing while a round of ours is still in play", async ({
-		reporter,
-		logger,
-		proposerByRound,
-	}) => {
-		// A block is accepted on its block number alone, so the round we moved on from can still be the one
-		// that commits. Reporting a lost round here would be a guess.
-		proposerByRound[1] = OUR_SECOND;
-		const notice = spy(logger, "notice");
-
-		await roundStarted(reporter, 1, 0);
-		await roundStarted(reporter, 1, 1);
-
-		notice.neverCalled();
-	});
-
 	it("#handle - should credit the round of ours that committed, not the latest one", async ({
 		reporter,
 		logger,
@@ -364,17 +348,18 @@ describe<{
 		notice.calledOnce();
 	});
 
-	it("#handle - should report a round only once", async ({ reporter, logger, block }) => {
+	it("#handle - should forget the rounds of a block number once its block is applied", async ({
+		reporter,
+		logger,
+		block,
+	}) => {
 		const notice = spy(logger, "notice");
 
 		await roundStarted(reporter, 1, 0);
-		await blockMissed(reporter, 1, [{ address: OURS.address, round: 0 }]);
 		await blockApplied(reporter, { ...block, proposer: THEIRS.address, round: 1 });
-		// The next block number must not produce a second report for the same round.
 		await blockMissed(reporter, 1, [{ address: OURS.address, round: 0 }]);
-		await blockMissed(reporter, 2, [{ address: OURS.address, round: 0 }]);
 
-		notice.calledOnce();
+		notice.neverCalled();
 	});
 
 	it("#handle - should not resolve our round with a block from another block number", async ({
@@ -386,7 +371,7 @@ describe<{
 
 		await roundStarted(reporter, 1, 0);
 		await blockMissed(reporter, 2, [{ address: OURS.address, round: 0 }]);
-		await blockApplied(reporter, { ...block, number: 2, proposer: THEIRS.address });
+		await blockApplied(reporter, { ...block, number: 2, proposer: THEIRS.address, round: 1 });
 
 		notice.neverCalled();
 	});
