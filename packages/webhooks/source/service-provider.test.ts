@@ -13,6 +13,7 @@ import { ServiceProvider } from "./service-provider";
 const importFresh = (moduleName) => import(`${moduleName}?${Date.now()}`);
 
 type Context = {
+	app: Application;
 	serviceProvider: ServiceProvider;
 	pluginConfiguration: Providers.PluginConfiguration;
 };
@@ -36,6 +37,7 @@ const init = (context: Context) => {
 
 	app.bind("path.cache").toConstantValue(dirSync().name);
 
+	context.app = app;
 	context.serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);
 	context.pluginConfiguration = app.get<Providers.PluginConfiguration>(Identifiers.ServiceProvider.Configuration);
 	context.serviceProvider.setConfig(context.pluginConfiguration.from("webhooks", defaults));
@@ -53,7 +55,8 @@ describe<Context>("ServiceProvider", ({ beforeEach, afterAll, it, assert, spy })
 		await assert.resolves(() => serviceProvider.register());
 	});
 
-	it("should not open the database, register the server or listen when disabled", async ({
+	it("should not set up the database, the server or the listener when disabled", async ({
+		app,
 		serviceProvider,
 		pluginConfiguration,
 	}) => {
@@ -64,6 +67,8 @@ describe<Context>("ServiceProvider", ({ beforeEach, afterAll, it, assert, spy })
 
 		await serviceProvider.register();
 
+		assert.false(app.isBound(Identifiers.Webhooks.Database));
+		assert.false(app.isBound(Identifiers.Webhooks.Server));
 		databaseBoot.neverCalled();
 		serverRegister.neverCalled();
 		listen.neverCalled();

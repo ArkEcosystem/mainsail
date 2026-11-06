@@ -12,12 +12,11 @@ import { Server, ServerOptions } from "./server/index.js";
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.Webhooks.Database).to(Database).inSingletonScope();
-		this.app.bind(Identifiers.Webhooks.Server).to(Server).inSingletonScope();
-
 		if (this.config().getRequired<boolean>("enabled")) {
+			this.app.bind(Identifiers.Webhooks.Database).to(Database).inSingletonScope();
 			this.app.get<Contracts.Webhooks.Database>(Identifiers.Webhooks.Database).boot();
 
+			this.app.bind(Identifiers.Webhooks.Server).to(Server).inSingletonScope();
 			await this.app
 				.get<Server>(Identifiers.Webhooks.Server)
 				.register(this.config().getRequired<ServerOptions>("server"));
