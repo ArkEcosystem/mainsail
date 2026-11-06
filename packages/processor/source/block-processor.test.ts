@@ -46,6 +46,7 @@ const makeUnit = (block: ReturnType<typeof makeBlock>, overrides: Record<string,
 		getBlock: () => block,
 		getCommit: async () => ({ block }),
 		getContractEvents: () => [],
+		getProcessorResult: () => ({ receipts: new Map() }),
 		round: block.round,
 		...overrides,
 	}) as unknown as Contracts.Processor.ProcessableUnit;
@@ -623,6 +624,39 @@ describe<{
 		dispatch.calledNthWith(1, Events.TransactionEvent.Applied, transaction2);
 		dispatch.calledNthWith(2, Events.BlockEvent.Applied, { ...blockData, contractEvents });
 		info.calledWith("Committed block 3/1/block-hash with 2 tx(s) (gasUsed=51,000)", "consensus");
+	});
+
+	it("#commit - should emit the receipt of each committed transaction after its applied event", async ({
+		events,
+		processor,
+	}) => {
+		const transaction1 = makeTransaction(1, { from: "sender-1" });
+		const transaction2 = makeTransaction(2, { from: "sender-2" });
+		const receipt1 = { gasUsed: 21_000n, status: 1 };
+		const receipt2 = { gasUsed: 30_000n, status: 0 };
+		const block = makeBlock({ gasUsed: 51_000, transactions: [transaction1, transaction2], transactionsCount: 2 });
+		const receipts = new Map([
+			["hash-1", receipt1],
+			["hash-2", receipt2],
+		]);
+		const dispatch = spy(events, "dispatch");
+
+		await processor.commit(makeUnit(block, { getProcessorResult: () => ({ receipts }) }));
+
+		dispatch.calledTimes(5);
+		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, transaction1);
+		dispatch.calledNthWith(1, Events.EvmEvent.TransactionReceipt, {
+			receipt: receipt1,
+			sender: "sender-1",
+			transactionId: "hash-1",
+		});
+		dispatch.calledNthWith(2, Events.TransactionEvent.Applied, transaction2);
+		dispatch.calledNthWith(3, Events.EvmEvent.TransactionReceipt, {
+			receipt: receipt2,
+			sender: "sender-2",
+			transactionId: "hash-2",
+		});
+		dispatch.calledNthWith(4, Events.BlockEvent.Applied, { ...blockData, contractEvents: [] });
 	});
 
 	it("#commit - should hand the unit to every commit handler", async ({

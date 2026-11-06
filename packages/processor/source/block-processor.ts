@@ -181,8 +181,20 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			return;
 		}
 
+		const { receipts } = unit.getProcessorResult();
+
 		for (const transaction of block.transactions) {
 			this.#emit(Events.TransactionEvent.Applied, transaction);
+
+			const receipt = receipts.get(transaction.hash);
+
+			if (receipt) {
+				this.#emit(Events.EvmEvent.TransactionReceipt, {
+					receipt,
+					sender: transaction.from,
+					transactionId: transaction.hash,
+				});
+			}
 		}
 
 		const { unvotes, usernames, validators, votes } = this.#getContractChanges(unit);
