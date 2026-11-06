@@ -300,16 +300,13 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const block = unit.getBlock();
 		const missedRounds: MissedRound[] = [];
 
-		for (let round = 0; round <= unit.round; round++) {
+		for (let round = 0; round < unit.round; round++) {
 			if (round === block.round) {
 				continue;
 			}
 
 			const { address } = this.validatorSet.getValidator(this.proposerCalculator.getValidatorIndex(round));
-
-			if (address !== block.proposer) {
-				missedRounds.push({ address, round });
-			}
+			missedRounds.push({ address, round });
 		}
 
 		return missedRounds;

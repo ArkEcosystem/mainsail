@@ -9,7 +9,7 @@ import { BlockProcessor } from "./block-processor.js";
 
 const blockNumber = 3;
 const blockData = { hash: "block-hash" };
-const commitKey = { blockHash: "block-hash", blockNumber: BigInt(blockNumber), round: 1n };
+const commitKey = { blockHash: "block-hash", blockNumber: BigInt(blockNumber), round: 0n };
 const previousBlock = {
 	hash: "parent-hash",
 	number: blockNumber - 1,
@@ -42,7 +42,7 @@ const makeBlock = (overrides: Record<string, unknown> = {}) => ({
 	logsBloom: "logs-bloom",
 	number: blockNumber,
 	proposer: "proposer",
-	round: 1,
+	round: 0,
 	stateRoot: "state-root",
 	timestamp: 1_700_000_000,
 	toData: () => blockData,
@@ -634,7 +634,7 @@ describe<{
 		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, appliedData(1));
 		dispatch.calledNthWith(1, Events.TransactionEvent.Applied, appliedData(2));
 		dispatch.calledNthWith(2, Events.BlockEvent.Applied, { ...blockData, contractEvents });
-		info.calledWith("Committed block 3/1/block-hash with 2 tx(s) (gasUsed=51,000)", "consensus");
+		info.calledWith("Committed block 3/0/block-hash with 2 tx(s) (gasUsed=51,000)", "consensus");
 	});
 
 	it("#commit - should emit the receipt of each committed transaction after its applied event", async ({
@@ -700,7 +700,7 @@ describe<{
 
 		await processor.commit(makeUnit(makeBlock(), { round: 2 }));
 
-		info.calledWith("Committed block 3/2(1)/block-hash with 0 tx(s) (gasUsed=0)", "consensus");
+		info.calledWith("Committed block 3/2(0)/block-hash with 0 tx(s) (gasUsed=0)", "consensus");
 	});
 
 	it("#commit - should skip the api sync for the genesis block", async ({ apiSync, evm, processor }) => {
@@ -841,7 +841,7 @@ describe<{
 		assert.length(payload.rounds, 3);
 	});
 
-	it("#commit - should report the proposer that re-proposed the committed block as missed", async ({
+	it("#commit - should report neither the round of the committed block nor the commit round", async ({
 		events,
 		processor,
 		validatorSet,
@@ -849,39 +849,55 @@ describe<{
 		const indexes: number[] = [];
 		validatorSet.getValidator = (index: number) => {
 			indexes.push(index);
-			return { address: "re-proposer" };
+			return { address: ["proposer", "second", "re-proposer"][index] };
 		};
 		const dispatch = spy(events, "dispatch");
 
-		await processor.commit(makeUnit(makeBlock({ round: 0 }), { round: 1 }));
+		await processor.commit(makeUnit(makeBlock({ round: 0 }), { round: 2 }));
 
 		assert.equal(indexes, [1]);
 		dispatch.calledTimes(2);
 		dispatch.calledNthWith(0, Events.BlockEvent.Missed, {
-			addresses: ["re-proposer"],
+			addresses: ["second"],
 			blockNumber,
-			rounds: [{ address: "re-proposer", round: 1 }],
+			rounds: [{ address: "second", round: 1 }],
 		});
 	});
 
-	it("#commit - should not report a later round of the proposer whose block was committed", async ({
+	it("#commit - should report a failed round of the proposer whose block was committed later", async ({
 		events,
 		processor,
 		validatorSet,
 	}) => {
-		validatorSet.getValidator = (index: number) => ({
-			address: ["missed-proposer", "proposer", "proposer"][index],
-		});
+		validatorSet.getValidator = (index: number) => ({ address: ["proposer", "second", "proposer"][index] });
 		const dispatch = spy(events, "dispatch");
 
-		await processor.commit(makeUnit(makeBlock(), { round: 2 }));
+		await processor.commit(makeUnit(makeBlock({ round: 2 })));
 
 		dispatch.calledTimes(2);
 		dispatch.calledNthWith(0, Events.BlockEvent.Missed, {
-			addresses: ["missed-proposer"],
+			addresses: ["proposer", "second"],
 			blockNumber,
-			rounds: [{ address: "missed-proposer", round: 0 }],
+			rounds: [
+				{ address: "proposer", round: 0 },
+				{ address: "second", round: 1 },
+			],
 		});
+	});
+
+	it("#commit - should report no missed rounds for a block committed in its first round", async ({
+		events,
+		processor,
+		validatorSet,
+	}) => {
+		const getValidator = spy(validatorSet, "getValidator");
+		const dispatch = spy(events, "dispatch");
+
+		await processor.commit(makeUnit(makeBlock()));
+
+		getValidator.neverCalled();
+		dispatch.calledOnce();
+		dispatch.calledWith(Events.BlockEvent.Applied, { ...blockData, contractEvents: [] });
 	});
 
 	it("#commit - should look up the missed proposers before the state moves to the next block", async ({
@@ -901,7 +917,7 @@ describe<{
 			calls.push("validatorSet");
 		};
 
-		await processor.commit(makeUnit(makeBlock()));
+		await processor.commit(makeUnit(makeBlock({ round: 1 })));
 
 		assert.equal(calls, ["getValidator", "stateStore", "validatorSet"]);
 	});
@@ -1022,7 +1038,7 @@ describe<{
 		const contractEvents = [
 			{ event: "Voted", txHash: "hash-1", txIndex: 0, validator: "validator", voter: "voter" },
 		];
-		const block = makeBlock({ transactions: [makeTransaction(1)], transactionsCount: 1 });
+		const block = makeBlock({ round: 1, transactions: [makeTransaction(1)], transactionsCount: 1 });
 		const dispatch = spy(events, "dispatch");
 
 		await processor.commit(makeUnit(block, { getContractEvents: () => contractEvents }));
