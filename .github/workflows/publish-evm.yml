@@ -21,11 +21,11 @@ jobs:
             fail-fast: false
             matrix:
                 settings:
-                    - host: ubuntu-latest
+                    - host: ubuntu-24.04
                       target: x86_64-unknown-linux-gnu
                       docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian
                       build: rustup update stable && cd ./packages/evm && ./node_modules/.bin/napi build --platform --output-dir ./ --manifest-path bindings/Cargo.toml --release --target x86_64-unknown-linux-gnu
-                    - host: ubuntu-latest
+                    - host: ubuntu-24.04
                       target: aarch64-unknown-linux-gnu
                       docker: ghcr.io/napi-rs/napi-rs/nodejs-rust:lts-debian-aarch64
                       build: rustup update stable && cd ./packages/evm && ./node_modules/.bin/napi build --platform --output-dir ./ --manifest-path bindings/Cargo.toml --release --target aarch64-unknown-linux-gnu
@@ -79,7 +79,7 @@ jobs:
     publish:
         name: Publish
         if: contains(github.event.head_commit.message, 'release:') && contains(github.event.head_commit.message, 'evm')
-        runs-on: ubuntu-latest
+        runs-on: ubuntu-24.04
         needs:
             - build
         steps:
