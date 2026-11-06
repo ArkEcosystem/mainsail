@@ -21,6 +21,7 @@ const prevrandao = Buffer.from("cc".repeat(32), "hex");
 const makeTransaction = (index: number, overrides: Record<string, unknown> = {}) => ({
 	gasPrice: 5,
 	hash: `hash-${index}`,
+	toData: () => ({ hash: `hash-${index}` }),
 	...overrides,
 });
 
@@ -620,8 +621,8 @@ describe<{
 			"apiSync",
 		]);
 		dispatch.calledTimes(3);
-		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, transaction1);
-		dispatch.calledNthWith(1, Events.TransactionEvent.Applied, transaction2);
+		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, { hash: "hash-1" });
+		dispatch.calledNthWith(1, Events.TransactionEvent.Applied, { hash: "hash-2" });
 		dispatch.calledNthWith(2, Events.BlockEvent.Applied, { ...blockData, contractEvents });
 		info.calledWith("Committed block 3/1/block-hash with 2 tx(s) (gasUsed=51,000)", "consensus");
 	});
@@ -644,13 +645,13 @@ describe<{
 		await processor.commit(makeUnit(block, { getProcessorResult: () => ({ receipts }) }));
 
 		dispatch.calledTimes(5);
-		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, transaction1);
+		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, { hash: "hash-1" });
 		dispatch.calledNthWith(1, Events.EvmEvent.TransactionReceipt, {
 			receipt: receipt1,
 			sender: "sender-1",
 			transactionId: "hash-1",
 		});
-		dispatch.calledNthWith(2, Events.TransactionEvent.Applied, transaction2);
+		dispatch.calledNthWith(2, Events.TransactionEvent.Applied, { hash: "hash-2" });
 		dispatch.calledNthWith(3, Events.EvmEvent.TransactionReceipt, {
 			receipt: receipt2,
 			sender: "sender-2",
@@ -803,7 +804,7 @@ describe<{
 		await processor.commit(makeUnit(makeBlock({ round: 2, transactions: [transaction], transactionsCount: 1 })));
 
 		dispatch.calledTimes(3);
-		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, transaction);
+		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, { hash: "hash-1" });
 		dispatch.calledNthWith(1, Events.BlockEvent.Missed, {
 			addresses: ["first", "second"],
 			blockNumber,

@@ -92,6 +92,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			round: 0,
 			hash: "blockHash",
 			proposer: "proposerAddress",
+			toData: () => ({ hash: "blockHash", number: 1 }),
 		};
 
 		context.proposal = {
@@ -332,6 +333,7 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			step: Enums.Consensus.Step.Propose,
 			validRound: undefined,
 		});
+		spyDispatch.calledWith(Events.BlockEvent.Forged, { hash: "blockHash", number: 1 });
 		assert.equal(consensus.getStep(), Enums.Consensus.Step.Propose);
 	});
 

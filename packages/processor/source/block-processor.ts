@@ -184,7 +184,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const { receipts } = unit.getProcessorResult();
 
 		for (const transaction of block.transactions) {
-			this.#emit(Events.TransactionEvent.Applied, transaction);
+			this.#emit(Events.TransactionEvent.Applied, transaction.toData());
 
 			const receipt = receipts.get(transaction.hash);
 
