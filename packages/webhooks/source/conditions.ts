@@ -30,7 +30,15 @@ const compareBigNumber = (
 	}
 };
 
-const contains = (actual: string | string[], expected: string): boolean => actual.includes(expected);
+const contains = (actual: string | string[], expected: string): boolean => {
+	if (!Array.isArray(actual)) {
+		return actual.includes(expected);
+	}
+
+	const lowerCaseExpected = expected.toLowerCase();
+
+	return actual.some((item) => item.toLowerCase() === lowerCaseExpected);
+};
 
 const eq = (actual: Contracts.Webhooks.ConditionPrimitive, expected: Contracts.Webhooks.ConditionPrimitive): boolean =>
 	JSON.stringify(actual) === JSON.stringify(expected);

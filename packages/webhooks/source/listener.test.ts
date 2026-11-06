@@ -280,7 +280,7 @@ describe<{
 		];
 		database.create(webhook);
 
-		await listener.handle({ data: { addresses: ["0xA", "0xB"] }, name: "event" });
+		await listener.handle({ data: { addresses: ["0xA", "0xb"] }, name: "event" });
 		await settle();
 
 		spyOnPost.calledOnce();

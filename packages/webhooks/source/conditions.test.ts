@@ -18,10 +18,13 @@ describe("Conditions.contains", ({ it, assert }) => {
 	it("should be true", () => {
 		assert.true(contains("Hello World", "Hello"));
 		assert.true(contains(["0xA", "0xB"], "0xB"));
+		assert.true(contains(["0xAbCd"], "0xabcd"));
+		assert.true(contains(["0xabcd"], "0xABCD"));
 	});
 
 	it("should be false", () => {
 		assert.false(contains("Hello World", "invalid"));
+		assert.false(contains("Hello World", "hello"));
 		assert.false(contains(["0xA", "0xB"], "0xC"));
 		assert.false(contains(["0xAB"], "0xA"));
 	});
