@@ -6,6 +6,19 @@ import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { InvalidFee, InvalidGasUsed, InvalidLogsBloom, InvalidStateRoot } from "@mainsail/exceptions";
 import { ensureError, sleep } from "@mainsail/utils";
 
+type UsernameChange = { address: string; previousUsername?: string; txHash: string; txIndex: number; username: string };
+type ValidatorChange = { address: string; blsPublicKey?: string; txHash: string; txIndex: number };
+type VoteChange = { txHash: string; txIndex: number; validator: string; voter: string };
+type ContractChanges = {
+	unvotes: VoteChange[];
+	usernames: { registered: UsernameChange[]; resigned: UsernameChange[] };
+	validators: { registered: ValidatorChange[]; resigned: ValidatorChange[]; updated: ValidatorChange[] };
+	votes: VoteChange[];
+};
+
+const addressOf = ({ address }: { address: string }): string[] => [address];
+const voteAddresses = ({ validator, voter }: VoteChange): string[] => [voter, validator];
+
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.State.Store)
@@ -19,6 +32,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	@inject(Identifiers.BlockchainUtils.RoundCalculator)
 	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
+
+	@inject(Identifiers.BlockchainUtils.ProposerCalculator)
+	private readonly proposerCalculator!: Contracts.BlockchainUtils.ProposerCalculator;
 
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
@@ -126,6 +142,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 
 		const commit = await unit.getCommit();
+		const missedRounds = this.#getMissedRounds(commit.block);
 
 		await this.evm.onCommit(unit);
 		await this.stateStore.onCommit(unit);
@@ -148,17 +165,152 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			throw new AggregateError(failures, "one or more commit handlers failed");
 		}
 
-		for (const transaction of commit.block.transactions) {
-			this.#emit(Events.TransactionEvent.Applied, transaction);
-		}
-
 		this.#logBlockCommitted(unit);
 		this.#logNewRound(unit);
 
-		this.#emit(Events.BlockEvent.Applied, {
-			...commit.block.toData(),
-			contractEvents: unit.getContractEvents(),
+		this.#emitCommitEvents(unit, commit.block, missedRounds);
+	}
+
+	#emitCommitEvents(
+		unit: Contracts.Processor.ProcessableUnit,
+		block: Contracts.Crypto.Block,
+		missedRounds: Contracts.Processor.MissedRound[],
+	): void {
+		if (this.state.isBootstrap()) {
+			return;
+		}
+
+		const { receipts } = unit.getProcessorResult();
+
+		for (const transaction of block.transactions) {
+			const { blockHash, blockNumber, transactionIndex } = transaction;
+			this.#emit(Events.TransactionEvent.Applied, {
+				...transaction.toData(),
+				blockHash,
+				blockNumber,
+				transactionIndex,
+			});
+
+			const receipt = receipts.get(transaction.hash);
+
+			if (receipt) {
+				this.#emit(Events.EvmEvent.TransactionReceipt, {
+					receipt,
+					sender: transaction.from,
+					transactionId: transaction.hash,
+				});
+			}
+		}
+
+		const { unvotes, usernames, validators, votes } = this.#getContractChanges(unit);
+		this.#emitBatch(Events.ValidatorEvent.Registered, block.number, "validators", validators.registered, addressOf);
+		this.#emitBatch(Events.ValidatorEvent.Updated, block.number, "validators", validators.updated, addressOf);
+		this.#emitBatch(Events.ValidatorEvent.Resigned, block.number, "validators", validators.resigned, addressOf);
+		this.#emitBatch(Events.VoteEvent.Voted, block.number, "votes", votes, voteAddresses);
+		this.#emitBatch(Events.VoteEvent.Unvoted, block.number, "unvotes", unvotes, voteAddresses);
+		this.#emitBatch(Events.UsernameEvent.Registered, block.number, "usernames", usernames.registered, addressOf);
+		this.#emitBatch(Events.UsernameEvent.Resigned, block.number, "usernames", usernames.resigned, addressOf);
+
+		if (missedRounds.length > 0) {
+			this.#emit<Contracts.Processor.MissedRoundsData>(Events.BlockEvent.Missed, {
+				addresses: [...new Set(missedRounds.map(({ address }) => address))],
+				blockNumber: block.number,
+				rounds: missedRounds,
+			});
+		}
+
+		this.#emit(Events.BlockEvent.Applied, { ...block.toData(), contractEvents: unit.getContractEvents() });
+	}
+
+	#emitBatch<T>(
+		event: string,
+		blockNumber: number,
+		key: string,
+		entries: T[],
+		addressesOf: (entry: T) => string[],
+	): void {
+		if (entries.length === 0) {
+			return;
+		}
+
+		this.#emit(event, {
+			addresses: [...new Set(entries.flatMap((entry) => addressesOf(entry)))],
+			blockNumber,
+			[key]: entries,
 		});
+	}
+
+	#getContractChanges(unit: Contracts.Processor.ProcessableUnit): ContractChanges {
+		const changes: ContractChanges = {
+			unvotes: [],
+			usernames: { registered: [], resigned: [] },
+			validators: { registered: [], resigned: [], updated: [] },
+			votes: [],
+		};
+
+		for (const contractEvent of unit.getContractEvents()) {
+			const { txHash, txIndex } = contractEvent;
+
+			switch (contractEvent.event) {
+				case "ValidatorRegistered": {
+					const { addr, blsPublicKey } = contractEvent;
+					changes.validators.registered.push({ address: addr, blsPublicKey, txHash, txIndex });
+					break;
+				}
+				case "ValidatorUpdated": {
+					const { addr, blsPublicKey } = contractEvent;
+					changes.validators.updated.push({ address: addr, blsPublicKey, txHash, txIndex });
+					break;
+				}
+				case "ValidatorResigned": {
+					changes.validators.resigned.push({ address: contractEvent.addr, txHash, txIndex });
+					break;
+				}
+				case "Voted": {
+					const { validator, voter } = contractEvent;
+					changes.votes.push({ txHash, txIndex, validator, voter });
+					break;
+				}
+				case "Unvoted": {
+					const { validator, voter } = contractEvent;
+					changes.unvotes.push({ txHash, txIndex, validator, voter });
+					break;
+				}
+				case "UsernameRegistered": {
+					const { addr, previousUsername, username } = contractEvent;
+					changes.usernames.registered.push({
+						address: addr,
+						...(previousUsername === undefined ? {} : { previousUsername }),
+						txHash,
+						txIndex,
+						username,
+					});
+					break;
+				}
+				case "UsernameResigned": {
+					const { addr, username } = contractEvent;
+					changes.usernames.resigned.push({ address: addr, txHash, txIndex, username });
+					break;
+				}
+			}
+		}
+
+		return changes;
+	}
+
+	#getMissedRounds(block: Contracts.Crypto.Block): Contracts.Processor.MissedRound[] {
+		if (this.state.isBootstrap()) {
+			return [];
+		}
+
+		const missedRounds: Contracts.Processor.MissedRound[] = [];
+
+		for (let round = 0; round < block.round; round++) {
+			const { address } = this.validatorSet.getValidator(this.proposerCalculator.getValidatorIndex(round));
+			missedRounds.push({ address, round });
+		}
+
+		return missedRounds;
 	}
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {

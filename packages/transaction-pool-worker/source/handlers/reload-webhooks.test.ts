@@ -8,7 +8,7 @@ describe<{
 	app: Application;
 	handler: ReloadWebhooksHandler;
 	database: any;
-}>("ReloadWebhooksHandler", ({ beforeEach, it, spy }) => {
+}>("ReloadWebhooksHandler", ({ assert, beforeEach, it, spy }) => {
 	beforeEach((context) => {
 		context.database = { restore: () => {} };
 
@@ -24,5 +24,11 @@ describe<{
 		await handler.handle();
 
 		restore.calledOnce();
+	});
+
+	it("does nothing when webhooks are not set up", async () => {
+		const handler = new Application().resolve(ReloadWebhooksHandler);
+
+		await assert.resolves(() => handler.handle());
 	});
 });

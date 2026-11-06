@@ -25,6 +25,8 @@ describe<{
 		dispatch: () => {},
 	};
 
+	const settle = async () => new Promise((resolve) => setImmediate(resolve));
+
 	const expectFinishedEventData = ({ executionTime, webhook, payload }) => {
 		assert.number(executionTime);
 		assert.object(webhook);
@@ -46,6 +48,9 @@ describe<{
 		app.bind<Database>(Identifiers.Webhooks.Database).to(Database).inSingletonScope();
 
 		app.bind(Identifiers.Services.Log.Service).toConstantValue(logger);
+		app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({
+			getRequired: (key: string) => ({ timeout: 2500 })[key],
+		});
 		app.bind(Identifiers.Services.Filesystem.Service).toConstantValue({ existsSync: () => true });
 
 		context.database = app.get<Database>(Identifiers.Webhooks.Database);
@@ -73,11 +78,33 @@ describe<{
 
 		spyOnDispatch.reset();
 		await listener.handle({ data: "dummy_data", name: "event" });
+		await settle();
 
 		spyOnPost.calledOnce();
 		spyOnDebug.calledOnce();
 		spyOnDispatch.calledOnce();
 		spyOnDispatch.calledWith(Events.WebhookEvent.Broadcasted);
+	});
+
+	it("should send with the configured timeout", async ({ database, listener }) => {
+		const spyOnPost = stub(http, "post").resolvedValue({ statusCode: 200 });
+
+		database.create(webhook);
+
+		await listener.handle({ data: "dummy_data", name: "event" });
+
+		spyOnPost.calledOnce();
+		assert.equal(spyOnPost.getCallArgs(0)[1].timeout, 2500);
+	});
+
+	it("should not wait for the webhook to be delivered", async ({ database, listener }) => {
+		const spyOnPost = stub(http, "post").returnValue(new Promise(() => {}));
+
+		database.create(webhook);
+
+		await listener.handle({ data: "dummy_data", name: "event" });
+
+		spyOnPost.calledOnce();
 	});
 
 	it("should log error if broadcast is not successful", async ({ database, listener }) => {
@@ -93,6 +120,7 @@ describe<{
 
 		spyOnDispatch.reset();
 		await listener.handle({ data: "dummy_data", name: "event" });
+		await settle();
 
 		spyOnPost.calledOnce();
 		spyOnError.calledOnce();
@@ -107,6 +135,7 @@ describe<{
 		database.create(webhook);
 
 		await listener.handle({ data: "dummy_data", name: "event" });
+		await settle();
 
 		spyOnPost.neverCalled();
 	});
@@ -117,6 +146,7 @@ describe<{
 		database.create(webhook);
 
 		await listener.handle({ data: "dummy_data", name: Events.WebhookEvent.Broadcasted });
+		await settle();
 
 		spyOnPost.neverCalled();
 	});
@@ -140,6 +170,7 @@ describe<{
 
 		spyOnDispatch.reset();
 		await listener.handle({ data: { test: 1 }, name: "event" });
+		await settle();
 
 		spyOnPost.calledOnce();
 		spyOnDispatch.calledOnce();
@@ -165,6 +196,7 @@ describe<{
 
 		spyOnDispatch.reset();
 		await listener.handle({ data: { some: { nested: { prop: 1 } } }, name: "event" });
+		await settle();
 
 		spyOnPost.calledOnce();
 		spyOnDispatch.calledOnce();
@@ -190,6 +222,7 @@ describe<{
 
 		spyOnDispatch.reset();
 		await listener.handle({ data: { some: { nested: { prop: 1 } } }, name: "event" });
+		await settle();
 
 		spyOnPost.calledOnce();
 		spyOnDispatch.calledOnce();
@@ -210,6 +243,7 @@ describe<{
 		database.create(webhook);
 
 		await listener.handle({ data: { test: 2 }, name: "event" });
+		await settle();
 
 		spyOnPost.neverCalled();
 	});
@@ -227,6 +261,45 @@ describe<{
 		database.create(webhook);
 
 		await listener.handle({ data: { some: { nested: { prop: 2 } } }, name: "event" });
+		await settle();
+
+		spyOnPost.neverCalled();
+	});
+
+	it("should broadcast when an address list contains the condition value", async ({ database, listener }) => {
+		const spyOnPost = stub(http, "post").resolvedValue({
+			statusCode: 200,
+		});
+
+		webhook.conditions = [
+			{
+				condition: "contains",
+				key: "addresses",
+				value: "0xB",
+			},
+		];
+		database.create(webhook);
+
+		await listener.handle({ data: { addresses: ["0xA", "0xb"] }, name: "event" });
+		await settle();
+
+		spyOnPost.calledOnce();
+	});
+
+	it("should not broadcast when an address list lacks the condition value", async ({ database, listener }) => {
+		const spyOnPost = stub(http, "post");
+
+		webhook.conditions = [
+			{
+				condition: "contains",
+				key: "addresses",
+				value: "0xA",
+			},
+		];
+		database.create(webhook);
+
+		await listener.handle({ data: { addresses: ["0xAB", "0xC"] }, name: "event" });
+		await settle();
 
 		spyOnPost.neverCalled();
 	});
@@ -248,6 +321,7 @@ describe<{
 		database.create(webhook);
 
 		await listener.handle({ data: { test: 2 }, name: "event" });
+		await settle();
 
 		spyOnEq.calledOnce();
 		spyOnPost.neverCalled();

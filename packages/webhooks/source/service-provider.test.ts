@@ -5,12 +5,15 @@ import { AnySchema } from "joi";
 import { dirSync, setGracefulCleanup } from "tmp";
 
 import { describe } from "@mainsail/test-runner";
+import { Database } from "./database";
 import { defaults } from "./defaults";
+import { Server } from "./server";
 import { ServiceProvider } from "./service-provider";
 
 const importFresh = (moduleName) => import(`${moduleName}?${Date.now()}`);
 
 type Context = {
+	app: Application;
 	serviceProvider: ServiceProvider;
 	pluginConfiguration: Providers.PluginConfiguration;
 };
@@ -34,6 +37,7 @@ const init = (context: Context) => {
 
 	app.bind("path.cache").toConstantValue(dirSync().name);
 
+	context.app = app;
 	context.serviceProvider = app.resolve<ServiceProvider>(ServiceProvider);
 	context.pluginConfiguration = app.get<Providers.PluginConfiguration>(Identifiers.ServiceProvider.Configuration);
 	context.serviceProvider.setConfig(context.pluginConfiguration.from("webhooks", defaults));
@@ -42,7 +46,7 @@ const init = (context: Context) => {
 const importDefaults = async () =>
 	// @ts-ignore
 	(await importFresh("../distribution/defaults.js")).defaults;
-describe<Context>("ServiceProvider", ({ beforeEach, afterAll, it, assert }) => {
+describe<Context>("ServiceProvider", ({ beforeEach, afterAll, it, assert, spy }) => {
 	beforeEach(init);
 
 	afterAll(() => setGracefulCleanup());
@@ -51,7 +55,44 @@ describe<Context>("ServiceProvider", ({ beforeEach, afterAll, it, assert }) => {
 		await assert.resolves(() => serviceProvider.register());
 	});
 
-	it("should boot and dispose", async ({ serviceProvider }) => {
+	it("should not set up the database, the server or the listener when disabled", async ({
+		app,
+		serviceProvider,
+		pluginConfiguration,
+	}) => {
+		serviceProvider.setConfig(pluginConfiguration.from("webhooks", { ...defaults, enabled: false }));
+		const databaseBoot = spy(Database.prototype, "boot");
+		const serverRegister = spy(Server.prototype, "register");
+		const listen = spy(NullEventDispatcher.prototype, "listen");
+
+		await serviceProvider.register();
+
+		assert.false(app.isBound(Identifiers.Webhooks.Database));
+		assert.false(app.isBound(Identifiers.Webhooks.Server));
+		databaseBoot.neverCalled();
+		serverRegister.neverCalled();
+		listen.neverCalled();
+	});
+
+	it("should open the database, register the server and listen when enabled", async ({
+		serviceProvider,
+		pluginConfiguration,
+	}) => {
+		serviceProvider.setConfig(pluginConfiguration.from("webhooks", { ...defaults, enabled: true }));
+		const databaseBoot = spy(Database.prototype, "boot");
+		const serverRegister = spy(Server.prototype, "register");
+		const listen = spy(NullEventDispatcher.prototype, "listen");
+
+		await serviceProvider.register();
+
+		databaseBoot.calledOnce();
+		serverRegister.calledOnce();
+		listen.calledOnce();
+		assert.equal(listen.getCallArgs(0)[0], "*");
+	});
+
+	it("should boot and dispose", async ({ serviceProvider, pluginConfiguration }) => {
+		serviceProvider.setConfig(pluginConfiguration.from("webhooks", { ...defaults, enabled: true }));
 		await assert.resolves(() => serviceProvider.register());
 		await assert.resolves(() => serviceProvider.boot());
 		await assert.resolves(() => serviceProvider.dispose());

@@ -1,9 +1,8 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { formatCurrency } from "@mainsail/blockchain-utils";
-import { Events, Identifiers } from "@mainsail/constants";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class TransactionProcessor implements Contracts.Processor.TransactionProcessor {
@@ -19,12 +18,6 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 
 	@inject(Identifiers.BlockchainUtils.FeeCalculator)
 	private readonly feeCalculator!: Contracts.BlockchainUtils.FeeCalculator;
-
-	@inject(Identifiers.State.State)
-	private readonly state!: Contracts.State.State;
-
-	@inject(Identifiers.Services.EventDispatcher.Service)
-	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	public async process(
 		block: Contracts.Crypto.Block,
@@ -48,8 +41,6 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 			value: transaction.value,
 		});
 
-		this.#emit(transaction, receipt);
-
 		const feeConsumed = this.feeCalculator.calculateConsumed(transaction.gasPrice, receipt.gasUsed);
 		this.logger.debug(
 			`executed EVM call (status=${receipt.status}, from=${transaction.from} to=${transaction.to} gasUsed=${receipt.gasUsed} paidNativeFee=${formatCurrency(this.configuration, feeConsumed)} deployed=${receipt.contractAddress ?? ""})`,
@@ -57,24 +48,5 @@ export class TransactionProcessor implements Contracts.Processor.TransactionProc
 		);
 
 		return receipt;
-	}
-
-	#emit(transaction: Contracts.Crypto.Transaction, receipt: Contracts.Evm.TransactionReceipt): void {
-		if (this.state.isBootstrap()) {
-			return;
-		}
-
-		const event = Events.EvmEvent.TransactionReceipt;
-
-		void this.eventDispatcher
-			.dispatch(event, {
-				receipt,
-				sender: transaction.from,
-				transactionId: transaction.hash,
-			})
-			.catch((rawError) => {
-				const error = ensureError(rawError);
-				this.logger.error(`Dispatching ${event} failed: ${error.stack ?? error.message}`, "consensus");
-			});
 	}
 }

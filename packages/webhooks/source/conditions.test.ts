@@ -17,10 +17,20 @@ describe("Conditions.between", ({ it, assert }) => {
 describe("Conditions.contains", ({ it, assert }) => {
 	it("should be true", () => {
 		assert.true(contains("Hello World", "Hello"));
+		assert.true(contains(["0xA", "0xB"], "0xB"));
+		assert.true(contains(["0xAbCd"], "0xabcd"));
+		assert.true(contains(["0xabcd"], "0xABCD"));
+		assert.true(contains([1, "0xAbCd"], "0xabcd"));
+		assert.true(contains([1, 2], 2));
 	});
 
 	it("should be false", () => {
 		assert.false(contains("Hello World", "invalid"));
+		assert.false(contains("Hello World", "hello"));
+		assert.false(contains(["0xA", "0xB"], "0xC"));
+		assert.false(contains(["0xAB"], "0xA"));
+		assert.false(contains([1, 2], 3));
+		assert.false(contains([1, 2], "1"));
 	});
 });
 
