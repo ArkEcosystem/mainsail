@@ -841,7 +841,22 @@ describe<{
 		assert.length(payload.rounds, 3);
 	});
 
-	it("#commit - should report neither the round of the committed block nor the commit round", async ({
+	it("#commit - should not report the rounds that re-proposed the committed block", async ({
+		events,
+		processor,
+		validatorSet,
+	}) => {
+		const getValidator = spy(validatorSet, "getValidator");
+		const dispatch = spy(events, "dispatch");
+
+		await processor.commit(makeUnit(makeBlock({ round: 0 }), { round: 2 }));
+
+		getValidator.neverCalled();
+		dispatch.calledOnce();
+		dispatch.calledWith(Events.BlockEvent.Applied, { ...blockData, contractEvents: [] });
+	});
+
+	it("#commit - should report only the rounds before the round of the committed block", async ({
 		events,
 		processor,
 		validatorSet,
@@ -849,18 +864,18 @@ describe<{
 		const indexes: number[] = [];
 		validatorSet.getValidator = (index: number) => {
 			indexes.push(index);
-			return { address: ["proposer", "second", "re-proposer"][index] };
+			return { address: ["first", "proposer", "re-proposer"][index] };
 		};
 		const dispatch = spy(events, "dispatch");
 
-		await processor.commit(makeUnit(makeBlock({ round: 0 }), { round: 2 }));
+		await processor.commit(makeUnit(makeBlock({ round: 1 }), { round: 2 }));
 
-		assert.equal(indexes, [1]);
+		assert.equal(indexes, [0]);
 		dispatch.calledTimes(2);
 		dispatch.calledNthWith(0, Events.BlockEvent.Missed, {
-			addresses: ["second"],
+			addresses: ["first"],
 			blockNumber,
-			rounds: [{ address: "second", round: 1 }],
+			rounds: [{ address: "first", round: 0 }],
 		});
 	});
 

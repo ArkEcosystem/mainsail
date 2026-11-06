@@ -142,7 +142,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 
 		const commit = await unit.getCommit();
-		const missedRounds = this.#getMissedRounds(unit);
+		const missedRounds = this.#getMissedRounds(commit.block);
 
 		await this.evm.onCommit(unit);
 		await this.stateStore.onCommit(unit);
@@ -298,19 +298,14 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		return changes;
 	}
 
-	#getMissedRounds(unit: Contracts.Processor.ProcessableUnit): Contracts.Processor.MissedRound[] {
+	#getMissedRounds(block: Contracts.Crypto.Block): Contracts.Processor.MissedRound[] {
 		if (this.state.isBootstrap()) {
 			return [];
 		}
 
-		const block = unit.getBlock();
 		const missedRounds: Contracts.Processor.MissedRound[] = [];
 
-		for (let round = 0; round < unit.round; round++) {
-			if (round === block.round) {
-				continue;
-			}
-
+		for (let round = 0; round < block.round; round++) {
 			const { address } = this.validatorSet.getValidator(this.proposerCalculator.getValidatorIndex(round));
 			missedRounds.push({ address, round });
 		}
