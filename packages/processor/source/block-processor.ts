@@ -6,7 +6,6 @@ import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { InvalidFee, InvalidGasUsed, InvalidLogsBloom, InvalidStateRoot } from "@mainsail/exceptions";
 import { ensureError, sleep } from "@mainsail/utils";
 
-type MissedRound = { address: string; round: number };
 type UsernameChange = { address: string; previousUsername?: string; txHash: string; txIndex: number; username: string };
 type ValidatorChange = { address: string; blsPublicKey?: string; txHash: string; txIndex: number };
 type VoteChange = { txHash: string; txIndex: number; validator: string; voter: string };
@@ -175,7 +174,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	#emitCommitEvents(
 		unit: Contracts.Processor.ProcessableUnit,
 		block: Contracts.Crypto.Block,
-		missedRounds: MissedRound[],
+		missedRounds: Contracts.Processor.MissedRound[],
 	): void {
 		if (this.state.isBootstrap()) {
 			return;
@@ -212,7 +211,14 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		this.#emitBatch(Events.UsernameEvent.Registered, block.number, "usernames", usernames.registered, addressOf);
 		this.#emitBatch(Events.UsernameEvent.Resigned, block.number, "usernames", usernames.resigned, addressOf);
 
-		this.#emitBatch(Events.BlockEvent.Missed, block.number, "rounds", missedRounds, addressOf);
+		if (missedRounds.length > 0) {
+			this.#emit<Contracts.Processor.MissedRoundsData>(Events.BlockEvent.Missed, {
+				addresses: [...new Set(missedRounds.map(({ address }) => address))],
+				blockNumber: block.number,
+				rounds: missedRounds,
+			});
+		}
+
 		this.#emit(Events.BlockEvent.Applied, { ...block.toData(), contractEvents: unit.getContractEvents() });
 	}
 
@@ -292,13 +298,13 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		return changes;
 	}
 
-	#getMissedRounds(unit: Contracts.Processor.ProcessableUnit): MissedRound[] {
+	#getMissedRounds(unit: Contracts.Processor.ProcessableUnit): Contracts.Processor.MissedRound[] {
 		if (this.state.isBootstrap()) {
 			return [];
 		}
 
 		const block = unit.getBlock();
-		const missedRounds: MissedRound[] = [];
+		const missedRounds: Contracts.Processor.MissedRound[] = [];
 
 		for (let round = 0; round < unit.round; round++) {
 			if (round === block.round) {

@@ -4,7 +4,6 @@ import { Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
 type OwnRound = { address: string; round: number };
-type MissedRounds = { blockNumber: number; rounds: Array<{ address: string; round: number }> };
 
 // Reports, for the validators this node runs, the proposals it submits and whether the block committed at a block
 // number is theirs or one they missed. It follows consensus through its events and holds nothing of it.
@@ -49,7 +48,7 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 				break;
 			}
 			case Events.BlockEvent.Missed: {
-				this.#onBlockMissed(data as MissedRounds);
+				this.#onBlockMissed(data as Contracts.Processor.MissedRoundsData);
 				break;
 			}
 			case Events.BlockEvent.Applied: {
@@ -121,7 +120,7 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 		}
 	}
 
-	#onBlockMissed({ blockNumber, rounds }: MissedRounds): void {
+	#onBlockMissed({ blockNumber, rounds }: Contracts.Processor.MissedRoundsData): void {
 		const ownRounds = this.#ownRounds.get(blockNumber) ?? [];
 
 		for (const { address, round } of rounds) {
