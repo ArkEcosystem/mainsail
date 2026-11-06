@@ -4,6 +4,7 @@ import { Events, Identifiers, Locale } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
 type OwnRound = { address: string; round: number };
+type MissedRounds = { blockNumber: number; rounds: Array<{ address: string; round: number }> };
 
 // Reports, for the validators this node runs, the proposals it submits and whether the block committed at a block
 // number is theirs or one they missed. It follows consensus through its events and holds nothing of it.
@@ -47,6 +48,10 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 				this.#onProposed(data as Contracts.Crypto.Proposal);
 				break;
 			}
+			case Events.BlockEvent.Missed: {
+				this.#onBlockMissed(data as MissedRounds);
+				break;
+			}
 			case Events.BlockEvent.Applied: {
 				this.#onBlockApplied(data as Contracts.Crypto.BlockData);
 				break;
@@ -58,6 +63,7 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 		return [
 			[Events.ConsensusEvent.RoundStarted, this],
 			[Events.ConsensusEvent.Proposed, this],
+			[Events.BlockEvent.Missed, this],
 			[Events.BlockEvent.Applied, this],
 		];
 	}
@@ -112,14 +118,19 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 				`✅ Committed our block ${this.#position(block.number, block.round)} as ${block.proposer}`,
 				"consensus",
 			);
-			return;
 		}
+	}
 
-		for (const ownRound of ownRounds) {
-			this.logger.notice(
-				`❌ Missed our round ${this.#position(block.number, ownRound.round)} as ${ownRound.address}, committed by ${block.proposer}`,
-				"consensus",
-			);
+	#onBlockMissed({ blockNumber, rounds }: MissedRounds): void {
+		const ownRounds = this.#ownRounds.get(blockNumber) ?? [];
+
+		for (const { address, round } of rounds) {
+			if (ownRounds.some((ownRound) => ownRound.address === address && ownRound.round === round)) {
+				this.logger.notice(
+					`❌ Missed our round ${this.#position(blockNumber, round)} as ${address}`,
+					"consensus",
+				);
+			}
 		}
 	}
 
