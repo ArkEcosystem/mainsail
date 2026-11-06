@@ -25,6 +25,8 @@ describe<{
 		dispatch: () => {},
 	};
 
+	const settle = async () => new Promise((resolve) => setImmediate(resolve));
+
 	const expectFinishedEventData = ({ executionTime, webhook, payload }) => {
 		assert.number(executionTime);
 		assert.object(webhook);
@@ -73,11 +75,22 @@ describe<{
 
 		spyOnDispatch.reset();
 		await listener.handle({ data: "dummy_data", name: "event" });
+		await settle();
 
 		spyOnPost.calledOnce();
 		spyOnDebug.calledOnce();
 		spyOnDispatch.calledOnce();
 		spyOnDispatch.calledWith(Events.WebhookEvent.Broadcasted);
+	});
+
+	it("should not wait for the webhook to be delivered", async ({ database, listener }) => {
+		const spyOnPost = stub(http, "post").returnValue(new Promise(() => {}));
+
+		database.create(webhook);
+
+		await listener.handle({ data: "dummy_data", name: "event" });
+
+		spyOnPost.calledOnce();
 	});
 
 	it("should log error if broadcast is not successful", async ({ database, listener }) => {
@@ -93,6 +106,7 @@ describe<{
 
 		spyOnDispatch.reset();
 		await listener.handle({ data: "dummy_data", name: "event" });
+		await settle();
 
 		spyOnPost.calledOnce();
 		spyOnError.calledOnce();
@@ -107,6 +121,7 @@ describe<{
 		database.create(webhook);
 
 		await listener.handle({ data: "dummy_data", name: "event" });
+		await settle();
 
 		spyOnPost.neverCalled();
 	});
@@ -117,6 +132,7 @@ describe<{
 		database.create(webhook);
 
 		await listener.handle({ data: "dummy_data", name: Events.WebhookEvent.Broadcasted });
+		await settle();
 
 		spyOnPost.neverCalled();
 	});
@@ -140,6 +156,7 @@ describe<{
 
 		spyOnDispatch.reset();
 		await listener.handle({ data: { test: 1 }, name: "event" });
+		await settle();
 
 		spyOnPost.calledOnce();
 		spyOnDispatch.calledOnce();
@@ -165,6 +182,7 @@ describe<{
 
 		spyOnDispatch.reset();
 		await listener.handle({ data: { some: { nested: { prop: 1 } } }, name: "event" });
+		await settle();
 
 		spyOnPost.calledOnce();
 		spyOnDispatch.calledOnce();
@@ -190,6 +208,7 @@ describe<{
 
 		spyOnDispatch.reset();
 		await listener.handle({ data: { some: { nested: { prop: 1 } } }, name: "event" });
+		await settle();
 
 		spyOnPost.calledOnce();
 		spyOnDispatch.calledOnce();
@@ -210,6 +229,7 @@ describe<{
 		database.create(webhook);
 
 		await listener.handle({ data: { test: 2 }, name: "event" });
+		await settle();
 
 		spyOnPost.neverCalled();
 	});
@@ -227,6 +247,7 @@ describe<{
 		database.create(webhook);
 
 		await listener.handle({ data: { some: { nested: { prop: 2 } } }, name: "event" });
+		await settle();
 
 		spyOnPost.neverCalled();
 	});
@@ -246,6 +267,7 @@ describe<{
 		database.create(webhook);
 
 		await listener.handle({ data: { addresses: ["0xA", "0xB"] }, name: "event" });
+		await settle();
 
 		spyOnPost.calledOnce();
 	});
@@ -263,6 +285,7 @@ describe<{
 		database.create(webhook);
 
 		await listener.handle({ data: { addresses: ["0xAB", "0xC"] }, name: "event" });
+		await settle();
 
 		spyOnPost.neverCalled();
 	});
@@ -284,6 +307,7 @@ describe<{
 		database.create(webhook);
 
 		await listener.handle({ data: { test: 2 }, name: "event" });
+		await settle();
 
 		spyOnEq.calledOnce();
 		spyOnPost.neverCalled();

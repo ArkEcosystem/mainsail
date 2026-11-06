@@ -24,15 +24,9 @@ export class Listener implements Contracts.Kernel.EventListener<{ name: string; 
 			return;
 		}
 
-		const webhooks: Contracts.Webhooks.Webhook[] = this.#getWebhooks(name, data);
-
-		const promises: Promise<void>[] = [];
-
-		for (const webhook of webhooks) {
-			promises.push(this.broadcast(webhook, data));
+		for (const webhook of this.#getWebhooks(name, data)) {
+			void this.broadcast(webhook, data);
 		}
-
-		await Promise.all(promises);
 	}
 
 	public async broadcast(
