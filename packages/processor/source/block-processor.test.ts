@@ -68,6 +68,7 @@ describe<{
 	nextMilestone: any;
 	processor: BlockProcessor;
 	processorWithoutApiSync: BlockProcessor;
+	proposerCalculator: any;
 	roundCalculator: any;
 	state: any;
 	stateStore: any;
@@ -82,6 +83,7 @@ describe<{
 		app.bind(Identifiers.State.State).toConstantValue(context.state);
 		app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 		app.bind(Identifiers.BlockchainUtils.RoundCalculator).toConstantValue(context.roundCalculator);
+		app.bind(Identifiers.BlockchainUtils.ProposerCalculator).toConstantValue(context.proposerCalculator);
 		app.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
 		app.bind(Identifiers.Evm.Instance).toConstantValue(context.evm).whenTagged("instance", "evm");
 		app.bind(Identifiers.Processor.TransactionProcessor).toConstantValue(context.transactionProcessor);
@@ -145,10 +147,11 @@ describe<{
 			calculateRound: () => ({ maxValidators: 53, round: 2, roundHeight: blockNumber + 1 }),
 			isNewRound: () => false,
 		};
+		context.proposerCalculator = { getValidatorIndex: (round: number) => round };
 		context.state = { isBootstrap: () => false };
 		context.stateStore = { getLastBlock: () => previousBlock, onCommit: async () => {} };
 		context.databaseService = { onCommit: async () => {} };
-		context.validatorSet = { onCommit: async () => {} };
+		context.validatorSet = { getValidator: () => ({ address: "proposer" }), onCommit: async () => {} };
 		context.txPoolWorker = { onCommit: async () => {} };
 		context.evmWorker = { onCommit: async () => {} };
 		context.apiSync = { flush: async () => {}, onCommit: async () => {} };
@@ -733,6 +736,7 @@ describe<{
 		processor,
 		roundCalculator,
 		state,
+		validatorSet,
 	}) => {
 		state.isBootstrap = () => true;
 		roundCalculator.isNewRound = () => true;
@@ -741,6 +745,7 @@ describe<{
 		const info = spy(logger, "info");
 		const debug = spy(logger, "debug");
 		const calculateRound = spy(roundCalculator, "calculateRound");
+		const getValidator = spy(validatorSet, "getValidator");
 
 		await processor.commit(makeUnit(makeBlock({ transactions: [makeTransaction(1)], transactionsCount: 1 })));
 
@@ -749,6 +754,111 @@ describe<{
 		info.neverCalled();
 		debug.neverCalled();
 		calculateRound.neverCalled();
+		getValidator.neverCalled();
+	});
+
+	it("#commit - should report the rounds missed before the committed block in one event", async ({
+		events,
+		processor,
+		validatorSet,
+	}) => {
+		validatorSet.getValidator = (index: number) => ({ address: ["first", "second", "proposer"][index] });
+		const transaction = makeTransaction(1);
+		const dispatch = spy(events, "dispatch");
+
+		await processor.commit(makeUnit(makeBlock({ round: 2, transactions: [transaction], transactionsCount: 1 })));
+
+		dispatch.calledTimes(3);
+		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, transaction);
+		dispatch.calledNthWith(1, Events.BlockEvent.Missed, {
+			addresses: ["first", "second"],
+			blockNumber,
+			rounds: [
+				{ address: "first", round: 0 },
+				{ address: "second", round: 1 },
+			],
+		});
+		dispatch.calledNthWith(2, Events.BlockEvent.Applied, { ...blockData, contractEvents: [] });
+	});
+
+	it("#commit - should list a proposer that missed several rounds once", async ({
+		events,
+		processor,
+		validatorSet,
+	}) => {
+		validatorSet.getValidator = (index: number) => ({ address: ["first", "second", "first", "proposer"][index] });
+		const dispatch = spy(events, "dispatch");
+
+		await processor.commit(makeUnit(makeBlock({ round: 3 })));
+
+		const [, payload] = dispatch.getCallArgs(0) as [string, { addresses: string[]; rounds: unknown[] }];
+		assert.equal(payload.addresses, ["first", "second"]);
+		assert.length(payload.rounds, 3);
+	});
+
+	it("#commit - should report the proposer that re-proposed the committed block as missed", async ({
+		events,
+		processor,
+		validatorSet,
+	}) => {
+		const indexes: number[] = [];
+		validatorSet.getValidator = (index: number) => {
+			indexes.push(index);
+			return { address: "re-proposer" };
+		};
+		const dispatch = spy(events, "dispatch");
+
+		await processor.commit(makeUnit(makeBlock({ round: 0 }), { round: 1 }));
+
+		assert.equal(indexes, [1]);
+		dispatch.calledTimes(2);
+		dispatch.calledNthWith(0, Events.BlockEvent.Missed, {
+			addresses: ["re-proposer"],
+			blockNumber,
+			rounds: [{ address: "re-proposer", round: 1 }],
+		});
+	});
+
+	it("#commit - should not report a later round of the proposer whose block was committed", async ({
+		events,
+		processor,
+		validatorSet,
+	}) => {
+		validatorSet.getValidator = (index: number) => ({
+			address: ["missed-proposer", "proposer", "proposer"][index],
+		});
+		const dispatch = spy(events, "dispatch");
+
+		await processor.commit(makeUnit(makeBlock(), { round: 2 }));
+
+		dispatch.calledTimes(2);
+		dispatch.calledNthWith(0, Events.BlockEvent.Missed, {
+			addresses: ["missed-proposer"],
+			blockNumber,
+			rounds: [{ address: "missed-proposer", round: 0 }],
+		});
+	});
+
+	it("#commit - should look up the missed proposers before the state moves to the next block", async ({
+		processor,
+		stateStore,
+		validatorSet,
+	}) => {
+		const calls: string[] = [];
+		validatorSet.getValidator = () => {
+			calls.push("getValidator");
+			return { address: "missed-proposer" };
+		};
+		stateStore.onCommit = async () => {
+			calls.push("stateStore");
+		};
+		validatorSet.onCommit = async () => {
+			calls.push("validatorSet");
+		};
+
+		await processor.commit(makeUnit(makeBlock()));
+
+		assert.equal(calls, ["getValidator", "stateStore", "validatorSet"]);
 	});
 
 	it("#commit - should log the start of a new validator round", async ({ logger, processor, roundCalculator }) => {

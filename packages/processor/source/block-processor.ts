@@ -6,6 +6,10 @@ import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { InvalidFee, InvalidGasUsed, InvalidLogsBloom, InvalidStateRoot } from "@mainsail/exceptions";
 import { ensureError, sleep } from "@mainsail/utils";
 
+type MissedRound = { address: string; round: number };
+
+const addressOf = ({ address }: { address: string }): string[] => [address];
+
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.State.Store)
@@ -19,6 +23,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	@inject(Identifiers.BlockchainUtils.RoundCalculator)
 	private readonly roundCalculator!: Contracts.BlockchainUtils.RoundCalculator;
+
+	@inject(Identifiers.BlockchainUtils.ProposerCalculator)
+	private readonly proposerCalculator!: Contracts.BlockchainUtils.ProposerCalculator;
 
 	@inject(Identifiers.Database.Service)
 	private readonly databaseService!: Contracts.Database.DatabaseService;
@@ -126,6 +133,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		}
 
 		const commit = await unit.getCommit();
+		const missedRounds = this.#getMissedRounds(unit);
 
 		await this.evm.onCommit(unit);
 		await this.stateStore.onCommit(unit);
@@ -151,10 +159,14 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		this.#logBlockCommitted(unit);
 		this.#logNewRound(unit);
 
-		this.#emitCommitEvents(unit, commit.block);
+		this.#emitCommitEvents(unit, commit.block, missedRounds);
 	}
 
-	#emitCommitEvents(unit: Contracts.Processor.ProcessableUnit, block: Contracts.Crypto.Block): void {
+	#emitCommitEvents(
+		unit: Contracts.Processor.ProcessableUnit,
+		block: Contracts.Crypto.Block,
+		missedRounds: MissedRound[],
+	): void {
 		if (this.state.isBootstrap()) {
 			return;
 		}
@@ -163,7 +175,49 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			this.#emit(Events.TransactionEvent.Applied, transaction);
 		}
 
+		this.#emitBatch(Events.BlockEvent.Missed, block.number, "rounds", missedRounds, addressOf);
 		this.#emit(Events.BlockEvent.Applied, { ...block.toData(), contractEvents: unit.getContractEvents() });
+	}
+
+	#emitBatch<T>(
+		event: string,
+		blockNumber: number,
+		key: string,
+		entries: T[],
+		addressesOf: (entry: T) => string[],
+	): void {
+		if (entries.length === 0) {
+			return;
+		}
+
+		this.#emit(event, {
+			addresses: [...new Set(entries.flatMap((entry) => addressesOf(entry)))],
+			blockNumber,
+			[key]: entries,
+		});
+	}
+
+	#getMissedRounds(unit: Contracts.Processor.ProcessableUnit): MissedRound[] {
+		if (this.state.isBootstrap()) {
+			return [];
+		}
+
+		const block = unit.getBlock();
+		const missedRounds: MissedRound[] = [];
+
+		for (let round = 0; round <= unit.round; round++) {
+			if (round === block.round) {
+				continue;
+			}
+
+			const { address } = this.validatorSet.getValidator(this.proposerCalculator.getValidatorIndex(round));
+
+			if (address !== block.proposer) {
+				missedRounds.push({ address, round });
+			}
+		}
+
+		return missedRounds;
 	}
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {
