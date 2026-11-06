@@ -32,9 +32,7 @@ const EXCEPTIONS = {
 		devDependencies: ["cross-env"],
 	},
 	"@mainsail/configuration-generator": {
-		dependencies: [
-			"@mainsail/crypto-key-pair-ecdsa",
-		],
+		dependencies: ["@mainsail/crypto-key-pair-ecdsa"],
 		devDependencies: [],
 	},
 	"@mainsail/core": {
@@ -106,9 +104,7 @@ const EXCEPTIONS = {
 		dependencies: ["@chainsafe/blst"],
 	},
 	"@mainsail/test-factories": {
-		dependencies: [
-			"@mainsail/configuration-generator",
-		],
+		dependencies: ["@mainsail/configuration-generator"],
 		devDependencies: [],
 	},
 };
@@ -220,8 +216,11 @@ class Import {
 		this.compileTimeOnly = this.isCompileTimeOnly();
 	}
 
+	// Generated protobuf modules live in protos/ next to source/ and ship with the package, so they count as source.
 	isTestOnly() {
-		return this.paths.every((path) => path.endsWith(".test.ts") || !path.includes("/source/"));
+		return this.paths.every(
+			(path) => path.endsWith(".test.ts") || !(path.includes("/source/") || path.includes("/protos/")),
+		);
 	}
 
 	isCompileTimeOnly() {
