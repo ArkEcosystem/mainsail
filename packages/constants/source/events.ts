@@ -24,7 +24,6 @@ export enum BlockEvent {
 	Applied = "block.applied",
 	Forged = "block.forged",
 	Invalid = "block.invalid",
-	Received = "block.received",
 }
 
 export enum ValidatorEvent {
