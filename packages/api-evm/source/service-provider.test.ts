@@ -183,6 +183,7 @@ describe<{
 		assert.number(result.value.plugins.socketTimeout);
 		assert.boolean(result.value.plugins.trustProxy);
 		assert.array(result.value.plugins.whitelist);
+		assert.number(result.value.rpc.batchResponseMaxSize);
 		assert.boolean(result.value.server.http.enabled);
 		assert.string(result.value.server.http.host);
 		assert.number(result.value.server.http.port);
@@ -266,6 +267,15 @@ describe<{
 
 		assert.undefined(result.error);
 		assert.equal(result.value.plugins.rateLimit.points, 500);
+	});
+
+	it("should parse process.env.MAINSAIL_API_EVM_BATCH_RESPONSE_MAX_SIZE", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_API_EVM_BATCH_RESPONSE_MAX_SIZE = "1000";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.rpc.batchResponseMaxSize, 1000);
 	});
 
 	it("#schemaRestrictions - plugins is required && is object", async ({ serviceProvider }) => {
@@ -451,6 +461,44 @@ describe<{
 		result = serviceProvider.configSchema().validate(defaults);
 
 		assert.equal(result.error?.message, '"plugins.whitelist" is required');
+	});
+
+	it("#schemaRestrictions - rpc is required && is object", async ({ serviceProvider }) => {
+		const defaults = await importDefaults();
+		defaults.rpc = false;
+		let result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"rpc" must be of type object');
+
+		delete defaults.rpc;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"rpc" is required');
+	});
+
+	it("#schemaRestrictions - rpc.batchResponseMaxSize is required && is integer && >= 0", async ({
+		serviceProvider,
+	}) => {
+		const defaults = await importDefaults();
+		defaults.rpc.batchResponseMaxSize = false;
+		let result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"rpc.batchResponseMaxSize" must be a number');
+
+		defaults.rpc.batchResponseMaxSize = 1.12;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"rpc.batchResponseMaxSize" must be an integer');
+
+		defaults.rpc.batchResponseMaxSize = -1;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"rpc.batchResponseMaxSize" must be greater than or equal to 0');
+
+		delete defaults.rpc.batchResponseMaxSize;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"rpc.batchResponseMaxSize" is required');
 	});
 
 	it("#schemaRestrictions - server is required && is object", async ({ serviceProvider }) => {

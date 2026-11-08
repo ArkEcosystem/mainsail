@@ -80,6 +80,7 @@ describe<{
 			}
 			protected pluginConfiguration(): Contracts.Kernel.PluginConfiguration {
 				return {
+					getOptional: (key: string, defaultValue: unknown) => defaultValue,
 					getRequired: () => 5000,
 				} as unknown as Contracts.Kernel.PluginConfiguration;
 			}
@@ -313,7 +314,10 @@ describe<{
 				return "Plain";
 			}
 			protected pluginConfiguration(): Contracts.Kernel.PluginConfiguration {
-				return { getRequired: () => 5000 } as unknown as Contracts.Kernel.PluginConfiguration;
+				return {
+					getOptional: (key: string, defaultValue: unknown) => defaultValue,
+					getRequired: () => 5000,
+				} as unknown as Contracts.Kernel.PluginConfiguration;
 			}
 			protected defaultOptions(): Record<string, unknown> {
 				return {};

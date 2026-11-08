@@ -8,16 +8,22 @@ import { tmpdir } from "os";
 import { join } from "path";
 
 import { AbstractServer } from "./server";
-import { Processor } from "./rcp/index.js";
+import { DEFAULT_BATCH_RESPONSE_MAX_SIZE, Processor } from "./rcp/index.js";
 
 @injectable()
 class TestServer extends AbstractServer {
+	public batchResponseMaxSize: number | undefined;
+
 	protected baseName(): string {
 		return "Test";
 	}
 
 	protected pluginConfiguration(): any {
 		return {
+			getOptional: (key: string, defaultValue: unknown) =>
+				key === "rpc.batchResponseMaxSize" && this.batchResponseMaxSize !== undefined
+					? this.batchResponseMaxSize
+					: defaultValue,
 			getRequired: (key: string) => {
 				if (key === "plugins.socketTimeout") {
 					return 5000;
@@ -68,6 +74,25 @@ describe<{
 		await subject.initialize(Enums.Api.ServerType.Http, {});
 
 		assert.instance(subject.getRPCProcessor(), Processor);
+	});
+
+	it("initialize - passes the default batch response max size to the processor", async ({ subject }) => {
+		const setBatchResponseMaxSize = spy(Processor.prototype, "setBatchResponseMaxSize");
+
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		setBatchResponseMaxSize.calledWith(DEFAULT_BATCH_RESPONSE_MAX_SIZE);
+		setBatchResponseMaxSize.restore();
+	});
+
+	it("initialize - passes the configured batch response max size to the processor", async ({ subject }) => {
+		const setBatchResponseMaxSize = spy(Processor.prototype, "setBatchResponseMaxSize");
+		subject.batchResponseMaxSize = 1000;
+
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		setBatchResponseMaxSize.calledWith(1000);
+		setBatchResponseMaxSize.restore();
 	});
 
 	it("uri - is defined after boot", async ({ subject }) => {
