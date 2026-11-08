@@ -148,6 +148,9 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				trustProxy: Joi.bool().required(),
 				whitelist: Joi.array().items(Joi.string()).required(),
 			}).required(),
+			rpc: Joi.object({
+				batchResponseMaxSize: Joi.number().integer().min(0).required(),
+			}).required(),
 			server: Joi.object({
 				http: Joi.object({
 					enabled: Joi.bool().required(),

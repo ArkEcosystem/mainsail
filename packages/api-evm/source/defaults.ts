@@ -19,6 +19,12 @@ export const defaults = {
 		trustProxy: Environment.isTrue(EnvironmentVariables.MAINSAIL_API_EVM_TRUST_PROXY),
 		whitelist: ["*"],
 	},
+	rpc: {
+		batchResponseMaxSize: Environment.get(
+			EnvironmentVariables.MAINSAIL_API_EVM_BATCH_RESPONSE_MAX_SIZE,
+			25_000_000,
+		),
+	},
 	server: {
 		http: {
 			enabled: !Environment.isTrue(EnvironmentVariables.MAINSAIL_API_EVM_DISABLED),

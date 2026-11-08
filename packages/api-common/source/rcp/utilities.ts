@@ -24,6 +24,7 @@ export const errorMessageMap = {
 	[Enums.Api.RcpErrorCode.InvalidRequest]: "Invalid request",
 	[Enums.Api.RcpErrorCode.MethodNotFound]: "Method not found",
 	[Enums.Api.RcpErrorCode.ParseError]: "Parse error",
+	[Enums.Api.RcpErrorCode.ResponseTooLarge]: "Response too large",
 };
 
 export const prepareRcpError = (
