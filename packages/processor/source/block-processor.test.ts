@@ -9,7 +9,7 @@ import { BlockProcessor } from "./block-processor.js";
 
 const blockNumber = 3;
 const blockData = { hash: "block-hash" };
-const commitKey = { blockHash: "block-hash", blockNumber: BigInt(blockNumber), round: 0n };
+const commitKey = { blockHash: "block-hash", blockNumber: BigInt(blockNumber), round: 1n };
 const previousBlock = {
 	hash: "parent-hash",
 	number: blockNumber - 1,
@@ -42,7 +42,7 @@ const makeBlock = (overrides: Record<string, unknown> = {}) => ({
 	logsBloom: "logs-bloom",
 	number: blockNumber,
 	proposer: "proposer",
-	round: 0,
+	round: 1,
 	stateRoot: "state-root",
 	timestamp: 1_700_000_000,
 	toData: () => blockData,
@@ -80,7 +80,6 @@ describe<{
 	nextMilestone: any;
 	processor: BlockProcessor;
 	processorWithoutApiSync: BlockProcessor;
-	proposerCalculator: any;
 	roundCalculator: any;
 	state: any;
 	stateStore: any;
@@ -95,7 +94,6 @@ describe<{
 		app.bind(Identifiers.State.State).toConstantValue(context.state);
 		app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 		app.bind(Identifiers.BlockchainUtils.RoundCalculator).toConstantValue(context.roundCalculator);
-		app.bind(Identifiers.BlockchainUtils.ProposerCalculator).toConstantValue(context.proposerCalculator);
 		app.bind(Identifiers.Database.Service).toConstantValue(context.databaseService);
 		app.bind(Identifiers.Evm.Instance).toConstantValue(context.evm).whenTagged("instance", "evm");
 		app.bind(Identifiers.Processor.TransactionProcessor).toConstantValue(context.transactionProcessor);
@@ -159,14 +157,10 @@ describe<{
 			calculateRound: () => ({ maxValidators: 53, round: 2, roundHeight: blockNumber + 1 }),
 			isNewRound: () => false,
 		};
-		context.proposerCalculator = { getValidatorIndex: (round: number) => round };
 		context.state = { isBootstrap: () => false };
 		context.stateStore = { getLastBlock: () => previousBlock, onCommit: async () => {} };
 		context.databaseService = { onCommit: async () => {} };
-		context.validatorSet = {
-			getValidator: (index: number) => ({ address: `validator-${index}` }),
-			onCommit: async () => {},
-		};
+		context.validatorSet = { onCommit: async () => {} };
 		context.txPoolWorker = { onCommit: async () => {} };
 		context.evmWorker = { onCommit: async () => {} };
 		context.apiSync = { flush: async () => {}, onCommit: async () => {} };
@@ -637,7 +631,7 @@ describe<{
 		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, appliedData(1));
 		dispatch.calledNthWith(1, Events.TransactionEvent.Applied, appliedData(2));
 		dispatch.calledNthWith(2, Events.BlockEvent.Applied, { ...blockData, contractEvents });
-		info.calledWith("Committed block 3/0/block-hash with 2 tx(s) (gasUsed=51,000)", "consensus");
+		info.calledWith("Committed block 3/1/block-hash with 2 tx(s) (gasUsed=51,000)", "consensus");
 	});
 
 	it("#commit - should emit the receipt of each committed transaction after its applied event", async ({
@@ -703,7 +697,7 @@ describe<{
 
 		await processor.commit(makeUnit(makeBlock(), { round: 2 }));
 
-		info.calledWith("Committed block 3/2(0)/block-hash with 0 tx(s) (gasUsed=0)", "consensus");
+		info.calledWith("Committed block 3/2(1)/block-hash with 0 tx(s) (gasUsed=0)", "consensus");
 	});
 
 	it("#commit - should skip the api sync for the genesis block", async ({ apiSync, evm, processor }) => {
@@ -784,7 +778,6 @@ describe<{
 		processor,
 		roundCalculator,
 		state,
-		validatorSet,
 	}) => {
 		state.isBootstrap = () => true;
 		roundCalculator.isNewRound = () => true;
@@ -793,133 +786,14 @@ describe<{
 		const info = spy(logger, "info");
 		const debug = spy(logger, "debug");
 		const calculateRound = spy(roundCalculator, "calculateRound");
-		const getValidator = spy(validatorSet, "getValidator");
 
-		await processor.commit(
-			makeUnit(makeBlock({ round: 1, transactions: [makeTransaction(1)], transactionsCount: 1 })),
-		);
+		await processor.commit(makeUnit(makeBlock({ transactions: [makeTransaction(1)], transactionsCount: 1 })));
 
 		onCommit.calledOnce();
 		dispatch.neverCalled();
 		info.neverCalled();
 		debug.neverCalled();
 		calculateRound.neverCalled();
-		getValidator.neverCalled();
-	});
-
-	it("#commit - should report the rounds missed before the committed block in one event", async ({
-		events,
-		processor,
-	}) => {
-		const transaction = makeTransaction(1);
-		const dispatch = spy(events, "dispatch");
-
-		await processor.commit(makeUnit(makeBlock({ round: 2, transactions: [transaction], transactionsCount: 1 })));
-
-		dispatch.calledTimes(3);
-		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, appliedData(1));
-		dispatch.calledNthWith(1, Events.BlockEvent.Missed, {
-			addresses: ["validator-0", "validator-1"],
-			blockNumber,
-			rounds: [
-				{ address: "validator-0", round: 0 },
-				{ address: "validator-1", round: 1 },
-			],
-		});
-		dispatch.calledNthWith(2, Events.BlockEvent.Applied, { ...blockData, contractEvents: [] });
-	});
-
-	it("#commit - should list a proposer that missed several rounds once", async ({
-		events,
-		processor,
-		validatorSet,
-	}) => {
-		validatorSet.getValidator = (index: number) => ({ address: ["first", "second", "first"][index] });
-		const dispatch = spy(events, "dispatch");
-
-		await processor.commit(makeUnit(makeBlock({ round: 3 })));
-
-		const [, payload] = dispatch.getCallArgs(0) as [string, { addresses: string[]; rounds: unknown[] }];
-		assert.equal(payload.addresses, ["first", "second"]);
-		assert.length(payload.rounds, 3);
-	});
-
-	it("#commit - should not report the rounds that re-proposed the committed block", async ({
-		events,
-		processor,
-		validatorSet,
-	}) => {
-		const getValidator = spy(validatorSet, "getValidator");
-		const dispatch = spy(events, "dispatch");
-
-		await processor.commit(makeUnit(makeBlock({ round: 0 }), { round: 2 }));
-
-		getValidator.neverCalled();
-		dispatch.calledOnce();
-		dispatch.calledWith(Events.BlockEvent.Applied, { ...blockData, contractEvents: [] });
-	});
-
-	it("#commit - should report only the rounds before the round of the committed block", async ({
-		events,
-		processor,
-		validatorSet,
-	}) => {
-		const getValidator = spy(validatorSet, "getValidator");
-		const dispatch = spy(events, "dispatch");
-
-		await processor.commit(makeUnit(makeBlock({ round: 1 }), { round: 2 }));
-
-		getValidator.calledOnce();
-		getValidator.calledWith(0);
-		dispatch.calledTimes(2);
-		dispatch.calledNthWith(0, Events.BlockEvent.Missed, {
-			addresses: ["validator-0"],
-			blockNumber,
-			rounds: [{ address: "validator-0", round: 0 }],
-		});
-	});
-
-	it("#commit - should report an earlier round of the proposer of the committed block", async ({
-		events,
-		processor,
-		validatorSet,
-	}) => {
-		validatorSet.getValidator = (index: number) => ({ address: ["proposer", "second", "proposer"][index] });
-		const dispatch = spy(events, "dispatch");
-
-		await processor.commit(makeUnit(makeBlock({ round: 2 })));
-
-		dispatch.calledTimes(2);
-		dispatch.calledNthWith(0, Events.BlockEvent.Missed, {
-			addresses: ["proposer", "second"],
-			blockNumber,
-			rounds: [
-				{ address: "proposer", round: 0 },
-				{ address: "second", round: 1 },
-			],
-		});
-	});
-
-	it("#commit - should look up the missed proposers before the state moves to the next block", async ({
-		processor,
-		stateStore,
-		validatorSet,
-	}) => {
-		const calls: string[] = [];
-		validatorSet.getValidator = () => {
-			calls.push("getValidator");
-			return { address: "missed-proposer" };
-		};
-		stateStore.onCommit = async () => {
-			calls.push("stateStore");
-		};
-		validatorSet.onCommit = async () => {
-			calls.push("validatorSet");
-		};
-
-		await processor.commit(makeUnit(makeBlock({ round: 1 })));
-
-		assert.equal(calls, ["getValidator", "stateStore", "validatorSet"]);
 	});
 
 	it("#commit - should emit the validator and vote changes of the block once per kind", async ({
@@ -1033,20 +907,15 @@ describe<{
 		const contractEvents = [
 			{ event: "Voted", txHash: "hash-1", txIndex: 0, validator: "validator", voter: "voter" },
 		];
-		const block = makeBlock({ round: 1, transactions: [makeTransaction(1)], transactionsCount: 1 });
+		const block = makeBlock({ transactions: [makeTransaction(1)], transactionsCount: 1 });
 		const dispatch = spy(events, "dispatch");
 
 		await processor.commit(makeUnit(block, { getContractEvents: () => contractEvents }));
 
-		dispatch.calledTimes(4);
+		dispatch.calledTimes(3);
 		assert.equal(
-			[0, 1, 2, 3].map((index) => dispatch.getCallArgs(index)[0]),
-			[
-				Events.TransactionEvent.Applied,
-				Events.VoteEvent.Voted,
-				Events.BlockEvent.Missed,
-				Events.BlockEvent.Applied,
-			],
+			[0, 1, 2].map((index) => dispatch.getCallArgs(index)[0]),
+			[Events.TransactionEvent.Applied, Events.VoteEvent.Voted, Events.BlockEvent.Applied],
 		);
 	});
 

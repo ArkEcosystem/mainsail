@@ -47,10 +47,6 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 				this.#onProposed(data as Contracts.Crypto.Proposal);
 				break;
 			}
-			case Events.BlockEvent.Missed: {
-				this.#onBlockMissed(data as Contracts.Processor.MissedRoundsData);
-				break;
-			}
 			case Events.BlockEvent.Applied: {
 				this.#onBlockApplied(data as Contracts.Crypto.BlockData);
 				break;
@@ -62,7 +58,6 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 		return [
 			[Events.ConsensusEvent.RoundStarted, this],
 			[Events.ConsensusEvent.Proposed, this],
-			[Events.BlockEvent.Missed, this],
 			[Events.BlockEvent.Applied, this],
 		];
 	}
@@ -111,22 +106,19 @@ export class ProposerReporter implements Contracts.Validator.ProposerReporter {
 			return;
 		}
 
+		for (const ownRound of ownRounds.filter(({ round }) => round < block.round)) {
+			this.logger.notice(
+				`Missed round ${this.#position(block.number, ownRound.round)} as ${ownRound.address}, committed by ${block.proposer} ❌`,
+				"consensus",
+			);
+		}
+
 		// Whichever of our rounds it came from, and whoever ended up proposing it: the block is ours.
 		if (ownRounds.some((ownRound) => ownRound.address === block.proposer)) {
 			this.logger.notice(
 				`Committed block ${this.#position(block.number, block.round)} as ${block.proposer} ✅`,
 				"consensus",
 			);
-		}
-	}
-
-	#onBlockMissed({ blockNumber, rounds }: Contracts.Processor.MissedRoundsData): void {
-		const ownRounds = this.#ownRounds.get(blockNumber) ?? [];
-
-		for (const { address, round } of rounds) {
-			if (ownRounds.some((ownRound) => ownRound.address === address && ownRound.round === round)) {
-				this.logger.notice(`Missed round ${this.#position(blockNumber, round)} as ${address} ❌`, "consensus");
-			}
 		}
 	}
 
