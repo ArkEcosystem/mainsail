@@ -99,12 +99,17 @@ describe<{
 
 	it("should not wait for the webhook to be delivered", async ({ database, listener }) => {
 		const spyOnPost = stub(http, "post").returnValue(new Promise(() => {}));
+		let handled = false;
 
 		database.create(webhook);
 
-		await listener.handle({ data: "dummy_data", name: "event" });
+		void listener.handle({ data: "dummy_data", name: "event" }).then(() => {
+			handled = true;
+		});
+		await settle();
 
 		spyOnPost.calledOnce();
+		assert.true(handled);
 	});
 
 	it("should log error if broadcast is not successful", async ({ database, listener }) => {
