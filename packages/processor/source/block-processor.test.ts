@@ -19,23 +19,9 @@ const previousBlock = {
 const prevrandao = Buffer.from("cc".repeat(32), "hex");
 
 const makeTransaction = (index: number, overrides: Record<string, unknown> = {}) => ({
-	blockHash: "block-hash",
-	blockNumber,
 	gasPrice: 5,
 	hash: `hash-${index}`,
-	toData: () => ({ hash: `hash-${index}` }),
-	transactionIndex: index - 1,
 	...overrides,
-});
-
-const receipt = { cumulativeGasUsed: 21_000n, gasRefunded: 0n, gasUsed: 21_000n, logs: [], status: 1 };
-
-const appliedData = (index: number) => ({
-	blockHash: "block-hash",
-	blockNumber,
-	hash: `hash-${index}`,
-	receipt,
-	transactionIndex: index - 1,
 });
 
 const makeBlock = (overrides: Record<string, unknown> = {}) => ({
@@ -58,11 +44,6 @@ const makeUnit = (block: ReturnType<typeof makeBlock>, overrides: Record<string,
 	({
 		blockNumber: block.number,
 		getBlock: () => block,
-		getCommit: async () => ({ block }),
-		getContractEvents: () => [],
-		getProcessorResult: () => ({
-			receipts: new Map(block.transactions.map((transaction) => [transaction.hash, receipt])),
-		}),
 		round: block.round,
 		...overrides,
 	}) as unknown as Contracts.Processor.ProcessableUnit;
@@ -73,6 +54,7 @@ const settle = async () => new Promise((resolve) => setImmediate(resolve));
 describe<{
 	apiSync: any;
 	app: Application;
+	commitEventEmitter: any;
 	configuration: any;
 	databaseService: any;
 	events: any;
@@ -106,6 +88,7 @@ describe<{
 		app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
 		app.bind(Identifiers.Processor.BlockVerifier).toConstantValue(context.verifier);
+		app.bind(Identifiers.Processor.CommitEventEmitter).toConstantValue(context.commitEventEmitter);
 		app.bind(Identifiers.TransactionPool.Worker).toConstantValue(context.txPoolWorker);
 		app.bind(Identifiers.Evm.Worker).toConstantValue(context.evmWorker);
 		app.bind(Identifiers.BlockchainUtils.FeeCalculator).toConstantValue(context.feeCalculator);
@@ -172,6 +155,7 @@ describe<{
 		context.events = { dispatch: async () => {} };
 		context.logger = { debug: () => {}, error: () => {}, info: () => {} };
 		context.verifier = { verify: async () => {} };
+		context.commitEventEmitter = { emit: () => {} };
 
 		context.app = bindDependencies(context);
 		context.app.bind(Identifiers.ApiSync.Service).toConstantValue(context.apiSync);
@@ -586,10 +570,10 @@ describe<{
 		logError.calledNthWith(1, "Dispatching block.invalid failed: dispatch failed", "consensus");
 	});
 
-	it("#commit - should run the commit handlers in order and announce the block", async ({
+	it("#commit - should run the commit handlers in order and then emit the commit events", async ({
 		apiSync,
+		commitEventEmitter,
 		databaseService,
-		events,
 		evm,
 		evmWorker,
 		logger,
@@ -612,15 +596,16 @@ describe<{
 		record(txPoolWorker, "onCommit", "txPoolWorker");
 		record(evmWorker, "onCommit", "evmWorker");
 		record(apiSync, "onCommit", "apiSync");
+		commitEventEmitter.emit = () => {
+			calls.push("commitEventEmitter");
+		};
 
 		const transaction1 = makeTransaction(1);
 		const transaction2 = makeTransaction(2);
 		const block = makeBlock({ gasUsed: 51_000, transactions: [transaction1, transaction2], transactionsCount: 2 });
-		const contractEvents = [{ name: "Voted" }];
-		const dispatch = spy(events, "dispatch");
 		const info = spy(logger, "info");
 
-		await processor.commit(makeUnit(block, { getContractEvents: () => contractEvents }));
+		await processor.commit(makeUnit(block));
 
 		assert.equal(calls, [
 			"apiSync.flush",
@@ -631,42 +616,14 @@ describe<{
 			"txPoolWorker",
 			"evmWorker",
 			"apiSync",
+			"commitEventEmitter",
 		]);
-		dispatch.calledTimes(3);
-		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, appliedData(1));
-		dispatch.calledNthWith(1, Events.TransactionEvent.Applied, appliedData(2));
-		dispatch.calledNthWith(2, Events.BlockEvent.Applied, { ...blockData, contractEvents });
 		info.calledWith("Committed block 3/1/block-hash with 2 tx(s) (gasUsed=51,000)", "consensus");
 	});
 
-	it("#commit - should include the receipt of each committed transaction in its applied event", async ({
-		events,
-		processor,
-	}) => {
-		const transaction1 = makeTransaction(1);
-		const transaction2 = makeTransaction(2);
-		const receipt1 = { ...receipt, output: Buffer.from("08c379a0", "hex"), status: 0 };
-		const receipt2 = { ...receipt, gasUsed: 30_000n };
-		const block = makeBlock({ gasUsed: 51_000, transactions: [transaction1, transaction2], transactionsCount: 2 });
-		const receipts = new Map([
-			["hash-1", receipt1],
-			["hash-2", receipt2],
-		]);
-		const dispatch = spy(events, "dispatch");
-
-		await processor.commit(makeUnit(block, { getProcessorResult: () => ({ receipts }) }));
-
-		dispatch.calledTimes(3);
-		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, {
-			...appliedData(1),
-			receipt: { ...receipt, output: "0x08c379a0", status: 0 },
-		});
-		dispatch.calledNthWith(1, Events.TransactionEvent.Applied, { ...appliedData(2), receipt: receipt2 });
-		dispatch.calledNthWith(2, Events.BlockEvent.Applied, { ...blockData, contractEvents: [] });
-	});
-
-	it("#commit - should hand the unit to every commit handler", async ({
+	it("#commit - should hand the unit to every commit handler and the commit event emitter", async ({
 		apiSync,
+		commitEventEmitter,
 		databaseService,
 		evm,
 		evmWorker,
@@ -679,6 +636,7 @@ describe<{
 			(owner) => spy(owner, "onCommit"),
 		);
 		const flush = spy(apiSync, "flush");
+		const emit = spy(commitEventEmitter, "emit");
 		const unit = makeUnit(makeBlock());
 
 		await processor.commit(unit);
@@ -688,6 +646,8 @@ describe<{
 			handler.calledOnce();
 			handler.calledWith(unit);
 		}
+		emit.calledOnce();
+		emit.calledWith(unit);
 	});
 
 	it("#commit - should log the block round when it differs from the commit round", async ({ logger, processor }) => {
@@ -710,19 +670,23 @@ describe<{
 		apiSyncOnCommit.neverCalled();
 	});
 
-	it("#commit - should commit without an api sync service", async ({ events, evm, processorWithoutApiSync }) => {
+	it("#commit - should commit without an api sync service", async ({
+		commitEventEmitter,
+		evm,
+		processorWithoutApiSync,
+	}) => {
 		const onCommit = spy(evm, "onCommit");
-		const dispatch = spy(events, "dispatch");
+		const emit = spy(commitEventEmitter, "emit");
 
 		await processorWithoutApiSync.commit(makeUnit(makeBlock()));
 
 		onCommit.calledOnce();
-		dispatch.calledWith(Events.BlockEvent.Applied, { ...blockData, contractEvents: [] });
+		emit.calledOnce();
 	});
 
 	it("#commit - should aggregate the failures of the concurrent commit handlers", async ({
 		apiSync,
-		events,
+		commitEventEmitter,
 		evmWorker,
 		processor,
 		txPoolWorker,
@@ -732,7 +696,7 @@ describe<{
 		stub(txPoolWorker, "onCommit").rejectedValue(poolError);
 		stub(apiSync, "onCommit").rejectedValue(syncError);
 		const evmWorkerOnCommit = spy(evmWorker, "onCommit");
-		const dispatch = spy(events, "dispatch");
+		const emit = spy(commitEventEmitter, "emit");
 
 		let caught: unknown;
 		try {
@@ -747,11 +711,11 @@ describe<{
 		assert.is((caught as AggregateError).errors[0], poolError);
 		assert.is((caught as AggregateError).errors[1], syncError);
 		evmWorkerOnCommit.calledOnce();
-		dispatch.neverCalled();
+		emit.neverCalled();
 	});
 
 	it("#commit - should stop at a failing sequential commit handler", async ({
-		events,
+		commitEventEmitter,
 		evm,
 		processor,
 		stateStore,
@@ -760,17 +724,16 @@ describe<{
 		stub(evm, "onCommit").rejectedValue(new Error("evm commit failed"));
 		const stateStoreOnCommit = spy(stateStore, "onCommit");
 		const txPoolOnCommit = spy(txPoolWorker, "onCommit");
-		const dispatch = spy(events, "dispatch");
+		const emit = spy(commitEventEmitter, "emit");
 
 		await assert.rejects(() => processor.commit(makeUnit(makeBlock())), "evm commit failed");
 
 		stateStoreOnCommit.neverCalled();
 		txPoolOnCommit.neverCalled();
-		dispatch.neverCalled();
+		emit.neverCalled();
 	});
 
-	it("#commit - should stay quiet while bootstrapping", async ({
-		events,
+	it("#commit - should log nothing while bootstrapping", async ({
 		evm,
 		logger,
 		processor,
@@ -780,7 +743,6 @@ describe<{
 		state.isBootstrap = () => true;
 		roundCalculator.isNewRound = () => true;
 		const onCommit = spy(evm, "onCommit");
-		const dispatch = spy(events, "dispatch");
 		const info = spy(logger, "info");
 		const debug = spy(logger, "debug");
 		const calculateRound = spy(roundCalculator, "calculateRound");
@@ -788,133 +750,9 @@ describe<{
 		await processor.commit(makeUnit(makeBlock({ transactions: [makeTransaction(1)], transactionsCount: 1 })));
 
 		onCommit.calledOnce();
-		dispatch.neverCalled();
 		info.neverCalled();
 		debug.neverCalled();
 		calculateRound.neverCalled();
-	});
-
-	it("#commit - should emit the validator and vote changes of the block once per kind", async ({
-		events,
-		processor,
-	}) => {
-		const contractEvents = [
-			{ address: "validator-1", blsPublicKey: "bls-1", event: "ValidatorRegistered", txHash: "tx-1", txIndex: 0 },
-			{ event: "Voted", txHash: "tx-2", txIndex: 1, validator: "validator-1", voter: "voter-1" },
-			{ event: "Voted", txHash: "tx-3", txIndex: 2, validator: "validator-1", voter: "voter-2" },
-			{ event: "Unvoted", txHash: "tx-4", txIndex: 3, validator: "validator-2", voter: "voter-3" },
-			{ address: "validator-2", blsPublicKey: "bls-2", event: "ValidatorUpdated", txHash: "tx-5", txIndex: 4 },
-			{ address: "validator-3", event: "ValidatorResigned", txHash: "tx-6", txIndex: 5 },
-		];
-		const dispatch = spy(events, "dispatch");
-
-		await processor.commit(makeUnit(makeBlock(), { getContractEvents: () => contractEvents }));
-
-		dispatch.calledTimes(6);
-		dispatch.calledNthWith(0, Events.ValidatorEvent.Registered, {
-			addresses: ["validator-1"],
-			blockNumber,
-			validators: [{ address: "validator-1", blsPublicKey: "bls-1", txHash: "tx-1", txIndex: 0 }],
-		});
-		dispatch.calledNthWith(1, Events.ValidatorEvent.Updated, {
-			addresses: ["validator-2"],
-			blockNumber,
-			validators: [{ address: "validator-2", blsPublicKey: "bls-2", txHash: "tx-5", txIndex: 4 }],
-		});
-		dispatch.calledNthWith(2, Events.ValidatorEvent.Resigned, {
-			addresses: ["validator-3"],
-			blockNumber,
-			validators: [{ address: "validator-3", txHash: "tx-6", txIndex: 5 }],
-		});
-		dispatch.calledNthWith(3, Events.VoteEvent.Voted, {
-			addresses: ["voter-1", "validator-1", "voter-2"],
-			blockNumber,
-			votes: [
-				{ txHash: "tx-2", txIndex: 1, validator: "validator-1", voter: "voter-1" },
-				{ txHash: "tx-3", txIndex: 2, validator: "validator-1", voter: "voter-2" },
-			],
-		});
-		dispatch.calledNthWith(4, Events.VoteEvent.Unvoted, {
-			addresses: ["voter-3", "validator-2"],
-			blockNumber,
-			unvotes: [{ txHash: "tx-4", txIndex: 3, validator: "validator-2", voter: "voter-3" }],
-		});
-		dispatch.calledNthWith(5, Events.BlockEvent.Applied, { ...blockData, contractEvents });
-	});
-
-	it("#commit - should emit the username changes of the block once per kind", async ({ events, processor }) => {
-		const contractEvents = [
-			{ address: "wallet-1", event: "UsernameRegistered", txHash: "tx-1", txIndex: 0, username: "first" },
-			{
-				address: "wallet-2",
-				event: "UsernameRegistered",
-				previousUsername: "old",
-				txHash: "tx-2",
-				txIndex: 1,
-				username: "second",
-			},
-			{ address: "wallet-3", event: "UsernameResigned", txHash: "tx-3", txIndex: 2, username: "third" },
-		];
-		const dispatch = spy(events, "dispatch");
-
-		await processor.commit(makeUnit(makeBlock(), { getContractEvents: () => contractEvents }));
-
-		dispatch.calledTimes(3);
-		dispatch.calledNthWith(0, Events.UsernameEvent.Registered, {
-			addresses: ["wallet-1", "wallet-2"],
-			blockNumber,
-			usernames: [
-				{ address: "wallet-1", txHash: "tx-1", txIndex: 0, username: "first" },
-				{ address: "wallet-2", previousUsername: "old", txHash: "tx-2", txIndex: 1, username: "second" },
-			],
-		});
-		dispatch.calledNthWith(1, Events.UsernameEvent.Resigned, {
-			addresses: ["wallet-3"],
-			blockNumber,
-			usernames: [{ address: "wallet-3", txHash: "tx-3", txIndex: 2, username: "third" }],
-		});
-		dispatch.calledNthWith(2, Events.BlockEvent.Applied, { ...blockData, contractEvents });
-	});
-
-	it("#commit - should report both a vote and an unvote of one wallet in the same block", async ({
-		events,
-		processor,
-	}) => {
-		const contractEvents = [
-			{ event: "Voted", txHash: "tx-1", txIndex: 0, validator: "validator-1", voter: "voter-1" },
-			{ event: "Unvoted", txHash: "tx-2", txIndex: 1, validator: "validator-1", voter: "voter-1" },
-		];
-		const dispatch = spy(events, "dispatch");
-
-		await processor.commit(makeUnit(makeBlock(), { getContractEvents: () => contractEvents }));
-
-		dispatch.calledTimes(3);
-		dispatch.calledNthWith(0, Events.VoteEvent.Voted, {
-			addresses: ["voter-1", "validator-1"],
-			blockNumber,
-			votes: [{ txHash: "tx-1", txIndex: 0, validator: "validator-1", voter: "voter-1" }],
-		});
-		dispatch.calledNthWith(1, Events.VoteEvent.Unvoted, {
-			addresses: ["voter-1", "validator-1"],
-			blockNumber,
-			unvotes: [{ txHash: "tx-2", txIndex: 1, validator: "validator-1", voter: "voter-1" }],
-		});
-	});
-
-	it("#commit - should announce the block after the events of its contents", async ({ events, processor }) => {
-		const contractEvents = [
-			{ event: "Voted", txHash: "hash-1", txIndex: 0, validator: "validator", voter: "voter" },
-		];
-		const block = makeBlock({ transactions: [makeTransaction(1)], transactionsCount: 1 });
-		const dispatch = spy(events, "dispatch");
-
-		await processor.commit(makeUnit(block, { getContractEvents: () => contractEvents }));
-
-		dispatch.calledTimes(3);
-		assert.equal(
-			[0, 1, 2].map((index) => dispatch.getCallArgs(index)[0]),
-			[Events.TransactionEvent.Applied, Events.VoteEvent.Voted, Events.BlockEvent.Applied],
-		);
 	});
 
 	it("#commit - should log the start of a new validator round", async ({ logger, processor, roundCalculator }) => {

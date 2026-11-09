@@ -6,21 +6,6 @@ import { inject, injectable, optional, tagged } from "@mainsail/container";
 import { InvalidFee, InvalidGasUsed, InvalidLogsBloom, InvalidStateRoot } from "@mainsail/exceptions";
 import { ensureError, sleep } from "@mainsail/utils";
 
-type UsernameChange = { address: string; previousUsername?: string; txHash: string; txIndex: number; username: string };
-type ValidatorChange = { address: string; blsPublicKey?: string; txHash: string; txIndex: number };
-type VoteChange = { txHash: string; txIndex: number; validator: string; voter: string };
-type ContractChanges = {
-	unvotes: VoteChange[];
-	usernames: { registered: UsernameChange[]; resigned: UsernameChange[] };
-	validators: { registered: ValidatorChange[]; resigned: ValidatorChange[]; updated: ValidatorChange[] };
-	votes: VoteChange[];
-};
-
-const addressOf = ({ address }: { address: string }): string[] => [address];
-const voteAddresses = ({ validator, voter }: VoteChange): string[] => [voter, validator];
-const toReceiptData = ({ output, ...receipt }: Contracts.Evm.TransactionReceipt) =>
-	output === undefined ? receipt : { ...receipt, output: `0x${output.toString("hex")}` };
-
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.State.Store)
@@ -56,6 +41,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 	@inject(Identifiers.Processor.BlockVerifier)
 	private readonly verifier!: Contracts.Processor.Verifier;
+
+	@inject(Identifiers.Processor.CommitEventEmitter)
+	private readonly commitEventEmitter!: Contracts.Processor.CommitEventEmitter;
 
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
@@ -140,8 +128,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await apiSync.flush();
 		}
 
-		const commit = await unit.getCommit();
-
 		await this.evm.onCommit(unit);
 		await this.stateStore.onCommit(unit);
 		await this.databaseService.onCommit(unit);
@@ -166,115 +152,7 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		this.#logBlockCommitted(unit);
 		this.#logNewRound(unit);
 
-		this.#emitCommitEvents(unit, commit.block);
-	}
-
-	#emitCommitEvents(unit: Contracts.Processor.ProcessableUnit, block: Contracts.Crypto.Block): void {
-		if (this.state.isBootstrap()) {
-			return;
-		}
-
-		const { receipts } = unit.getProcessorResult();
-
-		for (const transaction of block.transactions) {
-			const { blockHash, blockNumber, hash, transactionIndex } = transaction;
-			const receipt = receipts.get(hash);
-
-			this.#emit(Events.TransactionEvent.Applied, {
-				...transaction.toData(),
-				blockHash,
-				blockNumber,
-				receipt: receipt && toReceiptData(receipt),
-				transactionIndex,
-			});
-		}
-
-		const { unvotes, usernames, validators, votes } = this.#getContractChanges(unit);
-		this.#emitBatch(Events.ValidatorEvent.Registered, block.number, "validators", validators.registered, addressOf);
-		this.#emitBatch(Events.ValidatorEvent.Updated, block.number, "validators", validators.updated, addressOf);
-		this.#emitBatch(Events.ValidatorEvent.Resigned, block.number, "validators", validators.resigned, addressOf);
-		this.#emitBatch(Events.VoteEvent.Voted, block.number, "votes", votes, voteAddresses);
-		this.#emitBatch(Events.VoteEvent.Unvoted, block.number, "unvotes", unvotes, voteAddresses);
-		this.#emitBatch(Events.UsernameEvent.Registered, block.number, "usernames", usernames.registered, addressOf);
-		this.#emitBatch(Events.UsernameEvent.Resigned, block.number, "usernames", usernames.resigned, addressOf);
-
-		this.#emit(Events.BlockEvent.Applied, { ...block.toData(), contractEvents: unit.getContractEvents() });
-	}
-
-	#emitBatch<T>(
-		event: string,
-		blockNumber: number,
-		key: string,
-		entries: T[],
-		addressesOf: (entry: T) => string[],
-	): void {
-		if (entries.length === 0) {
-			return;
-		}
-
-		this.#emit(event, {
-			addresses: [...new Set(entries.flatMap((entry) => addressesOf(entry)))],
-			blockNumber,
-			[key]: entries,
-		});
-	}
-
-	#getContractChanges(unit: Contracts.Processor.ProcessableUnit): ContractChanges {
-		const changes: ContractChanges = {
-			unvotes: [],
-			usernames: { registered: [], resigned: [] },
-			validators: { registered: [], resigned: [], updated: [] },
-			votes: [],
-		};
-
-		for (const contractEvent of unit.getContractEvents()) {
-			const { txHash, txIndex } = contractEvent;
-
-			switch (contractEvent.event) {
-				case "ValidatorRegistered": {
-					const { address, blsPublicKey } = contractEvent;
-					changes.validators.registered.push({ address, blsPublicKey, txHash, txIndex });
-					break;
-				}
-				case "ValidatorUpdated": {
-					const { address, blsPublicKey } = contractEvent;
-					changes.validators.updated.push({ address, blsPublicKey, txHash, txIndex });
-					break;
-				}
-				case "ValidatorResigned": {
-					changes.validators.resigned.push({ address: contractEvent.address, txHash, txIndex });
-					break;
-				}
-				case "Voted": {
-					const { validator, voter } = contractEvent;
-					changes.votes.push({ txHash, txIndex, validator, voter });
-					break;
-				}
-				case "Unvoted": {
-					const { validator, voter } = contractEvent;
-					changes.unvotes.push({ txHash, txIndex, validator, voter });
-					break;
-				}
-				case "UsernameRegistered": {
-					const { address, previousUsername, username } = contractEvent;
-					changes.usernames.registered.push({
-						address,
-						...(previousUsername === undefined ? {} : { previousUsername }),
-						txHash,
-						txIndex,
-						username,
-					});
-					break;
-				}
-				case "UsernameResigned": {
-					const { address, username } = contractEvent;
-					changes.usernames.resigned.push({ address, txHash, txIndex, username });
-					break;
-				}
-			}
-		}
-
-		return changes;
+		this.commitEventEmitter.emit(unit);
 	}
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {

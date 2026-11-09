@@ -4,6 +4,7 @@ import { Providers } from "@mainsail/kernel";
 
 import { BlockProcessor } from "./block-processor.js";
 import { BlockVerifier } from "./block-verifier.js";
+import { CommitEventEmitter } from "./commit-event-emitter.js";
 import { TransactionProcessor } from "./transaction-processor.js";
 import {
 	ChainedVerifier,
@@ -44,6 +45,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			this.app.bind(Identifiers.Processor.BlockVerifierHandlers).to(handler);
 		}
 
+		this.app.bind(Identifiers.Processor.CommitEventEmitter).to(CommitEventEmitter).inSingletonScope();
 		this.app.bind(Identifiers.Processor.BlockProcessor).to(BlockProcessor).inSingletonScope();
 		this.app.bind(Identifiers.Processor.TransactionProcessor).to(TransactionProcessor).inSingletonScope();
 	}

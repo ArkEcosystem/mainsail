@@ -92,6 +92,7 @@ describe<Context>("ServiceProvider", ({ assert, it, beforeEach, stub }) => {
 
 		assert.true(app.isBound(Identifiers.Processor.BlockVerifier));
 		assert.true(app.isBound(Identifiers.Processor.BlockVerifierHandlers));
+		assert.true(app.isBound(Identifiers.Processor.CommitEventEmitter));
 		assert.true(app.isBound(Identifiers.Processor.BlockProcessor));
 		assert.true(app.isBound(Identifiers.Processor.TransactionProcessor));
 	});
