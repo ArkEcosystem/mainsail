@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Events, Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { ensureError, get, http } from "@mainsail/utils";
 import { performance } from "perf_hooks";
 
@@ -15,6 +15,10 @@ export class Listener implements Contracts.Kernel.EventListener<{ name: string; 
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "webhooks")
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
+
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -24,22 +28,12 @@ export class Listener implements Contracts.Kernel.EventListener<{ name: string; 
 			return;
 		}
 
-		const webhooks: Contracts.Webhooks.Webhook[] = this.#getWebhooks(name, data);
-
-		const promises: Promise<void>[] = [];
-
-		for (const webhook of webhooks) {
-			promises.push(this.broadcast(webhook, data));
+		for (const webhook of this.#getWebhooks(name, data)) {
+			void this.broadcast(webhook, data);
 		}
-
-		await Promise.all(promises);
 	}
 
-	public async broadcast(
-		webhook: Contracts.Webhooks.Webhook,
-		payload: Contracts.Types.JsonObject,
-		timeout: number = 1500,
-	): Promise<void> {
+	public async broadcast(webhook: Contracts.Webhooks.Webhook, payload: Contracts.Types.JsonObject): Promise<void> {
 		const start = performance.now();
 
 		try {
@@ -53,7 +47,7 @@ export class Listener implements Contracts.Kernel.EventListener<{ name: string; 
 				headers: {
 					Authorization: webhook.token,
 				},
-				timeout,
+				timeout: this.configuration.getRequired<number>("timeout"),
 			});
 
 			this.logger.debug(

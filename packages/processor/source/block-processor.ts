@@ -42,6 +42,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 	@inject(Identifiers.Processor.BlockVerifier)
 	private readonly verifier!: Contracts.Processor.Verifier;
 
+	@inject(Identifiers.Processor.CommitEventEmitter)
+	private readonly commitEventEmitter!: Contracts.Processor.CommitEventEmitter;
+
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly txPoolWorker!: Contracts.TransactionPool.Worker;
 
@@ -125,8 +128,6 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			await apiSync.flush();
 		}
 
-		const commit = await unit.getCommit();
-
 		await this.evm.onCommit(unit);
 		await this.stateStore.onCommit(unit);
 		await this.databaseService.onCommit(unit);
@@ -148,17 +149,10 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 			throw new AggregateError(failures, "one or more commit handlers failed");
 		}
 
-		for (const transaction of commit.block.transactions) {
-			this.#emit(Events.TransactionEvent.Applied, transaction);
-		}
-
 		this.#logBlockCommitted(unit);
 		this.#logNewRound(unit);
 
-		this.#emit(Events.BlockEvent.Applied, {
-			...commit.block.toData(),
-			contractEvents: unit.getContractEvents(),
-		});
+		this.commitEventEmitter.emit(unit);
 	}
 
 	#logBlockCommitted(unit: Contracts.Processor.ProcessableUnit): void {

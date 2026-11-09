@@ -679,7 +679,7 @@ export class Consensus implements Contracts.Consensus.Service {
 		this.logger.info(`Created proposal with new block ${this.#getBlockString(block)}`, "consensus");
 
 		this.#runInBackground("Dispatching block forged event", () =>
-			this.eventDispatcher.dispatch(Events.BlockEvent.Forged, block),
+			this.eventDispatcher.dispatch(Events.BlockEvent.Forged, block.toData()),
 		);
 
 		return registeredProposer.propose(validatorIndex, round, undefined, block);

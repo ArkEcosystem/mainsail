@@ -12,19 +12,17 @@ import { Server, ServerOptions } from "./server/index.js";
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		// Setup Database...
-		this.app.bind(Identifiers.Webhooks.Database).to(Database).inSingletonScope();
-		this.app.get<Contracts.Webhooks.Database>(Identifiers.Webhooks.Database).boot();
+		if (this.config().getRequired<boolean>("enabled")) {
+			this.app.bind(Identifiers.Webhooks.Database).to(Database).inSingletonScope();
+			this.app.get<Contracts.Webhooks.Database>(Identifiers.Webhooks.Database).boot();
 
-		// Setup Server...
-		this.app.bind(Identifiers.Webhooks.Server).to(Server).inSingletonScope();
+			this.app.bind(Identifiers.Webhooks.Server).to(Server).inSingletonScope();
+			await this.app
+				.get<Server>(Identifiers.Webhooks.Server)
+				.register(this.config().getRequired<ServerOptions>("server"));
 
-		await this.app
-			.get<Server>(Identifiers.Webhooks.Server)
-			.register(this.config().getRequired<ServerOptions>("server")!);
-
-		// Setup Listeners...
-		this.#startListeners();
+			this.#startListeners();
+		}
 	}
 
 	public async boot(): Promise<void> {

@@ -86,16 +86,16 @@ export type ContractEvent = {
 } & (
 	| { readonly event: "Voted"; readonly voter: string; readonly validator: string }
 	| { readonly event: "Unvoted"; readonly voter: string; readonly validator: string }
-	| { readonly event: "ValidatorRegistered"; readonly addr: string; readonly blsPublicKey: string }
-	| { readonly event: "ValidatorResigned"; readonly addr: string }
-	| { readonly event: "ValidatorUpdated"; readonly addr: string; readonly blsPublicKey: string }
+	| { readonly event: "ValidatorRegistered"; readonly address: string; readonly blsPublicKey: string }
+	| { readonly event: "ValidatorResigned"; readonly address: string }
+	| { readonly event: "ValidatorUpdated"; readonly address: string; readonly blsPublicKey: string }
 	| {
 			readonly event: "UsernameRegistered";
-			readonly addr: string;
+			readonly address: string;
 			readonly username: string;
 			readonly previousUsername?: string;
 	  }
-	| { readonly event: "UsernameResigned"; readonly addr: string; readonly username: string }
+	| { readonly event: "UsernameResigned"; readonly address: string; readonly username: string }
 );
 
 export interface AccountUpdateContext {

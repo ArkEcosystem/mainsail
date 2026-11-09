@@ -1,6 +1,4 @@
 export enum KernelEvent {
-	Booted = "kernel.booted",
-	Booting = "kernel.booting",
 	Bootstrapped = "kernel.bootstrapper.bootstrapped",
 	Bootstrapping = "kernel.bootstrapper.bootstrapping",
 	ServiceProviderBooted = "kernel.serviceProvider.booted",
@@ -24,24 +22,26 @@ export enum BlockEvent {
 	Applied = "block.applied",
 	Forged = "block.forged",
 	Invalid = "block.invalid",
-	Received = "block.received",
 }
 
 export enum ValidatorEvent {
 	Registered = "validator.registered",
 	Resigned = "validator.resigned",
+	Updated = "validator.updated",
 }
 
 export enum VoteEvent {
-	Vote = "wallet.vote",
-	Unvote = "wallet.unvote",
+	Voted = "wallet.voted",
+	Unvoted = "wallet.unvoted",
+}
+
+export enum UsernameEvent {
+	Registered = "username.registered",
+	Resigned = "username.resigned",
 }
 
 export enum PeerEvent {
 	Added = "peer.added",
-	Disconnect = "peer.disconnect",
-	Disconnected = "peer.disconnected",
-	Disconnecting = "peer.disconnecting",
 	Removed = "peer.removed",
 	Updated = "peer.updated",
 }
@@ -67,22 +67,12 @@ export enum ApiNodeEvent {
 	Removed = "apiNode.removed",
 }
 
-export enum StateEvent {
-	BuilderFinished = "state.builder.finished",
-	Started = "state.started",
-	Starting = "state.starting",
-}
-
 export enum TransactionEvent {
 	AddedToPool = "transaction.pool.added",
 	Applied = "transaction.applied",
 	Expired = "transaction.expired",
 	RejectedByPool = "transaction.pool.rejected",
 	RemovedFromPool = "transaction.pool.removed",
-}
-
-export enum EvmEvent {
-	TransactionReceipt = "evm.transaction.receipt",
 }
 
 export enum ScheduleEvent {

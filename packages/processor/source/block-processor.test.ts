@@ -44,8 +44,6 @@ const makeUnit = (block: ReturnType<typeof makeBlock>, overrides: Record<string,
 	({
 		blockNumber: block.number,
 		getBlock: () => block,
-		getCommit: async () => ({ block }),
-		getContractEvents: () => [],
 		round: block.round,
 		...overrides,
 	}) as unknown as Contracts.Processor.ProcessableUnit;
@@ -56,6 +54,7 @@ const settle = async () => new Promise((resolve) => setImmediate(resolve));
 describe<{
 	apiSync: any;
 	app: Application;
+	commitEventEmitter: any;
 	configuration: any;
 	databaseService: any;
 	events: any;
@@ -89,6 +88,7 @@ describe<{
 		app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
 		app.bind(Identifiers.Processor.BlockVerifier).toConstantValue(context.verifier);
+		app.bind(Identifiers.Processor.CommitEventEmitter).toConstantValue(context.commitEventEmitter);
 		app.bind(Identifiers.TransactionPool.Worker).toConstantValue(context.txPoolWorker);
 		app.bind(Identifiers.Evm.Worker).toConstantValue(context.evmWorker);
 		app.bind(Identifiers.BlockchainUtils.FeeCalculator).toConstantValue(context.feeCalculator);
@@ -155,6 +155,7 @@ describe<{
 		context.events = { dispatch: async () => {} };
 		context.logger = { debug: () => {}, error: () => {}, info: () => {} };
 		context.verifier = { verify: async () => {} };
+		context.commitEventEmitter = { emit: () => {} };
 
 		context.app = bindDependencies(context);
 		context.app.bind(Identifiers.ApiSync.Service).toConstantValue(context.apiSync);
@@ -569,10 +570,10 @@ describe<{
 		logError.calledNthWith(1, "Dispatching block.invalid failed: dispatch failed", "consensus");
 	});
 
-	it("#commit - should run the commit handlers in order and announce the block", async ({
+	it("#commit - should run the commit handlers in order and then emit the commit events", async ({
 		apiSync,
+		commitEventEmitter,
 		databaseService,
-		events,
 		evm,
 		evmWorker,
 		logger,
@@ -595,15 +596,16 @@ describe<{
 		record(txPoolWorker, "onCommit", "txPoolWorker");
 		record(evmWorker, "onCommit", "evmWorker");
 		record(apiSync, "onCommit", "apiSync");
+		commitEventEmitter.emit = () => {
+			calls.push("commitEventEmitter");
+		};
 
 		const transaction1 = makeTransaction(1);
 		const transaction2 = makeTransaction(2);
 		const block = makeBlock({ gasUsed: 51_000, transactions: [transaction1, transaction2], transactionsCount: 2 });
-		const contractEvents = [{ name: "Voted" }];
-		const dispatch = spy(events, "dispatch");
 		const info = spy(logger, "info");
 
-		await processor.commit(makeUnit(block, { getContractEvents: () => contractEvents }));
+		await processor.commit(makeUnit(block));
 
 		assert.equal(calls, [
 			"apiSync.flush",
@@ -614,16 +616,14 @@ describe<{
 			"txPoolWorker",
 			"evmWorker",
 			"apiSync",
+			"commitEventEmitter",
 		]);
-		dispatch.calledTimes(3);
-		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, transaction1);
-		dispatch.calledNthWith(1, Events.TransactionEvent.Applied, transaction2);
-		dispatch.calledNthWith(2, Events.BlockEvent.Applied, { ...blockData, contractEvents });
 		info.calledWith("Committed block 3/1/block-hash with 2 tx(s) (gasUsed=51,000)", "consensus");
 	});
 
-	it("#commit - should hand the unit to every commit handler", async ({
+	it("#commit - should hand the unit to every commit handler and the commit event emitter", async ({
 		apiSync,
+		commitEventEmitter,
 		databaseService,
 		evm,
 		evmWorker,
@@ -636,6 +636,7 @@ describe<{
 			(owner) => spy(owner, "onCommit"),
 		);
 		const flush = spy(apiSync, "flush");
+		const emit = spy(commitEventEmitter, "emit");
 		const unit = makeUnit(makeBlock());
 
 		await processor.commit(unit);
@@ -645,6 +646,8 @@ describe<{
 			handler.calledOnce();
 			handler.calledWith(unit);
 		}
+		emit.calledOnce();
+		emit.calledWith(unit);
 	});
 
 	it("#commit - should log the block round when it differs from the commit round", async ({ logger, processor }) => {
@@ -667,19 +670,23 @@ describe<{
 		apiSyncOnCommit.neverCalled();
 	});
 
-	it("#commit - should commit without an api sync service", async ({ events, evm, processorWithoutApiSync }) => {
+	it("#commit - should commit without an api sync service", async ({
+		commitEventEmitter,
+		evm,
+		processorWithoutApiSync,
+	}) => {
 		const onCommit = spy(evm, "onCommit");
-		const dispatch = spy(events, "dispatch");
+		const emit = spy(commitEventEmitter, "emit");
 
 		await processorWithoutApiSync.commit(makeUnit(makeBlock()));
 
 		onCommit.calledOnce();
-		dispatch.calledWith(Events.BlockEvent.Applied, { ...blockData, contractEvents: [] });
+		emit.calledOnce();
 	});
 
 	it("#commit - should aggregate the failures of the concurrent commit handlers", async ({
 		apiSync,
-		events,
+		commitEventEmitter,
 		evmWorker,
 		processor,
 		txPoolWorker,
@@ -689,7 +696,7 @@ describe<{
 		stub(txPoolWorker, "onCommit").rejectedValue(poolError);
 		stub(apiSync, "onCommit").rejectedValue(syncError);
 		const evmWorkerOnCommit = spy(evmWorker, "onCommit");
-		const dispatch = spy(events, "dispatch");
+		const emit = spy(commitEventEmitter, "emit");
 
 		let caught: unknown;
 		try {
@@ -704,11 +711,11 @@ describe<{
 		assert.is((caught as AggregateError).errors[0], poolError);
 		assert.is((caught as AggregateError).errors[1], syncError);
 		evmWorkerOnCommit.calledOnce();
-		dispatch.neverCalled();
+		emit.neverCalled();
 	});
 
 	it("#commit - should stop at a failing sequential commit handler", async ({
-		events,
+		commitEventEmitter,
 		evm,
 		processor,
 		stateStore,
@@ -717,17 +724,16 @@ describe<{
 		stub(evm, "onCommit").rejectedValue(new Error("evm commit failed"));
 		const stateStoreOnCommit = spy(stateStore, "onCommit");
 		const txPoolOnCommit = spy(txPoolWorker, "onCommit");
-		const dispatch = spy(events, "dispatch");
+		const emit = spy(commitEventEmitter, "emit");
 
 		await assert.rejects(() => processor.commit(makeUnit(makeBlock())), "evm commit failed");
 
 		stateStoreOnCommit.neverCalled();
 		txPoolOnCommit.neverCalled();
-		dispatch.neverCalled();
+		emit.neverCalled();
 	});
 
-	it("#commit - should stay quiet while bootstrapping", async ({
-		events,
+	it("#commit - should log nothing while bootstrapping", async ({
 		evm,
 		logger,
 		processor,
@@ -737,7 +743,6 @@ describe<{
 		state.isBootstrap = () => true;
 		roundCalculator.isNewRound = () => true;
 		const onCommit = spy(evm, "onCommit");
-		const dispatch = spy(events, "dispatch");
 		const info = spy(logger, "info");
 		const debug = spy(logger, "debug");
 		const calculateRound = spy(roundCalculator, "calculateRound");
@@ -745,7 +750,6 @@ describe<{
 		await processor.commit(makeUnit(makeBlock({ transactions: [makeTransaction(1)], transactionsCount: 1 })));
 
 		onCommit.calledOnce();
-		dispatch.neverCalled();
 		info.neverCalled();
 		debug.neverCalled();
 		calculateRound.neverCalled();

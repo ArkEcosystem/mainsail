@@ -110,7 +110,7 @@ describe<{
 		await proposed(reporter, block, 0);
 
 		notice.calledOnce();
-		notice.calledWith(`📦 Proposing block ${1}/${0}/${block.hash} as ${OURS.address}`);
+		notice.calledWith(`Proposing block ${1}/${0}/${block.hash} as ${OURS.address} 📦`);
 	});
 
 	it("#handle - should report a re-proposal with the validator proposing it and the forger of its block", async ({
@@ -127,7 +127,7 @@ describe<{
 		await proposed(reporter, { ...block, proposer: THEIRS.address }, 1, 0);
 
 		notice.calledWith(
-			`📦 Re-proposing block ${1}/${1}(${0})/${block.hash} as ${OURS.address}, forged by ${THEIRS.address}`,
+			`Re-proposing block ${1}/${1}(${0})/${block.hash} as ${OURS.address}, forged by ${THEIRS.address} 📦`,
 		);
 	});
 
@@ -144,7 +144,7 @@ describe<{
 		await proposed(reporter, block, 1, 0);
 
 		notice.calledWith(
-			`📦 Re-proposing block ${1}/${1}(${0})/${block.hash} as ${OUR_SECOND.address}, forged by ${OURS.address}`,
+			`Re-proposing block ${1}/${1}(${0})/${block.hash} as ${OUR_SECOND.address}, forged by ${OURS.address} 📦`,
 		);
 	});
 
@@ -157,7 +157,7 @@ describe<{
 
 		await proposed(reporter, block, 0);
 
-		notice.calledWith(`📦 Proposing block ${1}/${0}/${block.hash} as ${block.proposer}`);
+		notice.calledWith(`Proposing block ${1}/${0}/${block.hash} as ${block.proposer} 📦`);
 	});
 
 	it("#handle - should report our own block being committed", async ({ reporter, logger, block }) => {
@@ -167,7 +167,7 @@ describe<{
 		await blockApplied(reporter, block);
 
 		notice.calledOnce();
-		notice.calledWith(`✅ Committed our block ${1}/${0} as ${OURS.address}`);
+		notice.calledWith(`Committed block ${1}/${0} as ${OURS.address} ✅`);
 	});
 
 	it("#handle - should still count our block as ours when it is committed after the round moved on", async ({
@@ -183,7 +183,7 @@ describe<{
 		await blockApplied(reporter, block);
 
 		notice.calledOnce();
-		notice.calledWith(`✅ Committed our block ${1}/${0} as ${OURS.address}`);
+		notice.calledWith(`Committed block ${1}/${0} as ${OURS.address} ✅`);
 	});
 
 	it("#handle - should report a round we lost to another validator", async ({ reporter, logger, block }) => {
@@ -193,23 +193,99 @@ describe<{
 		await blockApplied(reporter, { ...block, proposer: THEIRS.address, round: 1 });
 
 		notice.calledOnce();
-		notice.calledWith(`❌ Missed our round ${1}/${0} as ${OURS.address}, committed by ${THEIRS.address}`);
+		notice.calledWith(`Missed round ${1}/${0} as ${OURS.address}, committed by ${THEIRS.address} ❌`);
 	});
 
-	it("#handle - should report nothing while a round of ours is still in play", async ({
+	it("#handle - should not report a round of ours that started after the round of the committed block", async ({
 		reporter,
 		logger,
+		block,
 		proposerByRound,
 	}) => {
-		// A block is accepted on its block number alone, so the round we moved on from can still be the one
-		// that commits. Reporting a lost round here would be a guess.
+		proposerByRound[0] = THEIRS;
+		proposerByRound[1] = OURS;
+		const notice = spy(logger, "notice");
+
+		await roundStarted(reporter, 1, 0);
+		await roundStarted(reporter, 1, 1);
+		await blockApplied(reporter, { ...block, proposer: THEIRS.address, round: 0 });
+
+		notice.neverCalled();
+	});
+
+	it("#handle - should not report a round of ours that re-proposed the committed block", async ({
+		reporter,
+		logger,
+		block,
+		proposerByRound,
+	}) => {
+		proposerByRound[0] = THEIRS;
+		proposerByRound[1] = OURS;
+		const theirBlock = { ...block, proposer: THEIRS.address, round: 0 };
+		const notice = spy(logger, "notice");
+
+		await roundStarted(reporter, 1, 1);
+		await proposed(reporter, theirBlock, 1, 0);
+		await blockApplied(reporter, theirBlock);
+
+		notice.calledOnce();
+		notice.calledWith(
+			`Re-proposing block ${1}/${1}(${0})/${block.hash} as ${OURS.address}, forged by ${THEIRS.address} 📦`,
+		);
+	});
+
+	it("#handle - should report a missed round of ours alongside a block of another validator of ours", async ({
+		reporter,
+		logger,
+		block,
+		proposerByRound,
+	}) => {
 		proposerByRound[1] = OUR_SECOND;
 		const notice = spy(logger, "notice");
 
 		await roundStarted(reporter, 1, 0);
 		await roundStarted(reporter, 1, 1);
+		await blockApplied(reporter, { ...block, proposer: OUR_SECOND.address, round: 1 });
 
-		notice.neverCalled();
+		notice.calledTimes(2);
+		notice.calledWith(`Missed round ${1}/${0} as ${OURS.address}, committed by ${OUR_SECOND.address} ❌`);
+		notice.calledWith(`Committed block ${1}/${1} as ${OUR_SECOND.address} ✅`);
+	});
+
+	it("#handle - should report a missed round of ours alongside our block committed in a later round", async ({
+		reporter,
+		logger,
+		block,
+		proposerByRound,
+	}) => {
+		proposerByRound[2] = OURS;
+		const notice = spy(logger, "notice");
+
+		await roundStarted(reporter, 1, 0);
+		await roundStarted(reporter, 1, 1);
+		await roundStarted(reporter, 1, 2);
+		await blockApplied(reporter, { ...block, round: 2 });
+
+		notice.calledTimes(2);
+		notice.calledWith(`Missed round ${1}/${0} as ${OURS.address}, committed by ${OURS.address} ❌`);
+		notice.calledWith(`Committed block ${1}/${2} as ${OURS.address} ✅`);
+	});
+
+	it("#handle - should report only the rounds of ours before the round of the committed block", async ({
+		reporter,
+		logger,
+		block,
+		proposerByRound,
+	}) => {
+		proposerByRound[2] = OUR_SECOND;
+		const notice = spy(logger, "notice");
+
+		await roundStarted(reporter, 1, 0);
+		await roundStarted(reporter, 1, 2);
+		await blockApplied(reporter, { ...block, proposer: THEIRS.address, round: 1 });
+
+		notice.calledOnce();
+		notice.calledWith(`Missed round ${1}/${0} as ${OURS.address}, committed by ${THEIRS.address} ❌`);
 	});
 
 	it("#handle - should credit the round of ours that committed, not the latest one", async ({
@@ -227,7 +303,7 @@ describe<{
 		await blockApplied(reporter, block);
 
 		notice.calledOnce();
-		notice.calledWith(`✅ Committed our block ${1}/${0} as ${OURS.address}`);
+		notice.calledWith(`Committed block ${1}/${0} as ${OURS.address} ✅`);
 	});
 
 	it("#handle - should report every round of ours when another validator wins the block number", async ({
@@ -244,8 +320,8 @@ describe<{
 		await blockApplied(reporter, { ...block, proposer: THEIRS.address, round: 2 });
 
 		notice.calledTimes(2);
-		notice.calledWith(`❌ Missed our round ${1}/${0} as ${OURS.address}, committed by ${THEIRS.address}`);
-		notice.calledWith(`❌ Missed our round ${1}/${1} as ${OUR_SECOND.address}, committed by ${THEIRS.address}`);
+		notice.calledWith(`Missed round ${1}/${0} as ${OURS.address}, committed by ${THEIRS.address} ❌`);
+		notice.calledWith(`Missed round ${1}/${1} as ${OUR_SECOND.address}, committed by ${THEIRS.address} ❌`);
 	});
 
 	it("#handle - should report nothing when this node runs no validators", async ({
@@ -258,7 +334,7 @@ describe<{
 		const notice = spy(logger, "notice");
 
 		await roundStarted(reporter, 1, 0);
-		await blockApplied(reporter, { ...block, proposer: THEIRS.address });
+		await blockApplied(reporter, { ...block, proposer: THEIRS.address, round: 1 });
 
 		notice.neverCalled();
 	});
@@ -273,7 +349,7 @@ describe<{
 		const notice = spy(logger, "notice");
 
 		await roundStarted(reporter, 1, 0);
-		await blockApplied(reporter, { ...block, proposer: THEIRS.address });
+		await blockApplied(reporter, { ...block, proposer: THEIRS.address, round: 1 });
 
 		notice.neverCalled();
 	});
@@ -288,7 +364,7 @@ describe<{
 		const notice = spy(logger, "notice");
 
 		await roundStarted(reporter, 1, 0);
-		await blockApplied(reporter, { ...block, proposer: THEIRS.address });
+		await blockApplied(reporter, { ...block, proposer: THEIRS.address, round: 1 });
 
 		notice.neverCalled();
 	});
@@ -302,7 +378,7 @@ describe<{
 
 		await roundStarted(reporter, 1, 0);
 		await roundStarted(reporter, 1, 0);
-		await blockApplied(reporter, { ...block, proposer: THEIRS.address });
+		await blockApplied(reporter, { ...block, proposer: THEIRS.address, round: 1 });
 
 		notice.calledOnce();
 	});
@@ -310,10 +386,11 @@ describe<{
 	it("#handle - should report a round only once", async ({ reporter, logger, block }) => {
 		const notice = spy(logger, "notice");
 
+		const theirBlock = { ...block, proposer: THEIRS.address, round: 1 };
+
 		await roundStarted(reporter, 1, 0);
-		await blockApplied(reporter, { ...block, proposer: THEIRS.address });
-		// The next block number must not produce a second report for the same round.
-		await blockApplied(reporter, { ...block, number: 2, proposer: THEIRS.address });
+		await blockApplied(reporter, theirBlock);
+		await blockApplied(reporter, theirBlock);
 
 		notice.calledOnce();
 	});
@@ -326,7 +403,7 @@ describe<{
 		const notice = spy(logger, "notice");
 
 		await roundStarted(reporter, 1, 0);
-		await blockApplied(reporter, { ...block, number: 2, proposer: THEIRS.address });
+		await blockApplied(reporter, { ...block, number: 2, proposer: THEIRS.address, round: 1 });
 
 		notice.neverCalled();
 	});
@@ -346,7 +423,7 @@ describe<{
 		await blockApplied(reporter, { ...block, number: 2 });
 
 		notice.calledTimes(2);
-		notice.calledWith(`❌ Missed our round ${1}/${0} as ${OURS.address}, committed by ${THEIRS.address}`);
-		notice.calledWith(`✅ Committed our block ${2}/${0} as ${OURS.address}`);
+		notice.calledWith(`Missed round ${1}/${0} as ${OURS.address}, committed by ${THEIRS.address} ❌`);
+		notice.calledWith(`Committed block ${2}/${0} as ${OURS.address} ✅`);
 	});
 });
