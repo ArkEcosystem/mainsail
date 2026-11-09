@@ -21,12 +21,12 @@ const toContractEvent = (raw: JsContractEvent): Contracts.Evm.ContractEvent => {
 			assert.defined(raw.addr);
 			assert.defined(raw.blsPublicKey);
 
-			return { ...base, addr: raw.addr, blsPublicKey: raw.blsPublicKey, event: raw.event };
+			return { ...base, address: raw.addr, blsPublicKey: raw.blsPublicKey, event: raw.event };
 		}
 		case "ValidatorResigned": {
 			assert.defined(raw.addr);
 
-			return { ...base, addr: raw.addr, event: raw.event };
+			return { ...base, address: raw.addr, event: raw.event };
 		}
 		case "UsernameRegistered": {
 			assert.defined(raw.addr);
@@ -34,7 +34,7 @@ const toContractEvent = (raw: JsContractEvent): Contracts.Evm.ContractEvent => {
 
 			return {
 				...base,
-				addr: raw.addr,
+				address: raw.addr,
 				event: raw.event,
 				previousUsername: raw.previousUsername,
 				username: raw.username,
@@ -44,7 +44,7 @@ const toContractEvent = (raw: JsContractEvent): Contracts.Evm.ContractEvent => {
 			assert.defined(raw.addr);
 			assert.defined(raw.username);
 
-			return { ...base, addr: raw.addr, event: raw.event, username: raw.username };
+			return { ...base, address: raw.addr, event: raw.event, username: raw.username };
 		}
 		default: {
 			throw new Error(`unknown contract event: ${raw.event}`);

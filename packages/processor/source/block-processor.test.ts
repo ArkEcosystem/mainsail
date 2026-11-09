@@ -799,12 +799,12 @@ describe<{
 		processor,
 	}) => {
 		const contractEvents = [
-			{ addr: "validator-1", blsPublicKey: "bls-1", event: "ValidatorRegistered", txHash: "tx-1", txIndex: 0 },
+			{ address: "validator-1", blsPublicKey: "bls-1", event: "ValidatorRegistered", txHash: "tx-1", txIndex: 0 },
 			{ event: "Voted", txHash: "tx-2", txIndex: 1, validator: "validator-1", voter: "voter-1" },
 			{ event: "Voted", txHash: "tx-3", txIndex: 2, validator: "validator-1", voter: "voter-2" },
 			{ event: "Unvoted", txHash: "tx-4", txIndex: 3, validator: "validator-2", voter: "voter-3" },
-			{ addr: "validator-2", blsPublicKey: "bls-2", event: "ValidatorUpdated", txHash: "tx-5", txIndex: 4 },
-			{ addr: "validator-3", event: "ValidatorResigned", txHash: "tx-6", txIndex: 5 },
+			{ address: "validator-2", blsPublicKey: "bls-2", event: "ValidatorUpdated", txHash: "tx-5", txIndex: 4 },
+			{ address: "validator-3", event: "ValidatorResigned", txHash: "tx-6", txIndex: 5 },
 		];
 		const dispatch = spy(events, "dispatch");
 
@@ -844,16 +844,16 @@ describe<{
 
 	it("#commit - should emit the username changes of the block once per kind", async ({ events, processor }) => {
 		const contractEvents = [
-			{ addr: "wallet-1", event: "UsernameRegistered", txHash: "tx-1", txIndex: 0, username: "first" },
+			{ address: "wallet-1", event: "UsernameRegistered", txHash: "tx-1", txIndex: 0, username: "first" },
 			{
-				addr: "wallet-2",
+				address: "wallet-2",
 				event: "UsernameRegistered",
 				previousUsername: "old",
 				txHash: "tx-2",
 				txIndex: 1,
 				username: "second",
 			},
-			{ addr: "wallet-3", event: "UsernameResigned", txHash: "tx-3", txIndex: 2, username: "third" },
+			{ address: "wallet-3", event: "UsernameResigned", txHash: "tx-3", txIndex: 2, username: "third" },
 		];
 		const dispatch = spy(events, "dispatch");
 

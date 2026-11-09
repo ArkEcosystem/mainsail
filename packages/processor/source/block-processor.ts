@@ -232,17 +232,17 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 
 			switch (contractEvent.event) {
 				case "ValidatorRegistered": {
-					const { addr, blsPublicKey } = contractEvent;
-					changes.validators.registered.push({ address: addr, blsPublicKey, txHash, txIndex });
+					const { address, blsPublicKey } = contractEvent;
+					changes.validators.registered.push({ address, blsPublicKey, txHash, txIndex });
 					break;
 				}
 				case "ValidatorUpdated": {
-					const { addr, blsPublicKey } = contractEvent;
-					changes.validators.updated.push({ address: addr, blsPublicKey, txHash, txIndex });
+					const { address, blsPublicKey } = contractEvent;
+					changes.validators.updated.push({ address, blsPublicKey, txHash, txIndex });
 					break;
 				}
 				case "ValidatorResigned": {
-					changes.validators.resigned.push({ address: contractEvent.addr, txHash, txIndex });
+					changes.validators.resigned.push({ address: contractEvent.address, txHash, txIndex });
 					break;
 				}
 				case "Voted": {
@@ -256,9 +256,9 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 					break;
 				}
 				case "UsernameRegistered": {
-					const { addr, previousUsername, username } = contractEvent;
+					const { address, previousUsername, username } = contractEvent;
 					changes.usernames.registered.push({
-						address: addr,
+						address,
 						...(previousUsername === undefined ? {} : { previousUsername }),
 						txHash,
 						txIndex,
@@ -267,8 +267,8 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 					break;
 				}
 				case "UsernameResigned": {
-					const { addr, username } = contractEvent;
-					changes.usernames.resigned.push({ address: addr, txHash, txIndex, username });
+					const { address, username } = contractEvent;
+					changes.usernames.resigned.push({ address, txHash, txIndex, username });
 					break;
 				}
 			}

@@ -268,11 +268,15 @@ describe<{
 
 			assert.defined(capturedUpdates);
 			assert.equal(
-				capturedEvents!.map((event) => ({ event: event.event, username: (event as any).username })),
+				capturedEvents!.map((event) => ({
+					address: (event as any).address,
+					event: event.event,
+					username: (event as any).username,
+				})),
 				[
-					{ event: "UsernameRegistered", username: "alice" },
-					{ event: "UsernameRegistered", username: "bob" },
-					{ event: "UsernameResigned", username: "bob" },
+					{ address: voter, event: "UsernameRegistered", username: "alice" },
+					{ address: voter, event: "UsernameRegistered", username: "bob" },
+					{ address: voter, event: "UsernameResigned", username: "bob" },
 				],
 			);
 		} finally {
