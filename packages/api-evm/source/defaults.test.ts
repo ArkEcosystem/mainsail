@@ -5,6 +5,7 @@ let bust = 0;
 const load = async (): Promise<any> => (await import(`./defaults.js?bust=${bust++}`)).defaults;
 
 const envKeys = [
+	EnvironmentVariables.MAINSAIL_API_EVM_BATCH_RESPONSE_MAX_SIZE,
 	EnvironmentVariables.MAINSAIL_API_EVM_DISABLED,
 	EnvironmentVariables.MAINSAIL_API_EVM_HOST,
 	EnvironmentVariables.MAINSAIL_API_EVM_PORT,
@@ -55,6 +56,9 @@ describe<{ snapshot: Record<string, string | undefined> }>("Defaults", ({ assert
 				socketTimeout: 5000,
 				trustProxy: false,
 				whitelist: ["*"],
+			},
+			rpc: {
+				batchResponseMaxSize: 25_000_000,
 			},
 			server: {
 				http: {
@@ -161,6 +165,14 @@ describe<{ snapshot: Record<string, string | undefined> }>("Defaults", ({ assert
 
 		assert.equal(defaults.plugins.rateLimit.duration, "120");
 		assert.equal(defaults.plugins.rateLimit.points, "300");
+	});
+
+	it("reads the batch response max size from the environment", async () => {
+		process.env[EnvironmentVariables.MAINSAIL_API_EVM_BATCH_RESPONSE_MAX_SIZE] = "1000";
+
+		const defaults = await load();
+
+		assert.equal(defaults.rpc.batchResponseMaxSize, "1000");
 	});
 
 	it("comma-splits the rate limit blacklist and whitelist", async () => {

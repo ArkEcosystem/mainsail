@@ -15,4 +15,5 @@ export enum RcpErrorCode {
 	MethodNotFound = -32_601,
 	InvalidParameters = -32_602,
 	InternalError = -32_603,
+	ResponseTooLarge = -32_003,
 }

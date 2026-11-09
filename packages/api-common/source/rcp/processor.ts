@@ -10,12 +10,27 @@ import { getRcpId, prepareRcpError } from "./utilities.js";
 
 const BATCH_CONCURRENCY = 10;
 
+const payloadBytes = (response: Contracts.Api.RPC.Response | Contracts.Api.RPC.Error): number => {
+	const json: string | undefined = JSON.stringify("error" in response ? response.error : response.result);
+
+	return json === undefined ? 0 : Buffer.byteLength(json);
+};
+
+export const DEFAULT_BATCH_RESPONSE_MAX_SIZE = 25_000_000;
+
 @injectable()
 export class Processor implements Contracts.Api.RPC.Processor {
 	@inject(Identifiers.Cryptography.Validator)
 	private readonly validator!: Contracts.Crypto.Validator;
 
 	#actions: Map<string, Contracts.Api.RPC.Action> = new Map();
+	#batchResponseMaxSize = DEFAULT_BATCH_RESPONSE_MAX_SIZE;
+
+	public setBatchResponseMaxSize(bytes: number): this {
+		this.#batchResponseMaxSize = bytes;
+
+		return this;
+	}
 
 	public registerAction(action: Contracts.Api.RPC.Action): void {
 		this.#actions.set(action.name, action);
@@ -38,9 +53,24 @@ export class Processor implements Contracts.Api.RPC.Processor {
 		}
 
 		const responses: (Contracts.Api.RPC.Response | Contracts.Api.RPC.Error)[] = [];
+		let remainingBytes = this.#batchResponseMaxSize || Number.POSITIVE_INFINITY;
+
 		for (const group of chunk(payload, BATCH_CONCURRENCY)) {
-			responses.push(...(await Promise.all(group.map((rcpRequest) => this.#processSingle(rcpRequest)))));
+			if (remainingBytes < 0) {
+				responses.push(...group.map(({ id }) => prepareRcpError(id, Enums.Api.RcpErrorCode.ResponseTooLarge)));
+				continue;
+			}
+
+			for (const response of await Promise.all(group.map((rcpRequest) => this.#processSingle(rcpRequest)))) {
+				remainingBytes -= payloadBytes(response);
+				responses.push(
+					remainingBytes < 0
+						? prepareRcpError(response.id, Enums.Api.RcpErrorCode.ResponseTooLarge)
+						: response,
+				);
+			}
 		}
+
 		return responses;
 	}
 

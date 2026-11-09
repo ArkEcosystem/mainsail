@@ -15,7 +15,7 @@ import { DatabaseException } from "@mainsail/exceptions";
 import { ensureError, merge } from "@mainsail/utils";
 import { readFileSync } from "fs";
 
-import { Processor } from "./rcp/index.js";
+import { DEFAULT_BATCH_RESPONSE_MAX_SIZE, Processor } from "./rcp/index.js";
 
 // statement_timeout (57014), insufficient resources (class 53), or no pooled connection free in time
 const isDatabaseOverloaded = (error: Error & { code?: string }): boolean =>
@@ -55,7 +55,11 @@ export abstract class AbstractServer {
 		this.server.listener.headersTimeout = timeout;
 
 		this.server.app.app = this.app;
-		this.server.app.rpc = this.app.resolve(Processor);
+		this.server.app.rpc = this.app
+			.resolve(Processor)
+			.setBatchResponseMaxSize(
+				this.pluginConfiguration().getOptional("rpc.batchResponseMaxSize", DEFAULT_BATCH_RESPONSE_MAX_SIZE),
+			);
 
 		this.server.ext("onPreHandler", (request, h) => {
 			request.headers["content-type"] = "application/json";
