@@ -75,10 +75,6 @@ export enum TransactionEvent {
 	RemovedFromPool = "transaction.pool.removed",
 }
 
-export enum EvmEvent {
-	TransactionReceipt = "evm.transaction.receipt",
-}
-
 export enum ScheduleEvent {
 	BlockJobFinished = "schedule.blockJob.finished",
 	BlockJobFailed = "schedule.blockJob.failed",

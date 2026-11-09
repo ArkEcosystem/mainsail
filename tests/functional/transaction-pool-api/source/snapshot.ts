@@ -17,6 +17,14 @@ interface WalletState {
 	nonce: bigint;
 }
 
+type AppliedReceipt = Omit<Contracts.Evm.TransactionReceipt, "output">;
+
+interface AppliedTransaction {
+	from: string;
+	hash: string;
+	receipt: AppliedReceipt;
+}
+
 export const takeSnapshot = async (app: Contracts.Kernel.Application): Promise<Snapshot> => {
 	const snapshot = new Snapshot(app);
 	const instance = app.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm");
@@ -40,33 +48,25 @@ export const takeSnapshot = async (app: Contracts.Kernel.Application): Promise<S
 export class Snapshot {
 	private states: Record<string, WalletState> = {};
 	private legacyColdWallets: Record<string, Contracts.Evm.LegacyColdWallet> = {};
-	private receipts: Record<string, { sender: string; receipt: Contracts.Evm.TransactionReceipt }> = {};
+	private receipts: Record<string, { sender: string; receipt: AppliedReceipt }> = {};
 	private manualDeltas: Record<string, WalletState> = {};
 
 	public constructor(public app: Contracts.Kernel.Application) {
-		this.listenForEvmEvents();
+		this.listenForAppliedTransactions();
 	}
 
-	private listenForEvmEvents() {
-		const event = Events.EvmEvent.TransactionReceipt;
-		const eventDispatcher = this.app.get<
-			Contracts.Kernel.EventDispatcher<{
-				receipt: Contracts.Evm.TransactionReceipt;
-				sender: string;
-				transactionId: string;
-			}>
-		>(Identifiers.Services.EventDispatcher.Service);
+	private listenForAppliedTransactions() {
+		const event = Events.TransactionEvent.Applied;
+		const eventDispatcher = this.app.get<Contracts.Kernel.EventDispatcher<AppliedTransaction>>(
+			Identifiers.Services.EventDispatcher.Service,
+		);
 
 		const listener = {
-			handle: async ({
-				data,
-			}: {
-				data: { receipt: Contracts.Evm.TransactionReceipt; sender: string; transactionId: string };
-			}): Promise<void> => {
-				const { receipt, sender, transactionId } = data;
+			handle: async ({ data }: { data: AppliedTransaction }): Promise<void> => {
+				const { from, hash, receipt } = data;
 
-				console.log("got receipt", sender, transactionId, receipt);
-				this.receipts[transactionId] = { receipt, sender };
+				console.log("got receipt", from, hash, receipt);
+				this.receipts[hash] = { receipt, sender: from };
 			},
 		};
 

@@ -18,6 +18,8 @@ type ContractChanges = {
 
 const addressOf = ({ address }: { address: string }): string[] => [address];
 const voteAddresses = ({ validator, voter }: VoteChange): string[] => [voter, validator];
+const toReceiptData = ({ output, ...receipt }: Contracts.Evm.TransactionReceipt) =>
+	output === undefined ? receipt : { ...receipt, output: `0x${output.toString("hex")}` };
 
 @injectable()
 export class BlockProcessor implements Contracts.Processor.BlockProcessor {
@@ -175,23 +177,16 @@ export class BlockProcessor implements Contracts.Processor.BlockProcessor {
 		const { receipts } = unit.getProcessorResult();
 
 		for (const transaction of block.transactions) {
-			const { blockHash, blockNumber, transactionIndex } = transaction;
+			const { blockHash, blockNumber, hash, transactionIndex } = transaction;
+			const receipt = receipts.get(hash);
+
 			this.#emit(Events.TransactionEvent.Applied, {
 				...transaction.toData(),
 				blockHash,
 				blockNumber,
+				receipt: receipt && toReceiptData(receipt),
 				transactionIndex,
 			});
-
-			const receipt = receipts.get(transaction.hash);
-
-			if (receipt) {
-				this.#emit(Events.EvmEvent.TransactionReceipt, {
-					receipt,
-					sender: transaction.from,
-					transactionId: transaction.hash,
-				});
-			}
 		}
 
 		const { unvotes, usernames, validators, votes } = this.#getContractChanges(unit);

@@ -28,10 +28,13 @@ const makeTransaction = (index: number, overrides: Record<string, unknown> = {})
 	...overrides,
 });
 
+const receipt = { cumulativeGasUsed: 21_000n, gasRefunded: 0n, gasUsed: 21_000n, logs: [], status: 1 };
+
 const appliedData = (index: number) => ({
 	blockHash: "block-hash",
 	blockNumber,
 	hash: `hash-${index}`,
+	receipt,
 	transactionIndex: index - 1,
 });
 
@@ -57,7 +60,9 @@ const makeUnit = (block: ReturnType<typeof makeBlock>, overrides: Record<string,
 		getBlock: () => block,
 		getCommit: async () => ({ block }),
 		getContractEvents: () => [],
-		getProcessorResult: () => ({ receipts: new Map() }),
+		getProcessorResult: () => ({
+			receipts: new Map(block.transactions.map((transaction) => [transaction.hash, receipt])),
+		}),
 		round: block.round,
 		...overrides,
 	}) as unknown as Contracts.Processor.ProcessableUnit;
@@ -634,14 +639,14 @@ describe<{
 		info.calledWith("Committed block 3/1/block-hash with 2 tx(s) (gasUsed=51,000)", "consensus");
 	});
 
-	it("#commit - should emit the receipt of each committed transaction after its applied event", async ({
+	it("#commit - should include the receipt of each committed transaction in its applied event", async ({
 		events,
 		processor,
 	}) => {
-		const transaction1 = makeTransaction(1, { from: "sender-1" });
-		const transaction2 = makeTransaction(2, { from: "sender-2" });
-		const receipt1 = { gasUsed: 21_000n, status: 1 };
-		const receipt2 = { gasUsed: 30_000n, status: 0 };
+		const transaction1 = makeTransaction(1);
+		const transaction2 = makeTransaction(2);
+		const receipt1 = { ...receipt, output: Buffer.from("08c379a0", "hex"), status: 0 };
+		const receipt2 = { ...receipt, gasUsed: 30_000n };
 		const block = makeBlock({ gasUsed: 51_000, transactions: [transaction1, transaction2], transactionsCount: 2 });
 		const receipts = new Map([
 			["hash-1", receipt1],
@@ -651,20 +656,13 @@ describe<{
 
 		await processor.commit(makeUnit(block, { getProcessorResult: () => ({ receipts }) }));
 
-		dispatch.calledTimes(5);
-		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, appliedData(1));
-		dispatch.calledNthWith(1, Events.EvmEvent.TransactionReceipt, {
-			receipt: receipt1,
-			sender: "sender-1",
-			transactionId: "hash-1",
+		dispatch.calledTimes(3);
+		dispatch.calledNthWith(0, Events.TransactionEvent.Applied, {
+			...appliedData(1),
+			receipt: { ...receipt, output: "0x08c379a0", status: 0 },
 		});
-		dispatch.calledNthWith(2, Events.TransactionEvent.Applied, appliedData(2));
-		dispatch.calledNthWith(3, Events.EvmEvent.TransactionReceipt, {
-			receipt: receipt2,
-			sender: "sender-2",
-			transactionId: "hash-2",
-		});
-		dispatch.calledNthWith(4, Events.BlockEvent.Applied, { ...blockData, contractEvents: [] });
+		dispatch.calledNthWith(1, Events.TransactionEvent.Applied, { ...appliedData(2), receipt: receipt2 });
+		dispatch.calledNthWith(2, Events.BlockEvent.Applied, { ...blockData, contractEvents: [] });
 	});
 
 	it("#commit - should hand the unit to every commit handler", async ({
