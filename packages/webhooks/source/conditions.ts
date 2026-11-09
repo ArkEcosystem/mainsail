@@ -38,7 +38,7 @@ const contains = (
 	expected: Contracts.Webhooks.ConditionPrimitive,
 ): boolean => {
 	if (!Array.isArray(actual)) {
-		return actual.includes(String(expected));
+		return actual.toLowerCase().includes(String(expected).toLowerCase());
 	}
 
 	const needle = ignoreCase(expected);
