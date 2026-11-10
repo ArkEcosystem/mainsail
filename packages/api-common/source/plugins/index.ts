@@ -1,4 +1,5 @@
 export { commaArrayQuery } from "./comma-separated-query.js";
+export { concurrencyLimit } from "./concurrency-limit.js";
 export { databaseReady } from "./database-ready.js";
 export { dotSeparatedQuery } from "./dot-separated-query.js";
 export { pagination } from "./pagination/index.js";
