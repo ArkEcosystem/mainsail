@@ -41,10 +41,12 @@ const deferred = () => {
 	return { promise, reject, resolve };
 };
 
+const { setTimeout: realSetTimeout } = globalThis;
+
 const within = async <T>(promise: Promise<T>): Promise<T> =>
 	Promise.race([
 		promise,
-		new Promise<T>((_, reject) => setTimeout(() => reject(new Error("Request did not settle in time")), 500)),
+		new Promise<T>((_, reject) => realSetTimeout(() => reject(new Error("Request did not settle in time")), 500)),
 	]);
 
 const waitFor = async (condition: () => boolean) => {
@@ -305,6 +307,127 @@ describe<{
 		sendRequest.calledWith("commit", 100, ["alice"], 0, true);
 	});
 
+	it("onCommit returns before the worker finishes the commit", async ({ worker, ipc }) => {
+		await startWorker(worker);
+		const commit = deferred();
+		ipc.respond = async (method) => (method === "commit" ? commit.promise : undefined);
+
+		await within(worker.onCommit(makeUnit(11)));
+		await waitFor(() => ipc.requests.length === 3);
+
+		assert.equal(ipc.requests[2][0], "commit");
+		commit.resolve();
+	});
+
+	for (const [label, request] of [
+		[
+			"getTransactions",
+			(worker: Worker) => worker.getTransactions({ blockRound: "12-0", maxBytes: 1024, maxSize: 100 }),
+		],
+		["the next commit", (worker: Worker) => worker.onCommit(makeUnit(12))],
+	] as const) {
+		it(`${label} waits for the pending commit`, async ({ worker, ipc }) => {
+			await startWorker(worker);
+			const commit = deferred();
+			ipc.respond = async (method, blockNumber) =>
+				method === "commit" && blockNumber === 11 ? commit.promise : undefined;
+
+			await within(worker.onCommit(makeUnit(11)));
+			const pending = request(worker);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			assert.length(ipc.requests, 3);
+
+			commit.resolve();
+			await within(pending);
+			await waitFor(() => ipc.requests.length === 4);
+		});
+	}
+
+	it("start waits for the pending commit", async ({ worker, ipc }) => {
+		await worker.boot({});
+		const commit = deferred();
+		ipc.respond = async (method) => (method === "commit" ? commit.promise : undefined);
+
+		await within(worker.onCommit(makeUnit(0)));
+		const start = worker.start(0);
+		await new Promise((resolve) => setTimeout(resolve, 10));
+
+		assert.equal(
+			ipc.requests.map(([method]) => method),
+			["boot", "commit"],
+		);
+
+		commit.resolve();
+		await within(start);
+
+		assert.equal(ipc.requests[2], ["start", 0]);
+	});
+
+	it("respawns the worker when a commit does not finish in time", async ({ worker, ipc, subprocesses, logs }) => {
+		await startWorker(worker);
+		const fake = clock({ toFake: ["setTimeout", "clearTimeout"] });
+		const commit = deferred();
+		ipc.respond = async (method) => (method === "commit" ? commit.promise : undefined);
+		ipc.kill = async () => {
+			stopIpc(ipc);
+			commit.reject(new Error("Worker was killed"));
+
+			return 1;
+		};
+		const replacement = addReplacement(subprocesses);
+
+		await within(worker.onCommit(makeUnit(11)));
+		await fake.tickAsync(29_999);
+
+		assert.length(replacement.requests, 0);
+
+		await fake.tickAsync(1);
+		fake.restore();
+		await waitFor(() => respawned(logs));
+
+		assert.equal(replacement.requests[1], ["start", 11]);
+		await within(worker.getTransactions({ blockRound: "12-0", maxBytes: 1024, maxSize: 100 }));
+	});
+
+	it("keeps the worker when a commit finishes in time", async (context) => {
+		const { worker, logs } = context;
+		await startWorker(worker);
+		const fake = clock({ toFake: ["setTimeout", "clearTimeout"] });
+
+		await within(worker.onCommit(makeUnit(11)));
+		await within(worker.getTransactions({ blockRound: "12-0", maxBytes: 1024, maxSize: 100 }));
+		await fake.tickAsync(30_000);
+		fake.restore();
+
+		assert.equal(context.spawned, 1);
+		assert.length(logs, 0);
+	});
+
+	it("keeps the replacement when a commit times out while it reloads the pool", async (context) => {
+		const { worker, ipc, subprocesses, terminations, logs } = context;
+		await startWorker(worker);
+
+		const reload = deferred();
+		const replacement = addReplacement(subprocesses);
+		replacement.respond = async (method) => (method === "boot" ? undefined : reload.promise);
+		stopIpc(ipc);
+
+		await worker.onCommit(makeUnit(11));
+		await waitFor(() => replacement.requests.length === 2);
+		const fake = clock({ toFake: ["setTimeout", "clearTimeout"] });
+
+		await within(worker.onCommit(makeUnit(12)));
+		await fake.tickAsync(30_000);
+		fake.restore();
+
+		assert.equal(context.spawned, 2);
+		assert.length(terminations, 0);
+
+		reload.resolve();
+		await waitFor(() => respawned(logs));
+	});
+
 	it("onCommit respawns a stopped worker at the committed block and restores handlers and peers", async ({
 		app,
 		worker,
@@ -362,14 +485,41 @@ describe<{
 		assert.equal(replacement.requests[1], ["start", 11]);
 	});
 
-	it("onCommit still fails when a running worker rejects the commit", async (context) => {
-		const { worker, ipc } = context;
+	it("onCommit terminates the node when a running worker rejects the commit", async (context) => {
+		const { worker, ipc, terminations } = context;
 		await startWorker(worker);
-		ipc.respond = async () => {
-			throw new Error("commit failed");
+		const error = new Error("commit failed");
+		ipc.respond = async (method) => {
+			if (method === "commit") {
+				throw error;
+			}
 		};
 
-		await assert.rejects(() => worker.onCommit(makeUnit(11)), "commit failed");
+		await assert.resolves(() => worker.onCommit(makeUnit(11)));
+		await waitFor(() => terminations.length === 1);
+
+		assert.equal(terminations[0], ["tx-pool worker failed to commit", error]);
+		assert.equal(context.spawned, 1);
+	});
+
+	it("respawns no more once a failed commit terminates the node", async (context) => {
+		const { worker, ipc, terminations } = context;
+		await startWorker(worker);
+		ipc.respond = async (method) => {
+			if (method === "commit") {
+				throw new Error("commit failed");
+			}
+		};
+
+		await worker.onCommit(makeUnit(11));
+		await waitFor(() => terminations.length === 1);
+		stopIpc(ipc);
+
+		assert.equal(await worker.getTransactions({ blockRound: "12-0", maxBytes: 1024, maxSize: 100 }), {
+			remaining: 0,
+			transactions: [],
+		});
+		await new Promise((resolve) => setTimeout(resolve, 10));
 		assert.equal(context.spawned, 1);
 	});
 
