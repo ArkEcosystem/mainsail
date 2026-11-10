@@ -116,6 +116,34 @@ describe<{
 		assert.false("errors" in body);
 	});
 
+	for (const [label, remoteAddress, remaining] of [
+		["charges a client one point per transaction", "1.2.3.4", "1"],
+		["charges a peer one point per request", "5.6.7.8", "2"],
+	] as const) {
+		it(`POST /api/transactions - ${label}`, async (context) => {
+			const configuration = makeConfiguration();
+			configuration.plugins.rateLimit = { ...configuration.plugins.rateLimit, enabled: true, points: 3 };
+			const { server, serviceProvider } = await bootstrapServer(
+				{ ...context, peers: ["5.6.7.8"] },
+				configuration,
+			);
+
+			try {
+				const response = await server.inject({
+					method: "POST",
+					payload: { transactions: ["deadbeef", "c0ffee"] },
+					remoteAddress,
+					url: "/api/transactions",
+				});
+
+				assert.is(response.statusCode, 200);
+				assert.is(response.headers["x-ratelimit-remaining"], remaining);
+			} finally {
+				await serviceProvider.dispose();
+			}
+		});
+	}
+
 	it("POST /api/transactions - rejects a payload without transactions", async ({ server }) => {
 		const response = await server.inject({ method: "POST", payload: {}, url: "/api/transactions" });
 

@@ -5,6 +5,7 @@ import { RLWrapperBlackAndWhite } from "rate-limiter-flexible";
 import { rateLimit } from "./rate-limit";
 
 const REMOTE = "1.2.3.4";
+const PEER = "5.6.7.8";
 
 const makeServer = async (options: any): Promise<Server> => {
 	const server = new Server();
@@ -15,10 +16,40 @@ const makeServer = async (options: any): Promise<Server> => {
 		path: "/",
 	});
 
+	server.route({
+		handler: () => "ok",
+		method: "POST",
+		options: {
+			plugins: {
+				rateLimit: {
+					points: (request, ip) => (ip === PEER ? 1 : request.payload.items.length),
+				},
+			},
+			validate: {
+				payload: (value: any) => {
+					if (!Array.isArray(value?.items)) {
+						throw new Error("items must be an array");
+					}
+
+					return value;
+				},
+			},
+		},
+		path: "/items",
+	});
+
 	await server.register({ options, plugin: rateLimit });
 
 	return server;
 };
+
+const postItems = async (server: Server, count: number, remoteAddress = REMOTE) =>
+	server.inject({
+		method: "POST",
+		payload: { items: Array.from({ length: count }, () => 1) },
+		remoteAddress,
+		url: "/items",
+	});
 
 describe<{
 	clock: any;
@@ -145,6 +176,114 @@ describe<{
 		assert.is((await server.inject({ method: "GET", remoteAddress: REMOTE, url: "/" })).statusCode, 429);
 		assert.is((await server.inject({ method: "GET", remoteAddress: REMOTE, url: "/unknown" })).statusCode, 429);
 		assert.is(checks, 1);
+	});
+
+	it("should charge the points a route asks for", async () => {
+		const server = await makeServer({
+			blacklist: [],
+			duration: 60,
+			enabled: true,
+			points: 5,
+			trustProxy: false,
+			whitelist: [],
+		});
+
+		const response = await postItems(server, 3);
+
+		assert.is(response.statusCode, 200);
+		assert.is(response.headers["x-ratelimit-remaining"], "2");
+	});
+
+	it("should charge a single point when a route asks for one", async () => {
+		const server = await makeServer({
+			blacklist: [],
+			duration: 60,
+			enabled: true,
+			points: 5,
+			trustProxy: false,
+			whitelist: [],
+		});
+
+		const response = await postItems(server, 3, PEER);
+
+		assert.is(response.statusCode, 200);
+		assert.is(response.headers["x-ratelimit-remaining"], "4");
+	});
+
+	it("should return 429 when a route asks for more points than are left", async () => {
+		const server = await makeServer({
+			blacklist: [],
+			duration: 60,
+			enabled: true,
+			points: 5,
+			trustProxy: false,
+			whitelist: [],
+		});
+
+		const response = await postItems(server, 6);
+
+		assert.is(response.statusCode, 429);
+		assert.is(response.headers["x-ratelimit-remaining"], "0");
+		assert.defined(response.headers["retry-after"]);
+		assert.is((await server.inject({ method: "GET", remoteAddress: REMOTE, url: "/" })).statusCode, 429);
+	});
+
+	it("should charge a single point for a request whose payload fails validation", async () => {
+		const server = await makeServer({
+			blacklist: [],
+			duration: 60,
+			enabled: true,
+			points: 5,
+			trustProxy: false,
+			whitelist: [],
+		});
+
+		const invalid = await server.inject({
+			method: "POST",
+			payload: { items: 3 },
+			remoteAddress: REMOTE,
+			url: "/items",
+		});
+		const response = await server.inject({ method: "GET", remoteAddress: REMOTE, url: "/" });
+
+		assert.is(invalid.statusCode, 400);
+		assert.is(response.headers["x-ratelimit-remaining"], "3");
+	});
+
+	it("should not charge route points to a whitelisted IP", async () => {
+		const server = await makeServer({
+			blacklist: [],
+			duration: 60,
+			enabled: true,
+			points: 1,
+			trustProxy: false,
+			whitelist: [REMOTE],
+		});
+
+		assert.is((await postItems(server, 5)).statusCode, 200);
+		assert.is((await postItems(server, 5)).statusCode, 200);
+	});
+
+	it("should pass the forwarded IP to the route points when trustProxy is enabled", async () => {
+		const server = await makeServer({
+			blacklist: [],
+			duration: 60,
+			enabled: true,
+			points: 5,
+			trustProxy: true,
+			whitelist: [],
+		});
+
+		const response = await server.inject({
+			headers: { "x-forwarded-for": PEER },
+			method: "POST",
+			payload: { items: [1, 2, 3] },
+			remoteAddress: REMOTE,
+			url: "/items",
+		});
+
+		assert.is(response.statusCode, 200);
+		assert.is(response.headers["x-ratelimit-remaining"], "4");
 	});
 
 	it("should block a blacklisted IP with 429", async () => {

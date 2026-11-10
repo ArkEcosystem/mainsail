@@ -27,6 +27,11 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		)
 		.getRequired<number>("maxTransactionBytes");
 
+	const isPeer = (ip: string): boolean =>
+		server.app.app
+			.get<Contracts.TransactionPool.PeerRepository>(Identifiers.TransactionPool.Peer.Repository)
+			.hasPeer(ip);
+
 	server.route({
 		handler: (request: Types.HapiRequest) => controller.store(request),
 		method: "POST",
@@ -35,6 +40,12 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				// Each transaction is hex encoded (2 chars per byte) and carries ~4 bytes
 				// of JSON overhead (quotes and comma), plus 100 bytes for the envelope.
 				maxBytes: 100 + maxTransactionsPerRequest * (maxTransactionBytes * 2 + 4),
+			},
+			plugins: {
+				rateLimit: {
+					points: (request: Types.HapiRequest, ip: string) =>
+						isPeer(ip) ? 1 : (request.payload as { transactions: string[] }).transactions.length,
+				},
 			},
 			validate: {
 				payload: Joi.object({
