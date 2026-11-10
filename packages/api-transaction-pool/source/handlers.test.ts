@@ -17,6 +17,10 @@ describe<{
 				getRequired: (key: string) => ({ maxTransactionBytes: 1024, maxTransactionsPerRequest: 2 })[key],
 			})
 			.whenTagged("plugin", "transaction-pool-service");
+		context.app
+			.bind(Identifiers.ServiceProvider.Configuration)
+			.toConstantValue({ getRequired: () => 1_000_000 })
+			.whenTagged("plugin", "api-transaction-pool");
 		context.app.bind(Identifiers.TransactionPool.Processor).toConstantValue({});
 		context.app.bind(Identifiers.TransactionPool.Query).toConstantValue({});
 		context.app.bind(Identifiers.State.Store).toConstantValue({});

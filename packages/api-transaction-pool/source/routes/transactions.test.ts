@@ -309,6 +309,48 @@ describe<{
 		}
 	});
 
+	it("GET /api/transactions/unconfirmed - links the next offset when the byte budget ends the page", async ({
+		processor,
+	}) => {
+		const transactions = [1, 2, 3].map((n) => {
+			const transaction = makeTransaction(n);
+			const data = { ...transaction.toData(), data: "ab".repeat(1000) };
+
+			return { ...transaction, toData: () => data };
+		});
+
+		const limited = makeConfiguration();
+		limited.plugins.pagination.maxBytes = 6000;
+
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
+
+		try {
+			let response = await server.inject({ method: "GET", url: "/api/transactions/unconfirmed?limit=3" });
+			assert.is(response.statusCode, 200);
+
+			let body = JSON.parse(response.payload);
+			assert.equal(
+				body.data.map(({ hash }) => hash),
+				[transactions[0].hash, transactions[1].hash],
+			);
+			assert.is(body.meta.count, 2);
+			assert.is(body.meta.totalCount, 3);
+			assert.is(body.meta.next, "/transactions/unconfirmed?limit=3&offset=2");
+
+			response = await server.inject({ method: "GET", url: `/api${body.meta.next}` });
+			assert.is(response.statusCode, 200);
+
+			body = JSON.parse(response.payload);
+			assert.equal(
+				body.data.map(({ hash }) => hash),
+				[transactions[2].hash],
+			);
+			assert.null(body.meta.next);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
 	it("GET /api/transactions/unconfirmed - accepts comma separated address lists", async ({
 		server,
 		transactions,

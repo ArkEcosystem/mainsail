@@ -158,6 +158,7 @@ describe<{
 		assert.undefined(result.error);
 
 		assert.number(result.value.plugins.pagination.limit);
+		assert.number(result.value.plugins.pagination.maxBytes);
 		assert.array(result.value.plugins.rateLimit.blacklist);
 		assert.number(result.value.plugins.rateLimit.duration);
 		assert.boolean(result.value.plugins.rateLimit.enabled);
@@ -300,6 +301,31 @@ describe<{
 		result = serviceProvider.configSchema().validate(defaults);
 
 		assert.equal(result.error?.message, '"plugins.pagination.limit" is required');
+	});
+
+	it("#schemaRestrictions - plugins.pagination.maxBytes is required && is integer && >= 1", async ({
+		serviceProvider,
+	}) => {
+		const defaults = await importDefaults();
+		defaults.plugins.pagination.maxBytes = false;
+		let result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.pagination.maxBytes" must be a number');
+
+		defaults.plugins.pagination.maxBytes = 1.12;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.pagination.maxBytes" must be an integer');
+
+		defaults.plugins.pagination.maxBytes = 0;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.pagination.maxBytes" must be greater than or equal to 1');
+
+		delete defaults.plugins.pagination.maxBytes;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.pagination.maxBytes" is required');
 	});
 
 	it("#schemaRestrictions - plugins.rateLimit is required && is object", async ({ serviceProvider }) => {

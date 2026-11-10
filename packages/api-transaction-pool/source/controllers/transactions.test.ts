@@ -8,14 +8,22 @@ import { TransactionsController } from "./transactions";
 describe<{
 	app: Application;
 	controller: TransactionsController;
+	maxBytes: number;
 	processor: { process: (data: Buffer[]) => Promise<object> };
 	transactions: ReturnType<typeof makeTransaction>[];
 }>("TransactionsController", ({ it, assert, beforeEach, spy, stub }) => {
 	beforeEach((context) => {
 		context.transactions = [makeTransaction(1), makeTransaction(2)];
 		context.processor = { process: async () => ({}) };
+		context.maxBytes = 1_000_000;
 
 		context.app = new Application();
+		context.app
+			.bind(Identifiers.ServiceProvider.Configuration)
+			.toConstantValue({
+				getRequired: (key: string) => ({ "plugins.pagination.maxBytes": context.maxBytes })[key],
+			})
+			.whenTagged("plugin", "api-transaction-pool");
 		context.app.bind(Identifiers.TransactionPool.Processor).toConstantValue(context.processor);
 		context.app.bind(Identifiers.TransactionPool.Query).toConstantValue({
 			getAll: () => makeQueryIterable(context.transactions),
@@ -67,6 +75,57 @@ describe<{
 		assert.is(result.totalCount, 2);
 		assert.length(result.results, 1);
 		assert.equal(result.results[0].hash, transactions[1].hash);
+	});
+
+	it("#unconfirmed - reports no next offset when the page fits the byte budget", async ({ controller }) => {
+		const result: any = await controller.unconfirmed({ query: { limit: 100, page: 1 } } as any);
+
+		assert.length(result.results, 2);
+		assert.undefined(result.nextOffset);
+	});
+
+	it("#unconfirmed - ends the page before the transaction that exceeds the byte budget", async (context) => {
+		const { controller, transactions } = context;
+		transactions.push(makeTransaction(3));
+
+		const full: any = await controller.unconfirmed({ query: { limit: 100, page: 1 } } as any);
+		const [first, second] = full.results.map((result: object) => Buffer.byteLength(JSON.stringify(result)));
+
+		context.maxBytes = first + second;
+		let result: any = await controller.unconfirmed({ query: { limit: 100, page: 1 } } as any);
+		assert.equal(result.results, full.results.slice(0, 2));
+		assert.is(result.nextOffset, 2);
+		assert.is(result.totalCount, 3);
+
+		context.maxBytes = first + second - 1;
+		result = await controller.unconfirmed({ query: { limit: 100, page: 1 } } as any);
+		assert.equal(result.results, full.results.slice(0, 1));
+		assert.is(result.nextOffset, 1);
+	});
+
+	it("#unconfirmed - returns one transaction when it alone exceeds the byte budget", async (context) => {
+		const { controller, transactions } = context;
+		transactions.push(makeTransaction(3));
+		context.maxBytes = 1;
+
+		const result: any = await controller.unconfirmed({ query: { limit: 100, offset: 1, page: 1 } } as any);
+
+		assert.length(result.results, 1);
+		assert.equal(result.results[0].hash, transactions[1].hash);
+		assert.is(result.nextOffset, 2);
+		assert.is(result.totalCount, 3);
+	});
+
+	it("#unconfirmed - reports no next offset when the budget ends the page at its limit", async (context) => {
+		const { controller, transactions } = context;
+		transactions.push(makeTransaction(3));
+		context.maxBytes = 1;
+
+		const result: any = await controller.unconfirmed({ query: { limit: 1, page: 2 } } as any);
+
+		assert.length(result.results, 1);
+		assert.equal(result.results[0].hash, transactions[1].hash);
+		assert.undefined(result.nextOffset);
 	});
 
 	it("#unconfirmed - filters by a list of from addresses", async ({ controller, transactions }) => {

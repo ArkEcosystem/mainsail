@@ -18,7 +18,7 @@ export const poolConfiguration = {
 // A factory instead of a shared constant so tests can mutate their copy freely.
 export const makeConfiguration = () => ({
 	plugins: {
-		pagination: { limit: 100 },
+		pagination: { limit: 100, maxBytes: 1_000_000 },
 		rateLimit: { blacklist: [], duration: 60, enabled: false, points: 150, whitelist: [] },
 		socketTimeout: 5000,
 		trustProxy: false,

@@ -35,7 +35,7 @@ describe("Defaults", ({ it, assert, beforeEach, afterAll }) => {
 
 		assert.equal(defaults, {
 			plugins: {
-				pagination: { limit: 100 },
+				pagination: { limit: 100, maxBytes: 1_000_000 },
 				rateLimit: {
 					blacklist: [],
 					duration: 60,
