@@ -36,6 +36,16 @@ describe("Schemas", ({ it, assert }) => {
 		assert.defined(validate({ limit: 60 }, 50).error);
 	});
 
+	it("pagination - accepts an offset", () => {
+		assertValid(validate({ offset: 0 }, 50), { limit: 50, offset: 0, page: 1 });
+		assertValid(validate({ limit: 10, offset: 37 }, 50), { limit: 10, offset: 37, page: 1 });
+	});
+
+	it("pagination - rejects a negative or fractional offset", () => {
+		assert.defined(validate({ offset: -1 }, 50).error);
+		assert.defined(validate({ offset: 1.5 }, 50).error);
+	});
+
 	it("pagination - rejects a non-positive limit and page", () => {
 		assert.defined(validate({ limit: 0 }, 50).error);
 		assert.defined(validate({ page: 0 }, 50).error);

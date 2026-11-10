@@ -199,6 +199,32 @@ describe<{
 		assert.equal(body.data[0].hash, transactions[1].hash);
 	});
 
+	it("GET /api/transactions/unconfirmed - paginates with limit and offset", async ({ server, transactions }) => {
+		const response = await server.inject({
+			method: "GET",
+			url: "/api/transactions/unconfirmed?limit=1&offset=1",
+		});
+
+		assert.is(response.statusCode, 200);
+
+		const body = JSON.parse(response.payload);
+		assert.is(body.meta.totalCount, 2);
+		assert.length(body.data, 1);
+		assert.equal(body.data[0].hash, transactions[1].hash);
+		assert.is(body.meta.self, "/transactions/unconfirmed?limit=1&offset=1");
+		assert.is(body.meta.previous, "/transactions/unconfirmed?limit=1&offset=0");
+		assert.null(body.meta.next);
+	});
+
+	it("GET /api/transactions/unconfirmed - rejects a negative offset", async ({ server }) => {
+		const response = await server.inject({
+			method: "GET",
+			url: "/api/transactions/unconfirmed?offset=-1",
+		});
+
+		assert.is(response.statusCode, 422);
+	});
+
 	it("GET /api/transactions/unconfirmed - rejects a limit above the configured maximum", async ({ server }) => {
 		const response = await server.inject({
 			method: "GET",
