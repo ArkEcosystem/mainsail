@@ -558,6 +558,28 @@ describe<{
 		});
 	}
 
+	it("respawns no more once a failed respawn terminates the node", async (context) => {
+		const { app, worker, ipc, subprocesses, terminations } = context;
+		await startWorker(worker);
+
+		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getPeers: () => [{ ip: "1.1.1.1" }] });
+		const exit = deferred();
+		const replacement = addReplacement(subprocesses);
+		replacement.respond = async (method) => (method === "boot" ? undefined : exit.promise);
+		stopIpc(ipc);
+
+		await worker.onCommit(makeUnit(11));
+		await waitFor(() => replacement.requests.length === 3);
+
+		stopIpc(replacement);
+		exit.reject(new Error("Worker stopped with exit code 1"));
+		await waitFor(() => terminations.length === 1);
+		await worker.onCommit(makeUnit(12));
+		await new Promise((resolve) => setTimeout(resolve, 10));
+
+		assert.equal(context.spawned, 2);
+	});
+
 	it("does not terminate the node when a respawn fails during shutdown", async ({
 		worker,
 		ipc,
