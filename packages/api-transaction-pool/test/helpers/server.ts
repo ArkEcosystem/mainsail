@@ -5,7 +5,7 @@ import { Server } from "../../source/server";
 import { ServiceProvider } from "../../source/service-provider";
 import { makeQueryIterable } from "../fixtures/transactions";
 
-export type ServerDependencies = { processor: object; transactions: unknown[] };
+export type ServerDependencies = { peers?: string[]; processor: object; transactions: unknown[] };
 
 export const poolConfiguration = {
 	maxTransactionAge: 2700,
@@ -49,6 +49,9 @@ export const bindDependencies = (app: Application, dependencies: ServerDependenc
 		})
 		.whenTagged("plugin", "transaction-pool-service");
 
+	app.bind(Identifiers.TransactionPool.Peer.Repository).toConstantValue({
+		hasPeer: (ip: string) => (dependencies.peers ?? []).includes(ip),
+	});
 	app.bind(Identifiers.TransactionPool.Processor).toConstantValue(dependencies.processor);
 	app.bind(Identifiers.TransactionPool.Query).toConstantValue({
 		getAll: () => makeQueryIterable(dependencies.transactions),

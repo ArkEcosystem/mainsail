@@ -7,6 +7,8 @@ import { RateLimiterMemory, RLWrapperBlackAndWhite } from "rate-limiter-flexible
 
 import { getIp } from "../utils/index.js";
 
+type RoutePoints = (request: Hapi.Request, ip: string) => number;
+
 type RateLimitPluginData = {
 	remaining: number;
 	reset: number;
@@ -52,38 +54,58 @@ export const rateLimit = {
 			whiteList: options.whitelist || ["*"],
 		});
 
-		server.ext({
-			method: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
-				try {
-					const rateLimitRes: RateLimiterRes = await rateLimiter.consume(
-						getIp(request, options.trustProxy),
-						1,
-					);
+		const consume = async (request: Hapi.Request, ip: string, points: number): Promise<Boom.Boom | undefined> => {
+			try {
+				const rateLimitRes: RateLimiterRes = await rateLimiter.consume(ip, points);
 
-					request.plugins["rate-limit"] = {
-						remaining: rateLimitRes.remainingPoints,
-						reset: Date.now() + rateLimitRes.msBeforeNext,
-					} as RateLimitPluginData;
-				} catch (error) {
-					// rate-limiter-flexible rejects with a RateLimiterRes (not an Error) when
-					// the limit is hit; a real Error only occurs on an internal failure.
-					if (error instanceof Error) {
-						return Boom.internal(error.message);
-					}
-
-					if (isRateLimiterResponse(error)) {
-						request.plugins["rate-limit"] = {
-							remaining: error.remainingPoints,
-							reset: Date.now() + error.msBeforeNext,
-						};
-					}
-
-					return Boom.tooManyRequests();
+				request.plugins["rate-limit"] = {
+					remaining: rateLimitRes.remainingPoints,
+					reset: Date.now() + rateLimitRes.msBeforeNext,
+				} as RateLimitPluginData;
+			} catch (error) {
+				// rate-limiter-flexible rejects with a RateLimiterRes (not an Error) when
+				// the limit is hit; a real Error only occurs on an internal failure.
+				if (error instanceof Error) {
+					return Boom.internal(error.message);
 				}
 
-				return h.continue;
-			},
+				if (isRateLimiterResponse(error)) {
+					request.plugins["rate-limit"] = {
+						remaining: error.remainingPoints,
+						reset: Date.now() + error.msBeforeNext,
+					};
+				}
+
+				return Boom.tooManyRequests();
+			}
+
+			return undefined;
+		};
+
+		server.ext({
+			method: async (request: Hapi.Request, h: Hapi.ResponseToolkit) =>
+				(await consume(request, getIp(request, options.trustProxy), 1)) ?? h.continue,
 			type: "onRequest",
+		});
+
+		server.ext({
+			method: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
+				const routePoints: RoutePoints | undefined = request.route.settings.plugins?.["rateLimit"]?.points;
+
+				if (routePoints === undefined) {
+					return h.continue;
+				}
+
+				const ip = getIp(request, options.trustProxy);
+				const points = routePoints(request, ip) - 1;
+
+				if (points <= 0) {
+					return h.continue;
+				}
+
+				return (await consume(request, ip, points)) ?? h.continue;
+			},
+			type: "onPreHandler",
 		});
 
 		server.ext({
