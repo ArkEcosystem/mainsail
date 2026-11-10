@@ -219,9 +219,53 @@ describe<{ subject: Extension }>("Extension", ({ it, beforeEach, assert }) => {
 		assert.equal(meta.next, "/blocks?limit=10&offset=25");
 		assert.equal(meta.previous, "/blocks?limit=10&offset=5");
 
+		assert.equal(getMeta(0, 40).previous, null);
 		assert.equal(getMeta(35, 40).next, null);
 		assert.equal(getMeta(35, 100).next, null);
 		assert.equal(getMeta(30, 100).next, "/blocks?limit=10&offset=40");
+	});
+
+	it("onPostHandler should link the next offset when the source reports one", ({ subject }) => {
+		const request: any = makePostRequest({
+			nextOffset: 3,
+			results: [{ id: 1 }, { id: 2 }, { id: 3 }],
+			totalCount: 25,
+		});
+		request.orig.query = { address: "0xabc" };
+
+		subject.onPostHandler(request, fakeH() as any);
+
+		const meta = request.response.source.meta;
+		assert.equal(meta.next, "/blocks?limit=10&address=0xabc&offset=3");
+		assert.equal(meta.self, "/blocks?limit=10&page=1&address=0xabc");
+		assert.equal(meta.first, "/blocks?limit=10&page=1&address=0xabc");
+		assert.false("nextOffset" in request.response.source);
+	});
+
+	it("onPostHandler should link the next offset from an offset page", ({ subject }) => {
+		const request: any = makePostRequest({ nextOffset: 17, results: [{ id: 1 }, { id: 2 }], totalCount: 25 });
+		request.query.offset = 15;
+		request.orig.query = { offset: "15" };
+
+		subject.onPostHandler(request, fakeH() as any);
+
+		const meta = request.response.source.meta;
+		assert.equal(meta.next, "/blocks?limit=10&offset=17");
+		assert.equal(meta.self, "/blocks?limit=10&offset=15");
+	});
+
+	it("onPostHandler should not link a next offset past the configured depth", () => {
+		const subject = new Extension({ maxDepth: 20, query: { limit: { default: 100 } } });
+		const getNext = (nextOffset: number) => {
+			const request: any = makePostRequest({ nextOffset, results: [{ id: 1 }], totalCount: 25 });
+
+			subject.onPostHandler(request, fakeH() as any);
+
+			return request.response.source.meta.next;
+		};
+
+		assert.equal(getNext(10), "/blocks?limit=10&offset=10");
+		assert.null(getNext(11));
 	});
 
 	it("onPostHandler should handle source as an array", ({ subject }) => {
