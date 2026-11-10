@@ -200,6 +200,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 
 			const start = this.ipcSubprocess.sendRequest("start", this.#blockNumber);
 			this.#respawning = false;
+			void this.#restorePeers();
 			await start;
 		} catch (error) {
 			this.#respawning = false;
@@ -210,8 +211,6 @@ export class Worker implements Contracts.TransactionPool.Worker {
 
 			return;
 		}
-
-		await this.#restorePeers();
 
 		this.logger.info("Respawned the transaction pool worker");
 	}

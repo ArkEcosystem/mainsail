@@ -434,6 +434,31 @@ describe<{
 		await waitFor(() => respawned(logs));
 	});
 
+	it("restores peers while the respawned worker reloads the pool", async ({
+		app,
+		worker,
+		ipc,
+		subprocesses,
+		logs,
+	}) => {
+		await startWorker(worker);
+
+		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getPeers: () => [{ ip: "1.1.1.1" }] });
+		const start = deferred();
+		const replacement = addReplacement(subprocesses);
+		replacement.respond = async (method) => (method === "start" ? start.promise : undefined);
+		stopIpc(ipc);
+
+		await worker.onCommit(makeUnit(11));
+		await waitFor(() => replacement.requests.length === 3);
+
+		assert.equal(replacement.requests[2], ["setPeer", "1.1.1.1"]);
+		assert.false(respawned(logs));
+
+		start.resolve();
+		await waitFor(() => respawned(logs));
+	});
+
 	it("starts the respawn from any request that finds the worker stopped", async (context) => {
 		const { worker, ipc, subprocesses, logs } = context;
 		await startWorker(worker);
