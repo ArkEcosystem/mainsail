@@ -558,6 +558,36 @@ describe<{
 		});
 	}
 
+	it("drops requests after the respawned worker fails to boot", async ({
+		worker,
+		ipc,
+		subprocesses,
+		terminations,
+	}) => {
+		await startWorker(worker);
+
+		const replacement = addReplacement(subprocesses);
+		replacement.respond = async (method) => {
+			if (method === "boot") {
+				throw new Error("boot failed");
+			}
+		};
+		stopIpc(ipc);
+
+		await worker.onCommit(makeUnit(11));
+		await waitFor(() => terminations.length === 1);
+
+		await assert.resolves(() => worker.setPeer("1.1.1.1"));
+		assert.equal(await worker.getTransactions({ blockRound: "12-0", maxBytes: 1024, maxSize: 100 }), {
+			remaining: 0,
+			transactions: [],
+		});
+		assert.equal(
+			replacement.requests.map(([method]) => method),
+			["boot"],
+		);
+	});
+
 	it("respawns no more once a failed respawn terminates the node", async (context) => {
 		const { app, worker, ipc, subprocesses, terminations } = context;
 		await startWorker(worker);

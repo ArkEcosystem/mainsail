@@ -203,8 +203,6 @@ export class Worker implements Contracts.TransactionPool.Worker {
 			void this.#restorePeers();
 			await start;
 		} catch (error) {
-			this.#respawning = false;
-
 			if (!this.#stopping) {
 				this.#stopping = true;
 				void this.app.terminate("tx-pool worker failed to respawn", error as Error);
