@@ -4,6 +4,8 @@ import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import dayjs from "dayjs";
 
+const COMMIT_TIMEOUT = 30_000;
+
 @injectable()
 export class Worker implements Contracts.TransactionPool.Worker {
 	@inject(Identifiers.Application.Instance)
@@ -31,6 +33,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	#respawning = false;
 	#bootPromise?: Promise<void>;
 	#respawnPromise?: Promise<void>;
+	#commitPromise: Promise<void> = Promise.resolve();
 	#disposePromise?: Promise<void>;
 
 	@postConstruct()
@@ -113,11 +116,14 @@ export class Worker implements Contracts.TransactionPool.Worker {
 
 		this.#blockNumber = unit.blockNumber;
 
-		await this.#sendIfRunning("commit", unit.blockNumber, [...sendersAddresses.keys()], block.gasUsed, isSyncing);
+		await this.#commitPromise;
+
+		this.#commitPromise = this.#commit(unit.blockNumber, [...sendersAddresses.keys()], block.gasUsed, isSyncing);
 	}
 
 	public async start(blockNumber: number): Promise<void> {
 		this.#blockNumber = blockNumber;
+		await this.#commitPromise;
 		await this.#send("start", blockNumber);
 		this.#started = true;
 	}
@@ -125,6 +131,8 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	public async getTransactions(
 		options: Contracts.TransactionPool.GetBatchOptions,
 	): Promise<Contracts.TransactionPool.GetBatchResult> {
+		await this.#commitPromise;
+
 		const batch = await this.#sendIfRunning<Contracts.TransactionPool.GetBatchResult>("getTransactions", options);
 
 		return batch ?? { remaining: 0, transactions: [] };
@@ -144,6 +152,19 @@ export class Worker implements Contracts.TransactionPool.Worker {
 
 	public async reloadWebhooks(): Promise<void> {
 		await this.#sendIfRunning("reloadWebhooks");
+	}
+
+	async #commit(...arguments_: unknown[]): Promise<void> {
+		const timeout = setTimeout(() => this.#respawn(), COMMIT_TIMEOUT);
+
+		try {
+			await this.#sendIfRunning("commit", ...arguments_);
+		} catch (error) {
+			this.#stopping = true;
+			void this.app.terminate("tx-pool worker failed to commit", error as Error);
+		} finally {
+			clearTimeout(timeout);
+		}
 	}
 
 	#isRunning(): boolean {
@@ -167,10 +188,11 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	}
 
 	#respawn(): void {
-		if (!this.#started || this.#stopping || this.#respawning) {
+		if (!this.#started || this.#stopping) {
 			return;
 		}
 
+		this.#started = false;
 		this.#respawning = true;
 		this.#respawnPromise = this.#doRespawn();
 	}
@@ -211,6 +233,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 			return;
 		}
 
+		this.#started = true;
 		this.logger.info("Respawned the transaction pool worker");
 	}
 
