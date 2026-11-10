@@ -68,6 +68,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				plugins: Joi.object({
 					pagination: Joi.object({
 						limit: Joi.number().integer().min(0).required(),
+						maxBytes: Joi.number().integer().min(1).required(),
 					}).required(),
 					rateLimit: Joi.object({
 						blacklist: Joi.array().items(Joi.string()).required(),

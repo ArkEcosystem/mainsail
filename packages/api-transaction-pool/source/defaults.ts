@@ -5,6 +5,7 @@ export const defaults = {
 	plugins: {
 		pagination: {
 			limit: 100,
+			maxBytes: 1_000_000,
 		},
 		rateLimit: {
 			blacklist:
