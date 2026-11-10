@@ -556,6 +556,82 @@ describe<{
 		assert.length(terminations, 0);
 	});
 
+	it("creates no replacement when the worker is disposed while the respawn kills it", async (context) => {
+		const { worker, ipc } = context;
+		await startWorker(worker);
+
+		const kill = deferred();
+		ipc.kill = async () => {
+			await kill.promise;
+
+			return 0;
+		};
+		stopIpc(ipc);
+
+		await worker.onCommit(makeUnit(11));
+		const disposed = worker.dispose();
+		kill.resolve();
+		await within(disposed);
+
+		assert.equal(context.spawned, 1);
+	});
+
+	it("disposes the replacement without starting it when the worker is disposed while the respawn boots it", async ({
+		worker,
+		ipc,
+		subprocesses,
+	}) => {
+		await startWorker(worker);
+
+		const boot = deferred();
+		const replacement = addReplacement(subprocesses);
+		replacement.respond = async (method) => (method === "boot" ? boot.promise : undefined);
+		const dispose = spy(replacement, "dispose");
+		stopIpc(ipc);
+
+		await worker.onCommit(makeUnit(11));
+		await waitFor(() => replacement.requests.length === 1);
+		const disposed = worker.dispose();
+		await new Promise((resolve) => setImmediate(resolve));
+
+		dispose.neverCalled();
+
+		boot.resolve();
+		await within(disposed);
+
+		assert.equal(
+			replacement.requests.map(([method]) => method),
+			["boot", "dispose"],
+		);
+		dispose.calledOnce();
+	});
+
+	it("disposes the worker when a failed respawn terminates the node", async ({ app, worker, ipc, subprocesses }) => {
+		await startWorker(worker);
+
+		const replacement = addReplacement(subprocesses);
+		replacement.respond = async (method) => {
+			if (method === "start") {
+				throw new Error("start failed");
+			}
+		};
+		const dispose = spy(replacement, "dispose");
+		let disposed: Promise<void> | undefined;
+		app.terminate = async () => {
+			disposed = worker.dispose();
+			await disposed;
+
+			return new Promise<never>(() => {});
+		};
+		stopIpc(ipc);
+
+		await worker.onCommit(makeUnit(11));
+		await waitFor(() => disposed !== undefined);
+		await within(disposed!);
+
+		dispose.calledOnce();
+	});
+
 	it("restores no peers when p2p is not registered", async ({ worker, ipc, subprocesses, logs }) => {
 		await startWorker(worker);
 

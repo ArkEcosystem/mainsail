@@ -30,6 +30,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	#stopping = false;
 	#respawning = false;
 	#bootPromise?: Promise<void>;
+	#respawnPromise?: Promise<void>;
 	#disposePromise?: Promise<void>;
 
 	@postConstruct()
@@ -70,6 +71,8 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	}
 
 	async #doDispose(): Promise<void> {
+		await this.#respawnPromise;
+
 		// Let any work already in flight finish before tearing the worker down, so the
 		// dispose doesn't cut off requests that other service providers issued before us.
 		await this.ipcSubprocess.drain();
@@ -158,21 +161,29 @@ export class Worker implements Contracts.TransactionPool.Worker {
 			}
 		}
 
-		void this.#respawn();
+		this.#respawn();
 
 		return undefined;
 	}
 
-	async #respawn(): Promise<void> {
+	#respawn(): void {
 		if (!this.#started || this.#stopping || this.#respawning) {
 			return;
 		}
 
 		this.#respawning = true;
+		this.#respawnPromise = this.#doRespawn();
+	}
+
+	async #doRespawn(): Promise<void> {
 		this.logger.warn("Respawning the transaction pool worker");
 
 		try {
 			await this.ipcSubprocess.kill();
+
+			if (this.#stopping) {
+				return;
+			}
 
 			this.ipcSubprocess = this.createWorkerSubprocess();
 
@@ -183,6 +194,10 @@ export class Worker implements Contracts.TransactionPool.Worker {
 			this.#bootPromise = this.ipcSubprocess.sendRequest("boot", this.#flags);
 			await this.#bootPromise;
 
+			if (this.#stopping) {
+				return;
+			}
+
 			const start = this.ipcSubprocess.sendRequest("start", this.#blockNumber);
 			this.#respawning = false;
 			await start;
@@ -190,7 +205,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 			this.#respawning = false;
 
 			if (!this.#stopping) {
-				await this.app.terminate("tx-pool worker failed to respawn", error as Error);
+				void this.app.terminate("tx-pool worker failed to respawn", error as Error);
 			}
 
 			return;
