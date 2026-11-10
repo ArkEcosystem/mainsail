@@ -3,6 +3,13 @@ import { Environment } from "@mainsail/kernel";
 
 export const defaults = {
 	plugins: {
+		concurrencyLimit: {
+			limit: Environment.get(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS, 16),
+			limitPerIp: Environment.get(
+				EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS_PER_IP,
+				4,
+			),
+		},
 		pagination: {
 			limit: 100,
 			maxBytes: 1_000_000,

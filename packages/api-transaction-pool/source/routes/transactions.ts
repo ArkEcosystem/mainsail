@@ -60,6 +60,9 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		method: "GET",
 		options: {
 			plugins: {
+				concurrencyLimit: {
+					enabled: true,
+				},
 				pagination: {
 					enabled: true,
 				},
@@ -79,6 +82,11 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		handler: (request: Types.HapiRequest) => controller.showUnconfirmed(request),
 		method: "GET",
 		options: {
+			plugins: {
+				concurrencyLimit: {
+					enabled: true,
+				},
+			},
 			validate: {
 				params: Joi.object({
 					// The pool stores hashes lowercase; accept any casing like the address filters do.
