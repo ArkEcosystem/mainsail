@@ -1,9 +1,46 @@
+import type { Plugin } from "@hapi/hapi";
+
 import { describe } from "@mainsail/test-runner";
 
 import { makeTransaction } from "../../test/fixtures/transactions";
 import { bootstrapServer, makeConfiguration } from "../../test/helpers/server";
 import { Server } from "../server";
 import { ServiceProvider } from "../service-provider";
+
+const holdFirstRead = async (server: Server) => {
+	let held = false;
+	let release!: () => void;
+	const released = new Promise<void>((resolve) => (release = resolve));
+
+	const plugin: Plugin<unknown> = {
+		name: "hold-first-read",
+		register: (hapi) =>
+			hapi.ext("onPostHandler", async (request, h) => {
+				if (!held && request.method === "get" && request.path.startsWith("/api/transactions/unconfirmed")) {
+					held = true;
+					await released;
+				}
+
+				return h.continue;
+			}),
+	};
+
+	await server.registerPlugins([{ plugin }]);
+
+	const waitForHeld = async () => {
+		const startedAt = Date.now();
+
+		while (!held) {
+			if (Date.now() - startedAt > 1000) {
+				throw new Error("No read was held");
+			}
+
+			await new Promise((resolve) => setImmediate(resolve));
+		}
+	};
+
+	return { release, waitForHeld };
+};
 
 describe<{
 	server: Server;
@@ -365,6 +402,106 @@ describe<{
 		assert.is(response.statusCode, 200);
 		assert.length(JSON.parse(response.payload).data, 2);
 	});
+
+	it("GET /api/transactions/unconfirmed - rejects reads past the concurrency limit but no other routes", async ({
+		processor,
+		transactions,
+	}) => {
+		const limited = makeConfiguration();
+		limited.plugins.concurrencyLimit = { limit: 1, limitPerIp: 1 };
+
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
+
+		try {
+			const { release, waitForHeld } = await holdFirstRead(server);
+
+			const held = server.inject("/api/transactions/unconfirmed");
+			await waitForHeld();
+
+			assert.is((await server.inject("/api/transactions/unconfirmed")).statusCode, 503);
+			assert.is((await server.inject(`/api/transactions/unconfirmed/${transactions[0].hash}`)).statusCode, 503);
+			assert.is(
+				(await server.inject({ method: "POST", payload: { transactions: ["aa"] }, url: "/api/transactions" }))
+					.statusCode,
+				200,
+			);
+			assert.is((await server.inject("/api/configuration")).statusCode, 200);
+			assert.is((await server.inject("/")).statusCode, 200);
+
+			release();
+			assert.is((await held).statusCode, 200);
+			assert.is((await server.inject("/api/transactions/unconfirmed")).statusCode, 200);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
+	it("GET /api/transactions/unconfirmed - limits concurrent reads per forwarded ip behind a trusted proxy", async ({
+		processor,
+		transactions,
+	}) => {
+		const limited = makeConfiguration();
+		limited.plugins.concurrencyLimit = { limit: 10, limitPerIp: 1 };
+		limited.plugins.rateLimit.enabled = true;
+		limited.plugins.trustProxy = true;
+
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
+		const from = (ip: string) => ({ headers: { "x-forwarded-for": ip }, url: "/api/transactions/unconfirmed" });
+
+		try {
+			const { release, waitForHeld } = await holdFirstRead(server);
+
+			const held = server.inject(from("1.1.1.1"));
+			await waitForHeld();
+
+			assert.is((await server.inject(from("1.1.1.1"))).statusCode, 503);
+			assert.is((await server.inject(from("2.2.2.2"))).statusCode, 200);
+
+			release();
+			assert.is((await held).statusCode, 200);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
+	for (const [label, rateLimit] of [
+		["ips the rate limit whitelists", { enabled: true, whitelist: ["1.1.1.*"] }],
+		["any ip when rate limiting is disabled", { enabled: false, whitelist: [] }],
+	] as const) {
+		it(`GET /api/transactions/unconfirmed - does not limit concurrent reads per ip for ${label}`, async ({
+			processor,
+			transactions,
+		}) => {
+			const limited = makeConfiguration();
+			limited.plugins.concurrencyLimit = { limit: 10, limitPerIp: 1 };
+			limited.plugins.rateLimit = {
+				...limited.plugins.rateLimit,
+				...rateLimit,
+				whitelist: [...rateLimit.whitelist],
+			};
+			limited.plugins.trustProxy = true;
+
+			const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
+			const from = (ip: string) => ({
+				headers: { "x-forwarded-for": ip },
+				url: "/api/transactions/unconfirmed",
+			});
+
+			try {
+				const { release, waitForHeld } = await holdFirstRead(server);
+
+				const held = server.inject(from("1.1.1.1"));
+				await waitForHeld();
+
+				assert.is((await server.inject(from("1.1.1.1"))).statusCode, 200);
+
+				release();
+				assert.is((await held).statusCode, 200);
+			} finally {
+				await serviceProvider.dispose();
+			}
+		});
+	}
 
 	it("GET /api/transactions/unconfirmed/{hash} - returns a single json-safe transaction", async ({
 		server,

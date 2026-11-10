@@ -3,6 +3,8 @@ import { describe } from "@mainsail/test-runner";
 const variables = [
 	"MAINSAIL_API_TRANSACTION_POOL_DISABLED",
 	"MAINSAIL_API_TRANSACTION_POOL_HOST",
+	"MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS",
+	"MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS_PER_IP",
 	"MAINSAIL_API_TRANSACTION_POOL_PORT",
 	"MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_BLACKLIST",
 	"MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_DISABLED",
@@ -35,6 +37,7 @@ describe("Defaults", ({ it, assert, beforeEach, afterAll }) => {
 
 		assert.equal(defaults, {
 			plugins: {
+				concurrencyLimit: { limit: 16, limitPerIp: 4 },
 				pagination: { limit: 100, maxBytes: 1_000_000 },
 				rateLimit: {
 					blacklist: [],
@@ -69,6 +72,8 @@ describe("Defaults", ({ it, assert, beforeEach, afterAll }) => {
 	it("honors the environment variable overrides", async () => {
 		process.env.MAINSAIL_API_TRANSACTION_POOL_DISABLED = "true";
 		process.env.MAINSAIL_API_TRANSACTION_POOL_HOST = "127.0.0.1";
+		process.env.MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS = "8";
+		process.env.MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS_PER_IP = "2";
 		process.env.MAINSAIL_API_TRANSACTION_POOL_PORT = "4107";
 		process.env.MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_BLACKLIST = "1.1.1.1,2.2.2.2";
 		process.env.MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_DISABLED = "true";
@@ -92,6 +97,7 @@ describe("Defaults", ({ it, assert, beforeEach, afterAll }) => {
 			points: "300",
 			whitelist: ["3.3.3.3"],
 		});
+		assert.equal(defaults.plugins.concurrencyLimit, { limit: "8", limitPerIp: "2" });
 		assert.true(defaults.plugins.trustProxy);
 		assert.equal(defaults.server.http, {
 			enabled: false,
