@@ -126,10 +126,12 @@ describe<{
 		const listen = spy(eventDispatcher, "listen");
 		const fresh = app.resolve(Worker);
 
-		listen.calledTimes(3);
+		listen.calledTimes(5);
 		listen.calledNthWith(0, Events.WebhookEvent.Created, fresh);
 		listen.calledNthWith(1, Events.WebhookEvent.Updated, fresh);
 		listen.calledNthWith(2, Events.WebhookEvent.Removed, fresh);
+		listen.calledNthWith(3, Events.PeerEvent.Added, fresh);
+		listen.calledNthWith(4, Events.PeerEvent.Removed, fresh);
 	});
 
 	it("boot sends a single boot request and memoizes it", async ({ worker, ipc }) => {
@@ -259,6 +261,17 @@ describe<{
 		await worker.handle({ data: {}, name: "webhooks.created" });
 
 		sendRequest.calledWith("reloadWebhooks");
+	});
+
+	it("handle forwards added and removed peers to the pool", async ({ worker, ipc }) => {
+		const sendRequest = spy(ipc, "sendRequest");
+
+		await worker.boot({});
+		await worker.handle({ data: { ip: "1.1.1.1" }, name: Events.PeerEvent.Added });
+		await worker.handle({ data: { ip: "1.1.1.1" }, name: Events.PeerEvent.Removed });
+
+		sendRequest.calledWith("setPeer", "1.1.1.1");
+		sendRequest.calledWith("forgetPeer", "1.1.1.1");
 	});
 
 	it("onCommit commits sender addresses, gas used and a not-syncing flag for a recent block", async ({

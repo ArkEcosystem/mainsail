@@ -40,10 +40,26 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		this.eventDispatcher.listen(Events.WebhookEvent.Created, this);
 		this.eventDispatcher.listen(Events.WebhookEvent.Updated, this);
 		this.eventDispatcher.listen(Events.WebhookEvent.Removed, this);
+
+		// The pool gossips to the active peers of the p2p layer, which announces them as they come and go.
+		this.eventDispatcher.listen(Events.PeerEvent.Added, this);
+		this.eventDispatcher.listen(Events.PeerEvent.Removed, this);
 	}
 
-	public async handle(payload: { name: string; data: unknown }): Promise<void> {
-		await this.reloadWebhooks();
+	public async handle({ data, name }: { name: string; data: unknown }): Promise<void> {
+		switch (name) {
+			case Events.PeerEvent.Added: {
+				await this.setPeer((data as { ip: string }).ip);
+				break;
+			}
+			case Events.PeerEvent.Removed: {
+				await this.forgetPeer((data as { ip: string }).ip);
+				break;
+			}
+			default: {
+				await this.reloadWebhooks();
+			}
+		}
 	}
 
 	public registerEventHandler<T>(event: string, callback: Contracts.Kernel.IPC.EventCallback<T>): void {

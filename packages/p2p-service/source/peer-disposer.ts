@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
-import { Events, Identifiers } from "@mainsail/constants";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { CloseReason, ConnectionError } from "@mainsail/p2p-websocket";
 import dayjs from "dayjs";
@@ -28,14 +28,8 @@ export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2PService.PeerRepository;
 
-	@inject(Identifiers.Services.EventDispatcher.Service)
-	private readonly events!: Contracts.Kernel.EventDispatcher;
-
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
-
-	@inject(Identifiers.TransactionPool.Worker)
-	private readonly transactionPoolWorker!: Contracts.TransactionPool.Worker;
 
 	// The ban list of the transport is the single record of bans; it also refuses banned sockets.
 	public banPeer(ip: string, error: Error): void {
@@ -57,20 +51,17 @@ export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 			this.websocketService.ban(ip, dayjs().add(timeout, "minute").valueOf());
 		}
 
-		this.disposePeer(ip);
+		// Banned addresses are forgotten entirely: the service loop must not dial them.
+		void this.websocketService.disconnect(ip);
+		this.repository.removePeer(ip);
 	}
 
+	// Closes the connection; an active peer becomes known again so the service loop can dial it later.
+	// Also runs when a connection closes by itself. The closed connection stays on the peer; everything
+	// that sends checks that it is open.
 	public disposePeer(ip: string): void {
 		void this.websocketService.disconnect(ip);
-
-		if (this.repository.hasPeer(ip)) {
-			const peer = this.repository.getPeer(ip);
-
-			this.repository.forgetPeer(peer);
-
-			void this.events.dispatch(Events.PeerEvent.Removed, peer);
-			void this.transactionPoolWorker.forgetPeer(ip);
-		}
+		this.repository.demotePeer(ip);
 	}
 
 	public async disposePeers(): Promise<void> {

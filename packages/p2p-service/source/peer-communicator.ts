@@ -1,29 +1,21 @@
 import type { Contracts } from "@mainsail/contracts";
-import type { ConnectionRepository, Interfaces, Service as WebSocketService } from "@mainsail/p2p-websocket";
+import type { Interfaces } from "@mainsail/p2p-websocket";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { ConnectionState } from "@mainsail/p2p-websocket";
-import { assert, ensureError, IpAddress } from "@mainsail/utils";
-import { setTimeout as sleep } from "node:timers/promises";
+import { CloseReason, ConnectionError, ConnectionState } from "@mainsail/p2p-websocket";
+import { assert, ensureError } from "@mainsail/utils";
 
 import type { Peer } from "./interfaces/index.js";
 
 import { constants } from "./constants.js";
 import { GetBlocks, GetMessages, GetPeers, GetProposal, GetStatus, PostMessage, PostProposal } from "./routes/index.js";
 
-const DIAL_SPACING = 10_000;
-
 // Minimal port of the @mainsail/p2p communicator over the new transport: no timeouts per route,
-// no reply validation, no throttling.
+// no reply validation, no throttling. It never connects: a peer without an open connection is not
+// an active peer, and the service loop dials known peers.
 @injectable()
 export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
-	@inject(Identifiers.P2P.WebSocket.Service)
-	private readonly websocketService!: WebSocketService;
-
-	@inject(Identifiers.P2P.WebSocket.Connection.Repository)
-	private readonly connections!: ConnectionRepository;
-
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
@@ -90,7 +82,7 @@ export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 		route: Interfaces.RouteDefinition<TRequest, TResponse>,
 		payload: Omit<TRequest, "headers">,
 	): Promise<TResponse> {
-		const connection = await this.#connect(peer);
+		const connection = this.#connection(peer);
 
 		// The request headers are added by HeaderIncludeSendMiddleware.
 		const started = performance.now();
@@ -105,44 +97,11 @@ export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 		return response;
 	}
 
-	// Reuses the peer's connection in either direction; dials only when there is none, at most once per DIAL_SPACING.
-	async #connect(peer: Peer): Promise<Interfaces.Connection> {
-		if (peer.connection?.state === ConnectionState.Open) {
-			return peer.connection;
+	#connection(peer: Peer): Interfaces.Connection {
+		if (peer.connection?.state !== ConnectionState.Open) {
+			throw new ConnectionError(CloseReason.NotOpen, `No open connection to ${peer.ip}`);
 		}
 
-		const existing = this.connections.get(peer.ip);
-		if (existing) {
-			this.#attach(peer, existing);
-			return existing;
-		}
-
-		const wait = DIAL_SPACING - (Date.now() - (peer.lastDialAt ?? 0));
-		if (wait > 0) {
-			await sleep(wait);
-		}
-
-		peer.lastDialAt = Date.now();
-		await this.websocketService.dial(`ws://${IpAddress.normalizeAddress(peer.ip)}:${peer.port}`);
-
-		// TEMPORARY until the service owns dialing: the open connection is in the transport repository.
-		const connection = this.connections.get(peer.ip);
-		assert.defined(connection);
-		this.#attach(peer, connection);
-
-		return connection;
-	}
-
-	#attach(peer: Peer, connection: Interfaces.Connection): void {
-		if (peer.connection === connection) {
-			return;
-		}
-
-		peer.connection = connection;
-		connection.onClose(() => {
-			if (peer.connection === connection) {
-				peer.connection = undefined;
-			}
-		});
+		return peer.connection;
 	}
 }

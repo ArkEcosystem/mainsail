@@ -2,22 +2,19 @@ import type { Contracts } from "@mainsail/contracts";
 import type { Interfaces, Service as WebSocketService } from "@mainsail/p2p-websocket";
 
 import { Events, Identifiers } from "@mainsail/constants";
-import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
+import { inject, injectable, postConstruct } from "@mainsail/container";
+import { ConnectionState } from "@mainsail/p2p-websocket";
 import { IpAddress } from "@mainsail/utils";
 
 import type { Peer } from "./interfaces/index.js";
 
 import { isValidVersion } from "./utils/index.js";
 
-// Port of the @mainsail/p2p processor without the tx pool node and API node checks. Unlike the old
-// one it never connects: addresses are only recorded as known, and a peer is verified when the
-// transport reports its open connection. The connection hook replaces the accept-peer plugin.
+// Moves peers between the three lists of the repository. It applies no address rules: those run on
+// the transport (PeerIpVerifier, ban list) for every inbound socket and every dial, so an address
+// recorded here that must not be a peer is refused when the service loop dials it.
 @injectable()
 export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
-	@inject(Identifiers.ServiceProvider.Configuration)
-	@tagged("plugin", "p2p-service")
-	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
-
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -32,12 +29,6 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 
 	@inject(Identifiers.P2P.Peer.Verifier)
 	private readonly peerVerifier!: Contracts.P2PService.PeerVerifier;
-
-	@inject(Identifiers.P2P.Peer.IpVerifier)
-	private readonly peerIpVerifier!: Interfaces.ConnectionVerifier;
-
-	@inject(Identifiers.P2P.Peer.Seeds)
-	private readonly seeds!: Contracts.P2PService.Seeds;
 
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
@@ -54,19 +45,22 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2PService.Logger;
 
+	// Public only because TypeScript treats a decorated private method as unused; not part of the contract.
 	@postConstruct()
-	private initialize(): void {
+	public initialize(): void {
 		this.websocketService.onConnection = (connection) => void this.#acceptConnection(connection);
 
 		this.events.listen(Events.CryptoEvent.MilestoneChanged, {
 			handle: async (): Promise<void> => this.#disconnectInvalidPeers(),
 		});
 
+		// The pool reports peers it cannot reach; the pool itself learns about peers from the repository's events.
 		this.transactionPoolWorker.registerEventHandler(Events.PeerEvent.Removed, (ip: string) => {
 			this.peerDisposer.disposePeer(ip);
 		});
 	}
 
+	// Records an address as known; the service loop dials known peers.
 	public async validateAndAcceptPeer(rawIp: string): Promise<void> {
 		const ip = IpAddress.sanitizeRemoteAddress(rawIp);
 		if (!ip) {
@@ -74,16 +68,6 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 		}
 
 		if (this.repository.hasPeer(ip) || this.repository.hasPendingPeer(ip) || this.repository.hasKnownPeer(ip)) {
-			return;
-		}
-
-		if (!this.seeds.isSeed(ip) && this.configuration.getOptional<boolean>("disableDiscovery", false)) {
-			this.logger.debug(`Rejected ${ip} because the relay is in non-discovery mode.`, "p2p");
-			return;
-		}
-
-		// The rules the transport applies to a socket, so an address we would refuse is never recorded.
-		if (this.peerIpVerifier.verify(ip) !== undefined || this.peerDisposer.isBanned(ip)) {
 			return;
 		}
 
@@ -99,23 +83,17 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 			return;
 		}
 
-		// The address rules and the ban list already ran on the transport before the handshake.
-		if (!this.seeds.isSeed(ip) && this.configuration.getOptional<boolean>("disableDiscovery", false)) {
-			this.logger.debug(`Rejected ${ip} because the relay is in non-discovery mode.`, "p2p");
-			this.peerDisposer.disposePeer(ip);
-			return;
-		}
-
 		const peer = this.repository.hasKnownPeer(ip)
 			? (this.repository.getKnownPeer(ip) as Peer)
 			: this.peerFactory(ip);
 		peer.connection = connection;
+		peer.dialFailures = 0;
 		connection.onClose(() => this.peerDisposer.disposePeer(ip));
 
 		await this.#verifyPeer(peer);
 	}
 
-	async #verifyPeer(peer: Contracts.P2PService.Peer): Promise<void> {
+	async #verifyPeer(peer: Peer): Promise<void> {
 		this.repository.forgetKnownPeer(peer);
 		this.repository.setPendingPeer(peer);
 
@@ -124,22 +102,14 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 				return;
 			}
 
-			if (this.peerDisposer.isBanned(peer.ip)) {
-				return;
-			}
-
-			// Concurrent accepts from one subnet all pass the transport's check; re-check now that they landed.
-			if (this.peerIpVerifier.verify(peer.ip) !== undefined) {
-				this.peerDisposer.disposePeer(peer.ip);
+			// A ban, a remote close or an error during the verification closed the connection; the close
+			// listener has put the peer back among the known ones.
+			if (peer.connection?.state !== ConnectionState.Open) {
 				return;
 			}
 
 			this.repository.setPeer(peer);
 			this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
-
-			void this.events.dispatch(Events.PeerEvent.Added, peer);
-
-			await this.transactionPoolWorker.setPeer(peer.ip);
 
 			await this.peerDiscoverer.discoverPeers(peer);
 		} catch {

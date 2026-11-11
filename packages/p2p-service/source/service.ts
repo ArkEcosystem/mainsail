@@ -3,14 +3,18 @@ import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { ensureError, groupBy, pluralize, shuffle } from "@mainsail/utils";
+import { CloseReason, ConnectionError } from "@mainsail/p2p-websocket";
+import { ensureError, groupBy, IpAddress, pluralize, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
+
+import type { Peer } from "./interfaces/index.js";
 
 import { constants } from "./constants.js";
 import { percentile } from "./utils/index.js";
 
 // Port of the @mainsail/p2p service without API nodes. It also owns the transport lifecycle, which the
-// old service left to the hapi server.
+// old service left to the hapi server, and the dialing of known peers, which the old connector did
+// on demand.
 @injectable()
 export class Service implements Contracts.P2PService.Service {
 	@inject(Identifiers.ServiceProvider.Configuration)
@@ -69,6 +73,7 @@ export class Service implements Contracts.P2PService.Service {
 
 	public async mainLoop(): Promise<void> {
 		try {
+			await this.#dialKnownPeers();
 			await this.#checkMinPeers();
 			await this.#checkReceivedMessages();
 		} catch (rawError) {
@@ -91,6 +96,46 @@ export class Service implements Contracts.P2PService.Service {
 
 		await this.peerDisposer.disposePeers();
 		await this.websocketService.dispose();
+	}
+
+	// Known peers become active only through a connection; this is the outbound side of that.
+	async #dialKnownPeers(): Promise<void> {
+		const now = Date.now();
+		const due = (this.repository.getKnownPeers() as Peer[]).filter(
+			(peer) => now - (peer.lastDialAt ?? 0) >= constants.DIAL_SPACING,
+		);
+
+		await Promise.all(due.map((peer) => this.#dial(peer)));
+	}
+
+	async #dial(peer: Peer): Promise<void> {
+		peer.lastDialAt = Date.now();
+
+		try {
+			await this.websocketService.dial(`ws://${IpAddress.normalizeAddress(peer.ip)}:${peer.port}`);
+			peer.dialFailures = 0;
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			this.logger.debug(`Dial to ${peer.ip}:${peer.port} failed: ${error.message}`, "p2p");
+
+			this.#forgetIfHopeless(peer, error);
+		}
+	}
+
+	// The transport refuses addresses that may not be peers (rules, bans) before opening a socket; such an
+	// address is dropped at once. One that only does not answer is dropped after repeated failures.
+	#forgetIfHopeless(peer: Peer, error: Error): void {
+		peer.dialFailures = (peer.dialFailures ?? 0) + 1;
+
+		const refused =
+			error instanceof ConnectionError &&
+			(error.reason === CloseReason.Rejected || error.reason === CloseReason.Banned);
+
+		const hopeless = peer.dialFailures >= constants.MAX_DIAL_FAILURES && !this.seeds.isSeed(peer.ip);
+
+		if ((refused || hopeless) && this.repository.hasKnownPeer(peer.ip)) {
+			this.repository.forgetKnownPeer(peer);
+		}
 	}
 
 	async #checkMinPeers(): Promise<void> {

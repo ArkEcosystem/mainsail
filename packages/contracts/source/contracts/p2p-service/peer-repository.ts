@@ -27,6 +27,13 @@ export interface PeerRepository {
 	forgetKnownPeer(peer: Peer): void;
 	hasKnownPeer(ip: string): boolean;
 
+	// Removes the peer from whichever list holds it.
+	removePeer(ip: string): void;
+
+	// An active peer that lost its connection becomes known again, so it can be dialed later; a pending
+	// one is dropped, it was never verified.
+	demotePeer(ip: string): void;
+
 	hasMinimumPeers(): boolean;
 
 	getSameSubnetPeers(ip: string): Peer[];
