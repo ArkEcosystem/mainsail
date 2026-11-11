@@ -225,6 +225,103 @@ describe<{
 		assert.false(peerRepository.hasPendingPeer("176.165.66.55"));
 	});
 
+	it("#getKnownPeers - should return the known peers", ({ peerRepository, app }) => {
+		const peers = [app.resolve(Peer).init("176.165.66.55", 4000), app.resolve(Peer).init("176.165.44.33", 4000)];
+
+		for (const peer of peers) {
+			peerRepository.setKnownPeer(peer);
+		}
+
+		assert.equal(peerRepository.getKnownPeers(), peers);
+	});
+
+	it("#hasKnownPeers - should return false if there is zero known peer", ({ peerRepository }) => {
+		assert.false(peerRepository.hasKnownPeers());
+	});
+
+	it("#hasKnownPeers - should return true if there is more than zero known peer", ({ peerRepository, app }) => {
+		const peers = [
+			app.resolve(Peer).init("176.165.66.55", 4000),
+			app.resolve(Peer).init("176.165.44.33", 4000),
+			app.resolve(Peer).init("176.165.22.11", 4000),
+			app.resolve(Peer).init("2001:3984:3989::104", 4000),
+		];
+
+		assert.false(peerRepository.hasKnownPeers());
+
+		for (const peer of peers) {
+			peerRepository.setKnownPeer(peer);
+			assert.true(peerRepository.hasKnownPeers());
+		}
+	});
+
+	it("#getKnownPeer - should return the known peer by its ip", ({ peerRepository, app }) => {
+		const peersByIp = {
+			"176.165.44.33": app.resolve(Peer).init("176.165.44.33", 4000),
+			"176.165.66.55": app.resolve(Peer).init("176.165.66.55", 4000),
+			"2001:3984:3989::104": app.resolve(Peer).init("2001:3984:3989::104", 4000),
+		};
+		for (const peer of Object.values(peersByIp)) {
+			peerRepository.setKnownPeer(peer);
+		}
+		for (const [ip, peer] of Object.entries(peersByIp)) {
+			assert.equal(peerRepository.getKnownPeer(ip), peer);
+		}
+	});
+
+	it("#getKnownPeer - should throw when no known peer exists for the ip", ({ peerRepository, app }) => {
+		const peersByIp = {
+			"176.165.44.33": app.resolve(Peer).init("176.165.44.33", 4000),
+			"176.165.66.55": app.resolve(Peer).init("176.165.66.55", 4000),
+			"2001:3984:3989::104": app.resolve(Peer).init("2001:3984:3989::104", 4000),
+		};
+		for (const peer of Object.values(peersByIp)) {
+			peerRepository.setKnownPeer(peer);
+		}
+
+		assert.throws(() => peerRepository.getKnownPeer("127.0.0.1"));
+	});
+
+	it("#setKnownPeer - should set the known peer by its ip", ({ peerRepository, app }) => {
+		const peersByIp = {
+			"176.165.44.33": app.resolve(Peer).init("176.165.44.33", 4000),
+			"176.165.66.55": app.resolve(Peer).init("176.165.66.55", 4000),
+			"2001:3984:3989::104": app.resolve(Peer).init("2001:3984:3989::104", 4000),
+		};
+		for (const peer of Object.values(peersByIp)) {
+			peerRepository.setKnownPeer(peer);
+		}
+		for (const [ip, peer] of Object.entries(peersByIp)) {
+			assert.equal(peerRepository.getKnownPeer(ip), peer);
+		}
+	});
+
+	it("#forgetKnownPeer - should forget the known peer", ({ peerRepository, app }) => {
+		const peer = app.resolve(Peer).init("176.165.66.55", 4000);
+
+		peerRepository.setKnownPeer(peer);
+
+		assert.true(peerRepository.hasKnownPeer(peer.ip));
+		assert.equal(peerRepository.getKnownPeer(peer.ip), peer);
+
+		peerRepository.forgetKnownPeer(peer);
+
+		assert.false(peerRepository.hasKnownPeer(peer.ip));
+		assert.throws(() => peerRepository.getKnownPeer(peer.ip));
+	});
+
+	it("#hasKnownPeer - should return true if the known peer exists", ({ peerRepository: peerRepository, app }) => {
+		const peer = app.resolve(Peer).init("176.165.66.55", 4000);
+
+		peerRepository.setKnownPeer(peer);
+
+		assert.true(peerRepository.hasKnownPeer(peer.ip));
+	});
+
+	it("#hasKnownPeer - should return false if the known peer does not exist", ({ peerRepository: peerRepository }) => {
+		assert.false(peerRepository.hasKnownPeer("176.165.66.55"));
+	});
+
 	it("#getSameSubnetPeers - should get the peers within same subnet of provided ip", ({
 		peerRepository: peerRepository,
 		app,
