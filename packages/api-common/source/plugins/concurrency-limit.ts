@@ -1,20 +1,14 @@
 import type Hapi from "@hapi/hapi";
 
 import Boom from "@hapi/boom";
-import mm from "micromatch";
-
-import { getIp } from "../utils/index.js";
 
 type Options = {
 	limit: number;
-	limitPerIp?: number;
-	limitPerIpWhitelist?: string[];
-	trustProxy?: boolean;
 };
 
 const slot = "concurrency-limit";
 
-const isLimited = (request: Hapi.Request): boolean =>
+export const isLimited = (request: Hapi.Request): boolean =>
 	request.route.settings.plugins?.["concurrencyLimit"]?.enabled === true;
 
 export const concurrencyLimit = {
@@ -25,24 +19,8 @@ export const concurrencyLimit = {
 			return;
 		}
 
-		const { limitPerIp = 0, limitPerIpWhitelist = [], trustProxy = false } = options;
 		const { payload, statusCode } = Boom.serverUnavailable("Too many concurrent requests").output;
-
 		let active = 0;
-		const perIp = new Map<string, number>();
-
-		const count = (ip: string, change: number): void => {
-			const total = (perIp.get(ip) ?? 0) + change;
-
-			if (total === 0) {
-				perIp.delete(ip);
-			} else {
-				perIp.set(ip, total);
-			}
-		};
-
-		const isOverLimitPerIp = (ip: string): boolean =>
-			limitPerIp > 0 && (perIp.get(ip) ?? 0) >= limitPerIp && !mm.isMatch(ip, limitPerIpWhitelist);
 
 		server.ext({
 			method: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
@@ -50,15 +28,12 @@ export const concurrencyLimit = {
 					return h.continue;
 				}
 
-				const ip = getIp(request, trustProxy);
-
-				if (active >= options.limit || isOverLimitPerIp(ip)) {
+				if (active >= options.limit) {
 					return h.response(payload).code(statusCode).takeover();
 				}
 
 				active++;
-				count(ip, 1);
-				request.plugins[slot] = ip;
+				request.plugins[slot] = true;
 
 				return h.continue;
 			},
@@ -66,11 +41,8 @@ export const concurrencyLimit = {
 		});
 
 		server.events.on("response", (request: Hapi.Request) => {
-			const ip = request.plugins[slot] as string | undefined;
-
-			if (ip !== undefined) {
+			if (request.plugins[slot]) {
 				active--;
-				count(ip, -1);
 			}
 		});
 	},

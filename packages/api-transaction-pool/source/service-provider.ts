@@ -64,10 +64,14 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 			},
 			{
 				options: {
-					...config.concurrencyLimit,
-					limitPerIpWhitelist: config.rateLimit.enabled ? config.rateLimit.whitelist : ["*"],
+					limit: config.concurrencyLimit.limitPerIp,
 					trustProxy: config.trustProxy,
+					whitelist: config.rateLimit.enabled ? config.rateLimit.whitelist : ["*"],
 				},
+				plugin: Plugins.concurrencyLimitPerIp,
+			},
+			{
+				options: { limit: config.concurrencyLimit.limit },
 				plugin: Plugins.concurrencyLimit,
 			},
 			{ plugin: Plugins.pagination },

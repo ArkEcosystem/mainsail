@@ -1,4 +1,5 @@
 export { commaArrayQuery } from "./comma-separated-query.js";
+export { concurrencyLimitPerIp } from "./concurrency-limit-per-ip.js";
 export { concurrencyLimit } from "./concurrency-limit.js";
 export { databaseReady } from "./database-ready.js";
 export { dotSeparatedQuery } from "./dot-separated-query.js";

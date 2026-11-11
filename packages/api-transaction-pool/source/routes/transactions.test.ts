@@ -408,7 +408,7 @@ describe<{
 		transactions,
 	}) => {
 		const limited = makeConfiguration();
-		limited.plugins.concurrencyLimit = { limit: 1, limitPerIp: 1 };
+		limited.plugins.concurrencyLimit = { limit: 1, limitPerIp: 0 };
 
 		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
 
@@ -456,6 +456,31 @@ describe<{
 
 			assert.is((await server.inject(from("1.1.1.1"))).statusCode, 503);
 			assert.is((await server.inject(from("2.2.2.2"))).statusCode, 200);
+
+			release();
+			assert.is((await held).statusCode, 200);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
+	it("GET /api/transactions/unconfirmed - limits concurrent reads per ip when the total limit is off", async ({
+		processor,
+		transactions,
+	}) => {
+		const limited = makeConfiguration();
+		limited.plugins.concurrencyLimit = { limit: 0, limitPerIp: 1 };
+		limited.plugins.rateLimit.enabled = true;
+
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
+
+		try {
+			const { release, waitForHeld } = await holdFirstRead(server);
+
+			const held = server.inject("/api/transactions/unconfirmed");
+			await waitForHeld();
+
+			assert.is((await server.inject("/api/transactions/unconfirmed")).statusCode, 503);
 
 			release();
 			assert.is((await held).statusCode, 200);
