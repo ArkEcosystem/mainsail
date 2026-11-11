@@ -43,7 +43,7 @@ export class TransactionsController extends AbstractController {
 		};
 	}
 
-	public async unconfirmed(request: Types.HapiRequest): Promise<object> {
+	public async unconfirmed(request: Types.HapiRequest): Promise<Contracts.Api.ResultsPage<object>> {
 		const pagination: Contracts.Api.Pagination = super.getListingPage(request);
 
 		const poolQuery = this.poolQuery.getFromHighestPriority();

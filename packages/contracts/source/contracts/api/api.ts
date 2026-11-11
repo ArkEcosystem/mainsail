@@ -37,6 +37,7 @@ export type Pagination = {
 export type ResultsPage<T> = {
 	results: T[];
 	totalCount: number;
+	nextOffset?: number;
 	meta?: { totalCountIsEstimate?: boolean };
 };
 
