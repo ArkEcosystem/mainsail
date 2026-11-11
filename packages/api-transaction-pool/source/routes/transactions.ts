@@ -41,10 +41,9 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		);
 	}
 
-	const isPeer = (ip: string): boolean =>
-		server.app.app
-			.get<Contracts.TransactionPool.PeerRepository>(Identifiers.TransactionPool.Peer.Repository)
-			.hasPeer(ip);
+	const peers = server.app.app.get<Contracts.TransactionPool.PeerRepository>(
+		Identifiers.TransactionPool.Peer.Repository,
+	);
 
 	server.route({
 		handler: (request: Types.HapiRequest) => controller.store(request),
@@ -58,7 +57,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 			plugins: {
 				rateLimit: {
 					points: (request: Types.HapiRequest, ip: string) =>
-						isPeer(ip) ? 1 : (request.payload as { transactions: string[] }).transactions.length,
+						peers.hasPeer(ip) ? 1 : (request.payload as { transactions: string[] }).transactions.length,
 				},
 			},
 			validate: {
