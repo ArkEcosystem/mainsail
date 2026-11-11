@@ -6,7 +6,6 @@ import { Identifiers } from "@mainsail/constants";
 import Joi from "joi";
 
 import { TransactionsController } from "../controllers/transactions.js";
-import { pagination } from "../schemas.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(TransactionsController);
@@ -60,6 +59,9 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		method: "GET",
 		options: {
 			plugins: {
+				concurrencyLimit: {
+					enabled: true,
+				},
 				pagination: {
 					enabled: true,
 				},
@@ -69,7 +71,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					address: Schemas.orEqualCriteria(Schemas.addressSchema),
 					from: Schemas.orEqualCriteria(Schemas.addressSchema),
 					to: Schemas.orEqualCriteria(Schemas.addressSchema),
-				}).concat(pagination),
+				}).concat(Schemas.pagination),
 			},
 		},
 		path: "/transactions/unconfirmed",
@@ -79,6 +81,11 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		handler: (request: Types.HapiRequest) => controller.showUnconfirmed(request),
 		method: "GET",
 		options: {
+			plugins: {
+				concurrencyLimit: {
+					enabled: true,
+				},
+			},
 			validate: {
 				params: Joi.object({
 					// The pool stores hashes lowercase; accept any casing like the address filters do.

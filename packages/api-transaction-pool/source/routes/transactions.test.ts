@@ -1,9 +1,46 @@
+import type { Plugin } from "@hapi/hapi";
+
 import { describe } from "@mainsail/test-runner";
 
 import { makeTransaction } from "../../test/fixtures/transactions";
 import { bootstrapServer, makeConfiguration } from "../../test/helpers/server";
 import { Server } from "../server";
 import { ServiceProvider } from "../service-provider";
+
+const holdFirstRead = async (server: Server) => {
+	let held = false;
+	let release!: () => void;
+	const released = new Promise<void>((resolve) => (release = resolve));
+
+	const plugin: Plugin<unknown> = {
+		name: "hold-first-read",
+		register: (hapi) =>
+			hapi.ext("onPostHandler", async (request, h) => {
+				if (!held && request.method === "get" && request.path.startsWith("/api/transactions/unconfirmed")) {
+					held = true;
+					await released;
+				}
+
+				return h.continue;
+			}),
+	};
+
+	await server.registerPlugins([{ plugin }]);
+
+	const waitForHeld = async () => {
+		const startedAt = Date.now();
+
+		while (!held) {
+			if (Date.now() - startedAt > 1000) {
+				throw new Error("No read was held");
+			}
+
+			await new Promise((resolve) => setImmediate(resolve));
+		}
+	};
+
+	return { release, waitForHeld };
+};
 
 describe<{
 	server: Server;
@@ -199,6 +236,32 @@ describe<{
 		assert.equal(body.data[0].hash, transactions[1].hash);
 	});
 
+	it("GET /api/transactions/unconfirmed - paginates with limit and offset", async ({ server, transactions }) => {
+		const response = await server.inject({
+			method: "GET",
+			url: "/api/transactions/unconfirmed?limit=1&offset=1",
+		});
+
+		assert.is(response.statusCode, 200);
+
+		const body = JSON.parse(response.payload);
+		assert.is(body.meta.totalCount, 2);
+		assert.length(body.data, 1);
+		assert.equal(body.data[0].hash, transactions[1].hash);
+		assert.is(body.meta.self, "/transactions/unconfirmed?limit=1&offset=1");
+		assert.is(body.meta.previous, "/transactions/unconfirmed?limit=1&offset=0");
+		assert.null(body.meta.next);
+	});
+
+	it("GET /api/transactions/unconfirmed - rejects a negative offset", async ({ server }) => {
+		const response = await server.inject({
+			method: "GET",
+			url: "/api/transactions/unconfirmed?offset=-1",
+		});
+
+		assert.is(response.statusCode, 422);
+	});
+
 	it("GET /api/transactions/unconfirmed - rejects a limit above the configured maximum", async ({ server }) => {
 		const response = await server.inject({
 			method: "GET",
@@ -283,6 +346,48 @@ describe<{
 		}
 	});
 
+	it("GET /api/transactions/unconfirmed - links the next offset when the byte budget ends the page", async ({
+		processor,
+	}) => {
+		const transactions = [1, 2, 3].map((n) => {
+			const transaction = makeTransaction(n);
+			const data = { ...transaction.toData(), data: "ab".repeat(1000) };
+
+			return { ...transaction, toData: () => data };
+		});
+
+		const limited = makeConfiguration();
+		limited.plugins.pagination.maxBytes = 6000;
+
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
+
+		try {
+			let response = await server.inject({ method: "GET", url: "/api/transactions/unconfirmed?limit=3" });
+			assert.is(response.statusCode, 200);
+
+			let body = JSON.parse(response.payload);
+			assert.equal(
+				body.data.map(({ hash }) => hash),
+				[transactions[0].hash, transactions[1].hash],
+			);
+			assert.is(body.meta.count, 2);
+			assert.is(body.meta.totalCount, 3);
+			assert.is(body.meta.next, "/transactions/unconfirmed?limit=3&offset=2");
+
+			response = await server.inject({ method: "GET", url: `/api${body.meta.next}` });
+			assert.is(response.statusCode, 200);
+
+			body = JSON.parse(response.payload);
+			assert.equal(
+				body.data.map(({ hash }) => hash),
+				[transactions[2].hash],
+			);
+			assert.null(body.meta.next);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
 	it("GET /api/transactions/unconfirmed - accepts comma separated address lists", async ({
 		server,
 		transactions,
@@ -297,6 +402,125 @@ describe<{
 		assert.is(response.statusCode, 200);
 		assert.length(JSON.parse(response.payload).data, 2);
 	});
+
+	it("GET /api/transactions/unconfirmed - rejects reads past the concurrency limit but no other routes", async ({
+		processor,
+		transactions,
+	}) => {
+		const limited = makeConfiguration();
+		limited.plugins.concurrencyLimit = { limit: 1, limitPerIp: 0 };
+
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
+
+		try {
+			const { release, waitForHeld } = await holdFirstRead(server);
+
+			const held = server.inject("/api/transactions/unconfirmed");
+			await waitForHeld();
+
+			assert.is((await server.inject("/api/transactions/unconfirmed")).statusCode, 503);
+			assert.is((await server.inject(`/api/transactions/unconfirmed/${transactions[0].hash}`)).statusCode, 503);
+			assert.is(
+				(await server.inject({ method: "POST", payload: { transactions: ["aa"] }, url: "/api/transactions" }))
+					.statusCode,
+				200,
+			);
+			assert.is((await server.inject("/api/configuration")).statusCode, 200);
+			assert.is((await server.inject("/")).statusCode, 200);
+
+			release();
+			assert.is((await held).statusCode, 200);
+			assert.is((await server.inject("/api/transactions/unconfirmed")).statusCode, 200);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
+	it("GET /api/transactions/unconfirmed - limits concurrent reads per forwarded ip behind a trusted proxy", async ({
+		processor,
+		transactions,
+	}) => {
+		const limited = makeConfiguration();
+		limited.plugins.concurrencyLimit = { limit: 10, limitPerIp: 1 };
+		limited.plugins.trustProxy = true;
+
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
+		const from = (ip: string) => ({ headers: { "x-forwarded-for": ip }, url: "/api/transactions/unconfirmed" });
+
+		try {
+			const { release, waitForHeld } = await holdFirstRead(server);
+
+			const held = server.inject(from("1.1.1.1"));
+			await waitForHeld();
+
+			assert.is((await server.inject(from("1.1.1.1"))).statusCode, 429);
+			assert.is((await server.inject(from("2.2.2.2"))).statusCode, 200);
+
+			release();
+			assert.is((await held).statusCode, 200);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
+	it("GET /api/transactions/unconfirmed - limits concurrent reads per ip when the total limit is off", async ({
+		processor,
+		transactions,
+	}) => {
+		const limited = makeConfiguration();
+		limited.plugins.concurrencyLimit = { limit: 0, limitPerIp: 1 };
+
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
+
+		try {
+			const { release, waitForHeld } = await holdFirstRead(server);
+
+			const held = server.inject("/api/transactions/unconfirmed");
+			await waitForHeld();
+
+			assert.is((await server.inject("/api/transactions/unconfirmed")).statusCode, 429);
+
+			release();
+			assert.is((await held).statusCode, 200);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
+	for (const [label, enabled] of [
+		["enabled", true],
+		["disabled", false],
+	] as const) {
+		it(`GET /api/transactions/unconfirmed - does not limit concurrent reads per ip for ips the rate limit whitelists while rate limiting is ${label}`, async ({
+			processor,
+			transactions,
+		}) => {
+			const limited = makeConfiguration();
+			limited.plugins.concurrencyLimit = { limit: 10, limitPerIp: 1 };
+			limited.plugins.rateLimit = { ...limited.plugins.rateLimit, enabled, whitelist: ["1.1.1.*"] };
+			limited.plugins.trustProxy = true;
+
+			const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
+			const from = (ip: string) => ({
+				headers: { "x-forwarded-for": ip },
+				url: "/api/transactions/unconfirmed",
+			});
+
+			try {
+				const { release, waitForHeld } = await holdFirstRead(server);
+
+				const held = server.inject(from("1.1.1.1"));
+				await waitForHeld();
+
+				assert.is((await server.inject(from("1.1.1.1"))).statusCode, 200);
+
+				release();
+				assert.is((await held).statusCode, 200);
+			} finally {
+				await serviceProvider.dispose();
+			}
+		});
+	}
 
 	it("GET /api/transactions/unconfirmed/{hash} - returns a single json-safe transaction", async ({
 		server,

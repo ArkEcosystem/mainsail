@@ -157,7 +157,10 @@ describe<{
 		const result = serviceProvider.configSchema().validate(defaults);
 		assert.undefined(result.error);
 
+		assert.number(result.value.plugins.concurrencyLimit.limit);
+		assert.number(result.value.plugins.concurrencyLimit.limitPerIp);
 		assert.number(result.value.plugins.pagination.limit);
+		assert.number(result.value.plugins.pagination.maxBytes);
 		assert.array(result.value.plugins.rateLimit.blacklist);
 		assert.number(result.value.plugins.rateLimit.duration);
 		assert.boolean(result.value.plugins.rateLimit.enabled);
@@ -251,6 +254,26 @@ describe<{
 		assert.equal(result.value.plugins.rateLimit.points, 500);
 	});
 
+	it("should parse process.env.MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS", async ({ serviceProvider }) => {
+		process.env.MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS = "0";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.plugins.concurrencyLimit.limit, 0);
+	});
+
+	it("should parse process.env.MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS_PER_IP", async ({
+		serviceProvider,
+	}) => {
+		process.env.MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS_PER_IP = "8";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.plugins.concurrencyLimit.limitPerIp, 8);
+	});
+
 	it("#schemaRestrictions - plugins is required && is object", async ({ serviceProvider }) => {
 		const defaults = await importDefaults();
 		defaults.plugins = false;
@@ -263,6 +286,52 @@ describe<{
 
 		assert.equal(result.error?.message, '"plugins" is required');
 	});
+
+	it("#schemaRestrictions - plugins.concurrencyLimit is required && is object", async ({ serviceProvider }) => {
+		const defaults = await importDefaults();
+		defaults.plugins.concurrencyLimit = false;
+		let result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.concurrencyLimit" must be of type object');
+
+		delete defaults.plugins.concurrencyLimit;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.concurrencyLimit" is required');
+	});
+
+	for (const [key, minimum] of [
+		["limit", 0],
+		["limitPerIp", 0],
+	] as const) {
+		it(`#schemaRestrictions - plugins.concurrencyLimit.${key} is required && is integer && >= ${minimum}`, async ({
+			serviceProvider,
+		}) => {
+			const defaults = await importDefaults();
+			defaults.plugins.concurrencyLimit[key] = false;
+			let result = serviceProvider.configSchema().validate(defaults);
+
+			assert.equal(result.error?.message, `"plugins.concurrencyLimit.${key}" must be a number`);
+
+			defaults.plugins.concurrencyLimit[key] = 1.12;
+			result = serviceProvider.configSchema().validate(defaults);
+
+			assert.equal(result.error?.message, `"plugins.concurrencyLimit.${key}" must be an integer`);
+
+			defaults.plugins.concurrencyLimit[key] = minimum - 1;
+			result = serviceProvider.configSchema().validate(defaults);
+
+			assert.equal(
+				result.error?.message,
+				`"plugins.concurrencyLimit.${key}" must be greater than or equal to ${minimum}`,
+			);
+
+			delete defaults.plugins.concurrencyLimit[key];
+			result = serviceProvider.configSchema().validate(defaults);
+
+			assert.equal(result.error?.message, `"plugins.concurrencyLimit.${key}" is required`);
+		});
+	}
 
 	it("#schemaRestrictions - plugins.pagination is required && is object", async ({ serviceProvider }) => {
 		const defaults = await importDefaults();
@@ -300,6 +369,31 @@ describe<{
 		result = serviceProvider.configSchema().validate(defaults);
 
 		assert.equal(result.error?.message, '"plugins.pagination.limit" is required');
+	});
+
+	it("#schemaRestrictions - plugins.pagination.maxBytes is required && is integer && >= 1", async ({
+		serviceProvider,
+	}) => {
+		const defaults = await importDefaults();
+		defaults.plugins.pagination.maxBytes = false;
+		let result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.pagination.maxBytes" must be a number');
+
+		defaults.plugins.pagination.maxBytes = 1.12;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.pagination.maxBytes" must be an integer');
+
+		defaults.plugins.pagination.maxBytes = 0;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.pagination.maxBytes" must be greater than or equal to 1');
+
+		delete defaults.plugins.pagination.maxBytes;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.pagination.maxBytes" is required');
 	});
 
 	it("#schemaRestrictions - plugins.rateLimit is required && is object", async ({ serviceProvider }) => {

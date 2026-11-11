@@ -30,6 +30,10 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 
 	protected getPlugins(): Plugin<unknown>[] {
 		const config = this.config().getRequired<{
+			concurrencyLimit: {
+				limit: number;
+				limitPerIp: number;
+			};
 			trustProxy: boolean;
 			whitelist: string[];
 			socketTimeout: number;
@@ -58,6 +62,18 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				},
 				plugin: Plugins.rateLimit,
 			},
+			{
+				options: {
+					limit: config.concurrencyLimit.limitPerIp,
+					trustProxy: config.trustProxy,
+					whitelist: config.rateLimit.whitelist,
+				},
+				plugin: Plugins.concurrencyLimitPerIp,
+			},
+			{
+				options: { limit: config.concurrencyLimit.limit },
+				plugin: Plugins.concurrencyLimit,
+			},
 			{ plugin: Plugins.pagination },
 		] as unknown as Plugin<unknown>[];
 	}
@@ -66,8 +82,13 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 		return super.configSchema().concat(
 			Joi.object({
 				plugins: Joi.object({
+					concurrencyLimit: Joi.object({
+						limit: Joi.number().integer().min(0).required(),
+						limitPerIp: Joi.number().integer().min(0).required(),
+					}).required(),
 					pagination: Joi.object({
 						limit: Joi.number().integer().min(0).required(),
+						maxBytes: Joi.number().integer().min(1).required(),
 					}).required(),
 					rateLimit: Joi.object({
 						blacklist: Joi.array().items(Joi.string()).required(),

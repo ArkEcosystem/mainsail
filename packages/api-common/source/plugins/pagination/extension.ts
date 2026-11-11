@@ -102,7 +102,7 @@ export class Extension {
 
 				last: links.last,
 
-				next: links.next,
+				next: this.getNextLink(request, links.next, source["nextOffset"]),
 				pageCount: pageCount,
 
 				previous: links.previous,
@@ -135,11 +135,7 @@ export class Extension {
 	): Record<"first" | "last" | "next" | "previous" | "self", string | null> {
 		const { limit, offset, page } = request.query;
 
-		// strip prefix in baseUri, we want a "clean" relative path
-		const baseUri = request.url.pathname.slice(this.routePathPrefix.length) + "?";
-		const query = flatten({ ...request.query, ...request.orig.query });
-		const getUri = (position: { page: number } | { offset: number }): string =>
-			baseUri + Qs.stringify({ ...query, ...position });
+		const getUri = (position: { page: number } | { offset: number }): string => this.getUri(request, position);
 
 		if (offset === undefined) {
 			return {
@@ -150,8 +146,6 @@ export class Extension {
 				self: getUri({ page }),
 			};
 		}
-
-		delete query.page;
 
 		const maxDepth: number = get(this.config, "maxDepth") ?? Number.POSITIVE_INFINITY;
 
@@ -165,6 +159,29 @@ export class Extension {
 			previous: offset > 0 ? getUri({ offset: Math.max(0, offset - limit) }) : null,
 			self: getUri({ offset }),
 		};
+	}
+
+	private getNextLink(request: HapiRequest, next: string | null, nextOffset: number | undefined): string | null {
+		if (nextOffset === undefined) {
+			return next;
+		}
+
+		const maxDepth: number = get(this.config, "maxDepth") ?? Number.POSITIVE_INFINITY;
+
+		return nextOffset + request.query.limit <= maxDepth ? this.getUri(request, { offset: nextOffset }) : null;
+	}
+
+	private getUri(request: HapiRequest, position: { page: number } | { offset: number }): string {
+		const query = flatten({ ...request.query, ...request.orig.query });
+
+		if ("offset" in position) {
+			delete query.page;
+		}
+
+		// strip prefix in baseUri, we want a "clean" relative path
+		const baseUri = request.url.pathname.slice(this.routePathPrefix.length) + "?";
+
+		return baseUri + Qs.stringify({ ...query, ...position });
 	}
 
 	private getRoutePaginationOptions(request: HapiRequest): { enabled: boolean } | undefined {
