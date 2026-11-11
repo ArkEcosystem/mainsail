@@ -1,3 +1,4 @@
+import { IpAddress } from "@mainsail/utils";
 import ipaddr from "ipaddr.js";
 import os from "os";
 
@@ -31,13 +32,7 @@ export const isPublicHttpUrl = (urlString: string): boolean => {
 	return ipaddr.isValid(hostname) ? isPublicIp(hostname) : true;
 };
 
-export const sanitizeRemoteAddress = (ip: string): string | undefined => {
-	try {
-		return ipaddr.process(ip).toString();
-	} catch {
-		return undefined;
-	}
-};
+export const sanitizeRemoteAddress = (ip: string): string | undefined => IpAddress.canonicalAddress(ip);
 export const isLocalHost = (ip: string, includeNetworkInterfaces = true): boolean => {
 	try {
 		if (ip.startsWith("0") || ["127.0.0.1", "::ffff:127.0.0.1", "::1"].includes(ip)) {
