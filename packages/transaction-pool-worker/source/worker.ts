@@ -157,11 +157,16 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		await this.#sendIfRunning("reloadWebhooks");
 	}
 
-	async #commit(...arguments_: unknown[]): Promise<void> {
+	async #commit(
+		blockNumber: number,
+		sendersAddresses: string[],
+		consumedGas: number,
+		isSyncing: boolean,
+	): Promise<void> {
 		const timeout = setTimeout(() => this.#respawn(), COMMIT_TIMEOUT);
 
 		try {
-			await this.#sendIfRunning("commit", ...arguments_);
+			await this.#sendIfRunning("commit", blockNumber, sendersAddresses, consumedGas, isSyncing);
 		} catch (error) {
 			this.#stopping = true;
 			void this.app.terminate("tx-pool worker failed to commit", error as Error);
