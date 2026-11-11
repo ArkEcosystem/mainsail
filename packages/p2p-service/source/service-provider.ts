@@ -78,6 +78,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async boot(): Promise<void> {
 		const websocketService = this.app.get<WebSocketService>(Identifiers.P2P.WebSocket.Service);
 
+		// Constructing the processor installs its accept and connection hooks on the transport.
+		this.app.get<Contracts.P2PService.PeerProcessor>(Identifiers.P2P.Peer.Processor);
+
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const routes: Contracts.Kernel.Container.Newable<Interfaces.Route<any, any>>[] = [
 			GetBlocksRoute,

@@ -1,6 +1,5 @@
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
-import { CloseReason } from "@mainsail/p2p-websocket";
 import { describe } from "@mainsail/test-runner";
 import dayjs from "dayjs";
 
@@ -22,18 +21,16 @@ describe<{
 	state: any;
 	logger: any;
 	peerDiscoverer: any;
-	peerProcessor: any;
 	peerDisposer: any;
 	websocketService: any;
 	configuration: any;
 }>("Service", ({ it, beforeEach, assert, clock, spy, stub }) => {
 	beforeEach((context) => {
 		context.logger = { debug: () => {}, error: () => {}, info: () => {}, warn: () => {} };
-		context.repository = { getPeers: () => [], hasMinimumPeers: () => true, hasPeer: () => false };
+		context.repository = { getPeers: () => [], hasMinimumPeers: () => true };
 		context.peerVerifier = { verify: async () => true };
 		context.state = { getLastMessageTime: () => dayjs() };
 		context.peerDiscoverer = { discoverPeers: async () => {}, populateSeedPeers: async () => {} };
-		context.peerProcessor = { validateAndAcceptPeer: async () => {}, validatePeerIp: () => true };
 		context.peerDisposer = { disposePeers: async () => {} };
 		context.websocketService = {
 			accept: undefined,
@@ -49,7 +46,6 @@ describe<{
 			.whenTagged("plugin", "p2p-service");
 		app.bind(Identifiers.P2P.State).toConstantValue(context.state);
 		app.bind(Identifiers.P2P.Peer.Discoverer).toConstantValue(context.peerDiscoverer);
-		app.bind(Identifiers.P2P.Peer.Processor).toConstantValue(context.peerProcessor);
 		app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue(context.peerDisposer);
 		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
 		app.bind(Identifiers.P2P.Peer.Verifier).toConstantValue(context.peerVerifier);
@@ -473,7 +469,6 @@ describe<{
 	it("#boot - should start the transport, populate seed peers, log discovered versions and start the loop", async ({
 		service,
 		websocketService,
-		peerProcessor,
 		peerDisposer,
 		peerDiscoverer,
 		repository,
@@ -491,7 +486,6 @@ describe<{
 			];
 			const boot = spy(websocketService, "boot");
 			const populateSeedPeers = spy(peerDiscoverer, "populateSeedPeers");
-			const validateAndAcceptPeer = spy(peerProcessor, "validateAndAcceptPeer");
 			const info = spy(logger, "info");
 
 			await service.boot();
@@ -502,15 +496,6 @@ describe<{
 			info.calledWith("Discovered 2 peers with v0.0.1.", "p2p");
 			info.calledWith("Discovered 1 peer with v0.0.2.", "p2p");
 
-			// Inbound sockets are checked by the processor unless the peer is known; connections are handed to it.
-			assert.undefined(websocketService.accept("5.5.5.5"));
-			peerProcessor.validatePeerIp = () => false;
-			assert.equal(websocketService.accept("5.5.5.5"), CloseReason.Rejected);
-			repository.hasPeer = () => true;
-			assert.undefined(websocketService.accept("5.5.5.5"));
-			websocketService.onConnection({ remoteAddress: "5.5.5.5" });
-			validateAndAcceptPeer.calledWith("5.5.5.5");
-
 			// The loop timer is pending; dispose cancels it, disconnects the peers and then stops the transport.
 			const calls: string[] = [];
 			peerDisposer.disposePeers = async () => void calls.push("disposePeers");
@@ -519,8 +504,6 @@ describe<{
 			await service.dispose();
 			assert.equal(fakeTimers.countTimers(), 0);
 			assert.equal(calls, ["disposePeers", "transport"]);
-			assert.undefined(websocketService.accept);
-			assert.undefined(websocketService.onConnection);
 		} finally {
 			await service.dispose();
 

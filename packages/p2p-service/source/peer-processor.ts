@@ -1,20 +1,33 @@
 import type { Contracts } from "@mainsail/contracts";
+import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
+import { CloseReason } from "@mainsail/p2p-websocket";
 import { IpAddress, isBlacklisted, isWhitelisted } from "@mainsail/utils";
+
+import type { Peer } from "./interfaces/index.js";
 
 import { isValidVersion } from "./utils/index.js";
 
-// Copied from @mainsail/p2p without the tx pool node and API node checks, which leave this package.
+// Port of the @mainsail/p2p processor without the tx pool node and API node checks. Unlike the old
+// one it never connects: addresses are only recorded as known, and a peer is verified when the
+// transport reports its open connection. The transport hooks replace the accept-peer and validate-ip
+// plugins.
 @injectable()
 export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p-service")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
+
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
+	@inject(Identifiers.P2P.WebSocket.Service)
+	private readonly websocketService!: WebSocketService;
+
+	@inject(Identifiers.P2P.Peer.Factory)
+	private readonly peerFactory!: (ip: string) => Peer;
 
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2PService.PeerRepository;
@@ -41,6 +54,11 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 
 	@postConstruct()
 	public initialize(): void {
+		// Banned addresses are already refused by the transport; known peers skip the rules they passed.
+		this.websocketService.accept = (ip) =>
+			this.repository.hasPeer(ip) || this.#validatePeerIp(ip) ? undefined : CloseReason.Rejected;
+		this.websocketService.onConnection = (connection) => void this.#acceptConnection(connection);
+
 		this.events.listen(Events.CryptoEvent.MilestoneChanged, {
 			handle: async (): Promise<void> => this.#disconnectInvalidPeers(),
 		});
@@ -48,10 +66,6 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 		this.transactionPoolWorker.registerEventHandler(Events.PeerEvent.Removed, (ip: string) => {
 			this.peerDisposer.disposePeer(ip);
 		});
-	}
-
-	public isWhitelisted(peer: Contracts.P2PService.Peer): boolean {
-		return isWhitelisted(this.configuration.getOptional<string[]>("remoteAccess", []), peer.ip);
 	}
 
 	public async validateAndAcceptPeer(
@@ -67,7 +81,7 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 			this.#seedIps.add(ip);
 		}
 
-		if (this.repository.hasPeer(ip) || this.repository.hasPendingPeer(ip)) {
+		if (this.repository.hasPeer(ip) || this.repository.hasPendingPeer(ip) || this.repository.hasKnownPeer(ip)) {
 			return;
 		}
 
@@ -76,12 +90,41 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 			return;
 		}
 
-		if (this.validatePeerIp(ip, options)) {
-			await this.#acceptNewPeer(ip, options);
+		if (this.#validatePeerIp(ip, options)) {
+			this.repository.setKnownPeer(this.peerFactory(ip));
+			this.logger.debug(`Discovered peer ${ip}`, "p2p");
 		}
 	}
 
-	public validatePeerIp(ip: string, options: Contracts.P2PService.AcceptNewPeerOptions = {}): boolean {
+	// Every open connection, inbound or outbound, is bound to its peer here and the peer is verified over it.
+	async #acceptConnection(connection: Interfaces.Connection): Promise<void> {
+		const ip = connection.remoteAddress;
+
+		if (this.repository.hasPeer(ip) || this.repository.hasPendingPeer(ip)) {
+			return;
+		}
+
+		// Inbound peers we did not learn about through discovery or the seeds; the same rules apply to them.
+		if (!this.#isSeed(ip, {}) && this.configuration.getOptional<boolean>("disableDiscovery", false)) {
+			this.logger.debug(`Rejected ${ip} because the relay is in non-discovery mode.`, "p2p");
+			this.peerDisposer.disposePeer(ip);
+			return;
+		}
+
+		if (!this.#validatePeerIp(ip)) {
+			this.peerDisposer.disposePeer(ip);
+			return;
+		}
+
+		const peer = this.repository.hasKnownPeer(ip)
+			? (this.repository.getKnownPeer(ip) as Peer)
+			: this.peerFactory(ip);
+		peer.connection = connection;
+
+		await this.#verifyPeer(peer);
+	}
+
+	#validatePeerIp(ip: string, options: Contracts.P2PService.AcceptNewPeerOptions = {}): boolean {
 		if (!IpAddress.isValidPeerIp(ip)) {
 			return false;
 		}
@@ -124,9 +167,8 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 		return true;
 	}
 
-	async #acceptNewPeer(ip: string, options: Contracts.P2PService.AcceptNewPeerOptions): Promise<void> {
-		const peer = this.app.get<Contracts.P2PService.PeerFactory>(Identifiers.P2P.Peer.Factory)(ip);
-
+	async #verifyPeer(peer: Contracts.P2PService.Peer): Promise<void> {
+		this.repository.forgetKnownPeer(peer);
 		this.repository.setPendingPeer(peer);
 
 		try {
@@ -138,8 +180,8 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 				return;
 			}
 
-			if (this.#isSameSubnetLimitReached(peer.ip, options)) {
-				this.peerDisposer.disposePeer(ip);
+			if (this.#isSameSubnetLimitReached(peer.ip, {})) {
+				this.peerDisposer.disposePeer(peer.ip);
 				return;
 			}
 
@@ -151,8 +193,8 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 			await this.transactionPoolWorker.setPeer(peer.ip);
 
 			await this.peerDiscoverer.discoverPeers(peer);
-		} catch (rawError) {
-			this.peerDisposer.disposePeer(ip);
+		} catch {
+			this.peerDisposer.disposePeer(peer.ip);
 		} finally {
 			this.repository.forgetPendingPeer(peer);
 		}

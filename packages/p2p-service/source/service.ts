@@ -3,7 +3,6 @@ import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { CloseReason } from "@mainsail/p2p-websocket";
 import { ensureError, groupBy, pluralize, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
@@ -26,9 +25,6 @@ export class Service implements Contracts.P2PService.Service {
 
 	@inject(Identifiers.P2P.Peer.Discoverer)
 	private readonly peerDiscoverer!: Contracts.P2PService.PeerDiscoverer;
-
-	@inject(Identifiers.P2P.Peer.Processor)
-	private readonly peerProcessor!: Contracts.P2PService.PeerProcessor;
 
 	@inject(Identifiers.P2P.Peer.Verifier)
 	private readonly peerVerifier!: Contracts.P2PService.PeerVerifier;
@@ -54,11 +50,6 @@ export class Service implements Contracts.P2PService.Service {
 			return;
 		}
 
-		// Replaces the validate-ip plugin; banned addresses are already refused by the transport.
-		this.websocketService.accept = (ip) =>
-			this.repository.hasPeer(ip) || this.peerProcessor.validatePeerIp(ip) ? undefined : CloseReason.Rejected;
-		this.websocketService.onConnection = (connection) =>
-			void this.peerProcessor.validateAndAcceptPeer(connection.remoteAddress);
 		await this.websocketService.boot();
 
 		await this.peerDiscoverer.populateSeedPeers();
