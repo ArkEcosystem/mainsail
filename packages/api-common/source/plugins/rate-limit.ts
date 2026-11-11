@@ -103,6 +103,17 @@ export const rateLimit = {
 					return h.continue;
 				}
 
+				const left = await rateLimiter.get(ip);
+
+				if (left && points > left.remainingPoints) {
+					request.plugins["rate-limit"] = {
+						remaining: left.remainingPoints,
+						reset: Date.now() + left.msBeforeNext,
+					} as RateLimitPluginData;
+
+					return Boom.tooManyRequests();
+				}
+
 				return (await consume(request, ip, points)) ?? h.continue;
 			},
 			type: "onPreHandler",
