@@ -168,8 +168,10 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		try {
 			await this.#sendIfRunning("commit", blockNumber, sendersAddresses, consumedGas, isSyncing);
 		} catch (error) {
-			this.#stopping = true;
-			void this.app.terminate("tx-pool worker failed to commit", error as Error);
+			if (!this.#stopping) {
+				this.#stopping = true;
+				void this.app.terminate("tx-pool worker failed to commit", error as Error);
+			}
 		} finally {
 			clearTimeout(timeout);
 		}
