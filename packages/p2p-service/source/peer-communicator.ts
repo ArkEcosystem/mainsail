@@ -131,7 +131,11 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 
 		peer.lastDialAt = Date.now();
-		const connection = await this.websocketService.dial(`ws://${IpAddress.normalizeAddress(peer.ip)}:${peer.port}`);
+		await this.websocketService.dial(`ws://${IpAddress.normalizeAddress(peer.ip)}:${peer.port}`);
+
+		// TEMPORARY until the service owns dialing: the open connection is in the transport repository.
+		const connection = this.connections.get(peer.ip);
+		assert.defined(connection);
 		this.#attach(peer, connection);
 
 		return connection;

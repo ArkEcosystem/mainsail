@@ -13,7 +13,8 @@ import { CloseReason } from "./enums.js";
 
 // The one object the p2p layer talks to. It only delegates: lifecycle to the server, routes to the
 // router, inbound sockets to the listener, outbound ones to the dialer, bans to the ban list.
-// Deciding whom to accept or ban stays with the caller through `accept` and `ban`.
+// Deciding whom to accept or ban stays with the caller through `accept` and `ban`; connections
+// reach the caller only through `onConnection`, never before their handshake is done.
 @injectable()
 export class Service {
 	@inject(Identifiers.P2P.WebSocket.Server)
@@ -62,15 +63,17 @@ export class Service {
 		this.listener.accept = hook;
 	}
 
-	// Fires for inbound connections once their handshake has completed.
+	// Fires for every connection, inbound or outbound, once its handshake has completed.
 	public set onConnection(handler: ((connection: Connection) => void) | undefined) {
 		this.listener.onConnection = handler;
+		this.dialer.onConnection = handler;
 	}
 
 	// Outbound
 
-	public async dial(url: string): Promise<Connection> {
-		return this.dialer.dial(url);
+	// Resolves once the connection is open and `onConnection` has been called; rejects on failure.
+	public async dial(url: string): Promise<void> {
+		await this.dialer.dial(url);
 	}
 
 	// Graceful close of the connection to an address, if there is one.
