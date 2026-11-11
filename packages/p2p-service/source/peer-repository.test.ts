@@ -1,4 +1,4 @@
-import { Identifiers } from "@mainsail/constants";
+import { Events, Identifiers } from "@mainsail/constants";
 
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
@@ -340,5 +340,73 @@ describe<{
 		assert.equal(peerRepository.getSameSubnetPeers("176.165.66.10").length, 2);
 		assert.equal(peerRepository.getSameSubnetPeers("176.165.22.99").length, 1);
 		assert.equal(peerRepository.getSameSubnetPeers("176.165.23.10").length, 0);
+	});
+
+	it("#removePeer - should remove the peer from whichever list holds it", ({ peerRepository, app }) => {
+		const active = app.resolve(Peer).init("176.165.66.55", 4000);
+		const pending = app.resolve(Peer).init("176.165.44.33", 4000);
+		const known = app.resolve(Peer).init("176.165.22.11", 4000);
+		peerRepository.setPeer(active);
+		peerRepository.setPendingPeer(pending);
+		peerRepository.setKnownPeer(known);
+
+		peerRepository.removePeer(active.ip);
+		peerRepository.removePeer(pending.ip);
+		peerRepository.removePeer(known.ip);
+		peerRepository.removePeer("1.1.1.1");
+
+		assert.false(peerRepository.hasPeer(active.ip));
+		assert.false(peerRepository.hasPendingPeer(pending.ip));
+		assert.false(peerRepository.hasKnownPeer(known.ip));
+	});
+
+	it("should announce active peers being set and forgotten, but not pending or known ones", ({
+		peerRepository,
+		app,
+	}) => {
+		const dispatch = spy(eventDispatcher, "dispatch");
+		const active = app.resolve(Peer).init("176.165.66.55", 4000);
+		const pending = app.resolve(Peer).init("176.165.44.33", 4000);
+		const known = app.resolve(Peer).init("176.165.22.11", 4000);
+
+		peerRepository.setPeer(active);
+		dispatch.calledWith(Events.PeerEvent.Added, active);
+
+		peerRepository.setPendingPeer(pending);
+		peerRepository.setKnownPeer(known);
+		peerRepository.removePeer(pending.ip);
+		peerRepository.removePeer(known.ip);
+		dispatch.calledOnce();
+
+		peerRepository.removePeer(active.ip);
+		dispatch.calledWith(Events.PeerEvent.Removed, active);
+		dispatch.calledTimes(2);
+
+		// Forgetting a peer that is not active announces nothing.
+		peerRepository.forgetPeer(active);
+		dispatch.calledTimes(2);
+	});
+
+	it("#demotePeer - should turn an active peer into a known one and drop a pending one", ({
+		peerRepository,
+		app,
+	}) => {
+		const active = app.resolve(Peer).init("176.165.66.55", 4000);
+		const pending = app.resolve(Peer).init("176.165.44.33", 4000);
+		peerRepository.setPeer(active);
+		peerRepository.setPendingPeer(pending);
+
+		peerRepository.demotePeer(active.ip);
+		assert.false(peerRepository.hasPeer(active.ip));
+		assert.equal(peerRepository.getKnownPeer(active.ip), active);
+
+		peerRepository.demotePeer(pending.ip);
+		assert.false(peerRepository.hasPendingPeer(pending.ip));
+		assert.false(peerRepository.hasKnownPeer(pending.ip));
+
+		// Unknown or already known addresses are left alone.
+		peerRepository.demotePeer("1.1.1.1");
+		peerRepository.demotePeer(active.ip);
+		assert.equal(peerRepository.getKnownPeers(), [active]);
 	});
 });

@@ -1,6 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { Identifiers } from "@mainsail/constants";
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { assert, IpAddress } from "@mainsail/utils";
 import ipaddr from "ipaddr.js";
@@ -10,6 +10,9 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p-service")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
+
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	readonly #peers: Map<string, Contracts.P2PService.Peer> = new Map<string, Contracts.P2PService.Peer>();
 	readonly #peersPending: Map<string, Contracts.P2PService.Peer> = new Map<string, Contracts.P2PService.Peer>();
@@ -31,12 +34,17 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 		return peer;
 	}
 
+	// Active peers are announced; pending and known ones are internal to this package.
 	public setPeer(peer: Contracts.P2PService.Peer): void {
 		this.#peers.set(peer.ip, peer);
+
+		void this.events.dispatch(Events.PeerEvent.Added, peer);
 	}
 
 	public forgetPeer(peer: Contracts.P2PService.Peer): void {
-		this.#peers.delete(peer.ip);
+		if (this.#peers.delete(peer.ip)) {
+			void this.events.dispatch(Events.PeerEvent.Removed, peer);
+		}
 	}
 
 	public hasPeer(ip: string): boolean {
@@ -97,6 +105,27 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 
 	public hasKnownPeer(ip: string): boolean {
 		return this.#peersKnown.has(ip);
+	}
+
+	public removePeer(ip: string): void {
+		if (this.#peers.has(ip)) {
+			this.forgetPeer(this.getPeer(ip));
+		}
+
+		this.#peersPending.delete(ip);
+		this.#peersKnown.delete(ip);
+	}
+
+	public demotePeer(ip: string): void {
+		if (this.#peers.has(ip)) {
+			const peer = this.getPeer(ip);
+			this.forgetPeer(peer);
+			this.setKnownPeer(peer);
+
+			return;
+		}
+
+		this.#peersPending.delete(ip);
 	}
 
 	public hasMinimumPeers(): boolean {

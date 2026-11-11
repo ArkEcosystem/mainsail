@@ -15,6 +15,7 @@ describe<{
 		context.repository = { getSameSubnetPeers: () => [] };
 		context.seeds = { isSeed: () => false };
 		context.configuration = {
+			getOptional: (key: string, defaultValue: unknown) => defaultValue,
 			getRequired: (key: string) => ({ blacklist: [], maxSameSubnetPeers: 5, whitelist: ["*"] })[key],
 		};
 
@@ -24,7 +25,7 @@ describe<{
 			.whenTagged("plugin", "p2p-service");
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
 		app.bind(Identifiers.P2P.Peer.Seeds).toConstantValue(context.seeds);
-		app.bind(Identifiers.P2P.Logger).toConstantValue({ warnExtra: () => {} });
+		app.bind(Identifiers.P2P.Logger).toConstantValue({ debug: () => {}, warnExtra: () => {} });
 
 		context.verifier = app.resolve(PeerIpVerifier);
 	});
@@ -65,5 +66,14 @@ describe<{
 
 		seeds.isSeed = (ip: string) => ip === "178.165.55.55";
 		assert.undefined(verifier.verify("178.165.55.55"));
+	});
+
+	it("should reject everyone but the seeds in non-discovery mode", ({ verifier, seeds, configuration }) => {
+		configuration.getOptional = (key: string, defaultValue: unknown) =>
+			key === "disableDiscovery" ? true : defaultValue;
+		seeds.isSeed = (ip: string) => ip === "178.165.55.55";
+
+		assert.undefined(verifier.verify("178.165.55.55"));
+		assert.equal(verifier.verify("178.165.55.56"), CloseReason.Rejected);
 	});
 });

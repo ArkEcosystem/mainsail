@@ -3,8 +3,13 @@ import { Units } from "@mainsail/constants";
 export const constants = {
 	CHECK_HEADER_DELAY: 2000,
 
+	// Known peers are dialed from the service loop; a peer is not dialed again within this time, and
+	// is forgotten after this many failed dials in a row (seeds are kept).
+	DIAL_SPACING: 10_000,
 	// cut-loose timeout for a fast peer cleanse. slow verifications continue in the background
 	FAST_VERIFY_TIMEOUT: 1500,
+
+	MAX_DIAL_FAILURES: 5,
 
 	MAX_DOWNLOAD_BLOCKS: 400, // maximum number of blocks we can download at once
 	MAX_DOWNLOAD_BLOCKS_JOBS: 10, // maximum number of blocks jobs
