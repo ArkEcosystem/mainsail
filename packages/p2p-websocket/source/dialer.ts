@@ -11,7 +11,8 @@ import { constants } from "./constants.js";
 import { Direction } from "./enums.js";
 import { ConnectionError } from "./errors.js";
 
-// Opens outbound sockets, runs the handshake and returns open connections.
+// Opens outbound sockets and runs the handshake. Open connections are reported through
+// `onConnection`, the same way the listener reports inbound ones, so the caller has one path.
 @injectable()
 export class Dialer {
 	@inject(Identifiers.P2P.WebSocket.Connection.Factory)
@@ -26,8 +27,12 @@ export class Dialer {
 	@inject(Identifiers.P2P.WebSocket.Router)
 	private readonly router!: Router;
 
+	// Called once the handshake has completed.
+	public onConnection?: (connection: Connection) => void;
+
 	// The connection takes the socket while it is still connecting so no frame is missed.
-	public async dial(url: string): Promise<Connection> {
+	// Rejects when the socket or the handshake fails; then `onConnection` is not called.
+	public async dial(url: string): Promise<void> {
 		const hostname = new URL(url).hostname;
 		const remoteAddress = IpAddress.sanitizeRemoteAddress(hostname) ?? hostname;
 
@@ -51,6 +56,6 @@ export class Dialer {
 
 		await connection.open();
 
-		return connection;
+		this.onConnection?.(connection);
 	}
 }
