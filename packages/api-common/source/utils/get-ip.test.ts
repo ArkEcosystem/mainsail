@@ -37,4 +37,16 @@ describe<{}>("getIp", ({ it, assert }) => {
 
 		assert.is(getIp(request, true), "7.7.7.7");
 	});
+
+	it("should map an IPv4-mapped IPv6 remoteAddress to IPv4", () => {
+		const request = makeRequest({}, "::ffff:1.2.3.4");
+
+		assert.is(getIp(request, false), "1.2.3.4");
+	});
+
+	it("should map an IPv4-mapped IPv6 forwarded entry to IPv4", () => {
+		const request = makeRequest({ "x-forwarded-for": "::ffff:9.9.9.9, 8.8.8.8" });
+
+		assert.is(getIp(request, true), "9.9.9.9");
+	});
 });

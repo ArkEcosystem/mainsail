@@ -21,3 +21,11 @@ export const normalizeAddress = (ip: string): string => {
 };
 
 export const cleanAddress = (ip: string): string => ip.replace("[", "").replace("]", "");
+
+export const canonicalAddress = (ip: string): string | undefined => {
+	try {
+		return ipaddr.process(cleanAddress(ip)).toString();
+	} catch {
+		return undefined;
+	}
+};
