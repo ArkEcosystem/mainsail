@@ -6,7 +6,6 @@ import { Identifiers } from "@mainsail/constants";
 import Joi from "joi";
 
 import { TransactionsController } from "../controllers/transactions.js";
-import { pagination } from "../schemas.js";
 
 export const register = (server: Contracts.Api.ApiServer): void => {
 	const controller = server.app.app.resolve(TransactionsController);
@@ -72,7 +71,7 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					address: Schemas.orEqualCriteria(Schemas.addressSchema),
 					from: Schemas.orEqualCriteria(Schemas.addressSchema),
 					to: Schemas.orEqualCriteria(Schemas.addressSchema),
-				}).concat(pagination),
+				}).concat(Schemas.pagination),
 			},
 		},
 		path: "/transactions/unconfirmed",
