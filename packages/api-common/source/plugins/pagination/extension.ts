@@ -18,11 +18,15 @@ const flatten = (query: object, prefix = ""): Record<string, unknown> =>
 	);
 
 export class Extension {
-	private readonly routePathPrefix = "/api";
-	public constructor(private readonly config: object) {}
+	readonly #routePathPrefix = "/api";
+	readonly #config: object;
+
+	public constructor(config: object) {
+		this.#config = config;
+	}
 
 	public isValidRoute(request: HapiRequest): boolean {
-		const pagination = this.getRoutePaginationOptions(request);
+		const pagination = this.#getRoutePaginationOptions(request);
 
 		if (!pagination) {
 			return false;
@@ -49,7 +53,7 @@ export class Extension {
 
 			// ! should be set through validation schema
 			setParameter("page", 1);
-			setParameter("limit", get(this.config, "query.limit.default", 100));
+			setParameter("limit", get(this.#config, "query.limit.default", 100));
 		}
 
 		return h.continue;
@@ -88,9 +92,9 @@ export class Extension {
 			pageCount = Math.trunc(totalCount / currentLimit) + (totalCount % currentLimit === 0 ? 0 : 1);
 		}
 
-		pageCount = this.getReachablePageCount(pageCount, currentLimit);
+		pageCount = this.#getReachablePageCount(pageCount, currentLimit);
 
-		const links = this.getLinks(request, pageCount, totalCount);
+		const links = this.#getLinks(request, pageCount, totalCount);
 
 		const newSource = {
 			meta: {
@@ -102,7 +106,7 @@ export class Extension {
 
 				last: links.last,
 
-				next: this.getNextLink(request, links.next, source["nextOffset"]),
+				next: this.#getNextLink(request, links.next, source["nextOffset"]),
 				pageCount: pageCount,
 
 				previous: links.previous,
@@ -128,14 +132,14 @@ export class Extension {
 		return h.continue;
 	}
 
-	private getLinks(
+	#getLinks(
 		request: HapiRequest,
 		pageCount: number,
 		totalCount: number,
 	): Record<"first" | "last" | "next" | "previous" | "self", string | null> {
 		const { limit, offset, page } = request.query;
 
-		const getUri = (position: { page: number } | { offset: number }): string => this.getUri(request, position);
+		const getUri = (position: { page: number } | { offset: number }): string => this.#getUri(request, position);
 
 		if (offset === undefined) {
 			return {
@@ -147,7 +151,7 @@ export class Extension {
 			};
 		}
 
-		const maxDepth: number = get(this.config, "maxDepth") ?? Number.POSITIVE_INFINITY;
+		const maxDepth: number = get(this.#config, "maxDepth") ?? Number.POSITIVE_INFINITY;
 
 		return {
 			first: getUri({ offset: 0 }),
@@ -161,17 +165,17 @@ export class Extension {
 		};
 	}
 
-	private getNextLink(request: HapiRequest, next: string | null, nextOffset: number | undefined): string | null {
+	#getNextLink(request: HapiRequest, next: string | null, nextOffset: number | undefined): string | null {
 		if (nextOffset === undefined) {
 			return next;
 		}
 
-		const maxDepth: number = get(this.config, "maxDepth") ?? Number.POSITIVE_INFINITY;
+		const maxDepth: number = get(this.#config, "maxDepth") ?? Number.POSITIVE_INFINITY;
 
-		return nextOffset + request.query.limit <= maxDepth ? this.getUri(request, { offset: nextOffset }) : null;
+		return nextOffset + request.query.limit <= maxDepth ? this.#getUri(request, { offset: nextOffset }) : null;
 	}
 
-	private getUri(request: HapiRequest, position: { page: number } | { offset: number }): string {
+	#getUri(request: HapiRequest, position: { page: number } | { offset: number }): string {
 		const query = flatten({ ...request.query, ...request.orig.query });
 
 		if ("offset" in position) {
@@ -179,12 +183,12 @@ export class Extension {
 		}
 
 		// strip prefix in baseUri, we want a "clean" relative path
-		const baseUri = request.url.pathname.slice(this.routePathPrefix.length) + "?";
+		const baseUri = request.url.pathname.slice(this.#routePathPrefix.length) + "?";
 
 		return baseUri + Qs.stringify({ ...query, ...position });
 	}
 
-	private getRoutePaginationOptions(request: HapiRequest): { enabled: boolean } | undefined {
+	#getRoutePaginationOptions(request: HapiRequest): { enabled: boolean } | undefined {
 		const { plugins } = request.route.settings;
 		if (!plugins) {
 			return undefined;
@@ -197,8 +201,8 @@ export class Extension {
 		return plugins["pagination"] as { enabled: boolean };
 	}
 
-	private getReachablePageCount(pageCount: number, limit: number): number {
-		const maxDepth: number | undefined = get(this.config, "maxDepth");
+	#getReachablePageCount(pageCount: number, limit: number): number {
+		const maxDepth: number | undefined = get(this.#config, "maxDepth");
 
 		return maxDepth === undefined ? pageCount : Math.min(pageCount, Math.max(1, Math.floor(maxDepth / limit)));
 	}
