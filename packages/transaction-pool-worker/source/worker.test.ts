@@ -364,6 +364,33 @@ describe<{
 		assert.equal(ipc.requests[2], ["start", 0]);
 	});
 
+	it("sends overlapping commits one after the other", async ({ worker, ipc }) => {
+		await startWorker(worker);
+		const pending = new Map<unknown, ReturnType<typeof deferred>>([
+			[11, deferred()],
+			[12, deferred()],
+		]);
+		ipc.respond = async (method, blockNumber) =>
+			method === "commit" ? pending.get(blockNumber)?.promise : undefined;
+		const sent = () => ipc.requests.filter(([method]) => method === "commit").map(([, blockNumber]) => blockNumber);
+
+		await within(worker.onCommit(makeUnit(11)));
+		const commit12 = worker.onCommit(makeUnit(12));
+		const commit13 = worker.onCommit(makeUnit(13));
+
+		pending.get(11)?.resolve();
+		await within(commit12);
+		await new Promise((resolve) => setTimeout(resolve, 10));
+
+		assert.equal(sent(), [11, 12]);
+
+		pending.get(12)?.resolve();
+		await within(commit13);
+		await waitFor(() => sent().length === 3);
+
+		assert.equal(sent(), [11, 12, 13]);
+	});
+
 	it("respawns the worker when a commit does not finish in time", async ({ worker, ipc, subprocesses, logs }) => {
 		await startWorker(worker);
 		const fake = clock({ toFake: ["setTimeout", "clearTimeout"] });
