@@ -1,7 +1,5 @@
 import { Server } from "@hapi/hapi";
 import { describe } from "@mainsail/test-runner";
-import { get, IncomingMessage, request as httpRequest } from "http";
-import { AddressInfo } from "net";
 
 import { concurrencyLimit } from "./concurrency-limit";
 
@@ -11,9 +9,8 @@ const limited = { plugins: { concurrencyLimit: { enabled: true } } };
 
 const makeServer = async (options: Options) => {
 	const server = new Server({ host: "127.0.0.1", port: 0 });
-	const pending: Array<{ id: string; resolve: () => void }> = [];
-	const hold = (request) =>
-		new Promise((resolve) => pending.push({ id: request.query.id as string, resolve: () => resolve("ok") }));
+	const pending: Array<() => void> = [];
+	const hold = () => new Promise((resolve) => pending.push(() => resolve("ok")));
 
 	server.route({ handler: hold, method: "GET", options: limited, path: "/slow" });
 	server.route({ handler: () => "ok", method: "GET", options: limited, path: "/" });
@@ -64,29 +61,14 @@ const makeServer = async (options: Options) => {
 		}
 	};
 
-	const releaseNext = () => pending.shift()?.resolve();
-
 	const releaseAll = () => {
-		for (const { resolve } of pending.splice(0)) {
+		for (const resolve of pending.splice(0)) {
 			resolve();
 		}
 	};
 
-	return { pending, releaseAll, releaseNext, server, waitForPending };
+	return { pending, releaseAll, server, waitForPending };
 };
-
-const request = (port: number, path: string) =>
-	new Promise<IncomingMessage>((resolve, reject) => {
-		get({ host: "127.0.0.1", path, port }, resolve).on("error", reject);
-	});
-
-const readBody = (response: IncomingMessage) =>
-	new Promise<string>((resolve, reject) => {
-		let body = "";
-		response.on("data", (chunk) => (body += chunk));
-		response.on("end", () => resolve(body));
-		response.on("error", reject);
-	});
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -104,7 +86,7 @@ describe("concurrencyLimit", ({ it, assert, spy }) => {
 		const server = new Server();
 		const ext = spy(server, "ext");
 
-		await concurrencyLimit.register(server, { limit: 0, queueLimit: 10, queueTimeout: 1000 });
+		await concurrencyLimit.register(server, { limit: 0, limitPerIp: 1 });
 
 		ext.neverCalled();
 	});
@@ -132,177 +114,6 @@ describe("concurrencyLimit", ({ it, assert, spy }) => {
 		assert.is((await server.inject("/")).statusCode, 200);
 	});
 
-	it("should queue requests past the limit until a slot frees", async () => {
-		const { pending, releaseNext, server, waitForPending } = await makeServer({
-			limit: 1,
-			queueLimit: 10,
-			queueTimeout: 1000,
-		});
-
-		const first = server.inject("/slow?id=1");
-		await waitForPending(1);
-
-		const queued = server.inject("/slow?id=2");
-		await sleep(10);
-
-		assert.length(pending, 1);
-
-		releaseNext();
-		await waitForPending(1);
-
-		assert.is(pending[0].id, "2");
-
-		releaseNext();
-
-		assert.is((await first).statusCode, 200);
-		assert.is((await queued).statusCode, 200);
-	});
-
-	it("should serve queued requests in arrival order", async () => {
-		const { pending, releaseNext, server, waitForPending } = await makeServer({
-			limit: 1,
-			queueLimit: 10,
-			queueTimeout: 1000,
-		});
-
-		const responses = [server.inject("/slow?id=1")];
-		await waitForPending(1);
-		responses.push(server.inject("/slow?id=2"), server.inject("/slow?id=3"));
-		await sleep(10);
-
-		const served: string[] = [];
-		for (let index = 0; index < 3; index++) {
-			await waitForPending(1);
-			served.push(pending[0].id);
-			releaseNext();
-		}
-
-		assert.equal(served, ["1", "2", "3"]);
-		for (const response of await Promise.all(responses)) {
-			assert.is(response.statusCode, 200);
-		}
-	});
-
-	it("should reject with a 503 when the queue is full", async () => {
-		const { releaseAll, server, waitForPending } = await makeServer({
-			limit: 1,
-			queueLimit: 1,
-			queueTimeout: 1000,
-		});
-
-		const first = server.inject("/slow");
-		await waitForPending(1);
-		const queued = server.inject("/slow");
-		await sleep(10);
-
-		assert.is(await statusWithin(server.inject("/")), 503);
-
-		releaseAll();
-		await first;
-		await waitForPending(1);
-		releaseAll();
-
-		assert.is((await queued).statusCode, 200);
-	});
-
-	it("should reject with a 503 when the wait times out and keep the slot count", async () => {
-		const { releaseAll, server, waitForPending } = await makeServer({
-			limit: 1,
-			limitPerIp: 1,
-			queueLimit: 10,
-			queueTimeout: 20,
-		});
-
-		const first = server.inject({ remoteAddress: "10.0.0.2", url: "/slow" });
-		await waitForPending(1);
-
-		assert.is(await statusWithin(server.inject({ remoteAddress: "10.0.0.1", url: "/" })), 503);
-
-		releaseAll();
-		await first;
-
-		assert.is((await server.inject({ remoteAddress: "10.0.0.1", url: "/" })).statusCode, 200);
-		assert.is((await server.inject({ remoteAddress: "10.0.0.2", url: "/" })).statusCode, 200);
-	});
-
-	it("should expire only the queued requests whose wait is over", async () => {
-		const { releaseAll, server, waitForPending } = await makeServer({
-			limit: 1,
-			queueLimit: 10,
-			queueTimeout: 200,
-		});
-
-		const first = server.inject("/slow");
-		await waitForPending(1);
-
-		const early = server.inject("/");
-		await sleep(100);
-		const late = server.inject("/");
-
-		assert.is((await early).statusCode, 503);
-
-		releaseAll();
-		assert.is((await first).statusCode, 200);
-		assert.is((await late).statusCode, 200);
-	});
-
-	it("should skip queued requests whose client went away", async () => {
-		const { pending, releaseAll, releaseNext, server, waitForPending } = await makeServer({
-			limit: 1,
-			limitPerIp: 3,
-			queueLimit: 10,
-			queueTimeout: 1000,
-		});
-		await server.start();
-
-		const { port } = server.listener.address() as AddressInfo;
-		const status = async (path: string) => {
-			try {
-				const response = await request(port, path);
-				await readBody(response);
-
-				return response.statusCode;
-			} catch (error) {
-				return error.code;
-			}
-		};
-
-		try {
-			const first = status("/slow?id=1");
-			await waitForPending(1);
-
-			const gone = httpRequest({ host: "127.0.0.1", path: "/slow?id=2", port });
-			gone.on("error", () => {});
-			gone.end();
-			await sleep(20);
-			gone.destroy();
-			await sleep(20);
-
-			const live = status("/slow?id=3");
-			await sleep(20);
-
-			releaseNext();
-			await waitForPending(1);
-
-			assert.is(pending[0].id, "3");
-
-			releaseNext();
-
-			assert.is(await first, 200);
-			assert.is(await live, 200);
-
-			const again = [status("/slow?id=4"), status("/slow?id=5"), status("/slow?id=6")];
-			for (let served = 0; served < 3; served++) {
-				await sleep(20);
-				releaseAll();
-			}
-
-			assert.equal(await Promise.all(again), [200, 200, 200]);
-		} finally {
-			await server.stop({ timeout: 0 });
-		}
-	});
-
 	it("should reject requests past the limit per ip", async () => {
 		const { releaseAll, server, waitForPending } = await makeServer({ limit: 10, limitPerIp: 1 });
 
@@ -314,34 +125,6 @@ describe("concurrencyLimit", ({ it, assert, spy }) => {
 
 		releaseAll();
 		assert.is((await first).statusCode, 200);
-
-		assert.is((await server.inject({ remoteAddress: "10.0.0.1", url: "/" })).statusCode, 200);
-	});
-
-	it("should count queued requests towards the limit per ip", async () => {
-		const { releaseAll, server, waitForPending } = await makeServer({
-			limit: 1,
-			limitPerIp: 2,
-			queueLimit: 10,
-			queueTimeout: 1000,
-		});
-		const from = (ip: string) => ({ remoteAddress: ip, url: "/slow" });
-
-		const first = server.inject(from("10.0.0.1"));
-		await waitForPending(1);
-		const queued = [server.inject(from("10.0.0.1")), server.inject(from("10.0.0.2"))];
-		await sleep(10);
-
-		assert.is(await statusWithin(server.inject({ remoteAddress: "10.0.0.1", url: "/" })), 503);
-
-		for (let served = 0; served < 3; served++) {
-			await waitForPending(1);
-			releaseAll();
-		}
-
-		for (const response of await Promise.all([first, ...queued])) {
-			assert.is(response.statusCode, 200);
-		}
 
 		assert.is((await server.inject({ remoteAddress: "10.0.0.1", url: "/" })).statusCode, 200);
 	});
