@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Events, Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
-import { http } from "@mainsail/utils";
+import { http, HttpError, type HttpResponse } from "@mainsail/utils";
 import esmock from "esmock";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
@@ -204,6 +204,36 @@ describe<{
 		spyForget.calledWith(ip);
 		spyEmit.calledOnce();
 		spyEmit.calledWith(Events.PeerEvent.Removed, ip);
+	});
+
+	it("#postTransactions - should not count a 429 from the peer as a failed post", async ({
+		peerCommunicator,
+		peer,
+	}) => {
+		stub(http, "post").callsFake(() => {
+			throw new HttpError({ statusCode: 429, statusMessage: "Too Many Requests" } as HttpResponse);
+		});
+		withConfig({ maxSequentialErrors: 2 });
+		const spyForget = stub(repository, "forgetPeer");
+		const spyEmit = spyFn();
+		emit = spyEmit.toFunction();
+
+		await peerCommunicator.postTransactions(peer, transactions);
+		await peerCommunicator.postTransactions(peer, transactions);
+
+		assert.equal(peer.errorCount, 0);
+		spyForget.neverCalled();
+		spyEmit.neverCalled();
+	});
+
+	it("#postTransactions - should count any other http error as a failed post", async ({ peerCommunicator, peer }) => {
+		stub(http, "post").callsFake(() => {
+			throw new HttpError({ statusCode: 503, statusMessage: "Service Unavailable" } as HttpResponse);
+		});
+
+		await peerCommunicator.postTransactions(peer, transactions);
+
+		assert.equal(peer.errorCount, 1);
 	});
 
 	it("#postTransactions - should reset errorCount after a successful retry", async ({ peerCommunicator, peer }) => {
