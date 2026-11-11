@@ -13,6 +13,7 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 
 	readonly #peers: Map<string, Contracts.P2PService.Peer> = new Map<string, Contracts.P2PService.Peer>();
 	readonly #peersPending: Map<string, Contracts.P2PService.Peer> = new Map<string, Contracts.P2PService.Peer>();
+	readonly #peersKnown: Map<string, Contracts.P2PService.Peer> = new Map<string, Contracts.P2PService.Peer>();
 
 	public getPeers(): Contracts.P2PService.Peer[] {
 		return [...this.#peers.values()];
@@ -68,6 +69,34 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 
 	public hasPendingPeer(ip: string): boolean {
 		return this.#peersPending.has(ip);
+	}
+
+	public getKnownPeers(): Contracts.P2PService.Peer[] {
+		return [...this.#peersKnown.values()];
+	}
+
+	public hasKnownPeers(): boolean {
+		return this.#peersKnown.size > 0;
+	}
+
+	public getKnownPeer(ip: string): Contracts.P2PService.Peer {
+		const peer = this.#peersKnown.get(ip);
+
+		assert.defined(peer);
+
+		return peer;
+	}
+
+	public setKnownPeer(peer: Contracts.P2PService.Peer): void {
+		this.#peersKnown.set(peer.ip, peer);
+	}
+
+	public forgetKnownPeer(peer: Contracts.P2PService.Peer): void {
+		this.#peersKnown.delete(peer.ip);
+	}
+
+	public hasKnownPeer(ip: string): boolean {
+		return this.#peersKnown.has(ip);
 	}
 
 	public hasMinimumPeers(): boolean {
