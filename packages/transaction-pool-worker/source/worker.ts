@@ -116,9 +116,12 @@ export class Worker implements Contracts.TransactionPool.Worker {
 
 		this.#blockNumber = unit.blockNumber;
 
-		await this.#commitPromise;
+		const previous = this.#commitPromise;
+		this.#commitPromise = previous.then(() =>
+			this.#commit(unit.blockNumber, [...sendersAddresses.keys()], block.gasUsed, isSyncing),
+		);
 
-		this.#commitPromise = this.#commit(unit.blockNumber, [...sendersAddresses.keys()], block.gasUsed, isSyncing);
+		await previous;
 	}
 
 	public async start(blockNumber: number): Promise<void> {
