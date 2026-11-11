@@ -94,19 +94,19 @@ describe("concurrencyLimitPerIp", ({ it, assert, spy }) => {
 		ext.neverCalled();
 	});
 
-	it("should reject requests past the limit of their ip with a 503 until one finishes", async () => {
+	it("should reject requests past the limit of their ip with a 429 until one finishes", async () => {
 		const { releaseAll, server, waitForPending } = await makeServer({ limit: 1 });
 
 		const first = server.inject(from("10.0.0.1"));
 		await waitForPending(1);
 
 		const rejected = await server.inject(from("10.0.0.1", "/"));
-		assert.is(rejected.statusCode, 503);
+		assert.is(rejected.statusCode, 429);
 		assert.undefined((rejected.request.response as { isBoom?: boolean }).isBoom);
 		assert.equal(JSON.parse(rejected.payload), {
-			error: "Service Unavailable",
+			error: "Too Many Requests",
 			message: "Too many concurrent requests",
-			statusCode: 503,
+			statusCode: 429,
 		});
 		assert.is((await server.inject(from("10.0.0.2", "/"))).statusCode, 200);
 
@@ -127,7 +127,7 @@ describe("concurrencyLimitPerIp", ({ it, assert, spy }) => {
 		held.push(server.inject(from("10.1.0.1")));
 		await waitForPending(3);
 
-		assert.is((await server.inject(from("10.1.0.1", "/"))).statusCode, 503);
+		assert.is((await server.inject(from("10.1.0.1", "/"))).statusCode, 429);
 
 		releaseAll();
 		for (const response of await Promise.all(held)) {
@@ -141,7 +141,7 @@ describe("concurrencyLimitPerIp", ({ it, assert, spy }) => {
 		const first = server.inject(forwarded("1.1.1.1"));
 		await waitForPending(1);
 
-		assert.is((await server.inject(forwarded("2.2.2.2", "/"))).statusCode, 503);
+		assert.is((await server.inject(forwarded("2.2.2.2", "/"))).statusCode, 429);
 
 		releaseAll();
 		await first;
@@ -153,7 +153,7 @@ describe("concurrencyLimitPerIp", ({ it, assert, spy }) => {
 		const first = server.inject(forwarded("1.1.1.1"));
 		await waitForPending(1);
 
-		assert.is((await server.inject(forwarded("1.1.1.1", "/"))).statusCode, 503);
+		assert.is((await server.inject(forwarded("1.1.1.1", "/"))).statusCode, 429);
 		assert.is((await server.inject(forwarded("2.2.2.2", "/"))).statusCode, 200);
 
 		releaseAll();
@@ -170,7 +170,7 @@ describe("concurrencyLimitPerIp", ({ it, assert, spy }) => {
 		await waitForPending(3);
 
 		assert.length(pending, 3);
-		assert.is((await server.inject("/")).statusCode, 503);
+		assert.is((await server.inject("/")).statusCode, 429);
 
 		releaseAll();
 		for (const response of await Promise.all([held, ...open])) {

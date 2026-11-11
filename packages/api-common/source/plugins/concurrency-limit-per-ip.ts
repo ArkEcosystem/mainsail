@@ -23,7 +23,7 @@ export const concurrencyLimitPerIp = {
 		}
 
 		const { trustProxy = false, whitelist = [] } = options;
-		const { payload, statusCode } = Boom.serverUnavailable("Too many concurrent requests").output;
+		const { payload, statusCode } = Boom.tooManyRequests("Too many concurrent requests").output;
 		const active = new Map<string, number>();
 
 		const count = (ip: string, change: number): void => {

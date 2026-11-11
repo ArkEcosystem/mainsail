@@ -454,7 +454,7 @@ describe<{
 			const held = server.inject(from("1.1.1.1"));
 			await waitForHeld();
 
-			assert.is((await server.inject(from("1.1.1.1"))).statusCode, 503);
+			assert.is((await server.inject(from("1.1.1.1"))).statusCode, 429);
 			assert.is((await server.inject(from("2.2.2.2"))).statusCode, 200);
 
 			release();
@@ -480,7 +480,7 @@ describe<{
 			const held = server.inject("/api/transactions/unconfirmed");
 			await waitForHeld();
 
-			assert.is((await server.inject("/api/transactions/unconfirmed")).statusCode, 503);
+			assert.is((await server.inject("/api/transactions/unconfirmed")).statusCode, 429);
 
 			release();
 			assert.is((await held).statusCode, 200);
