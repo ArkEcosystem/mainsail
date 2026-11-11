@@ -26,6 +26,9 @@ export class Service implements Contracts.P2PService.Service {
 	@inject(Identifiers.P2P.Peer.Discoverer)
 	private readonly peerDiscoverer!: Contracts.P2PService.PeerDiscoverer;
 
+	@inject(Identifiers.P2P.Peer.Seeds)
+	private readonly seeds!: Contracts.P2PService.Seeds;
+
 	@inject(Identifiers.P2P.Peer.Verifier)
 	private readonly peerVerifier!: Contracts.P2PService.PeerVerifier;
 
@@ -52,6 +55,7 @@ export class Service implements Contracts.P2PService.Service {
 
 		await this.websocketService.boot();
 
+		await this.seeds.load();
 		await this.peerDiscoverer.populateSeedPeers();
 
 		for (const [version, peers] of Object.entries(

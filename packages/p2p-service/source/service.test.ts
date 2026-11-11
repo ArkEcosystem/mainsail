@@ -22,6 +22,7 @@ describe<{
 	logger: any;
 	peerDiscoverer: any;
 	peerDisposer: any;
+	seeds: any;
 	websocketService: any;
 	configuration: any;
 }>("Service", ({ it, beforeEach, assert, clock, spy, stub }) => {
@@ -32,6 +33,7 @@ describe<{
 		context.state = { getLastMessageTime: () => dayjs() };
 		context.peerDiscoverer = { discoverPeers: async () => {}, populateSeedPeers: async () => {} };
 		context.peerDisposer = { disposePeers: async () => {} };
+		context.seeds = { load: async () => {} };
 		context.websocketService = {
 			boot: async () => {},
 			dispose: async () => {},
@@ -46,6 +48,7 @@ describe<{
 		app.bind(Identifiers.P2P.State).toConstantValue(context.state);
 		app.bind(Identifiers.P2P.Peer.Discoverer).toConstantValue(context.peerDiscoverer);
 		app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue(context.peerDisposer);
+		app.bind(Identifiers.P2P.Peer.Seeds).toConstantValue(context.seeds);
 		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
 		app.bind(Identifiers.P2P.Peer.Verifier).toConstantValue(context.peerVerifier);
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
