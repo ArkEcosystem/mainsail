@@ -27,6 +27,20 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		)
 		.getRequired<number>("maxTransactionBytes");
 
+	const rateLimit = server.app.app
+		.getTagged<Contracts.Kernel.PluginConfiguration>(
+			Identifiers.ServiceProvider.Configuration,
+			"plugin",
+			"api-transaction-pool",
+		)
+		.getRequired<{ enabled: boolean; points: number }>("plugins.rateLimit");
+
+	if (rateLimit.enabled && rateLimit.points < maxTransactionsPerRequest) {
+		throw new Error(
+			`The transaction pool API rate limit (${rateLimit.points} points) is below maxTransactionsPerRequest (${maxTransactionsPerRequest}); raise MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_USER_LIMIT to at least ${maxTransactionsPerRequest}`,
+		);
+	}
+
 	const isPeer = (ip: string): boolean =>
 		server.app.app
 			.get<Contracts.TransactionPool.PeerRepository>(Identifiers.TransactionPool.Peer.Repository)

@@ -144,6 +144,19 @@ describe<{
 		});
 	}
 
+	it("POST /api/transactions - refuses a rate limit below the transactions per request", async ({
+		processor,
+		transactions,
+	}) => {
+		const configuration = makeConfiguration();
+		configuration.plugins.rateLimit = { ...configuration.plugins.rateLimit, enabled: true, points: 1 };
+
+		await assert.rejects(
+			() => bootstrapServer({ processor, transactions }, configuration),
+			"rate limit (1 points) is below maxTransactionsPerRequest (2)",
+		);
+	});
+
 	it("POST /api/transactions - rejects a payload without transactions", async ({ server }) => {
 		const response = await server.inject({ method: "POST", payload: {}, url: "/api/transactions" });
 
