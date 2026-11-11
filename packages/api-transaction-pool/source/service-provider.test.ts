@@ -53,11 +53,12 @@ describe<{
 	it("#register - rate limits requests when the rate limiter is enabled", async ({ processor, transactions }) => {
 		const limited = makeConfiguration();
 		limited.plugins.rateLimit.enabled = true;
-		limited.plugins.rateLimit.points = 1;
+		limited.plugins.rateLimit.points = 2;
 
 		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
 
 		try {
+			assert.is((await server.inject({ method: "GET", url: "/api/configuration" })).statusCode, 200);
 			assert.is((await server.inject({ method: "GET", url: "/api/configuration" })).statusCode, 200);
 			assert.is((await server.inject({ method: "GET", url: "/api/configuration" })).statusCode, 429);
 		} finally {

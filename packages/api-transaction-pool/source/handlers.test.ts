@@ -19,7 +19,13 @@ describe<{
 			.whenTagged("plugin", "transaction-pool-service");
 		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)
-			.toConstantValue({ getRequired: () => 1_000_000 })
+			.toConstantValue({
+				getRequired: (key: string) =>
+					({
+						"plugins.pagination.maxBytes": 1_000_000,
+						"plugins.rateLimit": { enabled: false, points: 150 },
+					})[key],
+			})
 			.whenTagged("plugin", "api-transaction-pool");
 		context.app.bind(Identifiers.TransactionPool.Processor).toConstantValue({});
 		context.app.bind(Identifiers.TransactionPool.Query).toConstantValue({});
