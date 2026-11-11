@@ -33,7 +33,6 @@ describe<{
 		context.peerDiscoverer = { discoverPeers: async () => {}, populateSeedPeers: async () => {} };
 		context.peerDisposer = { disposePeers: async () => {} };
 		context.websocketService = {
-			accept: undefined,
 			boot: async () => {},
 			dispose: async () => {},
 			onConnection: undefined,

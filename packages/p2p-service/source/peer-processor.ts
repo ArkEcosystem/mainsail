@@ -3,7 +3,6 @@ import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import { CloseReason } from "@mainsail/p2p-websocket";
 import { IpAddress, isBlacklisted, isWhitelisted } from "@mainsail/utils";
 
 import type { Peer } from "./interfaces/index.js";
@@ -12,8 +11,7 @@ import { isValidVersion } from "./utils/index.js";
 
 // Port of the @mainsail/p2p processor without the tx pool node and API node checks. Unlike the old
 // one it never connects: addresses are only recorded as known, and a peer is verified when the
-// transport reports its open connection. The transport hooks replace the accept-peer and validate-ip
-// plugins.
+// transport reports its open connection. The connection hook replaces the accept-peer plugin.
 @injectable()
 export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 	@inject(Identifiers.ServiceProvider.Configuration)
@@ -54,9 +52,6 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 
 	@postConstruct()
 	public initialize(): void {
-		// Banned addresses are already refused by the transport; known peers skip the rules they passed.
-		this.websocketService.accept = (ip) =>
-			this.repository.hasPeer(ip) || this.#validatePeerIp(ip) ? undefined : CloseReason.Rejected;
 		this.websocketService.onConnection = (connection) => void this.#acceptConnection(connection);
 
 		this.events.listen(Events.CryptoEvent.MilestoneChanged, {
@@ -120,6 +115,7 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 			? (this.repository.getKnownPeer(ip) as Peer)
 			: this.peerFactory(ip);
 		peer.connection = connection;
+		connection.onClose(() => this.peerDisposer.disposePeer(ip));
 
 		await this.#verifyPeer(peer);
 	}

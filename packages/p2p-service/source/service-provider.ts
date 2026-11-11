@@ -16,6 +16,7 @@ import { HeaderIncludeReceiveMiddleware, HeaderIncludeSendMiddleware } from "./m
 import { PeerCommunicator } from "./peer-communicator.js";
 import { PeerDiscoverer } from "./peer-discoverer.js";
 import { PeerDisposer } from "./peer-disposer.js";
+import { PeerIpVerifier } from "./peer-ip-verifier.js";
 import { PeerProcessor } from "./peer-processor.js";
 import { PeerRepository } from "./peer-repository.js";
 import { PeerVerifier } from "./peer-verifier.js";
@@ -45,6 +46,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.Peer.Discoverer).to(PeerDiscoverer).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Processor).to(PeerProcessor).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Verifier).to(PeerVerifier).inSingletonScope();
+		// Runs after the transport's own verifiers (ban list, duplicate address), before the handshake.
+		this.app.bind(Identifiers.P2P.WebSocket.Connection.Verifiers).to(PeerIpVerifier).inSingletonScope();
 		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
 		this.app.bind<() => Header>(Identifiers.P2P.Header.Factory).toFactory(() => () => this.app.resolve(Header));
 		this.app.bind(Identifiers.P2P.Header.Service).to(HeaderService).inSingletonScope();
@@ -78,7 +81,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async boot(): Promise<void> {
 		const websocketService = this.app.get<WebSocketService>(Identifiers.P2P.WebSocket.Service);
 
-		// Constructing the processor installs its accept and connection hooks on the transport.
+		// Constructing the processor installs its connection hook on the transport.
 		this.app.get<Contracts.P2PService.PeerProcessor>(Identifiers.P2P.Peer.Processor);
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any

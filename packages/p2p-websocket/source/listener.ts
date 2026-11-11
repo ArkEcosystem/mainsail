@@ -33,9 +33,6 @@ export class Listener {
 	@inject(Identifiers.P2P.WebSocket.Router)
 	private readonly router!: Router;
 
-	// Called after the verifiers, before the handshake. Returning a reason rejects the socket.
-	public accept?: (remoteAddress: string) => CloseReason | undefined;
-
 	// Called once the handshake has completed.
 	public onConnection?: (connection: Connection) => void;
 
@@ -131,7 +128,7 @@ export class Listener {
 			}
 		}
 
-		return this.accept?.(remoteAddress);
+		return undefined;
 	}
 
 	async #open(connection: Connection): Promise<void> {

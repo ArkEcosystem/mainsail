@@ -83,7 +83,6 @@ export class Service implements Contracts.P2PService.Service {
 		this.#disposed = true;
 		clearTimeout(this.#mainLoopTimeout);
 
-		this.websocketService.accept = undefined;
 		this.websocketService.onConnection = undefined;
 
 		await this.peerDisposer.disposePeers();
