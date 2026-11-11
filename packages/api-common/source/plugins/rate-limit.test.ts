@@ -210,7 +210,7 @@ describe<{
 		assert.is(response.headers["x-ratelimit-remaining"], "4");
 	});
 
-	it("should return 429 when a route asks for more points than are left", async () => {
+	it("should return 429 without charging when a route asks for more points than are left", async () => {
 		const server = await makeServer({
 			blacklist: [],
 			duration: 60,
@@ -221,11 +221,29 @@ describe<{
 		});
 
 		const response = await postItems(server, 6);
+		const next = await server.inject({ method: "GET", remoteAddress: REMOTE, url: "/" });
 
 		assert.is(response.statusCode, 429);
-		assert.is(response.headers["x-ratelimit-remaining"], "0");
+		assert.is(response.headers["x-ratelimit-remaining"], "4");
 		assert.defined(response.headers["retry-after"]);
-		assert.is((await server.inject({ method: "GET", remoteAddress: REMOTE, url: "/" })).statusCode, 429);
+		assert.is(next.statusCode, 200);
+		assert.is(next.headers["x-ratelimit-remaining"], "3");
+	});
+
+	it("should accept a route that asks for exactly the points that are left", async () => {
+		const server = await makeServer({
+			blacklist: [],
+			duration: 60,
+			enabled: true,
+			points: 5,
+			trustProxy: false,
+			whitelist: [],
+		});
+
+		const response = await postItems(server, 5);
+
+		assert.is(response.statusCode, 200);
+		assert.is(response.headers["x-ratelimit-remaining"], "0");
 	});
 
 	it("should charge a single point for a request whose payload fails validation", async () => {
