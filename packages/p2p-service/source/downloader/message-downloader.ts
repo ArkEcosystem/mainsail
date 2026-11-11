@@ -14,9 +14,9 @@ type DownloadsByRound = {
 
 type DownloadJob = {
 	isFullDownload: boolean;
-	peer: Contracts.P2P.Peer;
-	peerHeader: Contracts.P2P.HeaderData;
-	ourHeader: Contracts.P2P.Header;
+	peer: Contracts.P2PService.Peer;
+	peerHeader: Contracts.P2PService.HeaderData;
+	ourHeader: Contracts.P2PService.Header;
 	prevoteIndexes: number[];
 	precommitIndexes: number[];
 	round: number;
@@ -29,21 +29,21 @@ type DownloadJob = {
  */
 
 @injectable()
-export class MessageDownloader implements Contracts.P2P.Downloader {
+export class MessageDownloader implements Contracts.P2PService.Downloader {
 	@inject(Identifiers.P2P.Peer.Communicator)
-	private readonly communicator!: Contracts.P2P.PeerCommunicator;
+	private readonly communicator!: Contracts.P2PService.PeerCommunicator;
 
 	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly repository!: Contracts.P2P.PeerRepository;
+	private readonly repository!: Contracts.P2PService.PeerRepository;
 
 	@inject(Identifiers.P2P.Header.Factory)
-	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
+	private readonly headerFactory!: Contracts.P2PService.HeaderFactory;
 
 	@inject(Identifiers.P2P.Downloader.Block)
-	private readonly blockDownloader!: Contracts.P2P.Downloader;
+	private readonly blockDownloader!: Contracts.P2PService.Downloader;
 
 	@inject(Identifiers.P2P.Peer.Disposer)
-	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
 	@inject(Identifiers.Consensus.Processor.Message)
 	private readonly messageProcessor!: Contracts.Consensus.MessageProcessor;
@@ -58,7 +58,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2P.State;
+	private readonly state!: Contracts.P2PService.State;
 
 	#fullDownloadsByBlockNumber: Map<number, Set<number>> = new Map();
 	#downloadsByBlockNumber: Map<number, Map<number, DownloadsByRound>> = new Map();
@@ -88,7 +88,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		}
 	}
 
-	public download(peer: Contracts.P2P.Peer): void {
+	public download(peer: Contracts.P2PService.Peer): void {
 		if (this.blockDownloader.isDownloading()) {
 			return;
 		}
@@ -137,7 +137,7 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		return this.#downloadsByBlockNumber.size > 0 || this.#fullDownloadsByBlockNumber.size > 0;
 	}
 
-	#canDownload(ourHeader: Contracts.P2P.Header, peerHeader: Contracts.P2P.HeaderData): boolean {
+	#canDownload(ourHeader: Contracts.P2PService.Header, peerHeader: Contracts.P2PService.HeaderData): boolean {
 		if (ourHeader.blockNumber !== peerHeader.blockNumber || ourHeader.round > peerHeader.round) {
 			return false;
 		}
@@ -159,7 +159,10 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 		return this.#canDownloadFullRound(peerHeader.blockNumber, round);
 	}
 
-	#getHighestRoundToDownload(ourHeader: Contracts.P2P.Header, peerHeader: Contracts.P2P.HeaderData): number {
+	#getHighestRoundToDownload(
+		ourHeader: Contracts.P2PService.Header,
+		peerHeader: Contracts.P2PService.HeaderData,
+	): number {
 		if (peerHeader.round <= ourHeader.round) {
 			return peerHeader.round;
 		}
@@ -399,8 +402,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#getPrevoteIndexesToDownload(
-		ourHeader: Contracts.P2P.Header,
-		peerHeader: Contracts.P2P.HeaderData,
+		ourHeader: Contracts.P2PService.Header,
+		peerHeader: Contracts.P2PService.HeaderData,
 		prevotes: boolean[],
 	): number[] {
 		return this.#getIndexesToDownload(
@@ -411,8 +414,8 @@ export class MessageDownloader implements Contracts.P2P.Downloader {
 	}
 
 	#getPrecommitIndexesToDownload(
-		ourHeader: Contracts.P2P.Header,
-		peerHeader: Contracts.P2P.HeaderData,
+		ourHeader: Contracts.P2PService.Header,
+		peerHeader: Contracts.P2PService.HeaderData,
 		precommits: boolean[],
 	): number[] {
 		return this.#getIndexesToDownload(

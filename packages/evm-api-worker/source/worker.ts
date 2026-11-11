@@ -12,7 +12,7 @@ export class Worker implements Contracts.Evm.Worker {
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly p2pRepository!: Contracts.P2P.PeerRepository;
+	private readonly p2pRepository!: Contracts.P2PService.PeerRepository;
 
 	private ipcSubprocess!: Contracts.Kernel.IPC.Subprocess;
 

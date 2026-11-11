@@ -25,10 +25,10 @@ export class PostMessageRoute implements Interfaces.Route<Request, Response> {
 	private readonly factory!: Contracts.Crypto.MessageFactory;
 
 	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2P.State;
+	private readonly state!: Contracts.P2PService.State;
 
 	@inject(Identifiers.P2P.Logger)
-	private readonly logger!: Contracts.P2P.Logger;
+	private readonly logger!: Contracts.P2PService.Logger;
 
 	public readonly path = PostMessage.path;
 	public readonly codec = PostMessage.codec;

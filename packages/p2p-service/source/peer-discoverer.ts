@@ -6,23 +6,23 @@ import { ensureError, http } from "@mainsail/utils";
 import { readJSONSync } from "fs-extra/esm";
 
 @injectable()
-export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
+export class PeerDiscoverer implements Contracts.P2PService.PeerDiscoverer {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
 	@inject(Identifiers.P2P.Peer.Factory)
-	private readonly peerFactory!: Contracts.P2P.PeerFactory;
+	private readonly peerFactory!: Contracts.P2PService.PeerFactory;
 
 	@inject(Identifiers.P2P.Peer.Communicator)
-	private readonly communicator!: Contracts.P2P.PeerCommunicator;
+	private readonly communicator!: Contracts.P2PService.PeerCommunicator;
 
 	@inject(Identifiers.P2P.Peer.Disposer)
-	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	async discoverPeers(peer: Contracts.P2P.Peer): Promise<void> {
+	async discoverPeers(peer: Contracts.P2PService.Peer): Promise<void> {
 		try {
 			const { peers } = await this.communicator.getPeers(peer);
 
@@ -37,7 +37,7 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 	}
 
 	async populateSeedPeers(): Promise<void> {
-		const peerList = this.app.config<{ list: Contracts.P2P.PeerData[] }>("peers")?.list ?? [];
+		const peerList = this.app.config<{ list: Contracts.P2PService.PeerData[] }>("peers")?.list ?? [];
 
 		try {
 			const peersFromUrl = await this.#loadPeersFromUrlList();
@@ -55,21 +55,21 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 			await this.app.terminate("No seed peers defined in peers.json");
 		}
 
-		const peers: Contracts.P2P.Peer[] = peerList.map((peer) => {
+		const peers: Contracts.P2PService.Peer[] = peerList.map((peer) => {
 			const peerInstance = this.peerFactory(peer.ip);
 			peerInstance.version = this.app.version();
 			return peerInstance;
 		});
 
 		await Promise.all(
-			Object.values(peers).map((peer: Contracts.P2P.Peer) =>
+			Object.values(peers).map((peer: Contracts.P2PService.Peer) =>
 				this.#getProcessor().validateAndAcceptPeer(peer.ip, { seed: true }),
 			),
 		);
 	}
 
-	#getProcessor(): Contracts.P2P.PeerProcessor {
-		return this.app.get<Contracts.P2P.PeerProcessor>(Identifiers.P2P.Peer.Processor);
+	#getProcessor(): Contracts.P2PService.PeerProcessor {
+		return this.app.get<Contracts.P2PService.PeerProcessor>(Identifiers.P2P.Peer.Processor);
 	}
 
 	// TODO: Get from all sources

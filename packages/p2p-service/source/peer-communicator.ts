@@ -17,7 +17,7 @@ const DIAL_SPACING = 10_000;
 // Minimal port of the @mainsail/p2p communicator over the new transport: no timeouts per route,
 // no reply validation, no throttling.
 @injectable()
-export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
+export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 	@inject(Identifiers.P2P.WebSocket.Service)
 	private readonly websocketService!: WebSocketService;
 
@@ -25,13 +25,13 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	private readonly connections!: ConnectionRepository;
 
 	@inject(Identifiers.P2P.Peer.Disposer)
-	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
 	@inject(Identifiers.P2P.Header.Service)
-	private readonly headerService!: Contracts.P2P.HeaderService;
+	private readonly headerService!: Contracts.P2PService.HeaderService;
 
 	@inject(Identifiers.P2P.Logger)
-	private readonly logger!: Contracts.P2P.Logger;
+	private readonly logger!: Contracts.P2PService.Logger;
 
 	public async postProposal(peer: Peer, proposal: Buffer): Promise<void> {
 		try {
@@ -49,8 +49,8 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 	}
 
-	public async getStatus(peer: Peer): Promise<Contracts.P2P.GetStatusResponse> {
-		return (await this.#emit(peer, GetStatus, {})) as unknown as Contracts.P2P.GetStatusResponse;
+	public async getStatus(peer: Peer): Promise<Contracts.P2PService.GetStatusResponse> {
+		return (await this.#emit(peer, GetStatus, {})) as unknown as Contracts.P2PService.GetStatusResponse;
 	}
 
 	// TODO: getBlocks needs the longer `getBlocksTimeout` from the configuration (30 s) instead of the
@@ -58,39 +58,31 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 	public async getBlocks(
 		peer: Peer,
 		{ fromBlockNumber, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromBlockNumber: number; limit?: number },
-	): Promise<Contracts.P2P.GetBlocksResponse> {
+	): Promise<Contracts.P2PService.GetBlocksResponse> {
 		return (await this.#emit(peer, GetBlocks, {
 			fromBlockNumber,
 			limit,
-		})) as unknown as Contracts.P2P.GetBlocksResponse;
+		})) as unknown as Contracts.P2PService.GetBlocksResponse;
 	}
 
 	public async getProposal(
 		peer: Peer,
-		query: Contracts.P2P.GetProposalQuery,
-	): Promise<Contracts.P2P.GetProposalResponse> {
-		return (await this.#emit(peer, GetProposal, { query })) as unknown as Contracts.P2P.GetProposalResponse;
+		query: Contracts.P2PService.GetProposalQuery,
+	): Promise<Contracts.P2PService.GetProposalResponse> {
+		return (await this.#emit(peer, GetProposal, { query })) as unknown as Contracts.P2PService.GetProposalResponse;
 	}
 
 	public async getMessages(
 		peer: Peer,
-		query: Contracts.P2P.GetMessagesQuery,
-	): Promise<Contracts.P2P.GetMessagesResponse> {
-		return (await this.#emit(peer, GetMessages, { query })) as unknown as Contracts.P2P.GetMessagesResponse;
+		query: Contracts.P2PService.GetMessagesQuery,
+	): Promise<Contracts.P2PService.GetMessagesResponse> {
+		return (await this.#emit(peer, GetMessages, { query })) as unknown as Contracts.P2PService.GetMessagesResponse;
 	}
 
-	public async getPeers(peer: Peer): Promise<Contracts.P2P.GetPeersResponse> {
+	public async getPeers(peer: Peer): Promise<Contracts.P2PService.GetPeersResponse> {
 		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`, "p2p");
 
-		return (await this.#emit(peer, GetPeers, {})) as unknown as Contracts.P2P.GetPeersResponse;
-	}
-
-	public async getApiNodes(): Promise<Contracts.P2P.GetApiNodesResponse> {
-		throw new Error("API nodes are not part of @mainsail/p2p-service");
-	}
-
-	public async pingPorts(): Promise<void> {
-		throw new Error("pingPorts is not ported to @mainsail/p2p-service yet");
+		return (await this.#emit(peer, GetPeers, {})) as unknown as Contracts.P2PService.GetPeersResponse;
 	}
 
 	async #emit<TRequest extends { headers?: unknown }, TResponse>(
@@ -106,7 +98,7 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		peer.setPinged(Math.floor(performance.now() - started));
 
 		// The wire type of the headers is the protobuf shape; the contract shape is what the codec unpacks.
-		const { headers } = response as { headers?: Contracts.P2P.HeaderData };
+		const { headers } = response as { headers?: Contracts.P2PService.HeaderData };
 		assert.defined(headers);
 		void this.headerService.handle(peer, headers);
 

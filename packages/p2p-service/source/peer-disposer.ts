@@ -17,7 +17,7 @@ const DISPOSE_REASONS = new Set<CloseReason>([
 ]);
 
 @injectable()
-export class PeerDisposer implements Contracts.P2P.PeerDisposer {
+export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p-service")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
@@ -26,7 +26,7 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 	private readonly websocketService!: WebSocketService;
 
 	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly repository!: Contracts.P2P.PeerRepository;
+	private readonly repository!: Contracts.P2PService.PeerRepository;
 
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;

@@ -4,11 +4,11 @@ import { injectable } from "@mainsail/container";
 
 @injectable()
 export class PeerResource implements Contracts.Api.Resource {
-	public raw(resource: Contracts.P2P.Peer): object {
+	public raw(resource: Contracts.P2PService.Peer): object {
 		return resource;
 	}
 
-	public transform(resource: Contracts.P2P.Peer): object {
+	public transform(resource: Contracts.P2PService.Peer): object {
 		return {
 			blockNumber: resource.header ? resource.header.blockNumber : undefined,
 			ip: resource.ip,

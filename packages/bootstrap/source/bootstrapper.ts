@@ -27,7 +27,7 @@ export class Bootstrapper {
 	private readonly validatorRepository!: Contracts.Validator.ValidatorRepository;
 
 	@inject(Identifiers.P2P.Service)
-	private readonly p2pService!: Contracts.P2P.Service;
+	private readonly p2pService!: Contracts.P2PService.Service;
 
 	@inject(Identifiers.Cryptography.Commit.Factory)
 	private readonly commitFactory!: Contracts.Crypto.CommitFactory;

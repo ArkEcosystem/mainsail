@@ -13,7 +13,7 @@ import { percentile } from "./utils/index.js";
 // Port of the @mainsail/p2p service without API nodes. It also owns the transport lifecycle, which the
 // old service left to the hapi server.
 @injectable()
-export class Service implements Contracts.P2P.Service {
+export class Service implements Contracts.P2PService.Service {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p-service")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
@@ -22,22 +22,22 @@ export class Service implements Contracts.P2P.Service {
 	private readonly websocketService!: WebSocketService;
 
 	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2P.State;
+	private readonly state!: Contracts.P2PService.State;
 
 	@inject(Identifiers.P2P.Peer.Discoverer)
-	private readonly peerDiscoverer!: Contracts.P2P.PeerDiscoverer;
+	private readonly peerDiscoverer!: Contracts.P2PService.PeerDiscoverer;
 
 	@inject(Identifiers.P2P.Peer.Processor)
-	private readonly peerProcessor!: Contracts.P2P.PeerProcessor;
+	private readonly peerProcessor!: Contracts.P2PService.PeerProcessor;
 
 	@inject(Identifiers.P2P.Peer.Verifier)
-	private readonly peerVerifier!: Contracts.P2P.PeerVerifier;
+	private readonly peerVerifier!: Contracts.P2PService.PeerVerifier;
 
 	@inject(Identifiers.P2P.Peer.Disposer)
-	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
 	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly repository!: Contracts.P2P.PeerRepository;
+	private readonly repository!: Contracts.P2PService.PeerRepository;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;

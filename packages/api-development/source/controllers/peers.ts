@@ -13,15 +13,15 @@ import { Controller } from "./controller.js";
 @injectable()
 export class PeersController extends Controller {
 	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly peerRepository!: Contracts.P2P.PeerRepository;
+	private readonly peerRepository!: Contracts.P2PService.PeerRepository;
 
 	@inject(Identifiers.P2P.Peer.Disposer)
-	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
 	public async index(
 		request: Types.HapiRequest,
 	): Promise<Contracts.Api.ResultsPage<ReturnType<PeerResource["transform"]>> | Boom.Boom> {
-		const allPeers: Contracts.P2P.Peer[] = [...this.peerRepository.getPeers()];
+		const allPeers: Contracts.P2PService.Peer[] = [...this.peerRepository.getPeers()];
 
 		let results = allPeers;
 
@@ -55,7 +55,7 @@ export class PeersController extends Controller {
 
 		switch (property) {
 			case "version": {
-				const version = (peer: Contracts.P2P.Peer) => semver.valid(peer.version) ?? "0.0.0";
+				const version = (peer: Contracts.P2PService.Peer) => semver.valid(peer.version) ?? "0.0.0";
 				results = results.sort((a, b) =>
 					ascending ? semver.compare(version(a), version(b)) : semver.rcompare(version(a), version(b)),
 				);

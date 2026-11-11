@@ -15,7 +15,7 @@ export const GetPeers: Interfaces.RouteDefinition<Request, Response> = { codec: 
 @injectable()
 export class GetPeersRoute implements Interfaces.Route<Request, Response> {
 	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly peerRepository!: Contracts.P2P.PeerRepository;
+	private readonly peerRepository!: Contracts.P2PService.PeerRepository;
 
 	public readonly path = GetPeers.path;
 	public readonly codec = GetPeers.codec;

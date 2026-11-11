@@ -8,7 +8,7 @@ import { isValidVersion } from "./utils/index.js";
 
 // Copied from @mainsail/p2p without the tx pool node and API node checks, which leave this package.
 @injectable()
-export class PeerProcessor implements Contracts.P2P.PeerProcessor {
+export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -17,16 +17,16 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly repository!: Contracts.P2P.PeerRepository;
+	private readonly repository!: Contracts.P2PService.PeerRepository;
 
 	@inject(Identifiers.P2P.Peer.Verifier)
-	private readonly peerVerifier!: Contracts.P2P.PeerVerifier;
+	private readonly peerVerifier!: Contracts.P2PService.PeerVerifier;
 
 	@inject(Identifiers.P2P.Peer.Disposer)
-	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
 	@inject(Identifiers.P2P.Peer.Discoverer)
-	private readonly peerDiscoverer!: Contracts.P2P.PeerDiscoverer;
+	private readonly peerDiscoverer!: Contracts.P2PService.PeerDiscoverer;
 
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly transactionPoolWorker!: Contracts.TransactionPool.Worker;
@@ -35,7 +35,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.P2P.Logger)
-	private readonly logger!: Contracts.P2P.Logger;
+	private readonly logger!: Contracts.P2PService.Logger;
 
 	readonly #seedIps = new Set<string>();
 
@@ -50,11 +50,14 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		});
 	}
 
-	public isWhitelisted(peer: Contracts.P2P.Peer): boolean {
+	public isWhitelisted(peer: Contracts.P2PService.Peer): boolean {
 		return isWhitelisted(this.configuration.getOptional<string[]>("remoteAccess", []), peer.ip);
 	}
 
-	public async validateAndAcceptPeer(rawIp: string, options: Contracts.P2P.AcceptNewPeerOptions = {}): Promise<void> {
+	public async validateAndAcceptPeer(
+		rawIp: string,
+		options: Contracts.P2PService.AcceptNewPeerOptions = {},
+	): Promise<void> {
 		const ip = IpAddress.sanitizeRemoteAddress(rawIp);
 		if (!ip) {
 			return;
@@ -78,7 +81,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		}
 	}
 
-	public validatePeerIp(ip: string, options: Contracts.P2P.AcceptNewPeerOptions = {}): boolean {
+	public validatePeerIp(ip: string, options: Contracts.P2PService.AcceptNewPeerOptions = {}): boolean {
 		if (!IpAddress.isValidPeerIp(ip)) {
 			return false;
 		}
@@ -98,11 +101,11 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		return !this.#isSameSubnetLimitReached(ip, options);
 	}
 
-	#isSeed(ip: string, options: Contracts.P2P.AcceptNewPeerOptions): boolean {
+	#isSeed(ip: string, options: Contracts.P2PService.AcceptNewPeerOptions): boolean {
 		return !!options.seed || this.#seedIps.has(ip);
 	}
 
-	#isSameSubnetLimitReached(ip: string, options: Contracts.P2P.AcceptNewPeerOptions): boolean {
+	#isSameSubnetLimitReached(ip: string, options: Contracts.P2PService.AcceptNewPeerOptions): boolean {
 		if (this.#isSeed(ip, options)) {
 			return false;
 		}
@@ -121,8 +124,8 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 		return true;
 	}
 
-	async #acceptNewPeer(ip: string, options: Contracts.P2P.AcceptNewPeerOptions): Promise<void> {
-		const peer = this.app.get<Contracts.P2P.PeerFactory>(Identifiers.P2P.Peer.Factory)(ip);
+	async #acceptNewPeer(ip: string, options: Contracts.P2PService.AcceptNewPeerOptions): Promise<void> {
+		const peer = this.app.get<Contracts.P2PService.PeerFactory>(Identifiers.P2P.Peer.Factory)(ip);
 
 		this.repository.setPendingPeer(peer);
 
