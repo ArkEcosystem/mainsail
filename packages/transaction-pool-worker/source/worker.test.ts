@@ -568,6 +568,20 @@ describe<{
 		assert.length(spawned, 1);
 	});
 
+	it("does not terminate the node when a commit fails during shutdown", async ({ worker, ipc, terminations }) => {
+		await startWorker(worker);
+		const commit = deferred();
+		ipc.respond = async (method) => (method === "commit" ? commit.promise : undefined);
+
+		await within(worker.onCommit(makeUnit(11)));
+		const disposed = worker.dispose();
+		commit.reject(new Error("pool disposed"));
+		await within(disposed);
+		await new Promise((resolve) => setTimeout(resolve, 10));
+
+		assert.length(terminations, 0);
+	});
+
 	it("skips every request while the worker respawns and restarts it at the latest block", async ({
 		worker,
 		ipc,
