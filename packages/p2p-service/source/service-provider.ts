@@ -31,6 +31,7 @@ import {
 	PostMessageRoute,
 	PostProposalRoute,
 } from "./routes/index.js";
+import { Seeds } from "./seeds.js";
 import { Service } from "./service.js";
 import { State } from "./state.js";
 
@@ -46,8 +47,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.Peer.Discoverer).to(PeerDiscoverer).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Processor).to(PeerProcessor).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Verifier).to(PeerVerifier).inSingletonScope();
-		// Runs after the transport's own verifiers (ban list, duplicate address), before the handshake.
-		this.app.bind(Identifiers.P2P.WebSocket.Connection.Verifiers).to(PeerIpVerifier).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Seeds).to(Seeds).inSingletonScope();
+		// Also runs on the transport after its own verifiers (ban list, duplicate address), before the handshake.
+		this.app.bind(Identifiers.P2P.Peer.IpVerifier).to(PeerIpVerifier).inSingletonScope();
+		this.app.bind(Identifiers.P2P.WebSocket.Connection.Verifiers).toService(Identifiers.P2P.Peer.IpVerifier);
 		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
 		this.app.bind<() => Header>(Identifiers.P2P.Header.Factory).toFactory(() => () => this.app.resolve(Header));
 		this.app.bind(Identifiers.P2P.Header.Service).to(HeaderService).inSingletonScope();

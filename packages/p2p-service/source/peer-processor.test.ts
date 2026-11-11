@@ -1,5 +1,6 @@
 import { Events, Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
+import { CloseReason } from "@mainsail/p2p-websocket";
 import { describe } from "@mainsail/test-runner";
 
 import { PeerProcessor } from "./peer-processor";
@@ -23,6 +24,8 @@ describe<{
 	transactionPoolWorker: any;
 	peerDiscoverer: any;
 	websocketService: any;
+	peerIpVerifier: any;
+	seeds: any;
 	configuration: any;
 }>("PeerProcessor", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
@@ -45,6 +48,8 @@ describe<{
 		context.transactionPoolWorker = { registerEventHandler: () => {}, setPeer: async () => {} };
 		context.peerDiscoverer = { discoverPeers: async () => {} };
 		context.websocketService = { onConnection: undefined };
+		context.peerIpVerifier = { verify: () => undefined };
+		context.seeds = { isSeed: () => false };
 
 		context.configuration = {
 			getOptional: (key: string, defaultValue: unknown) => defaultValue,
@@ -62,6 +67,8 @@ describe<{
 		app.bind(Identifiers.P2P.Peer.Discoverer).toConstantValue(context.peerDiscoverer);
 		app.bind(Identifiers.P2P.Peer.Factory).toConstantValue((ip: string) => makePeer(ip));
 		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
+		app.bind(Identifiers.P2P.Peer.IpVerifier).toConstantValue(context.peerIpVerifier);
+		app.bind(Identifiers.P2P.Peer.Seeds).toConstantValue(context.seeds);
 		app.bind(Identifiers.TransactionPool.Worker).toConstantValue(context.transactionPoolWorker);
 		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.events);
 		app.bind(Identifiers.P2P.Logger).toConstantValue(context.logger);
@@ -110,10 +117,15 @@ describe<{
 		setKnownPeer.neverCalled();
 	});
 
-	it("#validateAndAcceptPeer - should reject localhost addresses", async ({ processor, repository }) => {
+	it("#validateAndAcceptPeer - should reject addresses the ip verifier refuses", async ({
+		processor,
+		repository,
+		peerIpVerifier,
+	}) => {
+		peerIpVerifier.verify = () => CloseReason.Rejected;
 		const setKnownPeer = spy(repository, "setKnownPeer");
 
-		await processor.validateAndAcceptPeer("127.0.0.1");
+		await processor.validateAndAcceptPeer("178.165.55.55");
 
 		setKnownPeer.neverCalled();
 	});
@@ -135,13 +147,15 @@ describe<{
 	it("#validateAndAcceptPeer - should still record seed peers in non-discovery mode", async ({
 		processor,
 		repository,
+		seeds,
 		configuration,
 	}) => {
 		configuration.getOptional = (key: string, defaultValue: unknown) =>
 			key === "disableDiscovery" ? true : defaultValue;
+		seeds.isSeed = () => true;
 		const setKnownPeer = spy(repository, "setKnownPeer");
 
-		await processor.validateAndAcceptPeer("178.165.55.55", { seed: true });
+		await processor.validateAndAcceptPeer("178.165.55.55");
 
 		setKnownPeer.calledOnce();
 	});
@@ -257,26 +271,11 @@ describe<{
 		verify.neverCalled();
 	});
 
-	it("#onConnection - should dispose a peer that fails the address rules", async ({
-		websocketService,
-		peerVerifier,
-		peerDisposer,
-	}) => {
-		peerDisposer.isBanned = () => true;
-		const verify = spy(peerVerifier, "verify");
-		const disposePeer = spy(peerDisposer, "disposePeer");
-
-		await connect(websocketService, "178.165.55.55");
-
-		verify.neverCalled();
-		disposePeer.calledWith("178.165.55.55");
-	});
-
 	it("#onConnection - should dispose unknown peers in non-discovery mode but keep seeds", async ({
 		websocketService,
-		processor,
 		repository,
 		peerDisposer,
+		seeds,
 		configuration,
 	}) => {
 		configuration.getOptional = (key: string, defaultValue: unknown) =>
@@ -287,24 +286,22 @@ describe<{
 		await connect(websocketService, "178.165.55.55");
 		disposePeer.calledWith("178.165.55.55");
 
-		await processor.validateAndAcceptPeer("178.165.55.56", { seed: true });
+		seeds.isSeed = (ip: string) => ip === "178.165.55.56";
 		await connect(websocketService, "178.165.55.56");
 		setPeer.calledOnce();
 	});
 
-	it("#onConnection - should re-check the subnet cap after verification", async ({
+	it("#onConnection - should re-check the address rules after verification", async ({
 		websocketService,
 		repository,
 		peerVerifier,
+		peerIpVerifier,
 		peerDisposer,
 		events,
 	}) => {
-		// Concurrent accepts from one /24 all pass validatePeerIp() while none of them is in the repository;
-		// the others land while this one is being verified.
-		const sameSubnetPeers: object[] = [];
-		repository.getSameSubnetPeers = () => sameSubnetPeers;
+		// Concurrent accepts from one /24 all pass the transport's check; the others land during this verification.
 		peerVerifier.verify = async () => {
-			sameSubnetPeers.push(...Array.from({ length: 5 }, (_, index) => ({ ip: `178.165.55.${index}` })));
+			peerIpVerifier.verify = () => CloseReason.Rejected;
 			return true;
 		};
 
@@ -335,15 +332,5 @@ describe<{
 		disposePeer.neverCalled();
 		onClose();
 		disposePeer.calledWith("178.165.55.55");
-	});
-
-	it("#validateAndAcceptPeer - should exempt a known seed from the subnet cap", async ({ processor, repository }) => {
-		const setKnownPeer = spy(repository, "setKnownPeer");
-		repository.getSameSubnetPeers = () => Array.from({ length: 5 }, (_, index) => ({ ip: `178.165.55.${index}` }));
-
-		await processor.validateAndAcceptPeer("178.165.55.55", { seed: true });
-		await processor.validateAndAcceptPeer("178.165.55.56");
-
-		setKnownPeer.calledOnce();
 	});
 });
