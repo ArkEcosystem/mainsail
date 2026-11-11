@@ -1,12 +1,11 @@
 import { Events, Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
-import { CloseReason } from "@mainsail/p2p-websocket";
 import { describe } from "@mainsail/test-runner";
 
 import { PeerProcessor } from "./peer-processor";
 
 const makePeer = (ip: string): any => ({ ip, port: 4002, version: "0.0.1" });
-const makeConnection = (ip: string): any => ({ remoteAddress: ip });
+const makeConnection = (ip: string): any => ({ onClose: () => {}, remoteAddress: ip });
 
 // The hook does not return the verification promise; a macrotask lets the whole flow settle.
 const connect = async (websocketService: any, ip: string): Promise<void> => {
@@ -45,7 +44,7 @@ describe<{
 		context.events = { dispatch: async () => {}, listen: () => {} };
 		context.transactionPoolWorker = { registerEventHandler: () => {}, setPeer: async () => {} };
 		context.peerDiscoverer = { discoverPeers: async () => {} };
-		context.websocketService = { accept: undefined, onConnection: undefined };
+		context.websocketService = { onConnection: undefined };
 
 		context.configuration = {
 			getOptional: (key: string, defaultValue: unknown) => defaultValue,
@@ -322,36 +321,29 @@ describe<{
 		forgetPendingPeer.calledOnce();
 	});
 
-	it("#accept - should exempt a known seed from the subnet cap", async ({
-		processor,
+	it("#onConnection - should dispose the peer when its connection closes", async ({
 		websocketService,
-		repository,
-	}) => {
-		await processor.validateAndAcceptPeer("178.165.55.55", { seed: true });
-		repository.getSameSubnetPeers = () => Array.from({ length: 5 }, (_, index) => ({ ip: `178.165.55.${index}` }));
-
-		assert.undefined(websocketService.accept("178.165.55.55"));
-		assert.equal(websocketService.accept("178.165.55.56"), CloseReason.Rejected);
-	});
-
-	it("#accept - should not reject inbound sockets in non-discovery mode", ({ websocketService, configuration }) => {
-		configuration.getOptional = (key: string, defaultValue: unknown) =>
-			key === "disableDiscovery" ? true : defaultValue;
-
-		assert.undefined(websocketService.accept("178.165.55.55"));
-	});
-
-	it("#accept - should let active peers through and reject banned or local addresses", ({
-		websocketService,
-		repository,
 		peerDisposer,
 	}) => {
-		assert.equal(websocketService.accept("127.0.0.1"), CloseReason.Rejected);
+		let onClose!: () => void;
+		const connection = { onClose: (listener: () => void) => (onClose = listener), remoteAddress: "178.165.55.55" };
+		const disposePeer = spy(peerDisposer, "disposePeer");
 
-		peerDisposer.isBanned = () => true;
-		assert.equal(websocketService.accept("178.165.55.55"), CloseReason.Rejected);
+		websocketService.onConnection(connection);
+		await new Promise((resolve) => setImmediate(resolve));
 
-		repository.hasPeer = () => true;
-		assert.undefined(websocketService.accept("178.165.55.55"));
+		disposePeer.neverCalled();
+		onClose();
+		disposePeer.calledWith("178.165.55.55");
+	});
+
+	it("#validateAndAcceptPeer - should exempt a known seed from the subnet cap", async ({ processor, repository }) => {
+		const setKnownPeer = spy(repository, "setKnownPeer");
+		repository.getSameSubnetPeers = () => Array.from({ length: 5 }, (_, index) => ({ ip: `178.165.55.${index}` }));
+
+		await processor.validateAndAcceptPeer("178.165.55.55", { seed: true });
+		await processor.validateAndAcceptPeer("178.165.55.56");
+
+		setKnownPeer.calledOnce();
 	});
 });
