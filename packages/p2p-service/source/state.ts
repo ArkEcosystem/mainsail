@@ -4,7 +4,7 @@ import { injectable } from "@mainsail/container";
 import dayjs from "dayjs";
 
 @injectable()
-export class State implements Contracts.P2P.State {
+export class State implements Contracts.P2PService.State {
 	#lastMessage: dayjs.Dayjs = dayjs();
 
 	public resetLastMessageTime(): void {

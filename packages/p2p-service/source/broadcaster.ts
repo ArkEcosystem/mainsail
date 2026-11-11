@@ -5,19 +5,19 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { shuffle, take } from "@mainsail/utils";
 
 @injectable()
-export class Broadcaster implements Contracts.P2P.Broadcaster {
+export class Broadcaster implements Contracts.P2PService.Broadcaster {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p-service")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly repository!: Contracts.P2P.PeerRepository;
+	private readonly repository!: Contracts.P2PService.PeerRepository;
 
 	@inject(Identifiers.P2P.Peer.Communicator)
-	private readonly communicator!: Contracts.P2P.PeerCommunicator;
+	private readonly communicator!: Contracts.P2PService.PeerCommunicator;
 
 	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2P.State;
+	private readonly state!: Contracts.P2PService.State;
 
 	async broadcastProposal(proposal: Contracts.Crypto.Proposal): Promise<void> {
 		this.state.resetLastMessageTime();
@@ -39,9 +39,9 @@ export class Broadcaster implements Contracts.P2P.Broadcaster {
 		await Promise.all(promises);
 	}
 
-	#getPeersForBroadcast(): Contracts.P2P.Peer[] {
+	#getPeersForBroadcast(): Contracts.P2PService.Peer[] {
 		const maxPeersBroadcast: number = this.configuration.getRequired<number>("maxPeersBroadcast");
-		const peers: Contracts.P2P.Peer[] = take(shuffle(this.repository.getPeers()), maxPeersBroadcast);
+		const peers: Contracts.P2PService.Peer[] = take(shuffle(this.repository.getPeers()), maxPeersBroadcast);
 
 		return peers;
 	}

@@ -30,7 +30,7 @@ export class ProposalProcessor extends AbstractProcessor implements Contracts.Co
 	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;
 
 	@inject(Identifiers.P2P.Broadcaster)
-	private readonly broadcaster!: Contracts.P2P.Broadcaster;
+	private readonly broadcaster!: Contracts.P2PService.Broadcaster;
 
 	@inject(Identifiers.ConsensusStorage.Service)
 	private readonly storage!: Contracts.ConsensusStorage.Service;

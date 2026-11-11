@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Enums } from "@mainsail/constants";
 import { IpAddress } from "@mainsail/utils";
 
-export const getPeerUrl = (peer: Contracts.P2P.PeerBroadcast): string => {
+export const getPeerUrl = (peer: Contracts.P2PService.PeerBroadcast): string => {
 	let protocol = peer.protocol;
 	const host = IpAddress.normalizeAddress(peer.ip);
 
