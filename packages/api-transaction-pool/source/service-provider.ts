@@ -66,7 +66,7 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				options: {
 					limit: config.concurrencyLimit.limitPerIp,
 					trustProxy: config.trustProxy,
-					whitelist: config.rateLimit.enabled ? config.rateLimit.whitelist : ["*"],
+					whitelist: config.rateLimit.whitelist,
 				},
 				plugin: Plugins.concurrencyLimitPerIp,
 			},

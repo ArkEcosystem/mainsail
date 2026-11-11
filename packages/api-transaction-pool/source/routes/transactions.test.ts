@@ -442,7 +442,6 @@ describe<{
 	}) => {
 		const limited = makeConfiguration();
 		limited.plugins.concurrencyLimit = { limit: 10, limitPerIp: 1 };
-		limited.plugins.rateLimit.enabled = true;
 		limited.plugins.trustProxy = true;
 
 		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
@@ -470,7 +469,6 @@ describe<{
 	}) => {
 		const limited = makeConfiguration();
 		limited.plugins.concurrencyLimit = { limit: 0, limitPerIp: 1 };
-		limited.plugins.rateLimit.enabled = true;
 
 		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
 
@@ -489,21 +487,17 @@ describe<{
 		}
 	});
 
-	for (const [label, rateLimit] of [
-		["ips the rate limit whitelists", { enabled: true, whitelist: ["1.1.1.*"] }],
-		["any ip when rate limiting is disabled", { enabled: false, whitelist: [] }],
+	for (const [label, enabled] of [
+		["enabled", true],
+		["disabled", false],
 	] as const) {
-		it(`GET /api/transactions/unconfirmed - does not limit concurrent reads per ip for ${label}`, async ({
+		it(`GET /api/transactions/unconfirmed - does not limit concurrent reads per ip for ips the rate limit whitelists while rate limiting is ${label}`, async ({
 			processor,
 			transactions,
 		}) => {
 			const limited = makeConfiguration();
 			limited.plugins.concurrencyLimit = { limit: 10, limitPerIp: 1 };
-			limited.plugins.rateLimit = {
-				...limited.plugins.rateLimit,
-				...rateLimit,
-				whitelist: [...rateLimit.whitelist],
-			};
+			limited.plugins.rateLimit = { ...limited.plugins.rateLimit, enabled, whitelist: ["1.1.1.*"] };
 			limited.plugins.trustProxy = true;
 
 			const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
