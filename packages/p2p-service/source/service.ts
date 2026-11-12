@@ -61,6 +61,7 @@ export class Service implements Contracts.P2PService.Service {
 
 		await this.seeds.load();
 		await this.peerDiscoverer.populateSeedPeers();
+		await this.#dialKnownPeers();
 
 		for (const [version, peers] of Object.entries(
 			groupBy(this.repository.getPeers(), (peer) => peer.version ?? "unknown"),
@@ -98,7 +99,8 @@ export class Service implements Contracts.P2PService.Service {
 		await this.websocketService.dispose();
 	}
 
-	// Known peers lost their connection; they are dialed again, spaced out, until they answer or give up.
+	// Known peers are the seeds and peers that lost their connection; they are dialed, spaced out, until
+	// they answer or are given up.
 	async #dialKnownPeers(): Promise<void> {
 		const now = Date.now();
 		const due = (this.repository.getKnownPeers() as Peer[]).filter(
