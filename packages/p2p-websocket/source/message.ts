@@ -1,3 +1,5 @@
+import type { Message } from "./interfaces/index.js";
+
 import { constants } from "./constants.js";
 import { CloseReason } from "./enums.js";
 import { ConnectionError } from "./errors.js";
@@ -7,13 +9,6 @@ import { ConnectionError } from "./errors.js";
 // reject body:   <reason uint8>                                    sent by the acceptor instead of its hello, then it closes
 // request body:  <id uint32><pathLength uint8><path><payload>      either side, once the handshake is done
 // response body: <id uint32><statusCode uint16><payload>           answers the request with the same id
-
-type HelloMessage = { type: "hello"; version: number };
-type RejectMessage = { type: "reject"; reason: CloseReason };
-type RequestMessage = { type: "request"; id: number; path: string; payload: Buffer };
-type ResponseMessage = { type: "response"; id: number; statusCode: number; payload: Buffer };
-
-type Message = HelloMessage | RejectMessage | RequestMessage | ResponseMessage;
 
 // Wire value of each message type.
 enum MessageType {
@@ -140,12 +135,4 @@ const decode = (buffer: Buffer): Message => {
 	}
 };
 
-export {
-	decode,
-	encode,
-	type HelloMessage,
-	type Message,
-	type RejectMessage,
-	type RequestMessage,
-	type ResponseMessage,
-};
+export { decode, encode };

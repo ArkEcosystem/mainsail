@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package shared;
+
+message Headers {
+    string version = 1;
+    uint32 blockNumber = 2;
+    uint32 round = 3;
+    uint32 step = 4;
+	optional string proposedBlockHash = 5;
+	bytes validatorsSignedPrevote = 6;
+	bytes validatorsSignedPrecommit = 7;
+}
+
+message PeerLike {
+    string ip = 1;
+    uint32 port = 2;
+    uint32 protocol = 3;
+}
