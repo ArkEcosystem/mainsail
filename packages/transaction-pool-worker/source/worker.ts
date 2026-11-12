@@ -6,6 +6,9 @@ import dayjs from "dayjs";
 
 @injectable()
 export class Worker implements Contracts.TransactionPool.Worker {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.TransactionPool.WorkerSubprocess.Factory)
 	private readonly createWorkerSubprocess!: Contracts.Kernel.IPC.SubprocessFactory;
 
@@ -15,9 +18,19 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
+
 	private ipcSubprocess!: Contracts.Kernel.IPC.Subprocess;
 
+	readonly #eventHandlers = new Map<string, Contracts.Kernel.IPC.EventCallback<unknown>>();
+	#flags?: Contracts.TransactionPool.WorkerFlags;
+	#blockNumber?: number;
+	#started = false;
+	#stopping = false;
+	#respawning = false;
 	#bootPromise?: Promise<void>;
+	#respawnPromise?: Promise<void>;
 	#disposePromise?: Promise<void>;
 
 	@postConstruct()
@@ -34,11 +47,13 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	}
 
 	public registerEventHandler<T>(event: string, callback: Contracts.Kernel.IPC.EventCallback<T>): void {
+		this.#eventHandlers.set(event, callback as Contracts.Kernel.IPC.EventCallback<unknown>);
 		this.ipcSubprocess.registerEventHandler(event, callback);
 	}
 
 	public async boot(flags: Contracts.TransactionPool.WorkerFlags): Promise<void> {
 		if (!this.#bootPromise) {
+			this.#flags = flags;
 			this.#bootPromise = this.ipcSubprocess.sendRequest("boot", flags);
 		}
 
@@ -46,6 +61,8 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	}
 
 	public async dispose(): Promise<void> {
+		this.#stopping = true;
+
 		if (!this.#disposePromise) {
 			this.#disposePromise = this.#doDispose();
 		}
@@ -54,6 +71,8 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	}
 
 	async #doDispose(): Promise<void> {
+		await this.#respawnPromise;
+
 		// Let any work already in flight finish before tearing the worker down, so the
 		// dispose doesn't cut off requests that other service providers issued before us.
 		await this.ipcSubprocess.drain();
@@ -70,6 +89,8 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	}
 
 	public async kill(): Promise<number> {
+		this.#stopping = true;
+
 		return this.ipcSubprocess.kill();
 	}
 
@@ -90,33 +111,116 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		const { blockTime } = this.configuration.getMilestone().timeouts;
 		const isSyncing = block.timestamp < nowMs - blockTime * 3;
 
-		await this.#send("commit", unit.blockNumber, [...sendersAddresses.keys()], block.gasUsed, isSyncing);
+		this.#blockNumber = unit.blockNumber;
+
+		await this.#sendIfRunning("commit", unit.blockNumber, [...sendersAddresses.keys()], block.gasUsed, isSyncing);
 	}
 
 	public async start(blockNumber: number): Promise<void> {
+		this.#blockNumber = blockNumber;
 		await this.#send("start", blockNumber);
+		this.#started = true;
 	}
 
 	public async getTransactions(
 		options: Contracts.TransactionPool.GetBatchOptions,
 	): Promise<Contracts.TransactionPool.GetBatchResult> {
-		return this.#send("getTransactions", options);
+		const batch = await this.#sendIfRunning<Contracts.TransactionPool.GetBatchResult>("getTransactions", options);
+
+		return batch ?? { remaining: 0, transactions: [] };
 	}
 
 	public async removeTransaction(address: string, id: string): Promise<void> {
-		await this.#send("removeTransaction", address, id);
+		await this.#sendIfRunning("removeTransaction", address, id);
 	}
 
 	public async setPeer(ip: string): Promise<void> {
-		await this.#send("setPeer", ip);
+		await this.#sendIfRunning("setPeer", ip);
 	}
 
 	public async forgetPeer(ip: string): Promise<void> {
-		await this.#send("forgetPeer", ip);
+		await this.#sendIfRunning("forgetPeer", ip);
 	}
 
 	public async reloadWebhooks(): Promise<void> {
-		await this.#send("reloadWebhooks");
+		await this.#sendIfRunning("reloadWebhooks");
+	}
+
+	#isRunning(): boolean {
+		return !this.#respawning && !this.ipcSubprocess.isStopped();
+	}
+
+	async #sendIfRunning<T>(method: string, ...arguments_: unknown[]): Promise<T | undefined> {
+		if (this.#isRunning()) {
+			try {
+				return await this.#send<T>(method, ...arguments_);
+			} catch (error) {
+				if (this.#isRunning()) {
+					throw error;
+				}
+			}
+		}
+
+		this.#respawn();
+
+		return undefined;
+	}
+
+	#respawn(): void {
+		if (!this.#started || this.#stopping || this.#respawning) {
+			return;
+		}
+
+		this.#respawning = true;
+		this.#respawnPromise = this.#doRespawn();
+	}
+
+	async #doRespawn(): Promise<void> {
+		this.logger.warn("Respawning the transaction pool worker");
+
+		try {
+			await this.ipcSubprocess.kill();
+
+			if (this.#stopping) {
+				return;
+			}
+
+			this.ipcSubprocess = this.createWorkerSubprocess();
+
+			for (const [event, callback] of this.#eventHandlers) {
+				this.ipcSubprocess.registerEventHandler(event, callback);
+			}
+
+			this.#bootPromise = this.ipcSubprocess.sendRequest("boot", this.#flags);
+			await this.#bootPromise;
+
+			if (this.#stopping) {
+				return;
+			}
+
+			const start = this.ipcSubprocess.sendRequest("start", this.#blockNumber);
+			this.#respawning = false;
+			void this.#restorePeers();
+			await start;
+		} catch (error) {
+			if (!this.#stopping) {
+				this.#stopping = true;
+				void this.app.terminate("tx-pool worker failed to respawn", error as Error);
+			}
+
+			return;
+		}
+
+		this.logger.info("Respawned the transaction pool worker");
+	}
+
+	async #restorePeers(): Promise<void> {
+		if (!this.app.isBound(Identifiers.P2P.Peer.Repository)) {
+			return;
+		}
+
+		const peers = this.app.get<Contracts.P2P.PeerRepository>(Identifiers.P2P.Peer.Repository).getPeers();
+		await Promise.allSettled(peers.map(async (peer) => this.setPeer(peer.ip)));
 	}
 
 	async #send<T>(method: string, ...arguments_: unknown[]): Promise<T> {
