@@ -35,3 +35,7 @@ export const getPeerUrl = (peer: Contracts.P2PService.PeerBroadcast): string => 
 		}
 	}
 };
+
+// Where the transport dials a peer; the p2p port is the same for every peer.
+export const getPeerSocketUrl = (peer: Contracts.P2PService.PeerData): string =>
+	`ws://${IpAddress.normalizeAddress(peer.ip)}:${peer.port}`;

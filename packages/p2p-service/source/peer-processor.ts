@@ -4,15 +4,14 @@ import type { Interfaces, Service as WebSocketService } from "@mainsail/p2p-webs
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { ConnectionState } from "@mainsail/p2p-websocket";
-import { IpAddress } from "@mainsail/utils";
+import { ensureError, IpAddress } from "@mainsail/utils";
 
 import type { Peer } from "./interfaces/index.js";
 
-import { isValidVersion } from "./utils/index.js";
+import { getPeerSocketUrl, isValidVersion } from "./utils/index.js";
 
-// Moves peers between the three lists of the repository. It applies no address rules: those run on
-// the transport (PeerIpVerifier, ban list) for every inbound socket and every dial, so an address
-// recorded here that must not be a peer is refused when the service loop dials it.
+// Turns addresses into active peers. It applies no address rules: those run on the transport
+// (PeerIpVerifier, ban list) for every inbound socket and every dial.
 @injectable()
 export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 	@inject(Identifiers.Application.Instance)
@@ -60,7 +59,8 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 		});
 	}
 
-	// Records an address as known; the service loop dials known peers.
+	// Dials a new address; the connection, if it opens, arrives through the transport hook like any other.
+	// A known peer is left to the service loop, which spaces its dials out.
 	public async validateAndAcceptPeer(rawIp: string): Promise<void> {
 		const ip = IpAddress.sanitizeRemoteAddress(rawIp);
 		if (!ip) {
@@ -71,8 +71,13 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 			return;
 		}
 
-		this.repository.setKnownPeer(this.peerFactory(ip));
-		this.logger.debug(`Discovered peer ${ip}`, "p2p");
+		const peer = this.peerFactory(ip);
+
+		try {
+			await this.websocketService.dial(getPeerSocketUrl(peer));
+		} catch (rawError) {
+			this.logger.debug(`Dial to ${peer.ip}:${peer.port} failed: ${ensureError(rawError).message}`, "p2p");
+		}
 	}
 
 	// Every open connection, inbound or outbound, is bound to its peer here and the peer is verified over it.

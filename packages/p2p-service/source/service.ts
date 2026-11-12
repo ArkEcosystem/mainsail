@@ -4,16 +4,16 @@ import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { CloseReason, ConnectionError } from "@mainsail/p2p-websocket";
-import { ensureError, groupBy, IpAddress, pluralize, shuffle } from "@mainsail/utils";
+import { ensureError, groupBy, pluralize, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 import type { Peer } from "./interfaces/index.js";
 
 import { constants } from "./constants.js";
-import { percentile } from "./utils/index.js";
+import { getPeerSocketUrl, percentile } from "./utils/index.js";
 
 // Port of the @mainsail/p2p service without API nodes. It also owns the transport lifecycle, which the
-// old service left to the hapi server, and the dialing of known peers, which the old connector did
+// old service left to the hapi server, and the redialing of known peers, which the old connector did
 // on demand.
 @injectable()
 export class Service implements Contracts.P2PService.Service {
@@ -98,7 +98,7 @@ export class Service implements Contracts.P2PService.Service {
 		await this.websocketService.dispose();
 	}
 
-	// Known peers become active only through a connection; this is the outbound side of that.
+	// Known peers lost their connection; they are dialed again, spaced out, until they answer or give up.
 	async #dialKnownPeers(): Promise<void> {
 		const now = Date.now();
 		const due = (this.repository.getKnownPeers() as Peer[]).filter(
@@ -112,7 +112,7 @@ export class Service implements Contracts.P2PService.Service {
 		peer.lastDialAt = Date.now();
 
 		try {
-			await this.websocketService.dial(`ws://${IpAddress.normalizeAddress(peer.ip)}:${peer.port}`);
+			await this.websocketService.dial(getPeerSocketUrl(peer));
 			peer.dialFailures = 0;
 		} catch (rawError) {
 			const error = ensureError(rawError);
