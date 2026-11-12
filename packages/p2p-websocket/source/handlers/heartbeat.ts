@@ -9,15 +9,19 @@ export type HeartbeatOptions = {
 };
 
 // Detects a dead connection that the socket does not report, and a peer that misuses the heartbeat.
-// Only the dialer pings: every HEARTBEAT_INTERVAL it sends a ping and expects the pong before the
-// next one. The acceptor answers through the socket library and expects the pings to keep coming,
-// neither too late (HEARTBEAT_TIMEOUT) nor too close together (HEARTBEAT_MIN_SPACING). A ping on the
-// dialer's side or a pong on the acceptor's side, or a pong nobody asked for, is a protocol error.
+// Only the dialer pings: every HEARTBEAT_INTERVAL it sends a ping, and it fails once the oldest ping
+// has waited HEARTBEAT_TIMEOUT for its pong. Pings keep their cadence while one is outstanding, so a
+// stall of the event loop (the pong already received but not yet read when the timer fires) neither
+// kills the connection nor starves the acceptor. The acceptor answers through the socket library and
+// expects the pings to keep coming, neither too late (HEARTBEAT_TIMEOUT) nor too close together
+// (HEARTBEAT_MIN_SPACING). A ping on the dialer's side or a pong on the acceptor's side, or a pong
+// nobody asked for, is a protocol error.
 export class Heartbeat {
 	readonly #options: HeartbeatOptions;
 
 	#timer?: NodeJS.Timeout;
-	#awaitingPong = false;
+	// Dialer: when each unanswered ping was sent, oldest first. Acceptor: when the last ping arrived.
+	readonly #unansweredPings: number[] = [];
 	#lastPingAt?: number;
 	#stopped = false;
 
@@ -65,22 +69,24 @@ export class Heartbeat {
 			return;
 		}
 
-		if (this.#options.direction === Direction.Inbound || !this.#awaitingPong) {
+		if (this.#options.direction === Direction.Inbound || this.#unansweredPings.length === 0) {
 			this.#fail(CloseReason.ProtocolError, "Unexpected pong");
 			return;
 		}
 
-		this.#awaitingPong = false;
+		this.#unansweredPings.shift();
 	}
 
-	// Dialer: ping, unless the previous ping is still unanswered.
+	// Dialer: fail once the oldest ping has waited too long, otherwise keep pinging on the beat.
 	#ping(): void {
-		if (this.#awaitingPong) {
+		const now = Date.now();
+
+		if (this.#unansweredPings.length > 0 && now - this.#unansweredPings[0] >= constants.HEARTBEAT_TIMEOUT) {
 			this.#fail(CloseReason.HeartbeatTimeout, "Peer did not answer the heartbeat");
 			return;
 		}
 
-		this.#awaitingPong = true;
+		this.#unansweredPings.push(now);
 		this.#options.ping();
 	}
 

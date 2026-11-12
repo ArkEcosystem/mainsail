@@ -48,10 +48,18 @@ describe<{
 		assert.equal(dialer.failures, []);
 	});
 
-	it("dialer - should fail when a ping is still unanswered at the next one", ({ dialer, fakeTimers }) => {
+	it("dialer - should keep pinging on the beat and fail once the oldest ping waited the timeout", ({
+		dialer,
+		fakeTimers,
+	}) => {
 		dialer.heartbeat.start();
 
 		fakeTimers.tick(constants.HEARTBEAT_INTERVAL);
+		assert.equal(dialer.pings, 1);
+
+		// Unanswered, but not for long enough yet: the next ping still goes out.
+		fakeTimers.tick(constants.HEARTBEAT_TIMEOUT - constants.HEARTBEAT_INTERVAL);
+		assert.equal(dialer.pings, 2);
 		assert.equal(dialer.failures, []);
 
 		fakeTimers.tick(constants.HEARTBEAT_INTERVAL);
@@ -59,8 +67,22 @@ describe<{
 
 		// It stopped itself.
 		fakeTimers.tick(constants.HEARTBEAT_INTERVAL * 3);
-		assert.equal(dialer.pings, 1);
+		assert.equal(dialer.pings, 2);
 		assert.equal(dialer.failures.length, 1);
+	});
+
+	it("dialer - should accept the pongs of a ping read late, after a stall, in order", ({ dialer, fakeTimers }) => {
+		dialer.heartbeat.start();
+
+		// Two pings went out before their pongs were read; both pongs are then expected, a third is not.
+		fakeTimers.tick(constants.HEARTBEAT_INTERVAL * 2);
+		assert.equal(dialer.pings, 2);
+		dialer.heartbeat.onPong();
+		dialer.heartbeat.onPong();
+		assert.equal(dialer.failures, []);
+
+		dialer.heartbeat.onPong();
+		assert.equal(dialer.failures, [`${CloseReason.ProtocolError}: Unexpected pong`]);
 	});
 
 	it("dialer - should fail on a pong nobody asked for and ignore everything after", ({ dialer, fakeTimers }) => {
