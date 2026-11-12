@@ -119,19 +119,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
 			blacklist: Joi.array().items(Joi.string()).required(),
-			disableDiscovery: Joi.bool(),
+			disableDiscovery: Joi.bool().required(),
 			getBlocksTimeout: Joi.number().integer().min(0).required(),
-			ignoreMinimumNetworkReach: Joi.bool(),
+			ignoreMinimumNetworkReach: Joi.bool().required(),
 			maxPeersBroadcast: Joi.number().integer().min(0).required(),
 			maxSameSubnetPeers: Joi.number().integer().min(0).required(),
 			minimumNetworkReach: Joi.number().integer().min(0).required(),
 			minimumVersions: Joi.array().items(Joi.string()).required(),
 			peerBanTime: Joi.number().integer().min(0).required(),
-			remoteAccess: Joi.array()
-				.items(Joi.string().ip({ version: ["ipv4", "ipv6"] }))
-				.required(),
-			skipPeerStateVerification: Joi.bool(),
-			txPoolPort: Joi.number().integer().min(0).required(),
+			skipPeerStateVerification: Joi.bool().required(),
 			verifyTimeout: Joi.number().integer().min(0).required(),
 			whitelist: Joi.array().items(Joi.string()).required(),
 		}).unknown(true);
