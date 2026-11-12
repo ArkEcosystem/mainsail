@@ -1,4 +1,4 @@
-import type { RouteDefinition } from "./codec.js";
+import type { RouteDefinition, SendOptions } from "./codec.js";
 import type { Connection } from "./connection.js";
 import type { Route } from "./route.js";
 
@@ -24,6 +24,7 @@ export interface SendContext {
 	readonly route: RouteDefinition<any, any>;
 	readonly request: { data: unknown; payload?: Buffer };
 	readonly response: { statusCode: number; payload: Buffer; data?: unknown };
+	readonly options: SendOptions;
 }
 
 // A step around an outgoing request. `before` steps run in reverse binding order before the frame is

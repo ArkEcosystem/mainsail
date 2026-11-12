@@ -1,7 +1,14 @@
 import { Identifiers } from "@mainsail/constants";
 import { injectable, multiInject, optional } from "@mainsail/container";
 
-import type { Connection, RouteDefinition, RouteSender, SendContext, SendMiddleware } from "./interfaces/index.js";
+import type {
+	Connection,
+	RouteDefinition,
+	RouteSender,
+	SendContext,
+	SendMiddleware,
+	SendOptions,
+} from "./interfaces/index.js";
 
 import { RequestError } from "./errors.js";
 
@@ -17,9 +24,11 @@ export class Sender implements RouteSender {
 		connection: Connection,
 		route: RouteDefinition<TRequest, TResponse>,
 		data: TRequest,
+		options: SendOptions = {},
 	): Promise<TResponse> {
 		const context: SendContext = {
 			connection,
+			options,
 			request: { data },
 			response: { payload: Buffer.alloc(0), statusCode: 0 },
 			route,
@@ -34,7 +43,7 @@ export class Sender implements RouteSender {
 			throw new Error(`No middleware encoded the ${route.path} request; is the codec middleware registered?`);
 		}
 
-		const response = await connection.request(route.path, context.request.payload);
+		const response = await connection.request(route.path, context.request.payload, context.options);
 		context.response.statusCode = response.statusCode;
 		context.response.payload = response.payload;
 

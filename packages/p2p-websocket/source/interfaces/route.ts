@@ -1,4 +1,4 @@
-import type { RouteDefinition } from "./codec.js";
+import type { RouteDefinition, SendOptions } from "./codec.js";
 import type { Connection } from "./connection.js";
 
 // One request path. The codec middleware decodes the request and encodes the response, so the
@@ -13,5 +13,6 @@ export interface RouteSender {
 		connection: Connection,
 		route: RouteDefinition<TRequest, TResponse>,
 		data: TRequest,
+		options?: SendOptions,
 	): Promise<TResponse>;
 }

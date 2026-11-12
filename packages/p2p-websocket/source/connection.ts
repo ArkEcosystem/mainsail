@@ -16,6 +16,7 @@ import type {
 	Response,
 	RouteDefinition,
 	RouteSender,
+	SendOptions,
 } from "./interfaces/index.js";
 
 import { CloseReason, ConnectionState } from "./enums.js";
@@ -125,19 +126,20 @@ export class Connection implements ConnectionInterface {
 	public async send<TRequest, TResponse>(
 		route: RouteDefinition<TRequest, TResponse>,
 		data: TRequest,
+		options: SendOptions = {},
 	): Promise<TResponse> {
-		return this.sender.send(this, route, data);
+		return this.sender.send(this, route, data, options);
 	}
 
 	// Raw request: sends a frame and resolves with the peer's response, or rejects on timeout or close.
 	// A peer that lets a request time out is treated as gone: the connection is torn down, so every
 	// failure of a connection ends in its close and the owner needs only the close to react.
-	public async request(path: string, payload: Buffer): Promise<Response> {
+	public async request(path: string, payload: Buffer, options: SendOptions = {}): Promise<Response> {
 		if (this.#state !== ConnectionState.Open) {
 			throw new ConnectionError(CloseReason.NotOpen, `Connection is ${this.#state}`);
 		}
 
-		const { id, response } = this.#requestTable.open();
+		const { id, response } = this.#requestTable.open(options.timeout);
 		this.#send({ id, path, payload, type: "request" });
 
 		void response.then(undefined, (error: unknown) => {
