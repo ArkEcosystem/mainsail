@@ -30,34 +30,29 @@ export class Dialer {
 	// Called once the handshake has completed.
 	public onConnection?: (connection: Connection) => void;
 
-	// Rejects when the socket or the handshake fails; then `onConnection` is not called. A dial that
-	// crossed the peer's own dial to us is retried; if the peer's connection landed meanwhile, that is
-	// the connection and this dial ends quietly.
+	// Rejects when the socket or the handshake fails; then `onConnection` is not called. A dial refused
+	// as a duplicate crossed the peer's own dial to us: after a random pause either the peer's connection
+	// has landed, and that is the connection, or we dial once more and go first this time.
 	public async dial(url: string): Promise<void> {
 		const hostname = new URL(url).hostname;
 		const remoteAddress = IpAddress.sanitizeRemoteAddress(hostname) ?? hostname;
 
-		let attempt = 0;
-
-		while (true) {
-			attempt++;
-
-			try {
-				await this.#dial(url, remoteAddress);
-				return;
-			} catch (error) {
-				const crossed = error instanceof ConnectionError && error.reason === CloseReason.DuplicatePeer;
-				if (!crossed || attempt >= constants.DIAL_ATTEMPTS) {
-					throw error;
-				}
-			}
-
-			await sleep(randomNumber(constants.DIAL_RETRY_MIN_DELAY, constants.DIAL_RETRY_MAX_DELAY));
-
-			if (this.repository.get(remoteAddress)) {
-				return;
+		try {
+			await this.#dial(url, remoteAddress);
+			return;
+		} catch (error) {
+			if (!(error instanceof ConnectionError) || error.reason !== CloseReason.DuplicatePeer) {
+				throw error;
 			}
 		}
+
+		await sleep(randomNumber(constants.DIAL_RETRY_MIN_DELAY, constants.DIAL_RETRY_MAX_DELAY));
+
+		if (this.repository.get(remoteAddress)) {
+			return;
+		}
+
+		await this.#dial(url, remoteAddress);
 	}
 
 	// The connection takes the socket while it is still connecting so no frame is missed.
