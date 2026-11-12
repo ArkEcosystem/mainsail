@@ -25,6 +25,7 @@ describe<{
 			bans: () => [],
 			disconnect: async () => {},
 			isBanned: () => false,
+			terminate: () => {},
 		};
 		context.logger = { debug: () => {} };
 
@@ -39,13 +40,13 @@ describe<{
 		context.disposer = app.resolve(PeerDisposer);
 	});
 
-	it("#banPeer - should only dispose the peer when the connection failed", ({
+	it("#banPeer - should only tear the connection down and demote the peer when the connection failed", ({
 		disposer,
 		repository,
 		websocketService,
 	}) => {
 		const ban = spy(websocketService, "ban");
-		const disconnect = spy(websocketService, "disconnect");
+		const terminate = spy(websocketService, "terminate");
 		const demotePeer = spy(repository, "demotePeer");
 
 		for (const reason of [CloseReason.LocalClose, CloseReason.RequestTimeout, CloseReason.HeartbeatTimeout]) {
@@ -53,7 +54,7 @@ describe<{
 		}
 
 		ban.neverCalled();
-		disconnect.calledTimes(3);
+		terminate.calledTimes(3);
 		demotePeer.calledTimes(3);
 	});
 
@@ -64,12 +65,12 @@ describe<{
 		logger,
 	}) => {
 		repository.hasActivePeer = () => false;
-		const disconnect = spy(websocketService, "disconnect");
+		const terminate = spy(websocketService, "terminate");
 		const debug = spy(logger, "debug");
 
 		disposer.banPeer("1.1.1.1", new ConnectionError(CloseReason.LocalClose, "gone"));
 
-		disconnect.neverCalled();
+		terminate.neverCalled();
 		debug.neverCalled();
 	});
 
@@ -80,13 +81,11 @@ describe<{
 	}) => {
 		const fakeTimers = clock({ now: 1_000_000, toFake: ["Date"] });
 		const ban = spy(websocketService, "ban");
-		const disconnect = spy(websocketService, "disconnect");
 		const removePeer = spy(repository, "removePeer");
 
 		disposer.banPeer("1.1.1.1", new Error("bad block"));
 
 		ban.calledWith("1.1.1.1", 1_000_000 + 3 * 60 * 1000);
-		disconnect.calledOnce();
 		removePeer.calledWith("1.1.1.1");
 
 		fakeTimers.restore();
