@@ -61,11 +61,14 @@ export class Connection implements ConnectionInterface {
 		});
 
 		this.#heartbeat = new Heartbeat({
+			direction: options.direction,
 			fail: (error) => this.terminate(error.reason, error),
 			ping: () => this.#ws.ping(),
 		});
 
 		this.#ws.on("message", (data) => this.#onMessage(data));
+		// Pongs to the peer's pings are sent by ws itself; these only feed the heartbeat.
+		this.#ws.on("ping", () => this.#heartbeat.onPing());
 		this.#ws.on("pong", () => this.#heartbeat.onPong());
 		this.#ws.on("error", (error) => this.#onError(error));
 		this.#ws.on("close", () => this.#onClose());
