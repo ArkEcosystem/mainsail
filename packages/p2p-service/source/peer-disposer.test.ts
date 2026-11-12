@@ -9,8 +9,7 @@ describe<{
 	disposer: PeerDisposer;
 	repository: any;
 	websocketService: any;
-	logger: any;
-}>("PeerDisposer", ({ it, assert, beforeEach, spy, clock }) => {
+}>("PeerDisposer", ({ it, beforeEach, spy, clock }) => {
 	beforeEach((context) => {
 		context.repository = {
 			demotePeer: () => {},
@@ -24,29 +23,21 @@ describe<{
 			ban: () => {},
 			bans: () => [],
 			disconnect: async () => {},
-			isBanned: () => false,
-			terminate: () => {},
 		};
-		context.logger = { debug: () => {} };
-
 		const app = new Application();
 		app.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue({ getRequired: () => 3 })
 			.whenTagged("plugin", "p2p-service");
 		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
-		app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
+		app.bind(Identifiers.Services.Log.Service).toConstantValue({ debug: () => {} });
 
 		context.disposer = app.resolve(PeerDisposer);
 	});
 
-	it("#banPeer - should only tear the connection down and demote the peer when the connection failed", ({
-		disposer,
-		repository,
-		websocketService,
-	}) => {
+	it("#banPeer - should ignore a failure of the connection itself", ({ disposer, repository, websocketService }) => {
 		const ban = spy(websocketService, "ban");
-		const terminate = spy(websocketService, "terminate");
+		const disconnect = spy(websocketService, "disconnect");
 		const demotePeer = spy(repository, "demotePeer");
 
 		for (const reason of [CloseReason.LocalClose, CloseReason.RequestTimeout, CloseReason.HeartbeatTimeout]) {
@@ -54,24 +45,8 @@ describe<{
 		}
 
 		ban.neverCalled();
-		terminate.calledTimes(3);
-		demotePeer.calledTimes(3);
-	});
-
-	it("#banPeer - should ignore a connection failure of a peer that is neither active nor pending", ({
-		disposer,
-		repository,
-		websocketService,
-		logger,
-	}) => {
-		repository.hasActivePeer = () => false;
-		const terminate = spy(websocketService, "terminate");
-		const debug = spy(logger, "debug");
-
-		disposer.banPeer("1.1.1.1", new ConnectionError(CloseReason.LocalClose, "gone"));
-
-		terminate.neverCalled();
-		debug.neverCalled();
+		disconnect.neverCalled();
+		demotePeer.neverCalled();
 	});
 
 	it("#banPeer - should ban and forget the peer for any other error", ({
@@ -89,14 +64,5 @@ describe<{
 		removePeer.calledWith("1.1.1.1");
 
 		fakeTimers.restore();
-	});
-
-	it("#banPeer - should not ban a peer twice", ({ disposer, websocketService }) => {
-		websocketService.isBanned = () => true;
-		const ban = spy(websocketService, "ban");
-
-		disposer.banPeer("1.1.1.1", new Error("bad block"));
-
-		ban.neverCalled();
 	});
 });

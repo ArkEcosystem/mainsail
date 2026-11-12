@@ -77,12 +77,6 @@ export class Service {
 		await this.repository.get(ip)?.close(CloseReason.LocalClose);
 	}
 
-	// Immediate close for a connection that is known to be dead; a graceful close would wait for a
-	// closing handshake that never comes and hold the address until the socket gives up.
-	public terminate(ip: string): void {
-		this.repository.get(ip)?.terminate(CloseReason.LocalClose);
-	}
-
 	// Bans
 
 	public ban(ip: string, until: number): void {

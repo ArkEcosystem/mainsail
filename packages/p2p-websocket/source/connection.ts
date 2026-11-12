@@ -130,6 +130,8 @@ export class Connection implements ConnectionInterface {
 	}
 
 	// Raw request: sends a frame and resolves with the peer's response, or rejects on timeout or close.
+	// A peer that lets a request time out is treated as gone: the connection is torn down, so every
+	// failure of a connection ends in its close and the owner needs only the close to react.
 	public async request(path: string, payload: Buffer): Promise<Response> {
 		if (this.#state !== ConnectionState.Open) {
 			throw new ConnectionError(CloseReason.NotOpen, `Connection is ${this.#state}`);
@@ -137,6 +139,12 @@ export class Connection implements ConnectionInterface {
 
 		const { id, response } = this.#requestTable.open();
 		this.#send({ id, path, payload, type: "request" });
+
+		void response.then(undefined, (error: unknown) => {
+			if (error instanceof ConnectionError && error.reason === CloseReason.RequestTimeout) {
+				this.terminate(CloseReason.RequestTimeout, error);
+			}
+		});
 
 		return response;
 	}

@@ -27,7 +27,6 @@ class RequestTable {
 		this.#nextId = this.#nextId >= 0xff_ff_ff_ff ? 1 : this.#nextId + 1;
 
 		const response = new Promise<Response>((resolve, reject) => {
-			// TODO: Handle node ban on repeated request timeouts.
 			const timer = setTimeout(() => {
 				this.#pending.delete(id);
 				reject(new ConnectionError(CloseReason.RequestTimeout, `Request ${id} timed out`));
