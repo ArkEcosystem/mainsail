@@ -34,7 +34,8 @@ export class Dialer {
 	// as a duplicate crossed the peer's own dial to us: after a random pause either the peer's connection
 	// has landed, and that is the connection, or we dial once more and go first this time.
 	public async dial(url: string): Promise<void> {
-		const hostname = new URL(url).hostname;
+		// URL.hostname keeps the brackets of an IPv6 literal; the repository and the verifiers want the bare address.
+		const hostname = IpAddress.cleanAddress(new URL(url).hostname);
 		const remoteAddress = IpAddress.sanitizeRemoteAddress(hostname) ?? hostname;
 
 		try {
