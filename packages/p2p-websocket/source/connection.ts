@@ -20,7 +20,7 @@ import type {
 
 import { CloseReason, ConnectionState } from "./enums.js";
 import { ConnectionError } from "./errors.js";
-import { Handshake, RequestTable } from "./handlers/index.js";
+import { Handshake, Heartbeat, RequestTable } from "./handlers/index.js";
 import { decode, encode } from "./message.js";
 
 // One per socket, created through Identifiers.P2P.WebSocket.Connection.Factory and set up with init().
@@ -39,6 +39,7 @@ export class Connection implements ConnectionInterface {
 
 	#ws!: WebSocket;
 	#handshake!: Handshake;
+	#heartbeat!: Heartbeat;
 	#direction!: Direction;
 	#remoteAddress!: string;
 
@@ -59,7 +60,13 @@ export class Connection implements ConnectionInterface {
 			send: (message) => this.#send(message),
 		});
 
+		this.#heartbeat = new Heartbeat({
+			fail: (error) => this.terminate(error.reason, error),
+			ping: () => this.#ws.ping(),
+		});
+
 		this.#ws.on("message", (data) => this.#onMessage(data));
+		this.#ws.on("pong", () => this.#heartbeat.onPong());
 		this.#ws.on("error", (error) => this.#onError(error));
 		this.#ws.on("close", () => this.#onClose());
 
@@ -213,6 +220,7 @@ export class Connection implements ConnectionInterface {
 	#open(): void {
 		if (this.#state === ConnectionState.Handshaking) {
 			this.#state = ConnectionState.Open;
+			this.#heartbeat.start();
 		}
 	}
 
@@ -247,6 +255,7 @@ export class Connection implements ConnectionInterface {
 		this.#state = ConnectionState.Closing;
 		this.#closeReason = reason;
 		this.#closeError = error;
+		this.#heartbeat.stop();
 
 		// A close that starts during the handshake must fail open(), so the owner never sees the connection.
 		this.#handshake.abort(new ConnectionError(reason, "Connection closed during handshake", { cause: error }));
