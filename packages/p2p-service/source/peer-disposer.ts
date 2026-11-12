@@ -33,7 +33,9 @@ export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 			// Every request in flight fails when a connection goes; the first failure disposes, the rest are noise.
 			if (this.repository.hasActivePeer(ip) || this.repository.hasPendingPeer(ip)) {
 				this.logger.debug(`Disposing peer ${ip}, because: ${error.message}`, "p2p");
-				this.disposePeer(ip);
+				// The connection failed, so it is torn down at once rather than closed politely.
+				this.websocketService.terminate(ip);
+				this.repository.demotePeer(ip);
 			}
 
 			return;
@@ -46,14 +48,13 @@ export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 			this.websocketService.ban(ip, dayjs().add(timeout, "minute").valueOf());
 		}
 
-		// Banned addresses are forgotten entirely: the service loop must not dial them.
-		void this.websocketService.disconnect(ip);
+		// The ban terminated the connection; banned addresses are forgotten entirely, the loop must not dial them.
 		this.repository.removePeer(ip);
 	}
 
-	// Closes the connection; an active peer becomes known again so the service loop can dial it later.
-	// Also runs when a connection closes by itself. The closed connection stays on the peer; everything
-	// that sends checks that it is open.
+	// Closes the connection politely; an active peer becomes known again so the service loop can dial it
+	// later. Also runs when a connection closes by itself. The closed connection stays on the peer;
+	// everything that sends checks that it is open.
 	public disposePeer(ip: string): void {
 		void this.websocketService.disconnect(ip);
 		this.repository.demotePeer(ip);
