@@ -22,22 +22,10 @@ export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	// The ban list of the transport is the single record of bans; it also refuses banned sockets.
-	// A failure of the connection itself (closed, timed out, refused) is not the peer's doing: the peer is
-	// only disposed, as it was for the nes WS, DISCONNECT and TIMEOUT errors. Anything else is a ban.
+	// A failure of the connection itself is not the peer's doing and the transport has already closed
+	// the connection, which disposes the peer through the close listener; only other errors ban.
 	public banPeer(ip: string, error: Error): void {
-		if (this.isBanned(ip)) {
-			return;
-		}
-
 		if (error instanceof ConnectionError) {
-			// Every request in flight fails when a connection goes; the first failure disposes, the rest are noise.
-			if (this.repository.hasActivePeer(ip) || this.repository.hasPendingPeer(ip)) {
-				this.logger.debug(`Disposing peer ${ip}, because: ${error.message}`, "p2p");
-				// The connection failed, so it is torn down at once rather than closed politely.
-				this.websocketService.terminate(ip);
-				this.repository.demotePeer(ip);
-			}
-
 			return;
 		}
 
@@ -63,10 +51,6 @@ export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 	public async disposePeers(): Promise<void> {
 		await Promise.all(this.repository.getPendingPeers().map((peer) => this.websocketService.disconnect(peer.ip)));
 		await Promise.all(this.repository.getActivePeers().map((peer) => this.websocketService.disconnect(peer.ip)));
-	}
-
-	public isBanned(ip: string): boolean {
-		return this.websocketService.isBanned(ip);
 	}
 
 	public bannedPeers(): { ip: string; timeout: number }[] {
