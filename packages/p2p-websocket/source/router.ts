@@ -41,6 +41,15 @@ export class Router {
 			return { payload: Buffer.alloc(0), statusCode: 404 };
 		}
 
+		// Checked before the middleware so an oversized request is never decoded or handled.
+		if (payload.length > route.maxPayload.request) {
+			this.logger.debug(
+				`${path} from ${connection.remoteAddress} rejected: ${payload.length} bytes exceed ${route.maxPayload.request}`,
+				"p2p",
+			);
+			return { payload: Buffer.alloc(0), statusCode: 413 };
+		}
+
 		const context: ReceiveContext = { connection, request: { payload }, response: {}, route };
 
 		try {

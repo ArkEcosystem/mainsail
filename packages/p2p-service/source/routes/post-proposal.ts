@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 import type { Interfaces } from "@mainsail/p2p-websocket";
 
-import { Enums, Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
@@ -12,6 +12,7 @@ type Response = ReturnType<typeof Codecs.postProposal.response.deserialize>;
 
 export const PostProposal: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.postProposal,
+	maxPayload: { request: 3 * Units.MEGABYTE, response: Units.KILOBYTE },
 	path: "postProposal",
 };
 
@@ -32,6 +33,7 @@ export class PostProposalRoute implements Interfaces.Route<Request, Response> {
 
 	public readonly path = PostProposal.path;
 	public readonly codec = PostProposal.codec;
+	public readonly maxPayload = PostProposal.maxPayload;
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
 		try {

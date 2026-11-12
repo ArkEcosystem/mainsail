@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 import type { Interfaces } from "@mainsail/p2p-websocket";
 
-import { Identifiers } from "@mainsail/constants";
+import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { pluralize } from "@mainsail/utils";
 
@@ -11,7 +11,11 @@ import { constants } from "../constants.js";
 type Request = ReturnType<typeof Codecs.getBlocks.request.deserialize>;
 type Response = ReturnType<typeof Codecs.getBlocks.response.deserialize>;
 
-export const GetBlocks: Interfaces.RouteDefinition<Request, Response> = { codec: Codecs.getBlocks, path: "getBlocks" };
+export const GetBlocks: Interfaces.RouteDefinition<Request, Response> = {
+	codec: Codecs.getBlocks,
+	maxPayload: { request: Units.KILOBYTE, response: 3 * Units.MEGABYTE },
+	path: "getBlocks",
+};
 
 @injectable()
 export class GetBlocksRoute implements Interfaces.Route<Request, Response> {
@@ -26,19 +30,25 @@ export class GetBlocksRoute implements Interfaces.Route<Request, Response> {
 
 	public readonly path = GetBlocks.path;
 	public readonly codec = GetBlocks.codec;
+	public readonly maxPayload = GetBlocks.maxPayload;
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
-		const requestBlockNumber = data.fromBlockNumber ?? 0;
-		const requestBlockLimit = data.limit ?? constants.MAX_DOWNLOAD_BLOCKS;
+		// The request is not validated yet; the bounds keep a bad one from draining the database or the budget.
+		const requestBlockNumber = Math.max(data.fromBlockNumber ?? 0, 0);
+		const requestBlockLimit = Math.min(
+			Math.max(data.limit ?? constants.MAX_DOWNLOAD_BLOCKS, 1),
+			constants.MAX_DOWNLOAD_BLOCKS,
+		);
 
 		if (requestBlockNumber > this.stateStore.getBlockNumber()) {
 			return { blocks: [] };
 		}
 
-		// Budget the response so its fully serialized frame fits the client's maxPayload: raw block data plus
-		// the per-block protobuf framing and the fixed envelope reserve, for the worst case of `limit` blocks.
+		// Budget the response so its fully serialized frame fits what the caller accepts for this route: raw
+		// block data plus the per-block protobuf framing and the fixed envelope reserve, for the worst case
+		// of `limit` blocks.
 		const maxBytes =
-			constants.MAX_PAYLOAD_CLIENT -
+			GetBlocks.maxPayload.response -
 			constants.RESPONSE_ENVELOPE_RESERVE -
 			requestBlockLimit * constants.PROTO_BLOCK_OVERHEAD;
 
