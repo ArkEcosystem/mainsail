@@ -20,6 +20,7 @@ export enum CloseReason {
 	LocalClose = "localClose",
 	RemoteClose = "remoteClose",
 	HandshakeTimeout = "handshakeTimeout",
+	HeartbeatTimeout = "heartbeatTimeout",
 	VersionMismatch = "versionMismatch",
 	ProtocolError = "protocolError",
 	SocketError = "socketError",

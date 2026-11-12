@@ -9,6 +9,8 @@ export const constants = {
 	DIAL_RETRY_MIN_DELAY: 200,
 	// Time allowed for the hello exchange after the socket is open.
 	HANDSHAKE_TIMEOUT: 5000,
+	// An open connection is pinged this often; a ping that is still unanswered at the next one closes it.
+	HEARTBEAT_INTERVAL: 10_000,
 	// Longest request path on the wire, in bytes.
 	MAX_PATH_LENGTH: 100,
 	// Largest frame accepted on an inbound socket.

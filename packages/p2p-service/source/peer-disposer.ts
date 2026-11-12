@@ -3,18 +3,8 @@ import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { CloseReason, ConnectionError } from "@mainsail/p2p-websocket";
+import { ConnectionError } from "@mainsail/p2p-websocket";
 import dayjs from "dayjs";
-
-// Failures of the connection itself, not of the peer's behaviour: the peer is dropped but not banned.
-// Mirrors the WS, DISCONNECT and TIMEOUT nes errors of @mainsail/p2p.
-const DISPOSE_REASONS = new Set<CloseReason>([
-	CloseReason.SocketError,
-	CloseReason.RemoteClose,
-	CloseReason.RequestTimeout,
-	CloseReason.HandshakeTimeout,
-	CloseReason.NotOpen,
-]);
 
 @injectable()
 export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
@@ -32,14 +22,19 @@ export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	// The ban list of the transport is the single record of bans; it also refuses banned sockets.
+	// A failure of the connection itself (closed, timed out, refused) is not the peer's doing: the peer is
+	// only disposed, as it was for the nes WS, DISCONNECT and TIMEOUT errors. Anything else is a ban.
 	public banPeer(ip: string, error: Error): void {
 		if (this.isBanned(ip)) {
 			return;
 		}
 
-		if (error instanceof ConnectionError && DISPOSE_REASONS.has(error.reason)) {
-			this.logger.debug(`Disposing peer ${ip}, because: ${error.message}`, "p2p");
-			this.disposePeer(ip);
+		if (error instanceof ConnectionError) {
+			// Every request in flight fails when a connection goes; the first failure disposes, the rest are noise.
+			if (this.repository.hasActivePeer(ip) || this.repository.hasPendingPeer(ip)) {
+				this.logger.debug(`Disposing peer ${ip}, because: ${error.message}`, "p2p");
+				this.disposePeer(ip);
+			}
 
 			return;
 		}
