@@ -1,16 +1,19 @@
 import type { Peer } from "./peer.js";
 
-// Peers move between three disjoint lists: active (verified; the plain `getPeers` family), pending
-// (open connection, verification running) and known (formerly active peers that lost their
-// connection and are dialed again).
+// Peers move between three disjoint lists: active (verified, the ones the node talks to), pending (open
+// connection, verification running) and known (seeds and formerly active peers without a connection,
+// dialed by the service loop).
 export interface PeerRepository {
-	getPeers(): Peer[];
-	hasPeers(): boolean;
-
-	getPeer(ip: string): Peer;
-	setPeer(peer: Peer): void;
-	forgetPeer(peer: Peer): void;
+	// Any list.
 	hasPeer(ip: string): boolean;
+
+	getActivePeers(): Peer[];
+	hasActivePeers(): boolean;
+
+	getActivePeer(ip: string): Peer;
+	setActivePeer(peer: Peer): void;
+	forgetActivePeer(peer: Peer): void;
+	hasActivePeer(ip: string): boolean;
 
 	getPendingPeers(): Peer[];
 	hasPendingPeers(): boolean;

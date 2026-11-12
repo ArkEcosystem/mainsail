@@ -20,7 +20,7 @@ describe<{
 		context.peerRepository = context.app.resolve(PeerRepository);
 	});
 
-	it("#getPeers - should return all the peers in an array", ({ peerRepository, app }) => {
+	it("#getActivePeers - should return all the peers in an array", ({ peerRepository, app }) => {
 		const peers = [
 			app.resolve(Peer).init("176.165.66.55", 4000),
 			app.resolve(Peer).init("176.165.44.33", 4000),
@@ -28,17 +28,17 @@ describe<{
 		];
 
 		for (const peer of peers) {
-			peerRepository.setPeer(peer);
+			peerRepository.setActivePeer(peer);
 		}
 
-		assert.equal(peerRepository.getPeers(), peers);
+		assert.equal(peerRepository.getActivePeers(), peers);
 	});
 
-	it("#hasPeers - should return false if there is zero peer", ({ peerRepository }) => {
-		assert.false(peerRepository.hasPeers());
+	it("#hasActivePeers - should return false if there is zero peer", ({ peerRepository }) => {
+		assert.false(peerRepository.hasActivePeers());
 	});
 
-	it("#hasPeers - should return true if there is more than zero peer", ({ peerRepository, app }) => {
+	it("#hasActivePeers - should return true if there is more than zero peer", ({ peerRepository, app }) => {
 		const peers = [
 			app.resolve(Peer).init("176.165.66.55", 4000),
 			app.resolve(Peer).init("176.165.44.33", 4000),
@@ -46,15 +46,15 @@ describe<{
 			app.resolve(Peer).init("2001:3984:3989::104", 4000),
 		];
 
-		assert.false(peerRepository.hasPeers());
+		assert.false(peerRepository.hasActivePeers());
 
 		for (const peer of peers) {
-			peerRepository.setPeer(peer);
-			assert.true(peerRepository.hasPeers());
+			peerRepository.setActivePeer(peer);
+			assert.true(peerRepository.hasActivePeers());
 		}
 	});
 
-	it("#getPeer - should return the peer by its ip", ({ peerRepository, app }) => {
+	it("#getActivePeer - should return the peer by its ip", ({ peerRepository, app }) => {
 		const peersByIp = {
 			"176.165.44.33": app.resolve(Peer).init("176.165.44.33", 4000),
 			"176.165.66.55": app.resolve(Peer).init("176.165.66.55", 4000),
@@ -62,15 +62,15 @@ describe<{
 		};
 
 		for (const peerIp of Object.values(peersByIp)) {
-			peerRepository.setPeer(peerIp);
+			peerRepository.setActivePeer(peerIp);
 		}
 
 		for (const [ip, peer] of Object.entries(peersByIp)) {
-			assert.equal(peerRepository.getPeer(ip), peer);
+			assert.equal(peerRepository.getActivePeer(ip), peer);
 		}
 	});
 
-	it("#getPeer - should throw when no peer exists for the ip", ({ peerRepository, app }) => {
+	it("#getActivePeer - should throw when no peer exists for the ip", ({ peerRepository, app }) => {
 		const peersByIp = {
 			"176.165.44.33": app.resolve(Peer).init("176.165.44.33", 4000),
 			"176.165.66.55": app.resolve(Peer).init("176.165.66.55", 4000),
@@ -78,13 +78,13 @@ describe<{
 		};
 
 		for (const peerIp of Object.values(peersByIp)) {
-			peerRepository.setPeer(peerIp);
+			peerRepository.setActivePeer(peerIp);
 		}
 
-		assert.throws(() => peerRepository.getPeer("127.0.0.1"));
+		assert.throws(() => peerRepository.getActivePeer("127.0.0.1"));
 	});
 
-	it("#setPeer - should set the peer by its ip", ({ peerRepository, app }) => {
+	it("#setActivePeer - should set the peer by its ip", ({ peerRepository, app }) => {
 		const peersByIp = {
 			"176.165.44.33": app.resolve(Peer).init("176.165.44.33", 4000),
 			"176.165.66.55": app.resolve(Peer).init("176.165.66.55", 4000),
@@ -92,38 +92,38 @@ describe<{
 		};
 
 		for (const peer of Object.values(peersByIp)) {
-			peerRepository.setPeer(peer);
+			peerRepository.setActivePeer(peer);
 		}
 
 		for (const [ip, peer] of Object.entries(peersByIp)) {
-			assert.equal(peerRepository.getPeer(ip), peer);
+			assert.equal(peerRepository.getActivePeer(ip), peer);
 		}
 	});
 
-	it("#forgetPeer - should forget the peer", ({ peerRepository, app }) => {
+	it("#forgetActivePeer - should forget the peer", ({ peerRepository, app }) => {
 		const peer = app.resolve(Peer).init("176.165.66.55", 4000);
 
-		peerRepository.setPeer(peer);
+		peerRepository.setActivePeer(peer);
 
-		assert.true(peerRepository.hasPeer(peer.ip));
-		assert.equal(peerRepository.getPeer(peer.ip), peer);
+		assert.true(peerRepository.hasActivePeer(peer.ip));
+		assert.equal(peerRepository.getActivePeer(peer.ip), peer);
 
-		peerRepository.forgetPeer(peer);
+		peerRepository.forgetActivePeer(peer);
 
-		assert.false(peerRepository.hasPeer(peer.ip));
-		assert.throws(() => peerRepository.getPeer(peer.ip));
+		assert.false(peerRepository.hasActivePeer(peer.ip));
+		assert.throws(() => peerRepository.getActivePeer(peer.ip));
 	});
 
-	it("#hasPeer - should return true if the peer exists", ({ peerRepository, app }) => {
+	it("#hasActivePeer - should return true if the peer exists", ({ peerRepository, app }) => {
 		const peer = app.resolve(Peer).init("176.165.66.55", 4000);
 
-		peerRepository.setPeer(peer);
+		peerRepository.setActivePeer(peer);
 
-		assert.true(peerRepository.hasPeer(peer.ip));
+		assert.true(peerRepository.hasActivePeer(peer.ip));
 	});
 
-	it("#hasPeer - should return false if the peer does not exist", ({ peerRepository }) => {
-		assert.false(peerRepository.hasPeer("176.165.66.55"));
+	it("#hasActivePeer - should return false if the peer does not exist", ({ peerRepository }) => {
+		assert.false(peerRepository.hasActivePeer("176.165.66.55"));
 	});
 
 	it("#getPendingPeers - should return the pending peers", ({ peerRepository, app }) => {
@@ -334,7 +334,7 @@ describe<{
 		];
 
 		for (const peer of peers) {
-			peerRepository.setPeer(peer);
+			peerRepository.setActivePeer(peer);
 		}
 
 		assert.equal(peerRepository.getSameSubnetPeers("176.165.66.10").length, 2);
@@ -346,7 +346,7 @@ describe<{
 		const active = app.resolve(Peer).init("176.165.66.55", 4000);
 		const pending = app.resolve(Peer).init("176.165.44.33", 4000);
 		const known = app.resolve(Peer).init("176.165.22.11", 4000);
-		peerRepository.setPeer(active);
+		peerRepository.setActivePeer(active);
 		peerRepository.setPendingPeer(pending);
 		peerRepository.setKnownPeer(known);
 
@@ -355,7 +355,7 @@ describe<{
 		peerRepository.removePeer(known.ip);
 		peerRepository.removePeer("1.1.1.1");
 
-		assert.false(peerRepository.hasPeer(active.ip));
+		assert.false(peerRepository.hasActivePeer(active.ip));
 		assert.false(peerRepository.hasPendingPeer(pending.ip));
 		assert.false(peerRepository.hasKnownPeer(known.ip));
 	});
@@ -369,7 +369,7 @@ describe<{
 		const pending = app.resolve(Peer).init("176.165.44.33", 4000);
 		const known = app.resolve(Peer).init("176.165.22.11", 4000);
 
-		peerRepository.setPeer(active);
+		peerRepository.setActivePeer(active);
 		dispatch.calledWith(Events.PeerEvent.Added, active);
 
 		peerRepository.setPendingPeer(pending);
@@ -383,7 +383,7 @@ describe<{
 		dispatch.calledTimes(2);
 
 		// Forgetting a peer that is not active announces nothing.
-		peerRepository.forgetPeer(active);
+		peerRepository.forgetActivePeer(active);
 		dispatch.calledTimes(2);
 	});
 
@@ -393,11 +393,11 @@ describe<{
 	}) => {
 		const active = app.resolve(Peer).init("176.165.66.55", 4000);
 		const pending = app.resolve(Peer).init("176.165.44.33", 4000);
-		peerRepository.setPeer(active);
+		peerRepository.setActivePeer(active);
 		peerRepository.setPendingPeer(pending);
 
 		peerRepository.demotePeer(active.ip);
-		assert.false(peerRepository.hasPeer(active.ip));
+		assert.false(peerRepository.hasActivePeer(active.ip));
 		assert.equal(peerRepository.getKnownPeer(active.ip), active);
 
 		peerRepository.demotePeer(pending.ip);

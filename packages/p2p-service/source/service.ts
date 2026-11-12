@@ -64,7 +64,7 @@ export class Service implements Contracts.P2PService.Service {
 		await this.#dialKnownPeers();
 
 		for (const [version, peers] of Object.entries(
-			groupBy(this.repository.getPeers(), (peer) => peer.version ?? "unknown"),
+			groupBy(this.repository.getActivePeers(), (peer) => peer.version ?? "unknown"),
 		)) {
 			this.logger.info(`Discovered ${pluralize("peer", peers.length, true)} with v${version}.`, "p2p");
 		}
@@ -151,7 +151,7 @@ export class Service implements Contracts.P2PService.Service {
 
 			await this.peerDiscoverer.populateSeedPeers();
 
-			for (const peer of shuffle(this.repository.getPeers()).slice(0, 8)) {
+			for (const peer of shuffle(this.repository.getActivePeers()).slice(0, 8)) {
 				await this.peerDiscoverer.discoverPeers(peer);
 			}
 		}
@@ -159,7 +159,7 @@ export class Service implements Contracts.P2PService.Service {
 
 	async #checkReceivedMessages(): Promise<void> {
 		if (this.state.getLastMessageTime().isBefore(dayjs().subtract(8, "seconds"))) {
-			const peersCount = Math.max(Math.ceil(this.repository.getPeers().length * 0.2), 5);
+			const peersCount = Math.max(Math.ceil(this.repository.getActivePeers().length * 0.2), 5);
 
 			await this.cleansePeers({
 				fast: true,
@@ -169,10 +169,9 @@ export class Service implements Contracts.P2PService.Service {
 	}
 
 	public async cleansePeers({ fast, peerCount }: { fast: boolean; peerCount: number }): Promise<void> {
-		const peers = shuffle(this.repository.getPeers().filter((peer) => !this.#verifyingPeers.has(peer.ip))).slice(
-			0,
-			peerCount,
-		);
+		const peers = shuffle(
+			this.repository.getActivePeers().filter((peer) => !this.#verifyingPeers.has(peer.ip)),
+		).slice(0, peerCount);
 
 		if (peers.length === 0) {
 			return;
@@ -217,7 +216,7 @@ export class Service implements Contracts.P2PService.Service {
 
 	public getNetworkBlockNumberPercentile(p: number): number {
 		const blockNumbers = this.repository
-			.getPeers()
+			.getActivePeers()
 			.filter((peer) => peer.header.blockNumber)
 			.map((peer) => peer.header.blockNumber);
 

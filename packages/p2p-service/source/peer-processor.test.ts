@@ -37,12 +37,13 @@ describe<{
 			forgetKnownPeer: () => {},
 			forgetPendingPeer: () => {},
 			getKnownPeer: () => {},
-			getPeers: () => [],
+			getActivePeers: () => [],
+			hasActivePeer: () => false,
 			hasKnownPeer: () => false,
 			hasPeer: () => false,
 			hasPendingPeer: () => false,
 			setKnownPeer: () => {},
-			setPeer: () => {},
+			setActivePeer: () => {},
 			setPendingPeer: () => {},
 		};
 		context.peerVerifier = { verify: async () => true };
@@ -94,7 +95,7 @@ describe<{
 		debug.calledWith("Dial to 178.165.55.55:4002 failed: ECONNREFUSED", "p2p");
 	});
 
-	it("#validateAndAcceptPeer - should skip invalid addresses and peers that are already known, pending or active", async ({
+	it("#validateAndAcceptPeer - should skip invalid addresses and peers the repository already holds", async ({
 		processor,
 		repository,
 		websocketService,
@@ -102,12 +103,6 @@ describe<{
 		const dial = spy(websocketService, "dial");
 
 		await processor.validateAndAcceptPeer("not-an-ip");
-		repository.hasKnownPeer = () => true;
-		await processor.validateAndAcceptPeer("178.165.55.55");
-		repository.hasKnownPeer = () => false;
-		repository.hasPendingPeer = () => true;
-		await processor.validateAndAcceptPeer("178.165.55.55");
-		repository.hasPendingPeer = () => false;
 		repository.hasPeer = () => true;
 		await processor.validateAndAcceptPeer("178.165.55.55");
 
@@ -120,7 +115,7 @@ describe<{
 		peerDiscoverer,
 	}) => {
 		const setPendingPeer = spy(repository, "setPendingPeer");
-		const setPeer = spy(repository, "setPeer");
+		const setPeer = spy(repository, "setActivePeer");
 		const forgetPendingPeer = spy(repository, "forgetPendingPeer");
 		const discoverPeers = spy(peerDiscoverer, "discoverPeers");
 
@@ -139,7 +134,7 @@ describe<{
 		repository.hasKnownPeer = () => true;
 		repository.getKnownPeer = () => known;
 		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
-		const setPeer = spy(repository, "setPeer");
+		const setPeer = spy(repository, "setActivePeer");
 
 		const connection = await connect(websocketService, "178.165.55.55");
 
@@ -155,9 +150,9 @@ describe<{
 	}) => {
 		const verify = spy(peerVerifier, "verify");
 
-		repository.hasPeer = () => true;
+		repository.hasActivePeer = () => true;
 		await connect(websocketService, "178.165.55.55");
-		repository.hasPeer = () => false;
+		repository.hasActivePeer = () => false;
 		repository.hasPendingPeer = () => true;
 		await connect(websocketService, "178.165.55.55");
 
@@ -170,7 +165,7 @@ describe<{
 		peerVerifier,
 	}) => {
 		peerVerifier.verify = async () => false;
-		const setPeer = spy(repository, "setPeer");
+		const setPeer = spy(repository, "setActivePeer");
 		const forgetPendingPeer = spy(repository, "forgetPendingPeer");
 
 		await connect(websocketService, "178.165.55.55");
@@ -188,7 +183,7 @@ describe<{
 			peer.connection.state = ConnectionState.Closed;
 			return true;
 		};
-		const setPeer = spy(repository, "setPeer");
+		const setPeer = spy(repository, "setActivePeer");
 		const forgetPendingPeer = spy(repository, "forgetPendingPeer");
 
 		await connect(websocketService, "178.165.55.55");

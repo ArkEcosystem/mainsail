@@ -331,7 +331,7 @@ describe<{
 		await startWorker(worker, flags);
 
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({
-			getPeers: () => [{ ip: "1.1.1.1" }, { ip: "2.2.2.2" }],
+			getActivePeers: () => [{ ip: "1.1.1.1" }, { ip: "2.2.2.2" }],
 		});
 		const replacement = addReplacement(subprocesses);
 		const register = spy(replacement, "registerEventHandler");
@@ -456,7 +456,7 @@ describe<{
 	}) => {
 		await startWorker(worker);
 
-		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getPeers: () => [{ ip: "1.1.1.1" }] });
+		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getActivePeers: () => [{ ip: "1.1.1.1" }] });
 		const start = deferred();
 		const replacement = addReplacement(subprocesses);
 		replacement.respond = async (method) => (method === "start" ? start.promise : undefined);
@@ -605,7 +605,7 @@ describe<{
 		const { app, worker, ipc, subprocesses, terminations } = context;
 		await startWorker(worker);
 
-		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getPeers: () => [{ ip: "1.1.1.1" }] });
+		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getActivePeers: () => [{ ip: "1.1.1.1" }] });
 		const exit = deferred();
 		const replacement = addReplacement(subprocesses);
 		replacement.respond = async (method) => (method === "boot" ? undefined : exit.promise);

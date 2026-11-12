@@ -32,7 +32,7 @@ export class Worker implements Contracts.Evm.Worker {
 	}
 
 	public async handle(payload: { name: string; data: unknown }): Promise<void> {
-		await this.setPeerCount(this.p2pRepository.getPeers().length);
+		await this.setPeerCount(this.p2pRepository.getActivePeers().length);
 	}
 
 	public async boot(flags: Contracts.Evm.WorkerFlags): Promise<void> {

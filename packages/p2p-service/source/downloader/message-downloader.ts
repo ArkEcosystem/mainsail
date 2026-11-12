@@ -81,7 +81,7 @@ export class MessageDownloader implements Contracts.P2PService.Downloader {
 		}
 
 		const header = this.headerFactory();
-		let peers = this.repository.getPeers();
+		let peers = this.repository.getActivePeers();
 
 		while ((peers = peers.filter((peer) => this.#canDownload(header, peer.header))) && peers.length > 0) {
 			this.download(getRandomPeer(peers));

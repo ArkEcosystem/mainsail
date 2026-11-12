@@ -41,7 +41,7 @@ export class Broadcaster implements Contracts.P2PService.Broadcaster {
 
 	#getPeersForBroadcast(): Contracts.P2PService.Peer[] {
 		const maxPeersBroadcast: number = this.configuration.getRequired<number>("maxPeersBroadcast");
-		const peers: Contracts.P2PService.Peer[] = take(shuffle(this.repository.getPeers()), maxPeersBroadcast);
+		const peers: Contracts.P2PService.Peer[] = take(shuffle(this.repository.getActivePeers()), maxPeersBroadcast);
 
 		return peers;
 	}

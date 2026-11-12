@@ -18,15 +18,19 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 	readonly #peersPending: Map<string, Contracts.P2PService.Peer> = new Map<string, Contracts.P2PService.Peer>();
 	readonly #peersKnown: Map<string, Contracts.P2PService.Peer> = new Map<string, Contracts.P2PService.Peer>();
 
-	public getPeers(): Contracts.P2PService.Peer[] {
+	public hasPeer(ip: string): boolean {
+		return this.#peers.has(ip) || this.#peersPending.has(ip) || this.#peersKnown.has(ip);
+	}
+
+	public getActivePeers(): Contracts.P2PService.Peer[] {
 		return [...this.#peers.values()];
 	}
 
-	public hasPeers(): boolean {
+	public hasActivePeers(): boolean {
 		return this.#peers.size > 0;
 	}
 
-	public getPeer(ip: string): Contracts.P2PService.Peer {
+	public getActivePeer(ip: string): Contracts.P2PService.Peer {
 		const peer: Contracts.P2PService.Peer | undefined = this.#peers.get(ip);
 
 		assert.defined(peer);
@@ -35,19 +39,19 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 	}
 
 	// Active peers are announced; pending and known ones are internal to this package.
-	public setPeer(peer: Contracts.P2PService.Peer): void {
+	public setActivePeer(peer: Contracts.P2PService.Peer): void {
 		this.#peers.set(peer.ip, peer);
 
 		void this.events.dispatch(Events.PeerEvent.Added, peer);
 	}
 
-	public forgetPeer(peer: Contracts.P2PService.Peer): void {
+	public forgetActivePeer(peer: Contracts.P2PService.Peer): void {
 		if (this.#peers.delete(peer.ip)) {
 			void this.events.dispatch(Events.PeerEvent.Removed, peer);
 		}
 	}
 
-	public hasPeer(ip: string): boolean {
+	public hasActivePeer(ip: string): boolean {
 		return this.#peers.has(ip);
 	}
 
@@ -109,7 +113,7 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 
 	public removePeer(ip: string): void {
 		if (this.#peers.has(ip)) {
-			this.forgetPeer(this.getPeer(ip));
+			this.forgetActivePeer(this.getActivePeer(ip));
 		}
 
 		this.#peersPending.delete(ip);
@@ -118,8 +122,8 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 
 	public demotePeer(ip: string): void {
 		if (this.#peers.has(ip)) {
-			const peer = this.getPeer(ip);
-			this.forgetPeer(peer);
+			const peer = this.getActivePeer(ip);
+			this.forgetActivePeer(peer);
 			this.setKnownPeer(peer);
 
 			return;
@@ -133,11 +137,11 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 			return true;
 		}
 
-		return this.getPeers().length >= this.configuration.getRequired<number>("minimumNetworkReach");
+		return this.getActivePeers().length >= this.configuration.getRequired<number>("minimumNetworkReach");
 	}
 
 	public getSameSubnetPeers(peerIp: string): Contracts.P2PService.Peer[] {
-		return this.getPeers().filter((peer) => {
+		return this.getActivePeers().filter((peer) => {
 			if (!IpAddress.isIPv6Address(peer.ip) && !IpAddress.isIPv6Address(peerIp)) {
 				return this.#networkAddress(peer.ip) === this.#networkAddress(peerIp);
 			}

@@ -66,7 +66,7 @@ export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 
 	public async disposePeers(): Promise<void> {
 		await Promise.all(this.repository.getPendingPeers().map((peer) => this.websocketService.disconnect(peer.ip)));
-		await Promise.all(this.repository.getPeers().map((peer) => this.websocketService.disconnect(peer.ip)));
+		await Promise.all(this.repository.getActivePeers().map((peer) => this.websocketService.disconnect(peer.ip)));
 	}
 
 	public isBanned(ip: string): boolean {

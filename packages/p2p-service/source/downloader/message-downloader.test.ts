@@ -13,7 +13,7 @@ describe<{
 	appliedListener: { handle: (payload: { data: { number: number } }) => Promise<void> };
 }>("MessageDownloader", ({ it, assert, beforeEach, stub }) => {
 	const communicator = { getMessages: async () => ({ precommits: [], prevotes: [] }) };
-	const repository = { getPeers: () => [] };
+	const repository = { getActivePeers: () => [] };
 	const blockDownloader = { isDownloading: () => false };
 	const peerDisposer = { banPeer: () => {} };
 	const factory = { makeMessageFromBytes: async () => ({}) };
