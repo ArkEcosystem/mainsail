@@ -4,6 +4,7 @@ import { describe } from "@mainsail/test-runner";
 
 import type { Route } from "./interfaces/index.js";
 
+import { CloseReason } from "./enums.js";
 import { ReceiveCodecMiddleware } from "./middleware/index.js";
 import { Router } from "./router.js";
 
@@ -12,7 +13,7 @@ const codec = {
 	response: { deserialize: (payload: Buffer) => payload.toString(), serialize: (data: string) => Buffer.from(data) },
 };
 
-const connection = { remoteAddress: "1.1.1.1" } as any;
+const connection = { remoteAddress: "1.1.1.1", terminate: () => {} } as any;
 
 describe<{
 	router: Router;
@@ -42,17 +43,22 @@ describe<{
 		assert.equal((await router.handle(connection, "nope", Buffer.alloc(0))).statusCode, 404);
 	});
 
-	it("should answer 413 for a request over the route's limit without decoding it", async ({ router }) => {
+	it("should answer 413 for a request over the route's limit, without decoding it, and drop the connection", async ({
+		router,
+	}) => {
 		let decoded = false;
 		codec.request.deserialize = (payload: Buffer) => {
 			decoded = true;
 			return payload.toString();
 		};
+		let terminated: string | undefined;
+		connection.terminate = (reason: string) => (terminated = reason);
 
 		const response = await router.handle(connection, "echo", Buffer.alloc(9));
 
 		assert.equal(response.statusCode, 413);
 		assert.false(decoded);
+		assert.equal(terminated, CloseReason.PayloadTooLarge);
 	});
 
 	it("should refuse a duplicate path", ({ router }) => {

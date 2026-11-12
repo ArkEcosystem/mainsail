@@ -23,6 +23,7 @@ export enum CloseReason {
 	HeartbeatTimeout = "heartbeatTimeout",
 	VersionMismatch = "versionMismatch",
 	ProtocolError = "protocolError",
+	PayloadTooLarge = "payloadTooLarge",
 	SocketError = "socketError",
 	RequestTimeout = "requestTimeout",
 	NotOpen = "notOpen",
