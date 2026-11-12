@@ -12,6 +12,12 @@ export class PeerDiscoverer implements Contracts.P2PService.PeerDiscoverer {
 	@inject(Identifiers.P2P.Peer.Seeds)
 	private readonly seeds!: Contracts.P2PService.Seeds;
 
+	@inject(Identifiers.P2P.Peer.Repository)
+	private readonly repository!: Contracts.P2PService.PeerRepository;
+
+	@inject(Identifiers.P2P.Peer.Factory)
+	private readonly peerFactory!: Contracts.P2PService.PeerFactory;
+
 	@inject(Identifiers.P2P.Peer.Communicator)
 	private readonly communicator!: Contracts.P2PService.PeerCommunicator;
 
@@ -35,8 +41,16 @@ export class PeerDiscoverer implements Contracts.P2PService.PeerDiscoverer {
 		}
 	}
 
+	// Seeds are recorded as known, not merely dialed once: the service loop keeps dialing them until they
+	// answer and never gives them up, so a seed that is still starting is reached within DIAL_SPACING.
 	async populateSeedPeers(): Promise<void> {
-		await Promise.all(this.seeds.all().map((ip) => this.#getProcessor().validateAndAcceptPeer(ip)));
+		for (const ip of this.seeds.all()) {
+			if (this.repository.hasPeer(ip) || this.repository.hasPendingPeer(ip) || this.repository.hasKnownPeer(ip)) {
+				continue;
+			}
+
+			this.repository.setKnownPeer(this.peerFactory(ip));
+		}
 	}
 
 	#getProcessor(): Contracts.P2PService.PeerProcessor {
