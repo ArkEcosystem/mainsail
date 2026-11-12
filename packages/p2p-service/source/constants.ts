@@ -3,8 +3,8 @@ import { Units } from "@mainsail/constants";
 export const constants = {
 	CHECK_HEADER_DELAY: 2000,
 
-	// Known peers are dialed from the service loop; a peer is not dialed again within this time, and
-	// is forgotten after this many failed dials in a row (seeds are kept).
+	// Known peers (active ones that lost their connection) are redialed from the service loop: not
+	// again within this time, and forgotten after this many failed dials in a row (seeds are kept).
 	DIAL_SPACING: 10_000,
 	// cut-loose timeout for a fast peer cleanse. slow verifications continue in the background
 	FAST_VERIFY_TIMEOUT: 1500,

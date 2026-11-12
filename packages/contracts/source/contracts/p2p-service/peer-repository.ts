@@ -1,7 +1,8 @@
 import type { Peer } from "./peer.js";
 
-// Peers move between three disjoint lists: known (address only, no connection), pending (open
-// connection, verification running) and active (verified; the plain `getPeers` family).
+// Peers move between three disjoint lists: active (verified; the plain `getPeers` family), pending
+// (open connection, verification running) and known (formerly active peers that lost their
+// connection and are dialed again).
 export interface PeerRepository {
 	getPeers(): Peer[];
 	hasPeers(): boolean;

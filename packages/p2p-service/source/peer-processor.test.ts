@@ -50,7 +50,7 @@ describe<{
 		context.events = { dispatch: async () => {}, listen: () => {} };
 		context.transactionPoolWorker = { registerEventHandler: () => {} };
 		context.peerDiscoverer = { discoverPeers: async () => {} };
-		context.websocketService = { onConnection: undefined };
+		context.websocketService = { dial: async () => {}, onConnection: undefined };
 
 		const app = new Application();
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
@@ -66,25 +66,40 @@ describe<{
 		context.processor = app.resolve(PeerProcessor);
 	});
 
-	it("#validateAndAcceptPeer - should record the address as known without verifying it", async ({
+	it("#validateAndAcceptPeer - should dial a new address and record nothing", async ({
 		processor,
 		repository,
+		websocketService,
 		peerVerifier,
 	}) => {
+		const dial = spy(websocketService, "dial");
 		const setKnownPeer = spy(repository, "setKnownPeer");
 		const verify = spy(peerVerifier, "verify");
 
 		await processor.validateAndAcceptPeer("::ffff:178.165.55.55");
 
-		setKnownPeer.calledWith({ ip: "178.165.55.55", port: 4002, version: "0.0.1" });
+		dial.calledWith("ws://178.165.55.55:4002");
+		setKnownPeer.neverCalled();
 		verify.neverCalled();
+	});
+
+	it("#validateAndAcceptPeer - should swallow a failed dial", async ({ processor, websocketService, logger }) => {
+		websocketService.dial = async () => {
+			throw new Error("ECONNREFUSED");
+		};
+		const debug = spy(logger, "debug");
+
+		await processor.validateAndAcceptPeer("178.165.55.55");
+
+		debug.calledWith("Dial to 178.165.55.55:4002 failed: ECONNREFUSED", "p2p");
 	});
 
 	it("#validateAndAcceptPeer - should skip invalid addresses and peers that are already known, pending or active", async ({
 		processor,
 		repository,
+		websocketService,
 	}) => {
-		const setKnownPeer = spy(repository, "setKnownPeer");
+		const dial = spy(websocketService, "dial");
 
 		await processor.validateAndAcceptPeer("not-an-ip");
 		repository.hasKnownPeer = () => true;
@@ -96,7 +111,7 @@ describe<{
 		repository.hasPeer = () => true;
 		await processor.validateAndAcceptPeer("178.165.55.55");
 
-		setKnownPeer.neverCalled();
+		dial.neverCalled();
 	});
 
 	it("#onConnection - should bind the connection to a new peer, verify it and make it active", async ({
