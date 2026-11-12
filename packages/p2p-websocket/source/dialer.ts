@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject } from "@mainsail/container";
-import { IpAddress } from "@mainsail/utils";
+import { IpAddress, randomNumber, sleep } from "@mainsail/utils";
 import WebSocket from "ws";
 
 import type { ConnectionRepository } from "./connection-repository.js";
@@ -8,7 +8,7 @@ import type { Connection, ConnectionFactory, ConnectionVerifier } from "./interf
 import type { Router } from "./router.js";
 
 import { constants } from "./constants.js";
-import { Direction } from "./enums.js";
+import { CloseReason, Direction } from "./enums.js";
 import { ConnectionError } from "./errors.js";
 
 // Opens outbound sockets and runs the handshake. Open connections are reported through
@@ -30,12 +30,38 @@ export class Dialer {
 	// Called once the handshake has completed.
 	public onConnection?: (connection: Connection) => void;
 
-	// The connection takes the socket while it is still connecting so no frame is missed.
-	// Rejects when the socket or the handshake fails; then `onConnection` is not called.
+	// Rejects when the socket or the handshake fails; then `onConnection` is not called. A dial that
+	// crossed the peer's own dial to us is retried; if the peer's connection landed meanwhile, that is
+	// the connection and this dial ends quietly.
 	public async dial(url: string): Promise<void> {
 		const hostname = new URL(url).hostname;
 		const remoteAddress = IpAddress.sanitizeRemoteAddress(hostname) ?? hostname;
 
+		let attempt = 0;
+
+		while (true) {
+			attempt++;
+
+			try {
+				await this.#dial(url, remoteAddress);
+				return;
+			} catch (error) {
+				const crossed = error instanceof ConnectionError && error.reason === CloseReason.DuplicatePeer;
+				if (!crossed || attempt >= constants.DIAL_ATTEMPTS) {
+					throw error;
+				}
+			}
+
+			await sleep(randomNumber(constants.DIAL_RETRY_MIN_DELAY, constants.DIAL_RETRY_MAX_DELAY));
+
+			if (this.repository.get(remoteAddress)) {
+				return;
+			}
+		}
+	}
+
+	// The connection takes the socket while it is still connecting so no frame is missed.
+	async #dial(url: string, remoteAddress: string): Promise<void> {
 		for (const verifier of this.verifiers) {
 			const rejection = verifier.verify(remoteAddress);
 			if (rejection) {
