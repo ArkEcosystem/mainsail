@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
-import { ConnectionState } from "@mainsail/p2p-websocket";
+import { CloseReason, ConnectionState } from "@mainsail/p2p-websocket";
 import { describe } from "@mainsail/test-runner";
 
 import { PeerProcessor } from "./peer-processor";
@@ -10,7 +10,7 @@ const makePeer = (ip: string): any => ({ ip, port: 4002, version: "0.0.1" });
 // The hook does not return the verification promise; a macrotask lets the whole flow settle.
 const connect = async (websocketService: any, ip: string): Promise<any> => {
 	const connection: any = {
-		onClose: (listener: () => void) => (connection.close = listener),
+		onClose: (listener: (reason: string, error?: Error) => void) => (connection.close = listener),
 		remoteAddress: ip,
 		state: ConnectionState.Open,
 	};
@@ -47,7 +47,7 @@ describe<{
 			setPendingPeer: () => {},
 		};
 		context.peerVerifier = { verify: async () => true };
-		context.peerDisposer = { disposePeer: () => {} };
+		context.peerDisposer = { banPeer: () => {}, disposePeer: () => {} };
 		context.events = { dispatch: async () => {}, listen: () => {} };
 		context.transactionPoolWorker = { registerEventHandler: () => {} };
 		context.peerDiscoverer = { discoverPeers: async () => {} };
@@ -219,7 +219,19 @@ describe<{
 		const connection = await connect(websocketService, "178.165.55.55");
 
 		disposePeer.neverCalled();
-		connection.close();
+		connection.close(CloseReason.RemoteClose);
 		disposePeer.calledWith("178.165.55.55");
+	});
+
+	it("#onConnection - should ban the peer when it caused the close", async ({ websocketService, peerDisposer }) => {
+		const banPeer = spy(peerDisposer, "banPeer");
+		const disposePeer = spy(peerDisposer, "disposePeer");
+
+		const connection = await connect(websocketService, "178.165.55.55");
+		connection.close(CloseReason.PayloadTooLarge, new Error("too big"));
+
+		disposePeer.neverCalled();
+		assert.equal(banPeer.getCallArgs(0)[0], "178.165.55.55");
+		assert.equal(banPeer.getCallArgs(0)[1].message, "Connection closed: payloadTooLarge (too big)");
 	});
 });

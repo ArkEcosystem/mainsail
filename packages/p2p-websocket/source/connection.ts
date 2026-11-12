@@ -235,9 +235,13 @@ export class Connection implements ConnectionInterface {
 		}
 	}
 
-	#onError(error: Error): void {
-		this.#handshake.abort(new ConnectionError(CloseReason.SocketError, error.message, { cause: error }));
-		this.terminate(CloseReason.SocketError, error);
+	// ws closes the socket itself when a frame exceeds its maxPayload; the peer, not the network, did that.
+	#onError(error: Error & { code?: string }): void {
+		const reason =
+			error.code === "WS_ERR_UNSUPPORTED_MESSAGE_LENGTH" ? CloseReason.PayloadTooLarge : CloseReason.SocketError;
+
+		this.#handshake.abort(new ConnectionError(reason, error.message, { cause: error }));
+		this.terminate(reason, error);
 	}
 
 	#onClose(): void {

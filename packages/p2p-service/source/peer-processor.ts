@@ -3,12 +3,14 @@ import type { Interfaces, Service as WebSocketService } from "@mainsail/p2p-webs
 
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
-import { ConnectionState } from "@mainsail/p2p-websocket";
+import { CloseReason, ConnectionState } from "@mainsail/p2p-websocket";
 import { ensureError, IpAddress } from "@mainsail/utils";
 
 import type { Peer } from "./interfaces/index.js";
 
 import { getPeerSocketUrl, isValidVersion } from "./utils/index.js";
+
+const BAN_REASONS = new Set<CloseReason>([CloseReason.PayloadTooLarge, CloseReason.ProtocolError]);
 
 // Turns addresses into active peers. It applies no address rules: those run on the transport
 // (PeerIpVerifier, ban list) for every inbound socket and every dial.
@@ -93,9 +95,23 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 			: this.peerFactory(ip);
 		peer.connection = connection;
 		peer.dialFailures = 0;
-		connection.onClose(() => this.peerDisposer.disposePeer(ip));
+		connection.onClose((reason, error) => this.#onClose(ip, reason, error));
 
 		await this.#verifyPeer(peer);
+	}
+
+	// A connection the peer broke by misbehaving (oversized frame, protocol violation) costs it a ban; one
+	// that merely failed only puts it back among the known peers.
+	#onClose(ip: string, reason: CloseReason, error?: Error): void {
+		if (BAN_REASONS.has(reason)) {
+			this.peerDisposer.banPeer(
+				ip,
+				new Error(`Connection closed: ${reason}${error ? ` (${error.message})` : ""}`),
+			);
+			return;
+		}
+
+		this.peerDisposer.disposePeer(ip);
 	}
 
 	async #verifyPeer(peer: Peer): Promise<void> {
