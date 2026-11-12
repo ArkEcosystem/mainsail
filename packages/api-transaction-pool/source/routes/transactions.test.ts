@@ -120,11 +120,11 @@ describe<{
 		["charges a client one point per transaction", "1.2.3.4", "1"],
 		["charges a peer one point per request", "5.6.7.8", "2"],
 	] as const) {
-		it(`POST /api/transactions - ${label}`, async (context) => {
+		it(`POST /api/transactions - ${label}`, async ({ processor, transactions }) => {
 			const configuration = makeConfiguration();
 			configuration.plugins.rateLimit = { ...configuration.plugins.rateLimit, enabled: true, points: 3 };
 			const { server, serviceProvider } = await bootstrapServer(
-				{ ...context, peers: ["5.6.7.8"] },
+				{ peers: ["5.6.7.8"], processor, transactions },
 				configuration,
 			);
 
