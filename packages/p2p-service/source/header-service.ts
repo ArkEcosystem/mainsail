@@ -25,7 +25,7 @@ export class HeaderService implements Contracts.P2PService.HeaderService {
 
 		await this.#delay(peer);
 
-		if (!this.repository.hasPeer(peer.ip)) {
+		if (!this.repository.hasActivePeer(peer.ip)) {
 			return;
 		}
 

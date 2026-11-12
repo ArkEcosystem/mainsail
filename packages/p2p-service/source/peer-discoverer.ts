@@ -45,7 +45,7 @@ export class PeerDiscoverer implements Contracts.P2PService.PeerDiscoverer {
 	// answer and never gives them up, so a seed that is still starting is reached within DIAL_SPACING.
 	async populateSeedPeers(): Promise<void> {
 		for (const ip of this.seeds.all()) {
-			if (this.repository.hasPeer(ip) || this.repository.hasPendingPeer(ip) || this.repository.hasKnownPeer(ip)) {
+			if (this.repository.hasPeer(ip)) {
 				continue;
 			}
 

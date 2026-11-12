@@ -32,7 +32,7 @@ describe<{
 		context.repository = {
 			forgetKnownPeer: () => {},
 			getKnownPeers: () => [],
-			getPeers: () => [],
+			getActivePeers: () => [],
 			hasKnownPeer: () => true,
 			hasMinimumPeers: () => true,
 		};
@@ -81,7 +81,7 @@ describe<{
 		peerVerifier,
 		logger,
 	}) => {
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2"), makePeer("3.3.3.3")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2"), makePeer("3.3.3.3")];
 		const verify = spy(peerVerifier, "verify");
 		const info = spy(logger, "info");
 
@@ -92,7 +92,7 @@ describe<{
 	});
 
 	it("#cleansePeers - should verify at most peerCount peers", async ({ service, repository, peerVerifier }) => {
-		repository.getPeers = () => [
+		repository.getActivePeers = () => [
 			makePeer("1.1.1.1"),
 			makePeer("2.2.2.2"),
 			makePeer("3.3.3.3"),
@@ -112,7 +112,7 @@ describe<{
 		peerVerifier,
 		logger,
 	}) => {
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2"), makePeer("3.3.3.3")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2"), makePeer("3.3.3.3")];
 		peerVerifier.verify = async (peer) => peer.ip === "2.2.2.2";
 		const debug = spy(logger, "debug");
 
@@ -126,7 +126,7 @@ describe<{
 		repository,
 		logger,
 	}) => {
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
 		const debug = spy(logger, "debug");
 
 		await service.cleansePeers({ fast: true, peerCount: 5 });
@@ -139,7 +139,7 @@ describe<{
 		repository,
 	}) => {
 		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
 
 		let resolved = false;
 		const promise = service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (resolved = true));
@@ -157,7 +157,7 @@ describe<{
 		peerVerifier,
 	}) => {
 		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
 		peerVerifier.verify = (peer) => (peer.ip === "1.1.1.1" ? Promise.resolve(true) : new Promise(() => {}));
 
 		let resolved = false;
@@ -180,7 +180,7 @@ describe<{
 		configuration,
 	}) => {
 		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getPeers = () => [makePeer("1.1.1.1")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1")];
 		peerVerifier.verify = () => new Promise(() => {});
 		const getRequired = spy(configuration, "getRequired");
 
@@ -205,7 +205,7 @@ describe<{
 		logger,
 	}) => {
 		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
 		peerVerifier.verify = (peer) =>
 			peer.ip === "1.1.1.1"
 				? Promise.resolve(true)
@@ -237,7 +237,7 @@ describe<{
 		logger,
 	}) => {
 		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
 		peerVerifier.verify = (peer) =>
 			peer.ip === "1.1.1.1"
 				? Promise.resolve(true)
@@ -265,7 +265,7 @@ describe<{
 		peerVerifier,
 	}) => {
 		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getPeers = () => [makePeer("1.1.1.1")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1")];
 
 		let verifyCalls = 0;
 		let release!: (result: boolean) => void;
@@ -307,7 +307,7 @@ describe<{
 		peerVerifier,
 		logger,
 	}) => {
-		repository.getPeers = () => [makePeer("1.1.1.1")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1")];
 		peerVerifier.verify = async () => {
 			throw new Error("boom");
 		};
@@ -348,7 +348,7 @@ describe<{
 	}) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
 		state.getLastMessageTime = () => dayjs().subtract(9, "second");
-		repository.getPeers = () => [makePeer("1.1.1.1")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1")];
 
 		let release!: (result: boolean) => void;
 		peerVerifier.verify = () => new Promise<boolean>((resolve) => (release = resolve));
@@ -373,7 +373,7 @@ describe<{
 	}) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
 		repository.hasMinimumPeers = () => false;
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
 		const populateSeedPeers = spy(peerDiscoverer, "populateSeedPeers");
 		const discoverPeers = spy(peerDiscoverer, "discoverPeers");
 
@@ -398,7 +398,7 @@ describe<{
 	}) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
 		state.getLastMessageTime = () => dayjs().subtract(9, "second");
-		repository.getPeers = () => Array.from({ length: 10 }, (_, index) => makePeer(`1.1.1.${index}`));
+		repository.getActivePeers = () => Array.from({ length: 10 }, (_, index) => makePeer(`1.1.1.${index}`));
 		const verify = stub(peerVerifier, "verify").resolvedValue(true);
 
 		void service.mainLoop();
@@ -418,7 +418,7 @@ describe<{
 	}) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
 		state.getLastMessageTime = () => dayjs().subtract(9, "second");
-		repository.getPeers = () => Array.from({ length: 26 }, (_, index) => makePeer(`1.1.1.${index}`));
+		repository.getActivePeers = () => Array.from({ length: 26 }, (_, index) => makePeer(`1.1.1.${index}`));
 		const verify = stub(peerVerifier, "verify").resolvedValue(true);
 
 		void service.mainLoop();
@@ -489,7 +489,7 @@ describe<{
 		delete process.env.MAINSAIL_ENV;
 
 		try {
-			repository.getPeers = () => [
+			repository.getActivePeers = () => [
 				makePeer("1.1.1.1"),
 				makePeer("2.2.2.2"),
 				makePeer("3.3.3.3", { version: "0.0.2" }),
@@ -529,7 +529,7 @@ describe<{
 		service,
 		repository,
 	}) => {
-		repository.getPeers = () => [
+		repository.getActivePeers = () => [
 			makePeer("1.1.1.1", { header: { blockNumber: 9 } }),
 			makePeer("2.2.2.2", { header: { blockNumber: 3 } }),
 			makePeer("3.3.3.3", { header: { blockNumber: 5 } }),

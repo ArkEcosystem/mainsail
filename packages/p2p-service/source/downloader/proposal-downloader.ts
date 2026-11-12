@@ -57,7 +57,7 @@ export class ProposalDownloader implements Contracts.P2PService.Downloader {
 		}
 
 		const header = this.headerFactory();
-		const peers = this.repository.getPeers().filter((peer) => this.#canDownload(header, peer.header));
+		const peers = this.repository.getActivePeers().filter((peer) => this.#canDownload(header, peer.header));
 
 		if (peers.length > 0) {
 			this.download(getRandomPeer(peers));

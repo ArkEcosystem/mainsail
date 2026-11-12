@@ -67,7 +67,7 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 			return;
 		}
 
-		if (this.repository.hasPeer(ip) || this.repository.hasPendingPeer(ip) || this.repository.hasKnownPeer(ip)) {
+		if (this.repository.hasPeer(ip)) {
 			return;
 		}
 
@@ -84,7 +84,7 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 	async #acceptConnection(connection: Interfaces.Connection): Promise<void> {
 		const ip = connection.remoteAddress;
 
-		if (this.repository.hasPeer(ip) || this.repository.hasPendingPeer(ip)) {
+		if (this.repository.hasActivePeer(ip) || this.repository.hasPendingPeer(ip)) {
 			return;
 		}
 
@@ -113,7 +113,7 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 				return;
 			}
 
-			this.repository.setPeer(peer);
+			this.repository.setActivePeer(peer);
 			this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
 
 			await this.peerDiscoverer.discoverPeers(peer);
@@ -125,7 +125,7 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 	}
 
 	async #disconnectInvalidPeers(): Promise<void> {
-		const peers = this.repository.getPeers();
+		const peers = this.repository.getActivePeers();
 
 		for (const peer of peers) {
 			if (!peer.version || !isValidVersion(this.app, peer.version)) {

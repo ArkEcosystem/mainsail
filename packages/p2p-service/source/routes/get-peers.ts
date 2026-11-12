@@ -23,7 +23,7 @@ export class GetPeersRoute implements Interfaces.Route<Request, Response> {
 	public async handle(connection: Interfaces.Connection): Promise<Response> {
 		return {
 			peers: this.peerRepository
-				.getPeers()
+				.getActivePeers()
 				.filter((peer) => peer.ip !== connection.remoteAddress)
 				// Peers are accepted before they answered anything, so some have no latency yet; those go last.
 				.sort((a, b) => (a.latency ?? Number.POSITIVE_INFINITY) - (b.latency ?? Number.POSITIVE_INFINITY))

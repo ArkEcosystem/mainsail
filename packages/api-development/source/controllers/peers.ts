@@ -21,7 +21,7 @@ export class PeersController extends Controller {
 	public async index(
 		request: Types.HapiRequest,
 	): Promise<Contracts.Api.ResultsPage<ReturnType<PeerResource["transform"]>> | Boom.Boom> {
-		const allPeers: Contracts.P2PService.Peer[] = [...this.peerRepository.getPeers()];
+		const allPeers: Contracts.P2PService.Peer[] = [...this.peerRepository.getActivePeers()];
 
 		let results = allPeers;
 
@@ -89,11 +89,11 @@ export class PeersController extends Controller {
 	public async show(
 		request: Types.HapiRequest,
 	): Promise<{ data: ReturnType<PeerResource["transform"]> } | Boom.Boom> {
-		if (!this.peerRepository.hasPeer(request.params.ip)) {
+		if (!this.peerRepository.hasActivePeer(request.params.ip)) {
 			return Boom.notFound("Peer not found");
 		}
 
-		return super.respondWithResource(this.peerRepository.getPeer(request.params.ip), PeerResource);
+		return super.respondWithResource(this.peerRepository.getActivePeer(request.params.ip), PeerResource);
 	}
 
 	public async banned(

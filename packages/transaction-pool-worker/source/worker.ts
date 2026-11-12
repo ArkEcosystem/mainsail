@@ -235,7 +235,9 @@ export class Worker implements Contracts.TransactionPool.Worker {
 			return;
 		}
 
-		const peers = this.app.get<Contracts.P2P.PeerRepository>(Identifiers.P2P.Peer.Repository).getPeers();
+		const peers = this.app
+			.get<Contracts.P2PService.PeerRepository>(Identifiers.P2P.Peer.Repository)
+			.getActivePeers();
 		await Promise.allSettled(peers.map(async (peer) => this.setPeer(peer.ip)));
 	}
 

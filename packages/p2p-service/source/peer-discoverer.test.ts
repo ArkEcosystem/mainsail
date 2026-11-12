@@ -15,14 +15,9 @@ describe<{
 	peerDisposer: any;
 }>("PeerDiscoverer", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
-		context.repository = {
-			hasKnownPeer: () => false,
-			hasPeer: () => false,
-			hasPendingPeer: () => false,
-			setKnownPeer: () => {},
-		};
+		context.repository = { hasPeer: () => false, setKnownPeer: () => {} };
 		context.seeds = { all: () => ["1.1.1.1", "2.2.2.2"] };
-		context.communicator = { getPeers: async () => ({ peers: [] }) };
+		context.communicator = { getActivePeers: async () => ({ peers: [] }) };
 		context.processor = { validateAndAcceptPeer: async () => {} };
 		context.peerDisposer = { banPeer: () => {} };
 
@@ -48,12 +43,8 @@ describe<{
 		setKnownPeer.calledWith(makePeer("2.2.2.2"));
 	});
 
-	it("#populateSeedPeers - should skip seeds that are already active, pending or known", async ({
-		discoverer,
-		repository,
-	}) => {
-		repository.hasPeer = (ip: string) => ip === "1.1.1.1";
-		repository.hasKnownPeer = (ip: string) => ip === "2.2.2.2";
+	it("#populateSeedPeers - should skip seeds the repository already holds", async ({ discoverer, repository }) => {
+		repository.hasPeer = () => true;
 		const setKnownPeer = spy(repository, "setKnownPeer");
 
 		await discoverer.populateSeedPeers();

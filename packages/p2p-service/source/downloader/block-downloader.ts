@@ -273,7 +273,7 @@ export class BlockDownloader implements Contracts.P2PService.Downloader {
 		// keep its exact range so the requested ranges stay contiguous.
 		const requiredBlockNumber = isSoleJob ? blockNumberFrom : Math.max(blockNumberFrom, job.blockNumberTo);
 
-		const peers = this.repository.getPeers().filter((peer) => peer.header.blockNumber > requiredBlockNumber);
+		const peers = this.repository.getActivePeers().filter((peer) => peer.header.blockNumber > requiredBlockNumber);
 
 		if (peers.length === 0) {
 			// Remove higher jobs, because peer is no longer available
