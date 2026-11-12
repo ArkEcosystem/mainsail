@@ -78,9 +78,7 @@ export class Listener {
 			const connection = this.createConnection(ws, { direction: Direction.Inbound, remoteAddress });
 			connection.onRequest = (path, payload) => this.router.handle(connection, path, payload);
 
-			// Sockets that complete the upgrade while stop() is in progress are dropped here.
-			const rejection =
-				this.#state === ListenerState.Listening ? this.#verify(remoteAddress) : CloseReason.Shutdown;
+			const rejection = this.#verify(remoteAddress);
 			if (rejection) {
 				this.logger.debug(`Rejected inbound socket from ${remoteAddress}: ${rejection}`, "p2p");
 				connection.reject(rejection);
@@ -121,6 +119,11 @@ export class Listener {
 	}
 
 	#verify(remoteAddress: string): CloseReason | undefined {
+		// Sockets that complete the upgrade while stop() is in progress are dropped.
+		if (this.#state !== ListenerState.Listening) {
+			return CloseReason.Shutdown;
+		}
+
 		for (const verifier of this.verifiers) {
 			const rejection = verifier.verify(remoteAddress);
 			if (rejection) {
