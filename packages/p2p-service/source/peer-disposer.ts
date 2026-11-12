@@ -3,7 +3,7 @@ import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
-import { ConnectionError } from "@mainsail/p2p-websocket";
+import { CloseReason, ConnectionError } from "@mainsail/p2p-websocket";
 import dayjs from "dayjs";
 
 @injectable()
@@ -48,9 +48,12 @@ export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 		this.repository.demotePeer(ip);
 	}
 
+	// Shutdown: a graceful close waits for every peer's closing handshake, up to the socket's own timeout
+	// on a dead link, so the connections are torn down at once instead.
 	public async disposePeers(): Promise<void> {
-		await Promise.all(this.repository.getPendingPeers().map((peer) => this.websocketService.disconnect(peer.ip)));
-		await Promise.all(this.repository.getActivePeers().map((peer) => this.websocketService.disconnect(peer.ip)));
+		for (const peer of [...this.repository.getPendingPeers(), ...this.repository.getActivePeers()]) {
+			this.websocketService.terminate(peer.ip, CloseReason.Shutdown);
+		}
 	}
 
 	public bannedPeers(): { ip: string; timeout: number }[] {

@@ -23,6 +23,7 @@ describe<{
 			ban: () => {},
 			bans: () => [],
 			disconnect: async () => {},
+			terminate: () => {},
 		};
 		const app = new Application();
 		app.bind(Identifiers.ServiceProvider.Configuration)
@@ -64,5 +65,23 @@ describe<{
 		removePeer.calledWith("1.1.1.1");
 
 		fakeTimers.restore();
+	});
+
+	it("#disposePeers - should tear every pending and active connection down at once", async ({
+		disposer,
+		repository,
+		websocketService,
+	}) => {
+		repository.getPendingPeers = () => [{ ip: "1.1.1.1" }];
+		repository.getActivePeers = () => [{ ip: "2.2.2.2" }, { ip: "3.3.3.3" }];
+		const terminate = spy(websocketService, "terminate");
+		const disconnect = spy(websocketService, "disconnect");
+
+		await disposer.disposePeers();
+
+		terminate.calledTimes(3);
+		terminate.calledWith("1.1.1.1", CloseReason.Shutdown);
+		terminate.calledWith("3.3.3.3", CloseReason.Shutdown);
+		disconnect.neverCalled();
 	});
 });
