@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 import type { Interfaces } from "@mainsail/p2p-websocket";
 
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { CloseReason, ConnectionError, ConnectionState } from "@mainsail/p2p-websocket";
 import { assert, ensureError } from "@mainsail/utils";
 
@@ -16,6 +16,10 @@ import { GetBlocks, GetMessages, GetPeers, GetProposal, GetStatus, PostMessage, 
 // an active peer, and the service loop dials known peers.
 @injectable()
 export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "p2p-service")
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
+
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
@@ -45,16 +49,17 @@ export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 		return (await this.#emit(peer, GetStatus, {})) as unknown as Contracts.P2PService.GetStatusResponse;
 	}
 
-	// TODO: getBlocks needs the longer `getBlocksTimeout` from the configuration (30 s) instead of the
-	// transport's REQUEST_TIMEOUT (10 s); `send` has no per-request timeout yet.
+	// A batch of blocks is the one response that takes longer than a round trip; it gets its own timeout.
 	public async getBlocks(
 		peer: Peer,
 		{ fromBlockNumber, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromBlockNumber: number; limit?: number },
 	): Promise<Contracts.P2PService.GetBlocksResponse> {
-		return (await this.#emit(peer, GetBlocks, {
-			fromBlockNumber,
-			limit,
-		})) as unknown as Contracts.P2PService.GetBlocksResponse;
+		return (await this.#emit(
+			peer,
+			GetBlocks,
+			{ fromBlockNumber, limit },
+			{ timeout: this.configuration.getRequired<number>("getBlocksTimeout") },
+		)) as unknown as Contracts.P2PService.GetBlocksResponse;
 	}
 
 	public async getProposal(
@@ -81,12 +86,13 @@ export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 		peer: Peer,
 		route: Interfaces.RouteDefinition<TRequest, TResponse>,
 		payload: Omit<TRequest, "headers">,
+		options: Interfaces.SendOptions = {},
 	): Promise<TResponse> {
 		const connection = this.#connection(peer);
 
 		// The request headers are added by HeaderIncludeSendMiddleware.
 		const started = performance.now();
-		const response = await connection.send(route, payload as TRequest);
+		const response = await connection.send(route, payload as TRequest, options);
 		peer.setPinged(Math.floor(performance.now() - started));
 
 		// The wire type of the headers is the protobuf shape; the contract shape is what the codec unpacks.

@@ -24,3 +24,8 @@ export interface RouteDefinition<TRequest, TResponse> {
 	readonly codec: Codec<TRequest, TResponse>;
 	readonly maxPayload: PayloadLimits;
 }
+
+export interface SendOptions {
+	// How long to wait for the response, in milliseconds; the transport's REQUEST_TIMEOUT when omitted.
+	readonly timeout?: number;
+}

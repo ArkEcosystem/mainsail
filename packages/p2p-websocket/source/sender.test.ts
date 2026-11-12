@@ -44,6 +44,18 @@ describe<{
 		assert.equal(await sender.send(connection, route, "hi"), "echo:hi");
 	});
 
+	it("should pass the options on to the connection", async ({ sender, connection }) => {
+		let received: unknown;
+		connection.request = async (_: string, payload: Buffer, options: unknown) => {
+			received = options;
+			return { payload: Buffer.from(`echo:${payload}`), statusCode: 200 };
+		};
+
+		await sender.send(connection, route, "hi", { timeout: 123 });
+
+		assert.equal(received, { timeout: 123 });
+	});
+
 	it("should fail on a non-200 answer", async ({ sender, connection }) => {
 		connection.request = async () => ({ payload: Buffer.alloc(0), statusCode: 413 });
 
