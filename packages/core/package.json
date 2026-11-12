@@ -69,6 +69,8 @@
 		"@mainsail/logger-pino": "workspace:*",
 		"@mainsail/networking-ntp": "workspace:*",
 		"@mainsail/p2p": "workspace:*",
+		"@mainsail/p2p-service": "workspace:*",
+		"@mainsail/p2p-websocket": "workspace:*",
 		"@mainsail/processor": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
 		"@mainsail/state": "workspace:*",
