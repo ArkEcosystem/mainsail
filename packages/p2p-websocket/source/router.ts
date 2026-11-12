@@ -6,6 +6,7 @@ import { ensureError } from "@mainsail/utils";
 
 import type { Connection, ReceiveContext, ReceiveMiddleware, Response, Route } from "./interfaces/index.js";
 
+import { CloseReason } from "./enums.js";
 import { RequestError } from "./errors.js";
 
 // Maps request paths to routes and runs each request through the middleware chain. Middleware is
@@ -39,6 +40,20 @@ export class Router {
 		if (!route) {
 			this.logger.debug(`Unknown route ${path} requested by ${connection.remoteAddress}`, "p2p");
 			return { payload: Buffer.alloc(0), statusCode: 404 };
+		}
+
+		// Checked before the middleware so an oversized request is never decoded or handled. The peer knew
+		// the limit, so the connection goes too; the owner sees the reason on close.
+		if (payload.length > route.maxPayload.request) {
+			this.logger.debug(
+				`${path} from ${connection.remoteAddress} rejected: ${payload.length} bytes exceed ${route.maxPayload.request}`,
+				"p2p",
+			);
+			connection.terminate(
+				CloseReason.PayloadTooLarge,
+				new Error(`${path} request of ${payload.length} bytes exceeds ${route.maxPayload.request}`),
+			);
+			return { payload: Buffer.alloc(0), statusCode: 413 };
 		}
 
 		const context: ReceiveContext = { connection, request: { payload }, response: {}, route };

@@ -1,6 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject } from "@mainsail/container";
-import { IpAddress } from "@mainsail/utils";
+import { IpAddress, randomNumber, sleep } from "@mainsail/utils";
 import WebSocket from "ws";
 
 import type { ConnectionRepository } from "./connection-repository.js";
@@ -8,10 +8,11 @@ import type { Connection, ConnectionFactory, ConnectionVerifier } from "./interf
 import type { Router } from "./router.js";
 
 import { constants } from "./constants.js";
-import { Direction } from "./enums.js";
+import { CloseReason, Direction } from "./enums.js";
 import { ConnectionError } from "./errors.js";
 
-// Opens outbound sockets, runs the handshake and returns open connections.
+// Opens outbound sockets and runs the handshake. Open connections are reported through
+// `onConnection`, the same way the listener reports inbound ones, so the caller has one path.
 @injectable()
 export class Dialer {
 	@inject(Identifiers.P2P.WebSocket.Connection.Factory)
@@ -26,11 +27,36 @@ export class Dialer {
 	@inject(Identifiers.P2P.WebSocket.Router)
 	private readonly router!: Router;
 
-	// The connection takes the socket while it is still connecting so no frame is missed.
-	public async dial(url: string): Promise<Connection> {
+	// Called once the handshake has completed.
+	public onConnection?: (connection: Connection) => void;
+
+	// Rejects when the socket or the handshake fails; then `onConnection` is not called. A dial refused
+	// as a duplicate crossed the peer's own dial to us: after a random pause either the peer's connection
+	// has landed, and that is the connection, or we dial once more and go first this time.
+	public async dial(url: string): Promise<void> {
 		const hostname = new URL(url).hostname;
 		const remoteAddress = IpAddress.sanitizeRemoteAddress(hostname) ?? hostname;
 
+		try {
+			await this.#dial(url, remoteAddress);
+			return;
+		} catch (error) {
+			if (!(error instanceof ConnectionError) || error.reason !== CloseReason.DuplicatePeer) {
+				throw error;
+			}
+		}
+
+		await sleep(randomNumber(constants.DIAL_RETRY_MIN_DELAY, constants.DIAL_RETRY_MAX_DELAY));
+
+		if (this.repository.get(remoteAddress)) {
+			return;
+		}
+
+		await this.#dial(url, remoteAddress);
+	}
+
+	// The connection takes the socket while it is still connecting so no frame is missed.
+	async #dial(url: string, remoteAddress: string): Promise<void> {
 		for (const verifier of this.verifiers) {
 			const rejection = verifier.verify(remoteAddress);
 			if (rejection) {
@@ -51,6 +77,6 @@ export class Dialer {
 
 		await connection.open();
 
-		return connection;
+		this.onConnection?.(connection);
 	}
 }

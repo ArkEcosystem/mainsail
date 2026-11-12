@@ -4,7 +4,7 @@ import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
 @injectable()
-export class Logger implements Contracts.P2P.Logger {
+export class Logger implements Contracts.P2PService.Logger {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 

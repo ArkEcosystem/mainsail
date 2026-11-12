@@ -16,6 +16,7 @@ import { HeaderIncludeReceiveMiddleware, HeaderIncludeSendMiddleware } from "./m
 import { PeerCommunicator } from "./peer-communicator.js";
 import { PeerDiscoverer } from "./peer-discoverer.js";
 import { PeerDisposer } from "./peer-disposer.js";
+import { PeerIpVerifier } from "./peer-ip-verifier.js";
 import { PeerProcessor } from "./peer-processor.js";
 import { PeerRepository } from "./peer-repository.js";
 import { PeerVerifier } from "./peer-verifier.js";
@@ -30,6 +31,7 @@ import {
 	PostMessageRoute,
 	PostProposalRoute,
 } from "./routes/index.js";
+import { Seeds } from "./seeds.js";
 import { Service } from "./service.js";
 import { State } from "./state.js";
 
@@ -45,6 +47,10 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.Peer.Discoverer).to(PeerDiscoverer).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Processor).to(PeerProcessor).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Verifier).to(PeerVerifier).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.Seeds).to(Seeds).inSingletonScope();
+		// Also runs on the transport after its own verifiers (ban list, duplicate address), before the handshake.
+		this.app.bind(Identifiers.P2P.Peer.IpVerifier).to(PeerIpVerifier).inSingletonScope();
+		this.app.bind(Identifiers.P2P.WebSocket.Connection.Verifiers).toService(Identifiers.P2P.Peer.IpVerifier);
 		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
 		this.app.bind<() => Header>(Identifiers.P2P.Header.Factory).toFactory(() => () => this.app.resolve(Header));
 		this.app.bind(Identifiers.P2P.Header.Service).to(HeaderService).inSingletonScope();
@@ -78,6 +84,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async boot(): Promise<void> {
 		const websocketService = this.app.get<WebSocketService>(Identifiers.P2P.WebSocket.Service);
 
+		// Constructing the processor installs its connection hook on the transport.
+		this.app.get<Contracts.P2PService.PeerProcessor>(Identifiers.P2P.Peer.Processor);
+
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const routes: Contracts.Kernel.Container.Newable<Interfaces.Route<any, any>>[] = [
 			GetBlocksRoute,
@@ -95,7 +104,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async dispose(): Promise<void> {
-		await this.app.get<Contracts.P2P.Service>(Identifiers.P2P.Service).dispose();
+		await this.app.get<Contracts.P2PService.Service>(Identifiers.P2P.Service).dispose();
 	}
 
 	#transportConfiguration(): Contracts.Kernel.PluginConfiguration {
@@ -110,19 +119,15 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
 			blacklist: Joi.array().items(Joi.string()).required(),
-			disableDiscovery: Joi.bool(),
+			disableDiscovery: Joi.bool().required(),
 			getBlocksTimeout: Joi.number().integer().min(0).required(),
-			ignoreMinimumNetworkReach: Joi.bool(),
+			ignoreMinimumNetworkReach: Joi.bool().required(),
 			maxPeersBroadcast: Joi.number().integer().min(0).required(),
 			maxSameSubnetPeers: Joi.number().integer().min(0).required(),
 			minimumNetworkReach: Joi.number().integer().min(0).required(),
 			minimumVersions: Joi.array().items(Joi.string()).required(),
 			peerBanTime: Joi.number().integer().min(0).required(),
-			remoteAccess: Joi.array()
-				.items(Joi.string().ip({ version: ["ipv4", "ipv6"] }))
-				.required(),
-			skipPeerStateVerification: Joi.bool(),
-			txPoolPort: Joi.number().integer().min(0).required(),
+			skipPeerStateVerification: Joi.bool().required(),
 			verifyTimeout: Joi.number().integer().min(0).required(),
 			whitelist: Joi.array().items(Joi.string()).required(),
 		}).unknown(true);

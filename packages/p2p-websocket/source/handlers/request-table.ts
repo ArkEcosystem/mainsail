@@ -11,7 +11,7 @@ type Pending = {
 };
 
 // Outstanding requests we sent, keyed by id. Ids wrap at uint32 and never clash in practice: a
-// request lives for at most REQUEST_TIMEOUT.
+// request lives for at most its timeout.
 class RequestTable {
 	readonly #pending = new Map<number, Pending>();
 
@@ -22,16 +22,15 @@ class RequestTable {
 	}
 
 	// Reserves an id and returns the promise its response will settle. The caller sends the frame.
-	public open(): { id: number; response: Promise<Response> } {
+	public open(timeout: number = constants.REQUEST_TIMEOUT): { id: number; response: Promise<Response> } {
 		const id = this.#nextId;
 		this.#nextId = this.#nextId >= 0xff_ff_ff_ff ? 1 : this.#nextId + 1;
 
 		const response = new Promise<Response>((resolve, reject) => {
-			// TODO: Handle node ban on repeated request timeouts.
 			const timer = setTimeout(() => {
 				this.#pending.delete(id);
-				reject(new ConnectionError(CloseReason.RequestTimeout, `Request ${id} timed out`));
-			}, constants.REQUEST_TIMEOUT);
+				reject(new ConnectionError(CloseReason.RequestTimeout, `Request ${id} timed out after ${timeout} ms`));
+			}, timeout);
 
 			this.#pending.set(id, { reject, resolve, timer });
 		});

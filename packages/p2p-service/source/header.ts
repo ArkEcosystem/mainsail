@@ -4,7 +4,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 
 @injectable()
-export class Header implements Contracts.P2P.Header {
+export class Header implements Contracts.P2PService.Header {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -33,7 +33,7 @@ export class Header implements Contracts.P2P.Header {
 		this.proposal = roundState.getProposal();
 	}
 
-	public toData(): Contracts.P2P.HeaderData {
+	public toData(): Contracts.P2PService.HeaderData {
 		return {
 			blockNumber: this.blockNumber,
 			proposedBlockHash: this.proposal ? this.proposal.blockHeader.hash : undefined,

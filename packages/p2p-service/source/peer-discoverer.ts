@@ -2,32 +2,37 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { ensureError, http } from "@mainsail/utils";
-import { readJSONSync } from "fs-extra/esm";
+import { ensureError } from "@mainsail/utils";
 
 @injectable()
-export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
+export class PeerDiscoverer implements Contracts.P2PService.PeerDiscoverer {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
+	@inject(Identifiers.P2P.Peer.Seeds)
+	private readonly seeds!: Contracts.P2PService.Seeds;
+
+	@inject(Identifiers.P2P.Peer.Repository)
+	private readonly repository!: Contracts.P2PService.PeerRepository;
+
 	@inject(Identifiers.P2P.Peer.Factory)
-	private readonly peerFactory!: Contracts.P2P.PeerFactory;
+	private readonly peerFactory!: Contracts.P2PService.PeerFactory;
 
 	@inject(Identifiers.P2P.Peer.Communicator)
-	private readonly communicator!: Contracts.P2P.PeerCommunicator;
+	private readonly communicator!: Contracts.P2PService.PeerCommunicator;
 
 	@inject(Identifiers.P2P.Peer.Disposer)
-	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	async discoverPeers(peer: Contracts.P2P.Peer): Promise<void> {
+	async discoverPeers(peer: Contracts.P2PService.Peer): Promise<void> {
 		try {
 			const { peers } = await this.communicator.getPeers(peer);
 
 			for (const peer of peers) {
-				await this.#getProcessor().validateAndAcceptPeer(peer.ip, {});
+				await this.#getProcessor().validateAndAcceptPeer(peer.ip);
 			}
 		} catch (rawError) {
 			const error = ensureError(rawError);
@@ -36,58 +41,19 @@ export class PeerDiscoverer implements Contracts.P2P.PeerDiscoverer {
 		}
 	}
 
+	// Seeds are recorded as known, not merely dialed once: the service loop keeps dialing them until they
+	// answer and never gives them up, so a seed that is still starting is reached within DIAL_SPACING.
 	async populateSeedPeers(): Promise<void> {
-		const peerList = this.app.config<{ list: Contracts.P2P.PeerData[] }>("peers")?.list ?? [];
-
-		try {
-			const peersFromUrl = await this.#loadPeersFromUrlList();
-			for (const peer of peersFromUrl) {
-				if (!peerList.find((p) => p.ip === peer.ip)) {
-					peerList.push({
-						ip: peer.ip,
-						port: peer.port,
-					});
-				}
-			}
-		} catch {}
-
-		if (!peerList || peerList.length === 0) {
-			await this.app.terminate("No seed peers defined in peers.json");
-		}
-
-		const peers: Contracts.P2P.Peer[] = peerList.map((peer) => {
-			const peerInstance = this.peerFactory(peer.ip);
-			peerInstance.version = this.app.version();
-			return peerInstance;
-		});
-
-		await Promise.all(
-			Object.values(peers).map((peer: Contracts.P2P.Peer) =>
-				this.#getProcessor().validateAndAcceptPeer(peer.ip, { seed: true }),
-			),
-		);
-	}
-
-	#getProcessor(): Contracts.P2P.PeerProcessor {
-		return this.app.get<Contracts.P2P.PeerProcessor>(Identifiers.P2P.Peer.Processor);
-	}
-
-	// TODO: Get from all sources
-	async #loadPeersFromUrlList(): Promise<Array<{ ip: string; port: number }>> {
-		const urls: string[] = this.app.config<{ sources: string[] }>("peers")?.sources || [];
-
-		for (const url of urls) {
-			// Local File...
-			if (url.startsWith("/")) {
-				return readJSONSync(url);
+		for (const ip of this.seeds.all()) {
+			if (this.repository.hasPeer(ip)) {
+				continue;
 			}
 
-			// URL...
-			this.logger.debug(`GET ${url}`, "p2p");
-			const { data } = await http.get<string | Array<{ ip: string; port: number }>>(url);
-			return typeof data === "object" ? data : JSON.parse(data);
+			this.repository.setKnownPeer(this.peerFactory(ip));
 		}
+	}
 
-		return [];
+	#getProcessor(): Contracts.P2PService.PeerProcessor {
+		return this.app.get<Contracts.P2PService.PeerProcessor>(Identifiers.P2P.Peer.Processor);
 	}
 }

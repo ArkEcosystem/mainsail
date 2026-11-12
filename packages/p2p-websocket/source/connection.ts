@@ -16,11 +16,12 @@ import type {
 	Response,
 	RouteDefinition,
 	RouteSender,
+	SendOptions,
 } from "./interfaces/index.js";
 
 import { CloseReason, ConnectionState } from "./enums.js";
 import { ConnectionError } from "./errors.js";
-import { Handshake, RequestTable } from "./handlers/index.js";
+import { Handshake, Heartbeat, RequestTable } from "./handlers/index.js";
 import { decode, encode } from "./message.js";
 
 // One per socket, created through Identifiers.P2P.WebSocket.Connection.Factory and set up with init().
@@ -39,6 +40,7 @@ export class Connection implements ConnectionInterface {
 
 	#ws!: WebSocket;
 	#handshake!: Handshake;
+	#heartbeat!: Heartbeat;
 	#direction!: Direction;
 	#remoteAddress!: string;
 
@@ -54,11 +56,21 @@ export class Connection implements ConnectionInterface {
 
 		this.#handshake = new Handshake({
 			direction: options.direction,
+			open: () => this.#open(),
 			reject: (reason) => this.reject(reason),
 			send: (message) => this.#send(message),
 		});
 
+		this.#heartbeat = new Heartbeat({
+			direction: options.direction,
+			fail: (error) => this.terminate(error.reason, error),
+			ping: () => this.#ws.ping(),
+		});
+
 		this.#ws.on("message", (data) => this.#onMessage(data));
+		// Pongs to the peer's pings are sent by ws itself; these only feed the heartbeat.
+		this.#ws.on("ping", () => this.#heartbeat.onPing());
+		this.#ws.on("pong", () => this.#heartbeat.onPong());
 		this.#ws.on("error", (error) => this.#onError(error));
 		this.#ws.on("close", () => this.#onClose());
 
@@ -83,7 +95,7 @@ export class Connection implements ConnectionInterface {
 	}
 
 	// Waits for the socket to open if it is still connecting, then runs the handshake.
-	// Rejects and closes the connection on failure.
+	// Rejects and closes the connection on failure. The state becomes Open inside the handshake.
 	public async open(): Promise<void> {
 		try {
 			await this.#waitForOpen();
@@ -91,10 +103,6 @@ export class Connection implements ConnectionInterface {
 		} catch (error) {
 			this.terminate(error instanceof ConnectionError ? error.reason : CloseReason.ProtocolError, error as Error);
 			throw error;
-		}
-
-		if (this.#state === ConnectionState.Handshaking) {
-			this.#state = ConnectionState.Open;
 		}
 	}
 
@@ -118,18 +126,27 @@ export class Connection implements ConnectionInterface {
 	public async send<TRequest, TResponse>(
 		route: RouteDefinition<TRequest, TResponse>,
 		data: TRequest,
+		options: SendOptions = {},
 	): Promise<TResponse> {
-		return this.sender.send(this, route, data);
+		return this.sender.send(this, route, data, options);
 	}
 
 	// Raw request: sends a frame and resolves with the peer's response, or rejects on timeout or close.
-	public async request(path: string, payload: Buffer): Promise<Response> {
+	// A peer that lets a request time out is treated as gone: the connection is torn down, so every
+	// failure of a connection ends in its close and the owner needs only the close to react.
+	public async request(path: string, payload: Buffer, options: SendOptions = {}): Promise<Response> {
 		if (this.#state !== ConnectionState.Open) {
 			throw new ConnectionError(CloseReason.NotOpen, `Connection is ${this.#state}`);
 		}
 
-		const { id, response } = this.#requestTable.open();
+		const { id, response } = this.#requestTable.open(options.timeout);
 		this.#send({ id, path, payload, type: "request" });
+
+		void response.then(undefined, (error: unknown) => {
+			if (error instanceof ConnectionError && error.reason === CloseReason.RequestTimeout) {
+				this.terminate(CloseReason.RequestTimeout, error);
+			}
+		});
 
 		return response;
 	}
@@ -212,9 +229,21 @@ export class Connection implements ConnectionInterface {
 		this.#send({ id: message.id, payload: response.payload, statusCode: response.statusCode, type: "response" });
 	}
 
-	#onError(error: Error): void {
-		this.#handshake.abort(new ConnectionError(CloseReason.SocketError, error.message, { cause: error }));
-		this.terminate(CloseReason.SocketError, error);
+	// A close that began during the handshake wins; only an untouched connection opens.
+	#open(): void {
+		if (this.#state === ConnectionState.Handshaking) {
+			this.#state = ConnectionState.Open;
+			this.#heartbeat.start();
+		}
+	}
+
+	// ws closes the socket itself when a frame exceeds its maxPayload; the peer, not the network, did that.
+	#onError(error: Error & { code?: string }): void {
+		const reason =
+			error.code === "WS_ERR_UNSUPPORTED_MESSAGE_LENGTH" ? CloseReason.PayloadTooLarge : CloseReason.SocketError;
+
+		this.#handshake.abort(new ConnectionError(reason, error.message, { cause: error }));
+		this.terminate(reason, error);
 	}
 
 	#onClose(): void {
@@ -243,6 +272,7 @@ export class Connection implements ConnectionInterface {
 		this.#state = ConnectionState.Closing;
 		this.#closeReason = reason;
 		this.#closeError = error;
+		this.#heartbeat.stop();
 
 		// A close that starts during the handshake must fail open(), so the owner never sees the connection.
 		this.#handshake.abort(new ConnectionError(reason, "Connection closed during handshake", { cause: error }));

@@ -5,6 +5,7 @@ import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
 import { constants } from "../constants.js";
+import { GetBlocks } from "../routes/get-blocks.js";
 import { getRandomPeer } from "../utils/index.js";
 
 enum JobStatus {
@@ -14,7 +15,7 @@ enum JobStatus {
 }
 
 type DownloadJob = {
-	peer: Contracts.P2P.Peer;
+	peer: Contracts.P2PService.Peer;
 	blockNumberFrom: number;
 	blockNumberTo: number;
 	blocks: Buffer[];
@@ -22,15 +23,15 @@ type DownloadJob = {
 };
 
 @injectable()
-export class BlockDownloader implements Contracts.P2P.Downloader {
+export class BlockDownloader implements Contracts.P2PService.Downloader {
 	@inject(Identifiers.P2P.Peer.Communicator)
-	private readonly communicator!: Contracts.P2P.PeerCommunicator;
+	private readonly communicator!: Contracts.P2PService.PeerCommunicator;
 
 	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly repository!: Contracts.P2P.PeerRepository;
+	private readonly repository!: Contracts.P2PService.PeerRepository;
 
 	@inject(Identifiers.P2P.Peer.Disposer)
-	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
@@ -42,10 +43,10 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 	private readonly stateStore!: Contracts.State.Store;
 
 	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2P.State;
+	private readonly state!: Contracts.P2PService.State;
 
 	@inject(Identifiers.P2P.PendingCommits)
-	private readonly pendingCommits!: Contracts.P2P.PendingCommits;
+	private readonly pendingCommits!: Contracts.P2PService.PendingCommits;
 
 	@inject(Identifiers.Consensus.Processor.Commit)
 	private readonly commitProcessor!: Contracts.Consensus.CommitProcessor;
@@ -58,7 +59,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 
 	#downloadJobs: DownloadJob[] = [];
 
-	public download(peer: Contracts.P2P.Peer): void {
+	public download(peer: Contracts.P2PService.Peer): void {
 		if (
 			peer.header.blockNumber - 1 <= this.#getLastRequestedBlockNumber() ||
 			this.#downloadJobs.length >= constants.MAX_DOWNLOAD_BLOCKS_JOBS
@@ -248,7 +249,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		const size = job.blocks.reduce((size, block) => size + block.length, 0);
 
 		// TODO: Take header size into account
-		if (size + configuration.block.maxPayload < constants.MAX_PAYLOAD_CLIENT) {
+		if (size + configuration.block.maxPayload < GetBlocks.maxPayload.response) {
 			// Peer did't respond with all requested blocks and didn't exceed maxPayload
 			this.peerDisposer.banPeer(
 				job.peer.ip,
@@ -273,7 +274,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		// keep its exact range so the requested ranges stay contiguous.
 		const requiredBlockNumber = isSoleJob ? blockNumberFrom : Math.max(blockNumberFrom, job.blockNumberTo);
 
-		const peers = this.repository.getPeers().filter((peer) => peer.header.blockNumber > requiredBlockNumber);
+		const peers = this.repository.getActivePeers().filter((peer) => peer.header.blockNumber > requiredBlockNumber);
 
 		if (peers.length === 0) {
 			// Remove higher jobs, because peer is no longer available
@@ -305,7 +306,7 @@ export class BlockDownloader implements Contracts.P2P.Downloader {
 		void this.#downloadBlocksFromPeer(newJob);
 	}
 
-	#calculateBlockNumberTo(peer: Contracts.P2P.Peer, lastRequestedBlockNumber: number): number {
+	#calculateBlockNumberTo(peer: Contracts.P2PService.Peer, lastRequestedBlockNumber: number): number {
 		// Check that we don't exceed maxDownloadBlocks
 		return peer.header.blockNumber - lastRequestedBlockNumber > constants.MAX_DOWNLOAD_BLOCKS
 			? lastRequestedBlockNumber + constants.MAX_DOWNLOAD_BLOCKS

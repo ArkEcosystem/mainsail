@@ -12,7 +12,7 @@ describe<{
 	pendingCommits: PendingCommits;
 }>("BlockDownloader", ({ it, assert, beforeEach, stub }) => {
 	const communicator = { getBlocks: async () => ({ blocks: [] }) };
-	const repository = { getPeers: () => [] };
+	const repository = { getActivePeers: () => [] };
 	const peerDisposer = { banPeer: () => {} };
 	const configuration = { getMilestone: () => ({ block: { maxPayload: 2_097_152 } }) };
 	// One slice per batch: every batch fits into the round that starts at its first block.
@@ -195,7 +195,7 @@ describe<{
 			++calls === 1 ? Promise.reject(new Error("boom")) : new Promise(() => {}),
 		);
 		const banPeer = stub(peerDisposer, "banPeer");
-		stub(repository, "getPeers").returnValue([makePeer(1000, "2.2.2.2")]);
+		stub(repository, "getActivePeers").returnValue([makePeer(1000, "2.2.2.2")]);
 
 		downloader.download(makePeer(3));
 		await sleep(10);
@@ -359,7 +359,7 @@ describe<{
 			() => new Promise((_, reject) => rejecters.push(reject)),
 		);
 		const replayPeer = makePeer(100_000, "2.2.2.2");
-		stub(repository, "getPeers").returnValue([replayPeer]);
+		stub(repository, "getActivePeers").returnValue([replayPeer]);
 
 		// Job for blocks 1-400 (a full batch) fails; the replacement range must be measured
 		// from the job's start, not from the end of the failed job (which allowed 800).
@@ -382,7 +382,7 @@ describe<{
 		downloader.download(makePeer(500));
 		stub(stateStore, "getBlockNumber").returnValue(390);
 		const replayPeer = makePeer(395, "3.3.3.3");
-		stub(repository, "getPeers").returnValue([replayPeer]);
+		stub(repository, "getActivePeers").returnValue([replayPeer]);
 
 		rejecters[0](new Error("boom"));
 		await sleep(10);
@@ -398,7 +398,7 @@ describe<{
 			() => new Promise((_, reject) => rejecters.push(reject)),
 		);
 		const replayPeer = makePeer(100_000, "2.2.2.2");
-		stub(repository, "getPeers").returnValue([replayPeer]);
+		stub(repository, "getActivePeers").returnValue([replayPeer]);
 
 		// Jobs for blocks 1-400 and 401-800; the second fails and must be replayed unchanged
 		// so the requested ranges stay contiguous.
@@ -442,7 +442,7 @@ describe<{
 		stub(communicator, "getBlocks").callsFake(
 			() => new Promise((resolve, reject) => requests.push({ reject, resolve })),
 		);
-		stub(repository, "getPeers").returnValue([makePeer(1000, "2.2.2.2")]);
+		stub(repository, "getActivePeers").returnValue([makePeer(1000, "2.2.2.2")]);
 
 		// Jobs for blocks 1-400 and 401-402. The second one arrives first and waits for the first.
 		downloader.download(makePeer(401));

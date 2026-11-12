@@ -13,7 +13,9 @@ import { CloseReason } from "./enums.js";
 
 // The one object the p2p layer talks to. It only delegates: lifecycle to the server, routes to the
 // router, inbound sockets to the listener, outbound ones to the dialer, bans to the ban list.
-// Deciding whom to accept or ban stays with the caller through `accept` and `ban`.
+// Whom to refuse before the handshake is decided by the connection verifiers, whom to ban by the
+// caller through `ban`; connections reach the caller only through `onConnection`, never before
+// their handshake is done.
 @injectable()
 export class Service {
 	@inject(Identifiers.P2P.WebSocket.Server)
@@ -55,27 +57,29 @@ export class Service {
 		this.router.register(route as Route<unknown, unknown>);
 	}
 
-	// Inbound
+	// Connections
 
-	// Runs after the built-in verifiers (ban list, duplicate address) and before the handshake.
-	public set accept(hook: ((remoteAddress: string) => CloseReason | undefined) | undefined) {
-		this.listener.accept = hook;
-	}
-
-	// Fires for inbound connections once their handshake has completed.
+	// Fires for every connection, inbound or outbound, once its handshake has completed.
 	public set onConnection(handler: ((connection: Connection) => void) | undefined) {
 		this.listener.onConnection = handler;
+		this.dialer.onConnection = handler;
 	}
 
 	// Outbound
 
-	public async dial(url: string): Promise<Connection> {
-		return this.dialer.dial(url);
+	// Resolves once the connection is open and `onConnection` has been called; rejects on failure.
+	public async dial(url: string): Promise<void> {
+		await this.dialer.dial(url);
 	}
 
 	// Graceful close of the connection to an address, if there is one.
 	public async disconnect(ip: string): Promise<void> {
 		await this.repository.get(ip)?.close(CloseReason.LocalClose);
+	}
+
+	// Immediate close, for when waiting for the peer's closing handshake is not worth it.
+	public terminate(ip: string, reason: CloseReason = CloseReason.LocalClose): void {
+		this.repository.get(ip)?.terminate(reason);
 	}
 
 	// Bans

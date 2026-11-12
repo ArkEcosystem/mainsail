@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 import type { Interfaces } from "@mainsail/p2p-websocket";
 
-import { Enums, Identifiers } from "@mainsail/constants";
+import { Enums, Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
@@ -12,6 +12,7 @@ type Response = ReturnType<typeof Codecs.postMessage.response.deserialize>;
 
 export const PostMessage: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.postMessage,
+	maxPayload: { request: Units.KILOBYTE, response: Units.KILOBYTE },
 	path: "postMessage",
 };
 
@@ -25,13 +26,14 @@ export class PostMessageRoute implements Interfaces.Route<Request, Response> {
 	private readonly factory!: Contracts.Crypto.MessageFactory;
 
 	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2P.State;
+	private readonly state!: Contracts.P2PService.State;
 
 	@inject(Identifiers.P2P.Logger)
-	private readonly logger!: Contracts.P2P.Logger;
+	private readonly logger!: Contracts.P2PService.Logger;
 
 	public readonly path = PostMessage.path;
 	public readonly codec = PostMessage.codec;
+	public readonly maxPayload = PostMessage.maxPayload;
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
 		try {

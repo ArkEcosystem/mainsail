@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 import type { Interfaces } from "@mainsail/p2p-websocket";
 
-import { Identifiers } from "@mainsail/constants";
+import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
 import { Codecs } from "../codecs/index.js";
@@ -10,6 +10,7 @@ type Response = ReturnType<typeof Codecs.getProposal.response.deserialize>;
 
 export const GetProposal: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.getProposal,
+	maxPayload: { request: Units.KILOBYTE, response: 3 * Units.MEGABYTE },
 	path: "getProposal",
 };
 
@@ -23,6 +24,7 @@ export class GetProposalRoute implements Interfaces.Route<Request, Response> {
 
 	public readonly path = GetProposal.path;
 	public readonly codec = GetProposal.codec;
+	public readonly maxPayload = GetProposal.maxPayload;
 
 	public async handle(_: Interfaces.Connection, data: Request): Promise<Response> {
 		const empty = { proposal: Buffer.alloc(0) };

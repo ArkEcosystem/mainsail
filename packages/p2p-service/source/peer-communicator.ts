@@ -1,37 +1,33 @@
 import type { Contracts } from "@mainsail/contracts";
-import type { ConnectionRepository, Interfaces, Service as WebSocketService } from "@mainsail/p2p-websocket";
+import type { Interfaces } from "@mainsail/p2p-websocket";
 
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
-import { ConnectionState } from "@mainsail/p2p-websocket";
-import { assert, ensureError, IpAddress } from "@mainsail/utils";
-import { setTimeout as sleep } from "node:timers/promises";
+import { inject, injectable, tagged } from "@mainsail/container";
+import { CloseReason, ConnectionError, ConnectionState } from "@mainsail/p2p-websocket";
+import { assert, ensureError } from "@mainsail/utils";
 
 import type { Peer } from "./interfaces/index.js";
 
 import { constants } from "./constants.js";
 import { GetBlocks, GetMessages, GetPeers, GetProposal, GetStatus, PostMessage, PostProposal } from "./routes/index.js";
 
-const DIAL_SPACING = 10_000;
-
 // Minimal port of the @mainsail/p2p communicator over the new transport: no timeouts per route,
-// no reply validation, no throttling.
+// no reply validation, no throttling. It never connects: a peer without an open connection is not
+// an active peer, and the service loop dials known peers.
 @injectable()
-export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
-	@inject(Identifiers.P2P.WebSocket.Service)
-	private readonly websocketService!: WebSocketService;
-
-	@inject(Identifiers.P2P.WebSocket.Connection.Repository)
-	private readonly connections!: ConnectionRepository;
+export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "p2p-service")
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.Peer.Disposer)
-	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
 	@inject(Identifiers.P2P.Header.Service)
-	private readonly headerService!: Contracts.P2P.HeaderService;
+	private readonly headerService!: Contracts.P2PService.HeaderService;
 
 	@inject(Identifiers.P2P.Logger)
-	private readonly logger!: Contracts.P2P.Logger;
+	private readonly logger!: Contracts.P2PService.Logger;
 
 	public async postProposal(peer: Peer, proposal: Buffer): Promise<void> {
 		try {
@@ -49,104 +45,69 @@ export class PeerCommunicator implements Contracts.P2P.PeerCommunicator {
 		}
 	}
 
-	public async getStatus(peer: Peer): Promise<Contracts.P2P.GetStatusResponse> {
-		return (await this.#emit(peer, GetStatus, {})) as unknown as Contracts.P2P.GetStatusResponse;
+	public async getStatus(peer: Peer): Promise<Contracts.P2PService.GetStatusResponse> {
+		return (await this.#emit(peer, GetStatus, {})) as unknown as Contracts.P2PService.GetStatusResponse;
 	}
 
-	// TODO: getBlocks needs the longer `getBlocksTimeout` from the configuration (30 s) instead of the
-	// transport's REQUEST_TIMEOUT (10 s); `send` has no per-request timeout yet.
+	// A batch of blocks is the one response that takes longer than a round trip; it gets its own timeout.
 	public async getBlocks(
 		peer: Peer,
 		{ fromBlockNumber, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromBlockNumber: number; limit?: number },
-	): Promise<Contracts.P2P.GetBlocksResponse> {
-		return (await this.#emit(peer, GetBlocks, {
-			fromBlockNumber,
-			limit,
-		})) as unknown as Contracts.P2P.GetBlocksResponse;
+	): Promise<Contracts.P2PService.GetBlocksResponse> {
+		return (await this.#emit(
+			peer,
+			GetBlocks,
+			{ fromBlockNumber, limit },
+			{ timeout: this.configuration.getRequired<number>("getBlocksTimeout") },
+		)) as unknown as Contracts.P2PService.GetBlocksResponse;
 	}
 
 	public async getProposal(
 		peer: Peer,
-		query: Contracts.P2P.GetProposalQuery,
-	): Promise<Contracts.P2P.GetProposalResponse> {
-		return (await this.#emit(peer, GetProposal, { query })) as unknown as Contracts.P2P.GetProposalResponse;
+		query: Contracts.P2PService.GetProposalQuery,
+	): Promise<Contracts.P2PService.GetProposalResponse> {
+		return (await this.#emit(peer, GetProposal, { query })) as unknown as Contracts.P2PService.GetProposalResponse;
 	}
 
 	public async getMessages(
 		peer: Peer,
-		query: Contracts.P2P.GetMessagesQuery,
-	): Promise<Contracts.P2P.GetMessagesResponse> {
-		return (await this.#emit(peer, GetMessages, { query })) as unknown as Contracts.P2P.GetMessagesResponse;
+		query: Contracts.P2PService.GetMessagesQuery,
+	): Promise<Contracts.P2PService.GetMessagesResponse> {
+		return (await this.#emit(peer, GetMessages, { query })) as unknown as Contracts.P2PService.GetMessagesResponse;
 	}
 
-	public async getPeers(peer: Peer): Promise<Contracts.P2P.GetPeersResponse> {
+	public async getPeers(peer: Peer): Promise<Contracts.P2PService.GetPeersResponse> {
 		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`, "p2p");
 
-		return (await this.#emit(peer, GetPeers, {})) as unknown as Contracts.P2P.GetPeersResponse;
-	}
-
-	public async getApiNodes(): Promise<Contracts.P2P.GetApiNodesResponse> {
-		throw new Error("API nodes are not part of @mainsail/p2p-service");
-	}
-
-	public async pingPorts(): Promise<void> {
-		throw new Error("pingPorts is not ported to @mainsail/p2p-service yet");
+		return (await this.#emit(peer, GetPeers, {})) as unknown as Contracts.P2PService.GetPeersResponse;
 	}
 
 	async #emit<TRequest extends { headers?: unknown }, TResponse>(
 		peer: Peer,
 		route: Interfaces.RouteDefinition<TRequest, TResponse>,
 		payload: Omit<TRequest, "headers">,
+		options: Interfaces.SendOptions = {},
 	): Promise<TResponse> {
-		const connection = await this.#connect(peer);
+		const connection = this.#connection(peer);
 
 		// The request headers are added by HeaderIncludeSendMiddleware.
 		const started = performance.now();
-		const response = await connection.send(route, payload as TRequest);
+		const response = await connection.send(route, payload as TRequest, options);
 		peer.setPinged(Math.floor(performance.now() - started));
 
 		// The wire type of the headers is the protobuf shape; the contract shape is what the codec unpacks.
-		const { headers } = response as { headers?: Contracts.P2P.HeaderData };
+		const { headers } = response as { headers?: Contracts.P2PService.HeaderData };
 		assert.defined(headers);
 		void this.headerService.handle(peer, headers);
 
 		return response;
 	}
 
-	// Reuses the peer's connection in either direction; dials only when there is none, at most once per DIAL_SPACING.
-	async #connect(peer: Peer): Promise<Interfaces.Connection> {
-		if (peer.connection?.state === ConnectionState.Open) {
-			return peer.connection;
+	#connection(peer: Peer): Interfaces.Connection {
+		if (peer.connection?.state !== ConnectionState.Open) {
+			throw new ConnectionError(CloseReason.NotOpen, `No open connection to ${peer.ip}`);
 		}
 
-		const existing = this.connections.get(peer.ip);
-		if (existing) {
-			this.#attach(peer, existing);
-			return existing;
-		}
-
-		const wait = DIAL_SPACING - (Date.now() - (peer.lastDialAt ?? 0));
-		if (wait > 0) {
-			await sleep(wait);
-		}
-
-		peer.lastDialAt = Date.now();
-		const connection = await this.websocketService.dial(`ws://${IpAddress.normalizeAddress(peer.ip)}:${peer.port}`);
-		this.#attach(peer, connection);
-
-		return connection;
-	}
-
-	#attach(peer: Peer, connection: Interfaces.Connection): void {
-		if (peer.connection === connection) {
-			return;
-		}
-
-		peer.connection = connection;
-		connection.onClose(() => {
-			if (peer.connection === connection) {
-				peer.connection = undefined;
-			}
-		});
+		return peer.connection;
 	}
 }

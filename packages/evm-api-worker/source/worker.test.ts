@@ -21,7 +21,7 @@ describe<{
 			sendRequest: async () => {},
 		};
 		context.eventDispatcher = { listen: () => {} };
-		context.p2pRepository = { getPeers: () => [] };
+		context.p2pRepository = { getActivePeers: () => [] };
 
 		context.app = new Application();
 		// The injected factory hands back our fake subprocess instead of spawning a thread.
@@ -133,7 +133,7 @@ describe<{
 	});
 
 	it("handle relays the current peer count to the subprocess", async ({ worker, ipc, p2pRepository }) => {
-		p2pRepository.getPeers = () => [{}, {}, {}];
+		p2pRepository.getActivePeers = () => [{}, {}, {}];
 		const sendRequest = spy(ipc, "sendRequest");
 
 		await worker.boot({});

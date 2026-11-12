@@ -9,7 +9,7 @@ describe<{
 	app: Application;
 	route: GetPeersRoute;
 }>("GetPeersRoute", ({ it, assert, beforeEach, stub }) => {
-	const peerRepository = { getPeers: () => {} };
+	const peerRepository = { getActivePeers: () => {} };
 	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
 
 	beforeEach((context) => {
@@ -35,7 +35,7 @@ describe<{
 		peers[3].latency = 297_600;
 		peers[4].latency = 1_197_634;
 
-		stub(peerRepository, "getPeers").returnValue(peers);
+		stub(peerRepository, "getActivePeers").returnValue(peers);
 
 		const connection = { remoteAddress: "180.177.54.4" } as any;
 		const peersBroadcast = await route.handle(connection);
@@ -54,7 +54,7 @@ describe<{
 		peers[1].latency = 120_000;
 		peers[2].latency = 117_634;
 
-		stub(peerRepository, "getPeers").returnValue(peers);
+		stub(peerRepository, "getActivePeers").returnValue(peers);
 
 		const connection = { remoteAddress: "1.2.3.4" } as any;
 		const peersBroadcast = await route.handle(connection);

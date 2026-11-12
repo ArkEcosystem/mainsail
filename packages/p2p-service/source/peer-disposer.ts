@@ -1,23 +1,13 @@
 import type { Contracts } from "@mainsail/contracts";
 import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
-import { Events, Identifiers } from "@mainsail/constants";
+import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { CloseReason, ConnectionError } from "@mainsail/p2p-websocket";
 import dayjs from "dayjs";
 
-// Failures of the connection itself, not of the peer's behaviour: the peer is dropped but not banned.
-// Mirrors the WS, DISCONNECT and TIMEOUT nes errors of @mainsail/p2p.
-const DISPOSE_REASONS = new Set<CloseReason>([
-	CloseReason.SocketError,
-	CloseReason.RemoteClose,
-	CloseReason.RequestTimeout,
-	CloseReason.HandshakeTimeout,
-	CloseReason.NotOpen,
-]);
-
 @injectable()
-export class PeerDisposer implements Contracts.P2P.PeerDisposer {
+export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p-service")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
@@ -26,27 +16,16 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 	private readonly websocketService!: WebSocketService;
 
 	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly repository!: Contracts.P2P.PeerRepository;
-
-	@inject(Identifiers.Services.EventDispatcher.Service)
-	private readonly events!: Contracts.Kernel.EventDispatcher;
+	private readonly repository!: Contracts.P2PService.PeerRepository;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	@inject(Identifiers.TransactionPool.Worker)
-	private readonly transactionPoolWorker!: Contracts.TransactionPool.Worker;
-
 	// The ban list of the transport is the single record of bans; it also refuses banned sockets.
+	// A failure of the connection itself is not the peer's doing and the transport has already closed
+	// the connection, which disposes the peer through the close listener; only other errors ban.
 	public banPeer(ip: string, error: Error): void {
-		if (this.isBanned(ip)) {
-			return;
-		}
-
-		if (error instanceof ConnectionError && DISPOSE_REASONS.has(error.reason)) {
-			this.logger.debug(`Disposing peer ${ip}, because: ${error.message}`, "p2p");
-			this.disposePeer(ip);
-
+		if (error instanceof ConnectionError) {
 			return;
 		}
 
@@ -57,29 +36,24 @@ export class PeerDisposer implements Contracts.P2P.PeerDisposer {
 			this.websocketService.ban(ip, dayjs().add(timeout, "minute").valueOf());
 		}
 
-		this.disposePeer(ip);
+		// The ban terminated the connection; banned addresses are forgotten entirely, the loop must not dial them.
+		this.repository.removePeer(ip);
 	}
 
+	// Closes the connection politely; an active peer becomes known again so the service loop can dial it
+	// later. Also runs when a connection closes by itself. The closed connection stays on the peer;
+	// everything that sends checks that it is open.
 	public disposePeer(ip: string): void {
 		void this.websocketService.disconnect(ip);
-
-		if (this.repository.hasPeer(ip)) {
-			const peer = this.repository.getPeer(ip);
-
-			this.repository.forgetPeer(peer);
-
-			void this.events.dispatch(Events.PeerEvent.Removed, peer);
-			void this.transactionPoolWorker.forgetPeer(ip);
-		}
+		this.repository.demotePeer(ip);
 	}
 
+	// Shutdown: a graceful close waits for every peer's closing handshake, up to the socket's own timeout
+	// on a dead link, so the connections are torn down at once instead.
 	public async disposePeers(): Promise<void> {
-		await Promise.all(this.repository.getPendingPeers().map((peer) => this.websocketService.disconnect(peer.ip)));
-		await Promise.all(this.repository.getPeers().map((peer) => this.websocketService.disconnect(peer.ip)));
-	}
-
-	public isBanned(ip: string): boolean {
-		return this.websocketService.isBanned(ip);
+		for (const peer of [...this.repository.getPendingPeers(), ...this.repository.getActivePeers()]) {
+			this.websocketService.terminate(peer.ip, CloseReason.Shutdown);
+		}
 	}
 
 	public bannedPeers(): { ip: string; timeout: number }[] {

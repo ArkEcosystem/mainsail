@@ -21,7 +21,7 @@ describe<{
 
 	beforeEach((context) => {
 		context.app = new Application();
-		context.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getPeers: () => peers });
+		context.app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getActivePeers: () => peers });
 		context.app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue({});
 		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({});
 		context.app.bind(Identifiers.State.Store).toConstantValue({});

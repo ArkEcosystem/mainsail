@@ -9,7 +9,7 @@ import { Controller } from "./controller.js";
 @injectable()
 export class NodeController extends Controller {
 	@inject(Identifiers.P2P.Service)
-	private readonly p2pService!: Contracts.P2P.Service;
+	private readonly p2pService!: Contracts.P2PService.Service;
 
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;

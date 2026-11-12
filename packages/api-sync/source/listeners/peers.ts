@@ -13,7 +13,7 @@ import { assert } from "@mainsail/utils";
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";
 
 @injectable()
-export class Peers extends AbstractListener<Contracts.P2P.Peer, Models.Peer> {
+export class Peers extends AbstractListener<Contracts.P2PService.Peer, Models.Peer> {
 	@inject(ApiDatabaseIdentifiers.PeerRepositoryFactory)
 	private readonly peerRepositoryFactory!: ApiDatabaseContracts.PeerRepositoryFactory;
 
@@ -25,13 +25,13 @@ export class Peers extends AbstractListener<Contracts.P2P.Peer, Models.Peer> {
 		};
 	}
 
-	protected getEventId(event: Contracts.P2P.Peer): string {
+	protected getEventId(event: Contracts.P2PService.Peer): string {
 		const ip = event.ip;
 		assert.string(ip);
 		return ip;
 	}
 
-	protected mapEventToEntity(event: Contracts.P2P.Peer): Models.Peer {
+	protected mapEventToEntity(event: Contracts.P2PService.Peer): Models.Peer {
 		return {
 			blockNumber: event.header.blockNumber,
 			ip: event.ip,

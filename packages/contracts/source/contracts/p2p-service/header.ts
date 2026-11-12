@@ -1,0 +1,23 @@
+import type { Proposal } from "../crypto/proposal.js";
+
+export type HeaderData = {
+	version: string;
+	blockNumber: number;
+	round: number;
+	step: number;
+	proposedBlockHash?: string;
+	validatorsSignedPrevote: readonly boolean[];
+	validatorsSignedPrecommit: readonly boolean[];
+};
+
+export interface Header {
+	blockNumber: number;
+	round: number;
+	proposal?: Proposal;
+	validatorsSignedPrecommit: readonly boolean[];
+	validatorsSignedPrevote: readonly boolean[];
+
+	toData(): HeaderData;
+}
+
+export type HeaderFactory = () => Header;
