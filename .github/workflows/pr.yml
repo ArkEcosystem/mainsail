@@ -24,8 +24,7 @@ jobs:
     check-commit-count:
         uses: ./.github/workflows/_check-commit-count.yml
         permissions:
-            pull-requests: read
-            issues: write
+            pull-requests: write
 
     contracts:
         uses: ./.github/workflows/_contracts.yml
