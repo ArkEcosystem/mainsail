@@ -5,6 +5,7 @@ import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
 import { constants } from "../constants.js";
+import { GetBlocks } from "../routes/get-blocks.js";
 import { getRandomPeer } from "../utils/index.js";
 
 enum JobStatus {
@@ -248,7 +249,7 @@ export class BlockDownloader implements Contracts.P2PService.Downloader {
 		const size = job.blocks.reduce((size, block) => size + block.length, 0);
 
 		// TODO: Take header size into account
-		if (size + configuration.block.maxPayload < constants.MAX_PAYLOAD_CLIENT) {
+		if (size + configuration.block.maxPayload < GetBlocks.maxPayload.response) {
 			// Peer did't respond with all requested blocks and didn't exceed maxPayload
 			this.peerDisposer.banPeer(
 				job.peer.ip,

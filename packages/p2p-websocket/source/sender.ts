@@ -45,6 +45,12 @@ export class Sender implements RouteSender {
 			);
 		}
 
+		if (response.payload.length > route.maxPayload.response) {
+			throw new Error(
+				`${route.path} response from ${connection.remoteAddress} is ${response.payload.length} bytes, more than the ${route.maxPayload.response} allowed`,
+			);
+		}
+
 		for (const step of this.middleware) {
 			await step.after?.(context);
 		}
