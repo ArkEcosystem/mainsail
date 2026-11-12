@@ -24,7 +24,6 @@ type Context = {
 	eventDispatcher: any;
 	roundState: Contracts.Consensus.RoundState;
 	roundStateRepository: any;
-	peerStatistic: any;
 	pendingCommits: any;
 	forger: any;
 	storage: any;
@@ -125,10 +124,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 			setProcessorResult: () => {},
 		} as unknown as Contracts.Consensus.RoundState;
 
-		context.peerStatistic = {
-			newRound: () => {},
-		};
-
 		context.pendingCommits = {
 			has: () => false,
 		};
@@ -160,7 +155,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
 		context.app.bind(Identifiers.Consensus.RoundStateRepository).toConstantValue(context.roundStateRepository);
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
-		context.app.bind(Identifiers.P2P.Statistic.Service).toConstantValue(context.peerStatistic);
 		context.app.bind(Identifiers.P2P.PendingCommits).toConstantValue(context.pendingCommits);
 		context.app.bind(Identifiers.Forger.Block).toConstantValue(context.forger);
 		context.app.bind(Identifiers.ConsensusStorage.Service).toConstantValue(context.storage);
@@ -240,13 +234,11 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 		eventDispatcher,
 		proposer,
 		logger,
-		peerStatistic,
 	}) => {
 		stub(consensus, "applyRules").callsFake(async () => {});
 		const spyScheduleClear = spy(scheduler, "clear");
 		const spyScheduleTimeoutBlockPrepare = spy(scheduler, "scheduleTimeoutBlockPrepare");
 		const spyLoggerInfo = spy(logger, "info");
-		const spyStatisticNewRound = spy(peerStatistic, "newRound");
 		const spyGetValidator = stub(validatorsRepository, "getValidator").returnValue();
 		const spyGetRoundState = stub(roundStateRepository, "getRoundState").returnValue({
 			hasProposal: () => false,
@@ -256,8 +248,6 @@ describe<Context>("Consensus", ({ it, beforeEach, assert, stub, spy, clock, each
 
 		await consensus.startRound(0);
 
-		spyStatisticNewRound.calledOnce();
-		spyStatisticNewRound.calledWith(1, 0);
 		spyScheduleClear.calledOnce();
 		spyScheduleTimeoutBlockPrepare.calledOnce();
 
