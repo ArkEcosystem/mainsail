@@ -77,6 +77,11 @@ export class Service {
 		await this.repository.get(ip)?.close(CloseReason.LocalClose);
 	}
 
+	// Immediate close, for when waiting for the peer's closing handshake is not worth it.
+	public terminate(ip: string, reason: CloseReason = CloseReason.LocalClose): void {
+		this.repository.get(ip)?.terminate(reason);
+	}
+
 	// Bans
 
 	public ban(ip: string, until: number): void {
