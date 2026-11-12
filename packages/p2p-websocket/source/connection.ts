@@ -19,6 +19,7 @@ import type {
 	SendOptions,
 } from "./interfaces/index.js";
 
+import { constants } from "./constants.js";
 import { CloseReason, ConnectionState } from "./enums.js";
 import { ConnectionError } from "./errors.js";
 import { Handshake, Heartbeat, RequestTable } from "./handlers/index.js";
@@ -106,7 +107,8 @@ export class Connection implements ConnectionInterface {
 		}
 	}
 
-	// Graceful close; resolves once the socket has emitted "close". Idempotent.
+	// Graceful close; resolves once the socket has emitted "close". Idempotent. A peer that does not
+	// answer the closing handshake within CLOSE_TIMEOUT has its socket destroyed.
 	public async close(reason: CloseReason = CloseReason.LocalClose): Promise<void> {
 		if (!this.#closed) {
 			this.#begin(reason);
@@ -114,6 +116,9 @@ export class Connection implements ConnectionInterface {
 
 			if (this.#ws.readyState === WebSocket.OPEN || this.#ws.readyState === WebSocket.CONNECTING) {
 				this.#ws.close();
+
+				const cutoff = setTimeout(() => this.#ws.terminate(), constants.CLOSE_TIMEOUT);
+				void this.#closed.then(() => clearTimeout(cutoff));
 			} else {
 				this.#ws.terminate();
 			}

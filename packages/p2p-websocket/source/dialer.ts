@@ -8,7 +8,7 @@ import type { Connection, ConnectionFactory, ConnectionVerifier } from "./interf
 import type { Router } from "./router.js";
 
 import { constants } from "./constants.js";
-import { CloseReason, Direction } from "./enums.js";
+import { CloseReason, ConnectionState, Direction } from "./enums.js";
 import { ConnectionError } from "./errors.js";
 
 // Opens outbound sockets and runs the handshake. Open connections are reported through
@@ -49,7 +49,9 @@ export class Dialer {
 
 		await sleep(randomNumber(constants.DIAL_RETRY_MIN_DELAY, constants.DIAL_RETRY_MAX_DELAY));
 
-		if (this.repository.get(remoteAddress)) {
+		// A connection on its way out still holds the address but is not the peer's connection landing.
+		const existing = this.repository.get(remoteAddress);
+		if (existing && existing.state !== ConnectionState.Closing && existing.state !== ConnectionState.Closed) {
 			return;
 		}
 

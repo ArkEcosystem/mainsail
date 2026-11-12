@@ -1,6 +1,9 @@
 import { Units } from "@mainsail/constants";
 
 export const constants = {
+	// Time a graceful close waits for the peer's closing handshake before the socket is destroyed; ws
+	// itself would wait 30 s, which holds the address in the repository for as long on a dead link.
+	CLOSE_TIMEOUT: 2000,
 	// Time allowed for the TCP connection and the HTTP upgrade of an outbound socket.
 	CONNECT_TIMEOUT: 5000,
 	// Two peers dialing each other at once each refuse the other's socket as a duplicate and both dials
