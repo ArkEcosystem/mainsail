@@ -66,7 +66,7 @@ describe<{
 	worker: Worker;
 	ipc: ReturnType<typeof makeIpc>;
 	subprocesses: ReturnType<typeof makeIpc>[];
-	spawned: number;
+	spawned: ReturnType<typeof makeIpc>[];
 	configuration: any;
 	eventDispatcher: any;
 	logs: string[][];
@@ -75,7 +75,7 @@ describe<{
 	beforeEach((context) => {
 		context.ipc = makeIpc();
 		context.subprocesses = [context.ipc];
-		context.spawned = 0;
+		context.spawned = [];
 		context.configuration = { getMilestone: () => ({ timeouts: { blockTime: 8000 } }) };
 		context.eventDispatcher = { listen: () => {} };
 		context.logs = [];
@@ -84,9 +84,10 @@ describe<{
 		context.app = new Application();
 		// The injected factory hands back our fake subprocess instead of spawning a thread.
 		context.app.bind(Identifiers.TransactionPool.WorkerSubprocess.Factory).toConstantValue(() => {
-			context.spawned++;
+			const subprocess = context.subprocesses.shift() ?? makeIpc();
+			context.spawned.push(subprocess);
 
-			return context.subprocesses.shift() ?? makeIpc();
+			return subprocess;
 		});
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(context.configuration);
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.eventDispatcher);
@@ -417,8 +418,7 @@ describe<{
 		await within(worker.getTransactions({ blockRound: "12-0", maxBytes: 1024, maxSize: 100 }));
 	});
 
-	it("keeps the worker when a commit finishes in time", async (context) => {
-		const { worker, logs } = context;
+	it("keeps the worker when a commit finishes in time", async ({ worker, logs, spawned }) => {
 		await startWorker(worker);
 		const fake = clock({ toFake: ["setTimeout", "clearTimeout"] });
 
@@ -427,12 +427,18 @@ describe<{
 		await fake.tickAsync(30_000);
 		fake.restore();
 
-		assert.equal(context.spawned, 1);
+		assert.length(spawned, 1);
 		assert.length(logs, 0);
 	});
 
-	it("keeps the replacement when a commit times out while it reloads the pool", async (context) => {
-		const { worker, ipc, subprocesses, terminations, logs } = context;
+	it("keeps the replacement when a commit times out while it reloads the pool", async ({
+		worker,
+		ipc,
+		subprocesses,
+		terminations,
+		logs,
+		spawned,
+	}) => {
 		await startWorker(worker);
 
 		const reload = deferred();
@@ -448,7 +454,7 @@ describe<{
 		await fake.tickAsync(30_000);
 		fake.restore();
 
-		assert.equal(context.spawned, 2);
+		assert.length(spawned, 2);
 		assert.length(terminations, 0);
 
 		reload.resolve();
@@ -512,8 +518,12 @@ describe<{
 		assert.equal(replacement.requests[1], ["start", 11]);
 	});
 
-	it("onCommit terminates the node when a running worker rejects the commit", async (context) => {
-		const { worker, ipc, terminations } = context;
+	it("onCommit terminates the node when a running worker rejects the commit", async ({
+		worker,
+		ipc,
+		terminations,
+		spawned,
+	}) => {
 		await startWorker(worker);
 		const error = new Error("commit failed");
 		ipc.respond = async (method) => {
@@ -526,11 +536,10 @@ describe<{
 		await waitFor(() => terminations.length === 1);
 
 		assert.equal(terminations[0], ["tx-pool worker failed to commit", error]);
-		assert.equal(context.spawned, 1);
+		assert.length(spawned, 1);
 	});
 
-	it("respawns no more once a failed commit terminates the node", async (context) => {
-		const { worker, ipc, terminations } = context;
+	it("respawns no more once a failed commit terminates the node", async ({ worker, ipc, terminations, spawned }) => {
 		await startWorker(worker);
 		ipc.respond = async (method) => {
 			if (method === "commit") {
@@ -547,7 +556,7 @@ describe<{
 			transactions: [],
 		});
 		await new Promise((resolve) => setTimeout(resolve, 10));
-		assert.equal(context.spawned, 1);
+		assert.length(spawned, 1);
 	});
 
 	it("skips every request while the worker respawns and restarts it at the latest block", async ({
@@ -636,8 +645,13 @@ describe<{
 		await waitFor(() => respawned(logs));
 	});
 
-	it("starts the respawn from any request that finds the worker stopped", async (context) => {
-		const { worker, ipc, subprocesses, logs } = context;
+	it("starts the respawn from any request that finds the worker stopped", async ({
+		worker,
+		ipc,
+		subprocesses,
+		logs,
+		spawned,
+	}) => {
 		await startWorker(worker);
 
 		const replacement = addReplacement(subprocesses);
@@ -649,7 +663,7 @@ describe<{
 		});
 		await waitFor(() => respawned(logs));
 
-		assert.equal(context.spawned, 2);
+		assert.length(spawned, 2);
 		assert.equal(replacement.requests[1], ["start", 10]);
 	});
 
@@ -673,8 +687,7 @@ describe<{
 		await waitFor(() => respawned(logs));
 	});
 
-	it("respawns only once while a respawn is in progress", async (context) => {
-		const { worker, ipc, subprocesses, logs } = context;
+	it("respawns only once while a respawn is in progress", async ({ worker, ipc, subprocesses, logs, spawned }) => {
 		await startWorker(worker);
 
 		const boot = deferred();
@@ -689,11 +702,10 @@ describe<{
 		boot.resolve();
 		await waitFor(() => respawned(logs));
 
-		assert.equal(context.spawned, 2);
+		assert.length(spawned, 2);
 	});
 
-	it("respawns the worker again when the replacement dies", async (context) => {
-		const { worker, ipc, subprocesses, logs } = context;
+	it("respawns the worker again when the replacement dies", async ({ worker, ipc, subprocesses, logs, spawned }) => {
 		await startWorker(worker);
 
 		const replacement = addReplacement(subprocesses);
@@ -707,7 +719,7 @@ describe<{
 		await worker.onCommit(makeUnit(12));
 		await waitFor(() => respawned(logs, 2));
 
-		assert.equal(context.spawned, 3);
+		assert.length(spawned, 3);
 	});
 
 	for (const failing of ["boot", "start"]) {
@@ -765,8 +777,14 @@ describe<{
 		);
 	});
 
-	it("respawns no more once a failed respawn terminates the node", async (context) => {
-		const { app, worker, ipc, subprocesses, terminations } = context;
+	it("respawns no more once a failed respawn terminates the node", async ({
+		app,
+		worker,
+		ipc,
+		subprocesses,
+		terminations,
+		spawned,
+	}) => {
 		await startWorker(worker);
 
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getPeers: () => [{ ip: "1.1.1.1" }] });
@@ -784,7 +802,7 @@ describe<{
 		await worker.onCommit(makeUnit(12));
 		await new Promise((resolve) => setTimeout(resolve, 10));
 
-		assert.equal(context.spawned, 2);
+		assert.length(spawned, 2);
 	});
 
 	it("does not terminate the node when a respawn fails during shutdown", async ({
@@ -810,8 +828,11 @@ describe<{
 		assert.length(terminations, 0);
 	});
 
-	it("creates no replacement when the worker is disposed while the respawn kills it", async (context) => {
-		const { worker, ipc } = context;
+	it("creates no replacement when the worker is disposed while the respawn kills it", async ({
+		worker,
+		ipc,
+		spawned,
+	}) => {
 		await startWorker(worker);
 
 		const kill = deferred();
@@ -827,7 +848,7 @@ describe<{
 		kill.resolve();
 		await within(disposed);
 
-		assert.equal(context.spawned, 1);
+		assert.length(spawned, 1);
 	});
 
 	it("disposes the replacement without starting it when the worker is disposed while the respawn boots it", async ({
@@ -909,9 +930,7 @@ describe<{
 			async (worker: Worker) => startWorker(worker).then(async () => void (await worker.kill())),
 		],
 	] as const) {
-		it(`drops requests without respawning the worker ${label}`, async (context) => {
-			const { worker, ipc } = context;
-
+		it(`drops requests without respawning the worker ${label}`, async ({ worker, ipc, spawned }) => {
 			await prepare(worker);
 			stopIpc(ipc);
 
@@ -920,7 +939,7 @@ describe<{
 				remaining: 0,
 				transactions: [],
 			});
-			assert.equal(context.spawned, 1);
+			assert.length(spawned, 1);
 		});
 	}
 });
