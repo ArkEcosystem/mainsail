@@ -19,11 +19,18 @@ describe<{
 			.whenTagged("plugin", "transaction-pool-service");
 		context.app
 			.bind(Identifiers.ServiceProvider.Configuration)
-			.toConstantValue({ getRequired: () => 1_000_000 })
+			.toConstantValue({
+				getRequired: (key: string) =>
+					({
+						"plugins.pagination.maxBytes": 1_000_000,
+						"plugins.rateLimit": { enabled: false, points: 150 },
+					})[key],
+			})
 			.whenTagged("plugin", "api-transaction-pool");
 		context.app.bind(Identifiers.TransactionPool.Processor).toConstantValue({});
 		context.app.bind(Identifiers.TransactionPool.Query).toConstantValue({});
 		context.app.bind(Identifiers.State.Store).toConstantValue({});
+		context.app.bind(Identifiers.TransactionPool.Peer.Repository).toConstantValue({ hasPeer: () => false });
 
 		context.routes = [];
 		context.server = {
@@ -50,6 +57,12 @@ describe<{
 				"GET /transactions/unconfirmed/{hash}",
 			],
 		);
+	});
+
+	it("fails to register without a pool peer repository", async ({ app, server }) => {
+		await app.unbind(Identifiers.TransactionPool.Peer.Repository);
+
+		await assert.rejects(() => Handlers.register(server));
 	});
 
 	it("derives the post payload limit from the pool configuration", async ({ server, routes }) => {

@@ -27,6 +27,24 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		)
 		.getRequired<number>("maxTransactionBytes");
 
+	const rateLimit = server.app.app
+		.getTagged<Contracts.Kernel.PluginConfiguration>(
+			Identifiers.ServiceProvider.Configuration,
+			"plugin",
+			"api-transaction-pool",
+		)
+		.getRequired<{ enabled: boolean; points: number }>("plugins.rateLimit");
+
+	if (rateLimit.enabled && rateLimit.points < maxTransactionsPerRequest) {
+		throw new Error(
+			`The transaction pool API rate limit (${rateLimit.points} points) is below maxTransactionsPerRequest (${maxTransactionsPerRequest}); raise MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_USER_LIMIT to at least ${maxTransactionsPerRequest}`,
+		);
+	}
+
+	const peers = server.app.app.get<Contracts.TransactionPool.PeerRepository>(
+		Identifiers.TransactionPool.Peer.Repository,
+	);
+
 	server.route({
 		handler: (request: Types.HapiRequest) => controller.store(request),
 		method: "POST",
@@ -35,6 +53,12 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				// Each transaction is hex encoded (2 chars per byte) and carries ~4 bytes
 				// of JSON overhead (quotes and comma), plus 100 bytes for the envelope.
 				maxBytes: 100 + maxTransactionsPerRequest * (maxTransactionBytes * 2 + 4),
+			},
+			plugins: {
+				rateLimit: {
+					points: (request: Types.HapiRequest, ip: string) =>
+						peers.hasPeer(ip) ? 1 : (request.payload as { transactions: string[] }).transactions.length,
+				},
 			},
 			validate: {
 				payload: Joi.object({

@@ -116,6 +116,47 @@ describe<{
 		assert.false("errors" in body);
 	});
 
+	for (const [label, remoteAddress, remaining] of [
+		["charges a client one point per transaction", "1.2.3.4", "1"],
+		["charges a peer one point per request", "5.6.7.8", "2"],
+	] as const) {
+		it(`POST /api/transactions - ${label}`, async ({ processor, transactions }) => {
+			const configuration = makeConfiguration();
+			configuration.plugins.rateLimit = { ...configuration.plugins.rateLimit, enabled: true, points: 3 };
+			const { server, serviceProvider } = await bootstrapServer(
+				{ peers: ["5.6.7.8"], processor, transactions },
+				configuration,
+			);
+
+			try {
+				const response = await server.inject({
+					method: "POST",
+					payload: { transactions: ["deadbeef", "c0ffee"] },
+					remoteAddress,
+					url: "/api/transactions",
+				});
+
+				assert.is(response.statusCode, 200);
+				assert.is(response.headers["x-ratelimit-remaining"], remaining);
+			} finally {
+				await serviceProvider.dispose();
+			}
+		});
+	}
+
+	it("POST /api/transactions - refuses a rate limit below the transactions per request", async ({
+		processor,
+		transactions,
+	}) => {
+		const configuration = makeConfiguration();
+		configuration.plugins.rateLimit = { ...configuration.plugins.rateLimit, enabled: true, points: 1 };
+
+		await assert.rejects(
+			() => bootstrapServer({ processor, transactions }, configuration),
+			"rate limit (1 points) is below maxTransactionsPerRequest (2)",
+		);
+	});
+
 	it("POST /api/transactions - rejects a payload without transactions", async ({ server }) => {
 		const response = await server.inject({ method: "POST", payload: {}, url: "/api/transactions" });
 
