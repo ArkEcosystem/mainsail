@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { Application, Bootstrap, Providers, Services } from "@mainsail/kernel";
-import { copyFileSync } from "fs";
+import { copyFileSync, cpSync } from "fs";
 import { join } from "path";
 import { dirSync } from "tmp";
 
@@ -292,4 +292,42 @@ const restart = async (
 	return restarted;
 };
 
-export { boot, bootMany, bootstrap, bootstrapMany, restart, run, runMany, setup, stop, stopMany };
+const bootstrapFromState = async (app: Contracts.Kernel.Application) => {
+	const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
+	const commitFactory = app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
+	const databaseService = app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
+	const store = app.get<Contracts.State.Store>(Identifiers.State.Store);
+
+	store.setGenesisCommit(await commitFactory.fromJson(configuration.getGenesisCommit()));
+	store.setLastBlock((await databaseService.getLastCommit()).block);
+	store.setTotalRound(databaseService.getState().totalRound);
+
+	await app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service).restore();
+
+	await app.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository).printLoadedValidators();
+
+	app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
+};
+
+const restartFromState = async (
+	app: Contracts.Kernel.Application,
+	id: number,
+	p2pRegistry: P2PRegistry,
+	crypto: any,
+	validators: ValidatorsJson,
+): Promise<Contracts.Kernel.Application> => {
+	await stop(app);
+	p2pRegistry.unregisterNode(id);
+
+	const dataPath = dirSync({ unsafeCleanup: true }).name;
+	cpSync(app.dataPath(), dataPath, { recursive: true });
+
+	const restarted = await setup(id, p2pRegistry, crypto, validators, { consensusStorage: true, dataPath });
+	await boot(restarted);
+	await bootstrapFromState(restarted);
+	await run(restarted);
+
+	return restarted;
+};
+
+export { boot, bootMany, bootstrap, bootstrapMany, restart, restartFromState, run, runMany, setup, stop, stopMany };

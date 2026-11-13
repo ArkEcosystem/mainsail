@@ -1,6 +1,9 @@
 import { Events, Identifiers } from "@mainsail/constants";
 import type { Contracts } from "@mainsail/contracts";
+import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
+import { TransactionBuilder } from "@mainsail/crypto-transaction";
 import { sleep } from "@mainsail/utils";
+import { bytesToHex, encodeFunctionData, parseAbi } from "viem";
 
 import type { Validator, ValidatorsJson } from "./contracts.js";
 import type { P2PRegistry } from "./p2p.js";
@@ -192,6 +195,43 @@ export const makeReProposal = async (
 		block,
 		await makeLockProof(app, p2p, validRound, block.hash),
 	);
+};
+
+export const makeValidatorUpdate = async (
+	app: Contracts.Kernel.Application,
+	validator: Validator,
+	consensusKeyPair: Contracts.Crypto.KeyPair,
+): Promise<Contracts.Crypto.Transaction> => {
+	const { chainId } = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).getNetwork();
+	const { pop } = buildProofOfPossession(Buffer.from(consensusKeyPair.privateKey, "hex"), {
+		chainId,
+		registrantAddress: validator.address,
+	});
+
+	const payload = encodeFunctionData({
+		abi: parseAbi(["function updateValidator(bytes blsPublicKey, bytes proofOfPossession)"]),
+		args: [`0x${consensusKeyPair.publicKey}`, bytesToHex(pop)],
+		functionName: "updateValidator",
+	});
+
+	const keyPair = await app
+		.getTagged<Contracts.Crypto.KeyPairFactory>(Identifiers.Cryptography.Identity.KeyPair.Factory, "type", "wallet")
+		.fromMnemonic(validator.mnemonic);
+
+	const { nonce } = await app
+		.getTagged<Contracts.Evm.Instance>(Identifiers.Evm.Instance, "instance", "evm")
+		.getAccountInfo(validator.address);
+
+	const builder = await app
+		.resolve(TransactionBuilder)
+		.gasPrice(5 * 1e9)
+		.gasLimit(500_000)
+		.recipientAddress(app.get<string>(Identifiers.EvmConsensus.Contracts.Consensus))
+		.payload(payload.slice(2))
+		.nonce(nonce.toString())
+		.signWithKeyPair(keyPair);
+
+	return builder.build();
 };
 
 export const snoozeUntil = async (predicate: () => boolean, timeout = 10_000, interval = 10): Promise<void> => {
