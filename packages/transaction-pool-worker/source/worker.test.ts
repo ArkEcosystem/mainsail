@@ -470,6 +470,52 @@ describe<{
 		await waitFor(() => respawned(logs));
 	});
 
+	it("restarts the commit timeout once the replacement has reloaded the pool", async ({
+		worker,
+		ipc,
+		subprocesses,
+		logs,
+		spawned,
+	}) => {
+		await startWorker(worker);
+
+		const start = deferred();
+		const commit = deferred();
+		const replacement = addReplacement(subprocesses);
+		replacement.respond = async (method) => {
+			if (method === "start") {
+				return start.promise;
+			}
+
+			return method === "commit" ? commit.promise : undefined;
+		};
+		stopIpc(ipc);
+
+		await worker.onCommit(makeUnit(11));
+		await waitFor(() => replacement.requests.length === 2);
+		const fake = clock({ toFake: ["setTimeout", "clearTimeout"] });
+
+		await within(worker.onCommit(makeUnit(12)));
+		await waitFor(() => replacement.requests.length === 3);
+		await fake.tickAsync(25_000);
+		start.resolve();
+		await waitFor(() => respawned(logs));
+		await fake.tickAsync(5_000);
+
+		assert.length(spawned, 2);
+		assert.length(
+			logs.filter(([, message]) => message === "Respawning the transaction pool worker"),
+			1,
+		);
+
+		await fake.tickAsync(25_000);
+		await waitFor(() => spawned.length === 3);
+		fake.restore();
+
+		await waitFor(() => respawned(logs, 2));
+		assert.equal(spawned[2].requests[1], ["start", 12]);
+	});
+
 	it("onCommit respawns a stopped worker at the committed block and restores handlers and peers", async ({
 		app,
 		worker,
