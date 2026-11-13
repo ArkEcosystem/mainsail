@@ -34,6 +34,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	#bootPromise?: Promise<void>;
 	#respawnPromise?: Promise<void>;
 	#commitPromise: Promise<void> = Promise.resolve();
+	#commitTimeout?: NodeJS.Timeout;
 	#disposePromise?: Promise<void>;
 
 	@postConstruct()
@@ -163,7 +164,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		consumedGas: number,
 		isSyncing: boolean,
 	): Promise<void> {
-		const timeout = setTimeout(() => this.#respawn(), COMMIT_TIMEOUT);
+		this.#commitTimeout = setTimeout(() => this.#respawn(), COMMIT_TIMEOUT);
 
 		try {
 			await this.#sendIfRunning("commit", blockNumber, sendersAddresses, consumedGas, isSyncing);
@@ -173,7 +174,8 @@ export class Worker implements Contracts.TransactionPool.Worker {
 				void this.app.terminate("tx-pool worker failed to commit", error as Error);
 			}
 		} finally {
-			clearTimeout(timeout);
+			clearTimeout(this.#commitTimeout);
+			this.#commitTimeout = undefined;
 		}
 	}
 
@@ -244,6 +246,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 		}
 
 		this.#started = true;
+		this.#commitTimeout?.refresh();
 		this.logger.info("Respawned the transaction pool worker");
 	}
 
