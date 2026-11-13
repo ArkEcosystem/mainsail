@@ -5,6 +5,7 @@ import { describe } from "@mainsail/test-runner";
 import { TransactionSchemaError } from "@mainsail/exceptions";
 
 import { Serialized, Transactions, Storage, Json, wallet } from "../test/fixtures/index.js";
+import { TransactionBuilder } from "./builder.js";
 import { signTransfer, signUntilLeadingZeroRS } from "../test/helpers/canonical-transaction";
 import { prepareSandbox } from "../test/helpers/prepare-sandbox";
 
@@ -22,7 +23,7 @@ describe<{
 	app: Application;
 	factory: Contracts.Crypto.TransactionFactory;
 	serializer: Contracts.Crypto.TransactionSerializer;
-}>("Factory", ({ it, beforeEach, assert }) => {
+}>("Factory", ({ it, beforeEach, assert, spy }) => {
 	beforeEach(async (context) => {
 		await prepareSandbox(context);
 
@@ -159,6 +160,51 @@ describe<{
 		});
 
 		await assert.rejects(async () => factory.fromHex(serialized.toString("hex")), TransactionSchemaError);
+	});
+
+	it("fromBytes - should reject a schema error before recovering the sender", async ({
+		app,
+		factory,
+		serializer,
+	}) => {
+		const { gas } = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration).getMilestone();
+		const maximumGasLimit = gas.maximumGasLimit;
+		gas.maximumGasLimit = maximumGasLimit * 2;
+		const builder = app.resolve(TransactionBuilder);
+		builder
+			.recipientAddress(wallet.address)
+			.nonce("0")
+			.gasLimit(maximumGasLimit + 1);
+		await builder.signWithKeyPair({
+			compressed: false,
+			privateKey: wallet.privateKey,
+			publicKey: wallet.publicKey,
+		});
+		const serialized = await serializer.serialize(await builder.getStruct());
+		gas.maximumGasLimit = maximumGasLimit;
+		const computeCryptoData = spy(factory, "computeCryptoData");
+
+		await assert.rejects(
+			async () => factory.fromBytes(serialized),
+			'data/gasLimit must pass "transactionGasLimit" keyword validation',
+		);
+		computeCryptoData.neverCalled();
+	});
+
+	it("fromBytes - should accept a genesis transaction with a gas price below the minimum after genesis", async ({
+		app,
+		factory,
+	}) => {
+		const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
+		const [genesisTransaction] = configuration.getGenesisCommit().block.transactions;
+		configuration.setHeight(configuration.getGenesisHeight());
+		const { serialized } = await factory.fromJson(genesisTransaction);
+		configuration.setHeight(configuration.getGenesisHeight() + 1);
+
+		const transaction = await factory.fromBytes(serialized);
+
+		assert.equal(transaction.gasPrice, 0);
+		assert.equal(transaction.hash, genesisTransaction.hash);
 	});
 
 	it("fromBytes - should deserialize well-formed transactions", async ({ factory }) => {

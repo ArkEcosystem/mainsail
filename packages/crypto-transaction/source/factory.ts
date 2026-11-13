@@ -30,7 +30,10 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	private readonly serializer!: Contracts.Crypto.TransactionSerializer;
 
 	@inject(Identifiers.Cryptography.Transaction.HashFactory)
-	private readonly hashFactory!: Contracts.Crypto.TransactionHashFactory;
+	private readonly transactionHashFactory!: Contracts.Crypto.TransactionHashFactory;
+
+	@inject(Identifiers.Cryptography.Hash.Factory)
+	private readonly hashFactory!: Contracts.Crypto.HashFactory;
 
 	@inject(Identifiers.Cryptography.Transaction.Verifier)
 	private readonly verifier!: Contracts.Crypto.TransactionVerifier;
@@ -110,8 +113,8 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 			throw new Error("non-canonical signature (high S value)");
 		}
 
-		const unsignedHash = await this.hashFactory.toHashUnsigned(data);
-		const hash = await this.hashFactory.toHash(data);
+		const unsignedHash = await this.transactionHashFactory.toHashUnsigned(data);
+		const hash = await this.transactionHashFactory.toHash(data);
 
 		const senderPublicKey = this.signatureEcdsa.recoverPublicKey(unsignedHash, {
 			r: data.r,
@@ -130,6 +133,17 @@ export class TransactionFactory implements Contracts.Crypto.TransactionFactory {
 	async #fromSerialized(serialized: Buffer): Promise<Contracts.Crypto.Transaction> {
 		try {
 			const { data: transaction } = await this.deserializer.deserialize(serialized);
+
+			// The gas price keyword accepts a zero price only for genesis transactions, which it looks up by hash.
+			// The hash is keccak256 of the wire bytes unless a legacy second signature is appended, which it excludes.
+			const hash = transaction.legacySecondSignature
+				? await this.transactionHashFactory.toHash(transaction)
+				: this.hashFactory.keccak256(serialized);
+			const withHash = { ...transaction, hash: hash.toString("hex") };
+			const signed = await this.verifier.verifySchemaSigned(withHash);
+			if (signed.error) {
+				throw new TransactionSchemaError(signed.error);
+			}
 
 			const worker = this.workerPool ? this.workerPool.getWorker() : undefined;
 			const cryptoData = worker
