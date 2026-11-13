@@ -1,5 +1,5 @@
 import { describe } from "@mainsail/test-runner";
-import { cleanAddress, isIPv6Address, isValidAddress, normalizeAddress } from "./ip-address";
+import { canonicalAddress, cleanAddress, isIPv6Address, isValidAddress, normalizeAddress } from "./ip-address";
 
 describe("isValidAddress", ({ assert, it }) => {
 	it("should return true for valid IPv6 address", () => {
@@ -114,5 +114,27 @@ describe("cleanAddress", ({ assert, it }) => {
 
 	it("should return same random string", () => {
 		assert.equal(cleanAddress("random"), "random");
+	});
+});
+
+describe("canonicalAddress", ({ assert, it }) => {
+	it("should map an IPv4-mapped IPv6 address to IPv4", () => {
+		assert.is(canonicalAddress("::ffff:1.2.3.4"), "1.2.3.4");
+	});
+
+	it("should strip brackets before mapping", () => {
+		assert.is(canonicalAddress("[::ffff:1.2.3.4]"), "1.2.3.4");
+	});
+
+	it("should keep an IPv4 address", () => {
+		assert.is(canonicalAddress("1.2.3.4"), "1.2.3.4");
+	});
+
+	it("should keep a plain IPv6 address", () => {
+		assert.is(canonicalAddress("2001:db8::1"), "2001:db8::1");
+	});
+
+	it("should return undefined for an invalid address", () => {
+		assert.undefined(canonicalAddress("not-an-ip"));
 	});
 });
