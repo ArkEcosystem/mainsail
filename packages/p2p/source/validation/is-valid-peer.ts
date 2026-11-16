@@ -34,7 +34,7 @@ export const isPublicHttpUrl = (urlString: string): boolean => {
 
 export const isLocalHost = (ip: string, includeNetworkInterfaces = true): boolean => {
 	try {
-		if (ip.startsWith("0") || ["127.0.0.1", "::ffff:127.0.0.1", "::1"].includes(ip)) {
+		if (ip.startsWith("0") || ["127.0.0.1", "::1"].includes(ip)) {
 			return true;
 		}
 

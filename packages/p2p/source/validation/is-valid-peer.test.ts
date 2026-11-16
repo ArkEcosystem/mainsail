@@ -86,10 +86,6 @@ describe("isValidPeer", ({ it, assert }) => {
 		assert.true(isLocalHost("127.0.0.1"));
 	});
 
-	it("#isLocalHost - should ok for ::ffff:127.0.0.1", () => {
-		assert.true(isLocalHost("::ffff:127.0.0.1"));
-	});
-
 	it("#isLocalHost - should ok for 0.0.0.0", () => {
 		assert.true(isLocalHost("0.0.0.0"));
 	});
