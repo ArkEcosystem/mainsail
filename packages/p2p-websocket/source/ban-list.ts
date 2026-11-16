@@ -11,6 +11,7 @@ export class BanList implements ConnectionVerifier {
 	readonly #bans = new Map<string, number>();
 
 	public ban(ip: string, until: number): void {
+		this.#sweep();
 		this.#bans.set(ip, until);
 	}
 
@@ -33,11 +34,21 @@ export class BanList implements ConnectionVerifier {
 	}
 
 	public all(): { ip: string; until: number }[] {
-		const now = Date.now();
-		return [...this.#bans].filter(([, until]) => until > now).map(([ip, until]) => ({ ip, until }));
+		this.#sweep();
+		return [...this.#bans].map(([ip, until]) => ({ ip, until }));
 	}
 
 	public verify(ip: string): CloseReason | undefined {
 		return this.isBanned(ip) ? CloseReason.Banned : undefined;
+	}
+
+	// Expired bans are otherwise only dropped when their own address is looked up again.
+	#sweep(): void {
+		const now = Date.now();
+		for (const [ip, until] of this.#bans) {
+			if (until <= now) {
+				this.#bans.delete(ip);
+			}
+		}
 	}
 }
