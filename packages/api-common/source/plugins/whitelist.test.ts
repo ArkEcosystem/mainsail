@@ -35,6 +35,20 @@ describe<{}>("Whitelist", ({ it, assert }) => {
 		assert.is(response.statusCode, 200);
 	});
 
+	it("should allow a request matching a whitelist entry that is not written in canonical form", async () => {
+		const server = await buildServer({
+			trustProxy: false,
+			whitelist: ["::ffff:1.2.3.4", "2001:0DB8:0000:0000:0000:0000:0000:0001"],
+		});
+
+		const from = async (remoteAddress: string) =>
+			(await server.inject({ method: "GET", remoteAddress, url: "/" })).statusCode;
+
+		assert.is(await from("1.2.3.4"), 200);
+		assert.is(await from("2001:db8::1"), 200);
+		assert.is(await from("2001:db8::2"), 403);
+	});
+
 	it("should forbid a request from an IP not in the whitelist", async () => {
 		const server = await buildServer({ trustProxy: false, whitelist: ["127.0.0.1", "187.166.*"] });
 

@@ -135,6 +135,24 @@ describe("concurrencyLimitPerIp", ({ it, assert, spy }) => {
 		}
 	});
 
+	it("should not limit ips whitelisted by an entry that is not written in canonical form", async () => {
+		const { releaseAll, server, waitForPending } = await makeServer({
+			limit: 1,
+			whitelist: ["::ffff:10.0.0.1", "2001:0DB8:0001:0002:0000:0000:0000:0001"],
+		});
+
+		const held = [server.inject(from("10.0.0.1")), server.inject(from("2001:db8:1:2::1"))];
+		await waitForPending(2);
+
+		assert.is((await server.inject(from("10.0.0.1", "/"))).statusCode, 200);
+		assert.is((await server.inject(from("2001:db8:1:2::1", "/"))).statusCode, 200);
+
+		releaseAll();
+		for (const response of await Promise.all(held)) {
+			assert.is(response.statusCode, 200);
+		}
+	});
+
 	it("should ignore forwarded ips without trusting the proxy", async () => {
 		const { releaseAll, server, waitForPending } = await makeServer({ limit: 1 });
 

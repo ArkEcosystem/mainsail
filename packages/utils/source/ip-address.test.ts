@@ -1,5 +1,12 @@
 import { describe } from "@mainsail/test-runner";
-import { canonicalAddress, cleanAddress, isIPv6Address, isValidAddress, normalizeAddress } from "./ip-address";
+import {
+	canonicalAddress,
+	canonicalPatterns,
+	cleanAddress,
+	isIPv6Address,
+	isValidAddress,
+	normalizeAddress,
+} from "./ip-address";
 
 describe("isValidAddress", ({ assert, it }) => {
 	it("should return true for valid IPv6 address", () => {
@@ -163,5 +170,26 @@ describe("canonicalAddress", ({ assert, it }) => {
 		assert.undefined(canonicalAddress("[::1]"));
 		assert.undefined(canonicalAddress("[2001:db8::1]:443"));
 		assert.undefined(canonicalAddress("1.2.[3.4"));
+	});
+});
+
+describe("canonicalPatterns", ({ assert, it }) => {
+	it("should write literal addresses in canonical form", () => {
+		assert.equal(
+			canonicalPatterns(["127.0.0.1", "::ffff:1.2.3.4", "2001:0DB8:0000:0000:0000:0000:0000:0001", "::1"]),
+			["127.0.0.1", "1.2.3.4", "2001:db8::1", "::1"],
+		);
+	});
+
+	it("should keep glob patterns as written", () => {
+		assert.equal(canonicalPatterns(["*", "187.166.*", "2001:db8:*"]), ["*", "187.166.*", "2001:db8:*"]);
+	});
+
+	it("should keep entries that are not addresses as written", () => {
+		assert.equal(canonicalPatterns(["not-an-ip", "::1.2.3.4", "[::1]"]), ["not-an-ip", "::1.2.3.4", "[::1]"]);
+	});
+
+	it("should return an empty list for an empty list", () => {
+		assert.equal(canonicalPatterns([]), []);
 	});
 });

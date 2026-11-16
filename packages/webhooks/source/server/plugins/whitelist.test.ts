@@ -34,6 +34,21 @@ describe<Context>("Whitelist", ({ beforeEach, afterEach, afterAll, it, assert })
 		assert.equal(response.status, 403);
 	});
 
+	it("should GET all the webhooks if the whitelist entry is not written in canonical form", async (context) => {
+		await ServerHelper.initServer(context, {
+			...serverOptions,
+			whitelist: ["::ffff:127.0.0.1", "2001:0DB8:0000:0000:0000:0000:0000:0001"],
+		});
+
+		const from = async (remoteAddress: string) =>
+			(await context.server.inject({ method: "GET", remoteAddress, url: "http://localhost:4004/api/webhooks" }))
+				.statusCode;
+
+		assert.equal(await from("127.0.0.1"), 200);
+		assert.equal(await from("2001:db8::1"), 200);
+		assert.equal(await from("2001:db8::2"), 403);
+	});
+
 	it("should GET error for an IPv4-compatible IPv6 client that embeds a whitelisted IPv4 address", async (context) => {
 		await ServerHelper.initServer(context, { ...serverOptions, whitelist: ["127.0.0.1"] });
 

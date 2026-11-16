@@ -31,3 +31,8 @@ export const canonicalAddress = (ip: string): string | undefined => {
 		return undefined;
 	}
 };
+
+// Literal addresses in a whitelist or blacklist are compared as text, so they have to be in the
+// same form as the addresses they are matched against. Glob patterns are left as written.
+export const canonicalPatterns = (patterns: string[]): string[] =>
+	patterns.map((pattern) => canonicalAddress(pattern) ?? pattern);
