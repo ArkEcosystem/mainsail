@@ -28,13 +28,13 @@ export const concurrencyLimitPerIp = {
 		const { payload, statusCode } = Boom.tooManyRequests("Too many concurrent requests").output;
 		const active = new Map<string, number>();
 
-		const count = (ip: string, change: number): void => {
-			const total = (active.get(ip) ?? 0) + change;
+		const count = (key: string, change: number): void => {
+			const total = (active.get(key) ?? 0) + change;
 
 			if (total === 0) {
-				active.delete(ip);
+				active.delete(key);
 			} else {
-				active.set(ip, total);
+				active.set(key, total);
 			}
 		};
 
@@ -50,12 +50,14 @@ export const concurrencyLimitPerIp = {
 					return h.continue;
 				}
 
-				if ((active.get(ip) ?? 0) >= options.limit) {
+				const key = IpAddress.subnetAddress(ip);
+
+				if ((active.get(key) ?? 0) >= options.limit) {
 					return h.response(payload).code(statusCode).takeover();
 				}
 
-				count(ip, 1);
-				request.plugins[slot] = ip;
+				count(key, 1);
+				request.plugins[slot] = key;
 
 				return h.continue;
 			},
@@ -63,10 +65,10 @@ export const concurrencyLimitPerIp = {
 		});
 
 		server.events.on("response", (request: Hapi.Request) => {
-			const ip = request.plugins[slot] as string | undefined;
+			const key = request.plugins[slot] as string | undefined;
 
-			if (ip !== undefined) {
-				count(ip, -1);
+			if (key !== undefined) {
+				count(key, -1);
 			}
 		});
 	},

@@ -6,6 +6,7 @@ import {
 	isIPv6Address,
 	isValidAddress,
 	normalizeAddress,
+	subnetAddress,
 } from "./ip-address";
 
 describe("isValidAddress", ({ assert, it }) => {
@@ -191,5 +192,33 @@ describe("canonicalPatterns", ({ assert, it }) => {
 
 	it("should return an empty list for an empty list", () => {
 		assert.equal(canonicalPatterns([]), []);
+	});
+});
+
+describe("subnetAddress", ({ assert, it }) => {
+	it("should keep an IPv4 address", () => {
+		assert.is(subnetAddress("1.2.3.4"), "1.2.3.4");
+	});
+
+	it("should return the /64 of an IPv6 address", () => {
+		assert.is(subnetAddress("2001:db8:1:2:3:4:5:6"), "2001:db8:1:2::/64");
+		assert.is(subnetAddress("2001:db8::1"), "2001:db8::/64");
+	});
+
+	it("should return the same /64 for addresses that differ only in the last 64 bits", () => {
+		assert.is(subnetAddress("2001:db8:1:2::1"), subnetAddress("2001:db8:1:2:ffff:ffff:ffff:ffff"));
+	});
+
+	it("should return different /64s for addresses in neighbouring subnets", () => {
+		assert.is.not(subnetAddress("2001:db8:1:2::1"), subnetAddress("2001:db8:1:3::1"));
+	});
+
+	it("should not put IPv4-mapped addresses into one subnet", () => {
+		assert.is(subnetAddress("::ffff:1.2.3.4"), "::ffff:1.2.3.4");
+		assert.is.not(subnetAddress("::ffff:1.2.3.4"), subnetAddress("::ffff:5.6.7.8"));
+	});
+
+	it("should return a value that is not an address as is", () => {
+		assert.is(subnetAddress("not-an-ip"), "not-an-ip");
 	});
 });

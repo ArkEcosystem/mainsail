@@ -26,6 +26,13 @@ const isListed = (ip: string, patterns: string[]): boolean => {
 	return false;
 };
 
+// The lists are matched against the client address; the points are counted per subnet.
+class SubnetRateLimiter extends RateLimiterMemory {
+	public override consume(key: string | number, points?: number, options?: object): Promise<RateLimiterRes> {
+		return super.consume(IpAddress.subnetAddress(String(key)), points, options);
+	}
+}
+
 export const rateLimit = {
 	name: "rate-limit",
 	once: true,
@@ -51,7 +58,7 @@ export const rateLimit = {
 			blackList: blacklist,
 			isBlackListed: (ip: string) => isListed(ip, blacklist),
 			isWhiteListed: (ip: string) => isListed(ip, whitelist),
-			limiter: new RateLimiterMemory({ duration: options.duration, points: options.points }),
+			limiter: new SubnetRateLimiter({ duration: options.duration, points: options.points }),
 			runActionAnyway: false,
 			whiteList: whitelist,
 		});

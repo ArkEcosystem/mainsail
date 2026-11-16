@@ -36,3 +36,18 @@ export const canonicalAddress = (ip: string): string | undefined => {
 // same form as the addresses they are matched against. Glob patterns are left as written.
 export const canonicalPatterns = (patterns: string[]): string[] =>
 	patterns.map((pattern) => canonicalAddress(pattern) ?? pattern);
+
+// One IPv6 client controls at least a /64 and can pick any address in it, so per-client limits are
+// keyed by that prefix.
+export const subnetAddress = (ip: string): string => {
+	try {
+		// process() reads an IPv4-mapped address as IPv4, so those do not all end up in ::/64.
+		if (ipaddr.process(ip).kind() === "ipv6") {
+			const network = ipaddr.IPv6.networkAddressFromCIDR(`${ip}/64`);
+
+			return `${network}/64`;
+		}
+	} catch {}
+
+	return ip;
+};
