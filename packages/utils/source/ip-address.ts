@@ -1,5 +1,7 @@
 import ipaddr from "ipaddr.js";
 
+const isIPv4Compatible = (ip: string): boolean => ip.startsWith("::") && !ip.includes(":", 2) && ip.includes(".");
+
 export const isValidAddress = (ip: string): boolean => ipaddr.isValid(cleanAddress(ip));
 
 export const isIPv6Address = (ip: string): boolean => {
@@ -21,3 +23,11 @@ export const normalizeAddress = (ip: string): string => {
 };
 
 export const cleanAddress = (ip: string): string => ip.replace("[", "").replace("]", "");
+
+export const canonicalAddress = (ip: string): string | undefined => {
+	try {
+		return isIPv4Compatible(ip) ? undefined : ipaddr.process(ip).toString();
+	} catch {
+		return undefined;
+	}
+};

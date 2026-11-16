@@ -43,4 +43,40 @@ describe<{}>("getIp", ({ it, assert }) => {
 
 		assert.is(getIp(request, true), "7.7.7.7");
 	});
+
+	it("should map an IPv4-mapped IPv6 remoteAddress to IPv4", () => {
+		const request = makeRequest({}, "::ffff:1.2.3.4");
+
+		assert.is(getIp(request, false), "1.2.3.4");
+	});
+
+	it("should return an IPv4-compatible IPv6 remoteAddress as is", () => {
+		const request = makeRequest({}, "::1.2.3.4");
+
+		assert.is(getIp(request, false), "::1.2.3.4");
+	});
+
+	it("should not throw when the remoteAddress is missing", () => {
+		const request: any = { headers: {}, info: {} };
+
+		assert.undefined(getIp(request, false));
+	});
+
+	it("should return the forwarded entry as is when it is not an IP address", () => {
+		const request = makeRequest({ "x-forwarded-for": "unknown" });
+
+		assert.is(getIp(request, true), "unknown");
+	});
+
+	it("should compress and lowercase an IPv6 forwarded entry", () => {
+		const request = makeRequest({ "x-forwarded-for": "2001:0DB8:0000:0000:0000:0000:0000:0001" });
+
+		assert.is(getIp(request, true), "2001:db8::1");
+	});
+
+	it("should map an IPv4-mapped IPv6 forwarded entry to IPv4", () => {
+		const request = makeRequest({ "x-forwarded-for": "8.8.8.8, ::ffff:9.9.9.9" });
+
+		assert.is(getIp(request, true), "9.9.9.9");
+	});
 });
