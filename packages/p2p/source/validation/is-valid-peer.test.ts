@@ -136,6 +136,16 @@ describe("isValidPeer", ({ it, assert }) => {
 		assert.false(isValidPeerIp("garbage"));
 	});
 
+	it("#isValidPeerIp - should not be ok for an IPv4-compatible IPv6 address", () => {
+		assert.false(isValidPeerIp("::8.8.8.8", false));
+	});
+
+	it("#isValidPeerIp - should not be ok for a bracketed address", () => {
+		for (const ip of ["[2606:4700::1111]", "[2606:4700::1111]:443", "1.2.[3.4"]) {
+			assert.false(isValidPeerIp(ip, false), ip);
+		}
+	});
+
 	it("should not be ok for LAN addresses", () => {
 		const interfaces = os.networkInterfaces();
 		const addresses = [];

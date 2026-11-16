@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
-import { assert } from "@mainsail/utils";
+import { assert, IpAddress } from "@mainsail/utils";
 import Joi from "joi";
 
 import { ApiNodeDiscoverer } from "./api-node/api-node-discoverer.js";
@@ -45,7 +45,7 @@ import { Throttle } from "./throttle.js";
 import { TxPoolNodeVerifier } from "./tx-pool-node-verifier.js";
 import { TxPoolNode } from "./tx-pool-node.js";
 import { normalizeUrl } from "./utils/index.js";
-import { makeFormats, sanitizeRemoteAddress } from "./validation/index.js";
+import { makeFormats } from "./validation/index.js";
 
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
@@ -112,7 +112,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 	#registerFactories(): void {
 		this.app.bind<(ip: string) => Peer>(Identifiers.P2P.Peer.Factory).toFactory(() => (ip: string) => {
-			const sanitizedIp = sanitizeRemoteAddress(ip);
+			const sanitizedIp = IpAddress.canonicalAddress(ip);
 			assert.string(sanitizedIp);
 
 			return this.app.resolve(Peer).init(sanitizedIp, Number(this.config().getRequired<number>("server.port")));
@@ -124,7 +124,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		});
 
 		this.app.bind<(ip: string) => TxPoolNode>(Identifiers.P2P.TxPoolNode.Factory).toFactory(() => (ip: string) => {
-			const sanitizedIp = sanitizeRemoteAddress(ip);
+			const sanitizedIp = IpAddress.canonicalAddress(ip);
 			assert.string(sanitizedIp);
 
 			return this.app.resolve(TxPoolNode).init(sanitizedIp, this.config().getRequired<number>("txPoolPort"));

@@ -2,10 +2,10 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import { isBlacklisted, isWhitelisted } from "@mainsail/utils";
+import { IpAddress, isBlacklisted, isWhitelisted } from "@mainsail/utils";
 
 import { isValidVersion } from "./utils/index.js";
-import { isValidPeerIp, sanitizeRemoteAddress } from "./validation/index.js";
+import { isValidPeerIp } from "./validation/index.js";
 
 @injectable()
 export class PeerProcessor implements Contracts.P2P.PeerProcessor {
@@ -67,7 +67,7 @@ export class PeerProcessor implements Contracts.P2P.PeerProcessor {
 	}
 
 	public async validateAndAcceptPeer(rawIp: string, options: Contracts.P2P.AcceptNewPeerOptions = {}): Promise<void> {
-		const ip = sanitizeRemoteAddress(rawIp);
+		const ip = IpAddress.canonicalAddress(rawIp);
 		if (!ip) {
 			return;
 		}
