@@ -83,6 +83,24 @@ describe<{
 		assert.number(peer.port);
 		assert.equal(peer.port, 4002);
 	});
+
+	it("#peerFactory - should throw for an ipv4-compatible ipv6 address", async ({ app, serviceProvider }) => {
+		app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
+		const config = app.resolve(Providers.PluginConfiguration).from("", defaults);
+		serviceProvider.setConfig(config);
+		await serviceProvider.register();
+
+		assert.throws(() => app.get<Contracts.P2P.PeerFactory>(Identifiers.P2P.Peer.Factory)("::8.8.8.8"));
+	});
+
+	it("#txPoolNodeFactory - should throw for an ipv4-compatible ipv6 address", async ({ app, serviceProvider }) => {
+		app.bind(Identifiers.Services.Queue.Factory).toConstantValue({});
+		const config = app.resolve(Providers.PluginConfiguration).from("", defaults);
+		serviceProvider.setConfig(config);
+		await serviceProvider.register();
+
+		assert.throws(() => app.get<Contracts.P2P.TxPoolNodeFactory>(Identifiers.P2P.TxPoolNode.Factory)("::8.8.8.8"));
+	});
 });
 
 describe<{
