@@ -1,6 +1,6 @@
 import type { Request } from "@hapi/hapi";
 
-import { IpAddress } from "@mainsail/utils";
+import { assert, IpAddress } from "@mainsail/utils";
 
 const headerToString = (value: unknown): string | undefined => {
 	if (typeof value === "string") {
@@ -14,17 +14,16 @@ const headerToString = (value: unknown): string | undefined => {
 	return undefined;
 };
 
-const remoteIp = (request: Request, trustProxy: boolean): string => {
-	if (trustProxy) {
-		const forwardedFor = headerToString(request.headers["x-forwarded-for"]);
-		return forwardedFor?.split(",").at(-1)?.trim() ?? request.info.remoteAddress;
-	}
+const forwardedIp = (request: Request): string | undefined => {
+	const entry = headerToString(request.headers["x-forwarded-for"])?.split(",").at(-1)?.trim();
 
-	return request.info.remoteAddress;
+	return entry ? IpAddress.canonicalAddress(entry) : undefined;
 };
 
 export const getIp = (request: Request, trustProxy: boolean): string => {
-	const ip = remoteIp(request, trustProxy);
+	const ip =
+		(trustProxy ? forwardedIp(request) : undefined) ?? IpAddress.canonicalAddress(request.info.remoteAddress);
+	assert.string(ip);
 
-	return IpAddress.canonicalAddress(ip) ?? ip;
+	return ip;
 };
