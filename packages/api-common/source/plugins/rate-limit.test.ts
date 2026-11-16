@@ -191,7 +191,7 @@ describe<{
 		});
 
 		const response = await server.inject({
-			headers: { "x-forwarded-for": "9.9.9.9, 8.8.8.8" },
+			headers: { "x-forwarded-for": "8.8.8.8, 9.9.9.9" },
 			method: "GET",
 			remoteAddress: REMOTE,
 			url: "/",

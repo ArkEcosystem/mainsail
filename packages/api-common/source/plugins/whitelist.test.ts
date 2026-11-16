@@ -65,6 +65,19 @@ describe<{}>("Whitelist", ({ it, assert }) => {
 		assert.is(response.statusCode, 200);
 	});
 
+	it("should forbid a client that puts a whitelisted IP in front of the proxy's entry", async () => {
+		const server = await buildServer({ trustProxy: true, whitelist: ["127.0.0.1"] });
+
+		const response = await server.inject({
+			headers: { "x-forwarded-for": "127.0.0.1, 6.6.6.6" },
+			method: "GET",
+			remoteAddress: "10.0.0.1",
+			url: "/",
+		});
+
+		assert.is(response.statusCode, 403);
+	});
+
 	it("should forbid a forwarded IP not in the whitelist when trustProxy is enabled", async () => {
 		const server = await buildServer({ trustProxy: true, whitelist: ["127.0.0.1"] });
 
