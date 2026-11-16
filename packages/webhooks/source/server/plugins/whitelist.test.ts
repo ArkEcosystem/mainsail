@@ -33,4 +33,16 @@ describe<Context>("Whitelist", ({ beforeEach, afterEach, afterAll, it, assert })
 
 		assert.equal(response.status, 403);
 	});
+
+	it("should GET error for an IPv4-compatible IPv6 client that embeds a whitelisted IPv4 address", async (context) => {
+		await ServerHelper.initServer(context, { ...serverOptions, whitelist: ["127.0.0.1"] });
+
+		const response = await context.server.inject({
+			method: "GET",
+			remoteAddress: "::127.0.0.1",
+			url: "http://localhost:4004/api/webhooks",
+		});
+
+		assert.equal(response.statusCode, 403);
+	});
 });

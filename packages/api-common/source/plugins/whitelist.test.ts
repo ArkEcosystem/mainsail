@@ -78,10 +78,23 @@ describe<{}>("Whitelist", ({ it, assert }) => {
 		assert.is(response.statusCode, 200);
 	});
 
-	it("should forbid an IPv4-compatible IPv6 client that embeds a whitelisted IPv4 address", async () => {
+	it("should not allow an IPv4-compatible IPv6 client that embeds a whitelisted IPv4 address", async () => {
 		const server = await buildServer({ trustProxy: false, whitelist: ["127.0.0.1"] });
 
 		const response = await server.inject({ method: "GET", remoteAddress: "::127.0.0.1", url: "/" });
+
+		assert.is(response.statusCode, 500);
+	});
+
+	it("should match the socket address when the forwarded entry is not an IP address", async () => {
+		const server = await buildServer({ trustProxy: true, whitelist: ["10.0.*"] });
+
+		const response = await server.inject({
+			headers: { "x-forwarded-for": "10.0.not-an-ip" },
+			method: "GET",
+			remoteAddress: "6.6.6.6",
+			url: "/",
+		});
 
 		assert.is(response.statusCode, 403);
 	});

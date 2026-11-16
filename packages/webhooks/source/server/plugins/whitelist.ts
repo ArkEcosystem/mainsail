@@ -1,7 +1,7 @@
 import type Hapi from "@hapi/hapi";
 
 import Boom from "@hapi/boom";
-import { isWhitelisted } from "@mainsail/utils";
+import { IpAddress, isWhitelisted } from "@mainsail/utils";
 
 export const whitelist = {
 	name: "whitelist",
@@ -12,7 +12,9 @@ export const whitelist = {
 					return h.continue;
 				}
 
-				if (isWhitelisted(options.whitelist, request.info.remoteAddress)) {
+				const ip = IpAddress.canonicalAddress(request.info.remoteAddress);
+
+				if (ip && isWhitelisted(options.whitelist, ip)) {
 					return h.continue;
 				}
 
