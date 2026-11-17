@@ -100,11 +100,12 @@ export class Service implements Contracts.P2PService.Service {
 	}
 
 	// Known peers are the seeds and peers that lost their connection; they are dialed, spaced out, until
-	// they answer or are given up.
+	// they answer or are given up. One that is pending already has a connection and is being verified.
 	async #dialKnownPeers(): Promise<void> {
 		const now = Date.now();
 		const due = (this.repository.getKnownPeers() as Peer[]).filter(
-			(peer) => now - (peer.lastDialAt ?? 0) >= constants.DIAL_SPACING,
+			(peer) =>
+				!this.repository.hasPendingPeer(peer.ip) && now - (peer.lastDialAt ?? 0) >= constants.DIAL_SPACING,
 		);
 
 		await Promise.all(due.map((peer) => this.#dial(peer)));

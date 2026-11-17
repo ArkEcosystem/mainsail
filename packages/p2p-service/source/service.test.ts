@@ -35,6 +35,7 @@ describe<{
 			getActivePeers: () => [],
 			hasKnownPeer: () => true,
 			hasMinimumPeers: () => true,
+			hasPendingPeer: () => false,
 		};
 		context.peerVerifier = { verify: async () => true };
 		context.state = { getLastMessageTime: () => dayjs() };
@@ -560,6 +561,25 @@ describe<{
 
 		await fakeTimers.tickAsync(constants.DIAL_SPACING);
 		dial.calledTimes(4);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should not dial a known peer that is pending", async ({
+		service,
+		repository,
+		websocketService,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		repository.getKnownPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.hasPendingPeer = (ip: string) => ip === "1.1.1.1";
+		const dial = spy(websocketService, "dial");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+
+		dial.calledOnce();
+		dial.calledWith("ws://2.2.2.2:4002");
 
 		await service.dispose();
 	});

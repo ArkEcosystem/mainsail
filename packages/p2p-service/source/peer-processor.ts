@@ -114,8 +114,10 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 		this.peerDisposer.disposePeer(ip);
 	}
 
+	// A known peer (a seed, or one that was active before) stays known while it is pending, so a connection
+	// that fails during the verification costs it only the pending entry and the service loop dials it again.
+	// An address seen for the first time is only pending and is dropped. A ban removes the peer from every list.
 	async #verifyPeer(peer: Peer): Promise<void> {
-		this.repository.forgetKnownPeer(peer);
 		this.repository.setPendingPeer(peer);
 
 		try {
@@ -123,8 +125,8 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 				return;
 			}
 
-			// A ban, a remote close or an error during the verification closed the connection; the close
-			// listener has put the peer back among the known ones.
+			// The connection closed during the verification (remote close, timeout, ban); the close listener
+			// or the ban has already taken the peer off the pending list.
 			if (peer.connection?.state !== ConnectionState.Open) {
 				return;
 			}
@@ -136,6 +138,7 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 		} catch {
 			this.peerDisposer.disposePeer(peer.ip);
 		} finally {
+			// For a verification that failed while the connection stayed open; otherwise already gone.
 			this.repository.forgetPendingPeer(peer);
 		}
 	}

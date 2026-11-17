@@ -38,8 +38,11 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 		return peer;
 	}
 
-	// Active peers are announced; pending and known ones are internal to this package.
+	// An active peer is in no other list. Active peers are announced; pending and known ones are internal
+	// to this package.
 	public setActivePeer(peer: Contracts.P2PService.Peer): void {
+		this.#peersPending.delete(peer.ip);
+		this.#peersKnown.delete(peer.ip);
 		this.#peers.set(peer.ip, peer);
 
 		void this.events.dispatch(Events.PeerEvent.Added, peer);

@@ -342,7 +342,7 @@ describe<{
 		assert.equal(peerRepository.getSameSubnetPeers("176.165.23.10").length, 0);
 	});
 
-	it("#removePeer - should remove the peer from whichever list holds it", ({ peerRepository, app }) => {
+	it("#removePeer - should remove the peer from every list", ({ peerRepository, app }) => {
 		const active = app.resolve(Peer).init("176.165.66.55", 4000);
 		const pending = app.resolve(Peer).init("176.165.44.33", 4000);
 		const known = app.resolve(Peer).init("176.165.22.11", 4000);
@@ -408,5 +408,33 @@ describe<{
 		peerRepository.demotePeer("1.1.1.1");
 		peerRepository.demotePeer(active.ip);
 		assert.equal(peerRepository.getKnownPeers(), [active]);
+	});
+
+	it("#setActivePeer - should take the peer off the pending and known lists", ({ peerRepository, app }) => {
+		const peer = app.resolve(Peer).init("176.165.66.55", 4000);
+		peerRepository.setKnownPeer(peer);
+		peerRepository.setPendingPeer(peer);
+
+		peerRepository.setActivePeer(peer);
+
+		assert.equal(peerRepository.getActivePeer(peer.ip), peer);
+		assert.false(peerRepository.hasPendingPeer(peer.ip));
+		assert.false(peerRepository.hasKnownPeer(peer.ip));
+	});
+
+	it("should keep a known peer known while it is pending", ({ peerRepository, app }) => {
+		const demoted = app.resolve(Peer).init("176.165.66.55", 4000);
+		const removed = app.resolve(Peer).init("176.165.44.33", 4000);
+		for (const peer of [demoted, removed]) {
+			peerRepository.setKnownPeer(peer);
+			peerRepository.setPendingPeer(peer);
+		}
+
+		peerRepository.demotePeer(demoted.ip);
+		assert.false(peerRepository.hasPendingPeer(demoted.ip));
+		assert.equal(peerRepository.getKnownPeer(demoted.ip), demoted);
+
+		peerRepository.removePeer(removed.ip);
+		assert.false(peerRepository.hasPeer(removed.ip));
 	});
 });

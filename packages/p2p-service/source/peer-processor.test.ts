@@ -133,14 +133,53 @@ describe<{
 		const known = makePeer("178.165.55.55");
 		repository.hasKnownPeer = () => true;
 		repository.getKnownPeer = () => known;
-		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
 		const setPeer = spy(repository, "setActivePeer");
 
 		const connection = await connect(websocketService, "178.165.55.55");
 
-		forgetKnownPeer.calledWith(known);
 		setPeer.calledWith(known);
 		assert.equal(known.connection, connection);
+	});
+
+	it("#onConnection - should keep a known peer known when its verification fails", async ({
+		websocketService,
+		repository,
+		peerVerifier,
+	}) => {
+		const known = makePeer("178.165.55.55");
+		repository.hasKnownPeer = () => true;
+		repository.getKnownPeer = () => known;
+		peerVerifier.verify = async () => false;
+		const setPendingPeer = spy(repository, "setPendingPeer");
+		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
+		const forgetPendingPeer = spy(repository, "forgetPendingPeer");
+
+		await connect(websocketService, "178.165.55.55");
+
+		setPendingPeer.calledWith(known);
+		forgetKnownPeer.neverCalled();
+		forgetPendingPeer.calledWith(known);
+	});
+
+	it("#onConnection - should keep a known peer known when its connection closed during the verification", async ({
+		websocketService,
+		repository,
+		peerVerifier,
+	}) => {
+		const known = makePeer("178.165.55.55");
+		repository.hasKnownPeer = () => true;
+		repository.getKnownPeer = () => known;
+		peerVerifier.verify = async (peer: any) => {
+			peer.connection.state = ConnectionState.Closed;
+			return true;
+		};
+		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
+		const setPeer = spy(repository, "setActivePeer");
+
+		await connect(websocketService, "178.165.55.55");
+
+		forgetKnownPeer.neverCalled();
+		setPeer.neverCalled();
 	});
 
 	it("#onConnection - should skip peers that are already active or pending", async ({
