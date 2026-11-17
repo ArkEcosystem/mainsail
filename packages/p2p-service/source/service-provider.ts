@@ -12,7 +12,11 @@ import { BlockDownloader, MessageDownloader, ProposalDownloader } from "./downlo
 import { HeaderService } from "./header-service.js";
 import { Header } from "./header.js";
 import { Logger } from "./logger.js";
-import { HeaderIncludeReceiveMiddleware, HeaderIncludeSendMiddleware } from "./middleware/index.js";
+import {
+	HeaderHandleReceiveMiddleware,
+	HeaderIncludeReceiveMiddleware,
+	HeaderIncludeSendMiddleware,
+} from "./middleware/index.js";
 import { PeerCommunicator } from "./peer-communicator.js";
 import { PeerDiscoverer } from "./peer-discoverer.js";
 import { PeerDisposer } from "./peer-disposer.js";
@@ -54,6 +58,8 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
 		this.app.bind<() => Header>(Identifiers.P2P.Header.Factory).toFactory(() => () => this.app.resolve(Header));
 		this.app.bind(Identifiers.P2P.Header.Service).to(HeaderService).inSingletonScope();
+		// Both run after the transport's codec middleware: the request is decoded and the response not yet encoded.
+		this.app.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware).to(HeaderHandleReceiveMiddleware).inSingletonScope();
 		this.app
 			.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware)
 			.to(HeaderIncludeReceiveMiddleware)
