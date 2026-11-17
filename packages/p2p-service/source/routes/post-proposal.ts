@@ -12,6 +12,8 @@ type Response = ReturnType<typeof Codecs.postProposal.response.deserialize>;
 
 export const PostProposal: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.postProposal,
+	// One proposal per round; a second one in flight covers the round changing while the peer is slow.
+	maxConcurrentRequests: 2,
 	maxPayload: { request: 3 * Units.MEGABYTE, response: Units.KILOBYTE },
 	path: "postProposal",
 };
@@ -34,6 +36,7 @@ export class PostProposalRoute implements Interfaces.Route<Request, Response> {
 	public readonly path = PostProposal.path;
 	public readonly codec = PostProposal.codec;
 	public readonly maxPayload = PostProposal.maxPayload;
+	public readonly maxConcurrentRequests = PostProposal.maxConcurrentRequests;
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
 		try {

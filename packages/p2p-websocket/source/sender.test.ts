@@ -18,6 +18,7 @@ const route: RouteDefinition<string, string> = {
 			serialize: (data: string) => Buffer.from(data),
 		},
 	},
+	maxConcurrentRequests: 2,
 	maxPayload: { request: 64, response: 8 },
 	path: "echo",
 };

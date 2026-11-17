@@ -5,7 +5,7 @@ import { describe } from "@mainsail/test-runner";
 import type { Route } from "./interfaces/index.js";
 
 import { CloseReason } from "./enums.js";
-import { ReceiveCodecMiddleware } from "./middleware/index.js";
+import { ReceiveCodecMiddleware, RequestLimitMiddleware } from "./middleware/index.js";
 import { Router } from "./router.js";
 
 const codec = {
@@ -13,7 +13,7 @@ const codec = {
 	response: { deserialize: (payload: Buffer) => payload.toString(), serialize: (data: string) => Buffer.from(data) },
 };
 
-const connection = { remoteAddress: "1.1.1.1", terminate: () => {} } as any;
+const connection = { onClose: () => {}, remoteAddress: "1.1.1.1", terminate: () => {} } as any;
 
 describe<{
 	router: Router;
@@ -21,12 +21,14 @@ describe<{
 	beforeEach((context) => {
 		const app = new Application();
 		app.bind(Identifiers.P2P.WebSocket.Logger).toConstantValue({ debug: () => {} });
+		app.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware).to(RequestLimitMiddleware);
 		app.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware).to(ReceiveCodecMiddleware);
 
 		context.router = app.resolve(Router);
 		context.router.register({
 			codec,
 			handle: async (_, data: string) => `echo:${data}`,
+			maxConcurrentRequests: 2,
 			maxPayload: { request: 8, response: 64 },
 			path: "echo",
 		} as Route<unknown, unknown>);
@@ -76,5 +78,34 @@ describe<{
 				} as Route<unknown, unknown>),
 			"Duplicate route: echo",
 		);
+	});
+
+	it("should refuse and drop a peer that exceeds maxConcurrentRequests on a route, and free the slots afterwards", async ({
+		router,
+	}) => {
+		let release!: () => void;
+		const slow = new Promise<void>((resolve) => (release = resolve));
+		router.register({
+			codec,
+			handle: async () => {
+				await slow;
+				return "done";
+			},
+			maxConcurrentRequests: 1,
+			maxPayload: { request: 8, response: 64 },
+			path: "slow",
+		} as Route<unknown, unknown>);
+
+		let terminated: string | undefined;
+		connection.terminate = (reason: string) => (terminated = reason);
+
+		const first = router.handle(connection, "slow", Buffer.from("a"));
+		const second = await router.handle(connection, "slow", Buffer.from("b"));
+		assert.equal(second.statusCode, 429);
+		assert.equal(terminated, CloseReason.ProtocolError);
+
+		release();
+		assert.equal((await first).statusCode, 200);
+		assert.equal((await router.handle(connection, "slow", Buffer.from("c"))).statusCode, 200);
 	});
 });

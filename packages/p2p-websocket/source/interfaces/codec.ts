@@ -23,6 +23,8 @@ export interface RouteDefinition<TRequest, TResponse> {
 	readonly path: string;
 	readonly codec: Codec<TRequest, TResponse>;
 	readonly maxPayload: PayloadLimits;
+	// Requests for this route one peer may have in progress at once; more are answered 429.
+	readonly maxConcurrentRequests: number;
 }
 
 export interface SendOptions {

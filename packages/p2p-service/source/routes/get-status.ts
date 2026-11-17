@@ -12,6 +12,7 @@ type Response = ReturnType<typeof Codecs.getStatus.response.deserialize>;
 
 export const GetStatus: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.getStatus,
+	maxConcurrentRequests: 2,
 	maxPayload: { request: Units.KILOBYTE, response: 16 * Units.KILOBYTE },
 	path: "getStatus",
 };
@@ -27,6 +28,7 @@ export class GetStatusRoute implements Interfaces.Route<Request, Response> {
 	public readonly path = GetStatus.path;
 	public readonly codec = GetStatus.codec;
 	public readonly maxPayload = GetStatus.maxPayload;
+	public readonly maxConcurrentRequests = GetStatus.maxConcurrentRequests;
 
 	public async handle(): Promise<Response> {
 		const lastBlock = this.stateStore.getLastBlock();

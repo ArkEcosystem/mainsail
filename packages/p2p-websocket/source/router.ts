@@ -57,21 +57,7 @@ export class Router {
 
 			const context: ReceiveContext = { connection, request: { payload }, response: {}, route };
 
-			for (const step of this.middleware) {
-				await step.before?.(context);
-			}
-
-			context.response.data = await route.handle(connection, context.request.data);
-
-			for (const step of [...this.middleware].reverse()) {
-				await step.after?.(context);
-			}
-
-			if (!context.response.payload) {
-				throw new Error(`No middleware encoded the ${path} response; is the codec middleware registered?`);
-			}
-
-			return { payload: context.response.payload, statusCode: 200 };
+			return await this.#run(context);
 		} catch (rawError) {
 			const error = ensureError(rawError);
 			const statusCode = error instanceof RequestError ? error.statusCode : 500;
@@ -86,6 +72,36 @@ export class Router {
 			}
 
 			return { payload: Buffer.alloc(0), statusCode };
+		}
+	}
+
+	// Steps whose `before` completed get their `finally`, in reverse, even when a later step or the route threw.
+	async #run(context: ReceiveContext): Promise<Response> {
+		const started: ReceiveMiddleware[] = [];
+
+		try {
+			for (const step of this.middleware) {
+				await step.before?.(context);
+				started.push(step);
+			}
+
+			context.response.data = await context.route.handle(context.connection, context.request.data);
+
+			for (const step of [...this.middleware].reverse()) {
+				await step.after?.(context);
+			}
+
+			if (!context.response.payload) {
+				throw new Error(
+					`No middleware encoded the ${context.route.path} response; is the codec middleware registered?`,
+				);
+			}
+
+			return { payload: context.response.payload, statusCode: 200 };
+		} finally {
+			for (const step of started.reverse()) {
+				await step.finally?.(context);
+			}
 		}
 	}
 }

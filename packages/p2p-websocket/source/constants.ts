@@ -23,12 +23,12 @@ export const constants = {
 	MAX_PATH_LENGTH: 100,
 	// Largest frame accepted on an inbound socket.
 	MAX_PAYLOAD: 3 * Units.MEGABYTE,
-	// Version of the wire protocol: the frame format in message.ts and the set of route paths. Bump it
-	// whenever either changes; a request for an unknown path ends the connection.
-	PROTOCOL_VERSION: 1,
 	// Requests from one peer that may be in progress at once. Well above what an honest peer sends:
 	// consensus posts a few per round and the downloaders request one batch at a time.
 	MAX_REQUESTS_IN_FLIGHT: 32,
+	// Version of the wire protocol: the frame format in message.ts and the set of route paths. Bump it
+	// whenever either changes; a request for an unknown path ends the connection.
+	PROTOCOL_VERSION: 1,
 	// Time a request waits for its response before failing.
 	REQUEST_TIMEOUT: 10_000,
 };

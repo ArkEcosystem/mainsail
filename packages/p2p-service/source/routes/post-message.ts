@@ -12,6 +12,7 @@ type Response = ReturnType<typeof Codecs.postMessage.response.deserialize>;
 
 export const PostMessage: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.postMessage,
+	maxConcurrentRequests: 8,
 	maxPayload: { request: Units.KILOBYTE, response: Units.KILOBYTE },
 	path: "postMessage",
 };
@@ -34,6 +35,7 @@ export class PostMessageRoute implements Interfaces.Route<Request, Response> {
 	public readonly path = PostMessage.path;
 	public readonly codec = PostMessage.codec;
 	public readonly maxPayload = PostMessage.maxPayload;
+	public readonly maxConcurrentRequests = PostMessage.maxConcurrentRequests;
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
 		try {

@@ -13,6 +13,8 @@ type Response = ReturnType<typeof Codecs.getBlocks.response.deserialize>;
 
 export const GetBlocks: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.getBlocks,
+	// The block downloader runs up to MAX_DOWNLOAD_BLOCKS_JOBS batches at once, possibly all from one peer.
+	maxConcurrentRequests: 10,
 	maxPayload: { request: Units.KILOBYTE, response: 3 * Units.MEGABYTE },
 	path: "getBlocks",
 };
@@ -31,6 +33,7 @@ export class GetBlocksRoute implements Interfaces.Route<Request, Response> {
 	public readonly path = GetBlocks.path;
 	public readonly codec = GetBlocks.codec;
 	public readonly maxPayload = GetBlocks.maxPayload;
+	public readonly maxConcurrentRequests = GetBlocks.maxConcurrentRequests;
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
 		// The request is not validated yet; the bounds keep a bad one from draining the database or the budget.
