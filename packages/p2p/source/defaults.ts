@@ -16,7 +16,7 @@ export const defaults = {
 	minimumVersions: ["^0.0.1"],
 	peerBanTime: Environment.get(EnvironmentVariables.MAINSAIL_P2P_PEER_BAN_TIME, 3),
 	rateLimit: Environment.get(EnvironmentVariables.MAINSAIL_P2P_RATE_LIMIT, 150),
-	remoteAccess: ["127.0.0.1", "::ffff:127.0.0.1", "::1"],
+	remoteAccess: ["127.0.0.1", "::1"],
 	server: {
 		hostname: Environment.get(EnvironmentVariables.MAINSAIL_P2P_HOST, "0.0.0.0"),
 		logLevel: Environment.get(EnvironmentVariables.MAINSAIL_P2P_LOG_LEVEL, 0),

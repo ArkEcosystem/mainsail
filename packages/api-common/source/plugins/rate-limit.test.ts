@@ -191,7 +191,7 @@ describe<{
 		});
 
 		const response = await server.inject({
-			headers: { "x-forwarded-for": "9.9.9.9, 8.8.8.8" },
+			headers: { "x-forwarded-for": "8.8.8.8, 9.9.9.9" },
 			method: "GET",
 			remoteAddress: REMOTE,
 			url: "/",
@@ -199,6 +199,24 @@ describe<{
 
 		// The forwarded IP is blacklisted -> blocked, proving getIp used the header.
 		assert.is(response.statusCode, 429);
+	});
+
+	it("should match list entries that are not written in canonical form", async () => {
+		const server = await makeServer({
+			blacklist: ["::ffff:1.2.3.4"],
+			duration: 60,
+			enabled: true,
+			points: 1,
+			trustProxy: false,
+			whitelist: ["2001:0DB8:0000:0000:0000:0000:0000:0001"],
+		});
+
+		const from = async (remoteAddress: string) =>
+			(await server.inject({ method: "GET", remoteAddress, url: "/" })).statusCode;
+
+		assert.is(await from("1.2.3.4"), 429);
+		assert.is(await from("2001:db8::1"), 200);
+		assert.is(await from("2001:db8::1"), 200);
 	});
 
 	it("should fall back to an empty blacklist and a wildcard whitelist when the lists are missing", async () => {

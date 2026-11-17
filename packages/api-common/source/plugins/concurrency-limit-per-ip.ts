@@ -1,6 +1,7 @@
 import type Hapi from "@hapi/hapi";
 
 import Boom from "@hapi/boom";
+import { IpAddress } from "@mainsail/utils";
 import mm from "micromatch";
 
 import { getIp } from "../utils/index.js";
@@ -22,7 +23,8 @@ export const concurrencyLimitPerIp = {
 			return;
 		}
 
-		const { trustProxy = false, whitelist = [] } = options;
+		const { trustProxy = false } = options;
+		const whitelist = IpAddress.canonicalPatterns(options.whitelist ?? []);
 		const { payload, statusCode } = Boom.tooManyRequests("Too many concurrent requests").output;
 		const active = new Map<string, number>();
 

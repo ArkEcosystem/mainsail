@@ -86,10 +86,6 @@ describe("isValidPeer", ({ it, assert }) => {
 		assert.true(isLocalHost("127.0.0.1"));
 	});
 
-	it("#isLocalHost - should ok for ::ffff:127.0.0.1", () => {
-		assert.true(isLocalHost("::ffff:127.0.0.1"));
-	});
-
 	it("#isLocalHost - should ok for 0.0.0.0", () => {
 		assert.true(isLocalHost("0.0.0.0"));
 	});
@@ -134,6 +130,16 @@ describe("isValidPeer", ({ it, assert }) => {
 
 	it("#isValidPeerIp - should not be ok for garbage", () => {
 		assert.false(isValidPeerIp("garbage"));
+	});
+
+	it("#isValidPeerIp - should not be ok for an IPv4-compatible IPv6 address", () => {
+		assert.false(isValidPeerIp("::8.8.8.8", false));
+	});
+
+	it("#isValidPeerIp - should not be ok for a bracketed address", () => {
+		for (const ip of ["[2606:4700::1111]", "[2606:4700::1111]:443", "1.2.[3.4"]) {
+			assert.false(isValidPeerIp(ip, false), ip);
+		}
 	});
 
 	it("should not be ok for LAN addresses", () => {

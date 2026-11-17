@@ -301,4 +301,15 @@ describe<{
 
 		verify.neverCalled();
 	});
+
+	it("#validateAndAcceptPeer - should reject an ipv4-compatible ipv6 address", async ({
+		processor,
+		peerVerifier,
+	}) => {
+		const verify = spy(peerVerifier, "verify");
+
+		await processor.validateAndAcceptPeer("::8.8.8.8");
+
+		verify.neverCalled();
+	});
 });

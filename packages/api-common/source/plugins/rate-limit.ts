@@ -2,6 +2,7 @@ import type Hapi from "@hapi/hapi";
 import type { RateLimiterRes } from "rate-limiter-flexible";
 
 import Boom from "@hapi/boom";
+import { IpAddress } from "@mainsail/utils";
 import mm from "micromatch";
 import { RateLimiterMemory, RLWrapperBlackAndWhite } from "rate-limiter-flexible";
 
@@ -43,13 +44,16 @@ export const rateLimit = {
 			return;
 		}
 
+		const blacklist = IpAddress.canonicalPatterns(options.blacklist || []);
+		const whitelist = IpAddress.canonicalPatterns(options.whitelist || ["*"]);
+
 		const rateLimiter = new RLWrapperBlackAndWhite({
-			blackList: options.blacklist || [],
-			isBlackListed: (ip: string) => isListed(ip, options.blacklist || []),
-			isWhiteListed: (ip: string) => isListed(ip, options.whitelist || ["*"]),
+			blackList: blacklist,
+			isBlackListed: (ip: string) => isListed(ip, blacklist),
+			isWhiteListed: (ip: string) => isListed(ip, whitelist),
 			limiter: new RateLimiterMemory({ duration: options.duration, points: options.points }),
 			runActionAnyway: false,
-			whiteList: options.whitelist || ["*"],
+			whiteList: whitelist,
 		});
 
 		server.ext({

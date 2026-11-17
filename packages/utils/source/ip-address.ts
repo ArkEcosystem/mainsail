@@ -1,5 +1,7 @@
 import ipaddr from "ipaddr.js";
 
+const isIPv4Compatible = (ip: string): boolean => ip.startsWith("::") && !ip.includes(":", 2) && ip.includes(".");
+
 export const isValidAddress = (ip: string): boolean => ipaddr.isValid(cleanAddress(ip));
 
 export const isIPv6Address = (ip: string): boolean => {
@@ -21,3 +23,16 @@ export const normalizeAddress = (ip: string): string => {
 };
 
 export const cleanAddress = (ip: string): string => ip.replace("[", "").replace("]", "");
+
+export const canonicalAddress = (ip: string): string | undefined => {
+	try {
+		return isIPv4Compatible(ip) ? undefined : ipaddr.process(ip).toString();
+	} catch {
+		return undefined;
+	}
+};
+
+// Literal addresses in a whitelist or blacklist are compared as text, so they have to be in the
+// same form as the addresses they are matched against. Glob patterns are left as written.
+export const canonicalPatterns = (patterns: string[]): string[] =>
+	patterns.map((pattern) => canonicalAddress(pattern) ?? pattern);

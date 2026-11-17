@@ -35,6 +35,20 @@ describe<{}>("Whitelist", ({ it, assert }) => {
 		assert.is(response.statusCode, 200);
 	});
 
+	it("should allow a request matching a whitelist entry that is not written in canonical form", async () => {
+		const server = await buildServer({
+			trustProxy: false,
+			whitelist: ["::ffff:1.2.3.4", "2001:0DB8:0000:0000:0000:0000:0000:0001"],
+		});
+
+		const from = async (remoteAddress: string) =>
+			(await server.inject({ method: "GET", remoteAddress, url: "/" })).statusCode;
+
+		assert.is(await from("1.2.3.4"), 200);
+		assert.is(await from("2001:db8::1"), 200);
+		assert.is(await from("2001:db8::2"), 403);
+	});
+
 	it("should forbid a request from an IP not in the whitelist", async () => {
 		const server = await buildServer({ trustProxy: false, whitelist: ["127.0.0.1", "187.166.*"] });
 
@@ -63,6 +77,53 @@ describe<{}>("Whitelist", ({ it, assert }) => {
 		});
 
 		assert.is(response.statusCode, 200);
+	});
+
+	it("should allow an IPv4 whitelist entry for an IPv4-mapped forwarded entry", async () => {
+		const server = await buildServer({ trustProxy: true, whitelist: ["1.2.3.4"] });
+
+		const response = await server.inject({
+			headers: { "x-forwarded-for": "::ffff:1.2.3.4" },
+			method: "GET",
+			remoteAddress: "10.0.0.1",
+			url: "/",
+		});
+
+		assert.is(response.statusCode, 200);
+	});
+
+	it("should not allow an IPv4-compatible IPv6 client that embeds a whitelisted IPv4 address", async () => {
+		const server = await buildServer({ trustProxy: false, whitelist: ["127.0.0.1"] });
+
+		const response = await server.inject({ method: "GET", remoteAddress: "::127.0.0.1", url: "/" });
+
+		assert.is(response.statusCode, 500);
+	});
+
+	it("should match the socket address when the forwarded entry is not an IP address", async () => {
+		const server = await buildServer({ trustProxy: true, whitelist: ["10.0.*"] });
+
+		const response = await server.inject({
+			headers: { "x-forwarded-for": "10.0.not-an-ip" },
+			method: "GET",
+			remoteAddress: "6.6.6.6",
+			url: "/",
+		});
+
+		assert.is(response.statusCode, 403);
+	});
+
+	it("should forbid a client that puts a whitelisted IP in front of the proxy's entry", async () => {
+		const server = await buildServer({ trustProxy: true, whitelist: ["127.0.0.1"] });
+
+		const response = await server.inject({
+			headers: { "x-forwarded-for": "127.0.0.1, 6.6.6.6" },
+			method: "GET",
+			remoteAddress: "10.0.0.1",
+			url: "/",
+		});
+
+		assert.is(response.statusCode, 403);
 	});
 
 	it("should forbid a forwarded IP not in the whitelist when trustProxy is enabled", async () => {

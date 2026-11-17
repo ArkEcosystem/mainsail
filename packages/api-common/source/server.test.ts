@@ -5,8 +5,10 @@ import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { mkdtempSync, writeFileSync } from "fs";
 import { tmpdir } from "os";
+import { connect } from "net";
 import { join } from "path";
 
+import { whitelist } from "./plugins/whitelist";
 import { AbstractServer } from "./server";
 import { DEFAULT_BATCH_RESPONSE_MAX_SIZE, Processor } from "./rcp/index.js";
 
@@ -103,6 +105,76 @@ describe<{
 		assert.startsWith(subject.uri, "http://");
 
 		await subject.dispose();
+	});
+
+	it("onRequest - refuses a request whose connection was reset without logging an error", async ({
+		subject,
+		logger,
+	}) => {
+		const statusCodes: number[] = [];
+		const total = 20;
+
+		await subject.initialize(Enums.Api.ServerType.Http, { host: "127.0.0.1", port: 0 });
+		await subject.registerPlugins([
+			{ options: { trustProxy: false, whitelist: ["*"] }, plugin: whitelist },
+			{
+				plugin: {
+					name: "status-codes",
+					register: (server: any) =>
+						server.ext("onPreResponse", (request: any, h: any) => {
+							statusCodes.push(request.response.output?.statusCode ?? request.response.statusCode);
+							return h.continue;
+						}),
+				},
+			},
+		] as any);
+		await subject.boot();
+
+		const error = spy(logger, "error");
+		const port = Number(new URL(subject.uri).port);
+
+		for (let index = 0; index < total; index++) {
+			const socket = connect(port, "127.0.0.1", () => {
+				socket.write("GET / HTTP/1.1\r\nHost: localhost\r\n\r\n", () => socket.resetAndDestroy());
+			});
+			socket.on("error", () => {});
+		}
+
+		const startedAt = Date.now();
+		while (statusCodes.length < total && Date.now() - startedAt < 2000) {
+			await new Promise((resolve) => setImmediate(resolve));
+		}
+
+		await subject.dispose();
+
+		assert.length(statusCodes, total);
+		assert.true(statusCodes.every((statusCode) => statusCode === 403));
+		error.neverCalled();
+	});
+
+	it("onRequest - refuses a client with an IPv4-compatible IPv6 address without logging an error", async ({
+		subject,
+		logger,
+	}) => {
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+		await subject.registerPlugins([
+			{ options: { trustProxy: false, whitelist: ["127.0.0.1"] }, plugin: whitelist },
+		] as any);
+
+		const error = spy(logger, "error");
+
+		const response = await subject.inject({ method: "GET", remoteAddress: "::127.0.0.1", url: "/" });
+
+		assert.is(response.statusCode, 403);
+		error.neverCalled();
+	});
+
+	it("onRequest - lets a request with a remote address through", async ({ subject }) => {
+		await subject.initialize(Enums.Api.ServerType.Http, {});
+
+		const response = await subject.inject({ method: "GET", remoteAddress: "2001:db8::1", url: "/" });
+
+		assert.is(response.statusCode, 200);
 	});
 
 	it("onPreHandler - sets content-type to application/json without erroring", async ({ subject }) => {

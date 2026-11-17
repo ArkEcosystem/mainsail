@@ -1,18 +1,22 @@
 import type Hapi from "@hapi/hapi";
 
 import Boom from "@hapi/boom";
-import { isWhitelisted } from "@mainsail/utils";
+import { IpAddress, isWhitelisted } from "@mainsail/utils";
 
 export const whitelist = {
 	name: "whitelist",
 	register(server: Hapi.Server, options: { whitelist: string[] }): void {
+		const whitelist = options.whitelist && IpAddress.canonicalPatterns(options.whitelist);
+
 		server.ext({
 			method: async (request: Hapi.Request, h: Hapi.ResponseToolkit) => {
-				if (!options.whitelist) {
+				if (!whitelist) {
 					return h.continue;
 				}
 
-				if (isWhitelisted(options.whitelist, request.info.remoteAddress)) {
+				const ip = IpAddress.canonicalAddress(request.info.remoteAddress);
+
+				if (ip && isWhitelisted(whitelist, ip)) {
 					return h.continue;
 				}
 

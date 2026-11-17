@@ -10,7 +10,6 @@ export const defaults = {
 		},
 		whitelist: Environment.get<undefined>(EnvironmentVariables.MAINSAIL_WEBHOOKS_WHITELIST)?.split(",") ?? [
 			"127.0.0.1",
-			"::ffff:127.0.0.1",
 		],
 	},
 	timeout: Environment.get(EnvironmentVariables.MAINSAIL_WEBHOOKS_TIMEOUT, 1500),

@@ -29,6 +29,11 @@ describe("getPeerIp", ({ it, assert }) => {
 		assert.equal(getPeerIp(wsRequest("2001:0db8:3312:0000:0000:0000:0000:0001")), "2001:db8:3312::1");
 	});
 
+	it("should throw for an ipv4-compatible ipv6 address", () => {
+		assert.throws(() => getPeerIp(wsRequest("::8.8.8.8")));
+		assert.throws(() => getPeerIp(httpRequest("::8.8.8.8")));
+	});
+
 	it("should throw when the address is missing or not an ip", () => {
 		assert.throws(() => getPeerIp(wsRequest(undefined)));
 		assert.throws(() => getPeerIp(httpRequest(undefined)));
