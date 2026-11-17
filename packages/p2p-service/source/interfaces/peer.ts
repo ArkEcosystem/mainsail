@@ -6,6 +6,6 @@ export interface Peer extends Contracts.P2PService.Peer {
 	connection?: Interfaces.Connection;
 	// Kept for the service loop, which dials known peers: when we last dialed, and how many dials there
 	// were since the peer was last active.
-	lastDialAt?: number;
-	dialAttempts?: number;
+	lastDialAt: number;
+	dialAttempts: number;
 }

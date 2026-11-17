@@ -8,8 +8,10 @@ import { constants } from "./constants";
 import { Service } from "./service";
 
 const makePeer = (ip: string, extra: Record<string, unknown> = {}): any => ({
+	dialAttempts: 0,
 	header: {},
 	ip,
+	lastDialAt: 0,
 	port: 4002,
 	version: "0.0.1",
 	...extra,

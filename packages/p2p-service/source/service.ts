@@ -104,8 +104,7 @@ export class Service implements Contracts.P2PService.Service {
 	async #dialKnownPeers(): Promise<void> {
 		const now = Date.now();
 		const due = (this.repository.getKnownPeers() as Peer[]).filter(
-			(peer) =>
-				!this.repository.hasPendingPeer(peer.ip) && now - (peer.lastDialAt ?? 0) >= constants.DIAL_SPACING,
+			(peer) => !this.repository.hasPendingPeer(peer.ip) && now - peer.lastDialAt >= constants.DIAL_SPACING,
 		);
 
 		await Promise.all(due.map((peer) => this.#dial(peer)));
@@ -121,7 +120,7 @@ export class Service implements Contracts.P2PService.Service {
 		}
 
 		peer.lastDialAt = Date.now();
-		peer.dialAttempts = (peer.dialAttempts ?? 0) + 1;
+		peer.dialAttempts += 1;
 
 		try {
 			await this.websocketService.dial(getPeerSocketUrl(peer));
@@ -138,7 +137,7 @@ export class Service implements Contracts.P2PService.Service {
 	// Seeds get no exception, so that a node with enough peers does not keep knocking on them; a node
 	// that is short of peers records them again in #checkMinPeers.
 	#isGivenUp(peer: Peer): boolean {
-		return (peer.dialAttempts ?? 0) >= constants.MAX_DIAL_ATTEMPTS;
+		return peer.dialAttempts >= constants.MAX_DIAL_ATTEMPTS;
 	}
 
 	// Refused by our own address rules or ban list before a socket was opened, or by the peer's during the

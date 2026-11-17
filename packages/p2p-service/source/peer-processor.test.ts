@@ -5,7 +5,7 @@ import { describe } from "@mainsail/test-runner";
 
 import { PeerProcessor } from "./peer-processor";
 
-const makePeer = (ip: string): any => ({ ip, port: 4002, version: "0.0.1" });
+const makePeer = (ip: string): any => ({ dialAttempts: 0, ip, lastDialAt: 0, port: 4002, version: "0.0.1" });
 
 // The hook does not return the verification promise; a macrotask lets the whole flow settle.
 const connect = async (websocketService: any, ip: string): Promise<any> => {

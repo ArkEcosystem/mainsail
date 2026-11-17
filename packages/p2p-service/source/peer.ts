@@ -33,7 +33,9 @@ export class Peer implements PeerInterface {
 
 	public connection?: Interfaces.Connection;
 
-	public lastDialAt?: number;
+	public lastDialAt = 0;
+
+	public dialAttempts = 0;
 
 	#header: Contracts.P2PService.HeaderData | undefined;
 
