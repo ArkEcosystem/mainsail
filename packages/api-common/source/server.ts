@@ -12,7 +12,7 @@ import {
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { DatabaseException } from "@mainsail/exceptions";
-import { ensureError, merge } from "@mainsail/utils";
+import { ensureError, IpAddress, merge } from "@mainsail/utils";
 import { readFileSync } from "fs";
 
 import { DEFAULT_BATCH_RESPONSE_MAX_SIZE, Processor } from "./rcp/index.js";
@@ -60,6 +60,12 @@ export abstract class AbstractServer {
 			.setBatchResponseMaxSize(
 				this.pluginConfiguration().getOptional("rpc.batchResponseMaxSize", DEFAULT_BATCH_RESPONSE_MAX_SIZE),
 			);
+
+		// A client that resets its connection right after sending the request leaves no remote address
+		// behind. Refuse the request before the plugins look the address up.
+		this.server.ext("onRequest", (request, h) =>
+			IpAddress.canonicalAddress(request.info.remoteAddress) === undefined ? Boom.forbidden() : h.continue,
+		);
 
 		this.server.ext("onPreHandler", (request, h) => {
 			request.headers["content-type"] = "application/json";
