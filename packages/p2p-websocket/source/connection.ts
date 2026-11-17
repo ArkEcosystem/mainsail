@@ -25,6 +25,16 @@ import { ConnectionError } from "./errors.js";
 import { Handshake, Heartbeat, RequestTable } from "./handlers/index.js";
 import { decode, encode } from "./message.js";
 
+// ws receiver error codes: WS_ERR_UNSUPPORTED_MESSAGE_LENGTH is a frame over maxPayload, every other
+// WS_ERR_* code (bad opcode, UTF-8, masking, RSV bits) is a malformed frame; anything else is the socket.
+const wsErrorReason = (code: string | undefined): CloseReason => {
+	if (code === "WS_ERR_UNSUPPORTED_MESSAGE_LENGTH") {
+		return CloseReason.PayloadTooLarge;
+	}
+
+	return code?.startsWith("WS_ERR_") ? CloseReason.ProtocolError : CloseReason.SocketError;
+};
+
 // One per socket, created through Identifiers.P2P.WebSocket.Connection.Factory and set up with init().
 @injectable()
 export class Connection implements ConnectionInterface {
@@ -57,6 +67,7 @@ export class Connection implements ConnectionInterface {
 
 		this.#handshake = new Handshake({
 			direction: options.direction,
+			fail: (error) => this.terminate(error.reason, error),
 			open: () => this.#open(),
 			reject: (reason) => this.reject(reason),
 			send: (message) => this.#send(message),
@@ -242,16 +253,16 @@ export class Connection implements ConnectionInterface {
 		}
 	}
 
-	// ws closes the socket itself when a frame exceeds its maxPayload; the peer, not the network, did that.
+	// ws closes the socket itself on a malformed or oversized frame; the peer, not the network, did that.
 	#onError(error: Error & { code?: string }): void {
-		const reason =
-			error.code === "WS_ERR_UNSUPPORTED_MESSAGE_LENGTH" ? CloseReason.PayloadTooLarge : CloseReason.SocketError;
+		const reason = wsErrorReason(error.code);
 
 		this.#handshake.abort(new ConnectionError(reason, error.message, { cause: error }));
 		this.terminate(reason, error);
 	}
 
 	#onClose(): void {
+		this.#heartbeat.stop();
 		this.#handshake.abort(new ConnectionError(CloseReason.RemoteClose, "Socket closed during handshake"));
 
 		if (this.#closeReason === undefined) {

@@ -46,7 +46,7 @@ export class Handshake {
 
 	public onHello(message: HelloMessage): void {
 		if (this.#settled) {
-			this.#fail(new ConnectionError(CloseReason.ProtocolError, "Unexpected hello"));
+			this.#options.fail(new ConnectionError(CloseReason.ProtocolError, "Unexpected hello"));
 			return;
 		}
 
@@ -74,7 +74,12 @@ export class Handshake {
 	}
 
 	public onReject(message: RejectMessage): void {
-		if (this.#settled || this.#options.direction !== Direction.Outbound) {
+		if (this.#settled) {
+			this.#options.fail(new ConnectionError(CloseReason.ProtocolError, "Unexpected reject"));
+			return;
+		}
+
+		if (this.#options.direction !== Direction.Outbound) {
 			this.#fail(new ConnectionError(CloseReason.ProtocolError, "Unexpected reject"));
 			return;
 		}

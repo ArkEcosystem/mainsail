@@ -74,7 +74,14 @@ export class Listener {
 		this.#wss.on("connection", (ws, request) => {
 			ws.on("error", () => {});
 
-			const remoteAddress = IpAddress.sanitizeRemoteAddress(request.socket.remoteAddress ?? "") ?? "";
+			// A socket that went away before this fires has no address; nothing to key a connection on.
+			const remoteAddress = IpAddress.sanitizeRemoteAddress(request.socket.remoteAddress ?? "");
+			if (!remoteAddress) {
+				this.logger.debug("Dropped an inbound socket without a remote address", "p2p");
+				ws.terminate();
+				return;
+			}
+
 			const connection = this.createConnection(ws, { direction: Direction.Inbound, remoteAddress });
 			connection.onRequest = (path, payload) => this.router.handle(connection, path, payload);
 
