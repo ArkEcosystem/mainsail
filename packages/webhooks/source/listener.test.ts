@@ -309,6 +309,44 @@ describe<{
 		spyOnPost.neverCalled();
 	});
 
+	it("should broadcast if a not-between condition is satisfied", async ({ database, listener }) => {
+		const spyOnPost = stub(http, "post").resolvedValue({
+			statusCode: 200,
+		});
+
+		webhook.conditions = [
+			{
+				condition: "not-between",
+				key: "test",
+				value: { max: 3, min: 1 },
+			},
+		];
+		database.create(webhook);
+
+		await listener.handle({ data: { test: 5 }, name: "event" });
+		await settle();
+
+		spyOnPost.calledOnce();
+	});
+
+	it("should not broadcast if the condition name is not an own condition", async ({ database, listener }) => {
+		const spyOnPost = stub(http, "post");
+
+		webhook.conditions = [
+			{
+				condition: "constructor",
+				key: "test",
+				value: 1,
+			},
+		];
+		database.create(webhook);
+
+		await listener.handle({ data: { test: 1 }, name: "event" });
+		await settle();
+
+		spyOnPost.neverCalled();
+	});
+
 	it("should not broadcast if webhook condition throws error", async ({ database, listener }) => {
 		const spyOnEq = stub(conditions, "eq").callsFake(() => {
 			throw new Error("dummy error");
