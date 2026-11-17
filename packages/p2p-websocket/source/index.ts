@@ -1,3 +1,4 @@
+export * from "./address-family-verifier.js";
 export * from "./ban-list.js";
 export * from "./connection.js";
 export * from "./constants.js";

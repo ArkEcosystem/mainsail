@@ -7,6 +7,7 @@ import Joi from "joi";
 
 import type { ConnectionFactory, ConnectionOptions } from "./interfaces/index.js";
 
+import { AddressFamilyVerifier } from "./address-family-verifier.js";
 import { BanList } from "./ban-list.js";
 import { ConnectionRepository } from "./connection-repository.js";
 import { Connection } from "./connection.js";
@@ -27,7 +28,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.WebSocket.BanList).to(BanList).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Connection.Repository).to(ConnectionRepository).inSingletonScope();
 
-		// Verifiers run in this order at accept time: the cheapest, most definitive check first.
+		// Verifiers run in this order at accept time: the cheapest, most definitive check first. The ban list
+		// and the repository are bound under their own identifiers because others use them too.
+		this.app.bind(Identifiers.P2P.WebSocket.Connection.Verifiers).to(AddressFamilyVerifier).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Connection.Verifiers).toService(Identifiers.P2P.WebSocket.BanList);
 		this.app
 			.bind(Identifiers.P2P.WebSocket.Connection.Verifiers)
