@@ -56,6 +56,7 @@ export class Connection implements ConnectionInterface {
 	#remoteAddress!: string;
 
 	#state = ConnectionState.Handshaking;
+	#requestsInFlight = 0;
 	#closeReason?: CloseReason;
 	#closeError?: Error;
 	#closed?: Promise<void>;
@@ -225,11 +226,23 @@ export class Connection implements ConnectionInterface {
 	}
 
 	// Frames that arrive before the handshake is done are a protocol violation, not an early request.
+	// Frames that arrive before the handshake is done, or faster than they are answered, are a protocol
+	// violation, not a backlog to work through.
 	async #onRequest(message: RequestMessage): Promise<void> {
 		if (this.#state !== ConnectionState.Open) {
 			this.terminate(CloseReason.ProtocolError, new Error("Request before handshake"));
 			return;
 		}
+
+		if (this.#requestsInFlight >= constants.MAX_REQUESTS_IN_FLIGHT) {
+			this.terminate(
+				CloseReason.ProtocolError,
+				new Error(`More than ${constants.MAX_REQUESTS_IN_FLIGHT} requests in flight`),
+			);
+			return;
+		}
+
+		this.#requestsInFlight++;
 
 		let response: Response;
 		try {
@@ -240,6 +253,8 @@ export class Connection implements ConnectionInterface {
 			const error = ensureError(rawError);
 			this.logger.debug(`Request ${message.path} from ${this.#remoteAddress} failed: ${error.message}`, "p2p");
 			response = { payload: Buffer.alloc(0), statusCode: 500 };
+		} finally {
+			this.#requestsInFlight--;
 		}
 
 		this.#send({ id: message.id, payload: response.payload, statusCode: response.statusCode, type: "response" });
