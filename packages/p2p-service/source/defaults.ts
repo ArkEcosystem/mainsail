@@ -7,7 +7,6 @@ import { Environment } from "@mainsail/kernel";
 // address lives in the @mainsail/p2p-websocket configuration.
 export const defaults = {
 	blacklist: [],
-	disableDiscovery: false,
 	getBlocksTimeout: 30_000,
 	ignoreMinimumNetworkReach: false,
 	maxPeersBroadcast: Environment.get(EnvironmentVariables.MAINSAIL_P2P_MAX_PEERS_BROADCAST, 4),

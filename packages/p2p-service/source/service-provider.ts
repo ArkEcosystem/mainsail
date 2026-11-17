@@ -125,7 +125,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
 			blacklist: Joi.array().items(Joi.string()).required(),
-			disableDiscovery: Joi.bool().required(),
 			getBlocksTimeout: Joi.number().integer().min(0).required(),
 			ignoreMinimumNetworkReach: Joi.bool().required(),
 			maxPeersBroadcast: Joi.number().integer().min(0).required(),
