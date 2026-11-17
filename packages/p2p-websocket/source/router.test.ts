@@ -39,8 +39,12 @@ describe<{
 		assert.equal(response.payload.toString(), "echo:hi");
 	});
 
-	it("should answer 404 for an unknown path", async ({ router }) => {
+	it("should answer 404 for an unknown path and drop the connection", async ({ router }) => {
+		let terminated: string | undefined;
+		connection.terminate = (reason: string) => (terminated = reason);
+
 		assert.equal((await router.handle(connection, "nope", Buffer.alloc(0))).statusCode, 404);
+		assert.equal(terminated, CloseReason.ProtocolError);
 	});
 
 	it("should answer 413 for a request over the route's limit, without decoding it, and drop the connection", async ({

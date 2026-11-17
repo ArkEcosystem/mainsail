@@ -23,7 +23,8 @@ export const constants = {
 	MAX_PATH_LENGTH: 100,
 	// Largest frame accepted on an inbound socket.
 	MAX_PAYLOAD: 3 * Units.MEGABYTE,
-	// Version of the frame format in message.ts; bump it whenever the format changes.
+	// Version of the wire protocol: the frame format in message.ts and the set of route paths. Bump it
+	// whenever either changes; a request for an unknown path ends the connection.
 	PROTOCOL_VERSION: 1,
 	// Time a request waits for its response before failing.
 	REQUEST_TIMEOUT: 10_000,

@@ -36,29 +36,27 @@ export class Router {
 	}
 
 	public async handle(connection: Connection, path: string, payload: Buffer): Promise<Response> {
-		const route = this.#byPath.get(path);
-		if (!route) {
-			this.logger.debug(`Unknown route ${path} requested by ${connection.remoteAddress}`, "p2p");
-			return { payload: Buffer.alloc(0), statusCode: 404 };
-		}
-
-		// Checked before the middleware so an oversized request is never decoded or handled. The peer knew
-		// the limit, so the connection goes too; the owner sees the reason on close.
-		if (payload.length > route.maxPayload.request) {
-			this.logger.debug(
-				`${path} from ${connection.remoteAddress} rejected: ${payload.length} bytes exceed ${route.maxPayload.request}`,
-				"p2p",
-			);
-			connection.terminate(
-				CloseReason.PayloadTooLarge,
-				new Error(`${path} request of ${payload.length} bytes exceeds ${route.maxPayload.request}`),
-			);
-			return { payload: Buffer.alloc(0), statusCode: 413 };
-		}
-
-		const context: ReceiveContext = { connection, request: { payload }, response: {}, route };
-
 		try {
+			// The paths are part of the protocol both sides share (see PROTOCOL_VERSION), so a request for a
+			// path we do not have comes from something that is not a peer of ours.
+			const route = this.#byPath.get(path);
+			if (!route) {
+				throw new RequestError(404, `Unknown route ${path}`, { closeReason: CloseReason.ProtocolError });
+			}
+
+			// Checked before the middleware so an oversized request is never decoded or handled.
+			if (payload.length > route.maxPayload.request) {
+				throw new RequestError(
+					413,
+					`${path} request of ${payload.length} bytes exceeds ${route.maxPayload.request}`,
+					{
+						closeReason: CloseReason.PayloadTooLarge,
+					},
+				);
+			}
+
+			const context: ReceiveContext = { connection, request: { payload }, response: {}, route };
+
 			for (const step of this.middleware) {
 				await step.before?.(context);
 			}
@@ -72,6 +70,8 @@ export class Router {
 			if (!context.response.payload) {
 				throw new Error(`No middleware encoded the ${path} response; is the codec middleware registered?`);
 			}
+
+			return { payload: context.response.payload, statusCode: 200 };
 		} catch (rawError) {
 			const error = ensureError(rawError);
 			const statusCode = error instanceof RequestError ? error.statusCode : 500;
@@ -79,9 +79,13 @@ export class Router {
 				`${path} from ${connection.remoteAddress} failed (${statusCode}): ${error.message}`,
 				"p2p",
 			);
+
+			// The peer knew the rules it broke; the owner sees the reason on close.
+			if (error instanceof RequestError && error.closeReason) {
+				connection.terminate(error.closeReason, error);
+			}
+
 			return { payload: Buffer.alloc(0), statusCode };
 		}
-
-		return { payload: context.response.payload, statusCode: 200 };
 	}
 }
