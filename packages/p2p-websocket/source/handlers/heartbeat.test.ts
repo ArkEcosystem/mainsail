@@ -134,15 +134,39 @@ describe<{
 		assert.equal(acceptor.failures, [`${CloseReason.HeartbeatTimeout}: Peer stopped sending heartbeats`]);
 	});
 
-	it("acceptor - should fail when the pings come too close together", ({ acceptor, fakeTimers }) => {
+	it("acceptor - should accept pings bunched up by a retransmit but fail a flood", ({ acceptor, fakeTimers }) => {
 		acceptor.heartbeat.start();
 
+		// Two pings back to back, as after a retransmit: fine.
 		fakeTimers.tick(constants.HEARTBEAT_INTERVAL);
 		acceptor.heartbeat.onPing();
-		fakeTimers.tick(constants.HEARTBEAT_MIN_SPACING - 1);
 		acceptor.heartbeat.onPing();
+		assert.equal(acceptor.failures, []);
 
-		assert.equal(acceptor.failures, [`${CloseReason.ProtocolError}: Pings too close together`]);
+		// One more than the window allows: a flood.
+		for (let index = 2; index < constants.HEARTBEAT_MAX_PINGS; index++) {
+			fakeTimers.tick(100);
+			acceptor.heartbeat.onPing();
+		}
+		assert.equal(acceptor.failures, []);
+
+		fakeTimers.tick(100);
+		acceptor.heartbeat.onPing();
+		assert.equal(acceptor.failures, [`${CloseReason.ProtocolError}: Too many pings`]);
+	});
+
+	it("acceptor - should forget pings older than the timeout window", ({ acceptor, fakeTimers }) => {
+		acceptor.heartbeat.start();
+
+		for (let index = 0; index < constants.HEARTBEAT_MAX_PINGS; index++) {
+			fakeTimers.tick(constants.HEARTBEAT_INTERVAL);
+			acceptor.heartbeat.onPing();
+		}
+
+		// Only the pings of the last window count, so a dialer on the beat never trips the limit.
+		fakeTimers.tick(constants.HEARTBEAT_INTERVAL);
+		acceptor.heartbeat.onPing();
+		assert.equal(acceptor.failures, []);
 	});
 
 	it("acceptor - should fail on a pong", ({ acceptor }) => {

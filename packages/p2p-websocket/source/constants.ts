@@ -12,10 +12,12 @@ export const constants = {
 	DIAL_RETRY_MIN_DELAY: 200,
 	// Time allowed for the hello exchange after the socket is open.
 	HANDSHAKE_TIMEOUT: 5000,
-	// The dialer pings an open connection this often and expects the pong before the next ping. The
-	// acceptor expects a ping at most HEARTBEAT_TIMEOUT apart and at least HEARTBEAT_MIN_SPACING apart.
+	// The dialer pings an open connection this often and fails once a ping waited HEARTBEAT_TIMEOUT for
+	// its pong. The acceptor expects a ping at least every HEARTBEAT_TIMEOUT, and no more than
+	// HEARTBEAT_MAX_PINGS within one HEARTBEAT_TIMEOUT: twice what a dialer on the beat sends, so pings
+	// bunched up by a retransmit pass while a flood does not.
 	HEARTBEAT_INTERVAL: 10_000,
-	HEARTBEAT_MIN_SPACING: 5000,
+	HEARTBEAT_MAX_PINGS: 4,
 	HEARTBEAT_TIMEOUT: 20_000,
 	// Longest request path on the wire, in bytes.
 	MAX_PATH_LENGTH: 100,

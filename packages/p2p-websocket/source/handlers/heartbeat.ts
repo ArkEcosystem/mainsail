@@ -13,16 +13,16 @@ export type HeartbeatOptions = {
 // has waited HEARTBEAT_TIMEOUT for its pong. Pings keep their cadence while one is outstanding, so a
 // stall of the event loop (the pong already received but not yet read when the timer fires) neither
 // kills the connection nor starves the acceptor. The acceptor answers through the socket library and
-// expects the pings to keep coming, neither too late (HEARTBEAT_TIMEOUT) nor too close together
-// (HEARTBEAT_MIN_SPACING). A ping on the dialer's side or a pong on the acceptor's side, or a pong
-// nobody asked for, is a protocol error.
+// expects the pings to keep coming, neither too late (HEARTBEAT_TIMEOUT) nor too many within that
+// time (HEARTBEAT_MAX_PINGS; two arriving together after a retransmit is fine, a flood is not). A ping
+// on the dialer's side or a pong on the acceptor's side, or a pong nobody asked for, is a protocol error.
 export class Heartbeat {
 	readonly #options: HeartbeatOptions;
 
 	#timer?: NodeJS.Timeout;
-	// Dialer: when each unanswered ping was sent, oldest first. Acceptor: when the last ping arrived.
-	readonly #unansweredPings: number[] = [];
-	#lastPingAt?: number;
+	// Dialer: when each unanswered ping was sent. Acceptor: when the pings of the last timeout window
+	// arrived. Both oldest first.
+	readonly #pings: number[] = [];
 	#stopped = false;
 
 	public constructor(options: HeartbeatOptions) {
@@ -55,12 +55,16 @@ export class Heartbeat {
 		}
 
 		const now = Date.now();
-		if (this.#lastPingAt !== undefined && now - this.#lastPingAt < constants.HEARTBEAT_MIN_SPACING) {
-			this.#fail(CloseReason.ProtocolError, "Pings too close together");
+		while (this.#pings.length > 0 && now - this.#pings[0] >= constants.HEARTBEAT_TIMEOUT) {
+			this.#pings.shift();
+		}
+
+		this.#pings.push(now);
+		if (this.#pings.length > constants.HEARTBEAT_MAX_PINGS) {
+			this.#fail(CloseReason.ProtocolError, "Too many pings");
 			return;
 		}
 
-		this.#lastPingAt = now;
 		this.#expectPing();
 	}
 
@@ -69,24 +73,24 @@ export class Heartbeat {
 			return;
 		}
 
-		if (this.#options.direction === Direction.Inbound || this.#unansweredPings.length === 0) {
+		if (this.#options.direction === Direction.Inbound || this.#pings.length === 0) {
 			this.#fail(CloseReason.ProtocolError, "Unexpected pong");
 			return;
 		}
 
-		this.#unansweredPings.shift();
+		this.#pings.shift();
 	}
 
 	// Dialer: fail once the oldest ping has waited too long, otherwise keep pinging on the beat.
 	#ping(): void {
 		const now = Date.now();
 
-		if (this.#unansweredPings.length > 0 && now - this.#unansweredPings[0] >= constants.HEARTBEAT_TIMEOUT) {
+		if (this.#pings.length > 0 && now - this.#pings[0] >= constants.HEARTBEAT_TIMEOUT) {
 			this.#fail(CloseReason.HeartbeatTimeout, "Peer did not answer the heartbeat");
 			return;
 		}
 
-		this.#unansweredPings.push(now);
+		this.#pings.push(now);
 		this.#options.ping();
 	}
 
