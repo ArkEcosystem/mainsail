@@ -2,6 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Enums } from "@mainsail/constants";
 import { injectable } from "@mainsail/container";
+import { IpAddress } from "@mainsail/utils";
 import { Dayjs } from "dayjs";
 
 @injectable()
@@ -21,6 +22,6 @@ export class Peer implements Contracts.TransactionPool.Peer {
 	}
 
 	public get url(): string {
-		return `${this.protocol === Enums.Api.Protocol.Https ? "https" : "http"}://${this.ip}:${this.port}`;
+		return `${this.protocol === Enums.Api.Protocol.Https ? "https" : "http"}://${IpAddress.normalizeAddress(this.ip)}:${this.port}`;
 	}
 }

@@ -201,6 +201,62 @@ describe<{
 		assert.is(response.statusCode, 429);
 	});
 
+	it("should count IPv6 clients of the same /64 against one limit", async () => {
+		const server = await makeServer({
+			blacklist: [],
+			duration: 60,
+			enabled: true,
+			points: 2,
+			trustProxy: false,
+			whitelist: [],
+		});
+
+		const from = async (remoteAddress: string) =>
+			(await server.inject({ method: "GET", remoteAddress, url: "/" })).statusCode;
+
+		assert.is(await from("2001:db8:1:2::1"), 200);
+		assert.is(await from("2001:db8:1:2::2"), 200);
+		assert.is(await from("2001:db8:1:2:ffff::3"), 429);
+		assert.is(await from("2001:db8:1:3::1"), 200);
+	});
+
+	it("should count IPv4 clients per address", async () => {
+		const server = await makeServer({
+			blacklist: [],
+			duration: 60,
+			enabled: true,
+			points: 1,
+			trustProxy: false,
+			whitelist: [],
+		});
+
+		const from = async (remoteAddress: string) =>
+			(await server.inject({ method: "GET", remoteAddress, url: "/" })).statusCode;
+
+		assert.is(await from("1.2.3.4"), 200);
+		assert.is(await from("1.2.3.5"), 200);
+		assert.is(await from("1.2.3.4"), 429);
+	});
+
+	it("should match the whitelist against the client address and not its /64", async () => {
+		const server = await makeServer({
+			blacklist: [],
+			duration: 60,
+			enabled: true,
+			points: 1,
+			trustProxy: false,
+			whitelist: ["2001:db8:1:2::1"],
+		});
+
+		const from = async (remoteAddress: string) =>
+			(await server.inject({ method: "GET", remoteAddress, url: "/" })).statusCode;
+
+		assert.is(await from("2001:db8:1:2::1"), 200);
+		assert.is(await from("2001:db8:1:2::1"), 200);
+		assert.is(await from("2001:db8:1:2::2"), 200);
+		assert.is(await from("2001:db8:1:2::2"), 429);
+	});
+
 	it("should match list entries that are not written in canonical form", async () => {
 		const server = await makeServer({
 			blacklist: ["::ffff:1.2.3.4"],

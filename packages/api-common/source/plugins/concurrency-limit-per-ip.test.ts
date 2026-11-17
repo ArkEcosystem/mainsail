@@ -153,6 +153,42 @@ describe("concurrencyLimitPerIp", ({ it, assert, spy }) => {
 		}
 	});
 
+	it("should count ipv6 clients of the same /64 together", async () => {
+		const { releaseAll, server, waitForPending } = await makeServer({ limit: 1 });
+
+		const first = server.inject(from("2001:db8:1:2::1"));
+		await waitForPending(1);
+
+		assert.is((await server.inject(from("2001:db8:1:2::2", "/"))).statusCode, 429);
+		assert.is((await server.inject(from("2001:db8:1:3::1", "/"))).statusCode, 200);
+
+		releaseAll();
+		assert.is((await first).statusCode, 200);
+
+		assert.is((await server.inject(from("2001:db8:1:2::2", "/"))).statusCode, 200);
+	});
+
+	it("should match the whitelist against the ip and not its /64", async () => {
+		const { releaseAll, server, waitForPending } = await makeServer({
+			limit: 1,
+			whitelist: ["2001:db8:1:2::1"],
+		});
+
+		const held = [server.inject(from("2001:db8:1:2::1")), server.inject(from("2001:db8:1:2::1"))];
+		await waitForPending(2);
+
+		held.push(server.inject(from("2001:db8:1:2::2")));
+		await waitForPending(3);
+
+		assert.is((await server.inject(from("2001:db8:1:2::1", "/"))).statusCode, 200);
+		assert.is((await server.inject(from("2001:db8:1:2::2", "/"))).statusCode, 429);
+
+		releaseAll();
+		for (const response of await Promise.all(held)) {
+			assert.is(response.statusCode, 200);
+		}
+	});
+
 	it("should ignore forwarded ips without trusting the proxy", async () => {
 		const { releaseAll, server, waitForPending } = await makeServer({ limit: 1 });
 

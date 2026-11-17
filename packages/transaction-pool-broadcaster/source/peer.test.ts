@@ -32,6 +32,13 @@ describe<{
 		assert.equal(peer.url, `http://${ip}:${port}`);
 	});
 
+	it("#url - should wrap an ipv6 address in brackets", ({ peer }) => {
+		peer.init("2001:db8::1", port);
+
+		assert.equal(peer.url, `http://[2001:db8::1]:${port}`);
+		assert.equal(new URL(peer.url).hostname, "[2001:db8::1]");
+	});
+
 	it("#url - should return https url when protocol is https", ({ peer }) => {
 		peer.protocol = Enums.Api.Protocol.Https;
 
