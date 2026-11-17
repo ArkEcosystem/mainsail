@@ -14,6 +14,7 @@ export const PostMessage: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.postMessage,
 	maxConcurrentRequests: 8,
 	maxPayload: { request: Units.KILOBYTE, response: Units.KILOBYTE },
+	maxQueuedRequests: 8,
 	path: "postMessage",
 };
 
@@ -36,6 +37,7 @@ export class PostMessageRoute implements Interfaces.Route<Request, Response> {
 	public readonly codec = PostMessage.codec;
 	public readonly maxPayload = PostMessage.maxPayload;
 	public readonly maxConcurrentRequests = PostMessage.maxConcurrentRequests;
+	public readonly maxQueuedRequests = PostMessage.maxQueuedRequests;
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
 		try {

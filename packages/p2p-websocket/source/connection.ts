@@ -15,6 +15,7 @@ import type {
 	RequestMessage,
 	Response,
 	RouteDefinition,
+	RouteLookup,
 	RouteSender,
 	SendOptions,
 } from "./interfaces/index.js";
@@ -22,7 +23,7 @@ import type {
 import { constants } from "./constants.js";
 import { CloseReason, ConnectionState } from "./enums.js";
 import { ConnectionError } from "./errors.js";
-import { Handshake, Heartbeat, RequestTable } from "./handlers/index.js";
+import { Handshake, Heartbeat, RequestQueue, RequestTable } from "./handlers/index.js";
 import { decode, encode } from "./message.js";
 
 // ws receiver error codes: WS_ERR_UNSUPPORTED_MESSAGE_LENGTH is a frame over maxPayload, every other
@@ -44,10 +45,14 @@ export class Connection implements ConnectionInterface {
 	@inject(Identifiers.P2P.WebSocket.Sender)
 	private readonly sender!: RouteSender;
 
+	@inject(Identifiers.P2P.WebSocket.Router)
+	private readonly router!: RouteLookup;
+
 	public onRequest?: RequestHandler;
 
 	readonly #closeListeners: ((reason: CloseReason, error?: Error) => void)[] = [];
 	readonly #requestTable = new RequestTable();
+	readonly #requestQueue = new RequestQueue((path) => this.router.get(path));
 
 	#ws!: WebSocket;
 	#handshake!: Handshake;
@@ -148,24 +153,31 @@ export class Connection implements ConnectionInterface {
 		return this.sender.send(this, route, data, options);
 	}
 
-	// Raw request: sends a frame and resolves with the peer's response, or rejects on timeout or close.
-	// A peer that lets a request time out is treated as gone: the connection is torn down, so every
-	// failure of a connection ends in its close and the owner needs only the close to react.
+	// Raw request: waits for a slot within the peer's limits, sends a frame and resolves with the peer's
+	// response, or rejects on timeout or close. A peer that lets a request time out is treated as gone:
+	// the connection is torn down, so every failure of a connection ends in its close and the owner
+	// needs only the close to react.
 	public async request(path: string, payload: Buffer, options: SendOptions = {}): Promise<Response> {
 		if (this.#state !== ConnectionState.Open) {
 			throw new ConnectionError(CloseReason.NotOpen, `Connection is ${this.#state}`);
 		}
 
-		const { id, response } = this.#requestTable.open(options.timeout);
-		this.#send({ id, path, payload, type: "request" });
+		await this.#requestQueue.acquire(path);
 
-		void response.then(undefined, (error: unknown) => {
+		try {
+			const { id, response } = this.#requestTable.open(options.timeout);
+			this.#send({ id, path, payload, type: "request" });
+
+			return await response;
+		} catch (error) {
 			if (error instanceof ConnectionError && error.reason === CloseReason.RequestTimeout) {
 				this.terminate(CloseReason.RequestTimeout, error);
 			}
-		});
 
-		return response;
+			throw error;
+		} finally {
+			this.#requestQueue.release(path);
+		}
 	}
 
 	// Tells the peer why it is being refused, then terminates once the frame has been flushed.
@@ -284,9 +296,9 @@ export class Connection implements ConnectionInterface {
 			this.#closeReason = CloseReason.RemoteClose;
 		}
 
-		this.#requestTable.abort(
-			new ConnectionError(this.#closeReason, "Connection closed", { cause: this.#closeError }),
-		);
+		const closed = new ConnectionError(this.#closeReason, "Connection closed", { cause: this.#closeError });
+		this.#requestQueue.abort(closed);
+		this.#requestTable.abort(closed);
 
 		this.#state = ConnectionState.Closed;
 		this.logger.debug(
@@ -307,7 +319,9 @@ export class Connection implements ConnectionInterface {
 
 		// A close that starts during the handshake must fail open(), so the owner never sees the connection.
 		this.#handshake.abort(new ConnectionError(reason, "Connection closed during handshake", { cause: error }));
-		this.#requestTable.abort(new ConnectionError(reason, "Connection closed", { cause: error }));
+		const closed = new ConnectionError(reason, "Connection closed", { cause: error });
+		this.#requestQueue.abort(closed);
+		this.#requestTable.abort(closed);
 	}
 
 	// `once` rejects with the socket error if the connection attempt fails.

@@ -30,6 +30,7 @@ describe<{
 			handle: async (_, data: string) => `echo:${data}`,
 			maxConcurrentRequests: 2,
 			maxPayload: { request: 8, response: 64 },
+			maxQueuedRequests: 1,
 			path: "echo",
 		} as Route<unknown, unknown>);
 	});
@@ -67,6 +68,11 @@ describe<{
 		assert.equal(terminated, CloseReason.PayloadTooLarge);
 	});
 
+	it("should look a route up by its path", ({ router }) => {
+		assert.equal(router.get("echo")?.path, "echo");
+		assert.undefined(router.get("nope"));
+	});
+
 	it("should refuse a duplicate path", ({ router }) => {
 		assert.throws(
 			() =>
@@ -93,6 +99,7 @@ describe<{
 			},
 			maxConcurrentRequests: 1,
 			maxPayload: { request: 8, response: 64 },
+			maxQueuedRequests: 0,
 			path: "slow",
 		} as Route<unknown, unknown>);
 

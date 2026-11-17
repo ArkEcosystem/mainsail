@@ -26,6 +26,7 @@ export enum CloseReason {
 	PayloadTooLarge = "payloadTooLarge",
 	SocketError = "socketError",
 	RequestTimeout = "requestTimeout",
+	RequestQueueFull = "requestQueueFull",
 	NotOpen = "notOpen",
 	Rejected = "rejected",
 	Banned = "banned",

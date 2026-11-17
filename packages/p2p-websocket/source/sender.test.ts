@@ -20,6 +20,7 @@ const route: RouteDefinition<string, string> = {
 	},
 	maxConcurrentRequests: 2,
 	maxPayload: { request: 64, response: 8 },
+	maxQueuedRequests: 1,
 	path: "echo",
 };
 

@@ -14,6 +14,7 @@ export const GetPeers: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.getPeers,
 	maxConcurrentRequests: 2,
 	maxPayload: { request: Units.KILOBYTE, response: 64 * Units.KILOBYTE },
+	maxQueuedRequests: 1,
 	path: "getPeers",
 };
 
@@ -26,6 +27,7 @@ export class GetPeersRoute implements Interfaces.Route<Request, Response> {
 	public readonly codec = GetPeers.codec;
 	public readonly maxPayload = GetPeers.maxPayload;
 	public readonly maxConcurrentRequests = GetPeers.maxConcurrentRequests;
+	public readonly maxQueuedRequests = GetPeers.maxQueuedRequests;
 
 	public async handle(connection: Interfaces.Connection): Promise<Response> {
 		return {

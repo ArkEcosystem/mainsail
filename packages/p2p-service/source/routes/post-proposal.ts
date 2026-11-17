@@ -15,6 +15,7 @@ export const PostProposal: Interfaces.RouteDefinition<Request, Response> = {
 	// One proposal per round; a second one in flight covers the round changing while the peer is slow.
 	maxConcurrentRequests: 2,
 	maxPayload: { request: 3 * Units.MEGABYTE, response: Units.KILOBYTE },
+	maxQueuedRequests: 2,
 	path: "postProposal",
 };
 
@@ -37,6 +38,7 @@ export class PostProposalRoute implements Interfaces.Route<Request, Response> {
 	public readonly codec = PostProposal.codec;
 	public readonly maxPayload = PostProposal.maxPayload;
 	public readonly maxConcurrentRequests = PostProposal.maxConcurrentRequests;
+	public readonly maxQueuedRequests = PostProposal.maxQueuedRequests;
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
 		try {

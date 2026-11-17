@@ -16,3 +16,8 @@ export interface RouteSender {
 		options?: SendOptions,
 	): Promise<TResponse>;
 }
+
+// What a connection needs from the router: the route of a path, for its limits.
+export interface RouteLookup {
+	get(path: string): Route<unknown, unknown> | undefined;
+}

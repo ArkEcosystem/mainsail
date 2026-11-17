@@ -12,6 +12,7 @@ export const GetProposal: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.getProposal,
 	maxConcurrentRequests: 2,
 	maxPayload: { request: Units.KILOBYTE, response: 3 * Units.MEGABYTE },
+	maxQueuedRequests: 1,
 	path: "getProposal",
 };
 
@@ -27,6 +28,7 @@ export class GetProposalRoute implements Interfaces.Route<Request, Response> {
 	public readonly codec = GetProposal.codec;
 	public readonly maxPayload = GetProposal.maxPayload;
 	public readonly maxConcurrentRequests = GetProposal.maxConcurrentRequests;
+	public readonly maxQueuedRequests = GetProposal.maxQueuedRequests;
 
 	public async handle(_: Interfaces.Connection, data: Request): Promise<Response> {
 		const empty = { proposal: Buffer.alloc(0) };

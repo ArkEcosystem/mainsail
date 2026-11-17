@@ -23,11 +23,18 @@ export interface RouteDefinition<TRequest, TResponse> {
 	readonly path: string;
 	readonly codec: Codec<TRequest, TResponse>;
 	readonly maxPayload: PayloadLimits;
-	// Requests for this route one peer may have in progress at once; more are answered 429.
+	// Requests for this route one peer may have in progress at once; more are a violation. We hold
+	// ourselves to the same number: further requests of ours wait, up to `maxQueuedRequests`.
 	readonly maxConcurrentRequests: number;
+	readonly maxQueuedRequests: number;
 }
 
 export interface SendOptions {
 	// How long to wait for the response, in milliseconds; the transport's REQUEST_TIMEOUT when omitted.
 	readonly timeout?: number;
+}
+
+export interface RequestLimits {
+	readonly maxConcurrentRequests: number;
+	readonly maxQueuedRequests: number;
 }

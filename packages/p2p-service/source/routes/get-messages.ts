@@ -12,6 +12,7 @@ export const GetMessages: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.getMessages,
 	maxConcurrentRequests: 2,
 	maxPayload: { request: Units.KILOBYTE, response: 256 * Units.KILOBYTE },
+	maxQueuedRequests: 1,
 	path: "getMessages",
 };
 
@@ -27,6 +28,7 @@ export class GetMessagesRoute implements Interfaces.Route<Request, Response> {
 	public readonly codec = GetMessages.codec;
 	public readonly maxPayload = GetMessages.maxPayload;
 	public readonly maxConcurrentRequests = GetMessages.maxConcurrentRequests;
+	public readonly maxQueuedRequests = GetMessages.maxQueuedRequests;
 
 	public async handle(_: Interfaces.Connection, data: Request): Promise<Response> {
 		const { query } = data;

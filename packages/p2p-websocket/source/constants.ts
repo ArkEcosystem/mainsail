@@ -24,7 +24,9 @@ export const constants = {
 	// Largest frame accepted on an inbound socket.
 	MAX_PAYLOAD: 3 * Units.MEGABYTE,
 	// Requests from one peer that may be in progress at once. Well above what an honest peer sends:
-	// consensus posts a few per round and the downloaders request one batch at a time.
+	// consensus posts a few per round and the downloaders request one batch at a time. The same limit
+	// applies to what we send; beyond it our own requests wait, up to MAX_QUEUED_REQUESTS of them.
+	MAX_QUEUED_REQUESTS: 64,
 	MAX_REQUESTS_IN_FLIGHT: 32,
 	// Version of the wire protocol: the frame format in message.ts and the set of route paths. Bump it
 	// whenever either changes; a request for an unknown path ends the connection.

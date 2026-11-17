@@ -35,6 +35,12 @@ export class Router {
 		return [...this.#byPath.keys()];
 	}
 
+	// The routes are the shared protocol: what we serve is also what we send, so the sending side reads
+	// a route's limits here.
+	public get(path: string): Route<unknown, unknown> | undefined {
+		return this.#byPath.get(path);
+	}
+
 	public async handle(connection: Connection, path: string, payload: Buffer): Promise<Response> {
 		try {
 			// The paths are part of the protocol both sides share (see PROTOCOL_VERSION), so a request for a
