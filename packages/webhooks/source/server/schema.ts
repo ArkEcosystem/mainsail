@@ -27,7 +27,7 @@ export const store: object = {
 			.items(
 				Joi.object({
 					condition: Joi.string()
-						.allow(...conditions)
+						.valid(...conditions)
 						.required(),
 					key: Joi.string().required(),
 					value: Joi.any(),
@@ -49,7 +49,7 @@ export const update: object = {
 			.items(
 				Joi.object({
 					condition: Joi.string()
-						.allow(...conditions)
+						.valid(...conditions)
 						.required(),
 					key: Joi.string().required(),
 					value: Joi.any(),

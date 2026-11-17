@@ -95,6 +95,10 @@ export class Listener implements Contracts.Kernel.EventListener<{ name: string; 
 				}
 
 				for (const condition of webhook.conditions) {
+					if (!Object.hasOwn(conditions, condition.condition)) {
+						return false;
+					}
+
 					try {
 						const satisfies = conditions[condition.condition];
 
