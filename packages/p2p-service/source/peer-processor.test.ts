@@ -141,6 +141,24 @@ describe<{
 		assert.equal(known.connection, connection);
 	});
 
+	it("#onConnection - should clear the dial attempts only when the peer becomes active", async ({
+		websocketService,
+		repository,
+		peerVerifier,
+	}) => {
+		const known = { ...makePeer("178.165.55.55"), dialAttempts: 3 };
+		repository.hasKnownPeer = () => true;
+		repository.getKnownPeer = () => known;
+
+		peerVerifier.verify = async () => false;
+		await connect(websocketService, "178.165.55.55");
+		assert.equal(known.dialAttempts, 3);
+
+		peerVerifier.verify = async () => true;
+		await connect(websocketService, "178.165.55.55");
+		assert.equal(known.dialAttempts, 0);
+	});
+
 	it("#onConnection - should keep a known peer known when its verification fails", async ({
 		websocketService,
 		repository,

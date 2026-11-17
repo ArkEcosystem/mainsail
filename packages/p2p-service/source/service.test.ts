@@ -33,7 +33,6 @@ describe<{
 			forgetKnownPeer: () => {},
 			getKnownPeers: () => [],
 			getActivePeers: () => [],
-			hasKnownPeer: () => true,
 			hasMinimumPeers: () => true,
 			hasPendingPeer: () => false,
 		};
@@ -41,7 +40,7 @@ describe<{
 		context.state = { getLastMessageTime: () => dayjs() };
 		context.peerDiscoverer = { discoverPeers: async () => {}, populateSeedPeers: async () => {} };
 		context.peerDisposer = { disposePeers: async () => {} };
-		context.seeds = { isSeed: () => false, load: async () => {} };
+		context.seeds = { load: async () => {} };
 		context.websocketService = {
 			boot: async () => {},
 			dial: async () => {},
@@ -593,7 +592,7 @@ describe<{
 		const peer = makePeer("1.1.1.1");
 		repository.getKnownPeers = () => [peer];
 		websocketService.dial = async () => {
-			throw new ConnectionError(CloseReason.Rejected, "refused");
+			throw new ConnectionError(CloseReason.Banned, "refused");
 		};
 		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
 
@@ -605,31 +604,76 @@ describe<{
 		await service.dispose();
 	});
 
-	it("#mainLoop - should forget a known peer after repeated failed dials, but keep seeds", async ({
+	it("#mainLoop - should give up a known peer after repeated failed dials", async ({
 		service,
 		repository,
 		websocketService,
-		seeds,
 	}) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
 		const peer = makePeer("1.1.1.1");
-		const seed = makePeer("2.2.2.2");
-		const known = [peer, seed];
+		const known = [peer];
 		repository.getKnownPeers = () => [...known];
 		repository.forgetKnownPeer = (forgotten: any) => known.splice(known.indexOf(forgotten), 1);
-		seeds.isSeed = (ip: string) => ip === "2.2.2.2";
 		websocketService.dial = async () => {
 			throw new Error("ECONNREFUSED");
+		};
+		const dial = spy(websocketService, "dial");
+		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync((constants.MAX_DIAL_ATTEMPTS - 1) * constants.DIAL_SPACING);
+
+		// Nothing is given up before the next dial is due.
+		dial.calledTimes(constants.MAX_DIAL_ATTEMPTS);
+		forgetKnownPeer.neverCalled();
+
+		await fakeTimers.tickAsync(constants.DIAL_SPACING);
+
+		forgetKnownPeer.calledOnce();
+		forgetKnownPeer.calledWith(peer);
+		dial.calledTimes(constants.MAX_DIAL_ATTEMPTS);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should give up a known peer whose dials succeed but which never becomes active", async ({
+		service,
+		repository,
+		websocketService,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const peer = makePeer("1.1.1.1");
+		repository.getKnownPeers = () => [peer];
+		const dial = spy(websocketService, "dial");
+		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(constants.MAX_DIAL_ATTEMPTS * constants.DIAL_SPACING);
+
+		dial.calledTimes(constants.MAX_DIAL_ATTEMPTS);
+		forgetKnownPeer.calledWith(peer);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should keep dialing a known peer the processor made active in between", async ({
+		service,
+		repository,
+		websocketService,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const peer = makePeer("1.1.1.1");
+		repository.getKnownPeers = () => [peer];
+		// What the processor does when the verification succeeds.
+		websocketService.dial = async () => {
+			peer.dialAttempts = 0;
 		};
 		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
 
 		void service.mainLoop();
-		for (let index = 0; index < constants.MAX_DIAL_FAILURES; index++) {
-			await fakeTimers.tickAsync(constants.DIAL_SPACING);
-		}
+		await fakeTimers.tickAsync(2 * constants.MAX_DIAL_ATTEMPTS * constants.DIAL_SPACING);
 
-		forgetKnownPeer.calledOnce();
-		forgetKnownPeer.calledWith(peer);
+		forgetKnownPeer.neverCalled();
 
 		await service.dispose();
 	});

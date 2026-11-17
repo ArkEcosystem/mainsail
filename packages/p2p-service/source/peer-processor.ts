@@ -94,7 +94,6 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 			? (this.repository.getKnownPeer(ip) as Peer)
 			: this.peerFactory(ip);
 		peer.connection = connection;
-		peer.dialFailures = 0;
 		connection.onClose((reason, error) => this.#onClose(ip, reason, error));
 
 		await this.#verifyPeer(peer);
@@ -132,6 +131,7 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 			}
 
 			this.repository.setActivePeer(peer);
+			peer.dialAttempts = 0;
 			this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
 
 			await this.peerDiscoverer.discoverPeers(peer);

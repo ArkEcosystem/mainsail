@@ -100,7 +100,7 @@ export class Service implements Contracts.P2PService.Service {
 	}
 
 	// Known peers are the seeds and peers that lost their connection; they are dialed, spaced out, until
-	// they answer or are given up. One that is pending already has a connection and is being verified.
+	// they become active or are given up. One that is pending already has a connection and is being verified.
 	async #dialKnownPeers(): Promise<void> {
 		const now = Date.now();
 		const due = (this.repository.getKnownPeers() as Peer[]).filter(
@@ -111,34 +111,43 @@ export class Service implements Contracts.P2PService.Service {
 		await Promise.all(due.map((peer) => this.#dial(peer)));
 	}
 
+	// A dial counts as failed until the peer is verified: the count is cleared only when the processor
+	// makes the peer active, so a peer that answers but never passes the verification is given up too.
 	async #dial(peer: Peer): Promise<void> {
+		if (this.#isGivenUp(peer)) {
+			this.repository.forgetKnownPeer(peer);
+
+			return;
+		}
+
 		peer.lastDialAt = Date.now();
+		peer.dialAttempts = (peer.dialAttempts ?? 0) + 1;
 
 		try {
 			await this.websocketService.dial(getPeerSocketUrl(peer));
-			peer.dialFailures = 0;
 		} catch (rawError) {
 			const error = ensureError(rawError);
 			this.logger.debug(`Dial to ${peer.ip}:${peer.port} failed: ${error.message}`, "p2p");
 
-			this.#forgetIfHopeless(peer, error);
+			if (this.#isRefused(error)) {
+				this.repository.forgetKnownPeer(peer);
+			}
 		}
 	}
 
-	// The transport refuses addresses that may not be peers (rules, bans) before opening a socket; such an
-	// address is dropped at once. One that only does not answer is dropped after repeated failures.
-	#forgetIfHopeless(peer: Peer, error: Error): void {
-		peer.dialFailures = (peer.dialFailures ?? 0) + 1;
+	// Seeds get no exception, so that a node with enough peers does not keep knocking on them; a node
+	// that is short of peers records them again in #checkMinPeers.
+	#isGivenUp(peer: Peer): boolean {
+		return (peer.dialAttempts ?? 0) >= constants.MAX_DIAL_ATTEMPTS;
+	}
 
-		const refused =
+	// Refused by our own address rules or ban list before a socket was opened, or by the peer's during the
+	// handshake. The address is not worth further dials; discovery brings it back if that changes.
+	#isRefused(error: Error): boolean {
+		return (
 			error instanceof ConnectionError &&
-			(error.reason === CloseReason.Rejected || error.reason === CloseReason.Banned);
-
-		const hopeless = peer.dialFailures >= constants.MAX_DIAL_FAILURES && !this.seeds.isSeed(peer.ip);
-
-		if ((refused || hopeless) && this.repository.hasKnownPeer(peer.ip)) {
-			this.repository.forgetKnownPeer(peer);
-		}
+			(error.reason === CloseReason.Rejected || error.reason === CloseReason.Banned)
+		);
 	}
 
 	async #checkMinPeers(): Promise<void> {
