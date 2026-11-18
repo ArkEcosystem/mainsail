@@ -136,10 +136,6 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 	}
 
 	public hasMinimumPeers(): boolean {
-		if (this.configuration.getOptional<boolean>("ignoreMinimumNetworkReach", false)) {
-			return true;
-		}
-
 		return this.getActivePeers().length >= this.configuration.getRequired<number>("minimumNetworkReach");
 	}
 

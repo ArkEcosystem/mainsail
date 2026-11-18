@@ -39,6 +39,7 @@ export interface PeerRepository {
 	// one only loses its pending entry, so it stays known if it was and is dropped otherwise.
 	demotePeer(ip: string): void;
 
+	// Whether there are at least `minimumNetworkReach` active peers; always true with a minimum of 0.
 	hasMinimumPeers(): boolean;
 
 	getSameSubnetPeers(ip: string): Peer[];

@@ -10,11 +10,12 @@ describe<{
 	peerRepository: PeerRepository;
 }>("PeerRepository", ({ it, assert, beforeEach, spy }) => {
 	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
+	const configuration: any = {};
 
 	beforeEach((context) => {
 		context.app = new Application();
 
-		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue({});
+		context.app.bind(Identifiers.ServiceProvider.Configuration).toConstantValue(configuration);
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(eventDispatcher);
 
 		context.peerRepository = context.app.resolve(PeerRepository);
@@ -385,6 +386,28 @@ describe<{
 		// Forgetting a peer that is not active announces nothing.
 		peerRepository.forgetActivePeer(active);
 		dispatch.calledTimes(2);
+	});
+
+	it("#hasMinimumPeers - should compare the active peers with the minimum network reach", ({
+		peerRepository,
+		app,
+	}) => {
+		configuration.getRequired = () => 1;
+		assert.false(peerRepository.hasMinimumPeers());
+
+		// Pending and known peers do not count.
+		peerRepository.setPendingPeer(app.resolve(Peer).init("176.165.44.33", 4000));
+		peerRepository.setKnownPeer(app.resolve(Peer).init("176.165.22.11", 4000));
+		assert.false(peerRepository.hasMinimumPeers());
+
+		peerRepository.setActivePeer(app.resolve(Peer).init("176.165.66.55", 4000));
+		assert.true(peerRepository.hasMinimumPeers());
+	});
+
+	it("#hasMinimumPeers - should always hold with a minimum network reach of 0", ({ peerRepository }) => {
+		configuration.getRequired = () => 0;
+
+		assert.true(peerRepository.hasMinimumPeers());
 	});
 
 	it("#demotePeer - should turn an active peer into a known one and drop a pending one", ({
