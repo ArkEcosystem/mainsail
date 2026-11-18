@@ -26,7 +26,7 @@ jobs:
         steps:
             - uses: actions/checkout@v7.0.1
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.pull_request.head.sha }}
             - uses: actions/setup-node@v7.0.0
               with:
                   node-version: ${{ matrix.node-version }}
@@ -86,7 +86,7 @@ jobs:
         steps:
             - uses: actions/checkout@v7.0.1
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.pull_request.head.sha }}
             - uses: actions/setup-node@v7.0.0
               with:
                   node-version: ${{ matrix.node-version }}
@@ -172,7 +172,7 @@ jobs:
         steps:
             - uses: actions/checkout@v7.0.1
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.pull_request.head.sha }}
             - uses: actions/setup-node@v7.0.0
               with:
                   node-version: ${{ matrix.node-version }}
@@ -224,7 +224,7 @@ jobs:
         steps:
             - uses: actions/checkout@v7.0.1
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.pull_request.head.sha }}
             - uses: actions/setup-node@v7.0.0
               with:
                   node-version: ${{ matrix.node-version }}
@@ -310,7 +310,7 @@ jobs:
         steps:
             - uses: actions/checkout@v7.0.1
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.pull_request.head.sha }}
             - uses: actions/setup-node@v7.0.0
               with:
                   node-version: ${{ matrix.node-version }}
@@ -369,7 +369,7 @@ jobs:
         steps:
             - uses: actions/checkout@v7.0.1
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.pull_request.head.sha }}
             - uses: actions/setup-node@v7.0.0
               with:
                   node-version: ${{ matrix.node-version }}
@@ -449,7 +449,7 @@ jobs:
         steps:
             - uses: actions/checkout@v7.0.1
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.pull_request.head.sha }}
             - uses: actions/setup-node@v7.0.0
               with:
                   node-version: ${{ matrix.node-version }}
@@ -535,7 +535,7 @@ jobs:
         steps:
             - uses: actions/checkout@v7.0.1
               with:
-                  ref: ${{ github.head_ref }}
+                  ref: ${{ github.event.pull_request.head.sha }}
             - uses: actions/setup-node@v7.0.0
               with:
                   node-version: ${{ matrix.node-version }}
