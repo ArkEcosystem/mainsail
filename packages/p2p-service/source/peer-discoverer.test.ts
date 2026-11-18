@@ -18,7 +18,7 @@ describe<{
 		context.repository = { hasPeer: () => false, setKnownPeer: () => {} };
 		context.seeds = { all: () => ["1.1.1.1", "2.2.2.2"] };
 		context.communicator = { getActivePeers: async () => ({ peers: [] }) };
-		context.processor = { validateAndAcceptPeer: async () => {} };
+		context.processor = { validateAndAcceptPeer: () => {} };
 		context.peerDisposer = { banPeer: () => {} };
 
 		const app = new Application();

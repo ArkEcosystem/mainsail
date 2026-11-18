@@ -26,6 +26,7 @@ describe<{
 	peerDiscoverer: any;
 	peerDisposer: any;
 	seeds: any;
+	dialQueue: any;
 	websocketService: any;
 	configuration: any;
 }>("Service", ({ it, beforeEach, assert, clock, spy, stub }) => {
@@ -43,6 +44,7 @@ describe<{
 		context.peerDiscoverer = { discoverPeers: async () => {}, populateSeedPeers: async () => {} };
 		context.peerDisposer = { disposePeers: async () => {} };
 		context.seeds = { load: async () => {} };
+		context.dialQueue = { dispose: () => {} };
 		context.websocketService = {
 			boot: async () => {},
 			dial: async () => {},
@@ -59,6 +61,7 @@ describe<{
 		app.bind(Identifiers.P2P.Peer.Discoverer).toConstantValue(context.peerDiscoverer);
 		app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue(context.peerDisposer);
 		app.bind(Identifiers.P2P.Peer.Seeds).toConstantValue(context.seeds);
+		app.bind(Identifiers.P2P.Peer.DialQueue).toConstantValue(context.dialQueue);
 		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
 		app.bind(Identifiers.P2P.Peer.Verifier).toConstantValue(context.peerVerifier);
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
@@ -390,6 +393,34 @@ describe<{
 		discoverPeers.calledTimes(2);
 
 		await service.dispose();
+	});
+
+	it("#mainLoop - should ask the peers for their peers at the same time", async ({
+		service,
+		repository,
+		peerDiscoverer,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		repository.hasMinimumPeers = () => false;
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		// Never answers: a sequential loop would not get past the first peer.
+		peerDiscoverer.discoverPeers = () => new Promise(() => {});
+		const discoverPeers = spy(peerDiscoverer, "discoverPeers");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(61_000);
+
+		discoverPeers.calledTimes(2);
+
+		await service.dispose();
+	});
+
+	it("#dispose - should stop the dialing of new addresses", async ({ service, dialQueue }) => {
+		const dispose = spy(dialQueue, "dispose");
+
+		await service.dispose();
+
+		dispose.calledOnce();
 	});
 
 	it("#mainLoop - should fast-cleanse at least 5 peers when no messages arrived within 8 seconds", async ({

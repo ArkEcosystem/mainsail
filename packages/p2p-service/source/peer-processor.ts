@@ -4,11 +4,11 @@ import type { Interfaces, Service as WebSocketService } from "@mainsail/p2p-webs
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { CloseReason, ConnectionState } from "@mainsail/p2p-websocket";
-import { ensureError, IpAddress } from "@mainsail/utils";
+import { IpAddress } from "@mainsail/utils";
 
 import type { Peer } from "./interfaces/index.js";
 
-import { getPeerSocketUrl, isValidVersion } from "./utils/index.js";
+import { isValidVersion } from "./utils/index.js";
 
 const BAN_REASONS = new Set<CloseReason>([CloseReason.PayloadTooLarge, CloseReason.ProtocolError]);
 
@@ -24,6 +24,9 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 
 	@inject(Identifiers.P2P.Peer.Factory)
 	private readonly peerFactory!: (ip: string) => Peer;
+
+	@inject(Identifiers.P2P.Peer.DialQueue)
+	private readonly dialQueue!: Contracts.P2PService.DialQueue;
 
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2PService.PeerRepository;
@@ -61,25 +64,15 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 		});
 	}
 
-	// Dials a new address; the connection, if it opens, arrives through the transport hook like any other.
-	// A known peer is left to the service loop, which spaces its dials out.
-	public async validateAndAcceptPeer(rawIp: string): Promise<void> {
+	// Queues a new address for dialing; the connection, if it opens, arrives through the transport hook
+	// like any other. A known peer is left to the service loop, which spaces its dials out.
+	public validateAndAcceptPeer(rawIp: string): void {
 		const ip = IpAddress.sanitizeRemoteAddress(rawIp);
-		if (!ip) {
+		if (!ip || this.repository.hasPeer(ip)) {
 			return;
 		}
 
-		if (this.repository.hasPeer(ip)) {
-			return;
-		}
-
-		const peer = this.peerFactory(ip);
-
-		try {
-			await this.websocketService.dial(getPeerSocketUrl(peer));
-		} catch (rawError) {
-			this.logger.debug(`Dial to ${peer.ip}:${peer.port} failed: ${ensureError(rawError).message}`, "p2p");
-		}
+		this.dialQueue.add(ip);
 	}
 
 	// Every open connection, inbound or outbound, is bound to its peer here and the peer is verified over it.

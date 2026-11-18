@@ -27,12 +27,13 @@ export class PeerDiscoverer implements Contracts.P2PService.PeerDiscoverer {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	// Waits for the peer's answer only; the addresses in it are dialed in the background.
 	async discoverPeers(peer: Contracts.P2PService.Peer): Promise<void> {
 		try {
 			const { peers } = await this.communicator.getPeers(peer);
 
-			for (const peer of peers) {
-				await this.#getProcessor().validateAndAcceptPeer(peer.ip);
+			for (const { ip } of peers) {
+				this.#getProcessor().validateAndAcceptPeer(ip);
 			}
 		} catch (rawError) {
 			const error = ensureError(rawError);

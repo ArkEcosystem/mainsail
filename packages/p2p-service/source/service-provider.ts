@@ -8,6 +8,7 @@ import { assert, IpAddress } from "@mainsail/utils";
 import Joi from "joi";
 
 import { Broadcaster } from "./broadcaster.js";
+import { DialQueue } from "./dial-queue.js";
 import { BlockDownloader, MessageDownloader, ProposalDownloader } from "./downloader/index.js";
 import { HeaderService } from "./header-service.js";
 import { Header } from "./header.js";
@@ -52,6 +53,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.Peer.Processor).to(PeerProcessor).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Verifier).to(PeerVerifier).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Seeds).to(Seeds).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.DialQueue).to(DialQueue).inSingletonScope();
 		// Also runs on the transport after its own verifiers (ban list, duplicate address), before the handshake.
 		this.app.bind(Identifiers.P2P.Peer.IpVerifier).to(PeerIpVerifier).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Connection.Verifiers).toService(Identifiers.P2P.Peer.IpVerifier);

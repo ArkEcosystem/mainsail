@@ -30,6 +30,7 @@ describe<{
 	transactionPoolWorker: any;
 	peerDiscoverer: any;
 	websocketService: any;
+	dialQueue: any;
 }>("PeerProcessor", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
 		context.logger = { debug: () => {}, warn: () => {}, warnExtra: () => {} };
@@ -51,7 +52,8 @@ describe<{
 		context.events = { dispatch: async () => {}, listen: () => {} };
 		context.transactionPoolWorker = { registerEventHandler: () => {} };
 		context.peerDiscoverer = { discoverPeers: async () => {} };
-		context.websocketService = { dial: async () => {}, onConnection: undefined };
+		context.websocketService = { onConnection: undefined };
+		context.dialQueue = { add: () => {} };
 
 		const app = new Application();
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
@@ -60,6 +62,7 @@ describe<{
 		app.bind(Identifiers.P2P.Peer.Discoverer).toConstantValue(context.peerDiscoverer);
 		app.bind(Identifiers.P2P.Peer.Factory).toConstantValue((ip: string) => makePeer(ip));
 		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
+		app.bind(Identifiers.P2P.Peer.DialQueue).toConstantValue(context.dialQueue);
 		app.bind(Identifiers.TransactionPool.Worker).toConstantValue(context.transactionPoolWorker);
 		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.events);
 		app.bind(Identifiers.P2P.Logger).toConstantValue(context.logger);
@@ -67,46 +70,35 @@ describe<{
 		context.processor = app.resolve(PeerProcessor);
 	});
 
-	it("#validateAndAcceptPeer - should dial a new address and record nothing", async ({
+	it("#validateAndAcceptPeer - should queue a new address for dialing and record nothing", ({
 		processor,
 		repository,
-		websocketService,
+		dialQueue,
 		peerVerifier,
 	}) => {
-		const dial = spy(websocketService, "dial");
+		const add = spy(dialQueue, "add");
 		const setKnownPeer = spy(repository, "setKnownPeer");
 		const verify = spy(peerVerifier, "verify");
 
-		await processor.validateAndAcceptPeer("::ffff:178.165.55.55");
+		processor.validateAndAcceptPeer("::ffff:178.165.55.55");
 
-		dial.calledWith("ws://178.165.55.55:4002");
+		add.calledWith("178.165.55.55");
 		setKnownPeer.neverCalled();
 		verify.neverCalled();
 	});
 
-	it("#validateAndAcceptPeer - should swallow a failed dial", async ({ processor, websocketService, logger }) => {
-		websocketService.dial = async () => {
-			throw new Error("ECONNREFUSED");
-		};
-		const debug = spy(logger, "debug");
-
-		await processor.validateAndAcceptPeer("178.165.55.55");
-
-		debug.calledWith("Dial to 178.165.55.55:4002 failed: ECONNREFUSED", "p2p");
-	});
-
-	it("#validateAndAcceptPeer - should skip invalid addresses and peers the repository already holds", async ({
+	it("#validateAndAcceptPeer - should skip invalid addresses and peers the repository already holds", ({
 		processor,
 		repository,
-		websocketService,
+		dialQueue,
 	}) => {
-		const dial = spy(websocketService, "dial");
+		const add = spy(dialQueue, "add");
 
-		await processor.validateAndAcceptPeer("not-an-ip");
+		processor.validateAndAcceptPeer("not-an-ip");
 		repository.hasPeer = () => true;
-		await processor.validateAndAcceptPeer("178.165.55.55");
+		processor.validateAndAcceptPeer("178.165.55.55");
 
-		dial.neverCalled();
+		add.neverCalled();
 	});
 
 	it("#onConnection - should bind the connection to a new peer, verify it and make it active", async ({

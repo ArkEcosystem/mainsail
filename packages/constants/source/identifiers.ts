@@ -210,6 +210,7 @@ export const Identifiers = {
 		Peer: {
 			Communicator: Symbol("P2P<Peer.Communicator>"),
 			Connector: Symbol("P2P<Peer.Connector>"),
+			DialQueue: Symbol("P2P<Peer.DialQueue>"),
 			Discoverer: Symbol("P2P<Peer.Discoverer>"),
 			Disposer: Symbol("P2P<Peer.Disposer>"),
 			Factory: Symbol("P2P<Peer.Factory>"),

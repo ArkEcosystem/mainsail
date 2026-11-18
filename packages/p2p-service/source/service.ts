@@ -33,6 +33,9 @@ export class Service implements Contracts.P2PService.Service {
 	@inject(Identifiers.P2P.Peer.Seeds)
 	private readonly seeds!: Contracts.P2PService.Seeds;
 
+	@inject(Identifiers.P2P.Peer.DialQueue)
+	private readonly dialQueue!: Contracts.P2PService.DialQueue;
+
 	@inject(Identifiers.P2P.Peer.Verifier)
 	private readonly peerVerifier!: Contracts.P2PService.PeerVerifier;
 
@@ -88,10 +91,12 @@ export class Service implements Contracts.P2PService.Service {
 		}
 	}
 
-	// Same order as the old provider: stop the loop, say goodbye to the peers, then stop the transport.
+	// Same order as the old provider: stop the loop and the dialing of new addresses, say goodbye to the
+	// peers, then stop the transport.
 	public async dispose(): Promise<void> {
 		this.#disposed = true;
 		clearTimeout(this.#mainLoopTimeout);
+		this.dialQueue.dispose();
 
 		this.websocketService.onConnection = undefined;
 
@@ -160,9 +165,11 @@ export class Service implements Contracts.P2PService.Service {
 
 			await this.peerDiscoverer.populateSeedPeers();
 
-			for (const peer of shuffle(this.repository.getActivePeers()).slice(0, 8)) {
-				await this.peerDiscoverer.discoverPeers(peer);
-			}
+			await Promise.all(
+				shuffle(this.repository.getActivePeers())
+					.slice(0, 8)
+					.map((peer) => this.peerDiscoverer.discoverPeers(peer)),
+			);
 		}
 	}
 

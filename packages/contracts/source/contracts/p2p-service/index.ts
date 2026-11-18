@@ -1,4 +1,5 @@
 export * from "./broadcaster.js";
+export * from "./dial-queue.js";
 export * from "./downloader.js";
 export * from "./endpoints.js";
 export * from "./enums.js";
