@@ -36,20 +36,20 @@ export class PeerVerifier implements Contracts.P2PService.PeerVerifier {
 	@tagged("plugin", "p2p-service")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
+	// The status is requested even when the verification is skipped: the answer carries the peer's header
+	// and version, which the downloaders and the listeners of the peer events read on every active peer.
 	public async verify(peer: Contracts.P2PService.Peer): Promise<boolean> {
-		if (this.configuration.getRequired<boolean>("skipPeerStateVerification")) {
-			return true;
-		}
-
 		try {
 			const status = await this.communicator.getStatus(peer);
 			peer.version = status.config.version;
 
-			this.#verifyConfig(status.config);
+			if (!this.configuration.getRequired<boolean>("skipPeerStateVerification")) {
+				this.#verifyConfig(status.config);
 
-			this.#verifyVersion(status.config);
+				this.#verifyVersion(status.config);
 
-			await this.#verifyHighestCommonBlock(peer, status.state);
+				await this.#verifyHighestCommonBlock(peer, status.state);
+			}
 
 			peer.plugins = status.config.plugins;
 

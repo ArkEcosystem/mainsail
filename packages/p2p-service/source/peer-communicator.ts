@@ -98,7 +98,7 @@ export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 		// The wire type of the headers is the protobuf shape; the contract shape is what the codec unpacks.
 		const { headers } = response as { headers?: Contracts.P2PService.HeaderData };
 		assert.defined(headers);
-		void this.headerService.handle(peer, headers);
+		this.headerService.handle(peer, headers);
 
 		return response;
 	}

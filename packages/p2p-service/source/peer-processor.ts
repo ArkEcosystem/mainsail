@@ -4,6 +4,7 @@ import type { Interfaces, Service as WebSocketService } from "@mainsail/p2p-webs
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { CloseReason, ConnectionState } from "@mainsail/p2p-websocket";
+import { ensureError } from "@mainsail/utils";
 
 import type { Peer } from "./interfaces/index.js";
 
@@ -50,7 +51,16 @@ export class PeerProcessor {
 	// Public only because TypeScript treats a decorated private method as unused.
 	@postConstruct()
 	public initialize(): void {
-		this.websocketService.onConnection = (connection) => void this.#acceptConnection(connection);
+		// The transport does not wait for the hook; a failure is logged, as a rejection nobody handles
+		// would end the process.
+		this.websocketService.onConnection = (connection) => {
+			this.#acceptConnection(connection).catch((rawError: unknown) => {
+				this.logger.debug(
+					`Accepting the connection of ${connection.remoteAddress} failed: ${ensureError(rawError).message}`,
+					"p2p",
+				);
+			});
+		};
 
 		this.events.listen(Events.CryptoEvent.MilestoneChanged, {
 			handle: async (): Promise<void> => this.#disconnectInvalidPeers(),

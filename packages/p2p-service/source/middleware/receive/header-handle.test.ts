@@ -22,12 +22,11 @@ describe<{
 	beforeEach((context) => {
 		context.peer = { ip: "1.1.1.1" };
 		context.repository = { getActivePeer: () => context.peer, hasActivePeer: () => true };
-		context.headerService = { handle: async () => {} };
+		context.headerService = { handle: () => {} };
 
 		const app = new Application();
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
 		app.bind(Identifiers.P2P.Header.Service).toConstantValue(context.headerService);
-		app.bind(Identifiers.P2P.Logger).toConstantValue({ debug: () => {} });
 
 		context.middleware = app.resolve(HeaderHandleReceiveMiddleware);
 	});
@@ -57,14 +56,5 @@ describe<{
 		await middleware.before({ connection: { remoteAddress: "1.1.1.1" }, request: { data: { headers } } } as any);
 
 		handle.neverCalled();
-	});
-
-	it("should not fail the request when the header service does", async ({ middleware, headerService }) => {
-		headerService.handle = async () => {
-			throw new Error("boom");
-		};
-
-		await middleware.before({ connection: { remoteAddress: "1.1.1.1" }, request: { data: { headers } } } as any);
-		await new Promise((resolve) => setImmediate(resolve));
 	});
 });

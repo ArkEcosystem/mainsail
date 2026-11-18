@@ -225,6 +225,21 @@ describe<{
 		disposePeer.calledWith("178.165.55.55");
 	});
 
+	it("#onConnection - should log a failure to accept the connection", async ({
+		websocketService,
+		repository,
+		logger,
+	}) => {
+		repository.setPendingPeer = () => {
+			throw new Error("boom");
+		};
+		const debug = spy(logger, "debug");
+
+		await connect(websocketService, "178.165.55.55");
+
+		debug.calledWith("Accepting the connection of 178.165.55.55 failed: boom", "p2p");
+	});
+
 	it("#onConnection - should dispose the peer when its connection closes", async ({
 		websocketService,
 		peerDisposer,

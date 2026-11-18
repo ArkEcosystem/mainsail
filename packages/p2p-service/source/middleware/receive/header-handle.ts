@@ -3,7 +3,6 @@ import type { Interfaces } from "@mainsail/p2p-websocket";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { ensureError } from "@mainsail/utils";
 
 // Reads the peer's header off every request it sends us, as the HeaderHandlePlugin did in
 // @mainsail/p2p, so a peer that only posts to us still gets its progress tracked and the downloaders
@@ -15,9 +14,6 @@ export class HeaderHandleReceiveMiddleware implements Interfaces.ReceiveMiddlewa
 
 	@inject(Identifiers.P2P.Header.Service)
 	private readonly headerService!: Contracts.P2PService.HeaderService;
-
-	@inject(Identifiers.P2P.Logger)
-	private readonly logger!: Contracts.P2PService.Logger;
 
 	public async before(context: Interfaces.ReceiveContext): Promise<void> {
 		const ip = context.connection.remoteAddress;
@@ -31,9 +27,6 @@ export class HeaderHandleReceiveMiddleware implements Interfaces.ReceiveMiddlewa
 			return;
 		}
 
-		// Not awaited: the header service delays and then runs the downloaders, none of which the request waits for.
-		this.headerService.handle(this.repository.getActivePeer(ip), headers).catch((rawError: unknown) => {
-			this.logger.debug(`Handling the header of ${ip} failed: ${ensureError(rawError).message}`, "p2p");
-		});
+		this.headerService.handle(this.repository.getActivePeer(ip), headers);
 	}
 }

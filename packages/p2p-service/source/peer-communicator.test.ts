@@ -28,7 +28,7 @@ describe<{
 			state: ConnectionState.Open,
 		};
 		context.peer = { connection: context.connection, ip: "1.1.1.1", setPinged: () => {} };
-		context.headerService = { handle: async () => {} };
+		context.headerService = { handle: () => {} };
 		context.peerDisposer = { banPeer: () => {} };
 
 		const app = new Application();
