@@ -4,7 +4,7 @@ import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { CloseReason, ConnectionError } from "@mainsail/p2p-websocket";
-import { ensureError, groupBy, pluralize, shuffle } from "@mainsail/utils";
+import { ensureError, pluralize, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 import type { Peer } from "./interfaces/index.js";
@@ -64,13 +64,8 @@ export class Service implements Contracts.P2PService.Service {
 
 		await this.seeds.load();
 		await this.peerDiscoverer.populateSeedPeers();
+		// The seeds are dialed here; they become peers once verified, which nothing at boot waits for.
 		await this.#dialKnownPeers();
-
-		for (const [version, peers] of Object.entries(
-			groupBy(this.repository.getActivePeers(), (peer) => peer.version ?? "unknown"),
-		)) {
-			this.logger.info(`Discovered ${pluralize("peer", peers.length, true)} with v${version}.`, "p2p");
-		}
 
 		void this.mainLoop();
 	}

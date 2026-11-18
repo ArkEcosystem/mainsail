@@ -509,35 +509,31 @@ describe<{
 		}
 	});
 
-	it("#boot - should start the transport, populate seed peers, log discovered versions and start the loop", async ({
+	it("#boot - should start the transport, populate and dial the seed peers and start the loop", async ({
 		service,
 		websocketService,
 		peerDisposer,
 		peerDiscoverer,
 		repository,
-		logger,
 	}) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
 		const previous = process.env.MAINSAIL_ENV;
 		delete process.env.MAINSAIL_ENV;
 
 		try {
-			repository.getActivePeers = () => [
-				makePeer("1.1.1.1"),
-				makePeer("2.2.2.2"),
-				makePeer("3.3.3.3", { version: "0.0.2" }),
-			];
+			const known = [makePeer("1.1.1.1")];
+			repository.getKnownPeers = () => known;
 			const boot = spy(websocketService, "boot");
 			const populateSeedPeers = spy(peerDiscoverer, "populateSeedPeers");
-			const info = spy(logger, "info");
+			const dial = spy(websocketService, "dial");
 
 			await service.boot();
 			await fakeTimers.tickAsync(0);
 
 			boot.calledOnce();
 			populateSeedPeers.calledOnce();
-			info.calledWith("Discovered 2 peers with v0.0.1.", "p2p");
-			info.calledWith("Discovered 1 peer with v0.0.2.", "p2p");
+			dial.calledOnce();
+			dial.calledWith("ws://1.1.1.1:4002");
 
 			// The loop timer is pending; dispose cancels it, disconnects the peers and then stops the transport.
 			const calls: string[] = [];
