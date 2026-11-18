@@ -52,13 +52,15 @@ export class PeerProcessor {
 	@postConstruct()
 	public initialize(): void {
 		// The transport does not wait for the hook; a failure is logged, as a rejection nobody handles
-		// would end the process.
+		// would end the process, and the connection is closed so that the close listener clears its peer.
 		this.websocketService.onConnection = (connection) => {
 			this.#acceptConnection(connection).catch((rawError: unknown) => {
 				this.logger.debug(
 					`Accepting the connection of ${connection.remoteAddress} failed: ${ensureError(rawError).message}`,
 					"p2p",
 				);
+
+				void connection.close();
 			});
 		};
 
@@ -76,7 +78,11 @@ export class PeerProcessor {
 	async #acceptConnection(connection: Interfaces.Connection): Promise<void> {
 		const ip = connection.remoteAddress;
 
+		// Not expected: the transport keeps one connection per address and a connection that closes takes
+		// its peer off both lists. Should it happen, the connection would have no owner, so it is closed.
 		if (this.repository.hasActivePeer(ip) || this.repository.hasPendingPeer(ip)) {
+			void connection.close();
+
 			return;
 		}
 
@@ -86,7 +92,7 @@ export class PeerProcessor {
 		peer.connection = connection;
 		connection.onClose((reason, error) => this.#onClose(ip, reason, error));
 
-		await this.#verifyPeer(peer);
+		await this.#verifyPeer(peer, connection);
 	}
 
 	// A connection the peer broke by misbehaving (oversized frame, protocol violation) costs it a ban; one
@@ -103,34 +109,33 @@ export class PeerProcessor {
 		this.peerDisposer.disposePeer(ip);
 	}
 
-	// A known peer (a seed, or one that was active before) stays known while it is pending, so a connection
-	// that fails during the verification costs it only the pending entry and the service loop dials it again.
-	// An address seen for the first time is only pending and is dropped. A ban removes the peer from every list.
-	async #verifyPeer(peer: Peer): Promise<void> {
+	// A peer leaves the pending list in two ways only: it becomes active here, or its connection closes
+	// and the close listener disposes it. A known peer (a seed, or one that was active before) stays known
+	// while it is pending, so a failed verification costs it only the pending entry and the service loop
+	// dials it again; an address seen for the first time is dropped. A ban removes the peer from every list.
+	async #verifyPeer(peer: Peer, connection: Interfaces.Connection): Promise<void> {
 		this.repository.setPendingPeer(peer);
 
-		try {
-			if (!(await this.peerVerifier.verify(peer))) {
-				return;
-			}
+		const verified = await this.peerVerifier.verify(peer);
 
-			// The connection closed during the verification (remote close, timeout, ban); the close listener
-			// or the ban has already taken the peer off the pending list.
-			if (peer.connection?.state !== ConnectionState.Open) {
-				return;
-			}
-
-			this.repository.setActivePeer(peer);
-			peer.dialAttempts = 0;
-			this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
-
-			await this.peerDiscoverer.discoverPeers(peer);
-		} catch {
-			this.peerDisposer.disposePeer(peer.ip);
-		} finally {
-			// For a verification that failed while the connection stayed open; otherwise already gone.
-			this.repository.forgetPendingPeer(peer);
+		// Closed meanwhile (by the peer, a timeout, a ban); the close listener settles the lists. The
+		// transport keeps one connection per address, so while this one is open the peer is still ours.
+		if (connection.state !== ConnectionState.Open) {
+			return;
 		}
+
+		// A failed verification may leave the connection open; closing it has the close listener clean up.
+		if (!verified) {
+			void connection.close();
+
+			return;
+		}
+
+		this.repository.setActivePeer(peer);
+		peer.dialAttempts = 0;
+		this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
+
+		await this.peerDiscoverer.discoverPeers(peer);
 	}
 
 	async #disconnectInvalidPeers(): Promise<void> {

@@ -21,7 +21,6 @@ export interface PeerRepository {
 
 	getPendingPeer(ip: string): Peer;
 	setPendingPeer(peer: Peer): void;
-	forgetPendingPeer(peer: Peer): void;
 	hasPendingPeer(ip: string): boolean;
 
 	getKnownPeers(): Peer[];

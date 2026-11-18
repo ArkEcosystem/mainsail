@@ -78,10 +78,6 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 		this.#peersPending.set(peer.ip, peer);
 	}
 
-	public forgetPendingPeer(peer: Contracts.P2PService.Peer): void {
-		this.#peersPending.delete(peer.ip);
-	}
-
 	public hasPendingPeer(ip: string): boolean {
 		return this.#peersPending.has(ip);
 	}

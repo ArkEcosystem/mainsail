@@ -198,20 +198,6 @@ describe<{
 		}
 	});
 
-	it("#forgetPendingPeer - should forget the pending peer", ({ peerRepository, app }) => {
-		const peer = app.resolve(Peer).init("176.165.66.55", 4000);
-
-		peerRepository.setPendingPeer(peer);
-
-		assert.true(peerRepository.hasPendingPeer(peer.ip));
-		assert.equal(peerRepository.getPendingPeer(peer.ip), peer);
-
-		peerRepository.forgetPendingPeer(peer);
-
-		assert.false(peerRepository.hasPendingPeer(peer.ip));
-		assert.throws(() => peerRepository.getPendingPeer(peer.ip));
-	});
-
 	it("#hasPendingPeer - should return true if the pending peer exists", ({ peerRepository: peerRepository, app }) => {
 		const peer = app.resolve(Peer).init("176.165.66.55", 4000);
 
