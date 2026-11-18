@@ -134,7 +134,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			minimumNetworkReach: Joi.number().integer().min(0).required(),
 			minimumVersions: Joi.array().items(Joi.string()).required(),
 			peerBanTime: Joi.number().integer().min(0).required(),
-			skipPeerStateVerification: Joi.bool().required(),
 			verifyTimeout: Joi.number().integer().min(0).required(),
 			whitelist: Joi.array().items(Joi.string()).required(),
 		}).unknown(true);

@@ -14,7 +14,6 @@ export const defaults = {
 	minimumNetworkReach: Environment.get(EnvironmentVariables.MAINSAIL_P2P_MIN_NETWORK_REACH, 20),
 	minimumVersions: ["^0.0.1"],
 	peerBanTime: Environment.get(EnvironmentVariables.MAINSAIL_P2P_PEER_BAN_TIME, 3),
-	skipPeerStateVerification: Environment.isTrue(EnvironmentVariables.MAINSAIL_SKIP_PEER_STATE_VERIFICATION),
 	verifyTimeout: 60_000,
 	whitelist: ["*"],
 };
