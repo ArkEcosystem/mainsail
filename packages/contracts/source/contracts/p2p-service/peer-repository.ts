@@ -8,24 +8,16 @@ export interface PeerRepository {
 	hasPeer(ip: string): boolean;
 
 	getActivePeers(): Peer[];
-	hasActivePeers(): boolean;
-
 	getActivePeer(ip: string): Peer;
 	// Moves the peer here from the pending and known lists.
 	setActivePeer(peer: Peer): void;
-	forgetActivePeer(peer: Peer): void;
 	hasActivePeer(ip: string): boolean;
 
 	getPendingPeers(): Peer[];
-	hasPendingPeers(): boolean;
-
-	getPendingPeer(ip: string): Peer;
 	setPendingPeer(peer: Peer): void;
 	hasPendingPeer(ip: string): boolean;
 
 	getKnownPeers(): Peer[];
-	hasKnownPeers(): boolean;
-
 	getKnownPeer(ip: string): Peer;
 	setKnownPeer(peer: Peer): void;
 	forgetKnownPeer(peer: Peer): void;

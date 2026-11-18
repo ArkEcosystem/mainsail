@@ -26,7 +26,7 @@ const makeRepository = (): any => {
 		},
 		getActivePeers: () => [...active.values()],
 		getKnownPeer: (ip: string) => known.get(ip),
-		getPendingPeer: (ip: string) => pending.get(ip),
+		getPendingPeers: () => [...pending.values()],
 		hasActivePeer: (ip: string) => active.has(ip),
 		hasKnownPeer: (ip: string) => known.has(ip),
 		hasPendingPeer: (ip: string) => pending.has(ip),
@@ -290,7 +290,7 @@ describe<{
 		finish[0](true);
 		await settle();
 		assert.false(repository.hasActivePeer(ip));
-		assert.equal(repository.getPendingPeer(ip), known);
+		assert.equal(repository.getPendingPeers(), [known]);
 		close.neverCalled();
 
 		finish[1](true);
@@ -311,12 +311,12 @@ describe<{
 
 		const second = await connect(websocketService, ip);
 		const close = spy(second, "close");
-		const pending = repository.getPendingPeer(ip);
+		const [pending] = repository.getPendingPeers();
 
 		// A failed first verification must not drop the second peer or close its connection.
 		finish[0](false);
 		await settle();
-		assert.equal(repository.getPendingPeer(ip), pending);
+		assert.equal(repository.getPendingPeers(), [pending]);
 		close.neverCalled();
 
 		finish[1](true);
