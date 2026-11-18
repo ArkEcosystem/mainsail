@@ -31,6 +31,7 @@ export const constants = {
 	// Version of the wire protocol: the frame format in message.ts and the set of route paths. Bump it
 	// whenever either changes; a request for an unknown path ends the connection.
 	PROTOCOL_VERSION: 1,
-	// Time a request waits for its response before failing.
-	REQUEST_TIMEOUT: 10_000,
+	// Time a request waits for its response before failing, unless the request names its own. A request
+	// that times out closes the connection.
+	REQUEST_TIMEOUT: 5000,
 };

@@ -11,9 +11,10 @@ import type { Peer } from "./interfaces/index.js";
 import { constants } from "./constants.js";
 import { GetBlocks, GetMessages, GetPeers, GetProposal, GetStatus, PostMessage, PostProposal } from "./routes/index.js";
 
-// Minimal port of the @mainsail/p2p communicator over the new transport: no timeouts per route,
-// no reply validation, no throttling. It never connects: a peer without an open connection is not
-// an active peer, and the service loop dials known peers.
+// Port of the @mainsail/p2p communicator over the new transport, without reply validation and
+// throttling. Every request waits the transport's REQUEST_TIMEOUT for its response, except for a batch
+// of blocks. It never connects: a peer without an open connection is not an active peer, and the
+// service loop dials known peers.
 @injectable()
 export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 	@inject(Identifiers.ServiceProvider.Configuration)
@@ -49,7 +50,7 @@ export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 		return (await this.#emit(peer, GetStatus, {})) as unknown as Contracts.P2PService.GetStatusResponse;
 	}
 
-	// A batch of blocks is the one response that takes longer than a round trip; it gets its own timeout.
+	// A batch of blocks is the one response that takes longer than a round trip; its timeout is configured.
 	public async getBlocks(
 		peer: Peer,
 		{ fromBlockNumber, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromBlockNumber: number; limit?: number },
