@@ -6,9 +6,6 @@ import { ensureError } from "@mainsail/utils";
 
 @injectable()
 export class PeerDiscoverer implements Contracts.P2PService.PeerDiscoverer {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.P2P.Peer.Seeds)
 	private readonly seeds!: Contracts.P2PService.Seeds;
 
@@ -24,6 +21,9 @@ export class PeerDiscoverer implements Contracts.P2PService.PeerDiscoverer {
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
+	@inject(Identifiers.P2P.Peer.DialQueue)
+	private readonly dialQueue!: Contracts.P2PService.DialQueue;
+
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -33,7 +33,7 @@ export class PeerDiscoverer implements Contracts.P2PService.PeerDiscoverer {
 			const { peers } = await this.communicator.getPeers(peer);
 
 			for (const { ip } of peers) {
-				this.#getProcessor().validateAndAcceptPeer(ip);
+				this.dialQueue.add(ip);
 			}
 		} catch (rawError) {
 			const error = ensureError(rawError);
@@ -53,9 +53,5 @@ export class PeerDiscoverer implements Contracts.P2PService.PeerDiscoverer {
 
 			this.repository.setKnownPeer(this.peerFactory(ip));
 		}
-	}
-
-	#getProcessor(): Contracts.P2PService.PeerProcessor {
-		return this.app.get<Contracts.P2PService.PeerProcessor>(Identifiers.P2P.Peer.Processor);
 	}
 }

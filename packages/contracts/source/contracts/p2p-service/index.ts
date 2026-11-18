@@ -9,7 +9,6 @@ export * from "./log.js";
 export * from "./peer-communicator.js";
 export * from "./peer-discoverer.js";
 export * from "./peer-disposer.js";
-export * from "./peer-processor.js";
 export * from "./peer-repository.js";
 export * from "./peer-verifier.js";
 export * from "./peer.js";

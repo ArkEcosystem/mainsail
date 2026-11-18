@@ -45,6 +45,28 @@ describe<{
 		dial.calledWith("ws://1.1.1.1:4002");
 	});
 
+	it("should dial the sanitized address", ({ dialQueue, websocketService }) => {
+		const dial = spy(websocketService, "dial");
+
+		dialQueue.add("::ffff:178.165.55.55");
+
+		dial.calledWith("ws://178.165.55.55:4002");
+	});
+
+	it("should skip invalid addresses and peers the repository already holds", ({
+		dialQueue,
+		websocketService,
+		repository,
+	}) => {
+		const dial = spy(websocketService, "dial");
+
+		dialQueue.add("not-an-ip");
+		repository.hasPeer = () => true;
+		dialQueue.add("1.1.1.1");
+
+		dial.neverCalled();
+	});
+
 	it("should not dial more than MAX_CONCURRENT_DIALS addresses at a time", async ({
 		dialQueue,
 		websocketService,

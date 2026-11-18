@@ -4,7 +4,6 @@ import type { Interfaces, Service as WebSocketService } from "@mainsail/p2p-webs
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { CloseReason, ConnectionState } from "@mainsail/p2p-websocket";
-import { IpAddress } from "@mainsail/utils";
 
 import type { Peer } from "./interfaces/index.js";
 
@@ -12,10 +11,12 @@ import { isValidVersion } from "./utils/index.js";
 
 const BAN_REASONS = new Set<CloseReason>([CloseReason.PayloadTooLarge, CloseReason.ProtocolError]);
 
-// Turns addresses into active peers. It applies no address rules: those run on the transport
-// (PeerIpVerifier, ban list) for every inbound socket and every dial.
+// Turns connections into active peers: every connection, dialed or inbound, is accepted and verified
+// through the hook installed on the transport, so a peer becomes active only after a handshake and a
+// verification. It applies no address rules: those run on the transport (PeerIpVerifier, ban list) for
+// every inbound socket and every dial. Nothing calls it, so it has no contract; the provider constructs it.
 @injectable()
-export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
+export class PeerProcessor {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -24,9 +25,6 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 
 	@inject(Identifiers.P2P.Peer.Factory)
 	private readonly peerFactory!: (ip: string) => Peer;
-
-	@inject(Identifiers.P2P.Peer.DialQueue)
-	private readonly dialQueue!: Contracts.P2PService.DialQueue;
 
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2PService.PeerRepository;
@@ -49,7 +47,7 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2PService.Logger;
 
-	// Public only because TypeScript treats a decorated private method as unused; not part of the contract.
+	// Public only because TypeScript treats a decorated private method as unused.
 	@postConstruct()
 	public initialize(): void {
 		this.websocketService.onConnection = (connection) => void this.#acceptConnection(connection);
@@ -62,17 +60,6 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 		this.transactionPoolWorker.registerEventHandler(Events.PeerEvent.Removed, (ip: string) => {
 			this.peerDisposer.disposePeer(ip);
 		});
-	}
-
-	// Queues a new address for dialing; the connection, if it opens, arrives through the transport hook
-	// like any other. A known peer is left to the service loop, which spaces its dials out.
-	public validateAndAcceptPeer(rawIp: string): void {
-		const ip = IpAddress.sanitizeRemoteAddress(rawIp);
-		if (!ip || this.repository.hasPeer(ip)) {
-			return;
-		}
-
-		this.dialQueue.add(ip);
 	}
 
 	// Every open connection, inbound or outbound, is bound to its peer here and the peer is verified over it.

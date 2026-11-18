@@ -30,7 +30,6 @@ describe<{
 	transactionPoolWorker: any;
 	peerDiscoverer: any;
 	websocketService: any;
-	dialQueue: any;
 }>("PeerProcessor", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
 		context.logger = { debug: () => {}, warn: () => {}, warnExtra: () => {} };
@@ -53,7 +52,6 @@ describe<{
 		context.transactionPoolWorker = { registerEventHandler: () => {} };
 		context.peerDiscoverer = { discoverPeers: async () => {} };
 		context.websocketService = { onConnection: undefined };
-		context.dialQueue = { add: () => {} };
 
 		const app = new Application();
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
@@ -62,43 +60,11 @@ describe<{
 		app.bind(Identifiers.P2P.Peer.Discoverer).toConstantValue(context.peerDiscoverer);
 		app.bind(Identifiers.P2P.Peer.Factory).toConstantValue((ip: string) => makePeer(ip));
 		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
-		app.bind(Identifiers.P2P.Peer.DialQueue).toConstantValue(context.dialQueue);
 		app.bind(Identifiers.TransactionPool.Worker).toConstantValue(context.transactionPoolWorker);
 		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.events);
 		app.bind(Identifiers.P2P.Logger).toConstantValue(context.logger);
 
 		context.processor = app.resolve(PeerProcessor);
-	});
-
-	it("#validateAndAcceptPeer - should queue a new address for dialing and record nothing", ({
-		processor,
-		repository,
-		dialQueue,
-		peerVerifier,
-	}) => {
-		const add = spy(dialQueue, "add");
-		const setKnownPeer = spy(repository, "setKnownPeer");
-		const verify = spy(peerVerifier, "verify");
-
-		processor.validateAndAcceptPeer("::ffff:178.165.55.55");
-
-		add.calledWith("178.165.55.55");
-		setKnownPeer.neverCalled();
-		verify.neverCalled();
-	});
-
-	it("#validateAndAcceptPeer - should skip invalid addresses and peers the repository already holds", ({
-		processor,
-		repository,
-		dialQueue,
-	}) => {
-		const add = spy(dialQueue, "add");
-
-		processor.validateAndAcceptPeer("not-an-ip");
-		repository.hasPeer = () => true;
-		processor.validateAndAcceptPeer("178.165.55.55");
-
-		add.neverCalled();
 	});
 
 	it("#onConnection - should bind the connection to a new peer, verify it and make it active", async ({

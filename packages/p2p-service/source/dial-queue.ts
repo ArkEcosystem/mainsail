@@ -3,15 +3,15 @@ import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { ensureError } from "@mainsail/utils";
+import { ensureError, IpAddress } from "@mainsail/utils";
 
 import type { Peer } from "./interfaces/index.js";
 
 import { constants } from "./constants.js";
 import { getPeerSocketUrl } from "./utils/index.js";
 
-// Dials new addresses with a bounded number of dials in flight. Known peers are not its business: the
-// service loop dials those, spaced out and counted.
+// Dials new addresses, learned from other peers, with a bounded number of dials in flight. Known peers
+// are not its business: the service loop dials those, spaced out and counted.
 @injectable()
 export class DialQueue implements Contracts.P2PService.DialQueue {
 	@inject(Identifiers.P2P.WebSocket.Service)
@@ -31,7 +31,12 @@ export class DialQueue implements Contracts.P2PService.DialQueue {
 	readonly #dialing = new Set<string>();
 	#disposed = false;
 
-	public add(ip: string): void {
+	public add(rawIp: string): void {
+		const ip = IpAddress.sanitizeRemoteAddress(rawIp);
+		if (!ip || this.repository.hasPeer(ip)) {
+			return;
+		}
+
 		if (this.#disposed || this.#queued.has(ip) || this.#dialing.has(ip)) {
 			return;
 		}

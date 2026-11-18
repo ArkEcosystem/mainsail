@@ -93,7 +93,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const websocketService = this.app.get<WebSocketService>(Identifiers.P2P.WebSocket.Service);
 
 		// Constructing the processor installs its connection hook on the transport.
-		this.app.get<Contracts.P2PService.PeerProcessor>(Identifiers.P2P.Peer.Processor);
+		this.app.get<PeerProcessor>(Identifiers.P2P.Peer.Processor);
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const routes: Contracts.Kernel.Container.Newable<Interfaces.Route<any, any>>[] = [
