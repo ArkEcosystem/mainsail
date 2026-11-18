@@ -42,7 +42,6 @@ jobs:
         uses: ./.github/workflows/_lint-external.yml
         permissions:
             contents: read
-            issues: write
 
     # Runs after lint-internal so the two autofix jobs never push to the branch at the same time.
     references-internal:
