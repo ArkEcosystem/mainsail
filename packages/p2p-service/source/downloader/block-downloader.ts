@@ -5,7 +5,7 @@ import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
 import { constants } from "../constants.js";
-import { GetBlocks } from "../routes/get-blocks.js";
+import { getBlocksBudget } from "../routes/get-blocks.js";
 import { getRandomPeer } from "../utils/index.js";
 
 enum JobStatus {
@@ -243,14 +243,18 @@ export class BlockDownloader implements Contracts.P2PService.Downloader {
 		this.#replayJob(job);
 	}
 
+	// A peer returns fewer blocks than requested when the next one no longer fits its budget for the
+	// response. It charges every block its transaction payload plus a fixed overhead, so what it charged
+	// for this response and for the block it stopped at is at most the bytes received, that overhead per
+	// block and one block of the largest payload. A response that stays within the budget even by this
+	// upper bound had room for the next block: the peer withheld it.
 	#handleMissingBlocks(job: DownloadJob): void {
-		const configuration = this.configuration.getMilestone(this.stateStore.getBlockNumber() + 1);
+		const { maxPayload } = this.configuration.getMilestone(this.stateStore.getBlockNumber() + 1).block;
 
 		const size = job.blocks.reduce((size, block) => size + block.length, 0);
+		const charged = size + maxPayload + (job.blocks.length + 1) * constants.COMMIT_BUDGET_OVERHEAD;
 
-		// TODO: Take header size into account
-		if (size + configuration.block.maxPayload < GetBlocks.maxPayload.response) {
-			// Peer did't respond with all requested blocks and didn't exceed maxPayload
+		if (charged <= getBlocksBudget(job.blockNumberTo - job.blockNumberFrom + 1)) {
 			this.peerDisposer.banPeer(
 				job.peer.ip,
 				new Error("Peer didn't respond with all requested blocks and didn't exceed maxPayload"),

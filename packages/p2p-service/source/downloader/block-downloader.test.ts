@@ -3,7 +3,9 @@ import { Application } from "@mainsail/kernel";
 import { sleep } from "@mainsail/utils";
 
 import { describe } from "@mainsail/test-runner";
+import { constants } from "../constants";
 import { PendingCommits } from "../pending-commits";
+import { getBlocksBudget } from "../routes/get-blocks";
 import { BlockDownloader } from "./block-downloader";
 
 describe<{
@@ -14,7 +16,8 @@ describe<{
 	const communicator = { getBlocks: async () => ({ blocks: [] }) };
 	const repository = { getActivePeers: () => [] };
 	const peerDisposer = { banPeer: () => {} };
-	const configuration = { getMilestone: () => ({ block: { maxPayload: 2_097_152 } }) };
+	const maxPayload = 2_097_152;
+	const configuration = { getMilestone: () => ({ block: { maxPayload } }) };
 	// One slice per batch: every batch fits into the round that starts at its first block.
 	const roundCalculator = { calculateRound: () => ({ maxValidators: 400, roundHeight: 1 }) };
 	const stateStore = { getBlockNumber: () => 0, getLastBlock: () => ({ hash: "hash0" }) };
@@ -462,8 +465,8 @@ describe<{
 	});
 
 	it("#download - should not ban when the short reply was near the payload limit", async ({ downloader }) => {
-		// 3 MiB of block data: adding another maxPayload (2 MiB) block could exceed the 5 MiB
-		// response limit, so the short reply is legitimate.
+		// 3 MiB of block data: another block could not fit the 3 MiB response limit, so the short reply
+		// is legitimate.
 		stub(communicator, "getBlocks").resolvedValue({ blocks: [makeBlock(1, 3_145_728)] });
 		const banPeer = stub(peerDisposer, "banPeer");
 
@@ -472,5 +475,38 @@ describe<{
 
 		banPeer.neverCalled();
 		assert.false(downloader.isDownloading());
+	});
+
+	// The most block data a short reply of `count` blocks to a request for `limit` blocks can hold while
+	// the peer's budget still had room for one more block of the largest payload.
+	const withheldUpTo = (limit: number, count: number): number =>
+		getBlocksBudget(limit) - maxPayload - (count + 1) * constants.COMMIT_BUDGET_OVERHEAD;
+
+	it("#download - should ban when the peer's budget had room for the next block", async ({ downloader }) => {
+		// Blocks 1-4 requested, 1-3 returned.
+		const blocks = [makeBlock(1), makeBlock(2), makeBlock(3, withheldUpTo(4, 3) - 2)];
+		stub(communicator, "getBlocks").resolvedValue({ blocks });
+		const banPeer = stub(peerDisposer, "banPeer");
+
+		downloader.download(makePeer(5));
+		await sleep(10);
+
+		banPeer.calledOnce();
+	});
+
+	it("#download - should not ban when the peer's budget may have had no room for the next block", async ({
+		downloader,
+	}) => {
+		// One byte more than above. The reply is far below the response limit less one block, but the
+		// peer charges a fixed overhead per block on top of the payload and reserves the framing, so a
+		// full next block may not have fit.
+		const blocks = [makeBlock(1), makeBlock(2), makeBlock(3, withheldUpTo(4, 3) - 1)];
+		stub(communicator, "getBlocks").resolvedValue({ blocks });
+		const banPeer = stub(peerDisposer, "banPeer");
+
+		downloader.download(makePeer(5));
+		await sleep(10);
+
+		banPeer.neverCalled();
 	});
 });

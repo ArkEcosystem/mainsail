@@ -1,6 +1,11 @@
 export const constants = {
 	CHECK_HEADER_DELAY: 2000,
 
+	// What a peer charges against its get-blocks budget per block, on top of the block's transaction
+	// payload. Mirrors PER_COMMIT_OVERHEAD_BYTES of get_commits_by_block_range in packages/evm/core/src/db.rs;
+	// the block downloader uses it to tell a full response from a withheld one.
+	COMMIT_BUDGET_OVERHEAD: 1024,
+
 	// Known peers (seeds and active ones that lost their connection) are redialed from the service loop:
 	// not again within this time, and forgotten after MAX_DIAL_ATTEMPTS dials that did not make them
 	// active.
