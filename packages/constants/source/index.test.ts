@@ -23,6 +23,10 @@ describe("Index", ({ assert, it }) => {
 		assert.defined(index.Events);
 	});
 
+	it("should export ForkCheck", () => {
+		assert.is(index.ForkCheck, "fork pull request ci check");
+	});
+
 	it("should export Identifiers", () => {
 		assert.defined(index.Identifiers);
 	});
