@@ -1093,6 +1093,9 @@ importers:
       '@mainsail/p2p-service':
         specifier: workspace:*
         version: link:../p2p-service
+      '@mainsail/p2p-statistic':
+        specifier: workspace:*
+        version: link:../p2p-statistic
       '@mainsail/p2p-websocket':
         specifier: workspace:*
         version: link:../p2p-websocket
@@ -2746,6 +2749,25 @@ importers:
       protobufjs-cli:
         specifier: 2.6.2
         version: 2.6.2(protobufjs@8.7.2)
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
+
+  packages/p2p-statistic:
+    dependencies:
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      joi:
+        specifier: 18.2.5
+        version: 18.2.5
+    devDependencies:
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       uvu:
         specifier: 0.5.6
         version: 0.5.6

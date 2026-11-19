@@ -71,6 +71,7 @@
 		"@mainsail/p2p": "workspace:*",
 		"@mainsail/p2p-api-nodes": "workspace:*",
 		"@mainsail/p2p-service": "workspace:*",
+		"@mainsail/p2p-statistic": "workspace:*",
 		"@mainsail/p2p-websocket": "workspace:*",
 		"@mainsail/processor": "workspace:*",
 		"@mainsail/serializer": "workspace:*",
