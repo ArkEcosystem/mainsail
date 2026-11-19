@@ -48,19 +48,6 @@ export class ProposalDownloader implements Contracts.P2PService.Downloader {
 		});
 	}
 
-	public tryToDownload(): void {
-		if (this.blockDownloader.isDownloading()) {
-			return;
-		}
-
-		const header = this.headerFactory();
-		const peers = this.repository.getActivePeers().filter((peer) => this.#canDownload(header, peer.header));
-
-		if (peers.length > 0) {
-			this.download(getRandomPeer(peers));
-		}
-	}
-
 	public download(peer: Contracts.P2PService.Peer): void {
 		if (this.blockDownloader.isDownloading()) {
 			return;
@@ -83,6 +70,19 @@ export class ProposalDownloader implements Contracts.P2PService.Downloader {
 
 	public isDownloading(): boolean {
 		return this.#downloadsByBlockNumber.size > 0;
+	}
+
+	#tryToDownload(): void {
+		if (this.blockDownloader.isDownloading()) {
+			return;
+		}
+
+		const header = this.headerFactory();
+		const peers = this.repository.getActivePeers().filter((peer) => this.#canDownload(header, peer.header));
+
+		if (peers.length > 0) {
+			this.download(getRandomPeer(peers));
+		}
 	}
 
 	#canDownload(ourHeader: Contracts.P2PService.Header, peerHeader: Contracts.P2PService.HeaderData) {
@@ -158,7 +158,7 @@ export class ProposalDownloader implements Contracts.P2PService.Downloader {
 
 		if (error) {
 			this.peerDisposer.banPeer(job.peer.ip, error);
-			this.tryToDownload();
+			this.#tryToDownload();
 		}
 	}
 }
