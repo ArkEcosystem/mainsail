@@ -4,7 +4,6 @@ import type { Interfaces } from "@mainsail/p2p-websocket";
 import { Enums, Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { assert } from "@mainsail/utils";
-import dayjs from "dayjs";
 
 import type { Peer as PeerInterface } from "./interfaces/index.js";
 
@@ -26,8 +25,6 @@ export class Peer implements PeerInterface {
 	public version: string | undefined;
 
 	public latency: number | undefined;
-
-	public lastPinged: number | undefined;
 
 	public plugins: Contracts.P2PService.PeerPlugins = {};
 
@@ -78,7 +75,6 @@ export class Peer implements PeerInterface {
 	}
 
 	public setPinged(latency: number): void {
-		this.lastPinged = dayjs().valueOf();
 		this.latency = latency;
 	}
 

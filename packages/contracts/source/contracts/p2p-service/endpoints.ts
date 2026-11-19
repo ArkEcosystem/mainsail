@@ -38,7 +38,3 @@ export interface GetProposalQuery {
 export interface GetProposalResponse extends Response {
 	proposal: Buffer;
 }
-
-export type PostMessageResponse = Response;
-
-export type PostProposalResponse = Response;

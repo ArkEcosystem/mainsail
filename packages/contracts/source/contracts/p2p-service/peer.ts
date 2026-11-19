@@ -17,8 +17,6 @@ export interface Peer {
 	readonly ip: string;
 	readonly ports: PeerPorts;
 
-	readonly lastPinged: number | undefined;
-
 	version: string | undefined;
 	readonly latency: number | undefined;
 
@@ -59,17 +57,6 @@ export interface PeerConfig {
 		};
 	};
 	plugins: PeerPlugins;
-}
-
-export interface PeerPingResponse {
-	state: PeerState;
-	config: PeerConfig;
-}
-
-export interface PeerVerificationResult {
-	readonly myBlockNumber: number;
-	readonly hisBlockNumber: number;
-	readonly highestCommonBlockNumber: number;
 }
 
 export type PeerFactory = (ip: string) => Peer;
