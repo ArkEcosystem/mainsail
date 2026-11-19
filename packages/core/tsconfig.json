@@ -127,6 +127,9 @@
 			"path": "../p2p"
 		},
 		{
+			"path": "../p2p-api-nodes"
+		},
+		{
 			"path": "../p2p-service"
 		},
 		{
