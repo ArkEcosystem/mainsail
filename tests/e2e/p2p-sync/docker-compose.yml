@@ -2,6 +2,7 @@
 # validators starts 60 seconds later and must download the chain through the block downloader.
 # node0 and node2 load @mainsail/p2p-api-nodes, node1 does not: every run has peers that ask a node
 # without the API node directory, which must answer with an empty list and keep the connection.
+# node0 and node2 also load @mainsail/p2p-statistic and log one statistic line per round.
 #   pnpm run e2e:p2p-sync        start all three and follow the logs
 #   pnpm run e2e:p2p-sync:down   stop and remove them
 # To test a restart: docker compose -f tests/e2e/p2p-sync/docker-compose.yml restart node1

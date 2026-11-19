@@ -20,11 +20,15 @@
 		"uvu": "tsx --tsconfig ../../tsconfig.test.json ./node_modules/uvu/bin.js"
 	},
 	"dependencies": {
+		"@mainsail/constants": "workspace:*",
 		"@mainsail/container": "workspace:*",
 		"@mainsail/kernel": "workspace:*",
+		"@mainsail/p2p-websocket": "workspace:*",
+		"@mainsail/utils": "workspace:*",
 		"joi": "18.2.5"
 	},
 	"devDependencies": {
+		"@mainsail/contracts": "workspace:*",
 		"@mainsail/test-runner": "workspace:*",
 		"uvu": "0.5.6"
 	},
