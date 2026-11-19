@@ -11,7 +11,7 @@ import { ensureError } from "@mainsail/utils";
 @injectable()
 export class StatisticSendMiddleware implements Interfaces.SendMiddleware {
 	@inject(Identifiers.P2P.Statistic.Service)
-	private readonly statisticService!: Contracts.P2PStatistic.StatisticService;
+	private readonly statisticService!: Contracts.P2PStatistic.Service;
 
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;

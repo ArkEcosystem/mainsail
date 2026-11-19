@@ -1,7 +1,6 @@
-export interface StatisticService {
+export interface Service {
 	boot(): void;
 	dispose(): void;
-	newRound(height: number, round: number): void;
 	getCurrentRoundStatistic(): RoundStatistic;
 	getRoundStatisticList(): string[];
 	getRoundStatistic(id: string): RoundStatistic | undefined;
@@ -34,7 +33,7 @@ export interface RoundStatistic {
 	getPeerStatistics(): PeerStatistic[];
 }
 
-export interface StatisticLogger {
+export interface Logger {
 	log(roundStatistic: RoundStatistic): void;
 }
 

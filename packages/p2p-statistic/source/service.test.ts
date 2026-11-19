@@ -39,15 +39,16 @@ describe<{
 	const fire = async (listeners: Map<string, any>, name: string, data: unknown): Promise<void> =>
 		listeners.get(name).handle({ data, name });
 
-	it("#newRound - should log the finished round and start a statistic for the new one", ({
+	it("#boot - should log the finished round and keep the statistic of the new one", async ({
 		statisticService,
 		statisticLogger,
+		listeners,
 	}) => {
 		const log = spy(statisticLogger, "log");
 		statisticService.boot();
 		const first = statisticService.getCurrentRoundStatistic();
 
-		statisticService.newRound(5, 1);
+		await fire(listeners, Events.ConsensusEvent.RoundStarted, { blockNumber: 5, round: 1 });
 
 		log.calledWith(first);
 		const current = statisticService.getCurrentRoundStatistic();
@@ -57,11 +58,11 @@ describe<{
 		assert.equal(statisticService.getRoundStatisticList(), ["5-1"]);
 	});
 
-	it("#newRound - should keep as many rounds as configured, newest first", ({ statisticService }) => {
+	it("#boot - should keep as many rounds as configured, newest first", async ({ statisticService, listeners }) => {
 		statisticService.boot();
 
-		for (let height = 1; height <= MAX_TRACKED_ROUNDS + 2; height++) {
-			statisticService.newRound(height, 0);
+		for (let blockNumber = 1; blockNumber <= MAX_TRACKED_ROUNDS + 2; blockNumber++) {
+			await fire(listeners, Events.ConsensusEvent.RoundStarted, { blockNumber, round: 0 });
 		}
 
 		const list = statisticService.getRoundStatisticList();

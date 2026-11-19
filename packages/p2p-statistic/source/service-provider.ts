@@ -24,11 +24,11 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	}
 
 	public async boot(): Promise<void> {
-		this.app.get<Contracts.P2PStatistic.StatisticService>(Identifiers.P2P.Statistic.Service).boot();
+		this.app.get<Contracts.P2PStatistic.Service>(Identifiers.P2P.Statistic.Service).boot();
 	}
 
 	public async dispose(): Promise<void> {
-		this.app.get<Contracts.P2PStatistic.StatisticService>(Identifiers.P2P.Statistic.Service).dispose();
+		this.app.get<Contracts.P2PStatistic.Service>(Identifiers.P2P.Statistic.Service).dispose();
 	}
 
 	// Mirrors defaults.ts.

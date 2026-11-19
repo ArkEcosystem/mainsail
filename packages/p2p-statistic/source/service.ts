@@ -13,7 +13,7 @@ import { RoundStatistic } from "./round-statistic.js";
 // constructed. A round statistic needs the peer layer, which needs the transport, so the first one is
 // made in boot() and not here: by then the transport exists.
 @injectable()
-export class Service implements Contracts.P2PStatistic.StatisticService {
+export class Service implements Contracts.P2PStatistic.Service {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -22,7 +22,7 @@ export class Service implements Contracts.P2PStatistic.StatisticService {
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.Statistic.Logger)
-	private readonly statisticLogger!: Contracts.P2PStatistic.StatisticLogger;
+	private readonly statisticLogger!: Contracts.P2PStatistic.Logger;
 
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
@@ -35,7 +35,7 @@ export class Service implements Contracts.P2PStatistic.StatisticService {
 
 	readonly #listeners: Record<string, Contracts.Kernel.EventListener> = {
 		[Events.ConsensusEvent.RoundStarted]: this.#listener<Contracts.Consensus.State>(({ blockNumber, round }) =>
-			this.newRound(blockNumber, round),
+			this.#newRound(blockNumber, round),
 		),
 		[Events.PeerEvent.Added]: this.#listener<{ ip: string }>(({ ip }) => this.#currentRoundStatistic.peerAdded(ip)),
 		[Events.PeerEvent.Banned]: this.#listener<{ peer: { ip: string } }>(({ peer }) =>
@@ -62,7 +62,20 @@ export class Service implements Contracts.P2PStatistic.StatisticService {
 		}
 	}
 
-	public newRound(height: number, round: number): void {
+	public getCurrentRoundStatistic(): RoundStatistic {
+		return this.#currentRoundStatistic;
+	}
+
+	public getRoundStatisticList(): string[] {
+		return [...this.#roundStatistics.keys()].reverse();
+	}
+
+	public getRoundStatistic(id: string): Contracts.P2PStatistic.RoundStatistic | undefined {
+		return this.#roundStatistics.get(id);
+	}
+
+	// The round that just ended is logged and a statistic for the new one takes its place.
+	#newRound(height: number, round: number): void {
 		this.#currentRoundStatistic.stop();
 		this.statisticLogger.log(this.#currentRoundStatistic);
 
@@ -77,18 +90,6 @@ export class Service implements Contracts.P2PStatistic.StatisticService {
 			const [firstKey] = this.#roundStatistics.keys();
 			this.#roundStatistics.delete(firstKey);
 		}
-	}
-
-	public getCurrentRoundStatistic(): RoundStatistic {
-		return this.#currentRoundStatistic;
-	}
-
-	public getRoundStatisticList(): string[] {
-		return [...this.#roundStatistics.keys()].reverse();
-	}
-
-	public getRoundStatistic(id: string): Contracts.P2PStatistic.RoundStatistic | undefined {
-		return this.#roundStatistics.get(id);
 	}
 
 	// Consensus waits for the listeners of its round event and the peer layer does not catch what its
