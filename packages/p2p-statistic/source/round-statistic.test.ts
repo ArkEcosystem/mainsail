@@ -10,7 +10,7 @@ const MAX_ENDPOINT_SAMPLES = 32;
 
 describe<{
 	statistic: RoundStatistic;
-}>("RoundStatistic", ({ it, assert, beforeEach }) => {
+}>("RoundStatistic", ({ it, assert, beforeEach, clock }) => {
 	const ping = (responseTime: number, success = true) => ({ responseTime, success });
 	const emit = (responseTime: number, success = true) => ({ responseTime, success });
 
@@ -221,5 +221,22 @@ describe<{
 
 		assert.equal(count.peersTotal, 3);
 		assert.equal(count.peersBanned, 2);
+	});
+
+	it("should report the time passed so far for a running round and the full time once it is stopped", ({
+		statistic,
+	}) => {
+		const fakeTimers = clock({ toFake: ["performance"] });
+
+		assert.equal(statistic.getGeneralStatistic().duration, 0);
+
+		statistic.start();
+		fakeTimers.tick(1500);
+		assert.equal(statistic.getGeneralStatistic().duration, 1500);
+
+		fakeTimers.tick(1000);
+		statistic.stop();
+		fakeTimers.tick(4000);
+		assert.equal(statistic.getGeneralStatistic().duration, 2500);
 	});
 });

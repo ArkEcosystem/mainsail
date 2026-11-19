@@ -2,7 +2,6 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
-import { performance } from "perf_hooks";
 
 /* Each key holds running totals plus a fixed number of samples, so it costs the same whether it saw
  * one request or a million, and the number of ip keys is capped by `maxTrackedPeers`. The counts reported by
@@ -161,8 +160,8 @@ export class RoundStatistic implements Contracts.P2PStatistic.RoundStatistic {
 	public height: number = 0;
 	public round: number = 0;
 
-	#startTime!: number;
-	#endTime!: number;
+	#startTime?: number;
+	#endTime?: number;
 	#totalPeers!: number;
 	#totalPeersBanned = 0;
 	#maxTrackedPeers!: number;
@@ -185,7 +184,7 @@ export class RoundStatistic implements Contracts.P2PStatistic.RoundStatistic {
 
 	public start(): void {
 		this.#startTime = performance.now();
-		this.#endTime = 0;
+		this.#endTime = undefined;
 
 		this.#totalPeers = this.peerRepository.getActivePeers().length;
 	}
@@ -234,7 +233,9 @@ export class RoundStatistic implements Contracts.P2PStatistic.RoundStatistic {
 	}
 
 	public getGeneralStatistic(): Contracts.P2PStatistic.GeneralStatistic {
-		const duration = Math.round(this.#endTime - this.#startTime);
+		// A round that is still running has no end yet: its duration is the time that has passed so far.
+		const duration =
+			this.#startTime === undefined ? 0 : Math.round((this.#endTime ?? performance.now()) - this.#startTime);
 
 		const count = {
 			emitsFailed: this.#emits.totals.count - this.#emits.totals.success,
