@@ -22,7 +22,7 @@ export class GetProposalRoute implements Interfaces.Route<Request, Response> {
 	private readonly consensus!: Contracts.Consensus.Service;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
-	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;
+	private readonly roundStateRepository!: Contracts.Consensus.RoundStateRepository;
 
 	public readonly path = GetProposal.path;
 	public readonly codec = GetProposal.codec;
@@ -42,7 +42,7 @@ export class GetProposalRoute implements Interfaces.Route<Request, Response> {
 			return empty;
 		}
 
-		const proposal = this.roundStateRepo.getRoundState(query.blockNumber, query.round ?? 0).getProposal();
+		const proposal = this.roundStateRepository.getRoundState(query.blockNumber, query.round ?? 0).getProposal();
 
 		return proposal ? { proposal: proposal.serialized } : empty;
 	}

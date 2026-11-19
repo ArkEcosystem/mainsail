@@ -12,7 +12,7 @@ export class Header implements Contracts.P2PService.Header {
 	private readonly consensus!: Contracts.Consensus.Service;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
-	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;
+	private readonly roundStateRepository!: Contracts.Consensus.RoundStateRepository;
 
 	public blockNumber!: number;
 	public round!: number;
@@ -27,7 +27,7 @@ export class Header implements Contracts.P2PService.Header {
 		this.round = this.consensus.getRound();
 		this.step = this.consensus.getStep();
 
-		const roundState = this.roundStateRepo.getRoundState(this.blockNumber, this.round);
+		const roundState = this.roundStateRepository.getRoundState(this.blockNumber, this.round);
 		this.validatorsSignedPrecommit = roundState.getValidatorsSignedPrecommit();
 		this.validatorsSignedPrevote = roundState.getValidatorsSignedPrevote();
 		this.proposal = roundState.getProposal();
