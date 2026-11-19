@@ -11,6 +11,8 @@ describe<{
 	logger: any;
 	listeners: Map<string, any>;
 }>("Service", ({ it, assert, beforeEach, spy }) => {
+	const MAX_TRACKED_ROUNDS = 5;
+
 	beforeEach((context) => {
 		context.listeners = new Map();
 		context.statisticLogger = { log: () => {} };
@@ -18,7 +20,9 @@ describe<{
 
 		const app = new Application();
 		app.bind(Identifiers.ServiceProvider.Configuration)
-			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
+			.toConstantValue(
+				new Providers.PluginConfiguration().from("", { ...defaults, maxTrackedRounds: MAX_TRACKED_ROUNDS }),
+			)
 			.whenTagged("plugin", "p2p-statistic");
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getActivePeers: () => [] });
 		app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue({ bannedPeers: () => [] });
@@ -53,17 +57,17 @@ describe<{
 		assert.equal(statisticService.getRoundStatisticList(), ["5-1"]);
 	});
 
-	it("#newRound - should keep the last 100 rounds, newest first", ({ statisticService }) => {
+	it("#newRound - should keep as many rounds as configured, newest first", ({ statisticService }) => {
 		statisticService.boot();
 
-		for (let height = 1; height <= 102; height++) {
+		for (let height = 1; height <= MAX_TRACKED_ROUNDS + 2; height++) {
 			statisticService.newRound(height, 0);
 		}
 
 		const list = statisticService.getRoundStatisticList();
 
-		assert.length(list, 100);
-		assert.equal(list[0], "102-0");
+		assert.length(list, MAX_TRACKED_ROUNDS);
+		assert.equal(list[0], `${MAX_TRACKED_ROUNDS + 2}-0`);
 		assert.equal(list.at(-1), "3-0");
 		assert.undefined(statisticService.getRoundStatistic("2-0"));
 	});

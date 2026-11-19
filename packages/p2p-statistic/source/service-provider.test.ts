@@ -47,6 +47,7 @@ describe<{
 		const schema = serviceProvider.configSchema();
 
 		assert.defined(schema.validate({ ...defaults, maxTrackedPeers: 0 }).error);
+		assert.defined(schema.validate({ ...defaults, maxTrackedRounds: 0 }).error);
 		assert.defined(schema.validate({ ...defaults, verbosity: 4 }).error);
 	});
 });

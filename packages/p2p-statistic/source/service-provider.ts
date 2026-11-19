@@ -35,6 +35,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
 			maxTrackedPeers: Joi.number().integer().min(1).required(),
+			maxTrackedRounds: Joi.number().integer().min(1).required(),
 			verbosity: Joi.number().integer().min(0).max(3).required(),
 		}).unknown(true);
 	}

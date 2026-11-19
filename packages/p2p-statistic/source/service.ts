@@ -1,13 +1,10 @@
 import type { Contracts } from "@mainsail/contracts";
 
 import { Events, Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, tagged } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
 import { RoundStatistic } from "./round-statistic.js";
-
-// TODO: Read from config
-const MAX_ROUND_STATISTICS = 100;
 
 // Keeps one statistic per consensus round and the last rounds for the development API. It is fed from
 // outside: the request timings come from the transport middleware of this package, the rest from the
@@ -19,6 +16,10 @@ const MAX_ROUND_STATISTICS = 100;
 export class Service implements Contracts.P2PStatistic.StatisticService {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
+
+	@inject(Identifiers.ServiceProvider.Configuration)
+	@tagged("plugin", "p2p-statistic")
+	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
 	@inject(Identifiers.P2P.Statistic.Logger)
 	private readonly statisticLogger!: Contracts.P2PStatistic.StatisticLogger;
@@ -71,8 +72,8 @@ export class Service implements Contracts.P2PStatistic.StatisticService {
 		this.#currentRoundStatistic.start();
 
 		this.#roundStatistics.set(`${height}-${round}`, this.#currentRoundStatistic);
-		// Remove first if we have more than 100 rounds stored
-		if (this.#roundStatistics.size > MAX_ROUND_STATISTICS) {
+		// Remove the oldest one once more rounds are stored than configured
+		if (this.#roundStatistics.size > this.configuration.getRequired<number>("maxTrackedRounds")) {
 			const [firstKey] = this.#roundStatistics.keys();
 			this.#roundStatistics.delete(firstKey);
 		}
