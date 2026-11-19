@@ -16,7 +16,6 @@ export class PeerResource implements Contracts.Api.Resource {
 			latency: resource.latency,
 			plugins: resource.plugins,
 			port: resource.port,
-			ports: resource.ports,
 			version: resource.version,
 		};
 	}

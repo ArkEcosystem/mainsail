@@ -18,8 +18,6 @@ export class Peer implements PeerInterface {
 
 	public protocol!: Contracts.P2PService.PeerProtocol;
 
-	public readonly ports: Contracts.P2PService.PeerPorts = {};
-
 	public version: string | undefined;
 
 	public latency: number | undefined;
@@ -68,7 +66,7 @@ export class Peer implements PeerInterface {
 		const changed =
 			previousHeader.blockNumber !== this.#header.blockNumber || previousHeader.version !== this.#header.version;
 		if (changed) {
-			void this.events.dispatch(Events.PeerEvent.Updated, this);
+			void this.events.dispatch(Events.PeerEvent.Updated, this.toData());
 		}
 	}
 
@@ -92,7 +90,6 @@ export class Peer implements PeerInterface {
 			latency: this.latency,
 			plugins: { ...this.plugins },
 			port: this.port,
-			ports: { ...this.ports },
 			version: this.version,
 		};
 	}

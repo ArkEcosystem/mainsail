@@ -13,6 +13,9 @@ export class Service implements Contracts.P2PApiNodes.Service {
 	@inject(Identifiers.P2P.ApiNode.Discoverer)
 	private readonly apiNodeDiscoverer!: Contracts.P2PApiNodes.ApiNodeDiscoverer;
 
+	@inject(Identifiers.P2P.Peer.Repository)
+	private readonly peerRepository!: Contracts.P2PService.PeerRepository;
+
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -20,9 +23,15 @@ export class Service implements Contracts.P2PApiNodes.Service {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	readonly #peerListener: Contracts.Kernel.EventListener = {
-		// Not awaited: checking a peer's nodes takes a while and must not hold up the other listeners.
+		// The event carries the peer's data; asking takes the peer itself, which may be gone again by the
+		// time the event arrives. Not awaited: checking a peer's nodes takes a while and must not hold up
+		// the other listeners.
 		handle: async ({ data }): Promise<void> => {
-			void this.apiNodeDiscoverer.discoverApiNodes(data as Contracts.P2PService.Peer);
+			const { ip } = data as Contracts.P2PService.PeerData;
+
+			if (this.peerRepository.hasActivePeer(ip)) {
+				void this.apiNodeDiscoverer.discoverApiNodes(this.peerRepository.getActivePeer(ip));
+			}
 		},
 	};
 

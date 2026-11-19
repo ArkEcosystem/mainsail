@@ -13,7 +13,7 @@ import { assert } from "@mainsail/utils";
 import { AbstractListener, ListenerEvent, ListenerEventMapping } from "./abstract-listener.js";
 
 @injectable()
-export class Peers extends AbstractListener<Contracts.P2PService.Peer, Models.Peer> {
+export class Peers extends AbstractListener<Contracts.P2PService.PeerData, Models.Peer> {
 	@inject(ApiDatabaseIdentifiers.PeerRepositoryFactory)
 	private readonly peerRepositoryFactory!: ApiDatabaseContracts.PeerRepositoryFactory;
 
@@ -25,20 +25,22 @@ export class Peers extends AbstractListener<Contracts.P2PService.Peer, Models.Pe
 		};
 	}
 
-	protected getEventId(event: Contracts.P2PService.Peer): string {
+	protected getEventId(event: Contracts.P2PService.PeerData): string {
 		const ip = event.ip;
 		assert.string(ip);
 		return ip;
 	}
 
-	protected mapEventToEntity(event: Contracts.P2PService.Peer): Models.Peer {
+	protected mapEventToEntity(event: Contracts.P2PService.PeerData): Models.Peer {
+		// Only active peers are announced, and a peer is active once it has answered with its header.
+		assert.defined(event.header);
+
 		return {
 			blockNumber: event.header.blockNumber,
 			ip: event.ip,
 			latency: event.latency,
 			plugins: event.plugins as Record<string, unknown>,
 			port: event.port,
-			ports: event.ports as Record<string, unknown>,
 			version: event.version,
 		};
 	}
