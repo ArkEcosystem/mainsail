@@ -74,10 +74,11 @@ export class Service implements Contracts.P2PStatistic.Service {
 		return this.#roundStatistics.get(id);
 	}
 
-	// The round that just ended is logged and a statistic for the new one takes its place.
+	// A statistic for the new round takes the place of the one that just ended, which is then logged.
+	// The finished round is closed and written out last: if that fails, the new round is counted all the
+	// same instead of being added to the old one.
 	#newRound(height: number, round: number): void {
-		this.#currentRoundStatistic.stop();
-		this.statisticLogger.log(this.#currentRoundStatistic);
+		const finishedRoundStatistic = this.#currentRoundStatistic;
 
 		this.#currentRoundStatistic = this.app.resolve(RoundStatistic);
 		this.#currentRoundStatistic.height = height;
@@ -90,6 +91,9 @@ export class Service implements Contracts.P2PStatistic.Service {
 			const [firstKey] = this.#roundStatistics.keys();
 			this.#roundStatistics.delete(firstKey);
 		}
+
+		finishedRoundStatistic.stop();
+		this.statisticLogger.log(finishedRoundStatistic);
 	}
 
 	// Consensus waits for the listeners of its round event and the peer layer does not catch what its

@@ -114,6 +114,11 @@ describe<{
 		await fire(listeners, Events.ConsensusEvent.RoundStarted, { blockNumber: 7, round: 2 });
 
 		warn.calledWith(`Recording ${Events.ConsensusEvent.RoundStarted} in the statistics failed: boom`, "p2p");
+
+		// The round is counted on its own all the same, not added to the one that could not be logged.
+		const current = statisticService.getCurrentRoundStatistic();
+		assert.equal([current.height, current.round], [7, 2]);
+		assert.equal(statisticService.getRoundStatisticList(), ["7-2"]);
 	});
 
 	it("#dispose - should stop listening", ({ statisticService, listeners }) => {
