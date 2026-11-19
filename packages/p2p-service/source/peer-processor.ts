@@ -99,10 +99,8 @@ export class PeerProcessor {
 	// that merely failed only puts it back among the known peers.
 	#onClose(ip: string, reason: CloseReason, error?: Error): void {
 		if (BAN_REASONS.has(reason)) {
-			this.peerDisposer.banPeer(
-				ip,
-				new Error(`Connection closed: ${reason}${error ? ` (${error.message})` : ""}`),
-			);
+			const detail = error ? ` (${error.message})` : "";
+			this.peerDisposer.banPeer(ip, new Error(`Connection closed: ${reason}${detail}`));
 			return;
 		}
 

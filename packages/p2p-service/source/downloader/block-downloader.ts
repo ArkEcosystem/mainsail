@@ -141,33 +141,7 @@ export class BlockDownloader implements Contracts.P2PService.Downloader {
 						.map(async (buff) => await this.commitFactory.fromBytes(buff)),
 				);
 
-				// Check blocks
-				for (const [index, commit] of commits.entries()) {
-					if (commit.block.number !== number + index) {
-						throw new Error(
-							`Received block number ${commit.block.number} does not match expected number ${
-								number + index
-							}`,
-						);
-					}
-				}
-
-				// Each commit's precommit signature covers the previous block hash, so verify
-				// against the actual predecessor in the chain never the store's last block,
-				// which moves whenever consensus applies a block.
-				const hasValidSignatures = await Promise.all(
-					commits.map(
-						async (commit, index) =>
-							await this.commitProcessor.hasValidSignature(
-								commit,
-								index === 0 ? previousBlockHash : commits[index - 1].block.hash,
-							),
-					),
-				);
-
-				if (!hasValidSignatures.every(Boolean)) {
-					throw new Error(`Received block(s) with invalid signature(s)`);
-				}
+				await this.#verifyCommits(commits, number, previousBlockHash);
 
 				this.pendingCommits.add(commits);
 
@@ -198,6 +172,40 @@ export class BlockDownloader implements Contracts.P2PService.Downloader {
 
 		this.#downloadJobs.shift();
 		this.#processNextJob();
+	}
+
+	// Checks a slice before any of it is processed: the block numbers must follow on from
+	// `fromBlockNumber` and every commit must be signed. Each commit's precommit signature covers the
+	// previous block hash, so verify against the actual predecessor in the chain never the store's last
+	// block, which moves whenever consensus applies a block.
+	async #verifyCommits(
+		commits: Contracts.Crypto.Commit[],
+		fromBlockNumber: number,
+		previousBlockHash: string,
+	): Promise<void> {
+		for (const [index, commit] of commits.entries()) {
+			if (commit.block.number !== fromBlockNumber + index) {
+				throw new Error(
+					`Received block number ${commit.block.number} does not match expected number ${
+						fromBlockNumber + index
+					}`,
+				);
+			}
+		}
+
+		const hasValidSignatures = await Promise.all(
+			commits.map(
+				async (commit, index) =>
+					await this.commitProcessor.hasValidSignature(
+						commit,
+						index === 0 ? previousBlockHash : commits[index - 1].block.hash,
+					),
+			),
+		);
+
+		if (!hasValidSignatures.every(Boolean)) {
+			throw new Error(`Received block(s) with invalid signature(s)`);
+		}
 	}
 
 	// Drops leading blocks that are already applied (e.g. committed by live consensus while the job was in flight)
