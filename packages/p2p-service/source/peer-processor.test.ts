@@ -76,7 +76,7 @@ describe<{
 	websocketService: any;
 }>("PeerProcessor", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
-		context.logger = { debug: () => {}, warn: () => {}, warnExtra: () => {} };
+		context.logger = { debug: () => {}, info: () => {}, warn: () => {}, warnExtra: () => {} };
 		context.repository = makeRepository();
 		context.peerVerifier = { verify: async () => true };
 		// As the real disposer: the peer loses its place, an active one becomes known.
@@ -119,6 +119,23 @@ describe<{
 		verify.calledWith(peer);
 		discoverPeers.calledWith(peer);
 		close.neverCalled();
+	});
+
+	it("#onConnection - should log an accepted peer, and only once it is active", async ({
+		websocketService,
+		peerVerifier,
+		logger,
+	}) => {
+		const finish = deferVerification(peerVerifier);
+		const info = spy(logger, "info");
+
+		await connect(websocketService, ip);
+		info.neverCalled();
+
+		finish[0](true);
+		await settle();
+		info.calledOnce();
+		assert.true(info.getCallArgs(0)[0].startsWith(`Accepted new peer ${ip}:`));
 	});
 
 	it("#onConnection - should keep the peer pending while it is verified", async ({

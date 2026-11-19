@@ -131,7 +131,7 @@ export class PeerProcessor {
 
 		this.repository.setActivePeer(peer);
 		peer.dialAttempts = 0;
-		this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
+		this.logger.info(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
 
 		await this.peerDiscoverer.discoverPeers(peer);
 	}
