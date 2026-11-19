@@ -5,13 +5,13 @@ import { Application, Providers } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 
 import { defaults } from "./defaults";
-import { StatisticLogger } from "./statistic-logger";
+import { Logger } from "./logger";
 
 describe<{
 	app: Application;
 	messages: string[];
-	statisticLogger: StatisticLogger;
-}>("StatisticLogger", ({ it, assert, beforeEach }) => {
+	statisticLogger: Logger;
+}>("Logger", ({ it, assert, beforeEach }) => {
 	const roundStatistic = (count: Partial<Contracts.P2PStatistic.GeneralStatistic["count"]>) =>
 		({
 			getGeneralStatistic: (): Contracts.P2PStatistic.GeneralStatistic => ({
@@ -45,7 +45,7 @@ describe<{
 			info: (message: string) => context.messages.push(message),
 		});
 
-		context.statisticLogger = context.app.resolve(StatisticLogger);
+		context.statisticLogger = context.app.resolve(Logger);
 	});
 
 	it("should report unattributed records without discounting them from the totals", ({

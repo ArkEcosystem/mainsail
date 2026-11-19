@@ -4,7 +4,7 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 
 @injectable()
-export class StatisticLogger implements Contracts.P2PStatistic.StatisticLogger {
+export class Logger implements Contracts.P2PStatistic.StatisticLogger {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2PService.Logger;
 

@@ -3,14 +3,14 @@ import { Application, Providers } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 
 import { defaults } from "./defaults";
-import { StatisticService } from "./statistic-service";
+import { Service } from "./service";
 
 describe<{
-	statisticService: StatisticService;
+	statisticService: Service;
 	statisticLogger: any;
 	logger: any;
 	listeners: Map<string, any>;
-}>("StatisticService", ({ it, assert, beforeEach, spy }) => {
+}>("Service", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
 		context.listeners = new Map();
 		context.statisticLogger = { log: () => {} };
@@ -29,7 +29,7 @@ describe<{
 			listen: (name: string, listener: any) => context.listeners.set(name, listener),
 		});
 
-		context.statisticService = app.resolve(StatisticService);
+		context.statisticService = app.resolve(Service);
 	});
 
 	const fire = async (listeners: Map<string, any>, name: string, data: unknown): Promise<void> =>

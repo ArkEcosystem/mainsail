@@ -5,9 +5,9 @@ import { injectable } from "@mainsail/container";
 import { Providers } from "@mainsail/kernel";
 import Joi from "joi";
 
+import { Logger } from "./logger.js";
 import { StatisticReceiveMiddleware, StatisticSendMiddleware } from "./middleware/index.js";
-import { StatisticLogger } from "./statistic-logger.js";
-import { StatisticService } from "./statistic-service.js";
+import { Service } from "./service.js";
 
 // Per-round statistics of the peer layer: request timings and peers coming and going, for the log and
 // the development API. Nothing in consensus or sync reads them, so a node may leave this plugin out.
@@ -16,8 +16,8 @@ import { StatisticService } from "./statistic-service.js";
 @injectable()
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
-		this.app.bind(Identifiers.P2P.Statistic.Logger).to(StatisticLogger).inSingletonScope();
-		this.app.bind(Identifiers.P2P.Statistic.Service).to(StatisticService).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Statistic.Logger).to(Logger).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Statistic.Service).to(Service).inSingletonScope();
 
 		this.app.bind(Identifiers.P2P.WebSocket.SendMiddleware).to(StatisticSendMiddleware).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware).to(StatisticReceiveMiddleware).inSingletonScope();

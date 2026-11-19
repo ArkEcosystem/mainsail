@@ -16,7 +16,7 @@ const MAX_ROUND_STATISTICS = 100;
 // constructed. A round statistic needs the peer layer, which needs the transport, so the first one is
 // made in boot() and not here: by then the transport exists.
 @injectable()
-export class StatisticService implements Contracts.P2PStatistic.StatisticService {
+export class Service implements Contracts.P2PStatistic.StatisticService {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
