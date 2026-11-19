@@ -10,8 +10,6 @@ export const constants = {
 	// not again within this time, and forgotten after MAX_DIAL_ATTEMPTS dials that did not make them
 	// active.
 	DIAL_SPACING: 10_000,
-	// cut-loose timeout for a fast peer cleanse. slow verifications continue in the background
-	FAST_VERIFY_TIMEOUT: 1500,
 
 	// New addresses, learned from other peers, are dialed this many at a time; further ones wait, and
 	// are dropped once this many wait. A peer's list of dead addresses thus keeps the dialers busy for a

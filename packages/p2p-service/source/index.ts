@@ -20,5 +20,4 @@ export * from "./routes/index.js";
 export * from "./seeds.js";
 export * from "./service-provider.js";
 export * from "./service.js";
-export * from "./state.js";
 export * from "./utils/index.js";

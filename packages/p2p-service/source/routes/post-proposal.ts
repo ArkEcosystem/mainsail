@@ -28,9 +28,6 @@ export class PostProposalRoute implements Interfaces.Route<Request, Response> {
 	@inject(Identifiers.Cryptography.Proposal.Factory)
 	private readonly factory!: Contracts.Crypto.ProposalFactory;
 
-	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2PService.State;
-
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2PService.Logger;
 
@@ -46,8 +43,6 @@ export class PostProposalRoute implements Interfaces.Route<Request, Response> {
 			if ((await this.proposalProcessor.process(proposal)) === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error("Invalid proposal");
 			}
-
-			this.state.resetLastMessageTime();
 		} catch (rawError) {
 			this.logger.debug(
 				`Rejected proposal from ${connection.remoteAddress}: ${ensureError(rawError).message}`,

@@ -18,7 +18,6 @@ describe<{
 	const peerDisposer = { banPeer: () => {} };
 	const factory = { makeProposalFromBytes: async () => ({}) };
 	const proposalProcessor = { process: async () => Enums.Consensus.ProcessorResult.Accepted };
-	const state = { resetLastMessageTime: () => {} };
 
 	beforeEach((context) => {
 		// Eligible for download: peer is at our (blockNumber, round), we hold no proposal yet.
@@ -34,7 +33,6 @@ describe<{
 		context.app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue(peerDisposer);
 		context.app.bind(Identifiers.Cryptography.Proposal.Factory).toConstantValue(factory);
 		context.app.bind(Identifiers.Consensus.Processor.Proposal).toConstantValue(proposalProcessor);
-		context.app.bind(Identifiers.P2P.State).toConstantValue(state);
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({
 			listen: (event: string, listener: { handle: (payload: { data: { number: number } }) => Promise<void> }) => {
 				if (event === Events.BlockEvent.Applied) {
@@ -81,7 +79,6 @@ describe<{
 		stub(communicator, "getProposal").resolvedValue({ proposal: Buffer.from("dead", "hex") });
 		stub(factory, "makeProposalFromBytes").resolvedValue({ blockHeader: { number: 2 }, round: 0 });
 		const process = stub(proposalProcessor, "process").resolvedValue(Enums.Consensus.ProcessorResult.Accepted);
-		const resetLastMessageTime = stub(state, "resetLastMessageTime");
 		const banPeer = stub(peerDisposer, "banPeer");
 
 		downloader.download(peer);
@@ -89,7 +86,6 @@ describe<{
 
 		assert.false(downloader.isDownloading());
 		process.calledOnce();
-		resetLastMessageTime.calledOnce();
 		banPeer.neverCalled();
 	});
 

@@ -57,9 +57,6 @@ export class MessageDownloader implements Contracts.P2PService.Downloader {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2PService.State;
-
 	#fullDownloadsByBlockNumber: Map<number, Set<number>> = new Map();
 	#downloadsByBlockNumber: Map<number, Map<number, DownloadsByRound>> = new Map();
 
@@ -247,8 +244,6 @@ export class MessageDownloader implements Contracts.P2PService.Downloader {
 		if (prevotes.length === 0 && precommits.length === 0) {
 			return;
 		}
-
-		this.state.resetLastMessageTime();
 
 		if (job.peerHeader.round !== job.round) {
 			return;

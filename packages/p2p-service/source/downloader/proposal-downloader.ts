@@ -34,9 +34,6 @@ export class ProposalDownloader implements Contracts.P2PService.Downloader {
 	@inject(Identifiers.Consensus.Processor.Proposal)
 	private readonly proposalProcessor!: Contracts.Consensus.ProposalProcessor;
 
-	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2PService.State;
-
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -151,8 +148,6 @@ export class ProposalDownloader implements Contracts.P2PService.Downloader {
 			if (response === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error(`Received proposal is invalid`);
 			}
-
-			this.state.resetLastMessageTime();
 		} catch (rawError) {
 			error = ensureError(rawError);
 		} finally {

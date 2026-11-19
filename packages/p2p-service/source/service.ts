@@ -2,9 +2,9 @@ import type { Contracts } from "@mainsail/contracts";
 import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { CloseReason, ConnectionError } from "@mainsail/p2p-websocket";
-import { ensureError, pluralize, shuffle } from "@mainsail/utils";
+import { ensureError, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 import type { Peer } from "./interfaces/index.js";
@@ -17,15 +17,8 @@ import { getPeerSocketUrl, percentile } from "./utils/index.js";
 // on demand.
 @injectable()
 export class Service implements Contracts.P2PService.Service {
-	@inject(Identifiers.ServiceProvider.Configuration)
-	@tagged("plugin", "p2p-service")
-	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
-
 	@inject(Identifiers.P2P.WebSocket.Service)
 	private readonly websocketService!: WebSocketService;
-
-	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2PService.State;
 
 	@inject(Identifiers.P2P.Peer.Discoverer)
 	private readonly peerDiscoverer!: Contracts.P2PService.PeerDiscoverer;
@@ -35,9 +28,6 @@ export class Service implements Contracts.P2PService.Service {
 
 	@inject(Identifiers.P2P.Peer.DialQueue)
 	private readonly dialQueue!: Contracts.P2PService.DialQueue;
-
-	@inject(Identifiers.P2P.Peer.Verifier)
-	private readonly peerVerifier!: Contracts.P2PService.PeerVerifier;
 
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
@@ -49,7 +39,6 @@ export class Service implements Contracts.P2PService.Service {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#lastMinPeerCheck: dayjs.Dayjs = dayjs();
-	#verifyingPeers = new Set<string>();
 	#disposed = false;
 	#mainLoopTimeout?: NodeJS.Timeout = undefined;
 
@@ -74,7 +63,6 @@ export class Service implements Contracts.P2PService.Service {
 		try {
 			await this.#dialKnownPeers();
 			await this.#checkMinPeers();
-			await this.#checkReceivedMessages();
 		} catch (rawError) {
 			this.logger.error(`P2P main loop failed: ${ensureError(rawError).message}`, "p2p");
 		} finally {
@@ -165,63 +153,6 @@ export class Service implements Contracts.P2PService.Service {
 					.slice(0, 8)
 					.map((peer) => this.peerDiscoverer.discoverPeers(peer)),
 			);
-		}
-	}
-
-	async #checkReceivedMessages(): Promise<void> {
-		if (this.state.getLastMessageTime().isBefore(dayjs().subtract(8, "seconds"))) {
-			const peersCount = Math.max(Math.ceil(this.repository.getActivePeers().length * 0.2), 5);
-
-			await this.cleansePeers({
-				fast: true,
-				peerCount: peersCount,
-			});
-		}
-	}
-
-	public async cleansePeers({ fast, peerCount }: { fast: boolean; peerCount: number }): Promise<void> {
-		const peers = shuffle(
-			this.repository.getActivePeers().filter((peer) => !this.#verifyingPeers.has(peer.ip)),
-		).slice(0, peerCount);
-
-		if (peers.length === 0) {
-			return;
-		}
-
-		let unresponsivePeers = 0;
-		const verifyTimeout = fast
-			? constants.FAST_VERIFY_TIMEOUT
-			: this.configuration.getRequired<number>("verifyTimeout");
-
-		this.logger.info(`Checking ${pluralize("peer", peers.length, true)}`, "p2p");
-
-		const verifications = Promise.all(
-			peers.map(async (peer) => {
-				this.#verifyingPeers.add(peer.ip);
-
-				try {
-					if (!(await this.peerVerifier.verify(peer))) {
-						unresponsivePeers++;
-					}
-				} finally {
-					this.#verifyingPeers.delete(peer.ip);
-				}
-			}),
-		).catch((rawError) => {
-			this.logger.error(`Peer verification failed: ${ensureError(rawError).message}`, "p2p");
-		});
-
-		let cutoff: NodeJS.Timeout | undefined;
-		await Promise.race([
-			verifications,
-			new Promise<void>((resolve) => {
-				cutoff = setTimeout(resolve, verifyTimeout);
-			}),
-		]);
-		clearTimeout(cutoff);
-
-		if (unresponsivePeers > 0) {
-			this.logger.debug(`Removed ${pluralize("peer", unresponsivePeers, true)}`, "p2p");
 		}
 	}
 

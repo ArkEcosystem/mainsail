@@ -21,7 +21,6 @@ describe<{
 	// One slice per batch: every batch fits into the round that starts at its first block.
 	const roundCalculator = { calculateRound: () => ({ maxValidators: 400, roundHeight: 1 }) };
 	const stateStore = { getBlockNumber: () => 0, getLastBlock: () => ({ hash: "hash0" }) };
-	const state = { resetLastMessageTime: () => {} };
 	const commitProcessor = {
 		hasValidSignature: async () => true,
 		process: async () => Enums.Consensus.ProcessorResult.Accepted,
@@ -67,7 +66,6 @@ describe<{
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(configuration);
 		context.app.bind(Identifiers.BlockchainUtils.RoundCalculator).toConstantValue(roundCalculator);
 		context.app.bind(Identifiers.State.Store).toConstantValue(stateStore);
-		context.app.bind(Identifiers.P2P.State).toConstantValue(state);
 		context.app.bind(Identifiers.P2P.PendingCommits).toConstantValue(context.pendingCommits);
 		context.app.bind(Identifiers.Consensus.Processor.Commit).toConstantValue(commitProcessor);
 		context.app.bind(Identifiers.Cryptography.Commit.Factory).toConstantValue(commitFactory);

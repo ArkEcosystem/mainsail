@@ -27,9 +27,6 @@ export class PostMessageRoute implements Interfaces.Route<Request, Response> {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.MessageFactory;
 
-	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2PService.State;
-
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2PService.Logger;
 
@@ -45,8 +42,6 @@ export class PostMessageRoute implements Interfaces.Route<Request, Response> {
 			if ((await this.messageProcessor.process(message)) === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error("Invalid message");
 			}
-
-			this.state.resetLastMessageTime();
 		} catch (rawError) {
 			this.logger.debug(
 				`Rejected message from ${connection.remoteAddress}: ${ensureError(rawError).message}`,

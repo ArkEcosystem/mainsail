@@ -38,7 +38,6 @@ import {
 } from "./routes/index.js";
 import { Seeds } from "./seeds.js";
 import { Service } from "./service.js";
-import { State } from "./state.js";
 
 // Requires the @mainsail/p2p-websocket service provider to be registered first.
 @injectable()
@@ -46,7 +45,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.P2P.Logger).to(Logger).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Repository).to(PeerRepository).inSingletonScope();
-		this.app.bind(Identifiers.P2P.State).to(State).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Communicator).to(PeerCommunicator).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Disposer).to(PeerDisposer).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Discoverer).to(PeerDiscoverer).inSingletonScope();
@@ -133,7 +131,6 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			minimumNetworkReach: Joi.number().integer().min(0).required(),
 			minimumVersions: Joi.array().items(Joi.string()).required(),
 			peerBanTime: Joi.number().integer().min(0).required(),
-			verifyTimeout: Joi.number().integer().min(0).required(),
 			whitelist: Joi.array().items(Joi.string()).required(),
 		}).unknown(true);
 	}

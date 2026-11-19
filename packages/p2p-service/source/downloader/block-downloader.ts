@@ -42,9 +42,6 @@ export class BlockDownloader implements Contracts.P2PService.Downloader {
 	@inject(Identifiers.State.Store)
 	private readonly stateStore!: Contracts.State.Store;
 
-	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2PService.State;
-
 	@inject(Identifiers.P2P.PendingCommits)
 	private readonly pendingCommits!: Contracts.P2PService.PendingCommits;
 
@@ -186,8 +183,6 @@ export class BlockDownloader implements Contracts.P2PService.Downloader {
 					previousBlockHash = commit.block.hash;
 				}
 			}
-
-			this.state.resetLastMessageTime();
 		} catch (rawError) {
 			const error = ensureError(rawError);
 			this.#handleJobError(job, error);

@@ -19,7 +19,6 @@ describe<{
 	const factory = { makeMessageFromBytes: async () => ({}) };
 	const messageProcessor = { process: async () => Enums.Consensus.ProcessorResult.Accepted };
 	const cryptoConfiguration = { getMilestone: () => ({ roundValidators: 2 }) };
-	const state = { resetLastMessageTime: () => {} };
 	// By the time the async listener runs, the store may already be past the applied block;
 	// the purge must use the event payload, so this deliberately disagrees with it.
 	const stateStore = { getBlockNumber: () => 3 };
@@ -53,7 +52,6 @@ describe<{
 		context.app.bind(Identifiers.Cryptography.Message.Factory).toConstantValue(factory);
 		context.app.bind(Identifiers.Consensus.Processor.Message).toConstantValue(messageProcessor);
 		context.app.bind(Identifiers.Cryptography.Configuration).toConstantValue(cryptoConfiguration);
-		context.app.bind(Identifiers.P2P.State).toConstantValue(state);
 		context.app.bind(Identifiers.State.Store).toConstantValue(stateStore);
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({
 			listen: (event: string, listener: { handle: (payload: { data: { number: number } }) => Promise<void> }) => {
@@ -135,7 +133,6 @@ describe<{
 			{ blockNumber: 2, round: 0, validatorIndex: 0 },
 		]);
 		const process = stub(messageProcessor, "process").resolvedValue(Enums.Consensus.ProcessorResult.Accepted);
-		const resetLastMessageTime = stub(state, "resetLastMessageTime");
 		const banPeer = stub(peerDisposer, "banPeer");
 
 		downloader.download(peer);
@@ -143,7 +140,6 @@ describe<{
 
 		assert.false(downloader.isDownloading());
 		process.calledTimes(2);
-		resetLastMessageTime.calledOnce();
 		banPeer.neverCalled();
 	});
 
