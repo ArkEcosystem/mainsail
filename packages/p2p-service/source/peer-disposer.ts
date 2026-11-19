@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
-import { Identifiers } from "@mainsail/constants";
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { CloseReason, ConnectionError } from "@mainsail/p2p-websocket";
 import dayjs from "dayjs";
@@ -18,6 +18,12 @@ export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2PService.PeerRepository;
 
+	@inject(Identifiers.P2P.Peer.Factory)
+	private readonly peerFactory!: Contracts.P2PService.PeerFactory;
+
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly events!: Contracts.Kernel.EventDispatcher;
+
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -31,11 +37,27 @@ export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 			return;
 		}
 
+		// Several failures of one peer often arrive together; the first one bans it and the ban is not
+		// extended by the rest.
+		if (this.websocketService.isBanned(ip)) {
+			return;
+		}
+
 		this.logger.debug(`Banning peer ${ip}, because: ${error.message}`, "p2p");
 
 		const timeout = this.configuration.getRequired<number>("peerBanTime");
 		if (timeout > 0) {
-			this.websocketService.ban(ip, dayjs().add(timeout, "minute").valueOf());
+			const until = dayjs().add(timeout, "minute").valueOf();
+
+			this.websocketService.ban(ip, until);
+
+			// A ban is by address: it may hit a peer in any list, or an address we keep no peer for, which is
+			// then described by a fresh one.
+			const peer = this.repository.hasPeer(ip) ? this.repository.getPeer(ip) : this.peerFactory(ip);
+
+			// Announced before the peer leaves the lists, so that the ban of an active peer comes before
+			// its removal. Without a ban time the address is only disconnected, which is no ban.
+			void this.events.dispatch(Events.PeerEvent.Banned, { peer: peer.toData(), reason: error.message, until });
 		} else {
 			this.websocketService.terminate(ip);
 		}
