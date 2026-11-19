@@ -6,6 +6,11 @@ import { ensureError } from "@mainsail/utils";
 
 import { RoundStatistic } from "./round-statistic.js";
 
+// A round is logged only if it lasted at least this share of the block time. A live round takes about
+// a block time; the round of a block that was downloaded takes a moment, and a node that syncs a long
+// chain would otherwise log a line for every block.
+const LOGGED_ROUND_SHARE_OF_BLOCK_TIME = 0.3;
+
 // Keeps one statistic per consensus round and the last rounds for the development API. It is fed from
 // outside: the request timings come from the transport middleware of this package, the rest from the
 // events of the peer layer and of consensus.
@@ -20,6 +25,9 @@ export class Service implements Contracts.P2PStatistic.Service {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p-statistic")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
 
 	@inject(Identifiers.P2P.Statistic.Logger)
 	private readonly statisticLogger!: Contracts.P2PStatistic.Logger;
@@ -93,7 +101,16 @@ export class Service implements Contracts.P2PStatistic.Service {
 		}
 
 		finishedRoundStatistic.stop();
-		this.statisticLogger.log(finishedRoundStatistic);
+
+		if (this.#isWorthLogging(finishedRoundStatistic)) {
+			this.statisticLogger.log(finishedRoundStatistic);
+		}
+	}
+
+	#isWorthLogging(roundStatistic: RoundStatistic): boolean {
+		const { blockTime } = this.cryptoConfiguration.getMilestone().timeouts;
+
+		return roundStatistic.getGeneralStatistic().duration >= blockTime * LOGGED_ROUND_SHARE_OF_BLOCK_TIME;
 	}
 
 	// Consensus waits for the listeners of its round event and the peer layer does not catch what its

@@ -10,8 +10,9 @@ describe<{
 	statisticLogger: any;
 	logger: any;
 	listeners: Map<string, any>;
-}>("Service", ({ it, assert, beforeEach, spy }) => {
+}>("Service", ({ it, assert, beforeEach, spy, clock }) => {
 	const MAX_TRACKED_ROUNDS = 5;
+	const BLOCK_TIME = 8000;
 
 	beforeEach((context) => {
 		context.listeners = new Map();
@@ -27,6 +28,9 @@ describe<{
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getActivePeers: () => [] });
 		app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue({ bannedPeers: () => [] });
 		app.bind(Identifiers.P2P.Statistic.Logger).toConstantValue(context.statisticLogger);
+		app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
+			getMilestone: () => ({ timeouts: { blockTime: BLOCK_TIME } }),
+		});
 		app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({
 			forget: (name: string) => context.listeners.delete(name),
@@ -44,10 +48,12 @@ describe<{
 		statisticLogger,
 		listeners,
 	}) => {
+		const fakeTimers = clock({ toFake: ["performance"] });
 		const log = spy(statisticLogger, "log");
 		statisticService.boot();
 		const first = statisticService.getCurrentRoundStatistic();
 
+		fakeTimers.tick(BLOCK_TIME);
 		await fire(listeners, Events.ConsensusEvent.RoundStarted, { blockNumber: 5, round: 1 });
 
 		log.calledWith(first);
@@ -56,6 +62,35 @@ describe<{
 		assert.equal([current.height, current.round], [5, 1]);
 		assert.equal(statisticService.getRoundStatistic("5-1"), current);
 		assert.equal(statisticService.getRoundStatisticList(), ["5-1"]);
+	});
+
+	it("#boot - should not log the rounds of downloaded blocks, which take a moment each", async ({
+		statisticService,
+		statisticLogger,
+		listeners,
+	}) => {
+		const fakeTimers = clock({ toFake: ["performance"] });
+		const log = spy(statisticLogger, "log");
+		statisticService.boot();
+
+		// Blocks applied one after another during a sync.
+		for (let blockNumber = 1; blockNumber <= 3; blockNumber++) {
+			fakeTimers.tick(20);
+			await fire(listeners, Events.ConsensusEvent.RoundStarted, { blockNumber, round: 0 });
+		}
+		log.neverCalled();
+
+		// They are counted and kept like any other round.
+		assert.equal(statisticService.getRoundStatisticList(), ["3-0", "2-0", "1-0"]);
+
+		// A small part of a block time is still too short, a whole block time is a live round.
+		fakeTimers.tick(BLOCK_TIME / 10);
+		await fire(listeners, Events.ConsensusEvent.RoundStarted, { blockNumber: 4, round: 0 });
+		log.neverCalled();
+
+		fakeTimers.tick(BLOCK_TIME);
+		await fire(listeners, Events.ConsensusEvent.RoundStarted, { blockNumber: 4, round: 1 });
+		log.calledOnce();
 	});
 
 	it("#boot - should keep as many rounds as configured, newest first", async ({ statisticService, listeners }) => {
@@ -104,6 +139,7 @@ describe<{
 		logger,
 		listeners,
 	}) => {
+		const fakeTimers = clock({ toFake: ["performance"] });
 		statisticService.boot();
 		statisticLogger.log = () => {
 			throw new Error("boom");
@@ -111,6 +147,7 @@ describe<{
 		const warn = spy(logger, "warn");
 
 		// Consensus awaits the listeners of this event: a rejection would fail its round.
+		fakeTimers.tick(BLOCK_TIME);
 		await fire(listeners, Events.ConsensusEvent.RoundStarted, { blockNumber: 7, round: 2 });
 
 		warn.calledWith(`Recording ${Events.ConsensusEvent.RoundStarted} in the statistics failed: boom`, "p2p");
