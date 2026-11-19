@@ -2651,19 +2651,40 @@ importers:
 
   packages/p2p-api-nodes:
     dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
       '@mainsail/container':
         specifier: workspace:*
         version: link:../container
+      '@mainsail/exceptions':
+        specifier: workspace:*
+        version: link:../exceptions
       '@mainsail/kernel':
         specifier: workspace:*
         version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      dayjs:
+        specifier: 1.11.23
+        version: 1.11.23
+      ipaddr.js:
+        specifier: 2.5.0
+        version: 2.5.0
       joi:
         specifier: 18.2.5
         version: 18.2.5
     devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
+      esmock:
+        specifier: 2.7.6
+        version: 2.7.6
       uvu:
         specifier: 0.5.6
         version: 0.5.6

@@ -1,4 +1,5 @@
 import type {
+	GetApiNodesResponse,
 	GetBlocksResponse,
 	GetMessagesQuery,
 	GetMessagesResponse,
@@ -14,6 +15,7 @@ export interface PeerCommunicator {
 	postMessage(peer: Peer, message: Buffer): Promise<void>;
 
 	getPeers(peer: Peer): Promise<GetPeersResponse>;
+	getApiNodes(peer: Peer): Promise<GetApiNodesResponse>;
 	getMessages(peer: Peer, query: GetMessagesQuery): Promise<GetMessagesResponse>;
 	getProposal(peer: Peer, query: GetProposalQuery): Promise<GetProposalResponse>;
 	getBlocks(

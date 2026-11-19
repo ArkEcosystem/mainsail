@@ -194,6 +194,7 @@ export const Identifiers = {
 			Factory: Symbol("P2P<ApiNode.Factory>"),
 			Processor: Symbol("P2P<ApiNode.Processor>"),
 			Repository: Symbol("P2P<ApiNode.Repository>"),
+			Service: Symbol("P2P<ApiNode.Service>"),
 			Verifier: Symbol("P2P<ApiNode.Verifier>"),
 		},
 		Broadcaster: Symbol("P2P<Broadcaster>"),

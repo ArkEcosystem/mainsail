@@ -9,7 +9,16 @@ import { assert, ensureError } from "@mainsail/utils";
 import type { Peer } from "./interfaces/index.js";
 
 import { constants } from "./constants.js";
-import { GetBlocks, GetMessages, GetPeers, GetProposal, GetStatus, PostMessage, PostProposal } from "./routes/index.js";
+import {
+	GetApiNodes,
+	GetBlocks,
+	GetMessages,
+	GetPeers,
+	GetProposal,
+	GetStatus,
+	PostMessage,
+	PostProposal,
+} from "./routes/index.js";
 
 // Port of the @mainsail/p2p communicator over the new transport, without reply validation and
 // throttling. Every request waits the transport's REQUEST_TIMEOUT for its response, except for a batch
@@ -86,6 +95,13 @@ export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 		this.logger.debug(`Fetching a fresh peer list from ${peer.ip}`, "p2p");
 
 		return (await this.#emit(peer, GetPeers, {})) as unknown as Contracts.P2PService.GetPeersResponse;
+	}
+
+	// Asked on behalf of @mainsail/p2p-api-nodes; a peer without that plugin answers with an empty list.
+	public async getApiNodes(peer: Peer): Promise<Contracts.P2PService.GetApiNodesResponse> {
+		this.logger.debug(`Fetching API nodes from ${peer.ip}`, "p2p");
+
+		return (await this.#emit(peer, GetApiNodes, {})) as unknown as Contracts.P2PService.GetApiNodesResponse;
 	}
 
 	async #emit<TRequest extends { headers?: unknown }, TResponse>(

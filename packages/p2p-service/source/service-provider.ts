@@ -28,6 +28,7 @@ import { PeerVerifier } from "./peer-verifier.js";
 import { Peer } from "./peer.js";
 import { PendingCommits } from "./pending-commits.js";
 import {
+	GetApiNodesRoute,
 	GetBlocksRoute,
 	GetMessagesRoute,
 	GetPeersRoute,
@@ -95,6 +96,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const routes: Contracts.Kernel.Container.Newable<Interfaces.Route<any, any>>[] = [
+			GetApiNodesRoute,
 			GetBlocksRoute,
 			GetMessagesRoute,
 			GetPeersRoute,

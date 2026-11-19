@@ -4,7 +4,7 @@ import { CloseReason, ConnectionState } from "@mainsail/p2p-websocket";
 import { describe } from "@mainsail/test-runner";
 
 import { PeerCommunicator } from "./peer-communicator";
-import { GetBlocks, GetStatus, PostMessage } from "./routes/index.js";
+import { GetApiNodes, GetBlocks, GetStatus, PostMessage } from "./routes/index.js";
 
 const headers = {
 	blockNumber: 1,
@@ -58,6 +58,16 @@ describe<{
 		assert.equal(send.getCallArgs(0)[2], {});
 		handle.calledWith(peer, headers);
 		setLatency.calledOnce();
+	});
+
+	it("should ask a peer for its api nodes", async ({ communicator, peer, connection }) => {
+		const send = spy(connection, "send");
+
+		await communicator.getApiNodes(peer);
+
+		assert.equal(send.getCallArgs(0)[0], GetApiNodes);
+		assert.equal(send.getCallArgs(0)[1], {});
+		assert.equal(send.getCallArgs(0)[2], {});
 	});
 
 	it("should give a batch of blocks the configured timeout", async ({ communicator, peer, connection }) => {
