@@ -41,7 +41,7 @@ describe<{
 			.bind(Identifiers.ServiceProvider.Configuration)
 			.toConstantValue(new Providers.PluginConfiguration().from("", defaults))
 			.whenTagged("plugin", "p2p-statistic");
-		context.app.bind(Identifiers.P2P.Logger).toConstantValue({
+		context.app.bind(Identifiers.Services.Log.Service).toConstantValue({
 			info: (message: string) => context.messages.push(message),
 		});
 

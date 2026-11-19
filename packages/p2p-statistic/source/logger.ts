@@ -5,8 +5,8 @@ import { inject, injectable, postConstruct, tagged } from "@mainsail/container";
 
 @injectable()
 export class Logger implements Contracts.P2PStatistic.Logger {
-	@inject(Identifiers.P2P.Logger)
-	private readonly logger!: Contracts.P2PService.Logger;
+	@inject(Identifiers.Services.Log.Service)
+	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p-statistic")
