@@ -6,6 +6,10 @@ import { CloseReason, ConnectionError } from "@mainsail/p2p-websocket";
 import { constants } from "./constants";
 import { Service } from "./service";
 
+const BLOCK_TIME = 8000;
+// A header gets stale after this long without one from the peer.
+const STALE_AFTER = constants.HEADER_STALE_AFTER_BLOCKS * BLOCK_TIME;
+
 const makePeer = (ip: string, extra: Record<string, unknown> = {}): any => ({
 	dialAttempts: 0,
 	header: {},
@@ -22,6 +26,7 @@ describe<{
 	logger: any;
 	peerDiscoverer: any;
 	peerDisposer: any;
+	communicator: any;
 	seeds: any;
 	dialQueue: any;
 	websocketService: any;
@@ -36,7 +41,8 @@ describe<{
 			hasPendingPeer: () => false,
 		};
 		context.peerDiscoverer = { discoverPeers: async () => {}, populateSeedPeers: async () => {} };
-		context.peerDisposer = { disposePeers: async () => {} };
+		context.peerDisposer = { banPeer: () => {}, disposePeers: async () => {} };
+		context.communicator = { getStatus: async () => ({}) };
 		context.seeds = { load: async () => {} };
 		context.dialQueue = { dispose: () => {} };
 		context.websocketService = {
@@ -53,6 +59,10 @@ describe<{
 		app.bind(Identifiers.P2P.Peer.DialQueue).toConstantValue(context.dialQueue);
 		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
+		app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(context.communicator);
+		app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
+			getMilestone: () => ({ timeouts: { blockTime: BLOCK_TIME } }),
+		});
 		app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
 		context.service = app.resolve(Service);
@@ -246,6 +256,119 @@ describe<{
 				process.env.MAINSAIL_ENV = previous;
 			}
 		}
+	});
+
+	it("#mainLoop - should ask the peers with a stale header for their status", async ({
+		service,
+		repository,
+		communicator,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const fresh = makePeer("1.1.1.1", { lastHeaderAt: Date.now() - STALE_AFTER });
+		const stale = makePeer("2.2.2.2", { lastHeaderAt: Date.now() - STALE_AFTER - 1 });
+		repository.getActivePeers = () => [fresh, stale];
+		const getStatus = spy(communicator, "getStatus");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+
+		getStatus.calledOnce();
+		getStatus.calledWith(stale);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should ask a few peers per turn, the oldest headers first", async ({
+		service,
+		repository,
+		communicator,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		// The higher the address, the older the header.
+		const peers = Array.from({ length: constants.HEADER_REFRESH_BATCH + 2 }, (_, index) =>
+			makePeer(`1.1.1.${index}`, { lastHeaderAt: Date.now() - STALE_AFTER - 1 - index }),
+		);
+		repository.getActivePeers = () => peers;
+
+		const asked: string[] = [];
+		communicator.getStatus = async (peer: any) => {
+			asked.push(peer.ip);
+			// The answer brings a header.
+			peer.lastHeaderAt = Date.now();
+		};
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+		assert.equal(asked, ["1.1.1.6", "1.1.1.5", "1.1.1.4", "1.1.1.3", "1.1.1.2"]);
+
+		// The rest follow on the next turn.
+		await fakeTimers.tickAsync(2000);
+		assert.equal(asked.slice(constants.HEADER_REFRESH_BATCH), ["1.1.1.1", "1.1.1.0"]);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should not wait for the status and not ask a peer again while it is being asked", async ({
+		service,
+		repository,
+		communicator,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const peer = makePeer("1.1.1.1", { lastHeaderAt: 0 });
+		repository.getActivePeers = () => [peer];
+
+		let answer!: () => void;
+		let asked = 0;
+		communicator.getStatus = () => {
+			asked++;
+			return new Promise<void>((resolve) => (answer = resolve));
+		};
+
+		// Asked for once per turn of the loop.
+		const getKnownPeers = spy(repository, "getKnownPeers");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+		assert.equal(asked, 1);
+		getKnownPeers.calledTimes(1);
+
+		// The loop went on without the answer, and leaves the peer alone while the request is out.
+		await fakeTimers.tickAsync(4000);
+		getKnownPeers.calledTimes(3);
+		assert.equal(asked, 1);
+
+		// An answer without a header leaves the peer stale: it is asked again.
+		answer();
+		await fakeTimers.tickAsync(2000);
+		assert.equal(asked, 2);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should ban a peer whose status request fails", async ({
+		service,
+		repository,
+		communicator,
+		peerDisposer,
+		logger,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		repository.getActivePeers = () => [makePeer("1.1.1.1", { lastHeaderAt: 0 })];
+		const failure = new Error("boom");
+		communicator.getStatus = async () => {
+			throw failure;
+		};
+		const banPeer = spy(peerDisposer, "banPeer");
+		const error = spy(logger, "error");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+
+		// The disposer tells a failed connection, which it ignores, from a failure of the peer.
+		banPeer.calledWith("1.1.1.1", failure);
+		error.neverCalled();
+
+		await service.dispose();
 	});
 
 	it("#getNetworkBlockNumberPercentile - should compute the percentile over peers reporting a block number", ({

@@ -9,7 +9,7 @@ import { Peer } from "./peer";
 describe<{
 	app: Application;
 	peer: Peer;
-}>("Peer", ({ it, assert, beforeEach, each }) => {
+}>("Peer", ({ it, assert, beforeEach, clock, each }) => {
 	const ip = "167.184.53.78";
 	const port = 4000;
 	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
@@ -47,5 +47,18 @@ describe<{
 		};
 
 		assert.equal(peer.toBroadcast(), expectedBroadcast);
+	});
+
+	it("#header - should record when a header was received", ({ peer }) => {
+		const fakeTimers = clock({ now: 1_000_000, toFake: ["Date"] });
+		assert.equal(peer.lastHeaderAt, 0);
+
+		peer.header = { blockNumber: 1 } as Contracts.P2PService.HeaderData;
+		assert.equal(peer.lastHeaderAt, 1_000_000);
+
+		// An unchanged header counts too: the peer was heard from.
+		fakeTimers.tick(500);
+		peer.header = { blockNumber: 1 } as Contracts.P2PService.HeaderData;
+		assert.equal(peer.lastHeaderAt, 1_000_500);
 	});
 });

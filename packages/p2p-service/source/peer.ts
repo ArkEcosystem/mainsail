@@ -37,6 +37,8 @@ export class Peer implements PeerInterface {
 
 	public dialAttempts = 0;
 
+	public lastHeaderAt = 0;
+
 	#header: Contracts.P2PService.HeaderData | undefined;
 
 	public init(ip: string, port: number): Peer {
@@ -62,6 +64,7 @@ export class Peer implements PeerInterface {
 		const previousHeader = this.#header;
 
 		this.#header = header;
+		this.lastHeaderAt = Date.now();
 
 		if (previousHeader === undefined) {
 			return;

@@ -8,4 +8,7 @@ export interface Peer extends Contracts.P2PService.Peer {
 	// were since the peer was last active.
 	lastDialAt: number;
 	dialAttempts: number;
+	// When the peer's header was last received, in either direction; the service loop asks a peer for its
+	// status once this is too long ago.
+	lastHeaderAt: number;
 }

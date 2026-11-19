@@ -35,10 +35,17 @@ export class Service implements Contracts.P2PService.Service {
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2PService.PeerRepository;
 
+	@inject(Identifiers.P2P.Peer.Communicator)
+	private readonly communicator!: Contracts.P2PService.PeerCommunicator;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
+
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#lastMinPeerCheck: dayjs.Dayjs = dayjs();
+	readonly #refreshingPeers = new Set<string>();
 	#disposed = false;
 	#mainLoopTimeout?: NodeJS.Timeout = undefined;
 
@@ -63,6 +70,7 @@ export class Service implements Contracts.P2PService.Service {
 		try {
 			await this.#dialKnownPeers();
 			await this.#checkMinPeers();
+			this.#refreshStaleHeaders();
 		} catch (rawError) {
 			this.logger.error(`P2P main loop failed: ${ensureError(rawError).message}`, "p2p");
 		} finally {
@@ -153,6 +161,41 @@ export class Service implements Contracts.P2PService.Service {
 					.slice(0, 8)
 					.map((peer) => this.peerDiscoverer.discoverPeers(peer)),
 			);
+		}
+	}
+
+	// Every exchange with a peer, in either direction, carries its header, so on a live network the headers
+	// stay fresh by themselves. A peer we have not heard from for a while is asked for its status: the
+	// answer brings its header, which starts the downloads if we are behind, and a peer that does not
+	// answer loses its connection to the request timeout. The peers with the oldest headers go first, a
+	// few per turn, and the loop does not wait for the answers.
+	#refreshStaleHeaders(): void {
+		const { blockTime } = this.cryptoConfiguration.getMilestone().timeouts;
+		const staleBefore = Date.now() - constants.HEADER_STALE_AFTER_BLOCKS * blockTime;
+
+		const stalePeers = (this.repository.getActivePeers() as Peer[])
+			.filter((peer) => peer.lastHeaderAt < staleBefore && !this.#refreshingPeers.has(peer.ip))
+			.sort((a, b) => a.lastHeaderAt - b.lastHeaderAt)
+			.slice(0, constants.HEADER_REFRESH_BATCH);
+
+		for (const peer of stalePeers) {
+			void this.#refreshHeader(peer);
+		}
+	}
+
+	// The communicator hands the header of the answer to the header service. A failed connection has
+	// already disposed the peer; any other failure is the peer's and bans it.
+	async #refreshHeader(peer: Peer): Promise<void> {
+		this.#refreshingPeers.add(peer.ip);
+
+		try {
+			await this.communicator.getStatus(peer);
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			this.logger.debug(`Failed to get the status of ${peer.ip}: ${error.message}`, "p2p");
+			this.peerDisposer.banPeer(peer.ip, error);
+		} finally {
+			this.#refreshingPeers.delete(peer.ip);
 		}
 	}
 
