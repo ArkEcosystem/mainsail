@@ -3,20 +3,28 @@ import type { Contracts } from "@mainsail/contracts";
 
 import Boom from "@hapi/boom";
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, optional } from "@mainsail/container";
 
 import { Controller } from "./controller.js";
 
+// The statistics come from a plugin a node may leave out. Without it this API still starts and has no
+// rounds to show.
 @injectable()
 export class StatisticController extends Controller {
 	@inject(Identifiers.P2P.Statistic.Service)
-	private readonly staticService!: Contracts.P2P.StatisticService;
+	@optional()
+	private readonly statisticService?: Contracts.P2P.StatisticService;
 
 	public async index(
 		request: Types.HapiRequest,
 	): Promise<{ round: string; general: Contracts.P2P.GeneralStatistic }[]> {
-		return this.staticService.getRoundStatisticList().map((id) => {
-			const statistic = this.staticService.getRoundStatistic(id)!;
+		const statisticService = this.statisticService;
+		if (!statisticService) {
+			return [];
+		}
+
+		return statisticService.getRoundStatisticList().map((id) => {
+			const statistic = statisticService.getRoundStatistic(id)!;
 			return {
 				round: `${statistic.height}-${statistic.round}`,
 				// eslint-disable-next-line perfectionist/sort-objects
@@ -26,12 +34,12 @@ export class StatisticController extends Controller {
 	}
 
 	public async list(request: Types.HapiRequest): Promise<string[]> {
-		return this.staticService.getRoundStatisticList();
+		return this.statisticService?.getRoundStatisticList() ?? [];
 	}
 
 	public async show(request: Types.HapiRequest): Promise<object> {
 		const { id } = request.params as { id: string };
-		const statistic = this.staticService.getRoundStatistic(id);
+		const statistic = this.statisticService?.getRoundStatistic(id);
 
 		if (!statistic) {
 			return Boom.notFound("Statistic not found");
@@ -50,12 +58,12 @@ export class StatisticController extends Controller {
 	}
 
 	public async latest(request: Types.HapiRequest): Promise<object> {
-		const list = this.staticService.getRoundStatisticList();
+		const list = this.statisticService?.getRoundStatisticList() ?? [];
 		if (list.length === 0) {
 			return Boom.notFound("No statistics available");
 		}
 
-		const statistic = this.staticService.getRoundStatistic(list[0]);
+		const statistic = this.statisticService?.getRoundStatistic(list[0]);
 
 		if (!statistic) {
 			return Boom.notFound("Statistic not found");

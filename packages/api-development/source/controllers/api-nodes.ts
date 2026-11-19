@@ -2,19 +2,22 @@ import type { Types } from "@mainsail/api-common";
 import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
-import { inject, injectable } from "@mainsail/container";
+import { inject, injectable, optional } from "@mainsail/container";
 import { get } from "@mainsail/utils";
 
 import { PeerResource } from "../resources/index.js";
 import { Controller } from "./controller.js";
 
+// The directory of API nodes comes from a plugin a node may leave out. Without it this API still starts
+// and lists no nodes.
 @injectable()
 export class ApiNodesController extends Controller {
 	@inject(Identifiers.P2P.ApiNode.Repository)
-	private readonly peerRepository!: Contracts.P2P.ApiNodeRepository;
+	@optional()
+	private readonly apiNodeRepository?: Contracts.P2P.ApiNodeRepository;
 
 	public async index(request: Types.HapiRequest): Promise<Contracts.Api.ResultsPage<object>> {
-		const allPeers: Contracts.P2P.ApiNode[] = [...this.peerRepository.getApiNodes()];
+		const allPeers: Contracts.P2P.ApiNode[] = [...(this.apiNodeRepository?.getApiNodes() ?? [])];
 
 		let results = allPeers;
 
