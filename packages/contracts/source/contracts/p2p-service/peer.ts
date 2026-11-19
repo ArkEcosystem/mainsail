@@ -10,7 +10,6 @@ export interface PeerPlugins {
 }
 
 export interface Peer {
-	readonly url: string;
 	readonly port: number;
 	readonly protocol: PeerProtocol;
 
@@ -37,11 +36,6 @@ export interface PeerBroadcast {
 export interface PeerState {
 	blockNumber: number;
 	blockHash: string;
-}
-
-export interface PeerData {
-	ip: string;
-	port: number;
 }
 
 export interface PeerConfig {

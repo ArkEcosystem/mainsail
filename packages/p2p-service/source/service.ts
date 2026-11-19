@@ -10,7 +10,7 @@ import dayjs from "dayjs";
 import type { Peer } from "./interfaces/index.js";
 
 import { constants } from "./constants.js";
-import { getPeerSocketUrl, percentile } from "./utils/index.js";
+import { percentile } from "./utils/index.js";
 
 // Port of the @mainsail/p2p service without API nodes. It also owns the transport lifecycle, which the
 // old service left to the hapi server, and the redialing of known peers, which the old connector did
@@ -119,7 +119,7 @@ export class Service implements Contracts.P2PService.Service {
 		peer.dialAttempts += 1;
 
 		try {
-			await this.websocketService.dial(getPeerSocketUrl(peer));
+			await this.websocketService.dial(peer.socketUrl);
 		} catch (rawError) {
 			const error = ensureError(rawError);
 			this.logger.debug(`Dial to ${peer.ip}:${peer.port} failed: ${error.message}`, "p2p");

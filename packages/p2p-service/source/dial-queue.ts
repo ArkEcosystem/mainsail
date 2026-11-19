@@ -8,7 +8,6 @@ import { ensureError, IpAddress } from "@mainsail/utils";
 import type { Peer } from "./interfaces/index.js";
 
 import { constants } from "./constants.js";
-import { getPeerSocketUrl } from "./utils/index.js";
 
 // Dials new addresses, learned from other peers, with a bounded number of dials in flight. Known peers
 // are not its business: the service loop dials those, spaced out and counted.
@@ -77,7 +76,7 @@ export class DialQueue implements Contracts.P2PService.DialQueue {
 		try {
 			// The address may have become a peer while it waited, by connecting to us.
 			if (!this.repository.hasPeer(ip)) {
-				await this.websocketService.dial(getPeerSocketUrl(this.peerFactory(ip)));
+				await this.websocketService.dial(this.peerFactory(ip).socketUrl);
 			}
 		} catch (rawError) {
 			this.logger.debug(`Dial to ${ip} failed: ${ensureError(rawError).message}`, "p2p");

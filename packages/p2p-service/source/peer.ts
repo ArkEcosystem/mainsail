@@ -3,11 +3,9 @@ import type { Interfaces } from "@mainsail/p2p-websocket";
 
 import { Enums, Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { assert } from "@mainsail/utils";
+import { assert, IpAddress } from "@mainsail/utils";
 
 import type { Peer as PeerInterface } from "./interfaces/index.js";
-
-import { getPeerUrl } from "./utils/get-peer-url.js";
 
 @injectable()
 export class Peer implements PeerInterface {
@@ -46,8 +44,8 @@ export class Peer implements PeerInterface {
 		return this;
 	}
 
-	public get url(): string {
-		return getPeerUrl(this);
+	public get socketUrl(): string {
+		return `ws://${IpAddress.normalizeAddress(this.ip)}:${this.port}`;
 	}
 
 	public get header(): Contracts.P2PService.HeaderData {

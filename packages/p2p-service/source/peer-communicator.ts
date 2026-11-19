@@ -83,7 +83,7 @@ export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 	}
 
 	public async getPeers(peer: Peer): Promise<Contracts.P2PService.GetPeersResponse> {
-		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`, "p2p");
+		this.logger.debug(`Fetching a fresh peer list from ${peer.ip}`, "p2p");
 
 		return (await this.#emit(peer, GetPeers, {})) as unknown as Contracts.P2PService.GetPeersResponse;
 	}

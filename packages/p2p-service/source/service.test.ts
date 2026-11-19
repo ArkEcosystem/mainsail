@@ -16,6 +16,7 @@ const makePeer = (ip: string, extra: Record<string, unknown> = {}): any => ({
 	ip,
 	lastDialAt: 0,
 	port: 4002,
+	socketUrl: `ws://${ip}:4002`,
 	version: "0.0.1",
 	...extra,
 });

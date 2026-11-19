@@ -9,7 +9,7 @@ import { Peer } from "./peer";
 describe<{
 	app: Application;
 	peer: Peer;
-}>("Peer", ({ it, assert, beforeEach, clock, each }) => {
+}>("Peer", ({ it, assert, beforeEach, clock }) => {
 	const ip = "167.184.53.78";
 	const port = 4000;
 	const eventDispatcher = { dispatch: () => {}, listen: () => {} };
@@ -21,20 +21,10 @@ describe<{
 		context.peer = context.app.resolve(Peer).init(ip, port);
 	});
 
-	it("#url - should return http url", ({ peer }) => {
-		assert.equal(peer.url, `http://${ip}:${port}`);
+	it("#socketUrl - should return the WebSocket url of the peer", ({ peer, app }) => {
+		assert.equal(peer.socketUrl, `ws://${ip}:${port}`);
+		assert.equal(app.resolve(Peer).init("2001:3984:3989::104", 4002).socketUrl, "ws://[2001:3984:3989::104]:4002");
 	});
-
-	each(
-		"#url - should infer protocol when port is 80 or 443",
-		({ context, dataset }) => {
-			assert.equal(context.app.resolve(Peer).init(ip, dataset[0]).url, `${dataset[1]}://${ip}:${dataset[0]}`);
-		},
-		[
-			[80, "http"],
-			[443, "https"],
-		],
-	);
 
 	it("#toBroadcast - should return a Contracts.P2PService.PeerBroadcast object for peer properties", ({ peer }) => {
 		peer.version = "3.0.1";

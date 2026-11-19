@@ -30,7 +30,11 @@ describe<{
 		const app = new Application();
 		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
-		app.bind(Identifiers.P2P.Peer.Factory).toConstantValue((ip: string) => ({ ip, port: 4002 }));
+		app.bind(Identifiers.P2P.Peer.Factory).toConstantValue((ip: string) => ({
+			ip,
+			port: 4002,
+			socketUrl: `ws://${ip}:4002`,
+		}));
 		app.bind(Identifiers.P2P.Logger).toConstantValue(context.logger);
 
 		context.dialQueue = app.resolve(DialQueue);
