@@ -23,7 +23,7 @@ export interface Peer {
 	header: HeaderData;
 	plugins: PeerPlugins;
 
-	setPinged(latency: number): void;
+	setLatency(latency: number): void;
 
 	toBroadcast(): PeerBroadcast;
 }

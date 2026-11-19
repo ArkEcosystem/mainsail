@@ -27,7 +27,7 @@ describe<{
 			send: async () => ({ headers }),
 			state: ConnectionState.Open,
 		};
-		context.peer = { connection: context.connection, ip: "1.1.1.1", setPinged: () => {} };
+		context.peer = { connection: context.connection, ip: "1.1.1.1", setLatency: () => {} };
 		context.headerService = { handle: () => {} };
 		context.peerDisposer = { banPeer: () => {} };
 
@@ -50,14 +50,14 @@ describe<{
 	}) => {
 		const send = spy(connection, "send");
 		const handle = spy(headerService, "handle");
-		const setPinged = spy(peer, "setPinged");
+		const setLatency = spy(peer, "setLatency");
 
 		await communicator.getStatus(peer);
 
 		assert.equal(send.getCallArgs(0)[0], GetStatus);
 		assert.equal(send.getCallArgs(0)[2], {});
 		handle.calledWith(peer, headers);
-		setPinged.calledOnce();
+		setLatency.calledOnce();
 	});
 
 	it("should give a batch of blocks the configured timeout", async ({ communicator, peer, connection }) => {

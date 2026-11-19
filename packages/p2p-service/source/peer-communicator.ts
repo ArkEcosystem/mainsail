@@ -99,7 +99,7 @@ export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 		// The request headers are added by HeaderIncludeSendMiddleware.
 		const started = performance.now();
 		const response = await connection.send(route, payload as TRequest, options);
-		peer.setPinged(Math.floor(performance.now() - started));
+		peer.setLatency(Math.floor(performance.now() - started));
 
 		// The wire type of the headers is the protobuf shape; the contract shape is what the codec unpacks.
 		const { headers } = response as { headers?: Contracts.P2PService.HeaderData };

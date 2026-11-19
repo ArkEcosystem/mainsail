@@ -74,7 +74,7 @@ export class Peer implements PeerInterface {
 		}
 	}
 
-	public setPinged(latency: number): void {
+	public setLatency(latency: number): void {
 		this.latency = latency;
 	}
 
