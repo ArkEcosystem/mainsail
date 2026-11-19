@@ -8,6 +8,9 @@ export const defaults = {
 	},
 	server: {
 		hostname: Environment.get(EnvironmentVariables.MAINSAIL_P2P_HOST, "0.0.0.0"),
+		// Inbound connections accepted at once; a further one is refused as full. Connections we dialed
+		// do not count.
+		maxInboundConnections: Environment.get(EnvironmentVariables.MAINSAIL_P2P_MAX_CONNECTIONS, 500),
 		port: Environment.get(EnvironmentVariables.MAINSAIL_P2P_PORT, 4002),
 	},
 };

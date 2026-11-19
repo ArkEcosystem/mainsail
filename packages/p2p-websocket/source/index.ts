@@ -6,6 +6,7 @@ export * from "./defaults.js";
 export * from "./dialer.js";
 export * from "./enums.js";
 export * from "./errors.js";
+export * from "./inbound-limit-verifier.js";
 export * as Interfaces from "./interfaces/index.js";
 export * from "./listener.js";
 export * from "./logger.js";

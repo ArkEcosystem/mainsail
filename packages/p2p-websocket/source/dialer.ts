@@ -61,7 +61,7 @@ export class Dialer {
 	// The connection takes the socket while it is still connecting so no frame is missed.
 	async #dial(url: string, remoteAddress: string): Promise<void> {
 		for (const verifier of this.verifiers) {
-			const rejection = verifier.verify(remoteAddress);
+			const rejection = verifier.verify(remoteAddress, Direction.Outbound);
 			if (rejection) {
 				throw new ConnectionError(rejection, `Refused to dial ${remoteAddress}: ${rejection}`);
 			}
