@@ -177,12 +177,8 @@ export class MessageDownloader implements Contracts.P2PService.Downloader {
 	}
 
 	#canDownloadFullRound(blockNumber: number, round: number): boolean {
-		if (!this.#fullDownloadsByBlockNumber.has(blockNumber)) {
-			return true;
-		}
-
-		const rounds = [...this.#fullDownloadsByBlockNumber.get(blockNumber)!.values()];
-		if (rounds.length === 0) {
+		const rounds = this.#fullDownloadsByBlockNumber.get(blockNumber);
+		if (!rounds || rounds.size === 0) {
 			return true;
 		}
 
@@ -191,25 +187,29 @@ export class MessageDownloader implements Contracts.P2PService.Downloader {
 	}
 
 	#setFullDownload(blockNumber: number, round: number): void {
-		if (!this.#fullDownloadsByBlockNumber.has(blockNumber)) {
-			this.#fullDownloadsByBlockNumber.set(blockNumber, new Set<number>());
+		let rounds = this.#fullDownloadsByBlockNumber.get(blockNumber);
+		if (!rounds) {
+			rounds = new Set<number>();
+			this.#fullDownloadsByBlockNumber.set(blockNumber, rounds);
 		}
 
-		this.#fullDownloadsByBlockNumber.get(blockNumber)!.add(round);
+		rounds.add(round);
 	}
 
 	#getDownloadsByRound(blockNumber: number, round: number): DownloadsByRound {
-		if (!this.#downloadsByBlockNumber.has(blockNumber)) {
-			this.#downloadsByBlockNumber.set(blockNumber, new Map<number, DownloadsByRound>());
+		let roundsByBlockNumber = this.#downloadsByBlockNumber.get(blockNumber);
+		if (!roundsByBlockNumber) {
+			roundsByBlockNumber = new Map<number, DownloadsByRound>();
+			this.#downloadsByBlockNumber.set(blockNumber, roundsByBlockNumber);
 		}
 
-		const roundsByBlockNumber = this.#downloadsByBlockNumber.get(blockNumber)!;
-
-		if (!roundsByBlockNumber.has(round)) {
-			roundsByBlockNumber.set(round, this.#makeDownloadsByRound(blockNumber));
+		let downloads = roundsByBlockNumber.get(round);
+		if (!downloads) {
+			downloads = this.#makeDownloadsByRound(blockNumber);
+			roundsByBlockNumber.set(round, downloads);
 		}
 
-		return roundsByBlockNumber.get(round)!;
+		return downloads;
 	}
 
 	#peekDownloadsByRound(blockNumber: number, round: number): DownloadsByRound {

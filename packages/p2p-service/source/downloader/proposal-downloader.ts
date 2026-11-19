@@ -90,10 +90,7 @@ export class ProposalDownloader implements Contracts.P2PService.Downloader {
 			return false;
 		}
 
-		if (
-			this.#downloadsByBlockNumber.has(peerHeader.blockNumber) &&
-			this.#downloadsByBlockNumber.get(peerHeader.blockNumber)!.has(peerHeader.round)
-		) {
+		if (this.#downloadsByBlockNumber.get(peerHeader.blockNumber)?.has(peerHeader.round)) {
 			return false;
 		}
 
@@ -101,21 +98,24 @@ export class ProposalDownloader implements Contracts.P2PService.Downloader {
 	}
 
 	#setDownload(job: DownloadJob) {
-		if (!this.#downloadsByBlockNumber.has(job.blockNumber)) {
-			this.#downloadsByBlockNumber.set(job.blockNumber, new Set());
+		let rounds = this.#downloadsByBlockNumber.get(job.blockNumber);
+		if (!rounds) {
+			rounds = new Set();
+			this.#downloadsByBlockNumber.set(job.blockNumber, rounds);
 		}
 
-		this.#downloadsByBlockNumber.get(job.blockNumber)!.add(job.round);
+		rounds.add(job.round);
 	}
 
 	#removeDownload(job: DownloadJob) {
-		if (!this.#downloadsByBlockNumber.has(job.blockNumber)) {
+		const rounds = this.#downloadsByBlockNumber.get(job.blockNumber);
+		if (!rounds) {
 			return;
 		}
 
-		this.#downloadsByBlockNumber.get(job.blockNumber)!.delete(job.round);
+		rounds.delete(job.round);
 
-		if (this.#downloadsByBlockNumber.get(job.blockNumber)!.size === 0) {
+		if (rounds.size === 0) {
 			this.#downloadsByBlockNumber.delete(job.blockNumber);
 		}
 	}
