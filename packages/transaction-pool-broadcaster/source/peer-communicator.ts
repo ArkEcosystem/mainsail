@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { Ipc } from "@mainsail/kernel";
-import { ensureError, http } from "@mainsail/utils";
+import { ensureError, http, HttpError } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 const MAX_RESPONSE_BYTES = 128 * 1024;
@@ -35,6 +35,13 @@ export class PeerCommunicator implements Contracts.TransactionPool.PeerCommunica
 			peer.lastPinged = dayjs();
 		} catch (rawError) {
 			const error = ensureError(rawError);
+
+			if (error instanceof HttpError && error.response.statusCode === 429) {
+				this.logger.debug(`rate limited by ${peer.ip}`);
+
+				return;
+			}
+
 			this.handleSocketError(peer, error);
 		}
 	}

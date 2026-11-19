@@ -134,6 +134,8 @@ export type HttpResponse<T = unknown> = {
 };
 
 export class HttpError extends Error {
+	public readonly response!: Pick<HttpResponse, "data" | "headers" | "statusCode" | "statusMessage">;
+
 	public constructor(response: HttpResponse, error?: Error) {
 		const message: string | undefined = error ? error.message : response.statusMessage;
 
