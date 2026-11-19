@@ -51,15 +51,20 @@ export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 	}
 
 	// A batch of blocks is the one response that takes longer than a round trip; its timeout is configured.
+	// A single block, which the verifier asks a new peer for, is no larger than a proposal and gets the
+	// transport's timeout like every other request.
 	public async getBlocks(
 		peer: Peer,
 		{ fromBlockNumber, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromBlockNumber: number; limit?: number },
 	): Promise<Contracts.P2PService.GetBlocksResponse> {
+		const options: Interfaces.SendOptions =
+			limit > 1 ? { timeout: this.configuration.getRequired<number>("getBlocksTimeout") } : {};
+
 		return (await this.#emit(
 			peer,
 			GetBlocks,
 			{ fromBlockNumber, limit },
-			{ timeout: this.configuration.getRequired<number>("getBlocksTimeout") },
+			options,
 		)) as unknown as Contracts.P2PService.GetBlocksResponse;
 	}
 

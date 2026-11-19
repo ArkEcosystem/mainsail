@@ -60,7 +60,7 @@ describe<{
 		setPinged.calledOnce();
 	});
 
-	it("should give getBlocks the configured timeout", async ({ communicator, peer, connection }) => {
+	it("should give a batch of blocks the configured timeout", async ({ communicator, peer, connection }) => {
 		const send = spy(connection, "send");
 
 		await communicator.getBlocks(peer, { fromBlockNumber: 5 });
@@ -68,6 +68,15 @@ describe<{
 		assert.equal(send.getCallArgs(0)[0], GetBlocks);
 		assert.equal(send.getCallArgs(0)[1], { fromBlockNumber: 5, limit: 400 });
 		assert.equal(send.getCallArgs(0)[2], { timeout: 30_000 });
+	});
+
+	it("should give a single block the transport's timeout", async ({ communicator, peer, connection }) => {
+		const send = spy(connection, "send");
+
+		await communicator.getBlocks(peer, { fromBlockNumber: 5, limit: 1 });
+
+		assert.equal(send.getCallArgs(0)[1], { fromBlockNumber: 5, limit: 1 });
+		assert.equal(send.getCallArgs(0)[2], {});
 	});
 
 	it("should fail without an open connection instead of dialing", async ({ communicator, peer }) => {
