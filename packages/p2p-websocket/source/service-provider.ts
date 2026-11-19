@@ -9,10 +9,10 @@ import type { ConnectionFactory, ConnectionOptions } from "./interfaces/index.js
 
 import { AddressFamilyVerifier } from "./address-family-verifier.js";
 import { BanList } from "./ban-list.js";
+import { ConnectionLimitVerifier } from "./connection-limit-verifier.js";
 import { ConnectionRepository } from "./connection-repository.js";
 import { Connection } from "./connection.js";
 import { Dialer } from "./dialer.js";
-import { InboundLimitVerifier } from "./inbound-limit-verifier.js";
 import { Listener } from "./listener.js";
 import { Logger } from "./logger.js";
 import { ReceiveCodecMiddleware, RequestLimitMiddleware, SendCodecMiddleware } from "./middleware/index.js";
@@ -37,7 +37,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.bind(Identifiers.P2P.WebSocket.Connection.Verifiers)
 			.toService(Identifiers.P2P.WebSocket.Connection.Repository);
 		// After the duplicate check, so a second socket from a connected address is told so and not that we are full.
-		this.app.bind(Identifiers.P2P.WebSocket.Connection.Verifiers).to(InboundLimitVerifier).inSingletonScope();
+		this.app.bind(Identifiers.P2P.WebSocket.Connection.Verifiers).to(ConnectionLimitVerifier).inSingletonScope();
 
 		this.app
 			.bind<ConnectionFactory>(Identifiers.P2P.WebSocket.Connection.Factory)
@@ -73,6 +73,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 					.ip({ version: ["ipv4", "ipv6"] })
 					.required(),
 				maxInboundConnections: Joi.number().integer().min(0).required(),
+				maxOutboundConnections: Joi.number().integer().min(0).required(),
 				port: Joi.number().integer().min(1).max(65_535).required(),
 			}).required(),
 		}).unknown(true);
