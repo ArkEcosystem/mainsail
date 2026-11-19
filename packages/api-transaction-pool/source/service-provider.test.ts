@@ -167,6 +167,9 @@ describe<{
 		assert.number(result.value.plugins.rateLimit.points);
 		assert.array(result.value.plugins.rateLimit.whitelist);
 		assert.number(result.value.plugins.socketTimeout);
+		assert.number(result.value.plugins.transactionRateLimit.duration);
+		assert.boolean(result.value.plugins.transactionRateLimit.enabled);
+		assert.number(result.value.plugins.transactionRateLimit.points);
 		assert.boolean(result.value.plugins.trustProxy);
 		assert.array(result.value.plugins.whitelist);
 		assert.boolean(result.value.server.http.enabled);
@@ -252,6 +255,40 @@ describe<{
 
 		assert.undefined(result.error);
 		assert.equal(result.value.plugins.rateLimit.points, 500);
+	});
+
+	it("should parse process.env.MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_DISABLED", async ({
+		serviceProvider,
+	}) => {
+		process.env.MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_DISABLED = "true";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.plugins.transactionRateLimit.enabled, false);
+		assert.equal(result.value.plugins.rateLimit.enabled, true);
+	});
+
+	it("should parse process.env.MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_USER_LIMIT", async ({
+		serviceProvider,
+	}) => {
+		process.env.MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_USER_LIMIT = "1200";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.plugins.transactionRateLimit.points, 1200);
+	});
+
+	it("should parse process.env.MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_USER_EXPIRES", async ({
+		serviceProvider,
+	}) => {
+		process.env.MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_USER_EXPIRES = "30";
+
+		const result = serviceProvider.configSchema().validate(await importDefaults());
+
+		assert.undefined(result.error);
+		assert.equal(result.value.plugins.transactionRateLimit.duration, 30);
 	});
 
 	it("should parse process.env.MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS", async ({ serviceProvider }) => {
@@ -533,6 +570,83 @@ describe<{
 		result = serviceProvider.configSchema().validate(defaults);
 
 		assert.equal(result.error?.message, '"plugins.socketTimeout" is required');
+	});
+
+	it("#schemaRestrictions - plugins.transactionRateLimit is required && is object", async ({ serviceProvider }) => {
+		const defaults = await importDefaults();
+		defaults.plugins.transactionRateLimit = false;
+		let result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.transactionRateLimit" must be of type object');
+
+		delete defaults.plugins.transactionRateLimit;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.transactionRateLimit" is required');
+	});
+
+	for (const [key, minimum] of [
+		["duration", 1],
+		["points", 0],
+	] as const) {
+		it(`#schemaRestrictions - plugins.transactionRateLimit.${key} is required && is integer && >= ${minimum}`, async ({
+			serviceProvider,
+		}) => {
+			const defaults = await importDefaults();
+			defaults.plugins.transactionRateLimit[key] = false;
+			let result = serviceProvider.configSchema().validate(defaults);
+
+			assert.equal(result.error?.message, `"plugins.transactionRateLimit.${key}" must be a number`);
+
+			defaults.plugins.transactionRateLimit[key] = 1.12;
+			result = serviceProvider.configSchema().validate(defaults);
+
+			assert.equal(result.error?.message, `"plugins.transactionRateLimit.${key}" must be an integer`);
+
+			defaults.plugins.transactionRateLimit[key] = minimum - 1;
+			result = serviceProvider.configSchema().validate(defaults);
+
+			assert.equal(
+				result.error?.message,
+				`"plugins.transactionRateLimit.${key}" must be greater than or equal to ${minimum}`,
+			);
+
+			delete defaults.plugins.transactionRateLimit[key];
+			result = serviceProvider.configSchema().validate(defaults);
+
+			assert.equal(result.error?.message, `"plugins.transactionRateLimit.${key}" is required`);
+		});
+	}
+
+	it("#schemaRestrictions - plugins.transactionRateLimit.duration is <= 2147483", async ({ serviceProvider }) => {
+		const defaults = await importDefaults();
+		defaults.plugins.transactionRateLimit.duration = 2_147_484;
+		let result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(
+			result.error?.message,
+			'"plugins.transactionRateLimit.duration" must be less than or equal to 2147483',
+		);
+
+		defaults.plugins.transactionRateLimit.duration = 2_147_483;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.undefined(result.error);
+	});
+
+	it("#schemaRestrictions - plugins.transactionRateLimit.enabled is required && is boolean", async ({
+		serviceProvider,
+	}) => {
+		const defaults = await importDefaults();
+		defaults.plugins.transactionRateLimit.enabled = 1;
+		let result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.transactionRateLimit.enabled" must be a boolean');
+
+		delete defaults.plugins.transactionRateLimit.enabled;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.transactionRateLimit.enabled" is required');
 	});
 
 	it("#schemaRestrictions - plugins.trustProxy is required && is boolean", async ({ serviceProvider }) => {

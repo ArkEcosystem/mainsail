@@ -16,6 +16,9 @@ const variables = [
 	"MAINSAIL_API_TRANSACTION_POOL_SSL_HOST",
 	"MAINSAIL_API_TRANSACTION_POOL_SSL_KEY",
 	"MAINSAIL_API_TRANSACTION_POOL_SSL_PORT",
+	"MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_DISABLED",
+	"MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_USER_EXPIRES",
+	"MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_USER_LIMIT",
 	"MAINSAIL_API_TRANSACTION_POOL_TRUST_PROXY",
 ];
 
@@ -47,6 +50,7 @@ describe("Defaults", ({ it, assert, beforeEach, afterAll }) => {
 					whitelist: [],
 				},
 				socketTimeout: 5000,
+				transactionRateLimit: { duration: 60, enabled: true, points: 600 },
 				trustProxy: false,
 				whitelist: ["*"],
 			},
@@ -85,6 +89,9 @@ describe("Defaults", ({ it, assert, beforeEach, afterAll }) => {
 		process.env.MAINSAIL_API_TRANSACTION_POOL_SSL_HOST = "10.0.0.1";
 		process.env.MAINSAIL_API_TRANSACTION_POOL_SSL_KEY = "/key.pem";
 		process.env.MAINSAIL_API_TRANSACTION_POOL_SSL_PORT = "8448";
+		process.env.MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_DISABLED = "true";
+		process.env.MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_USER_EXPIRES = "30";
+		process.env.MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_USER_LIMIT = "1200";
 		process.env.MAINSAIL_API_TRANSACTION_POOL_TRUST_PROXY = "true";
 
 		const { defaults } = await import("./defaults.js?overridden");
@@ -98,6 +105,7 @@ describe("Defaults", ({ it, assert, beforeEach, afterAll }) => {
 			whitelist: ["3.3.3.3"],
 		});
 		assert.equal(defaults.plugins.concurrencyLimit, { limit: "8", limitPerIp: "2" });
+		assert.equal(defaults.plugins.transactionRateLimit, { duration: "30", enabled: false, points: "1200" });
 		assert.true(defaults.plugins.trustProxy);
 		assert.equal(defaults.server.http, {
 			enabled: false,

@@ -29,6 +29,19 @@ export const defaults = {
 				)?.split(",") ?? [],
 		},
 		socketTimeout: 5000,
+		transactionRateLimit: {
+			duration: Environment.get(
+				EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_USER_EXPIRES,
+				60,
+			),
+			enabled: !Environment.isTrue(
+				EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_DISABLED,
+			),
+			points: Environment.get(
+				EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_TRANSACTION_RATE_LIMIT_USER_LIMIT,
+				600,
+			),
+		},
 		trustProxy: Environment.isTrue(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_TRUST_PROXY),
 		whitelist: ["*"],
 	},

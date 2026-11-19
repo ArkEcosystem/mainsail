@@ -22,6 +22,7 @@ export const makeConfiguration = () => ({
 		pagination: { limit: 100, maxBytes: 1_000_000 },
 		rateLimit: { blacklist: [], duration: 60, enabled: false, points: 150, whitelist: [] },
 		socketTimeout: 5000,
+		transactionRateLimit: { duration: 60, enabled: true, points: 600 },
 		trustProxy: false,
 		whitelist: ["*"],
 	},
