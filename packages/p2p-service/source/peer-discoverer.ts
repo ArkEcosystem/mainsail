@@ -28,7 +28,7 @@ export class PeerDiscoverer implements Contracts.P2PService.PeerDiscoverer {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	// Waits for the peer's answer only; the addresses in it are dialed in the background.
-	async discoverPeers(peer: Contracts.P2PService.Peer): Promise<void> {
+	public async discoverPeers(peer: Contracts.P2PService.Peer): Promise<void> {
 		try {
 			const { peers } = await this.communicator.getPeers(peer);
 
@@ -45,7 +45,7 @@ export class PeerDiscoverer implements Contracts.P2PService.PeerDiscoverer {
 	// Seeds are recorded as known, not merely dialed once: the service loop dials them like any known peer,
 	// so a seed that is still starting is tried again after DIAL_SPACING. The loop gives them up like any
 	// other peer too; the service records them again while the node is short of peers.
-	async populateSeedPeers(): Promise<void> {
+	public async populateSeedPeers(): Promise<void> {
 		for (const ip of this.seeds.all()) {
 			if (this.repository.hasPeer(ip)) {
 				continue;
