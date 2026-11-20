@@ -4,13 +4,8 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { assert, ensureError } from "@mainsail/utils";
 
-import { isValidVersion } from "./utils/index.js";
-
 @injectable()
 export class PeerVerifier implements Contracts.P2PService.PeerVerifier {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.P2P.Peer.Communicator)
 	private readonly communicator!: Contracts.P2PService.PeerCommunicator;
 
@@ -35,11 +30,8 @@ export class PeerVerifier implements Contracts.P2PService.PeerVerifier {
 	public async verify(peer: Contracts.P2PService.Peer): Promise<boolean> {
 		try {
 			const status = await this.communicator.getStatus(peer);
-			peer.version = status.config.version;
 
 			this.#verifyConfig(status.config);
-
-			this.#verifyVersion(status.config);
 
 			await this.#verifyHighestCommonBlock(peer, status.state);
 
@@ -62,12 +54,6 @@ export class PeerVerifier implements Contracts.P2PService.PeerVerifier {
 		}
 
 		// TODO: Verify genesis block id
-	}
-
-	#verifyVersion(config: Contracts.P2PService.PeerConfig): void {
-		if (!isValidVersion(this.app, config.version)) {
-			throw new Error("Invalid version");
-		}
 	}
 
 	async #verifyHighestCommonBlock(

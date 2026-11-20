@@ -51,12 +51,7 @@ describe<{
 		banPeer.calledWith("1.1.1.1", error);
 	});
 
-	it("should record the version and fail a peer on another network", async ({
-		peerVerifier,
-		communicator,
-		peerDisposer,
-		peer,
-	}) => {
+	it("should fail a peer on another network", async ({ peerVerifier, communicator, peerDisposer, peer }) => {
 		communicator.getStatus = async () => ({
 			...status,
 			config: { ...status.config, network: { nethash: "other" } },
@@ -66,6 +61,5 @@ describe<{
 		assert.false(await peerVerifier.verify(peer));
 
 		assert.equal(banPeer.getCallArgs(0)[1].message, "Invalid nethash");
-		assert.equal(peer.version, "1.0.0");
 	});
 });
