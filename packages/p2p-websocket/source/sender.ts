@@ -25,7 +25,8 @@ export class Sender implements RouteSender {
 			route,
 		};
 
-		for (const step of this.middleware) {
+		// Reverse: the codec is bound first and must encode last, after the other steps shaped the data.
+		for (const step of [...this.middleware].reverse()) {
 			await step.before?.(context);
 		}
 
@@ -44,7 +45,7 @@ export class Sender implements RouteSender {
 			);
 		}
 
-		for (const step of [...this.middleware].reverse()) {
+		for (const step of this.middleware) {
 			await step.after?.(context);
 		}
 
