@@ -16,12 +16,15 @@ describe<{
 	subject: WorkerScriptHandler;
 	handler: any;
 	resolve: any;
+	processor: any;
 }>("WorkerScriptHandler", ({ assert, beforeEach, it, spy, stub }) => {
 	beforeEach((context) => {
 		// WorkerScriptHandler owns a private `new Application()`; stub the prototype so the
 		// handler resolutions and lifecycle calls stay in-process.
 		context.handler = { handle: async () => {} };
 		context.resolve = stub(Application.prototype, "resolve").returnValue(context.handler);
+		context.processor = { pauseWhile: async (work: () => Promise<unknown>) => work() };
+		stub(Application.prototype, "get").returnValue(context.processor);
 
 		context.subject = new WorkerScriptHandler();
 	});
@@ -77,6 +80,32 @@ describe<{
 		resolve.calledWith(GetTransactionsHandler);
 		handle.calledWith(options);
 		assert.equal(result, batch);
+	});
+
+	it("runs start, commit and getTransactions with the transaction processor paused", async ({
+		subject,
+		handler,
+		processor,
+	}) => {
+		let paused = false;
+		processor.pauseWhile = async (work: () => Promise<unknown>) => {
+			await new Promise((resolve) => setImmediate(resolve));
+			paused = true;
+
+			try {
+				return await work();
+			} finally {
+				paused = false;
+			}
+		};
+		const pausedDuringWork: boolean[] = [];
+		stub(handler, "handle").callsFake(async () => void pausedDuringWork.push(paused));
+
+		await subject.start(42);
+		await subject.commit(10, ["alice"], 5000, true);
+		await subject.getTransactions({ blockRound: "0", maxBytes: 1024, maxSize: 100 });
+
+		assert.equal(pausedDuringWork, [true, true, true]);
 	});
 
 	it("removeTransaction resolves the RemoveTransactionHandler and forwards address and id", async ({
