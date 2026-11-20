@@ -86,7 +86,7 @@ export const conditions = {
 	lt,
 	lte,
 	ne,
-	notBetween,
+	"not-between": notBetween,
 	regexp,
 	truthy,
 };

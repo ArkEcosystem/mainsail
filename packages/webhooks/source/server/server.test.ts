@@ -71,6 +71,35 @@ describe<Context>("Server", ({ beforeEach, afterEach, afterAll, it, assert, stub
 		assert.object(response.body.data);
 	});
 
+	it("should reject a webhook with an unknown condition", async ({ server }) => {
+		const response = await createWebhook(server, {
+			...postData,
+			conditions: [{ condition: "unknown", key: "fee", value: "1" }],
+		});
+
+		assert.equal(response.status, 422);
+	});
+
+	it("should POST a new webhook with a not-between condition", async ({ server }) => {
+		const response = await createWebhook(server, {
+			...postData,
+			conditions: [{ condition: "not-between", key: "fee", value: { max: "3", min: "1" } }],
+		});
+
+		assert.equal(response.status, 201);
+	});
+
+	it("should reject an update with an unknown condition", async ({ server }) => {
+		const { body } = await createWebhook(server);
+
+		const response = await ServerHelper.request(server, "PUT", `webhooks/${body.data.id}`, {
+			...postData,
+			conditions: [{ condition: "toString", key: "fee", value: "1" }],
+		});
+
+		assert.equal(response.status, 422);
+	});
+
 	it("should GET a webhook by the given id", async ({ server }) => {
 		const { body } = await createWebhook(server);
 
