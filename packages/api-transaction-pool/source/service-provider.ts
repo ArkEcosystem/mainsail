@@ -44,6 +44,11 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				points: number;
 				whitelist: string[];
 			};
+			transactionRateLimit: {
+				duration: number;
+				enabled: boolean;
+				points: number;
+			};
 		}>("plugins");
 
 		return [
@@ -61,6 +66,17 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 					trustProxy: config.trustProxy,
 				},
 				plugin: Plugins.rateLimit,
+			},
+			{
+				options: {
+					...config.transactionRateLimit,
+					enabled: config.rateLimit.enabled && config.transactionRateLimit.enabled,
+					headerPrefix: "X-TransactionRateLimit",
+					message: "Too many transactions",
+					trustProxy: config.trustProxy,
+					whitelist: config.rateLimit.whitelist,
+				},
+				plugin: Plugins.costRateLimit,
 			},
 			{
 				options: {
@@ -98,6 +114,11 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 						whitelist: Joi.array().items(Joi.string()).required(),
 					}).required(),
 					socketTimeout: Joi.number().integer().min(0).required(),
+					transactionRateLimit: Joi.object({
+						duration: Joi.number().integer().min(1).max(2_147_483).required(),
+						enabled: Joi.bool().required(),
+						points: Joi.number().integer().min(0).required(),
+					}).required(),
 					trustProxy: Joi.bool().required(),
 					whitelist: Joi.array().items(Joi.string()).required(),
 				}).required(),

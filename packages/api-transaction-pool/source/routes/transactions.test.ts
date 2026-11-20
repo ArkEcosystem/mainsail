@@ -1,4 +1,4 @@
-import type { Plugin } from "@hapi/hapi";
+import type { Plugin, ServerInjectResponse } from "@hapi/hapi";
 
 import { describe } from "@mainsail/test-runner";
 
@@ -42,12 +42,34 @@ const holdFirstRead = async (server: Server) => {
 	return { release, waitForHeld };
 };
 
+const limitTransactions = (points: number) => {
+	const limited = makeConfiguration();
+	limited.plugins.rateLimit.enabled = true;
+	limited.plugins.transactionRateLimit.points = points;
+
+	return limited;
+};
+
+const post = (server: Server, count: number, headers = {}) =>
+	server.inject({
+		headers,
+		method: "POST",
+		payload: { transactions: Array.from({ length: count }, () => "aa") },
+		url: "/api/transactions",
+	});
+
+const transactionBudget = (response: ServerInjectResponse) => ({
+	limit: response.headers["x-transactionratelimit-limit"],
+	remaining: response.headers["x-transactionratelimit-remaining"],
+	reset: response.headers["x-transactionratelimit-reset"],
+});
+
 describe<{
 	server: Server;
 	serviceProvider: ServiceProvider;
 	processor: { process: (data: Buffer[]) => Promise<object> };
 	transactions: ReturnType<typeof makeTransaction>[];
-}>("Transactions routes", ({ it, assert, beforeEach, afterEach, stub }) => {
+}>("Transactions routes", ({ it, assert, beforeEach, afterEach, clock, spy, stub }) => {
 	beforeEach(async (context) => {
 		context.transactions = [makeTransaction(1), makeTransaction(2)];
 
@@ -185,6 +207,159 @@ describe<{
 		});
 
 		assert.is(response.statusCode, 422);
+	});
+
+	it("POST /api/transactions - takes one transaction point per transaction and one request point per request", async ({
+		processor,
+		transactions,
+	}) => {
+		clock({ now: 1_000_000, toFake: ["Date", "performance"] });
+
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limitTransactions(3));
+		const budget = { limit: "3", remaining: "1", reset: "Thu, 01 Jan 1970 00:17:40 GMT" };
+
+		try {
+			const accepted = await post(server, 2);
+
+			assert.is(accepted.statusCode, 200);
+			assert.is(accepted.headers["x-ratelimit-remaining"], "149");
+			assert.equal(transactionBudget(accepted), budget);
+
+			const refused = await post(server, 2);
+
+			assert.is(refused.statusCode, 429);
+			assert.is(refused.headers["x-ratelimit-remaining"], "148");
+			assert.is(refused.headers["retry-after"], "60");
+			assert.is(JSON.parse(refused.payload).message, "Too many transactions");
+			assert.equal(transactionBudget(refused), budget);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
+	it("POST /api/transactions - refuses a batch over the transaction points left without charging or processing it", async ({
+		processor,
+		transactions,
+	}) => {
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limitTransactions(3));
+		const process = spy(processor, "process");
+
+		try {
+			assert.is((await post(server, 2)).statusCode, 200);
+			assert.is((await post(server, 2)).statusCode, 429);
+			assert.is((await post(server, 1)).statusCode, 200);
+			assert.is((await post(server, 1)).statusCode, 429);
+
+			process.calledTimes(2);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
+	it("POST /api/transactions - takes no transaction points for a payload that fails validation", async ({
+		processor,
+		transactions,
+	}) => {
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limitTransactions(2));
+
+		try {
+			const invalid = await server.inject({
+				method: "POST",
+				payload: { transactions: ["aa", "not-hex!"] },
+				url: "/api/transactions",
+			});
+
+			assert.is(invalid.statusCode, 422);
+			assert.is((await post(server, 2)).statusCode, 200);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
+	it("POST /api/transactions - does not limit the transactions of an address the rate limit whitelists", async ({
+		processor,
+		transactions,
+	}) => {
+		const limited = limitTransactions(1);
+		limited.plugins.rateLimit.whitelist = ["127.0.0.1"];
+
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
+
+		try {
+			assert.is((await post(server, 2)).statusCode, 200);
+			assert.is((await post(server, 2)).statusCode, 200);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
+	it("POST /api/transactions - counts the transactions per forwarded address behind a trusted proxy", async ({
+		processor,
+		transactions,
+	}) => {
+		const limited = limitTransactions(2);
+		limited.plugins.trustProxy = true;
+
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
+
+		try {
+			assert.is((await post(server, 2, { "x-forwarded-for": "1.1.1.1" })).statusCode, 200);
+			assert.is((await post(server, 1, { "x-forwarded-for": "1.1.1.1" })).statusCode, 429);
+			assert.is((await post(server, 2, { "x-forwarded-for": "2.2.2.2" })).statusCode, 200);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
+	it("POST /api/transactions - does not limit transactions while rate limiting is disabled", async ({
+		processor,
+		transactions,
+	}) => {
+		const limited = limitTransactions(1);
+		limited.plugins.rateLimit.enabled = false;
+
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
+
+		try {
+			assert.is((await post(server, 2)).statusCode, 200);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
+	it("POST /api/transactions - limits requests but not transactions while only the transaction rate limit is disabled", async ({
+		processor,
+		transactions,
+	}) => {
+		const limited = limitTransactions(1);
+		limited.plugins.transactionRateLimit.enabled = false;
+
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limited);
+
+		try {
+			const response = await post(server, 2);
+
+			assert.is(response.statusCode, 200);
+			assert.is(response.headers["x-ratelimit-remaining"], "149");
+			assert.equal(transactionBudget(response), { limit: undefined, remaining: undefined, reset: undefined });
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
+	it("GET /api/transactions/unconfirmed - answers while the transaction points are used up", async ({
+		processor,
+		transactions,
+	}) => {
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, limitTransactions(1));
+
+		try {
+			assert.is((await post(server, 1)).statusCode, 200);
+			assert.is((await post(server, 1)).statusCode, 429);
+			assert.is((await server.inject("/api/transactions/unconfirmed")).statusCode, 200);
+		} finally {
+			await serviceProvider.dispose();
+		}
 	});
 
 	it("GET /api/transactions/unconfirmed - returns json-safe transactions in a pagination envelope", async ({

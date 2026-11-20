@@ -36,6 +36,12 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 				// of JSON overhead (quotes and comma), plus 100 bytes for the envelope.
 				maxBytes: 100 + maxTransactionsPerRequest * (maxTransactionBytes * 2 + 4),
 			},
+			plugins: {
+				costRateLimit: {
+					points: (request: Types.HapiRequest) =>
+						(request.payload as { transactions: string[] }).transactions.length,
+				},
+			},
 			validate: {
 				payload: Joi.object({
 					transactions: Joi.array()
