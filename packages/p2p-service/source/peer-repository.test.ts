@@ -248,12 +248,11 @@ describe<{
 		// A reconnecting peer: the known entry stays while a new object for the address is verified.
 		const known = app.resolve(Peer).init("176.165.22.11", 4000);
 		const pending = app.resolve(Peer).init("176.165.22.11", 4000);
-		pending.version = "0.0.2";
 
 		peerRepository.setKnownPeer(known);
 		peerRepository.setPendingPeer(pending);
 
-		assert.equal(peerRepository.getPeer("176.165.22.11").version, "0.0.2");
+		assert.true(peerRepository.getPeer("176.165.22.11") === pending);
 	});
 
 	it("#removePeer - should remove the peer from every list", ({ peerRepository, app }) => {

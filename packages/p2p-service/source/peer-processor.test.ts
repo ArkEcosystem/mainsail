@@ -113,8 +113,6 @@ describe<{
 		const [peer] = repository.getActivePeers();
 		assert.equal(peer.ip, ip);
 		assert.equal(peer.connection, connection);
-		// The version the peer named in its hello.
-		assert.equal(peer.version, "0.0.1");
 		assert.false(repository.hasPendingPeer(ip));
 		verify.calledWith(peer);
 		discoverPeers.calledWith(peer);

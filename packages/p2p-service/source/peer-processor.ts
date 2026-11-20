@@ -78,8 +78,6 @@ export class PeerProcessor {
 			? (this.repository.getKnownPeer(ip) as Peer)
 			: this.peerFactory(ip);
 		peer.connection = connection;
-		// The transport has checked it in the handshake; here it is only kept for those who ask about the peer.
-		peer.version = connection.remoteVersion;
 		connection.onClose((reason, error) => this.#onClose(ip, reason, error));
 
 		await this.#verifyPeer(peer, connection);
