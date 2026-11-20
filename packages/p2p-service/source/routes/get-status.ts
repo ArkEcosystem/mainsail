@@ -1,7 +1,7 @@
 import type { Contracts } from "@mainsail/contracts";
 import type { Interfaces } from "@mainsail/p2p-websocket";
 
-import { Identifiers } from "@mainsail/constants";
+import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
 import { Codecs } from "../codecs/index.js";
@@ -10,7 +10,13 @@ import { getPeerConfig } from "../utils/index.js";
 type Request = ReturnType<typeof Codecs.getStatus.request.deserialize>;
 type Response = ReturnType<typeof Codecs.getStatus.response.deserialize>;
 
-export const GetStatus: Interfaces.RouteDefinition<Request, Response> = { codec: Codecs.getStatus, path: "getStatus" };
+export const GetStatus: Interfaces.RouteDefinition<Request, Response> = {
+	codec: Codecs.getStatus,
+	maxConcurrentRequests: 2,
+	maxPayload: { request: Units.KILOBYTE, response: 16 * Units.KILOBYTE },
+	maxQueuedRequests: 1,
+	path: "getStatus",
+};
 
 @injectable()
 export class GetStatusRoute implements Interfaces.Route<Request, Response> {
@@ -22,6 +28,9 @@ export class GetStatusRoute implements Interfaces.Route<Request, Response> {
 
 	public readonly path = GetStatus.path;
 	public readonly codec = GetStatus.codec;
+	public readonly maxPayload = GetStatus.maxPayload;
+	public readonly maxConcurrentRequests = GetStatus.maxConcurrentRequests;
+	public readonly maxQueuedRequests = GetStatus.maxQueuedRequests;
 
 	public async handle(): Promise<Response> {
 		const lastBlock = this.stateStore.getLastBlock();

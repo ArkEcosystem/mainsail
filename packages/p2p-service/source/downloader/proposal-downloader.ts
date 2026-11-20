@@ -7,26 +7,26 @@ import { ensureError } from "@mainsail/utils";
 import { getRandomPeer } from "../utils/index.js";
 
 type DownloadJob = {
-	peer: Contracts.P2P.Peer;
+	peer: Contracts.P2PService.Peer;
 	blockNumber: number;
 	round: number;
 };
 @injectable()
-export class ProposalDownloader implements Contracts.P2P.Downloader {
+export class ProposalDownloader implements Contracts.P2PService.Downloader {
 	@inject(Identifiers.P2P.Peer.Communicator)
-	private readonly communicator!: Contracts.P2P.PeerCommunicator;
+	private readonly communicator!: Contracts.P2PService.PeerCommunicator;
 
 	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly repository!: Contracts.P2P.PeerRepository;
+	private readonly repository!: Contracts.P2PService.PeerRepository;
 
 	@inject(Identifiers.P2P.Header.Factory)
-	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
+	private readonly headerFactory!: Contracts.P2PService.HeaderFactory;
 
 	@inject(Identifiers.P2P.Downloader.Block)
-	private readonly blockDownloader!: Contracts.P2P.Downloader;
+	private readonly blockDownloader!: Contracts.P2PService.Downloader;
 
 	@inject(Identifiers.P2P.Peer.Disposer)
-	private readonly peerDisposer!: Contracts.P2P.PeerDisposer;
+	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
 	@inject(Identifiers.Cryptography.Proposal.Factory)
 	private readonly factory!: Contracts.Crypto.ProposalFactory;
@@ -35,7 +35,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 	private readonly proposalProcessor!: Contracts.Consensus.ProposalProcessor;
 
 	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2P.State;
+	private readonly state!: Contracts.P2PService.State;
 
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
@@ -57,14 +57,14 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		}
 
 		const header = this.headerFactory();
-		const peers = this.repository.getPeers().filter((peer) => this.#canDownload(header, peer.header));
+		const peers = this.repository.getActivePeers().filter((peer) => this.#canDownload(header, peer.header));
 
 		if (peers.length > 0) {
 			this.download(getRandomPeer(peers));
 		}
 	}
 
-	public download(peer: Contracts.P2P.Peer): void {
+	public download(peer: Contracts.P2PService.Peer): void {
 		if (this.blockDownloader.isDownloading()) {
 			return;
 		}
@@ -88,7 +88,7 @@ export class ProposalDownloader implements Contracts.P2P.Downloader {
 		return this.#downloadsByBlockNumber.size > 0;
 	}
 
-	#canDownload(ourHeader: Contracts.P2P.Header, peerHeader: Contracts.P2P.HeaderData) {
+	#canDownload(ourHeader: Contracts.P2PService.Header, peerHeader: Contracts.P2PService.HeaderData) {
 		if (ourHeader.blockNumber !== peerHeader.blockNumber || ourHeader.round !== peerHeader.round) {
 			return false;
 		}

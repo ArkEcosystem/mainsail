@@ -13,7 +13,7 @@ describe<{
 	appliedListener: { handle: (payload: { data: { number: number } }) => Promise<void> };
 }>("ProposalDownloader", ({ it, assert, beforeEach, stub }) => {
 	const communicator = { getProposal: async () => ({ proposal: Buffer.alloc(0) }) };
-	const repository = { getPeers: () => [] };
+	const repository = { getActivePeers: () => [] };
 	const blockDownloader = { isDownloading: () => false };
 	const peerDisposer = { banPeer: () => {} };
 	const factory = { makeProposalFromBytes: async () => ({}) };
@@ -130,7 +130,7 @@ describe<{
 		stub(communicator, "getProposal").resolvedValue({ proposal: Buffer.from("dead", "hex") });
 		stub(factory, "makeProposalFromBytes").resolvedValue({ blockHeader: { number: 2 }, round: 1 });
 		const banPeer = stub(peerDisposer, "banPeer");
-		const getPeers = stub(repository, "getPeers").returnValue([]);
+		const getPeers = stub(repository, "getActivePeers").returnValue([]);
 
 		downloader.download(peer);
 		await sleep(10);
@@ -155,7 +155,7 @@ describe<{
 
 	it("#tryToDownload - should download from an eligible peer", async ({ downloader, peer }) => {
 		const getProposal = stub(communicator, "getProposal").resolvedValue({ proposal: Buffer.alloc(0) });
-		stub(repository, "getPeers").returnValue([peer]);
+		stub(repository, "getActivePeers").returnValue([peer]);
 
 		downloader.tryToDownload();
 		assert.true(downloader.isDownloading());
@@ -166,7 +166,7 @@ describe<{
 
 	it("#tryToDownload - should do nothing while the block downloader is downloading", ({ downloader, peer }) => {
 		const getProposal = stub(communicator, "getProposal");
-		stub(repository, "getPeers").returnValue([peer]);
+		stub(repository, "getActivePeers").returnValue([peer]);
 		stub(blockDownloader, "isDownloading").returnValue(true);
 
 		downloader.tryToDownload();

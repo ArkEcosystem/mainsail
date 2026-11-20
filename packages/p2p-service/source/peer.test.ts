@@ -36,11 +36,11 @@ describe<{
 		],
 	);
 
-	it("#toBroadcast - should return a Contracts.P2P.PeerBroadcast object for peer properties", ({ peer }) => {
+	it("#toBroadcast - should return a Contracts.P2PService.PeerBroadcast object for peer properties", ({ peer }) => {
 		peer.version = "3.0.1";
 		peer.latency = 135;
 
-		const expectedBroadcast: Contracts.P2P.PeerBroadcast = {
+		const expectedBroadcast: Contracts.P2PService.PeerBroadcast = {
 			ip,
 			port: 4000,
 			protocol: Enums.Api.Protocol.Http,

@@ -12,7 +12,7 @@ export class Worker implements Contracts.Evm.Worker {
 	private readonly eventDispatcher!: Contracts.Kernel.EventDispatcher;
 
 	@inject(Identifiers.P2P.Peer.Repository)
-	private readonly p2pRepository!: Contracts.P2P.PeerRepository;
+	private readonly p2pRepository!: Contracts.P2PService.PeerRepository;
 
 	private ipcSubprocess!: Contracts.Kernel.IPC.Subprocess;
 
@@ -32,7 +32,7 @@ export class Worker implements Contracts.Evm.Worker {
 	}
 
 	public async handle(payload: { name: string; data: unknown }): Promise<void> {
-		await this.setPeerCount(this.p2pRepository.getPeers().length);
+		await this.setPeerCount(this.p2pRepository.getActivePeers().length);
 	}
 
 	public async boot(flags: Contracts.Evm.WorkerFlags): Promise<void> {

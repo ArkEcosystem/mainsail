@@ -44,7 +44,7 @@ export class Consensus implements Contracts.Consensus.Service {
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	@inject(Identifiers.P2P.PendingCommits)
-	private readonly pendingCommits!: Contracts.P2P.PendingCommits;
+	private readonly pendingCommits!: Contracts.P2PService.PendingCommits;
 
 	@inject(Identifiers.ConsensusStorage.Service)
 	private readonly storage!: Contracts.ConsensusStorage.Service;

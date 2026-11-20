@@ -3,7 +3,7 @@ import type { Contracts } from "@mainsail/contracts";
 import { injectable } from "@mainsail/container";
 
 @injectable()
-export class PendingCommits implements Contracts.P2P.PendingCommits {
+export class PendingCommits implements Contracts.P2PService.PendingCommits {
 	readonly #commits = new Map<number, Contracts.Crypto.Commit>();
 
 	public add(commits: Contracts.Crypto.Commit[]): void {

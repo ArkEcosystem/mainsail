@@ -1,7 +1,7 @@
 import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
-import { CloseReason } from "@mainsail/p2p-websocket";
 import { describe } from "@mainsail/test-runner";
+import { CloseReason, ConnectionError } from "@mainsail/p2p-websocket";
 import dayjs from "dayjs";
 
 import { constants } from "./constants";
@@ -22,22 +22,28 @@ describe<{
 	state: any;
 	logger: any;
 	peerDiscoverer: any;
-	peerProcessor: any;
 	peerDisposer: any;
+	seeds: any;
 	websocketService: any;
 	configuration: any;
 }>("Service", ({ it, beforeEach, assert, clock, spy, stub }) => {
 	beforeEach((context) => {
 		context.logger = { debug: () => {}, error: () => {}, info: () => {}, warn: () => {} };
-		context.repository = { getPeers: () => [], hasMinimumPeers: () => true, hasPeer: () => false };
+		context.repository = {
+			forgetKnownPeer: () => {},
+			getKnownPeers: () => [],
+			getActivePeers: () => [],
+			hasKnownPeer: () => true,
+			hasMinimumPeers: () => true,
+		};
 		context.peerVerifier = { verify: async () => true };
 		context.state = { getLastMessageTime: () => dayjs() };
 		context.peerDiscoverer = { discoverPeers: async () => {}, populateSeedPeers: async () => {} };
-		context.peerProcessor = { validateAndAcceptPeer: async () => {}, validatePeerIp: () => true };
 		context.peerDisposer = { disposePeers: async () => {} };
+		context.seeds = { isSeed: () => false, load: async () => {} };
 		context.websocketService = {
-			accept: undefined,
 			boot: async () => {},
+			dial: async () => {},
 			dispose: async () => {},
 			onConnection: undefined,
 		};
@@ -49,8 +55,8 @@ describe<{
 			.whenTagged("plugin", "p2p-service");
 		app.bind(Identifiers.P2P.State).toConstantValue(context.state);
 		app.bind(Identifiers.P2P.Peer.Discoverer).toConstantValue(context.peerDiscoverer);
-		app.bind(Identifiers.P2P.Peer.Processor).toConstantValue(context.peerProcessor);
 		app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue(context.peerDisposer);
+		app.bind(Identifiers.P2P.Peer.Seeds).toConstantValue(context.seeds);
 		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
 		app.bind(Identifiers.P2P.Peer.Verifier).toConstantValue(context.peerVerifier);
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
@@ -75,7 +81,7 @@ describe<{
 		peerVerifier,
 		logger,
 	}) => {
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2"), makePeer("3.3.3.3")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2"), makePeer("3.3.3.3")];
 		const verify = spy(peerVerifier, "verify");
 		const info = spy(logger, "info");
 
@@ -86,7 +92,7 @@ describe<{
 	});
 
 	it("#cleansePeers - should verify at most peerCount peers", async ({ service, repository, peerVerifier }) => {
-		repository.getPeers = () => [
+		repository.getActivePeers = () => [
 			makePeer("1.1.1.1"),
 			makePeer("2.2.2.2"),
 			makePeer("3.3.3.3"),
@@ -106,7 +112,7 @@ describe<{
 		peerVerifier,
 		logger,
 	}) => {
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2"), makePeer("3.3.3.3")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2"), makePeer("3.3.3.3")];
 		peerVerifier.verify = async (peer) => peer.ip === "2.2.2.2";
 		const debug = spy(logger, "debug");
 
@@ -120,7 +126,7 @@ describe<{
 		repository,
 		logger,
 	}) => {
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
 		const debug = spy(logger, "debug");
 
 		await service.cleansePeers({ fast: true, peerCount: 5 });
@@ -133,7 +139,7 @@ describe<{
 		repository,
 	}) => {
 		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
 
 		let resolved = false;
 		const promise = service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (resolved = true));
@@ -151,7 +157,7 @@ describe<{
 		peerVerifier,
 	}) => {
 		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
 		peerVerifier.verify = (peer) => (peer.ip === "1.1.1.1" ? Promise.resolve(true) : new Promise(() => {}));
 
 		let resolved = false;
@@ -174,7 +180,7 @@ describe<{
 		configuration,
 	}) => {
 		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getPeers = () => [makePeer("1.1.1.1")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1")];
 		peerVerifier.verify = () => new Promise(() => {});
 		const getRequired = spy(configuration, "getRequired");
 
@@ -199,7 +205,7 @@ describe<{
 		logger,
 	}) => {
 		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
 		peerVerifier.verify = (peer) =>
 			peer.ip === "1.1.1.1"
 				? Promise.resolve(true)
@@ -231,7 +237,7 @@ describe<{
 		logger,
 	}) => {
 		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
 		peerVerifier.verify = (peer) =>
 			peer.ip === "1.1.1.1"
 				? Promise.resolve(true)
@@ -259,7 +265,7 @@ describe<{
 		peerVerifier,
 	}) => {
 		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getPeers = () => [makePeer("1.1.1.1")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1")];
 
 		let verifyCalls = 0;
 		let release!: (result: boolean) => void;
@@ -301,7 +307,7 @@ describe<{
 		peerVerifier,
 		logger,
 	}) => {
-		repository.getPeers = () => [makePeer("1.1.1.1")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1")];
 		peerVerifier.verify = async () => {
 			throw new Error("boom");
 		};
@@ -342,7 +348,7 @@ describe<{
 	}) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
 		state.getLastMessageTime = () => dayjs().subtract(9, "second");
-		repository.getPeers = () => [makePeer("1.1.1.1")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1")];
 
 		let release!: (result: boolean) => void;
 		peerVerifier.verify = () => new Promise<boolean>((resolve) => (release = resolve));
@@ -367,7 +373,7 @@ describe<{
 	}) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
 		repository.hasMinimumPeers = () => false;
-		repository.getPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
 		const populateSeedPeers = spy(peerDiscoverer, "populateSeedPeers");
 		const discoverPeers = spy(peerDiscoverer, "discoverPeers");
 
@@ -392,7 +398,7 @@ describe<{
 	}) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
 		state.getLastMessageTime = () => dayjs().subtract(9, "second");
-		repository.getPeers = () => Array.from({ length: 10 }, (_, index) => makePeer(`1.1.1.${index}`));
+		repository.getActivePeers = () => Array.from({ length: 10 }, (_, index) => makePeer(`1.1.1.${index}`));
 		const verify = stub(peerVerifier, "verify").resolvedValue(true);
 
 		void service.mainLoop();
@@ -412,7 +418,7 @@ describe<{
 	}) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
 		state.getLastMessageTime = () => dayjs().subtract(9, "second");
-		repository.getPeers = () => Array.from({ length: 26 }, (_, index) => makePeer(`1.1.1.${index}`));
+		repository.getActivePeers = () => Array.from({ length: 26 }, (_, index) => makePeer(`1.1.1.${index}`));
 		const verify = stub(peerVerifier, "verify").resolvedValue(true);
 
 		void service.mainLoop();
@@ -473,7 +479,6 @@ describe<{
 	it("#boot - should start the transport, populate seed peers, log discovered versions and start the loop", async ({
 		service,
 		websocketService,
-		peerProcessor,
 		peerDisposer,
 		peerDiscoverer,
 		repository,
@@ -484,14 +489,13 @@ describe<{
 		delete process.env.MAINSAIL_ENV;
 
 		try {
-			repository.getPeers = () => [
+			repository.getActivePeers = () => [
 				makePeer("1.1.1.1"),
 				makePeer("2.2.2.2"),
 				makePeer("3.3.3.3", { version: "0.0.2" }),
 			];
 			const boot = spy(websocketService, "boot");
 			const populateSeedPeers = spy(peerDiscoverer, "populateSeedPeers");
-			const validateAndAcceptPeer = spy(peerProcessor, "validateAndAcceptPeer");
 			const info = spy(logger, "info");
 
 			await service.boot();
@@ -502,15 +506,6 @@ describe<{
 			info.calledWith("Discovered 2 peers with v0.0.1.", "p2p");
 			info.calledWith("Discovered 1 peer with v0.0.2.", "p2p");
 
-			// Inbound sockets are checked by the processor unless the peer is known; connections are handed to it.
-			assert.undefined(websocketService.accept("5.5.5.5"));
-			peerProcessor.validatePeerIp = () => false;
-			assert.equal(websocketService.accept("5.5.5.5"), CloseReason.Rejected);
-			repository.hasPeer = () => true;
-			assert.undefined(websocketService.accept("5.5.5.5"));
-			websocketService.onConnection({ remoteAddress: "5.5.5.5" });
-			validateAndAcceptPeer.calledWith("5.5.5.5");
-
 			// The loop timer is pending; dispose cancels it, disconnects the peers and then stops the transport.
 			const calls: string[] = [];
 			peerDisposer.disposePeers = async () => void calls.push("disposePeers");
@@ -519,8 +514,6 @@ describe<{
 			await service.dispose();
 			assert.equal(fakeTimers.countTimers(), 0);
 			assert.equal(calls, ["disposePeers", "transport"]);
-			assert.undefined(websocketService.accept);
-			assert.undefined(websocketService.onConnection);
 		} finally {
 			await service.dispose();
 
@@ -536,7 +529,7 @@ describe<{
 		service,
 		repository,
 	}) => {
-		repository.getPeers = () => [
+		repository.getActivePeers = () => [
 			makePeer("1.1.1.1", { header: { blockNumber: 9 } }),
 			makePeer("2.2.2.2", { header: { blockNumber: 3 } }),
 			makePeer("3.3.3.3", { header: { blockNumber: 5 } }),
@@ -544,5 +537,80 @@ describe<{
 		];
 
 		assert.equal(service.getNetworkBlockNumberPercentile(50), 5);
+	});
+
+	it("#mainLoop - should dial the known peers that are due and space the dials out", async ({
+		service,
+		repository,
+		websocketService,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const known = [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.getKnownPeers = () => known;
+		const dial = spy(websocketService, "dial");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+		dial.calledTimes(2);
+		dial.calledWith("ws://1.1.1.1:4002");
+
+		// Not due again within DIAL_SPACING.
+		await fakeTimers.tickAsync(2000);
+		dial.calledTimes(2);
+
+		await fakeTimers.tickAsync(constants.DIAL_SPACING);
+		dial.calledTimes(4);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should forget a known peer the transport refuses to dial", async ({
+		service,
+		repository,
+		websocketService,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const peer = makePeer("1.1.1.1");
+		repository.getKnownPeers = () => [peer];
+		websocketService.dial = async () => {
+			throw new ConnectionError(CloseReason.Rejected, "refused");
+		};
+		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+
+		forgetKnownPeer.calledWith(peer);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should forget a known peer after repeated failed dials, but keep seeds", async ({
+		service,
+		repository,
+		websocketService,
+		seeds,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const peer = makePeer("1.1.1.1");
+		const seed = makePeer("2.2.2.2");
+		const known = [peer, seed];
+		repository.getKnownPeers = () => [...known];
+		repository.forgetKnownPeer = (forgotten: any) => known.splice(known.indexOf(forgotten), 1);
+		seeds.isSeed = (ip: string) => ip === "2.2.2.2";
+		websocketService.dial = async () => {
+			throw new Error("ECONNREFUSED");
+		};
+		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
+
+		void service.mainLoop();
+		for (let index = 0; index < constants.MAX_DIAL_FAILURES; index++) {
+			await fakeTimers.tickAsync(constants.DIAL_SPACING);
+		}
+
+		forgetKnownPeer.calledOnce();
+		forgetKnownPeer.calledWith(peer);
+
+		await service.dispose();
 	});
 });

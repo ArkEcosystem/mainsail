@@ -9,8 +9,8 @@ type PluginConfig = {
 	options: { enabled?: boolean; server?: { http?: { port: number }; https?: { port: number } } };
 };
 
-const transformPlugins = (plugins: PluginConfig[]): Contracts.P2P.PeerPlugins => {
-	const result: Contracts.P2P.PeerPlugins = {};
+const transformPlugins = (plugins: PluginConfig[]): Contracts.P2PService.PeerPlugins => {
+	const result: Contracts.P2PService.PeerPlugins = {};
 
 	for (const pluginConfig of plugins) {
 		const name = pluginConfig.package;
@@ -49,7 +49,7 @@ const getPluginsConfig = (plugins: PluginConfig[], app: Contracts.Kernel.Applica
 		};
 	});
 
-export const getPeerConfig = (app: Contracts.Kernel.Application): Contracts.P2P.PeerConfig => {
+export const getPeerConfig = (app: Contracts.Kernel.Application): Contracts.P2PService.PeerConfig => {
 	const configuration: Contracts.Crypto.Configuration = app.get(Identifiers.Cryptography.Configuration);
 
 	return {

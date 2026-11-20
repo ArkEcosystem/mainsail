@@ -19,9 +19,9 @@ export class Peer implements PeerInterface {
 
 	public port!: number;
 
-	public protocol!: Contracts.P2P.PeerProtocol;
+	public protocol!: Contracts.P2PService.PeerProtocol;
 
-	public readonly ports: Contracts.P2P.PeerPorts = {};
+	public readonly ports: Contracts.P2PService.PeerPorts = {};
 
 	public version: string | undefined;
 
@@ -29,13 +29,13 @@ export class Peer implements PeerInterface {
 
 	public lastPinged: number | undefined;
 
-	public plugins: Contracts.P2P.PeerPlugins = {};
+	public plugins: Contracts.P2PService.PeerPlugins = {};
 
 	public connection?: Interfaces.Connection;
 
 	public lastDialAt?: number;
 
-	#header: Contracts.P2P.HeaderData | undefined;
+	#header: Contracts.P2PService.HeaderData | undefined;
 
 	public init(ip: string, port: number): Peer {
 		this.ip = ip;
@@ -49,14 +49,14 @@ export class Peer implements PeerInterface {
 		return getPeerUrl(this);
 	}
 
-	public get header(): Contracts.P2P.HeaderData {
+	public get header(): Contracts.P2PService.HeaderData {
 		// State can be undefined when the peer is not yet verified.
 		assert.defined(this.#header);
 
 		return this.#header;
 	}
 
-	public set header(header: Contracts.P2P.HeaderData) {
+	public set header(header: Contracts.P2PService.HeaderData) {
 		const previousHeader = this.#header;
 
 		this.#header = header;
@@ -77,7 +77,7 @@ export class Peer implements PeerInterface {
 		this.latency = latency;
 	}
 
-	public toBroadcast(): Contracts.P2P.PeerBroadcast {
+	public toBroadcast(): Contracts.P2PService.PeerBroadcast {
 		return {
 			ip: this.ip,
 			port: this.port,

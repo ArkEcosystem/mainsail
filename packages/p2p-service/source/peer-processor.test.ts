@@ -1,8 +1,24 @@
-import { Events, Identifiers } from "@mainsail/constants";
+import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
+import { CloseReason, ConnectionState } from "@mainsail/p2p-websocket";
 import { describe } from "@mainsail/test-runner";
 
 import { PeerProcessor } from "./peer-processor";
+
+const makePeer = (ip: string): any => ({ ip, port: 4002, version: "0.0.1" });
+
+// The hook does not return the verification promise; a macrotask lets the whole flow settle.
+const connect = async (websocketService: any, ip: string): Promise<any> => {
+	const connection: any = {
+		onClose: (listener: (reason: string, error?: Error) => void) => (connection.close = listener),
+		remoteAddress: ip,
+		state: ConnectionState.Open,
+	};
+	websocketService.onConnection(connection);
+	await new Promise((resolve) => setImmediate(resolve));
+
+	return connection;
+};
 
 describe<{
 	processor: PeerProcessor;
@@ -13,40 +29,37 @@ describe<{
 	logger: any;
 	transactionPoolWorker: any;
 	peerDiscoverer: any;
-	configuration: any;
+	websocketService: any;
 }>("PeerProcessor", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
 		context.logger = { debug: () => {}, warn: () => {}, warnExtra: () => {} };
 		context.repository = {
+			forgetKnownPeer: () => {},
 			forgetPendingPeer: () => {},
-			getPeers: () => [],
-			getSameSubnetPeers: () => [],
+			getKnownPeer: () => {},
+			getActivePeers: () => [],
+			hasActivePeer: () => false,
+			hasKnownPeer: () => false,
 			hasPeer: () => false,
 			hasPendingPeer: () => false,
-			setPeer: () => {},
+			setKnownPeer: () => {},
+			setActivePeer: () => {},
 			setPendingPeer: () => {},
 		};
 		context.peerVerifier = { verify: async () => true };
-		context.peerDisposer = { banPeer: () => {}, disposePeer: () => {}, isBanned: () => false };
+		context.peerDisposer = { banPeer: () => {}, disposePeer: () => {} };
 		context.events = { dispatch: async () => {}, listen: () => {} };
-		context.transactionPoolWorker = { registerEventHandler: () => {}, setPeer: async () => {} };
+		context.transactionPoolWorker = { registerEventHandler: () => {} };
 		context.peerDiscoverer = { discoverPeers: async () => {} };
-
-		context.configuration = {
-			getOptional: (key: string, defaultValue: unknown) => defaultValue,
-			getRequired: (key: string) => ({ blacklist: [], maxSameSubnetPeers: 5, whitelist: ["*"] })[key],
-		};
-		const configuration = context.configuration;
+		context.websocketService = { dial: async () => {}, onConnection: undefined };
 
 		const app = new Application();
-		app.bind(Identifiers.ServiceProvider.Configuration)
-			.toConstantValue(configuration)
-			.whenTagged("plugin", "p2p-service");
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
 		app.bind(Identifiers.P2P.Peer.Verifier).toConstantValue(context.peerVerifier);
 		app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue(context.peerDisposer);
 		app.bind(Identifiers.P2P.Peer.Discoverer).toConstantValue(context.peerDiscoverer);
-		app.bind(Identifiers.P2P.Peer.Factory).toConstantValue((ip: string) => ({ ip, port: 4002, version: "0.0.1" }));
+		app.bind(Identifiers.P2P.Peer.Factory).toConstantValue((ip: string) => makePeer(ip));
+		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
 		app.bind(Identifiers.TransactionPool.Worker).toConstantValue(context.transactionPoolWorker);
 		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.events);
 		app.bind(Identifiers.P2P.Logger).toConstantValue(context.logger);
@@ -54,225 +67,171 @@ describe<{
 		context.processor = app.resolve(PeerProcessor);
 	});
 
-	it("#validateAndAcceptPeer - should accept a new peer when verification succeeds", async ({
+	it("#validateAndAcceptPeer - should dial a new address and record nothing", async ({
 		processor,
 		repository,
-		events,
+		websocketService,
+		peerVerifier,
 	}) => {
-		const setPeer = spy(repository, "setPeer");
-		const forgetPendingPeer = spy(repository, "forgetPendingPeer");
-		const dispatch = spy(events, "dispatch");
+		const dial = spy(websocketService, "dial");
+		const setKnownPeer = spy(repository, "setKnownPeer");
+		const verify = spy(peerVerifier, "verify");
 
-		await processor.validateAndAcceptPeer("178.165.55.55");
+		await processor.validateAndAcceptPeer("::ffff:178.165.55.55");
 
-		setPeer.calledOnce();
-		dispatch.calledWith(Events.PeerEvent.Added, { ip: "178.165.55.55", port: 4002, version: "0.0.1" });
-		forgetPendingPeer.calledOnce();
+		dial.calledWith("ws://178.165.55.55:4002");
+		setKnownPeer.neverCalled();
+		verify.neverCalled();
 	});
 
-	it("#validateAndAcceptPeer - should forget the pending peer and dispose it when accepting throws", async ({
-		processor,
-		repository,
-		transactionPoolWorker,
-		peerDisposer,
-	}) => {
-		transactionPoolWorker.setPeer = async () => {
-			throw new Error("worker down");
+	it("#validateAndAcceptPeer - should swallow a failed dial", async ({ processor, websocketService, logger }) => {
+		websocketService.dial = async () => {
+			throw new Error("ECONNREFUSED");
 		};
-		const forgetPendingPeer = spy(repository, "forgetPendingPeer");
-		const disposePeer = spy(peerDisposer, "disposePeer");
+		const debug = spy(logger, "debug");
 
 		await processor.validateAndAcceptPeer("178.165.55.55");
 
-		forgetPendingPeer.calledOnce();
-		disposePeer.calledWith("178.165.55.55");
+		debug.calledWith("Dial to 178.165.55.55:4002 failed: ECONNREFUSED", "p2p");
 	});
 
-	it("#validateAndAcceptPeer - should not accept a peer that got banned while its acceptance was being verified", async ({
+	it("#validateAndAcceptPeer - should skip invalid addresses and peers the repository already holds", async ({
 		processor,
+		repository,
+		websocketService,
+	}) => {
+		const dial = spy(websocketService, "dial");
+
+		await processor.validateAndAcceptPeer("not-an-ip");
+		repository.hasPeer = () => true;
+		await processor.validateAndAcceptPeer("178.165.55.55");
+
+		dial.neverCalled();
+	});
+
+	it("#onConnection - should bind the connection to a new peer, verify it and make it active", async ({
+		websocketService,
+		repository,
+		peerDiscoverer,
+	}) => {
+		const setPendingPeer = spy(repository, "setPendingPeer");
+		const setPeer = spy(repository, "setActivePeer");
+		const forgetPendingPeer = spy(repository, "forgetPendingPeer");
+		const discoverPeers = spy(peerDiscoverer, "discoverPeers");
+
+		const connection = await connect(websocketService, "178.165.55.55");
+
+		const peer = setPeer.getCallArgs(0)[0];
+		assert.equal(peer.ip, "178.165.55.55");
+		assert.equal(peer.connection, connection);
+		setPendingPeer.calledWith(peer);
+		discoverPeers.calledWith(peer);
+		forgetPendingPeer.calledWith(peer);
+	});
+
+	it("#onConnection - should reuse the known peer for the address", async ({ websocketService, repository }) => {
+		const known = makePeer("178.165.55.55");
+		repository.hasKnownPeer = () => true;
+		repository.getKnownPeer = () => known;
+		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
+		const setPeer = spy(repository, "setActivePeer");
+
+		const connection = await connect(websocketService, "178.165.55.55");
+
+		forgetKnownPeer.calledWith(known);
+		setPeer.calledWith(known);
+		assert.equal(known.connection, connection);
+	});
+
+	it("#onConnection - should skip peers that are already active or pending", async ({
+		websocketService,
 		repository,
 		peerVerifier,
-		peerDisposer,
-		events,
 	}) => {
-		// The ban lands after the pre-verification isBanned check has already passed.
-		let banned = false;
-		peerVerifier.verify = async () => {
-			banned = true;
-			return true;
-		};
-		peerDisposer.isBanned = () => banned;
+		const verify = spy(peerVerifier, "verify");
 
-		const setPeer = spy(repository, "setPeer");
-		const forgetPendingPeer = spy(repository, "forgetPendingPeer");
-		const dispatch = spy(events, "dispatch");
+		repository.hasActivePeer = () => true;
+		await connect(websocketService, "178.165.55.55");
+		repository.hasActivePeer = () => false;
+		repository.hasPendingPeer = () => true;
+		await connect(websocketService, "178.165.55.55");
 
-		await processor.validateAndAcceptPeer("178.165.55.55");
-
-		setPeer.neverCalled();
-		dispatch.neverCalled();
-		forgetPendingPeer.calledOnce();
+		verify.neverCalled();
 	});
 
-	it("#validateAndAcceptPeer - should not accept a peer when peer verification fails", async ({
-		processor,
+	it("#onConnection - should not activate a peer when verification fails", async ({
+		websocketService,
 		repository,
 		peerVerifier,
 	}) => {
 		peerVerifier.verify = async () => false;
-		const setPeer = spy(repository, "setPeer");
+		const setPeer = spy(repository, "setActivePeer");
 		const forgetPendingPeer = spy(repository, "forgetPendingPeer");
 
-		await processor.validateAndAcceptPeer("178.165.55.55");
+		await connect(websocketService, "178.165.55.55");
 
 		setPeer.neverCalled();
 		forgetPendingPeer.calledOnce();
 	});
 
-	it("#validateAndAcceptPeer - should skip peers that are already known", async ({
-		processor,
+	it("#onConnection - should not activate a peer whose connection closed during the verification", async ({
+		websocketService,
 		repository,
 		peerVerifier,
 	}) => {
-		repository.hasPeer = () => true;
-		const verify = spy(peerVerifier, "verify");
-		const setPendingPeer = spy(repository, "setPendingPeer");
-
-		await processor.validateAndAcceptPeer("178.165.55.55");
-
-		verify.neverCalled();
-		setPendingPeer.neverCalled();
-	});
-
-	it("#validateAndAcceptPeer - should skip peers that are already pending", async ({
-		processor,
-		repository,
-		peerVerifier,
-	}) => {
-		repository.hasPendingPeer = () => true;
-		const verify = spy(peerVerifier, "verify");
-		const setPendingPeer = spy(repository, "setPendingPeer");
-
-		await processor.validateAndAcceptPeer("178.165.55.55");
-
-		verify.neverCalled();
-		setPendingPeer.neverCalled();
-	});
-
-	it("#validateAndAcceptPeer - should reject a peer that is banned before verification starts", async ({
-		processor,
-		repository,
-		peerVerifier,
-		peerDisposer,
-	}) => {
-		peerDisposer.isBanned = () => true;
-		const verify = spy(peerVerifier, "verify");
-		const setPendingPeer = spy(repository, "setPendingPeer");
-
-		await processor.validateAndAcceptPeer("178.165.55.55");
-
-		verify.neverCalled();
-		setPendingPeer.neverCalled();
-	});
-
-	it("#validateAndAcceptPeer - should not learn new peers in non-discovery mode", async ({
-		processor,
-		repository,
-		peerVerifier,
-		configuration,
-	}) => {
-		configuration.getOptional = (key: string, defaultValue: unknown) =>
-			key === "disableDiscovery" ? true : defaultValue;
-		const verify = spy(peerVerifier, "verify");
-		const setPendingPeer = spy(repository, "setPendingPeer");
-
-		await processor.validateAndAcceptPeer("178.165.55.55");
-
-		verify.neverCalled();
-		setPendingPeer.neverCalled();
-	});
-
-	it("#validateAndAcceptPeer - should still accept seed peers in non-discovery mode", async ({
-		processor,
-		repository,
-		configuration,
-	}) => {
-		configuration.getOptional = (key: string, defaultValue: unknown) =>
-			key === "disableDiscovery" ? true : defaultValue;
-		const setPeer = spy(repository, "setPeer");
-
-		await processor.validateAndAcceptPeer("178.165.55.55", { seed: true });
-
-		setPeer.calledOnce();
-	});
-
-	it("#validateAndAcceptPeer - should re-check the subnet cap after verification", async ({
-		processor,
-		repository,
-		peerVerifier,
-		peerDisposer,
-		events,
-	}) => {
-		// Concurrent accepts from one /24 all pass validatePeerIp() while none of them is in the repository;
-		// the others land while this one is being verified.
-		const sameSubnetPeers: object[] = [];
-		repository.getSameSubnetPeers = () => sameSubnetPeers;
-		peerVerifier.verify = async () => {
-			sameSubnetPeers.push(...Array.from({ length: 5 }, (_, index) => ({ ip: `178.165.55.${index}` })));
+		peerVerifier.verify = async (peer: any) => {
+			peer.connection.state = ConnectionState.Closed;
 			return true;
 		};
-
-		const setPeer = spy(repository, "setPeer");
-		const disposePeer = spy(peerDisposer, "disposePeer");
+		const setPeer = spy(repository, "setActivePeer");
 		const forgetPendingPeer = spy(repository, "forgetPendingPeer");
-		const dispatch = spy(events, "dispatch");
 
-		await processor.validateAndAcceptPeer("178.165.55.55");
+		await connect(websocketService, "178.165.55.55");
 
 		setPeer.neverCalled();
-		dispatch.neverCalled();
-		disposePeer.calledWith("178.165.55.55");
 		forgetPendingPeer.calledOnce();
 	});
 
-	it("#validateAndAcceptPeer - should re-accept a disposed seed from an inbound request in non-discovery mode", async ({
-		processor,
+	it("#onConnection - should forget the pending peer and dispose it when accepting throws", async ({
+		websocketService,
 		repository,
-		configuration,
+		peerDiscoverer,
+		peerDisposer,
 	}) => {
-		configuration.getOptional = (key: string, defaultValue: unknown) =>
-			key === "disableDiscovery" ? true : defaultValue;
-		const setPeer = spy(repository, "setPeer");
+		peerDiscoverer.discoverPeers = async () => {
+			throw new Error("boom");
+		};
+		const forgetPendingPeer = spy(repository, "forgetPendingPeer");
+		const disposePeer = spy(peerDisposer, "disposePeer");
 
-		await processor.validateAndAcceptPeer("178.165.55.55", { seed: true });
-		setPeer.calledOnce();
+		await connect(websocketService, "178.165.55.55");
 
-		// The seed was disposed meanwhile (the repository no longer has it) and connects to us again:
-		// the inbound accept carries no seed flag, and nothing else re-populates seeds (launchMode=seed).
-		await processor.validateAndAcceptPeer("178.165.55.55");
-		setPeer.calledTimes(2);
+		forgetPendingPeer.calledOnce();
+		disposePeer.calledWith("178.165.55.55");
 	});
 
-	it("#validatePeerIp - should exempt a known seed from the subnet cap", async ({ processor, repository }) => {
-		await processor.validateAndAcceptPeer("178.165.55.55", { seed: true });
-		repository.getSameSubnetPeers = () => Array.from({ length: 5 }, (_, index) => ({ ip: `178.165.55.${index}` }));
+	it("#onConnection - should dispose the peer when its connection closes", async ({
+		websocketService,
+		peerDisposer,
+	}) => {
+		const disposePeer = spy(peerDisposer, "disposePeer");
 
-		assert.true(processor.validatePeerIp("178.165.55.55"));
-		assert.false(processor.validatePeerIp("178.165.55.56"));
+		const connection = await connect(websocketService, "178.165.55.55");
+
+		disposePeer.neverCalled();
+		connection.close(CloseReason.RemoteClose);
+		disposePeer.calledWith("178.165.55.55");
 	});
 
-	it("#validatePeerIp - should not reject inbound requests in non-discovery mode", ({ processor, configuration }) => {
-		configuration.getOptional = (key: string, defaultValue: unknown) =>
-			key === "disableDiscovery" ? true : defaultValue;
+	it("#onConnection - should ban the peer when it caused the close", async ({ websocketService, peerDisposer }) => {
+		const banPeer = spy(peerDisposer, "banPeer");
+		const disposePeer = spy(peerDisposer, "disposePeer");
 
-		assert.true(processor.validatePeerIp("178.165.55.55"));
-	});
+		const connection = await connect(websocketService, "178.165.55.55");
+		connection.close(CloseReason.PayloadTooLarge, new Error("too big"));
 
-	it("#validateAndAcceptPeer - should reject localhost addresses", async ({ processor, peerVerifier }) => {
-		const verify = spy(peerVerifier, "verify");
-
-		await processor.validateAndAcceptPeer("127.0.0.1");
-
-		verify.neverCalled();
+		disposePeer.neverCalled();
+		assert.equal(banPeer.getCallArgs(0)[0], "178.165.55.55");
+		assert.equal(banPeer.getCallArgs(0)[1].message, "Connection closed: payloadTooLarge (too big)");
 	});
 });
