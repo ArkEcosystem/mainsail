@@ -17,8 +17,9 @@ export class ValidateReceiveMiddleware implements Interfaces.ReceiveMiddleware {
 	private readonly validator!: Contracts.Crypto.Validator;
 
 	public async before(context: Interfaces.ReceiveContext): Promise<void> {
-		const { path, schema } = context.route as RouteDefinition<unknown, unknown>;
-		if (!schema?.request) {
+		// The transport also serves routes other packages register with it, which carry no schema.
+		const { path, schema } = context.route as Partial<RouteDefinition<unknown, unknown>>;
+		if (!schema) {
 			return;
 		}
 

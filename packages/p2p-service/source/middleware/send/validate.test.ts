@@ -56,15 +56,10 @@ describe<{
 		);
 	});
 
-	it("should not check a route without a response schema", async ({ middleware, validator }) => {
+	it("should not check a route without a schema, which is not one of ours", async ({ middleware, validator }) => {
 		const validate = spy(validator, "validate");
 
-		await middleware.after({ connection, response: { data }, route: { path: "getPeers" } } as any);
-		await middleware.after({
-			connection,
-			response: { data },
-			route: { path: "getPeers", schema: { request: schema.request } },
-		} as any);
+		await middleware.after({ connection, response: { data }, route: { path: "foreign" } } as any);
 
 		validate.neverCalled();
 	});

@@ -44,7 +44,7 @@ export class PostMessageRoute implements Interfaces.Route<Request, Response> {
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
 		try {
-			const message = await this.factory.makeMessageFromBytes(Buffer.from(data.message ?? []));
+			const message = await this.factory.makeMessageFromBytes(data.message);
 			if ((await this.messageProcessor.process(message)) === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error("Invalid message");
 			}

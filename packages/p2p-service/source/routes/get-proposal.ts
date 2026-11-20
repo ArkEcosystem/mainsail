@@ -39,15 +39,11 @@ export class GetProposalRoute implements Interfaces.Route<Request, Response> {
 		const empty = { proposal: Buffer.alloc(0) };
 
 		const { query } = data;
-		if (
-			!query ||
-			query.blockNumber !== this.consensus.getBlockNumber() ||
-			(query.round ?? 0) > this.consensus.getRound()
-		) {
+		if (query.blockNumber !== this.consensus.getBlockNumber() || query.round > this.consensus.getRound()) {
 			return empty;
 		}
 
-		const proposal = this.roundStateRepository.getRoundState(query.blockNumber, query.round ?? 0).getProposal();
+		const proposal = this.roundStateRepository.getRoundState(query.blockNumber, query.round).getProposal();
 
 		return proposal ? { proposal: proposal.serialized } : empty;
 	}

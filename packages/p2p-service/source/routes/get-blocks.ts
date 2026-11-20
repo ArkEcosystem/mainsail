@@ -51,25 +51,21 @@ export class GetBlocksRoute implements Interfaces.Route<Request, Response> {
 	public readonly schema = GetBlocks.schema;
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
-		// The request is not validated yet; the bounds keep a bad one from draining the database or the budget.
-		const requestBlockNumber = Math.max(data.fromBlockNumber ?? 0, 0);
-		const requestBlockLimit = Math.min(
-			Math.max(data.limit ?? constants.MAX_DOWNLOAD_BLOCKS, 1),
-			constants.MAX_DOWNLOAD_BLOCKS,
-		);
+		// The schema of the route bounds the limit, which keeps a request from draining the database or the budget.
+		const { fromBlockNumber, limit } = data;
 
-		if (requestBlockNumber > this.stateStore.getBlockNumber()) {
+		if (fromBlockNumber > this.stateStore.getBlockNumber()) {
 			return { blocks: [] };
 		}
 
 		const blocks = await this.database.findCommitBuffers(
-			requestBlockNumber,
-			requestBlockNumber + requestBlockLimit - 1,
-			getBlocksBudget(requestBlockLimit),
+			fromBlockNumber,
+			fromBlockNumber + limit - 1,
+			getBlocksBudget(limit),
 		);
 
 		this.logger.debug(
-			`${connection.remoteAddress} has downloaded ${pluralize("block", blocks.length, true)} from block number ${requestBlockNumber.toLocaleString()}`,
+			`${connection.remoteAddress} has downloaded ${pluralize("block", blocks.length, true)} from block number ${fromBlockNumber.toLocaleString()}`,
 			"p2p",
 		);
 

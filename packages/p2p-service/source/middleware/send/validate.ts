@@ -15,8 +15,9 @@ export class ValidateSendMiddleware implements Interfaces.SendMiddleware {
 	private readonly validator!: Contracts.Crypto.Validator;
 
 	public async after(context: Interfaces.SendContext): Promise<void> {
-		const { path, schema } = context.route as RouteDefinition<unknown, unknown>;
-		if (!schema?.response) {
+		// The transport also sends to routes other packages define, which carry no schema.
+		const { path, schema } = context.route as Partial<RouteDefinition<unknown, unknown>>;
+		if (!schema) {
 			return;
 		}
 

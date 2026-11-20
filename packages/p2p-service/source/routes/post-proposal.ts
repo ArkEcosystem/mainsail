@@ -45,7 +45,7 @@ export class PostProposalRoute implements Interfaces.Route<Request, Response> {
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
 		try {
-			const proposal = await this.factory.makeProposalFromBytes(Buffer.from(data.proposal ?? []));
+			const proposal = await this.factory.makeProposalFromBytes(data.proposal);
 			if ((await this.proposalProcessor.process(proposal)) === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error("Invalid proposal");
 			}

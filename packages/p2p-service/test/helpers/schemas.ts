@@ -56,8 +56,6 @@ export const makeValidator = (): Validator => {
 	return validator;
 };
 
-
-
 export const requestError = (
 	validator: Validator,
 	route: RouteName,
