@@ -8,7 +8,6 @@ import { Service } from "./service";
 describe<{
 	service: Service;
 	apiNodeDiscoverer: any;
-	peerRepository: any;
 	events: any;
 	logger: any;
 	listeners: Map<string, any>;
@@ -28,11 +27,9 @@ describe<{
 			listen: (name: string, listener: any) => context.listeners.set(name, listener),
 		};
 		context.logger = { error: () => {} };
-		context.peerRepository = { getActivePeer: () => undefined, hasActivePeer: () => false };
 
 		const app = new Application();
 		app.bind(Identifiers.P2P.ApiNode.Discoverer).toConstantValue(context.apiNodeDiscoverer);
-		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.peerRepository);
 		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.events);
 		app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
@@ -101,13 +98,9 @@ describe<{
 	it("should ask a peer that became active for its api nodes without waiting for the answer", async ({
 		service,
 		apiNodeDiscoverer,
-		peerRepository,
 		listeners,
 	}) => {
 		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		const peer = { ip: "1.2.3.4" };
-		peerRepository.hasActivePeer = (ip: string) => ip === peer.ip;
-		peerRepository.getActivePeer = () => peer;
 		const asked: unknown[] = [];
 		apiNodeDiscoverer.discoverApiNodes = (from: unknown) => {
 			asked.push(from);
@@ -117,29 +110,10 @@ describe<{
 		service.boot();
 		await fakeTimers.tickAsync(0);
 
-		// The event carries the peer's data; the peer itself comes from the repository. The listener
-		// settles although the discovery never does.
+		// The event carries the peer's data, of which the address is handed on. The listener settles
+		// although the discovery never does.
 		await listeners.get(Events.PeerEvent.Added).handle({ data: { ip: "1.2.3.4" }, name: Events.PeerEvent.Added });
-		assert.equal(asked.length, 1);
-		assert.true(asked[0] === peer);
-
-		service.dispose();
-	});
-
-	it("should not ask a peer that is gone again by the time its event arrives", async ({
-		service,
-		apiNodeDiscoverer,
-		listeners,
-	}) => {
-		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		const discoverApiNodes = spy(apiNodeDiscoverer, "discoverApiNodes");
-
-		service.boot();
-		await fakeTimers.tickAsync(0);
-
-		await listeners.get(Events.PeerEvent.Added).handle({ data: { ip: "1.2.3.4" }, name: Events.PeerEvent.Added });
-
-		discoverApiNodes.neverCalled();
+		assert.equal(asked, ["1.2.3.4"]);
 
 		service.dispose();
 	});
