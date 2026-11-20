@@ -1087,6 +1087,12 @@ importers:
       '@mainsail/p2p':
         specifier: workspace:*
         version: link:../p2p
+      '@mainsail/p2p-service':
+        specifier: workspace:*
+        version: link:../p2p-service
+      '@mainsail/p2p-websocket':
+        specifier: workspace:*
+        version: link:../p2p-websocket
       '@mainsail/processor':
         specifier: workspace:*
         version: link:../processor
@@ -2636,6 +2642,62 @@ importers:
       protobufjs-cli:
         specifier: 2.6.2
         version: 2.6.2(protobufjs@8.7.2)
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
+
+  packages/p2p-service:
+    dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/p2p-websocket':
+        specifier: workspace:*
+        version: link:../p2p-websocket
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+    devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      uvu:
+        specifier: 0.5.6
+        version: 0.5.6
+
+  packages/p2p-websocket:
+    dependencies:
+      '@mainsail/constants':
+        specifier: workspace:*
+        version: link:../constants
+      '@mainsail/container':
+        specifier: workspace:*
+        version: link:../container
+      '@mainsail/kernel':
+        specifier: workspace:*
+        version: link:../kernel
+      '@mainsail/utils':
+        specifier: workspace:*
+        version: link:../utils
+      joi:
+        specifier: 18.2.5
+        version: 18.2.5
+      ws:
+        specifier: 8.21.3
+        version: 8.21.3
+    devDependencies:
+      '@mainsail/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@types/ws':
+        specifier: 8.18.1
+        version: 8.18.1
       uvu:
         specifier: 0.5.6
         version: 0.5.6
@@ -12279,7 +12341,7 @@ snapshots:
 
   '@types/duplexify@3.6.5':
     dependencies:
-      '@types/node': 26.2.0
+      '@types/node': 24.13.3
 
   '@types/esrecurse@4.3.1': {}
 
@@ -12312,7 +12374,7 @@ snapshots:
 
   '@types/jsonfile@6.1.4':
     dependencies:
-      '@types/node': 26.2.0
+      '@types/node': 24.13.3
 
   '@types/linkify-it@5.0.0': {}
 
@@ -12400,7 +12462,7 @@ snapshots:
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 26.2.0
+      '@types/node': 24.13.3
 
   '@types/yargs-parser@21.0.3': {}
 

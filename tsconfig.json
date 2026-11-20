@@ -73,6 +73,8 @@
 		{ "path": "packages/logger-pino" },
 		{ "path": "packages/networking-ntp" },
 		{ "path": "packages/p2p" },
+		{ "path": "packages/p2p-service" },
+		{ "path": "packages/p2p-websocket" },
 		{ "path": "packages/processor" },
 		{ "path": "packages/serializer" },
 		{ "path": "packages/snapshot-legacy-exporter" },

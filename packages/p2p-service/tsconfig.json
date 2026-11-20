@@ -1,0 +1,25 @@
+{
+	"extends": "../../tsconfig.json",
+	"compilerOptions": {
+		"rootDir": "source",
+		"outDir": "distribution"
+	},
+	"include": ["source/**/**.ts"],
+	"references": [
+		{
+			"path": "../constants"
+		},
+		{
+			"path": "../container"
+		},
+		{
+			"path": "../kernel"
+		},
+		{
+			"path": "../p2p-websocket"
+		},
+		{
+			"path": "../utils"
+		}
+	]
+}
