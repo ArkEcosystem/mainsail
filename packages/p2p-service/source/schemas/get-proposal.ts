@@ -18,4 +18,14 @@ export const getProposal = {
 		required: ["headers", "query"],
 		type: "object",
 	},
+	// A peer without the proposal answers with an empty buffer.
+	response: {
+		additionalProperties: false,
+		properties: {
+			headers,
+			proposal: { buffer: {} },
+		},
+		required: ["headers", "proposal"],
+		type: "object",
+	},
 };

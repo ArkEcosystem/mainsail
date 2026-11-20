@@ -12,4 +12,17 @@ export const getBlocks = {
 		required: ["fromBlockNumber", "headers", "limit"],
 		type: "object",
 	},
+	response: {
+		additionalProperties: false,
+		properties: {
+			blocks: {
+				items: { buffer: {} },
+				maxItems: constants.MAX_DOWNLOAD_BLOCKS,
+				type: "array",
+			},
+			headers,
+		},
+		required: ["blocks", "headers"],
+		type: "object",
+	},
 };

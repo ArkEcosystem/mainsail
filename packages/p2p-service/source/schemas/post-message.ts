@@ -1,4 +1,4 @@
-import { headers } from "./headers.js";
+import { headers, headersOnly } from "./headers.js";
 
 export const postMessage = {
 	request: {
@@ -10,4 +10,5 @@ export const postMessage = {
 		required: ["headers", "message"],
 		type: "object",
 	},
+	response: headersOnly,
 };

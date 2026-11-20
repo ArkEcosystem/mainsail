@@ -2,7 +2,7 @@ import type { Validator } from "@mainsail/validation";
 
 import { describe } from "@mainsail/test-runner";
 
-import { bitmap, headers, makeValidator, requestError, VALIDATORS } from "../../test/helpers/schemas";
+import { bitmap, headers, makeValidator, requestError, responseError, VALIDATORS } from "../../test/helpers/schemas";
 
 describe<{
 	validator: Validator;
@@ -36,4 +36,29 @@ describe<{
 			["more precommits than the round has validators", { validatorsSignedPrecommit: bitmap(VALIDATORS + 1) }],
 		] as [string, Record<string, unknown>][],
 	);
+
+	const votes = (count: number) => Array.from({ length: count }, () => Buffer.from("vote"));
+
+	it("response - should accept what the codec hands over", ({ validator }) => {
+		assert.undefined(
+			responseError(validator, "getMessages", { headers, precommits: votes(1), prevotes: votes(VALIDATORS) }),
+		);
+	});
+
+	it("response - should accept a response without votes", ({ validator }) => {
+		assert.undefined(responseError(validator, "getMessages", { headers, precommits: [], prevotes: [] }));
+	});
+
+	it("response - should not accept a response without the header", ({ validator }) => {
+		assert.string(responseError(validator, "getMessages", { precommits: [], prevotes: [] }));
+	});
+
+	it("response - should not accept more votes of a kind than the round has validators", ({ validator }) => {
+		assert.string(
+			responseError(validator, "getMessages", { headers, precommits: [], prevotes: votes(VALIDATORS + 1) }),
+		);
+		assert.string(
+			responseError(validator, "getMessages", { headers, precommits: votes(VALIDATORS + 1), prevotes: [] }),
+		);
+	});
 });

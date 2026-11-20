@@ -1,4 +1,4 @@
-import { headers } from "./headers.js";
+import { headers, headersOnly } from "./headers.js";
 
 export const postProposal = {
 	request: {
@@ -10,4 +10,5 @@ export const postProposal = {
 		required: ["headers", "proposal"],
 		type: "object",
 	},
+	response: headersOnly,
 };

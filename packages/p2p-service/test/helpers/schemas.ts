@@ -2,8 +2,26 @@ import { makeKeywords } from "@mainsail/crypto-validation";
 import { Application } from "@mainsail/kernel";
 import { Validator } from "@mainsail/validation";
 
-import { Codecs } from "../../source/codecs/index";
-import { Schemas } from "../../source/schemas/index";
+import { Codecs } from "../../source/codecs/index.js";
+import { Schemas } from "../../source/schemas/index.js";
+
+type Direction = "request" | "response";
+
+// Sends the data through the real codec first: the schemas describe what the codec hands over, and a
+// schema that rejected such data would ban honest peers. Returns the validation error, if any.
+const validationError = (
+	validator: Validator,
+	route: RouteName,
+	direction: Direction,
+	data: Record<string, unknown>,
+): string | undefined => {
+	const codec = Codecs[route][direction] as {
+		deserialize: (payload: Buffer) => unknown;
+		serialize: (data: unknown) => Buffer;
+	};
+
+	return validator.validate(Schemas[route][direction]!, codec.deserialize(codec.serialize(data))).error;
+};
 
 export type RouteName = keyof typeof Schemas;
 
@@ -38,17 +56,16 @@ export const makeValidator = (): Validator => {
 	return validator;
 };
 
-// Sends the data through the real codec first: the schemas describe what the codec hands over, and a
-// schema that rejected such data would ban honest peers. Returns the validation error, if any.
+
+
 export const requestError = (
 	validator: Validator,
 	route: RouteName,
 	data: Record<string, unknown>,
-): string | undefined => {
-	const codec = Codecs[route].request as {
-		deserialize: (payload: Buffer) => unknown;
-		serialize: (data: unknown) => Buffer;
-	};
+): string | undefined => validationError(validator, route, "request", data);
 
-	return validator.validate(Schemas[route].request!, codec.deserialize(codec.serialize(data))).error;
-};
+export const responseError = (
+	validator: Validator,
+	route: RouteName,
+	data: Record<string, unknown>,
+): string | undefined => validationError(validator, route, "response", data);

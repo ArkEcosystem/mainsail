@@ -26,7 +26,7 @@ export const headers: Schema = {
 	type: "object",
 };
 
-// A request that carries nothing but the header.
+// A request or a response that carries nothing but the header.
 export const headersOnly: Schema = {
 	additionalProperties: false,
 	properties: { headers },
