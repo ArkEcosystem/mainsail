@@ -1,4 +1,6 @@
-import { Identifiers } from "@mainsail/constants";
+import type { Contracts } from "@mainsail/contracts";
+
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
 import type { BanList } from "./ban-list.js";
@@ -10,14 +12,22 @@ import type { Router } from "./router.js";
 import type { Server } from "./server.js";
 
 import { CloseReason } from "./enums.js";
+import { isValidVersion } from "./is-valid-version.js";
 
-// The one object the p2p layer talks to. It only delegates: lifecycle to the server, routes to the
+// The one object the p2p layer talks to. It delegates: lifecycle to the server, routes to the
 // router, inbound sockets to the listener, outbound ones to the dialer, bans to the ban list.
 // Whom to refuse before the handshake is decided by the connection verifiers, whom to ban by the
 // caller through `ban`; connections reach the caller only through `onConnection`, never before
-// their handshake is done.
+// their handshake is done. The versions of the software we connect with are checked in the handshake
+// and again here whenever a milestone begins, as it may name other versions.
 @injectable()
 export class Service {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly events!: Contracts.Kernel.EventDispatcher;
+
 	@inject(Identifiers.P2P.WebSocket.Server)
 	private readonly server!: Server;
 
@@ -36,10 +46,16 @@ export class Service {
 	@inject(Identifiers.P2P.WebSocket.Connection.Repository)
 	private readonly repository!: ConnectionRepository;
 
+	readonly #milestoneListener: Contracts.Kernel.EventListener = {
+		handle: async (): Promise<void> => this.#closeUnsupportedConnections(),
+	};
+
 	// Lifecycle
 
 	public initialize(): void {
 		this.server.initialize();
+
+		this.events.listen(Events.CryptoEvent.MilestoneChanged, this.#milestoneListener);
 	}
 
 	public async boot(): Promise<void> {
@@ -47,6 +63,8 @@ export class Service {
 	}
 
 	public async dispose(): Promise<void> {
+		this.events.forget(Events.CryptoEvent.MilestoneChanged, this.#milestoneListener);
+
 		await this.server.dispose();
 	}
 
@@ -95,5 +113,17 @@ export class Service {
 
 	public bans(): { ip: string; until: number }[] {
 		return this.banList.all();
+	}
+
+	// A peer whose software the new milestone no longer accepts loses its connection, as a handshake
+	// would refuse it now. A connection still in its handshake has no version yet; the handshake checks it.
+	#closeUnsupportedConnections(): void {
+		for (const connection of this.repository.all()) {
+			const version = connection.remoteVersion;
+
+			if (version !== undefined && !isValidVersion(this.app, version)) {
+				void connection.close(CloseReason.VersionMismatch);
+			}
+		}
 	}
 }
