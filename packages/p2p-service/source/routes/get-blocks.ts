@@ -5,13 +5,16 @@ import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { pluralize } from "@mainsail/utils";
 
+import type { RouteDefinition } from "../interfaces/index.js";
+
 import { Codecs } from "../codecs/index.js";
 import { constants } from "../constants.js";
+import { Schemas } from "../schemas/index.js";
 
 type Request = ReturnType<typeof Codecs.getBlocks.request.deserialize>;
 type Response = ReturnType<typeof Codecs.getBlocks.response.deserialize>;
 
-export const GetBlocks: Interfaces.RouteDefinition<Request, Response> = {
+export const GetBlocks: RouteDefinition<Request, Response> = {
 	codec: Codecs.getBlocks,
 	// The block downloader runs up to MAX_DOWNLOAD_BLOCKS_JOBS batches at once, possibly all from one peer.
 	maxConcurrentRequests: 10,
@@ -19,6 +22,7 @@ export const GetBlocks: Interfaces.RouteDefinition<Request, Response> = {
 	// A batch that cannot go out at once is better retried from another peer than queued behind the rest.
 	maxQueuedRequests: 0,
 	path: "getBlocks",
+	schema: Schemas.getBlocks,
 };
 
 // The block data a response to a request for `limit` blocks may hold, so that its fully serialized frame
@@ -44,6 +48,7 @@ export class GetBlocksRoute implements Interfaces.Route<Request, Response> {
 	public readonly maxPayload = GetBlocks.maxPayload;
 	public readonly maxConcurrentRequests = GetBlocks.maxConcurrentRequests;
 	public readonly maxQueuedRequests = GetBlocks.maxQueuedRequests;
+	public readonly schema = GetBlocks.schema;
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
 		// The request is not validated yet; the bounds keep a bad one from draining the database or the budget.

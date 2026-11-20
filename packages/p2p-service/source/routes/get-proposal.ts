@@ -4,16 +4,20 @@ import type { Interfaces } from "@mainsail/p2p-websocket";
 import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
+import type { RouteDefinition } from "../interfaces/index.js";
+
 import { Codecs } from "../codecs/index.js";
+import { Schemas } from "../schemas/index.js";
 type Request = ReturnType<typeof Codecs.getProposal.request.deserialize>;
 type Response = ReturnType<typeof Codecs.getProposal.response.deserialize>;
 
-export const GetProposal: Interfaces.RouteDefinition<Request, Response> = {
+export const GetProposal: RouteDefinition<Request, Response> = {
 	codec: Codecs.getProposal,
 	maxConcurrentRequests: 2,
 	maxPayload: { request: Units.KILOBYTE, response: 3 * Units.MEGABYTE },
 	maxQueuedRequests: 1,
 	path: "getProposal",
+	schema: Schemas.getProposal,
 };
 
 @injectable()
@@ -29,6 +33,7 @@ export class GetProposalRoute implements Interfaces.Route<Request, Response> {
 	public readonly maxPayload = GetProposal.maxPayload;
 	public readonly maxConcurrentRequests = GetProposal.maxConcurrentRequests;
 	public readonly maxQueuedRequests = GetProposal.maxQueuedRequests;
+	public readonly schema = GetProposal.schema;
 
 	public async handle(_: Interfaces.Connection, data: Request): Promise<Response> {
 		const empty = { proposal: Buffer.alloc(0) };

@@ -5,18 +5,22 @@ import { Enums, Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
+import type { RouteDefinition } from "../interfaces/index.js";
+
 import { Codecs } from "../codecs/index.js";
+import { Schemas } from "../schemas/index.js";
 
 type Request = ReturnType<typeof Codecs.postProposal.request.deserialize>;
 type Response = ReturnType<typeof Codecs.postProposal.response.deserialize>;
 
-export const PostProposal: Interfaces.RouteDefinition<Request, Response> = {
+export const PostProposal: RouteDefinition<Request, Response> = {
 	codec: Codecs.postProposal,
 	// One proposal per round; a second one in flight covers the round changing while the peer is slow.
 	maxConcurrentRequests: 2,
 	maxPayload: { request: 3 * Units.MEGABYTE, response: Units.KILOBYTE },
 	maxQueuedRequests: 2,
 	path: "postProposal",
+	schema: Schemas.postProposal,
 };
 
 // A proposal that cannot be read or fails the checks of the consensus costs its sender a ban, as in
@@ -37,6 +41,7 @@ export class PostProposalRoute implements Interfaces.Route<Request, Response> {
 	public readonly maxPayload = PostProposal.maxPayload;
 	public readonly maxConcurrentRequests = PostProposal.maxConcurrentRequests;
 	public readonly maxQueuedRequests = PostProposal.maxQueuedRequests;
+	public readonly schema = PostProposal.schema;
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
 		try {
