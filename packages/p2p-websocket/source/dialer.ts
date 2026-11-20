@@ -1,5 +1,6 @@
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, multiInject } from "@mainsail/container";
+import { IpAddress } from "@mainsail/utils";
 import WebSocket from "ws";
 
 import type { ConnectionRepository } from "./connection-repository.js";
@@ -27,7 +28,8 @@ export class Dialer {
 
 	// The connection takes the socket while it is still connecting so no frame is missed.
 	public async dial(url: string): Promise<Connection> {
-		const remoteAddress = new URL(url).hostname;
+		const hostname = new URL(url).hostname;
+		const remoteAddress = IpAddress.sanitizeRemoteAddress(hostname) ?? hostname;
 
 		for (const verifier of this.verifiers) {
 			const rejection = verifier.verify(remoteAddress);
