@@ -59,9 +59,6 @@ describe<{
 			["an upper-case proposed block hash", { proposedBlockHash: "A".repeat(64) }],
 			["more prevotes than the round has validators", { validatorsSignedPrevote: bitmap(VALIDATORS + 1) }],
 			["more precommits than the round has validators", { validatorsSignedPrecommit: bitmap(VALIDATORS + 1) }],
-			["no version", { version: "" }],
-			["a version that is no version", { version: "latest" }],
-			["a version of more than 24 characters", { version: `1.0.0-${"a".repeat(17)}.1` }],
 		] as [string, Record<string, unknown>][],
 	);
 });

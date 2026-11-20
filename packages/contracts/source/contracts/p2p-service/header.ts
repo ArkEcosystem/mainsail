@@ -1,7 +1,6 @@
 import type { Proposal } from "../crypto/proposal.js";
 
 export type HeaderData = {
-	version: string;
 	blockNumber: number;
 	round: number;
 	step: number;

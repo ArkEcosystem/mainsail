@@ -13,7 +13,6 @@ describe("getMessages codec", ({ it, assert }) => {
 		step: 1,
 		validatorsSignedPrecommit: bitmap(1),
 		validatorsSignedPrevote: bitmap(0),
-		version: "0.0.1",
 	};
 	const query = {
 		blockNumber: 2,

@@ -63,9 +63,7 @@ export class Peer implements PeerInterface {
 			return;
 		}
 
-		const changed =
-			previousHeader.blockNumber !== this.#header.blockNumber || previousHeader.version !== this.#header.version;
-		if (changed) {
+		if (previousHeader.blockNumber !== this.#header.blockNumber) {
 			void this.events.dispatch(Events.PeerEvent.Updated, this.toData());
 		}
 	}

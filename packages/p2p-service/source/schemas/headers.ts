@@ -20,9 +20,8 @@ export const headers: Interfaces.Schema = {
 		step: { maximum: 2, minimum: 0, type: "integer" },
 		validatorsSignedPrecommit: bitmap("headers.blockNumber"),
 		validatorsSignedPrevote: bitmap("headers.blockNumber"),
-		version: { maxLength: 24, pattern: "^\\d+\\.\\d+\\.\\d+(-[a-zA-Z0-9.-]+\\.\\d+)?$", type: "string" },
 	},
-	required: ["blockNumber", "round", "step", "validatorsSignedPrecommit", "validatorsSignedPrevote", "version"],
+	required: ["blockNumber", "round", "step", "validatorsSignedPrecommit", "validatorsSignedPrevote"],
 	type: "object",
 };
 

@@ -5,9 +5,6 @@ import { inject, injectable, postConstruct } from "@mainsail/container";
 
 @injectable()
 export class Header implements Contracts.P2PService.Header {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.Consensus.Service)
 	private readonly consensus!: Contracts.Consensus.Service;
 
@@ -41,7 +38,6 @@ export class Header implements Contracts.P2PService.Header {
 			step: this.step,
 			validatorsSignedPrecommit: this.validatorsSignedPrecommit,
 			validatorsSignedPrevote: this.validatorsSignedPrevote,
-			version: this.app.version(),
 		};
 	}
 }

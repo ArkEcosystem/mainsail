@@ -36,7 +36,6 @@ export const headers = {
 	step: 2,
 	validatorsSignedPrecommit: bitmap(),
 	validatorsSignedPrevote: bitmap(),
-	version: "0.0.1-rc.9",
 };
 
 // The genesis milestone has no validators; they start with the first block. A call without a block
