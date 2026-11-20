@@ -114,6 +114,11 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		handler: (request: Types.HapiRequest) => controller.tokenTransfers(request),
 		method: "GET",
 		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
 			validate: {
 				params: Joi.object({
 					address,
@@ -132,6 +137,11 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 		handler: (request: Types.HapiRequest) => controller.tokenApprovals(request),
 		method: "GET",
 		options: {
+			plugins: {
+				pagination: {
+					enabled: true,
+				},
+			},
 			validate: {
 				params: Joi.object({
 					address,
