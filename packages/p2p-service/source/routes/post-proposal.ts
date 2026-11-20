@@ -5,15 +5,13 @@ import { Enums, Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
-import type { RouteDefinition } from "../interfaces/index.js";
-
 import { Codecs } from "../codecs/index.js";
 import { Schemas } from "../schemas/index.js";
 
 type Request = ReturnType<typeof Codecs.postProposal.request.deserialize>;
 type Response = ReturnType<typeof Codecs.postProposal.response.deserialize>;
 
-export const PostProposal: RouteDefinition<Request, Response> = {
+export const PostProposal: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.postProposal,
 	// One proposal per round; a second one in flight covers the round changing while the peer is slow.
 	maxConcurrentRequests: 2,

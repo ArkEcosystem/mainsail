@@ -17,6 +17,17 @@ export interface PayloadLimits {
 	readonly response: number;
 }
 
+export type Schema = Record<string, unknown>;
+
+// The shapes the decoded request and response of a route must have, as JSON schemas. Both sides share
+// the definition, so one checks what we receive as the handler and the other what we get back as the
+// caller. The transport does not read them itself: whoever defines the routes also binds the
+// middleware that checks them.
+export interface RouteSchema {
+	readonly request: Schema;
+	readonly response: Schema;
+}
+
 // What `send` needs from a route: the same object a Route implementation spreads into itself,
 // so one definition drives both the handler and the typed client call.
 export interface RouteDefinition<TRequest, TResponse> {
@@ -27,6 +38,7 @@ export interface RouteDefinition<TRequest, TResponse> {
 	// ourselves to the same number: further requests of ours wait, up to `maxQueuedRequests`.
 	readonly maxConcurrentRequests: number;
 	readonly maxQueuedRequests: number;
+	readonly schema: RouteSchema;
 }
 
 export interface SendOptions {

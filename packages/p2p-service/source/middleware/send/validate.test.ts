@@ -55,12 +55,4 @@ describe<{
 			"Invalid getPeers response from 1.2.3.4: data must have required property 'headers'",
 		);
 	});
-
-	it("should not check a route without a schema, which is not one of ours", async ({ middleware, validator }) => {
-		const validate = spy(validator, "validate");
-
-		await middleware.after({ connection, response: { data }, route: { path: "foreign" } } as any);
-
-		validate.neverCalled();
-	});
 });

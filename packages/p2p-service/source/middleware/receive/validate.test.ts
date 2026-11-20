@@ -51,12 +51,4 @@ describe<{
 		assert.equal((thrown as RequestError).closeReason, CloseReason.ProtocolError);
 		assert.equal((thrown as RequestError).message, "Invalid getPeers request: data must be object");
 	});
-
-	it("should not check a route without a schema, which is not one of ours", async ({ middleware, validator }) => {
-		const validate = spy(validator, "validate");
-
-		await middleware.before({ request: { data }, route: { path: "foreign" } } as any);
-
-		validate.neverCalled();
-	});
 });

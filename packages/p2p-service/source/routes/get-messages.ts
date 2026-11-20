@@ -4,14 +4,12 @@ import type { Interfaces } from "@mainsail/p2p-websocket";
 import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
-import type { RouteDefinition } from "../interfaces/index.js";
-
 import { Codecs } from "../codecs/index.js";
 import { Schemas } from "../schemas/index.js";
 type Request = ReturnType<typeof Codecs.getMessages.request.deserialize>;
 type Response = ReturnType<typeof Codecs.getMessages.response.deserialize>;
 
-export const GetMessages: RouteDefinition<Request, Response> = {
+export const GetMessages: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.getMessages,
 	maxConcurrentRequests: 2,
 	maxPayload: { request: Units.KILOBYTE, response: 256 * Units.KILOBYTE },

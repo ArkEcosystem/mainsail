@@ -5,8 +5,6 @@ import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { pluralize } from "@mainsail/utils";
 
-import type { RouteDefinition } from "../interfaces/index.js";
-
 import { Codecs } from "../codecs/index.js";
 import { constants } from "../constants.js";
 import { Schemas } from "../schemas/index.js";
@@ -14,7 +12,7 @@ import { Schemas } from "../schemas/index.js";
 type Request = ReturnType<typeof Codecs.getBlocks.request.deserialize>;
 type Response = ReturnType<typeof Codecs.getBlocks.response.deserialize>;
 
-export const GetBlocks: RouteDefinition<Request, Response> = {
+export const GetBlocks: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.getBlocks,
 	// The block downloader runs up to MAX_DOWNLOAD_BLOCKS_JOBS batches at once, possibly all from one peer.
 	maxConcurrentRequests: 10,

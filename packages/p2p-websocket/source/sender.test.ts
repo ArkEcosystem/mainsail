@@ -22,6 +22,7 @@ const route: RouteDefinition<string, string> = {
 	maxPayload: { request: 64, response: 8 },
 	maxQueuedRequests: 1,
 	path: "echo",
+	schema: { request: { type: "string" }, response: { type: "string" } },
 };
 
 describe<{

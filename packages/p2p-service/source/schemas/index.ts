@@ -1,4 +1,4 @@
-import type { RouteSchema } from "../interfaces/index.js";
+import type { Interfaces } from "@mainsail/p2p-websocket";
 
 import { getApiNodes } from "./get-api-nodes.js";
 import { getBlocks } from "./get-blocks.js";
@@ -19,7 +19,7 @@ export const Schemas: Record<
 	| "getStatus"
 	| "postMessage"
 	| "postProposal",
-	RouteSchema
+	Interfaces.RouteSchema
 > = {
 	getApiNodes,
 	getBlocks,

@@ -5,15 +5,13 @@ import { Enums, Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
-import type { RouteDefinition } from "../interfaces/index.js";
-
 import { Codecs } from "../codecs/index.js";
 import { Schemas } from "../schemas/index.js";
 
 type Request = ReturnType<typeof Codecs.postMessage.request.deserialize>;
 type Response = ReturnType<typeof Codecs.postMessage.response.deserialize>;
 
-export const PostMessage: RouteDefinition<Request, Response> = {
+export const PostMessage: Interfaces.RouteDefinition<Request, Response> = {
 	codec: Codecs.postMessage,
 	maxConcurrentRequests: 8,
 	maxPayload: { request: Units.KILOBYTE, response: Units.KILOBYTE },

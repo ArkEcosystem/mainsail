@@ -5,8 +5,6 @@ import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { CloseReason, RequestError } from "@mainsail/p2p-websocket";
 
-import type { RouteDefinition } from "../../interfaces/index.js";
-
 // Checks the decoded request against the schema of its route before anything else looks at it. A peer
 // runs the same definitions, so a request that does not fit is a protocol violation: it is answered
 // 400 and the connection is closed for that reason, which costs the peer a ban. Bound right after the
@@ -17,11 +15,7 @@ export class ValidateReceiveMiddleware implements Interfaces.ReceiveMiddleware {
 	private readonly validator!: Contracts.Crypto.Validator;
 
 	public async before(context: Interfaces.ReceiveContext): Promise<void> {
-		// The transport also serves routes other packages register with it, which carry no schema.
-		const { path, schema } = context.route as Partial<RouteDefinition<unknown, unknown>>;
-		if (!schema) {
-			return;
-		}
+		const { path, schema } = context.route;
 
 		const { error } = this.validator.validate(schema.request, context.request.data);
 		if (error) {
