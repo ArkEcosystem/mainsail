@@ -101,7 +101,7 @@ describe<{
 		// Feed one peer event through the captured Peers listener, then flush through the aggregate.
 		const peers = captured[Events.PeerEvent.Added] as any;
 		await peers.handle({
-			data: { header: { blockNumber: 1 }, ip: "127.0.0.1", latency: 1, plugins: {}, port: 4002, ports: {} },
+			data: { header: { blockNumber: 1 }, ip: "127.0.0.1", latency: 1, plugins: {}, port: 4002 },
 			name: Events.PeerEvent.Added,
 		});
 

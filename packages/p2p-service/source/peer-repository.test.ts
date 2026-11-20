@@ -284,7 +284,8 @@ describe<{
 		const known = app.resolve(Peer).init("176.165.22.11", 4000);
 
 		peerRepository.setActivePeer(active);
-		dispatch.calledWith(Events.PeerEvent.Added, active);
+		// The event carries the peer's data, not the peer.
+		dispatch.calledWith(Events.PeerEvent.Added, active.toData());
 
 		peerRepository.setPendingPeer(pending);
 		peerRepository.setKnownPeer(known);
@@ -293,7 +294,7 @@ describe<{
 		dispatch.calledOnce();
 
 		peerRepository.removePeer(active.ip);
-		dispatch.calledWith(Events.PeerEvent.Removed, active);
+		dispatch.calledWith(Events.PeerEvent.Removed, active.toData());
 		dispatch.calledTimes(2);
 
 		// Removing a peer that is not active announces nothing.

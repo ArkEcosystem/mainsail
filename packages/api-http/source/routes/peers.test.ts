@@ -23,7 +23,7 @@ describe<{
 	});
 
 	it("GET /api/peers - returns transformed peers in a pagination envelope", async ({ server, repos }) => {
-		repos.peer.data.page = makePage([makePeer({ plugins: { "api-http": {} }, ports: { "api-http": 4003 } })]);
+		repos.peer.data.page = makePage([makePeer({ plugins: { "api-http": {} } })]);
 
 		const response = await server.inject({ method: "GET", url: "/api/peers" });
 
@@ -37,7 +37,6 @@ describe<{
 			latency: 10,
 			plugins: { "api-http": {} },
 			port: 4002,
-			ports: { "api-http": 4003 },
 			version: "1.0.0",
 		});
 

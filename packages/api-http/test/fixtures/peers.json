@@ -5,10 +5,6 @@
 		"version": "0.0.1",
 		"blockNumber": 7,
 		"latency": 33,
-		"ports": {
-			"@mainsail/webhooks": -1,
-			"@mainsail/api-development": 4006
-		},
 		"plugins": {
 			"@mainsail/webhooks": {
 				"port": 4004,
@@ -26,10 +22,6 @@
 		"version": "0.0.1",
 		"blockNumber": 4,
 		"latency": 22,
-		"ports": {
-			"@mainsail/webhooks": -1,
-			"@mainsail/api-development": 4006
-		},
 		"plugins": {
 			"@mainsail/webhooks": {
 				"port": 4004,
@@ -47,10 +39,6 @@
 		"version": "0.0.1",
 		"blockNumber": 6,
 		"latency": 1,
-		"ports": {
-			"@mainsail/webhooks": -1,
-			"@mainsail/api-development": 4006
-		},
 		"plugins": {
 			"@mainsail/webhooks": {
 				"port": 4004,

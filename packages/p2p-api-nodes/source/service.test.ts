@@ -101,7 +101,6 @@ describe<{
 		listeners,
 	}) => {
 		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		const peer = { ip: "1.2.3.4" };
 		const asked: unknown[] = [];
 		apiNodeDiscoverer.discoverApiNodes = (from: unknown) => {
 			asked.push(from);
@@ -111,9 +110,10 @@ describe<{
 		service.boot();
 		await fakeTimers.tickAsync(0);
 
-		// The listener settles although the discovery never does.
-		await listeners.get(Events.PeerEvent.Added).handle({ data: peer, name: Events.PeerEvent.Added });
-		assert.equal(asked, [peer]);
+		// The event carries the peer's data, of which the address is handed on. The listener settles
+		// although the discovery never does.
+		await listeners.get(Events.PeerEvent.Added).handle({ data: { ip: "1.2.3.4" }, name: Events.PeerEvent.Added });
+		assert.equal(asked, ["1.2.3.4"]);
 
 		service.dispose();
 	});

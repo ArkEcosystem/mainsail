@@ -19,10 +19,10 @@ export class Service implements Contracts.P2PApiNodes.Service {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	readonly #peerListener: Contracts.Kernel.EventListener = {
+	readonly #peerListener: Contracts.Kernel.EventListener<Contracts.P2PService.PeerData> = {
 		// Not awaited: checking a peer's nodes takes a while and must not hold up the other listeners.
 		handle: async ({ data }): Promise<void> => {
-			void this.apiNodeDiscoverer.discoverApiNodes(data as Contracts.P2PService.Peer);
+			void this.apiNodeDiscoverer.discoverApiNodes(data.ip);
 		},
 	};
 

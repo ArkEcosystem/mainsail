@@ -78,7 +78,6 @@ export const makePeer = (overrides: Record<string, unknown> = {}) => ({
 	latency: 10,
 	plugins: {},
 	port: 4002,
-	ports: {},
 	version: "1.0.0",
 	...overrides,
 });

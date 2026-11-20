@@ -43,14 +43,14 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 		return peer;
 	}
 
-	// An active peer is in no other list. Active peers are announced; pending and known ones are internal
-	// to this package.
+	// An active peer is in no other list. Active peers are announced, as plain data; pending and known
+	// ones are internal to this package.
 	public setActivePeer(peer: Contracts.P2PService.Peer): void {
 		this.#peersPending.delete(peer.ip);
 		this.#peersKnown.delete(peer.ip);
 		this.#peers.set(peer.ip, peer);
 
-		void this.events.dispatch(Events.PeerEvent.Added, peer);
+		void this.events.dispatch(Events.PeerEvent.Added, peer.toData());
 	}
 
 	public hasActivePeer(ip: string): boolean {
@@ -131,7 +131,7 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 		if (peer) {
 			this.#peers.delete(ip);
 
-			void this.events.dispatch(Events.PeerEvent.Removed, peer);
+			void this.events.dispatch(Events.PeerEvent.Removed, peer.toData());
 		}
 
 		return peer;

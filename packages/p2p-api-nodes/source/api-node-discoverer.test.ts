@@ -12,6 +12,7 @@ describe<{
 	apiNodeRepository: any;
 	apiNodeProcessor: any;
 	communicator: any;
+	peerRepository: any;
 	configuration: any;
 	logger: any;
 }>("ApiNodeDiscoverer", ({ it, beforeEach, spy }) => {
@@ -21,6 +22,11 @@ describe<{
 		context.apiNodeRepository = { getApiNodes: () => [] };
 		context.apiNodeProcessor = { revalidateApiNode: async () => {}, validateAndAcceptApiNode: async () => {} };
 		context.communicator = { getApiNodes: async () => ({ apiNodes: [] }) };
+		context.peerRepository = {
+			getActivePeer: () => peer,
+			getActivePeers: () => [peer],
+			hasActivePeer: (ip: string) => ip === peer.ip,
+		};
 		context.configuration = { getOptional: (key: string, defaultValue: unknown) => defaultValue };
 		context.logger = { debug: () => {}, warn: () => {} };
 
@@ -32,7 +38,7 @@ describe<{
 		app.bind(Identifiers.P2P.ApiNode.Processor).toConstantValue(context.apiNodeProcessor);
 		app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(context.communicator);
 		app.bind(Identifiers.P2P.ApiNode.Repository).toConstantValue(context.apiNodeRepository);
-		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getActivePeers: () => [peer] });
+		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.peerRepository);
 		app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
 		context.discoverer = app.resolve(ApiNodeDiscoverer);
@@ -47,7 +53,7 @@ describe<{
 		communicator.getApiNodes = async () => ({ apiNodes });
 		const validateAndAcceptApiNode = spy(apiNodeProcessor, "validateAndAcceptApiNode");
 
-		await discoverer.discoverApiNodes(peer);
+		await discoverer.discoverApiNodes(peer.ip);
 
 		validateAndAcceptApiNode.calledTimes(2);
 		validateAndAcceptApiNode.calledWith({ url: "http://1.2.3.4:4003/" }, {});
@@ -65,7 +71,7 @@ describe<{
 		communicator.getApiNodes = async () => ({ apiNodes });
 		const validateAndAcceptApiNode = spy(apiNodeProcessor, "validateAndAcceptApiNode");
 
-		await discoverer.discoverApiNodes(peer);
+		await discoverer.discoverApiNodes(peer.ip);
 
 		validateAndAcceptApiNode.calledTimes(constants.MAX_API_NODES_PER_PEER);
 	});
@@ -78,7 +84,7 @@ describe<{
 		communicator.getApiNodes = async () => ({ apiNodes: [{ url: "http://1.2.3.4:4003/api/?x=1#frag" }] });
 		const validateAndAcceptApiNode = spy(apiNodeProcessor, "validateAndAcceptApiNode");
 
-		await discoverer.discoverApiNodes(peer);
+		await discoverer.discoverApiNodes(peer.ip);
 
 		validateAndAcceptApiNode.calledOnce();
 		validateAndAcceptApiNode.calledWith({ url: "http://1.2.3.4:4003/api" }, {});
@@ -96,7 +102,7 @@ describe<{
 		const validateAndAcceptApiNode = spy(apiNodeProcessor, "validateAndAcceptApiNode");
 		const debug = spy(logger, "debug");
 
-		await discoverer.discoverApiNodes(peer);
+		await discoverer.discoverApiNodes(peer.ip);
 
 		validateAndAcceptApiNode.calledOnce();
 		validateAndAcceptApiNode.calledWith({ url: "http://5.6.7.8:4003/" }, {});
@@ -116,7 +122,7 @@ describe<{
 		const validateAndAcceptApiNode = spy(apiNodeProcessor, "validateAndAcceptApiNode");
 		const debug = spy(logger, "debug");
 
-		await discoverer.discoverApiNodes(peer);
+		await discoverer.discoverApiNodes(peer.ip);
 
 		validateAndAcceptApiNode.calledOnce();
 		validateAndAcceptApiNode.calledWith({ url: "http://5.6.7.8:4003/" }, {});
@@ -141,7 +147,7 @@ describe<{
 		const validateAndAcceptApiNode = spy(apiNodeProcessor, "validateAndAcceptApiNode");
 		const debug = spy(logger, "debug");
 
-		await discoverer.discoverApiNodes(peer);
+		await discoverer.discoverApiNodes(peer.ip);
 
 		validateAndAcceptApiNode.calledTimes(2);
 		validateAndAcceptApiNode.calledWith({ url: "http://1.2.3.4:4003/" }, {});
@@ -188,6 +194,26 @@ describe<{
 		warn.calledWith("Skipping configured API node: Invalid API Node url: http://1.2.3.4:99999/", "p2p");
 	});
 
+	it("#discoverApiNodes - should ask the active peer with the given address", async ({
+		discoverer,
+		communicator,
+	}) => {
+		const getApiNodes = spy(communicator, "getApiNodes");
+
+		await discoverer.discoverApiNodes(peer.ip);
+
+		getApiNodes.calledOnce();
+		getApiNodes.calledWith(peer);
+	});
+
+	it("#discoverApiNodes - should not ask a peer that is not active", async ({ discoverer, communicator }) => {
+		const getApiNodes = spy(communicator, "getApiNodes");
+
+		await discoverer.discoverApiNodes("5.6.7.8");
+
+		getApiNodes.neverCalled();
+	});
+
 	it("#discoverApiNodes - should swallow a failed request", async ({
 		discoverer,
 		communicator,
@@ -198,9 +224,18 @@ describe<{
 		};
 		const validateAndAcceptApiNode = spy(apiNodeProcessor, "validateAndAcceptApiNode");
 
-		await discoverer.discoverApiNodes(peer);
+		await discoverer.discoverApiNodes(peer.ip);
 
 		validateAndAcceptApiNode.neverCalled();
+	});
+
+	it("#discoverNewApiNodes - should ask the active peers", async ({ discoverer, communicator }) => {
+		const getApiNodes = spy(communicator, "getApiNodes");
+
+		await discoverer.discoverNewApiNodes();
+
+		getApiNodes.calledOnce();
+		getApiNodes.calledWith(peer);
 	});
 
 	it("#refreshApiNodes - should revalidate nodes that were never pinged or were pinged long ago", async ({
