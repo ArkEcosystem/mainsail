@@ -12,6 +12,9 @@ import type { Peer } from "./interfaces/index.js";
 import { constants } from "./constants.js";
 import { percentile } from "./utils/index.js";
 
+// Reasons a dial fails for that make the address not worth another dial.
+const REFUSED_REASONS = new Set<CloseReason>([CloseReason.Banned, CloseReason.Rejected, CloseReason.VersionMismatch]);
+
 // Port of the @mainsail/p2p service without API nodes. It also owns the transport lifecycle, which the
 // old service left to the hapi server, and the redialing of known peers, which the old connector did
 // on demand.
@@ -136,13 +139,11 @@ export class Service implements Contracts.P2PService.Service {
 		return peer.dialAttempts >= constants.MAX_DIAL_ATTEMPTS;
 	}
 
-	// Refused by our own address rules or ban list before a socket was opened, or by the peer's during the
-	// handshake. The address is not worth further dials; discovery brings it back if that changes.
+	// Refused by our own address rules or ban list before a socket was opened, by the peer's during the
+	// handshake, or by either side for the other's version. The address is not worth further dials;
+	// discovery brings it back if that changes.
 	#isRefused(error: Error): boolean {
-		return (
-			error instanceof ConnectionError &&
-			(error.reason === CloseReason.Rejected || error.reason === CloseReason.Banned)
-		);
+		return error instanceof ConnectionError && REFUSED_REASONS.has(error.reason);
 	}
 
 	async #checkMinPeers(): Promise<void> {

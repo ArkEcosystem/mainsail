@@ -2730,9 +2730,6 @@ importers:
       protobufjs:
         specifier: 8.7.2
         version: 8.7.2
-      semver:
-        specifier: 7.8.0
-        version: 7.8.0
     devDependencies:
       '@mainsail/contracts':
         specifier: workspace:*
@@ -2749,9 +2746,6 @@ importers:
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4
-      '@types/semver':
-        specifier: 7.8.0
-        version: 7.8.0
       protobufjs-cli:
         specifier: 2.6.2
         version: 2.6.2(protobufjs@8.7.2)
@@ -2807,6 +2801,9 @@ importers:
       joi:
         specifier: 18.2.5
         version: 18.2.5
+      semver:
+        specifier: 7.8.0
+        version: 7.8.0
       ws:
         specifier: 8.21.3
         version: 8.21.3
@@ -2817,6 +2814,9 @@ importers:
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
+      '@types/semver':
+        specifier: 7.8.0
+        version: 7.8.0
       '@types/ws':
         specifier: 8.18.1
         version: 8.18.1

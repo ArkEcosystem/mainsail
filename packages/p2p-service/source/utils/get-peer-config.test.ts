@@ -6,7 +6,6 @@ import { getPeerConfig } from "./get-peer-config";
 describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 	let mockNetwork;
 	let configuration;
-	let version;
 	let appPlugins;
 	let coreApiServiceProviderConfiguration;
 	let coreApiServiceProvider;
@@ -31,7 +30,6 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 			getNetwork: () => mockNetwork,
 		};
 
-		version = "3.0.9";
 		appPlugins = [
 			{ options: {}, package: "@mainsail/api" },
 			{ package: "@mainsail/webhooks" },
@@ -78,7 +76,6 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 
 		app = {
 			get: (key) => appGet[key],
-			version: () => version,
 		};
 
 		result = {
@@ -103,7 +100,6 @@ describe("getPeerConfig", ({ it, assert, beforeEach }) => {
 					port: 4004,
 				},
 			},
-			version,
 		};
 	});
 

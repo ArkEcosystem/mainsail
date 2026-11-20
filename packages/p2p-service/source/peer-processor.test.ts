@@ -7,7 +7,7 @@ import { PeerProcessor } from "./peer-processor";
 
 const ip = "178.165.55.55";
 
-const makePeer = (ip: string): any => ({ dialAttempts: 0, ip, lastDialAt: 0, port: 4002, version: "0.0.1" });
+const makePeer = (ip: string): any => ({ dialAttempts: 0, ip, lastDialAt: 0, port: 4002 });
 
 // The three lists with the transitions the processor relies on, as the real repository makes them.
 const makeRepository = (): any => {
@@ -48,6 +48,7 @@ const connect = async (websocketService: any, ip: string): Promise<any> => {
 		close: async () => {},
 		onClose: (listener: (reason: string, error?: Error) => void) => (connection.fireClose = listener),
 		remoteAddress: ip,
+		remoteVersion: "0.0.1",
 		state: ConnectionState.Open,
 	};
 	websocketService.onConnection(connection);
@@ -69,7 +70,6 @@ describe<{
 	repository: any;
 	peerVerifier: any;
 	peerDisposer: any;
-	events: any;
 	logger: any;
 	transactionPoolWorker: any;
 	peerDiscoverer: any;
@@ -81,7 +81,6 @@ describe<{
 		context.peerVerifier = { verify: async () => true };
 		// As the real disposer: the peer loses its place, an active one becomes known.
 		context.peerDisposer = { banPeer: () => {}, disposePeer: (ip: string) => context.repository.demotePeer(ip) };
-		context.events = { dispatch: async () => {}, listen: () => {} };
 		context.transactionPoolWorker = { registerEventHandler: () => {} };
 		context.peerDiscoverer = { discoverPeers: async () => {} };
 		context.websocketService = { onConnection: undefined };
@@ -94,7 +93,6 @@ describe<{
 		app.bind(Identifiers.P2P.Peer.Factory).toConstantValue((ip: string) => makePeer(ip));
 		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
 		app.bind(Identifiers.TransactionPool.Worker).toConstantValue(context.transactionPoolWorker);
-		app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue(context.events);
 		app.bind(Identifiers.P2P.Logger).toConstantValue(context.logger);
 
 		context.processor = app.resolve(PeerProcessor);

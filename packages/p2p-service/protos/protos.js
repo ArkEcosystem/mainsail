@@ -5630,7 +5630,6 @@ export const getStatus = $root.getStatus = (() => {
             /**
              * Properties of a Config.
              * @typedef {Object} getStatus.GetStatusResponse.Config.$Properties
-             * @property {string|null} [version] Config version
              * @property {getStatus.GetStatusResponse.Config.Network.$Properties|null} [network] Config network
              * @property {Object.<string,getStatus.GetStatusResponse.Config.Plugin.$Properties>|null} [plugins] Config plugins
              * @property {Array.<Uint8Array>} [$unknowns] Unknown fields preserved while decoding when enabled
@@ -5664,14 +5663,6 @@ export const getStatus = $root.getStatus = (() => {
                         if (properties[keys[i]] != null && keys[i] !== "__proto__")
                             this[keys[i]] = properties[keys[i]];
             };
-
-            /**
-             * Config version.
-             * @member {string} version
-             * @memberof getStatus.GetStatusResponse.Config
-             * @instance
-             */
-            Config.prototype.version = "";
 
             /**
              * Config network.
@@ -5721,8 +5712,6 @@ export const getStatus = $root.getStatus = (() => {
                     _depth = 0;
                 if (_depth > $util.recursionLimit)
                     throw $Error("max depth exceeded");
-                if (message.version != null && $Object.hasOwnProperty.call(message, "version") && message.version !== "")
-                    writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);
                 if (message.network != null && $Object.hasOwnProperty.call(message, "network"))
                     $root.getStatus.GetStatusResponse.Config.Network.encode(message.network, writer.uint32(/* id 2, wireType 2 =*/18).fork(), _depth + 1).ldelim();
                 if (message.plugins != null && $Object.hasOwnProperty.call(message, "plugins"))
@@ -5777,15 +5766,6 @@ export const getStatus = $root.getStatus = (() => {
                     }
                     let wireType = tag & 7;
                     switch (tag >>>= 3) {
-                    case 1: {
-                            if (wireType !== 2)
-                                break;
-                            if ((value = reader.stringVerify()).length)
-                                message.version = value;
-                            else
-                                delete message.version;
-                            continue;
-                        }
                     case 2: {
                             if (wireType !== 2)
                                 break;
@@ -5865,9 +5845,6 @@ export const getStatus = $root.getStatus = (() => {
                     _depth = 0;
                 if (_depth > $util.recursionLimit)
                     return "max depth exceeded";
-                if (message.version != null && $Object.hasOwnProperty.call(message, "version"))
-                    if (!$util.isString(message.version))
-                        return "version: string expected";
                 if (message.network != null && $Object.hasOwnProperty.call(message, "network")) {
                     let error = $root.getStatus.GetStatusResponse.Config.Network.verify(message.network, _depth + 1);
                     if (error)
@@ -5904,9 +5881,6 @@ export const getStatus = $root.getStatus = (() => {
                 if (_depth > $util.recursionLimit)
                     throw $Error("max depth exceeded");
                 let message = new $root.getStatus.GetStatusResponse.Config();
-                if (object.version != null)
-                    if (typeof object.version !== "string" || object.version.length)
-                        message.version = $String(object.version);
                 if (object.network != null) {
                     if (!$util.isObject(object.network))
                         throw $TypeError(".getStatus.GetStatusResponse.Config.network: object expected");
@@ -5946,12 +5920,8 @@ export const getStatus = $root.getStatus = (() => {
                 let object = {};
                 if (options.objects || options.defaults)
                     object.plugins = {};
-                if (options.defaults) {
-                    object.version = "";
+                if (options.defaults)
                     object.network = null;
-                }
-                if (message.version != null && $Object.hasOwnProperty.call(message, "version"))
-                    object.version = message.version;
                 if (message.network != null && $Object.hasOwnProperty.call(message, "network"))
                     object.network = $root.getStatus.GetStatusResponse.Config.Network.toObject(message.network, options, _depth + 1);
                 let keys2;

@@ -28,9 +28,11 @@ export const constants = {
 	// applies to what we send; beyond it our own requests wait, up to MAX_QUEUED_REQUESTS of them.
 	MAX_QUEUED_REQUESTS: 64,
 	MAX_REQUESTS_IN_FLIGHT: 32,
+	// Longest version of its software a peer may name in its hello, in bytes.
+	MAX_VERSION_LENGTH: 24,
 	// Version of the wire protocol: the frame format in message.ts and the set of route paths. Bump it
 	// whenever either changes; a request for an unknown path ends the connection.
-	PROTOCOL_VERSION: 1,
+	PROTOCOL_VERSION: 2,
 	// Time a request waits for its response before failing, unless the request names its own. A request
 	// that times out closes the connection.
 	REQUEST_TIMEOUT: 5000,

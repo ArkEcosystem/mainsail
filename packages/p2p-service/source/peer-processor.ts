@@ -8,8 +8,6 @@ import { ensureError } from "@mainsail/utils";
 
 import type { Peer } from "./interfaces/index.js";
 
-import { isValidVersion } from "./utils/index.js";
-
 const BAN_REASONS = new Set<CloseReason>([CloseReason.PayloadTooLarge, CloseReason.ProtocolError]);
 
 // Turns connections into active peers: every connection, dialed or inbound, is accepted and verified
@@ -18,9 +16,6 @@ const BAN_REASONS = new Set<CloseReason>([CloseReason.PayloadTooLarge, CloseReas
 // every inbound socket and every dial. Nothing calls it, so it has no contract; the provider constructs it.
 @injectable()
 export class PeerProcessor {
-	@inject(Identifiers.Application.Instance)
-	private readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.P2P.WebSocket.Service)
 	private readonly websocketService!: WebSocketService;
 
@@ -42,9 +37,6 @@ export class PeerProcessor {
 	@inject(Identifiers.TransactionPool.Worker)
 	private readonly transactionPoolWorker!: Contracts.TransactionPool.Worker;
 
-	@inject(Identifiers.Services.EventDispatcher.Service)
-	private readonly events!: Contracts.Kernel.EventDispatcher;
-
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2PService.Logger;
 
@@ -63,10 +55,6 @@ export class PeerProcessor {
 				void connection.close();
 			});
 		};
-
-		this.events.listen(Events.CryptoEvent.MilestoneChanged, {
-			handle: async (): Promise<void> => this.#disconnectInvalidPeers(),
-		});
 
 		// The pool reports peers it cannot reach; the pool itself learns about peers from the repository's events.
 		this.transactionPoolWorker.registerEventHandler(Events.PeerEvent.Removed, (ip: string) => {
@@ -134,15 +122,5 @@ export class PeerProcessor {
 		this.logger.info(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
 
 		await this.peerDiscoverer.discoverPeers(peer);
-	}
-
-	async #disconnectInvalidPeers(): Promise<void> {
-		const peers = this.repository.getActivePeers();
-
-		for (const peer of peers) {
-			if (!peer.version || !isValidVersion(this.app, peer.version)) {
-				this.peerDisposer.disposePeer(peer.ip);
-			}
-		}
 	}
 }
