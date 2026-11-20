@@ -18,7 +18,7 @@ import { Storage } from "./storage.js";
 export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.TransactionPool.Mempool).to(Mempool).inSingletonScope();
-		this.app.bind(Identifiers.TransactionPool.Processor).to(Processor);
+		this.app.bind(Identifiers.TransactionPool.Processor).to(Processor).inSingletonScope();
 		this.app.bind(Identifiers.TransactionPool.Query).to(Query);
 		this.app
 			.bind<(address: string, legacyAddress?: string) => Promise<SenderMempool>>(
