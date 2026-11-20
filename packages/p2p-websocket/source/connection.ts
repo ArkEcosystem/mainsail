@@ -39,6 +39,9 @@ const wsErrorReason = (code: string | undefined): CloseReason => {
 // One per socket, created through Identifiers.P2P.WebSocket.Connection.Factory and set up with init().
 @injectable()
 export class Connection implements ConnectionInterface {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.P2P.WebSocket.Logger)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -77,6 +80,7 @@ export class Connection implements ConnectionInterface {
 			open: () => this.#open(),
 			reject: (reason) => this.reject(reason),
 			send: (message) => this.#send(message),
+			version: this.app.version(),
 		});
 
 		this.#heartbeat = new Heartbeat({

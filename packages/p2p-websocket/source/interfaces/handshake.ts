@@ -4,6 +4,8 @@ import type { Message } from "./message.js";
 
 export type HandshakeOptions = {
 	direction: Direction;
+	// The version of our software, which the hello tells the peer.
+	version: string;
 	send: (message: Message) => void;
 	reject: (reason: CloseReason) => void;
 	// Called synchronously once the peer's hello has been accepted, before any later frame is processed.

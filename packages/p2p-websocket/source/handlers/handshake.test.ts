@@ -28,12 +28,13 @@ const make = (direction: Direction): Probe => {
 		open: () => probe.opened++,
 		reject: (reason) => probe.rejected.push(reason),
 		send: (message) => probe.sent.push(message),
+		version: "1.2.3",
 	});
 
 	return probe;
 };
 
-const hello = { type: "hello" as const, version: constants.PROTOCOL_VERSION };
+const hello = { protocolVersion: constants.PROTOCOL_VERSION, type: "hello" as const, version: "1.2.3" };
 
 describe("Handshake", ({ it, assert, clock }) => {
 	it("dialer - should send hello and open on the echo", async () => {
@@ -63,7 +64,7 @@ describe("Handshake", ({ it, assert, clock }) => {
 		const probe = make(Direction.Inbound);
 		const started = probe.handshake.start().catch((error) => error);
 
-		probe.handshake.onHello({ type: "hello", version: constants.PROTOCOL_VERSION + 1 });
+		probe.handshake.onHello({ ...hello, protocolVersion: constants.PROTOCOL_VERSION + 1 });
 
 		assert.equal(probe.rejected, [CloseReason.VersionMismatch]);
 		assert.equal((await started).reason, CloseReason.VersionMismatch);
