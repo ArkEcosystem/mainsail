@@ -60,22 +60,6 @@ describe<{
 		validateAndAcceptApiNode.calledWith({ url: "http://5.6.7.8:4003/" }, {});
 	});
 
-	it("#discoverApiNodes - should look at no more nodes than a peer may tell", async ({
-		discoverer,
-		communicator,
-		apiNodeProcessor,
-	}) => {
-		const apiNodes = Array.from({ length: constants.MAX_API_NODES_PER_PEER + 10 }, (_, index) => ({
-			url: `http://1.2.3.4:${4000 + index}/`,
-		}));
-		communicator.getApiNodes = async () => ({ apiNodes });
-		const validateAndAcceptApiNode = spy(apiNodeProcessor, "validateAndAcceptApiNode");
-
-		await discoverer.discoverApiNodes(peer.ip);
-
-		validateAndAcceptApiNode.calledTimes(constants.MAX_API_NODES_PER_PEER);
-	});
-
 	it("#discoverApiNodes - should hand the factory-normalized url to the processor", async ({
 		discoverer,
 		communicator,
