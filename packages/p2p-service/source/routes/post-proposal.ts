@@ -6,6 +6,7 @@ import { inject, injectable } from "@mainsail/container";
 import { ensureError } from "@mainsail/utils";
 
 import { Codecs } from "../codecs/index.js";
+import { Schemas } from "../schemas/index.js";
 
 type Request = ReturnType<typeof Codecs.postProposal.request.deserialize>;
 type Response = ReturnType<typeof Codecs.postProposal.response.deserialize>;
@@ -17,6 +18,7 @@ export const PostProposal: Interfaces.RouteDefinition<Request, Response> = {
 	maxPayload: { request: 3 * Units.MEGABYTE, response: Units.KILOBYTE },
 	maxQueuedRequests: 2,
 	path: "postProposal",
+	schema: Schemas.postProposal,
 };
 
 // A proposal that cannot be read or fails the checks of the consensus costs its sender a ban, as in
@@ -37,10 +39,11 @@ export class PostProposalRoute implements Interfaces.Route<Request, Response> {
 	public readonly maxPayload = PostProposal.maxPayload;
 	public readonly maxConcurrentRequests = PostProposal.maxConcurrentRequests;
 	public readonly maxQueuedRequests = PostProposal.maxQueuedRequests;
+	public readonly schema = PostProposal.schema;
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
 		try {
-			const proposal = await this.factory.makeProposalFromBytes(Buffer.from(data.proposal ?? []));
+			const proposal = await this.factory.makeProposalFromBytes(data.proposal);
 			if ((await this.proposalProcessor.process(proposal)) === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error("Invalid proposal");
 			}

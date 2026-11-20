@@ -6,6 +6,7 @@ import { inject, injectable } from "@mainsail/container";
 
 import { Codecs } from "../codecs/index.js";
 import { constants } from "../constants.js";
+import { Schemas } from "../schemas/index.js";
 
 type Request = ReturnType<typeof Codecs.getPeers.request.deserialize>;
 type Response = ReturnType<typeof Codecs.getPeers.response.deserialize>;
@@ -16,6 +17,7 @@ export const GetPeers: Interfaces.RouteDefinition<Request, Response> = {
 	maxPayload: { request: Units.KILOBYTE, response: 64 * Units.KILOBYTE },
 	maxQueuedRequests: 1,
 	path: "getPeers",
+	schema: Schemas.getPeers,
 };
 
 @injectable()
@@ -28,6 +30,7 @@ export class GetPeersRoute implements Interfaces.Route<Request, Response> {
 	public readonly maxPayload = GetPeers.maxPayload;
 	public readonly maxConcurrentRequests = GetPeers.maxConcurrentRequests;
 	public readonly maxQueuedRequests = GetPeers.maxQueuedRequests;
+	public readonly schema = GetPeers.schema;
 
 	public async handle(connection: Interfaces.Connection): Promise<Response> {
 		return {

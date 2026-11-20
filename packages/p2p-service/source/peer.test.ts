@@ -75,16 +75,16 @@ describe<{
 		});
 	});
 
-	it("#header - should announce a new block number or version with the peer's data", ({ peer }) => {
+	it("#header - should announce a new block number with the peer's data", ({ peer }) => {
 		const dispatched: unknown[][] = [];
 		eventDispatcher.dispatch = (...arguments_: unknown[]) => void dispatched.push(arguments_);
 
 		// The first header is the peer becoming known to us, not an update.
-		peer.header = { blockNumber: 1, version: "0.0.1" } as Contracts.P2PService.HeaderData;
-		peer.header = { blockNumber: 1, version: "0.0.1" } as Contracts.P2PService.HeaderData;
+		peer.header = { blockNumber: 1 } as Contracts.P2PService.HeaderData;
+		peer.header = { blockNumber: 1 } as Contracts.P2PService.HeaderData;
 		assert.equal(dispatched, []);
 
-		peer.header = { blockNumber: 2, version: "0.0.1" } as Contracts.P2PService.HeaderData;
+		peer.header = { blockNumber: 2 } as Contracts.P2PService.HeaderData;
 
 		assert.equal(dispatched, [[Events.PeerEvent.Updated, peer.toData()]]);
 		assert.equal((dispatched[0][1] as Contracts.P2PService.PeerData).header?.blockNumber, 2);

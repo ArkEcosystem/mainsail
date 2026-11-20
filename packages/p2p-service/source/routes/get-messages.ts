@@ -5,6 +5,7 @@ import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
 import { Codecs } from "../codecs/index.js";
+import { Schemas } from "../schemas/index.js";
 type Request = ReturnType<typeof Codecs.getMessages.request.deserialize>;
 type Response = ReturnType<typeof Codecs.getMessages.response.deserialize>;
 
@@ -14,6 +15,7 @@ export const GetMessages: Interfaces.RouteDefinition<Request, Response> = {
 	maxPayload: { request: Units.KILOBYTE, response: 256 * Units.KILOBYTE },
 	maxQueuedRequests: 1,
 	path: "getMessages",
+	schema: Schemas.getMessages,
 };
 
 @injectable()
@@ -29,29 +31,24 @@ export class GetMessagesRoute implements Interfaces.Route<Request, Response> {
 	public readonly maxPayload = GetMessages.maxPayload;
 	public readonly maxConcurrentRequests = GetMessages.maxConcurrentRequests;
 	public readonly maxQueuedRequests = GetMessages.maxQueuedRequests;
+	public readonly schema = GetMessages.schema;
 
 	public async handle(_: Interfaces.Connection, data: Request): Promise<Response> {
 		const { query } = data;
-		if (
-			!query ||
-			query.blockNumber !== this.consensus.getBlockNumber() ||
-			(query.round ?? 0) > this.consensus.getRound()
-		) {
+		if (query.blockNumber !== this.consensus.getBlockNumber() || query.round > this.consensus.getRound()) {
 			return { precommits: [], prevotes: [] };
 		}
 
-		const roundState = this.roundStateRepository.getRoundState(query.blockNumber, query.round ?? 0);
-		const signedPrevote = query.validatorsSignedPrevote ?? [];
-		const signedPrecommit = query.validatorsSignedPrecommit ?? [];
+		const roundState = this.roundStateRepository.getRoundState(query.blockNumber, query.round);
 
 		return {
 			precommits: roundState
 				.getPrecommits()
-				.filter((precommit) => !signedPrecommit[precommit.validatorIndex])
+				.filter((precommit) => !query.validatorsSignedPrecommit[precommit.validatorIndex])
 				.map((precommit) => precommit.serialized),
 			prevotes: roundState
 				.getPrevotes()
-				.filter((prevote) => !signedPrevote[prevote.validatorIndex])
+				.filter((prevote) => !query.validatorsSignedPrevote[prevote.validatorIndex])
 				.map((prevote) => prevote.serialized),
 		};
 	}

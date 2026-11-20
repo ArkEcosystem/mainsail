@@ -7,6 +7,7 @@ import { pluralize } from "@mainsail/utils";
 
 import { Codecs } from "../codecs/index.js";
 import { constants } from "../constants.js";
+import { Schemas } from "../schemas/index.js";
 
 type Request = ReturnType<typeof Codecs.getBlocks.request.deserialize>;
 type Response = ReturnType<typeof Codecs.getBlocks.response.deserialize>;
@@ -19,6 +20,7 @@ export const GetBlocks: Interfaces.RouteDefinition<Request, Response> = {
 	// A batch that cannot go out at once is better retried from another peer than queued behind the rest.
 	maxQueuedRequests: 0,
 	path: "getBlocks",
+	schema: Schemas.getBlocks,
 };
 
 // The block data a response to a request for `limit` blocks may hold, so that its fully serialized frame
@@ -44,27 +46,24 @@ export class GetBlocksRoute implements Interfaces.Route<Request, Response> {
 	public readonly maxPayload = GetBlocks.maxPayload;
 	public readonly maxConcurrentRequests = GetBlocks.maxConcurrentRequests;
 	public readonly maxQueuedRequests = GetBlocks.maxQueuedRequests;
+	public readonly schema = GetBlocks.schema;
 
 	public async handle(connection: Interfaces.Connection, data: Request): Promise<Response> {
-		// The request is not validated yet; the bounds keep a bad one from draining the database or the budget.
-		const requestBlockNumber = Math.max(data.fromBlockNumber ?? 0, 0);
-		const requestBlockLimit = Math.min(
-			Math.max(data.limit ?? constants.MAX_DOWNLOAD_BLOCKS, 1),
-			constants.MAX_DOWNLOAD_BLOCKS,
-		);
+		// The schema of the route bounds the limit, which keeps a request from draining the database or the budget.
+		const { fromBlockNumber, limit } = data;
 
-		if (requestBlockNumber > this.stateStore.getBlockNumber()) {
+		if (fromBlockNumber > this.stateStore.getBlockNumber()) {
 			return { blocks: [] };
 		}
 
 		const blocks = await this.database.findCommitBuffers(
-			requestBlockNumber,
-			requestBlockNumber + requestBlockLimit - 1,
-			getBlocksBudget(requestBlockLimit),
+			fromBlockNumber,
+			fromBlockNumber + limit - 1,
+			getBlocksBudget(limit),
 		);
 
 		this.logger.debug(
-			`${connection.remoteAddress} has downloaded ${pluralize("block", blocks.length, true)} from block number ${requestBlockNumber.toLocaleString()}`,
+			`${connection.remoteAddress} has downloaded ${pluralize("block", blocks.length, true)} from block number ${fromBlockNumber.toLocaleString()}`,
 			"p2p",
 		);
 

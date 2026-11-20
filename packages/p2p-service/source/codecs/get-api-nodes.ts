@@ -4,7 +4,9 @@ import { packHeadersBitmaps, unpackHeadersBitmaps, type WithUnpackedHeaders } fr
 export const getApiNodes = {
 	request: {
 		deserialize: (payload: Buffer): WithUnpackedHeaders<proto.GetApiNodesRequest.$Properties> => {
-			const decoded = proto.GetApiNodesRequest.decode(payload);
+			const decoded = proto.GetApiNodesRequest.toObject(proto.GetApiNodesRequest.decode(payload), {
+				defaults: true,
+			});
 			return unpackHeadersBitmaps(decoded);
 		},
 		serialize: (object: WithUnpackedHeaders<proto.GetApiNodesRequest.$Properties>): Buffer =>

@@ -44,8 +44,8 @@ export class ApiNodeDiscoverer implements Contracts.P2PApiNodes.ApiNodeDiscovere
 		try {
 			const { apiNodes } = await this.peerCommunicator.getApiNodes(peer);
 
-			// A peer tells at most this many; whatever comes after that is not looked at.
-			for (const { url } of apiNodes.slice(0, constants.MAX_API_NODES_PER_PEER)) {
+			// The schema of the route bounds the answer, in the number of nodes and the length of a url.
+			for (const { url } of apiNodes) {
 				let apiNode: Contracts.P2PApiNodes.ApiNode;
 				try {
 					apiNode = this.apiNodeFactory(url);

@@ -5,6 +5,7 @@ import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 
 import { Codecs } from "../codecs/index.js";
+import { Schemas } from "../schemas/index.js";
 import { getPeerConfig } from "../utils/index.js";
 
 type Request = ReturnType<typeof Codecs.getStatus.request.deserialize>;
@@ -16,6 +17,7 @@ export const GetStatus: Interfaces.RouteDefinition<Request, Response> = {
 	maxPayload: { request: Units.KILOBYTE, response: 16 * Units.KILOBYTE },
 	maxQueuedRequests: 1,
 	path: "getStatus",
+	schema: Schemas.getStatus,
 };
 
 @injectable()
@@ -31,6 +33,7 @@ export class GetStatusRoute implements Interfaces.Route<Request, Response> {
 	public readonly maxPayload = GetStatus.maxPayload;
 	public readonly maxConcurrentRequests = GetStatus.maxConcurrentRequests;
 	public readonly maxQueuedRequests = GetStatus.maxQueuedRequests;
+	public readonly schema = GetStatus.schema;
 
 	public async handle(): Promise<Response> {
 		const lastBlock = this.stateStore.getLastBlock();
