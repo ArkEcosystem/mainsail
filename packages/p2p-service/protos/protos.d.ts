@@ -2296,9 +2296,6 @@ export namespace getStatus {
 			/** Unknown fields preserved while decoding when enabled */
 			$unknowns?: Uint8Array[];
 
-			/** Config version. */
-			version: string;
-
 			/** Config network. */
 			network?: (getStatus.GetStatusResponse.Config.Network.$Properties|null);
 
@@ -2388,9 +2385,6 @@ export namespace getStatus {
 
 			/** Properties of a Config. */
 			interface $Properties {
-
-				/** Config version */
-				version?: (string|null);
 
 				/** Config network */
 				network?: (getStatus.GetStatusResponse.Config.Network.$Properties|null);

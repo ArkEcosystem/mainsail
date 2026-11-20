@@ -46,7 +46,6 @@ export interface PeerState {
 }
 
 export interface PeerConfig {
-	version: string;
 	network: {
 		version: number;
 		name: string;

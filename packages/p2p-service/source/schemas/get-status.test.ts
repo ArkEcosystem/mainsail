@@ -27,7 +27,7 @@ describe<{
 		token: { name: "TOKEN", symbol: "T" },
 		version: 30,
 	};
-	const config = { network, plugins: { "@mainsail/api-http": plugin }, version: "0.0.1-rc.9" };
+	const config = { network, plugins: { "@mainsail/api-http": plugin } };
 	const state = { blockHash: "b".repeat(64), blockNumber: 12 };
 
 	it("response - should accept what the codec hands over", ({ validator }) => {
@@ -57,8 +57,6 @@ describe<{
 		},
 		[
 			["a block hash that is no hash", { state: { ...state, blockHash: "b".repeat(63) } }],
-			["a version of fewer than 5 characters", { config: { ...config, version: "1.0" } }],
-			["a version of more than 24 characters", { config: { ...config, version: "1".repeat(25) } }],
 			["a nethash that is no hash", { config: { ...config, network: { ...network, nethash: "xyz" } } }],
 			["a network without a name", { config: { ...config, network: { ...network, name: "" } } }],
 			[

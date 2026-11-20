@@ -34,7 +34,6 @@ message GetStatusResponse {
             bool estimateTotalCount = 3;
         }
 
-        string version = 1;
         Network network = 2;
         map<string, Plugin> plugins = 3;
     }

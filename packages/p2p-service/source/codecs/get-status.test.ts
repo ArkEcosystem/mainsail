@@ -34,7 +34,6 @@ describe("PeerCodec", ({ it, assert }) => {
 					"@mainsail/api": { enabled: true, estimateTotalCount: false, port: 4003 },
 					"@mainsail/webhooks": { enabled: false, estimateTotalCount: false, port: 4004 },
 				},
-				version: "0.0.1",
 			},
 			headers,
 			state: {

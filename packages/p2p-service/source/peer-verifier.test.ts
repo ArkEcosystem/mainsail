@@ -5,7 +5,7 @@ import { describe } from "@mainsail/test-runner";
 import { PeerVerifier } from "./peer-verifier";
 
 const status = {
-	config: { network: { nethash: "nethash" }, plugins: { "@mainsail/api-http": { port: 4003 } }, version: "1.0.0" },
+	config: { network: { nethash: "nethash" }, plugins: { "@mainsail/api-http": { port: 4003 } } },
 	state: { blockNumber: 1 },
 };
 
