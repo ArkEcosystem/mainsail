@@ -3,8 +3,8 @@ import { inject, injectable } from "@mainsail/container";
 
 import type { BanList } from "./ban-list.js";
 import type { ConnectionRepository } from "./connection-repository.js";
-import type { Connection } from "./connection.js";
 import type { Dialer } from "./dialer.js";
+import type { Connection } from "./interfaces/index.js";
 import type { Listener } from "./listener.js";
 import type { Server } from "./server.js";
 

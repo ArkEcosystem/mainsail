@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+import "shared.proto";
+
+package getBlocks;
+
+message GetBlocksRequest {
+    uint32 fromBlockNumber = 1;
+    uint32 limit = 2;
+    shared.Headers headers = 3;
+}
+
+message GetBlocksResponse {
+	shared.Headers headers = 1;
+    repeated bytes blocks = 2;
+}
