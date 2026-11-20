@@ -1,5 +1,6 @@
 export * from "./address-family-verifier.js";
 export * from "./ban-list.js";
+export * from "./connection-limit-verifier.js";
 export * from "./connection.js";
 export * from "./constants.js";
 export * from "./defaults.js";

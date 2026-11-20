@@ -22,6 +22,7 @@ enum MessageType {
 const reasonToByte: Partial<Record<CloseReason, number>> = {
 	[CloseReason.Banned]: 2,
 	[CloseReason.DuplicatePeer]: 3,
+	[CloseReason.Full]: 5,
 	[CloseReason.Rejected]: 1,
 	[CloseReason.Shutdown]: 4,
 	[CloseReason.VersionMismatch]: 0,

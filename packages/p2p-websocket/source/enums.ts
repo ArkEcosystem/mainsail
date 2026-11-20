@@ -31,5 +31,6 @@ export enum CloseReason {
 	Rejected = "rejected",
 	Banned = "banned",
 	DuplicatePeer = "duplicatePeer",
+	Full = "full",
 	Shutdown = "shutdown",
 }

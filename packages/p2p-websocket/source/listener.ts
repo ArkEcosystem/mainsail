@@ -132,7 +132,7 @@ export class Listener {
 		}
 
 		for (const verifier of this.verifiers) {
-			const rejection = verifier.verify(remoteAddress);
+			const rejection = verifier.verify(remoteAddress, Direction.Inbound);
 			if (rejection) {
 				return rejection;
 			}
