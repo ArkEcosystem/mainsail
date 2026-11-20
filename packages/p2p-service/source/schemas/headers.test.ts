@@ -3,6 +3,7 @@ import type { Validator } from "@mainsail/validation";
 import { describe } from "@mainsail/test-runner";
 
 import { bitmap, configuration, headers, makeValidator, requestError, VALIDATORS } from "../../test/helpers/schemas";
+import { Schemas } from "./index";
 
 // The header is checked as part of a request; getPeers carries nothing else.
 describe<{
@@ -35,6 +36,15 @@ describe<{
 		assert.equal(configuration.getMilestone().roundValidators, 0);
 
 		assert.undefined(requestError(validator, "getPeers", { headers }));
+	});
+
+	// The decoder drops what the protocol does not define, so such data cannot come through the codec.
+	it("should not accept a field the protocol does not define", ({ validator }) => {
+		const schema = Schemas.getPeers.request!;
+
+		assert.undefined(validator.validate(schema, { headers }).error);
+		assert.string(validator.validate(schema, { headers: { ...headers, extra: 1 } }).error);
+		assert.string(validator.validate(schema, { extra: 1, headers }).error);
 	});
 
 	each(

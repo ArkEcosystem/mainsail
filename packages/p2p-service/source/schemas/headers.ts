@@ -12,9 +12,10 @@ export const bitmap = (blockNumberPath: string): Schema => ({
 // The header every request and every response carries, as the codec hands it over: bitmaps unpacked,
 // no proposed block hash while the peer has no proposal.
 export const headers: Schema = {
+	additionalProperties: false,
 	properties: {
 		blockNumber: { minimum: 1, type: "integer" },
-		proposedBlockHash: { anyOf: [{ type: "null" }, { pattern: "^[0-9a-f]{64}$", type: "string" }] },
+		proposedBlockHash: { pattern: "^[0-9a-f]{64}$", type: "string" },
 		round: { minimum: 0, type: "integer" },
 		step: { maximum: 2, minimum: 0, type: "integer" },
 		validatorsSignedPrecommit: bitmap("headers.blockNumber"),
@@ -27,6 +28,7 @@ export const headers: Schema = {
 
 // A request that carries nothing but the header.
 export const headersOnly: Schema = {
+	additionalProperties: false,
 	properties: { headers },
 	required: ["headers"],
 	type: "object",

@@ -4,7 +4,9 @@ import { packHeadersBitmaps, unpackHeadersBitmaps, type WithUnpackedHeaders } fr
 export const postProposal = {
 	request: {
 		deserialize: (payload: Buffer): WithUnpackedHeaders<proto.PostProposalRequest.$Properties> => {
-			const decoded = proto.PostProposalRequest.decode(payload);
+			const decoded = proto.PostProposalRequest.toObject(proto.PostProposalRequest.decode(payload), {
+				defaults: true,
+			});
 			return {
 				...unpackHeadersBitmaps(decoded),
 				proposal: Buffer.from(decoded.proposal),

@@ -4,7 +4,9 @@ import { packHeadersBitmaps, unpackHeadersBitmaps, type WithUnpackedHeaders } fr
 export const getStatus = {
 	request: {
 		deserialize: (payload: Buffer): WithUnpackedHeaders<proto.GetStatusRequest.$Properties> => {
-			const decoded = proto.GetStatusRequest.decode(payload);
+			const decoded = proto.GetStatusRequest.toObject(proto.GetStatusRequest.decode(payload), {
+				defaults: true,
+			});
 			return unpackHeadersBitmaps(decoded);
 		},
 		serialize: (object: WithUnpackedHeaders<proto.GetStatusRequest.$Properties>): Buffer =>

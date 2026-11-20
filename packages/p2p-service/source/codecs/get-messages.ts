@@ -15,7 +15,9 @@ type GetMessagesRequest = Omit<WithUnpackedHeaders<proto.GetMessagesRequest.$Pro
 export const getMessages = {
 	request: {
 		deserialize: (payload: Buffer): GetMessagesRequest => {
-			const decoded = proto.GetMessagesRequest.decode(payload);
+			const decoded = proto.GetMessagesRequest.toObject(proto.GetMessagesRequest.decode(payload), {
+				defaults: true,
+			});
 			unpackBitmapsInPlace(decoded.query);
 			return unpackHeadersBitmaps(decoded) as GetMessagesRequest;
 		},

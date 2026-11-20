@@ -3,6 +3,7 @@ import { headers } from "./headers.js";
 
 export const getBlocks = {
 	request: {
+		additionalProperties: false,
 		properties: {
 			fromBlockNumber: { minimum: 0, type: "integer" },
 			headers,
