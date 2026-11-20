@@ -41,11 +41,22 @@ const deferred = () => {
 	return { promise, reject, resolve };
 };
 
-const within = async <T>(promise: Promise<T>): Promise<T> =>
-	Promise.race([
-		promise,
-		new Promise<T>((_, reject) => setTimeout(() => reject(new Error("Request did not settle in time")), 500)),
-	]);
+const { clearTimeout: realClearTimeout, setTimeout: realSetTimeout } = globalThis;
+
+const within = async <T>(promise: Promise<T>): Promise<T> => {
+	let timeout: ReturnType<typeof setTimeout> | undefined;
+
+	try {
+		return await Promise.race([
+			promise,
+			new Promise<T>((_, reject) => {
+				timeout = realSetTimeout(() => reject(new Error("Request did not settle in time")), 500);
+			}),
+		]);
+	} finally {
+		realClearTimeout(timeout);
+	}
+};
 
 const waitFor = async (condition: () => boolean) => {
 	const startedAt = Date.now();
