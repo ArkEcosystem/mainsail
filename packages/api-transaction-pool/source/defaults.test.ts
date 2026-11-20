@@ -5,6 +5,8 @@ const variables = [
 	"MAINSAIL_API_TRANSACTION_POOL_HOST",
 	"MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS",
 	"MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS_PER_IP",
+	"MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_WRITES",
+	"MAINSAIL_API_TRANSACTION_POOL_MAX_QUEUED_WRITES",
 	"MAINSAIL_API_TRANSACTION_POOL_PORT",
 	"MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_BLACKLIST",
 	"MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_DISABLED",
@@ -49,6 +51,7 @@ describe("Defaults", ({ it, assert, beforeEach, afterAll }) => {
 					points: 150,
 					whitelist: [],
 				},
+				requestQueue: { concurrent: 4, queued: 64 },
 				socketTimeout: 5000,
 				transactionRateLimit: { duration: 60, enabled: true, points: 600 },
 				trustProxy: false,
@@ -78,6 +81,8 @@ describe("Defaults", ({ it, assert, beforeEach, afterAll }) => {
 		process.env.MAINSAIL_API_TRANSACTION_POOL_HOST = "127.0.0.1";
 		process.env.MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS = "8";
 		process.env.MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_READS_PER_IP = "2";
+		process.env.MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_WRITES = "2";
+		process.env.MAINSAIL_API_TRANSACTION_POOL_MAX_QUEUED_WRITES = "16";
 		process.env.MAINSAIL_API_TRANSACTION_POOL_PORT = "4107";
 		process.env.MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_BLACKLIST = "1.1.1.1,2.2.2.2";
 		process.env.MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_DISABLED = "true";
@@ -105,6 +110,7 @@ describe("Defaults", ({ it, assert, beforeEach, afterAll }) => {
 			whitelist: ["3.3.3.3"],
 		});
 		assert.equal(defaults.plugins.concurrencyLimit, { limit: "8", limitPerIp: "2" });
+		assert.equal(defaults.plugins.requestQueue, { concurrent: "2", queued: "16" });
 		assert.equal(defaults.plugins.transactionRateLimit, { duration: "30", enabled: false, points: "1200" });
 		assert.true(defaults.plugins.trustProxy);
 		assert.equal(defaults.server.http, {

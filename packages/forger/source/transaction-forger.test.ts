@@ -30,7 +30,7 @@ describe<{
 	milestone: any;
 	roundCalculator: any;
 	txPoolWorker: any;
-}>("TransactionForger", ({ beforeEach, it, assert, spy, stub }) => {
+}>("TransactionForger", ({ beforeEach, it, assert, clock, spy, stub }) => {
 	const commitKey = { blockNumber: 3n, round: 0n };
 	const generatorAddress = "generatorAddress";
 	const timestamp = 1_700_000_000;
@@ -203,6 +203,27 @@ describe<{
 
 		assert.empty(result.transactions);
 		process.neverCalled();
+	});
+
+	it("#getTransactions - should stop waiting for the pool when the time budget runs out", async ({
+		forger,
+		txPoolWorker,
+	}) => {
+		const fake = clock({ toFake: ["setTimeout", "clearTimeout"] });
+		txPoolWorker.getTransactions = async () => new Promise(() => {});
+
+		let transactions: unknown[] | undefined;
+		void forger
+			.initialize(generatorAddress, timestamp, commitKey)
+			.getTransactions()
+			.then((result) => (transactions = result.transactions));
+		await fake.tickAsync(2000);
+
+		assert.undefined(transactions);
+
+		await fake.tickAsync(1000);
+
+		assert.equal(transactions, []);
 	});
 
 	it("#getTransactions - should stop collating when the remaining block space cannot fit another transaction", async ({

@@ -13,6 +13,7 @@ export type ProcessorResult = {
 
 export interface Processor {
 	process(data: Buffer[]): Promise<ProcessorResult>;
+	pauseWhile<T>(work: () => Promise<T>): Promise<T>;
 }
 
 export type ProcessorFactory = () => Processor;
