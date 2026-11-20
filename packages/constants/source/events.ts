@@ -42,6 +42,7 @@ export enum UsernameEvent {
 
 export enum PeerEvent {
 	Added = "peer.added",
+	Banned = "peer.banned",
 	Removed = "peer.removed",
 	Updated = "peer.updated",
 }

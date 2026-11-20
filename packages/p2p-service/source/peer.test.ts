@@ -39,6 +39,44 @@ describe<{
 		assert.equal(peer.toBroadcast(), expectedBroadcast);
 	});
 
+	it("#toData - should return the peer as plain data", ({ peer }) => {
+		const header = { blockNumber: 7, round: 1 } as Contracts.P2PService.HeaderData;
+		peer.header = header;
+		peer.version = "3.0.1";
+		peer.latency = 135;
+		peer.plugins = { "@mainsail/api-http": { enabled: true, port: 4003 } };
+
+		const data = peer.toData();
+
+		assert.equal(data, {
+			header,
+			ip,
+			latency: 135,
+			plugins: { "@mainsail/api-http": { enabled: true, port: 4003 } },
+			port,
+			ports: {},
+			version: "3.0.1",
+		});
+
+		// Plain data all the way down, and none of it shared with the peer.
+		assert.equal(JSON.parse(JSON.stringify(data)), data);
+		assert.not.equal(data.header === header, true);
+		peer.plugins["@mainsail/webhooks"] = { enabled: true, port: 4004 };
+		assert.undefined(data.plugins["@mainsail/webhooks"]);
+	});
+
+	it("#toData - should leave the header out for a peer that has none yet", ({ peer }) => {
+		assert.equal(peer.toData(), {
+			header: undefined,
+			ip,
+			latency: undefined,
+			plugins: {},
+			port,
+			ports: {},
+			version: undefined,
+		});
+	});
+
 	it("#header - should record when a header was received", ({ peer }) => {
 		const fakeTimers = clock({ now: 1_000_000, toFake: ["Date"] });
 		assert.equal(peer.lastHeaderAt, 0);

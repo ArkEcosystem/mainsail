@@ -27,10 +27,20 @@ const route: RouteDefinition<string, string> = {
 describe<{
 	sender: Sender;
 	connection: any;
+	calls: string[];
 }>("Sender", ({ it, assert, beforeEach }) => {
 	beforeEach((context) => {
+		context.calls = [];
+
 		const app = new Application();
 		app.bind(Identifiers.P2P.WebSocket.SendMiddleware).to(SendCodecMiddleware);
+		// A second step, bound after the codec like the steps of other packages; it records when it runs.
+		app.bind(Identifiers.P2P.WebSocket.SendMiddleware).toConstantValue({
+			after: async () => void context.calls.push("after"),
+			before: async () => void context.calls.push("before"),
+			finally: async ({ response }: { response: { statusCode: number } }) =>
+				void context.calls.push(`finally:${response.statusCode}`),
+		});
 
 		context.sender = app.resolve(Sender);
 		context.connection = {
@@ -71,5 +81,29 @@ describe<{
 			() => sender.send(connection, route, "hi"),
 			"echo response from 1.1.1.1 is 9 bytes, more than the 8 allowed",
 		);
+	});
+
+	it("should run the finally step after a successful request", async ({ sender, connection, calls }) => {
+		await sender.send(connection, route, "hi");
+
+		assert.equal(calls, ["before", "after", "finally:200"]);
+	});
+
+	it("should run the finally step when the peer answers with an error", async ({ sender, connection, calls }) => {
+		connection.request = async () => ({ payload: Buffer.alloc(0), statusCode: 413 });
+
+		await assert.rejects(() => sender.send(connection, route, "hi"));
+
+		assert.equal(calls, ["before", "finally:413"]);
+	});
+
+	it("should run the finally step when no response arrives", async ({ sender, connection, calls }) => {
+		connection.request = async () => {
+			throw new Error("timed out");
+		};
+
+		await assert.rejects(() => sender.send(connection, route, "hi"), "timed out");
+
+		assert.equal(calls, ["before", "finally:0"]);
 	});
 });

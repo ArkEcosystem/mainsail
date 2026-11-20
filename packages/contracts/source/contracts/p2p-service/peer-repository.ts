@@ -4,8 +4,10 @@ import type { Peer } from "./peer.js";
 // verification running) and known (seeds and formerly active peers, dialed by the service loop). A known
 // peer stays known while it is pending and leaves the list only when it becomes active.
 export interface PeerRepository {
-	// Any list.
+	// Any list. A peer may be in two of them: the active one is returned first, then the pending one,
+	// then the known one.
 	hasPeer(ip: string): boolean;
+	getPeer(ip: string): Peer;
 
 	getActivePeers(): Peer[];
 	getActivePeer(ip: string): Peer;

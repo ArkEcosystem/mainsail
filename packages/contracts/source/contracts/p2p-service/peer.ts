@@ -25,6 +25,19 @@ export interface Peer {
 	setLatency(latency: number): void;
 
 	toBroadcast(): PeerBroadcast;
+	toData(): PeerData;
+}
+
+// A peer as plain data, under the field names of the peer itself. The header is missing until the peer
+// has answered or sent its first request.
+export interface PeerData {
+	ip: string;
+	port: number;
+	ports: PeerPorts;
+	version: string | undefined;
+	latency: number | undefined;
+	plugins: PeerPlugins;
+	header: HeaderData | undefined;
 }
 
 export interface PeerBroadcast {

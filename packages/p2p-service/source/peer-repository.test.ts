@@ -229,6 +229,33 @@ describe<{
 		assert.equal(peerRepository.getSameSubnetPeers("176.165.23.10").length, 0);
 	});
 
+	it("#getPeer - should return the peer from whichever list holds it", ({ peerRepository, app }) => {
+		const active = app.resolve(Peer).init("176.165.66.55", 4000);
+		const pending = app.resolve(Peer).init("176.165.44.33", 4000);
+		const known = app.resolve(Peer).init("176.165.22.11", 4000);
+
+		peerRepository.setActivePeer(active);
+		peerRepository.setPendingPeer(pending);
+		peerRepository.setKnownPeer(known);
+
+		assert.equal(peerRepository.getPeer(active.ip), active);
+		assert.equal(peerRepository.getPeer(pending.ip), pending);
+		assert.equal(peerRepository.getPeer(known.ip), known);
+		assert.throws(() => peerRepository.getPeer("1.1.1.1"));
+	});
+
+	it("#getPeer - should prefer the pending entry of an address that is also known", ({ peerRepository, app }) => {
+		// A reconnecting peer: the known entry stays while a new object for the address is verified.
+		const known = app.resolve(Peer).init("176.165.22.11", 4000);
+		const pending = app.resolve(Peer).init("176.165.22.11", 4000);
+		pending.version = "0.0.2";
+
+		peerRepository.setKnownPeer(known);
+		peerRepository.setPendingPeer(pending);
+
+		assert.equal(peerRepository.getPeer("176.165.22.11").version, "0.0.2");
+	});
+
 	it("#removePeer - should remove the peer from every list", ({ peerRepository, app }) => {
 		const active = app.resolve(Peer).init("176.165.66.55", 4000);
 		const pending = app.resolve(Peer).init("176.165.44.33", 4000);
