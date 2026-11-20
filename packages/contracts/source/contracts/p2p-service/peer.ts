@@ -10,14 +10,11 @@ export interface PeerPlugins {
 }
 
 export interface Peer {
-	readonly url: string;
 	readonly port: number;
 	readonly protocol: PeerProtocol;
 
 	readonly ip: string;
 	readonly ports: PeerPorts;
-
-	readonly lastPinged: number | undefined;
 
 	version: string | undefined;
 	readonly latency: number | undefined;
@@ -25,7 +22,7 @@ export interface Peer {
 	header: HeaderData;
 	plugins: PeerPlugins;
 
-	setPinged(latency: number): void;
+	setLatency(latency: number): void;
 
 	toBroadcast(): PeerBroadcast;
 }
@@ -41,11 +38,6 @@ export interface PeerState {
 	blockHash: string;
 }
 
-export interface PeerData {
-	ip: string;
-	port: number;
-}
-
 export interface PeerConfig {
 	version: string;
 	network: {
@@ -59,17 +51,6 @@ export interface PeerConfig {
 		};
 	};
 	plugins: PeerPlugins;
-}
-
-export interface PeerPingResponse {
-	state: PeerState;
-	config: PeerConfig;
-}
-
-export interface PeerVerificationResult {
-	readonly myBlockNumber: number;
-	readonly hisBlockNumber: number;
-	readonly highestCommonBlockNumber: number;
 }
 
 export type PeerFactory = (ip: string) => Peer;

@@ -4,18 +4,20 @@ import type { Interfaces, Service as WebSocketService } from "@mainsail/p2p-webs
 import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import { CloseReason, ConnectionState } from "@mainsail/p2p-websocket";
-import { ensureError, IpAddress } from "@mainsail/utils";
+import { ensureError } from "@mainsail/utils";
 
 import type { Peer } from "./interfaces/index.js";
 
-import { getPeerSocketUrl, isValidVersion } from "./utils/index.js";
+import { isValidVersion } from "./utils/index.js";
 
 const BAN_REASONS = new Set<CloseReason>([CloseReason.PayloadTooLarge, CloseReason.ProtocolError]);
 
-// Turns addresses into active peers. It applies no address rules: those run on the transport
-// (PeerIpVerifier, ban list) for every inbound socket and every dial.
+// Turns connections into active peers: every connection, dialed or inbound, is accepted and verified
+// through the hook installed on the transport, so a peer becomes active only after a handshake and a
+// verification. It applies no address rules: those run on the transport (PeerIpVerifier, ban list) for
+// every inbound socket and every dial. Nothing calls it, so it has no contract; the provider constructs it.
 @injectable()
-export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
+export class PeerProcessor {
 	@inject(Identifiers.Application.Instance)
 	private readonly app!: Contracts.Kernel.Application;
 
@@ -46,10 +48,21 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 	@inject(Identifiers.P2P.Logger)
 	private readonly logger!: Contracts.P2PService.Logger;
 
-	// Public only because TypeScript treats a decorated private method as unused; not part of the contract.
+	// Public only because TypeScript treats a decorated private method as unused.
 	@postConstruct()
 	public initialize(): void {
-		this.websocketService.onConnection = (connection) => void this.#acceptConnection(connection);
+		// The transport does not wait for the hook; a failure is logged, as a rejection nobody handles
+		// would end the process, and the connection is closed so that the close listener clears its peer.
+		this.websocketService.onConnection = (connection) => {
+			this.#acceptConnection(connection).catch((rawError: unknown) => {
+				this.logger.debug(
+					`Accepting the connection of ${connection.remoteAddress} failed: ${ensureError(rawError).message}`,
+					"p2p",
+				);
+
+				void connection.close();
+			});
+		};
 
 		this.events.listen(Events.CryptoEvent.MilestoneChanged, {
 			handle: async (): Promise<void> => this.#disconnectInvalidPeers(),
@@ -61,32 +74,15 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 		});
 	}
 
-	// Dials a new address; the connection, if it opens, arrives through the transport hook like any other.
-	// A known peer is left to the service loop, which spaces its dials out.
-	public async validateAndAcceptPeer(rawIp: string): Promise<void> {
-		const ip = IpAddress.sanitizeRemoteAddress(rawIp);
-		if (!ip) {
-			return;
-		}
-
-		if (this.repository.hasPeer(ip)) {
-			return;
-		}
-
-		const peer = this.peerFactory(ip);
-
-		try {
-			await this.websocketService.dial(getPeerSocketUrl(peer));
-		} catch (rawError) {
-			this.logger.debug(`Dial to ${peer.ip}:${peer.port} failed: ${ensureError(rawError).message}`, "p2p");
-		}
-	}
-
 	// Every open connection, inbound or outbound, is bound to its peer here and the peer is verified over it.
 	async #acceptConnection(connection: Interfaces.Connection): Promise<void> {
 		const ip = connection.remoteAddress;
 
+		// Not expected: the transport keeps one connection per address and a connection that closes takes
+		// its peer off both lists. Should it happen, the connection would have no owner, so it is closed.
 		if (this.repository.hasActivePeer(ip) || this.repository.hasPendingPeer(ip)) {
+			void connection.close();
+
 			return;
 		}
 
@@ -94,50 +90,50 @@ export class PeerProcessor implements Contracts.P2PService.PeerProcessor {
 			? (this.repository.getKnownPeer(ip) as Peer)
 			: this.peerFactory(ip);
 		peer.connection = connection;
-		peer.dialFailures = 0;
 		connection.onClose((reason, error) => this.#onClose(ip, reason, error));
 
-		await this.#verifyPeer(peer);
+		await this.#verifyPeer(peer, connection);
 	}
 
 	// A connection the peer broke by misbehaving (oversized frame, protocol violation) costs it a ban; one
 	// that merely failed only puts it back among the known peers.
 	#onClose(ip: string, reason: CloseReason, error?: Error): void {
 		if (BAN_REASONS.has(reason)) {
-			this.peerDisposer.banPeer(
-				ip,
-				new Error(`Connection closed: ${reason}${error ? ` (${error.message})` : ""}`),
-			);
+			const detail = error ? ` (${error.message})` : "";
+			this.peerDisposer.banPeer(ip, new Error(`Connection closed: ${reason}${detail}`));
 			return;
 		}
 
 		this.peerDisposer.disposePeer(ip);
 	}
 
-	async #verifyPeer(peer: Peer): Promise<void> {
-		this.repository.forgetKnownPeer(peer);
+	// A peer leaves the pending list in two ways only: it becomes active here, or its connection closes
+	// and the close listener disposes it. A known peer (a seed, or one that was active before) stays known
+	// while it is pending, so a failed verification costs it only the pending entry and the service loop
+	// dials it again; an address seen for the first time is dropped. A ban removes the peer from every list.
+	async #verifyPeer(peer: Peer, connection: Interfaces.Connection): Promise<void> {
 		this.repository.setPendingPeer(peer);
 
-		try {
-			if (!(await this.peerVerifier.verify(peer))) {
-				return;
-			}
+		const verified = await this.peerVerifier.verify(peer);
 
-			// A ban, a remote close or an error during the verification closed the connection; the close
-			// listener has put the peer back among the known ones.
-			if (peer.connection?.state !== ConnectionState.Open) {
-				return;
-			}
-
-			this.repository.setActivePeer(peer);
-			this.logger.debug(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
-
-			await this.peerDiscoverer.discoverPeers(peer);
-		} catch {
-			this.peerDisposer.disposePeer(peer.ip);
-		} finally {
-			this.repository.forgetPendingPeer(peer);
+		// Closed meanwhile (by the peer, a timeout, a ban); the close listener settles the lists. The
+		// transport keeps one connection per address, so while this one is open the peer is still ours.
+		if (connection.state !== ConnectionState.Open) {
+			return;
 		}
+
+		// A failed verification may leave the connection open; closing it has the close listener clean up.
+		if (!verified) {
+			void connection.close();
+
+			return;
+		}
+
+		this.repository.setActivePeer(peer);
+		peer.dialAttempts = 0;
+		this.logger.info(`Accepted new peer ${peer.ip}:${peer.port} (v${peer.version})`, "p2p");
+
+		await this.peerDiscoverer.discoverPeers(peer);
 	}
 
 	async #disconnectInvalidPeers(): Promise<void> {

@@ -8,37 +8,37 @@ export class Logger implements Contracts.P2PService.Logger {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	alert(message: string, context?: Contracts.Kernel.LoggerContext): void {
+	public alert(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.logger.alert(message, context);
 	}
 
-	error(message: string, context?: Contracts.Kernel.LoggerContext): void {
+	public error(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.logger.error(message, context);
 	}
 
-	warn(message: string, context?: Contracts.Kernel.LoggerContext): void {
+	public warn(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.logger.warn(message, context);
 	}
 
-	warnExtra(message: string, context?: Contracts.Kernel.LoggerContext): void {
+	public warnExtra(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		if (this.#allowExtra()) {
 			this.logger.warn(message, context);
 		}
 	}
 
-	notice(message: string, context?: Contracts.Kernel.LoggerContext): void {
+	public notice(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.logger.notice(message, context);
 	}
 
-	info(message: string, context?: Contracts.Kernel.LoggerContext): void {
+	public info(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.logger.info(message, context);
 	}
 
-	debug(message: string, context?: Contracts.Kernel.LoggerContext): void {
+	public debug(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		this.logger.debug(message, context);
 	}
 
-	debugExtra(message: string, context?: Contracts.Kernel.LoggerContext): void {
+	public debugExtra(message: string, context?: Contracts.Kernel.LoggerContext): void {
 		if (this.#allowExtra()) {
 			this.logger.debug(message, context);
 		}

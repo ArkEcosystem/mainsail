@@ -16,12 +16,7 @@ export class Broadcaster implements Contracts.P2PService.Broadcaster {
 	@inject(Identifiers.P2P.Peer.Communicator)
 	private readonly communicator!: Contracts.P2PService.PeerCommunicator;
 
-	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2PService.State;
-
-	async broadcastProposal(proposal: Contracts.Crypto.Proposal): Promise<void> {
-		this.state.resetLastMessageTime();
-
+	public async broadcastProposal(proposal: Contracts.Crypto.Proposal): Promise<void> {
 		const promises = this.#getPeersForBroadcast().map((peer) =>
 			this.communicator.postProposal(peer, proposal.serialized),
 		);
@@ -29,9 +24,7 @@ export class Broadcaster implements Contracts.P2PService.Broadcaster {
 		await Promise.all(promises);
 	}
 
-	async broadcastMessage(message: Contracts.Crypto.Message): Promise<void> {
-		this.state.resetLastMessageTime();
-
+	public async broadcastMessage(message: Contracts.Crypto.Message): Promise<void> {
 		const promises = this.#getPeersForBroadcast().map((peer) =>
 			this.communicator.postMessage(peer, message.serialized),
 		);

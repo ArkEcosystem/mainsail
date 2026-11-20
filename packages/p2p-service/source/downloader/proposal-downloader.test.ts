@@ -18,7 +18,6 @@ describe<{
 	const peerDisposer = { banPeer: () => {} };
 	const factory = { makeProposalFromBytes: async () => ({}) };
 	const proposalProcessor = { process: async () => Enums.Consensus.ProcessorResult.Accepted };
-	const state = { resetLastMessageTime: () => {} };
 
 	beforeEach((context) => {
 		// Eligible for download: peer is at our (blockNumber, round), we hold no proposal yet.
@@ -34,7 +33,6 @@ describe<{
 		context.app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue(peerDisposer);
 		context.app.bind(Identifiers.Cryptography.Proposal.Factory).toConstantValue(factory);
 		context.app.bind(Identifiers.Consensus.Processor.Proposal).toConstantValue(proposalProcessor);
-		context.app.bind(Identifiers.P2P.State).toConstantValue(state);
 		context.app.bind(Identifiers.Services.EventDispatcher.Service).toConstantValue({
 			listen: (event: string, listener: { handle: (payload: { data: { number: number } }) => Promise<void> }) => {
 				if (event === Events.BlockEvent.Applied) {
@@ -81,7 +79,6 @@ describe<{
 		stub(communicator, "getProposal").resolvedValue({ proposal: Buffer.from("dead", "hex") });
 		stub(factory, "makeProposalFromBytes").resolvedValue({ blockHeader: { number: 2 }, round: 0 });
 		const process = stub(proposalProcessor, "process").resolvedValue(Enums.Consensus.ProcessorResult.Accepted);
-		const resetLastMessageTime = stub(state, "resetLastMessageTime");
 		const banPeer = stub(peerDisposer, "banPeer");
 
 		downloader.download(peer);
@@ -89,7 +86,6 @@ describe<{
 
 		assert.false(downloader.isDownloading());
 		process.calledOnce();
-		resetLastMessageTime.calledOnce();
 		banPeer.neverCalled();
 	});
 
@@ -153,26 +149,43 @@ describe<{
 		banPeer.calledOnce();
 	});
 
-	it("#tryToDownload - should download from an eligible peer", async ({ downloader, peer }) => {
-		const getProposal = stub(communicator, "getProposal").resolvedValue({ proposal: Buffer.alloc(0) });
-		stub(repository, "getActivePeers").returnValue([peer]);
+	it("#download - should retry with another eligible peer after a failed download", async ({ downloader, peer }) => {
+		const other = { ...peer, ip: "5.6.7.8" };
+		const getProposal = stub(communicator, "getProposal").callsFake(async (from: { ip: string }) => {
+			if (from.ip === peer.ip) {
+				throw new Error("boom");
+			}
 
-		downloader.tryToDownload();
-		assert.true(downloader.isDownloading());
+			return { proposal: Buffer.alloc(0) };
+		});
+		const banPeer = stub(peerDisposer, "banPeer");
+		stub(repository, "getActivePeers").returnValue([other]);
 
+		downloader.download(peer);
 		await sleep(10);
-		getProposal.calledOnce();
+
+		banPeer.calledOnce();
+		getProposal.calledTimes(2);
+		getProposal.calledWith(other, { blockNumber: 2, round: 0 });
 	});
 
-	it("#tryToDownload - should do nothing while the block downloader is downloading", ({ downloader, peer }) => {
-		const getProposal = stub(communicator, "getProposal");
-		stub(repository, "getActivePeers").returnValue([peer]);
-		stub(blockDownloader, "isDownloading").returnValue(true);
+	it("#download - should do nothing while the block downloader is downloading", async ({ downloader, peer }) => {
+		let fail!: (error: Error) => void;
+		const getProposal = stub(communicator, "getProposal").returnValue(new Promise((_, reject) => (fail = reject)));
+		stub(repository, "getActivePeers").returnValue([{ ...peer, ip: "5.6.7.8" }]);
+		const isDownloading = stub(blockDownloader, "isDownloading").returnValue(false);
 
-		downloader.tryToDownload();
+		downloader.download(peer);
+		getProposal.calledOnce();
+
+		// Blocks are being downloaded by the time the request fails: neither the retry nor a new header
+		// starts a proposal download.
+		isDownloading.returnValue(true);
+		fail(new Error("boom"));
+		await sleep(10);
 		downloader.download(peer);
 
-		getProposal.neverCalled();
+		getProposal.calledOnce();
 		assert.false(downloader.isDownloading());
 	});
 

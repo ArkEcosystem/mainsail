@@ -22,7 +22,7 @@ export const defaults = {
 		logLevel: Environment.get(EnvironmentVariables.MAINSAIL_P2P_LOG_LEVEL, 0),
 		port: Environment.get(EnvironmentVariables.MAINSAIL_P2P_PORT, 4002),
 	},
-	skipPeerStateVerification: Environment.isTrue(EnvironmentVariables.MAINSAIL_SKIP_PEER_STATE_VERIFICATION),
+	skipPeerStateVerification: false,
 	statistic: {
 		maxTrackedPeers: Environment.get(EnvironmentVariables.MAINSAIL_P2P_STATISTIC_MAX_TRACKED_PEERS, 250),
 		verbosity: Environment.get(EnvironmentVariables.MAINSAIL_P2P_STATISTIC_VERBOSITY, 0),

@@ -15,7 +15,6 @@ describe<{
 		context.repository = { getSameSubnetPeers: () => [] };
 		context.seeds = { isSeed: () => false };
 		context.configuration = {
-			getOptional: (key: string, defaultValue: unknown) => defaultValue,
 			getRequired: (key: string) => ({ blacklist: [], maxSameSubnetPeers: 5, whitelist: ["*"] })[key],
 		};
 
@@ -66,14 +65,5 @@ describe<{
 
 		seeds.isSeed = (ip: string) => ip === "178.165.55.55";
 		assert.undefined(verifier.verify("178.165.55.55"));
-	});
-
-	it("should reject everyone but the seeds in non-discovery mode", ({ verifier, seeds, configuration }) => {
-		configuration.getOptional = (key: string, defaultValue: unknown) =>
-			key === "disableDiscovery" ? true : defaultValue;
-		seeds.isSeed = (ip: string) => ip === "178.165.55.55";
-
-		assert.undefined(verifier.verify("178.165.55.55"));
-		assert.equal(verifier.verify("178.165.55.56"), CloseReason.Rejected);
 	});
 });

@@ -9,10 +9,6 @@ import type {
 } from "./endpoints.js";
 import type { Peer } from "./peer.js";
 
-export type EmitOptions = {
-	timeout: number;
-};
-
 export interface PeerCommunicator {
 	postProposal(peer: Peer, proposal: Buffer): Promise<void>;
 	postMessage(peer: Peer, message: Buffer): Promise<void>;
@@ -23,7 +19,6 @@ export interface PeerCommunicator {
 	getBlocks(
 		peer: Peer,
 		{ fromBlockNumber, limit }: { fromBlockNumber: number; limit?: number },
-		options?: Partial<EmitOptions>,
 	): Promise<GetBlocksResponse>;
-	getStatus(peer: Peer, options?: Partial<EmitOptions>): Promise<GetStatusResponse>;
+	getStatus(peer: Peer): Promise<GetStatusResponse>;
 }

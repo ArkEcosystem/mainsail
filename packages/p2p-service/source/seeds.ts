@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
-import { http, IpAddress } from "@mainsail/utils";
+import { ensureError, http, IpAddress } from "@mainsail/utils";
 import { readJSONSync } from "fs-extra/esm";
 
 type SeedData = { ip: string; port: number };
@@ -20,11 +20,14 @@ export class Seeds implements Contracts.P2PService.Seeds {
 	readonly #seeds = new Set<string>();
 
 	public async load(): Promise<void> {
-		const list = this.app.config<{ list: SeedData[] }>("peers")?.list ?? [];
+		// A copy: the list belongs to the application's configuration.
+		const list = [...(this.app.config<{ list: SeedData[] }>("peers")?.list ?? [])];
 
 		try {
 			list.push(...(await this.#loadFromSources()));
-		} catch {}
+		} catch (rawError) {
+			this.logger.warn(`Failed to load the seed peers from a source: ${ensureError(rawError).message}`, "p2p");
+		}
 
 		for (const { ip } of list) {
 			const sanitizedIp = IpAddress.sanitizeRemoteAddress(ip);

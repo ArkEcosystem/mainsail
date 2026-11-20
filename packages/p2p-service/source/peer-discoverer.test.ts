@@ -11,14 +11,14 @@ describe<{
 	repository: any;
 	seeds: any;
 	communicator: any;
-	processor: any;
+	dialQueue: any;
 	peerDisposer: any;
 }>("PeerDiscoverer", ({ it, assert, beforeEach, spy }) => {
 	beforeEach((context) => {
 		context.repository = { hasPeer: () => false, setKnownPeer: () => {} };
 		context.seeds = { all: () => ["1.1.1.1", "2.2.2.2"] };
 		context.communicator = { getActivePeers: async () => ({ peers: [] }) };
-		context.processor = { validateAndAcceptPeer: async () => {} };
+		context.dialQueue = { add: () => {} };
 		context.peerDisposer = { banPeer: () => {} };
 
 		const app = new Application();
@@ -26,7 +26,7 @@ describe<{
 		app.bind(Identifiers.P2P.Peer.Seeds).toConstantValue(context.seeds);
 		app.bind(Identifiers.P2P.Peer.Factory).toConstantValue((ip: string) => makePeer(ip));
 		app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(context.communicator);
-		app.bind(Identifiers.P2P.Peer.Processor).toConstantValue(context.processor);
+		app.bind(Identifiers.P2P.Peer.DialQueue).toConstantValue(context.dialQueue);
 		app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue(context.peerDisposer);
 		app.bind(Identifiers.Services.Log.Service).toConstantValue({ debug: () => {} });
 
@@ -52,19 +52,19 @@ describe<{
 		setKnownPeer.neverCalled();
 	});
 
-	it("#discoverPeers - should hand every address the peer reports to the processor", async ({
+	it("#discoverPeers - should hand every address the peer reports to the dial queue", async ({
 		discoverer,
 		communicator,
-		processor,
+		dialQueue,
 	}) => {
 		communicator.getPeers = async () => ({ peers: [makePeer("3.3.3.3"), makePeer("4.4.4.4")] });
-		const validateAndAcceptPeer = spy(processor, "validateAndAcceptPeer");
+		const add = spy(dialQueue, "add");
 
 		await discoverer.discoverPeers(makePeer("1.1.1.1"));
 
-		validateAndAcceptPeer.calledTimes(2);
-		validateAndAcceptPeer.calledWith("3.3.3.3");
-		validateAndAcceptPeer.calledWith("4.4.4.4");
+		add.calledTimes(2);
+		add.calledWith("3.3.3.3");
+		add.calledWith("4.4.4.4");
 	});
 
 	it("#discoverPeers - should ban the peer when it does not answer", async ({

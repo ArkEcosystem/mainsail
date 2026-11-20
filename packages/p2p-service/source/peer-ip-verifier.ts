@@ -6,9 +6,9 @@ import { inject, injectable, tagged } from "@mainsail/container";
 import { CloseReason } from "@mainsail/p2p-websocket";
 import { IpAddress, isBlacklisted, isWhitelisted } from "@mainsail/utils";
 
-// All address rules of @mainsail/p2p (validate-ip plugin, PeerProcessor.validatePeerIp and the
-// discovery mode) in one place, run by the transport before every inbound handshake and every dial.
-// Bans are kept and refused by the transport's own ban list.
+// All address rules of @mainsail/p2p (validate-ip plugin and PeerProcessor.validatePeerIp) in one place,
+// run by the transport before every inbound handshake and every dial. Bans are kept and refused by the
+// transport's own ban list. The old non-discovery mode is gone: a whitelist of the seeds does the same.
 @injectable()
 export class PeerIpVerifier implements Interfaces.ConnectionVerifier {
 	@inject(Identifiers.ServiceProvider.Configuration)
@@ -38,11 +38,6 @@ export class PeerIpVerifier implements Interfaces.ConnectionVerifier {
 		}
 
 		if (this.#isSameSubnetLimitReached(ip)) {
-			return CloseReason.Rejected;
-		}
-
-		if (!this.seeds.isSeed(ip) && this.configuration.getOptional<boolean>("disableDiscovery", false)) {
-			this.logger.debug(`Rejected ${ip} because the relay is in non-discovery mode.`, "p2p");
 			return CloseReason.Rejected;
 		}
 

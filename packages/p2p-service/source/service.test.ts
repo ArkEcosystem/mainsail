@@ -2,15 +2,21 @@ import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 import { describe } from "@mainsail/test-runner";
 import { CloseReason, ConnectionError } from "@mainsail/p2p-websocket";
-import dayjs from "dayjs";
 
 import { constants } from "./constants";
 import { Service } from "./service";
 
+const BLOCK_TIME = 8000;
+// A header gets stale after this long without one from the peer.
+const STALE_AFTER = constants.HEADER_STALE_AFTER_BLOCKS * BLOCK_TIME;
+
 const makePeer = (ip: string, extra: Record<string, unknown> = {}): any => ({
+	dialAttempts: 0,
 	header: {},
 	ip,
+	lastDialAt: 0,
 	port: 4002,
+	socketUrl: `ws://${ip}:4002`,
 	version: "0.0.1",
 	...extra,
 });
@@ -18,348 +24,92 @@ const makePeer = (ip: string, extra: Record<string, unknown> = {}): any => ({
 describe<{
 	service: Service;
 	repository: any;
-	peerVerifier: any;
-	state: any;
 	logger: any;
 	peerDiscoverer: any;
 	peerDisposer: any;
+	communicator: any;
 	seeds: any;
+	dialQueue: any;
 	websocketService: any;
-	configuration: any;
-}>("Service", ({ it, beforeEach, assert, clock, spy, stub }) => {
+}>("Service", ({ it, beforeEach, assert, clock, spy }) => {
 	beforeEach((context) => {
 		context.logger = { debug: () => {}, error: () => {}, info: () => {}, warn: () => {} };
 		context.repository = {
 			forgetKnownPeer: () => {},
 			getKnownPeers: () => [],
 			getActivePeers: () => [],
-			hasKnownPeer: () => true,
 			hasMinimumPeers: () => true,
+			hasPendingPeer: () => false,
 		};
-		context.peerVerifier = { verify: async () => true };
-		context.state = { getLastMessageTime: () => dayjs() };
 		context.peerDiscoverer = { discoverPeers: async () => {}, populateSeedPeers: async () => {} };
-		context.peerDisposer = { disposePeers: async () => {} };
-		context.seeds = { isSeed: () => false, load: async () => {} };
+		context.peerDisposer = { banPeer: () => {}, disposePeers: async () => {} };
+		context.communicator = { getStatus: async () => ({}) };
+		context.seeds = { load: async () => {} };
+		context.dialQueue = { dispose: () => {} };
 		context.websocketService = {
 			boot: async () => {},
 			dial: async () => {},
 			dispose: async () => {},
 			onConnection: undefined,
 		};
-		context.configuration = { getRequired: (key: string) => ({ verifyTimeout: 60_000 })[key] };
 
 		const app = new Application();
-		app.bind(Identifiers.ServiceProvider.Configuration)
-			.toConstantValue(context.configuration)
-			.whenTagged("plugin", "p2p-service");
-		app.bind(Identifiers.P2P.State).toConstantValue(context.state);
 		app.bind(Identifiers.P2P.Peer.Discoverer).toConstantValue(context.peerDiscoverer);
 		app.bind(Identifiers.P2P.Peer.Disposer).toConstantValue(context.peerDisposer);
 		app.bind(Identifiers.P2P.Peer.Seeds).toConstantValue(context.seeds);
+		app.bind(Identifiers.P2P.Peer.DialQueue).toConstantValue(context.dialQueue);
 		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
-		app.bind(Identifiers.P2P.Peer.Verifier).toConstantValue(context.peerVerifier);
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
+		app.bind(Identifiers.P2P.Peer.Communicator).toConstantValue(context.communicator);
+		app.bind(Identifiers.Cryptography.Configuration).toConstantValue({
+			getMilestone: () => ({ timeouts: { blockTime: BLOCK_TIME } }),
+		});
 		app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
 		context.service = app.resolve(Service);
 	});
 
-	it("#cleansePeers - should do nothing when there are no peers", async ({ service, peerVerifier, logger }) => {
-		const verify = spy(peerVerifier, "verify");
-		const info = spy(logger, "info");
-
-		await service.cleansePeers({ fast: true, peerCount: 5 });
-
-		verify.neverCalled();
-		info.neverCalled();
-	});
-
-	it("#cleansePeers - should verify every peer when the repository holds fewer than peerCount", async ({
-		service,
-		repository,
-		peerVerifier,
-		logger,
-	}) => {
-		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2"), makePeer("3.3.3.3")];
-		const verify = spy(peerVerifier, "verify");
-		const info = spy(logger, "info");
-
-		await service.cleansePeers({ fast: true, peerCount: 5 });
-
-		verify.calledTimes(3);
-		info.calledWith("Checking 3 peers", "p2p");
-	});
-
-	it("#cleansePeers - should verify at most peerCount peers", async ({ service, repository, peerVerifier }) => {
-		repository.getActivePeers = () => [
-			makePeer("1.1.1.1"),
-			makePeer("2.2.2.2"),
-			makePeer("3.3.3.3"),
-			makePeer("4.4.4.4"),
-			makePeer("5.5.5.5"),
-		];
-		const verify = spy(peerVerifier, "verify");
-
-		await service.cleansePeers({ fast: true, peerCount: 2 });
-
-		verify.calledTimes(2);
-	});
-
-	it("#cleansePeers - should log the number of unresponsive peers", async ({
-		service,
-		repository,
-		peerVerifier,
-		logger,
-	}) => {
-		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2"), makePeer("3.3.3.3")];
-		peerVerifier.verify = async (peer) => peer.ip === "2.2.2.2";
-		const debug = spy(logger, "debug");
-
-		await service.cleansePeers({ fast: true, peerCount: 5 });
-
-		debug.calledWith("Removed 2 peers", "p2p");
-	});
-
-	it("#cleansePeers - should not log removals when every peer is responsive", async ({
-		service,
-		repository,
-		logger,
-	}) => {
-		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
-		const debug = spy(logger, "debug");
-
-		await service.cleansePeers({ fast: true, peerCount: 5 });
-
-		debug.neverCalled();
-	});
-
-	it("#cleansePeers - should resolve once all verifications finish and clear the cutoff timer", async ({
-		service,
-		repository,
-	}) => {
-		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
-
-		let resolved = false;
-		const promise = service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (resolved = true));
-
-		await fakeTimers.tickAsync(0);
-		assert.true(resolved);
-		assert.equal(fakeTimers.countTimers(), 0);
-
-		await promise;
-	});
-
-	it("#cleansePeers - fast mode should cut loose after the fast timeout when a verification hangs", async ({
-		service,
-		repository,
-		peerVerifier,
-	}) => {
-		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
-		peerVerifier.verify = (peer) => (peer.ip === "1.1.1.1" ? Promise.resolve(true) : new Promise(() => {}));
-
-		let resolved = false;
-		const promise = service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (resolved = true));
-
-		await fakeTimers.tickAsync(constants.FAST_VERIFY_TIMEOUT - 1);
-		assert.false(resolved);
-
-		await fakeTimers.tickAsync(1);
-		assert.true(resolved);
-		assert.equal(fakeTimers.countTimers(), 0);
-
-		await promise;
-	});
-
-	it("#cleansePeers - should cut loose after the configured verifyTimeout when not in fast mode", async ({
-		service,
-		repository,
-		peerVerifier,
-		configuration,
-	}) => {
-		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getActivePeers = () => [makePeer("1.1.1.1")];
-		peerVerifier.verify = () => new Promise(() => {});
-		const getRequired = spy(configuration, "getRequired");
-
-		let resolved = false;
-		const promise = service.cleansePeers({ fast: false, peerCount: 5 }).then(() => (resolved = true));
-
-		getRequired.calledWith("verifyTimeout");
-
-		await fakeTimers.tickAsync(59_999);
-		assert.false(resolved);
-
-		await fakeTimers.tickAsync(1);
-		assert.true(resolved);
-
-		await promise;
-	});
-
-	it("#cleansePeers - should let slow verifications finish in the background after the cutoff", async ({
-		service,
-		repository,
-		peerVerifier,
-		logger,
-	}) => {
-		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
-		peerVerifier.verify = (peer) =>
-			peer.ip === "1.1.1.1"
-				? Promise.resolve(true)
-				: new Promise((resolve) => setTimeout(() => resolve(false), 5000));
-		const debug = spy(logger, "debug");
-
-		let resolved = false;
-		const promise = service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (resolved = true));
-
-		await fakeTimers.tickAsync(constants.FAST_VERIFY_TIMEOUT);
-		assert.true(resolved);
-
-		// The slow peer had not failed by the cutoff, so nothing was logged as removed.
-		debug.neverCalled();
-
-		// The slow verification settles in the background without surfacing errors
-		// and without being logged retroactively.
-		await fakeTimers.tickAsync(5000);
-		debug.neverCalled();
-		assert.equal(fakeTimers.countTimers(), 0);
-
-		await promise;
-	});
-
-	it("#cleansePeers - should log a verification that rejects in the background after the cutoff", async ({
-		service,
-		repository,
-		peerVerifier,
-		logger,
-	}) => {
-		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
-		peerVerifier.verify = (peer) =>
-			peer.ip === "1.1.1.1"
-				? Promise.resolve(true)
-				: new Promise((_, reject) => setTimeout(() => reject(new Error("late boom")), 5000));
-		const error = spy(logger, "error");
-
-		let resolved = false;
-		const promise = service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (resolved = true));
-
-		await fakeTimers.tickAsync(constants.FAST_VERIFY_TIMEOUT);
-		assert.true(resolved);
-		error.neverCalled();
-
-		// The late rejection is caught and logged instead of surfacing as unhandled.
-		await fakeTimers.tickAsync(5000);
-		error.calledWith("Peer verification failed: late boom", "p2p");
-		assert.equal(fakeTimers.countTimers(), 0);
-
-		await promise;
-	});
-
-	it("#cleansePeers - should skip peers whose verification is still in flight and retry them once it settles", async ({
-		service,
-		repository,
-		peerVerifier,
-	}) => {
-		const fakeTimers = clock({ toFake: ["setTimeout", "clearTimeout"] });
-		repository.getActivePeers = () => [makePeer("1.1.1.1")];
-
-		let verifyCalls = 0;
-		let release!: (result: boolean) => void;
-		peerVerifier.verify = () => {
-			verifyCalls++;
-			return new Promise<boolean>((resolve) => (release = resolve));
-		};
-
-		// The first cleanse hangs on the verification and is cut loose.
-		let firstResolved = false;
-		const first = service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (firstResolved = true));
-		await fakeTimers.tickAsync(constants.FAST_VERIFY_TIMEOUT);
-		assert.true(firstResolved);
-		assert.equal(verifyCalls, 1);
-
-		// A second cleanse finds no eligible peer and returns immediately.
-		let secondResolved = false;
-		void service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (secondResolved = true));
-		await fakeTimers.tickAsync(0);
-		assert.true(secondResolved);
-		assert.equal(verifyCalls, 1);
-
-		// Once the hung verification settles, the peer becomes eligible again.
-		release(true);
-		await fakeTimers.tickAsync(0);
-		await first;
-
-		let thirdResolved = false;
-		void service.cleansePeers({ fast: true, peerCount: 5 }).then(() => (thirdResolved = true));
-		assert.equal(verifyCalls, 2);
-		release(true);
-		await fakeTimers.tickAsync(0);
-		assert.true(thirdResolved);
-	});
-
-	it("#cleansePeers - should resolve and log instead of hanging when a verification rejects", async ({
-		service,
-		repository,
-		peerVerifier,
-		logger,
-	}) => {
-		repository.getActivePeers = () => [makePeer("1.1.1.1")];
-		peerVerifier.verify = async () => {
-			throw new Error("boom");
-		};
-		const error = spy(logger, "error");
-
-		await service.cleansePeers({ fast: true, peerCount: 5 });
-
-		error.calledWith("Peer verification failed: boom", "p2p");
-	});
-
-	it("#mainLoop - should re-arm every 2 seconds until disposed", async ({ service, state }) => {
+	it("#mainLoop - should re-arm every 2 seconds until disposed", async ({ service, repository }) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
-		const getLastMessageTime = spy(state, "getLastMessageTime");
+		const getKnownPeers = spy(repository, "getKnownPeers");
 
 		void service.mainLoop();
 		await fakeTimers.tickAsync(0);
-		getLastMessageTime.calledTimes(1);
+		getKnownPeers.calledTimes(1);
 
 		await fakeTimers.tickAsync(2000);
-		getLastMessageTime.calledTimes(2);
+		getKnownPeers.calledTimes(2);
 
 		await fakeTimers.tickAsync(2000);
-		getLastMessageTime.calledTimes(3);
+		getKnownPeers.calledTimes(3);
 
 		assert.equal(fakeTimers.countTimers(), 1);
 		await service.dispose();
 		assert.equal(fakeTimers.countTimers(), 0);
 
 		await fakeTimers.tickAsync(10_000);
-		getLastMessageTime.calledTimes(3);
+		getKnownPeers.calledTimes(3);
 	});
 
 	it("#mainLoop - should not re-arm when disposed during an in-flight iteration", async ({
 		service,
-		state,
 		repository,
-		peerVerifier,
+		websocketService,
 	}) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
-		state.getLastMessageTime = () => dayjs().subtract(9, "second");
-		repository.getActivePeers = () => [makePeer("1.1.1.1")];
+		const known = [makePeer("1.1.1.1")];
+		repository.getKnownPeers = () => known;
 
-		let release!: (result: boolean) => void;
-		peerVerifier.verify = () => new Promise<boolean>((resolve) => (release = resolve));
+		let release!: () => void;
+		websocketService.dial = () => new Promise<void>((resolve) => (release = resolve));
 
-		// The iteration is now in flight, blocked on the verification.
+		// The iteration is now in flight, blocked on the dial.
 		void service.mainLoop();
 		await fakeTimers.tickAsync(0);
 
 		await service.dispose();
 
-		release(true);
+		release();
 		await fakeTimers.tickAsync(0);
 
 		// The finished iteration must not have armed a new loop timer.
@@ -390,58 +140,46 @@ describe<{
 		await service.dispose();
 	});
 
-	it("#mainLoop - should fast-cleanse at least 5 peers when no messages arrived within 8 seconds", async ({
+	it("#mainLoop - should ask the peers for their peers at the same time", async ({
 		service,
-		state,
 		repository,
-		peerVerifier,
+		peerDiscoverer,
 	}) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
-		state.getLastMessageTime = () => dayjs().subtract(9, "second");
-		repository.getActivePeers = () => Array.from({ length: 10 }, (_, index) => makePeer(`1.1.1.${index}`));
-		const verify = stub(peerVerifier, "verify").resolvedValue(true);
+		repository.hasMinimumPeers = () => false;
+		repository.getActivePeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		// Never answers: a sequential loop would not get past the first peer.
+		peerDiscoverer.discoverPeers = () => new Promise(() => {});
+		const discoverPeers = spy(peerDiscoverer, "discoverPeers");
 
 		void service.mainLoop();
-		await fakeTimers.tickAsync(0);
+		await fakeTimers.tickAsync(61_000);
 
-		// max(ceil(10 * 0.2), 5) = 5
-		verify.calledTimes(5);
+		discoverPeers.calledTimes(2);
 
 		await service.dispose();
 	});
 
-	it("#mainLoop - should fast-cleanse 20% of peers (rounded up) when that exceeds the minimum of 5", async ({
-		service,
-		state,
-		repository,
-		peerVerifier,
-	}) => {
-		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
-		state.getLastMessageTime = () => dayjs().subtract(9, "second");
-		repository.getActivePeers = () => Array.from({ length: 26 }, (_, index) => makePeer(`1.1.1.${index}`));
-		const verify = stub(peerVerifier, "verify").resolvedValue(true);
-
-		void service.mainLoop();
-		await fakeTimers.tickAsync(0);
-
-		// ceil(26 * 0.2) = 6
-		verify.calledTimes(6);
+	it("#dispose - should stop the dialing of new addresses", async ({ service, dialQueue }) => {
+		const dispose = spy(dialQueue, "dispose");
 
 		await service.dispose();
+
+		dispose.calledOnce();
 	});
 
-	it("#mainLoop - should log and re-arm when a check throws", async ({ service, state, logger }) => {
+	it("#mainLoop - should log and re-arm when a check throws", async ({ service, repository, logger }) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
 		const error = spy(logger, "error");
 
 		let calls = 0;
-		state.getLastMessageTime = () => {
+		repository.getKnownPeers = () => {
 			calls++;
 			if (calls === 1) {
 				throw new Error("boom");
 			}
 
-			return dayjs();
+			return [];
 		};
 
 		void service.mainLoop();
@@ -476,35 +214,31 @@ describe<{
 		}
 	});
 
-	it("#boot - should start the transport, populate seed peers, log discovered versions and start the loop", async ({
+	it("#boot - should start the transport, populate and dial the seed peers and start the loop", async ({
 		service,
 		websocketService,
 		peerDisposer,
 		peerDiscoverer,
 		repository,
-		logger,
 	}) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
 		const previous = process.env.MAINSAIL_ENV;
 		delete process.env.MAINSAIL_ENV;
 
 		try {
-			repository.getActivePeers = () => [
-				makePeer("1.1.1.1"),
-				makePeer("2.2.2.2"),
-				makePeer("3.3.3.3", { version: "0.0.2" }),
-			];
+			const known = [makePeer("1.1.1.1")];
+			repository.getKnownPeers = () => known;
 			const boot = spy(websocketService, "boot");
 			const populateSeedPeers = spy(peerDiscoverer, "populateSeedPeers");
-			const info = spy(logger, "info");
+			const dial = spy(websocketService, "dial");
 
 			await service.boot();
 			await fakeTimers.tickAsync(0);
 
 			boot.calledOnce();
 			populateSeedPeers.calledOnce();
-			info.calledWith("Discovered 2 peers with v0.0.1.", "p2p");
-			info.calledWith("Discovered 1 peer with v0.0.2.", "p2p");
+			dial.calledOnce();
+			dial.calledWith("ws://1.1.1.1:4002");
 
 			// The loop timer is pending; dispose cancels it, disconnects the peers and then stops the transport.
 			const calls: string[] = [];
@@ -523,6 +257,119 @@ describe<{
 				process.env.MAINSAIL_ENV = previous;
 			}
 		}
+	});
+
+	it("#mainLoop - should ask the peers with a stale header for their status", async ({
+		service,
+		repository,
+		communicator,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const fresh = makePeer("1.1.1.1", { lastHeaderAt: Date.now() - STALE_AFTER });
+		const stale = makePeer("2.2.2.2", { lastHeaderAt: Date.now() - STALE_AFTER - 1 });
+		repository.getActivePeers = () => [fresh, stale];
+		const getStatus = spy(communicator, "getStatus");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+
+		getStatus.calledOnce();
+		getStatus.calledWith(stale);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should ask a few peers per turn, the oldest headers first", async ({
+		service,
+		repository,
+		communicator,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		// The higher the address, the older the header.
+		const peers = Array.from({ length: constants.HEADER_REFRESH_BATCH + 2 }, (_, index) =>
+			makePeer(`1.1.1.${index}`, { lastHeaderAt: Date.now() - STALE_AFTER - 1 - index }),
+		);
+		repository.getActivePeers = () => peers;
+
+		const asked: string[] = [];
+		communicator.getStatus = async (peer: any) => {
+			asked.push(peer.ip);
+			// The answer brings a header.
+			peer.lastHeaderAt = Date.now();
+		};
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+		assert.equal(asked, ["1.1.1.6", "1.1.1.5", "1.1.1.4", "1.1.1.3", "1.1.1.2"]);
+
+		// The rest follow on the next turn.
+		await fakeTimers.tickAsync(2000);
+		assert.equal(asked.slice(constants.HEADER_REFRESH_BATCH), ["1.1.1.1", "1.1.1.0"]);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should not wait for the status and not ask a peer again while it is being asked", async ({
+		service,
+		repository,
+		communicator,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const peer = makePeer("1.1.1.1", { lastHeaderAt: 0 });
+		repository.getActivePeers = () => [peer];
+
+		let answer!: () => void;
+		let asked = 0;
+		communicator.getStatus = () => {
+			asked++;
+			return new Promise<void>((resolve) => (answer = resolve));
+		};
+
+		// Asked for once per turn of the loop.
+		const getKnownPeers = spy(repository, "getKnownPeers");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+		assert.equal(asked, 1);
+		getKnownPeers.calledTimes(1);
+
+		// The loop went on without the answer, and leaves the peer alone while the request is out.
+		await fakeTimers.tickAsync(4000);
+		getKnownPeers.calledTimes(3);
+		assert.equal(asked, 1);
+
+		// An answer without a header leaves the peer stale: it is asked again.
+		answer();
+		await fakeTimers.tickAsync(2000);
+		assert.equal(asked, 2);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should ban a peer whose status request fails", async ({
+		service,
+		repository,
+		communicator,
+		peerDisposer,
+		logger,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		repository.getActivePeers = () => [makePeer("1.1.1.1", { lastHeaderAt: 0 })];
+		const failure = new Error("boom");
+		communicator.getStatus = async () => {
+			throw failure;
+		};
+		const banPeer = spy(peerDisposer, "banPeer");
+		const error = spy(logger, "error");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+
+		// The disposer tells a failed connection, which it ignores, from a failure of the peer.
+		banPeer.calledWith("1.1.1.1", failure);
+		error.neverCalled();
+
+		await service.dispose();
 	});
 
 	it("#getNetworkBlockNumberPercentile - should compute the percentile over peers reporting a block number", ({
@@ -564,6 +411,25 @@ describe<{
 		await service.dispose();
 	});
 
+	it("#mainLoop - should not dial a known peer that is pending", async ({
+		service,
+		repository,
+		websocketService,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		repository.getKnownPeers = () => [makePeer("1.1.1.1"), makePeer("2.2.2.2")];
+		repository.hasPendingPeer = (ip: string) => ip === "1.1.1.1";
+		const dial = spy(websocketService, "dial");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+
+		dial.calledOnce();
+		dial.calledWith("ws://2.2.2.2:4002");
+
+		await service.dispose();
+	});
+
 	it("#mainLoop - should forget a known peer the transport refuses to dial", async ({
 		service,
 		repository,
@@ -573,7 +439,7 @@ describe<{
 		const peer = makePeer("1.1.1.1");
 		repository.getKnownPeers = () => [peer];
 		websocketService.dial = async () => {
-			throw new ConnectionError(CloseReason.Rejected, "refused");
+			throw new ConnectionError(CloseReason.Banned, "refused");
 		};
 		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
 
@@ -585,31 +451,76 @@ describe<{
 		await service.dispose();
 	});
 
-	it("#mainLoop - should forget a known peer after repeated failed dials, but keep seeds", async ({
+	it("#mainLoop - should give up a known peer after repeated failed dials", async ({
 		service,
 		repository,
 		websocketService,
-		seeds,
 	}) => {
 		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
 		const peer = makePeer("1.1.1.1");
-		const seed = makePeer("2.2.2.2");
-		const known = [peer, seed];
+		const known = [peer];
 		repository.getKnownPeers = () => [...known];
 		repository.forgetKnownPeer = (forgotten: any) => known.splice(known.indexOf(forgotten), 1);
-		seeds.isSeed = (ip: string) => ip === "2.2.2.2";
 		websocketService.dial = async () => {
 			throw new Error("ECONNREFUSED");
+		};
+		const dial = spy(websocketService, "dial");
+		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync((constants.MAX_DIAL_ATTEMPTS - 1) * constants.DIAL_SPACING);
+
+		// Nothing is given up before the next dial is due.
+		dial.calledTimes(constants.MAX_DIAL_ATTEMPTS);
+		forgetKnownPeer.neverCalled();
+
+		await fakeTimers.tickAsync(constants.DIAL_SPACING);
+
+		forgetKnownPeer.calledOnce();
+		forgetKnownPeer.calledWith(peer);
+		dial.calledTimes(constants.MAX_DIAL_ATTEMPTS);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should give up a known peer whose dials succeed but which never becomes active", async ({
+		service,
+		repository,
+		websocketService,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const peer = makePeer("1.1.1.1");
+		repository.getKnownPeers = () => [peer];
+		const dial = spy(websocketService, "dial");
+		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(constants.MAX_DIAL_ATTEMPTS * constants.DIAL_SPACING);
+
+		dial.calledTimes(constants.MAX_DIAL_ATTEMPTS);
+		forgetKnownPeer.calledWith(peer);
+
+		await service.dispose();
+	});
+
+	it("#mainLoop - should keep dialing a known peer the processor made active in between", async ({
+		service,
+		repository,
+		websocketService,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const peer = makePeer("1.1.1.1");
+		repository.getKnownPeers = () => [peer];
+		// What the processor does when the verification succeeds.
+		websocketService.dial = async () => {
+			peer.dialAttempts = 0;
 		};
 		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
 
 		void service.mainLoop();
-		for (let index = 0; index < constants.MAX_DIAL_FAILURES; index++) {
-			await fakeTimers.tickAsync(constants.DIAL_SPACING);
-		}
+		await fakeTimers.tickAsync(2 * constants.MAX_DIAL_ATTEMPTS * constants.DIAL_SPACING);
 
-		forgetKnownPeer.calledOnce();
-		forgetKnownPeer.calledWith(peer);
+		forgetKnownPeer.neverCalled();
 
 		await service.dispose();
 	});
