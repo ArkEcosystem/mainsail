@@ -725,6 +725,38 @@ describe<{
 		broadcastTransactions.calledWith([expiredTransaction, failingTransaction]);
 	});
 
+	it("reAddTransactions - should re-add a replaced transaction before the later nonces of its sender", async ({
+		service,
+		mempool,
+		poolTransactions,
+		storage,
+		transactionFactory,
+	}) => {
+		const [laterTransaction, replacement] = [makeTransaction(alice, 1n), makeTransaction(alice, 0n, 10)];
+		// The replacement was stored after the sender's nonce 1, so storage returns it last.
+		stub(storage, "getAllTransactions").returnValue([
+			toStoredTransaction(laterTransaction, 99),
+			toStoredTransaction(replacement, 99),
+		]);
+		stub(transactionFactory, "fromBytes").callsFake(async (serialized: Buffer) =>
+			[laterTransaction, replacement].find((transaction) => transaction.serialized.equals(serialized)),
+		);
+		// Like the mempool, reject a nonce gap.
+		stub(mempool, "addTransaction").callsFake(async (transaction: any) => {
+			if (transaction.nonce !== BigInt(poolTransactions.length)) {
+				throw new Error("unexpected nonce");
+			}
+
+			poolTransactions.push(transaction);
+		});
+		const removeTransactions = spy(storage, "removeTransactions");
+
+		await service.reAddTransactions();
+
+		assert.equal(poolTransactions, [replacement, laterTransaction]);
+		removeTransactions.calledWith([]);
+	});
+
 	it("reAddTransactions - should do nothing when disposed", async ({ service, mempool, storage }) => {
 		const mempoolFlush = spy(mempool, "flush");
 		const getAllTransactions = spy(storage, "getAllTransactions");
