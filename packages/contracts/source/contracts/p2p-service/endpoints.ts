@@ -1,8 +1,13 @@
+import type { ApiNodeBroadcast } from "../p2p-api-nodes/api-node.js";
 import type { HeaderData } from "./header.js";
 import type { PeerBroadcast, PeerConfig, PeerState } from "./peer.js";
 
 export interface Response {
 	headers?: HeaderData;
+}
+
+export interface GetApiNodesResponse extends Response {
+	apiNodes: ApiNodeBroadcast[];
 }
 
 export interface GetBlocksResponse extends Response {

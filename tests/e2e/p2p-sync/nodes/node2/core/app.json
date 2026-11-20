@@ -91,6 +91,9 @@
 			"package": "@mainsail/p2p-service"
 		},
 		{
+			"package": "@mainsail/p2p-api-nodes"
+		},
+		{
 			"package": "@mainsail/evm-api-worker"
 		},
 		{
