@@ -10,6 +10,7 @@ import type { Direction } from "./enums.js";
 import type {
 	Connection as ConnectionInterface,
 	ConnectionOptions,
+	HelloMessage,
 	Message,
 	RequestHandler,
 	RequestMessage,
@@ -62,6 +63,7 @@ export class Connection implements ConnectionInterface {
 	#heartbeat!: Heartbeat;
 	#direction!: Direction;
 	#remoteAddress!: string;
+	#remoteVersion?: string;
 
 	#state = ConnectionState.Handshaking;
 	#requestsInFlight = 0;
@@ -77,7 +79,7 @@ export class Connection implements ConnectionInterface {
 		this.#handshake = new Handshake({
 			direction: options.direction,
 			fail: (error) => this.terminate(error.reason, error),
-			open: () => this.#open(),
+			open: (hello) => this.#open(hello),
 			reject: (reason) => this.reject(reason),
 			send: (message) => this.#send(message),
 			version: this.app.version(),
@@ -110,6 +112,10 @@ export class Connection implements ConnectionInterface {
 
 	public get remoteAddress(): string {
 		return this.#remoteAddress;
+	}
+
+	public get remoteVersion(): string | undefined {
+		return this.#remoteVersion;
 	}
 
 	public get state(): ConnectionState {
@@ -277,8 +283,9 @@ export class Connection implements ConnectionInterface {
 	}
 
 	// A close that began during the handshake wins; only an untouched connection opens.
-	#open(): void {
+	#open(hello: HelloMessage): void {
 		if (this.#state === ConnectionState.Handshaking) {
+			this.#remoteVersion = hello.version;
 			this.#state = ConnectionState.Open;
 			this.#heartbeat.start();
 		}

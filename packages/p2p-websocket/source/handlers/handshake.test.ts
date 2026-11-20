@@ -12,12 +12,14 @@ type Probe = {
 	rejected: CloseReason[];
 	failed: string[];
 	opened: number;
+	hellos: Message[];
 };
 
 const make = (direction: Direction): Probe => {
 	const probe: Probe = {
 		failed: [],
 		handshake: undefined as unknown as Handshake,
+		hellos: [],
 		opened: 0,
 		rejected: [],
 		sent: [],
@@ -25,7 +27,10 @@ const make = (direction: Direction): Probe => {
 	probe.handshake = new Handshake({
 		direction,
 		fail: (error) => probe.failed.push(error.message),
-		open: () => probe.opened++,
+		open: (hello) => {
+			probe.opened++;
+			probe.hellos.push(hello);
+		},
 		reject: (reason) => probe.rejected.push(reason),
 		send: (message) => probe.sent.push(message),
 		version: "1.2.3",
@@ -37,25 +42,29 @@ const make = (direction: Direction): Probe => {
 const hello = { protocolVersion: constants.PROTOCOL_VERSION, type: "hello" as const, version: "1.2.3" };
 
 describe("Handshake", ({ it, assert, clock }) => {
-	it("dialer - should send hello and open on the echo", async () => {
+	it("dialer - should send hello and open with the hello the acceptor answers", async () => {
 		const probe = make(Direction.Outbound);
 
 		const started = probe.handshake.start();
 		assert.equal(probe.sent, [hello]);
 
-		probe.handshake.onHello(hello);
+		const answer = { ...hello, version: "4.5.6" };
+		probe.handshake.onHello(answer);
 		await started;
 
 		assert.equal(probe.opened, 1);
+		assert.equal(probe.hellos, [answer]);
 		assert.equal(probe.sent.length, 1);
 	});
 
-	it("acceptor - should wait for hello, echo it and open, also when it arrived before start", async () => {
+	it("acceptor - should wait for hello, answer with its own and open, also when it arrived before start", async () => {
 		const probe = make(Direction.Inbound);
 
-		probe.handshake.onHello(hello);
+		const theirs = { ...hello, version: "4.5.6" };
+		probe.handshake.onHello(theirs);
 		assert.equal(probe.sent, [hello]);
 		assert.equal(probe.opened, 1);
+		assert.equal(probe.hellos, [theirs]);
 
 		await probe.handshake.start();
 	});

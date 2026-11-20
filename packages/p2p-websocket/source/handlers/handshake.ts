@@ -70,7 +70,7 @@ export class Handshake {
 		}
 
 		this.#settle();
-		this.#options.open();
+		this.#options.open(message);
 		this.#resolve();
 	}
 

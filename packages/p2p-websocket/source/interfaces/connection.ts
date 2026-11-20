@@ -20,6 +20,8 @@ export type RequestHandler = (path: string, payload: Buffer) => Promise<Response
 export interface Connection {
 	readonly direction: Direction;
 	readonly remoteAddress: string;
+	// The version of its software the peer named in its hello; not known before the handshake is done.
+	readonly remoteVersion: string | undefined;
 	readonly state: ConnectionState;
 
 	// Answers requests from the peer; set by the transport when the connection is created.
