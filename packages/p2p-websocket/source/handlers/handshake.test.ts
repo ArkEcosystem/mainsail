@@ -32,6 +32,7 @@ const make = (direction: Direction): Probe => {
 			probe.hellos.push(hello);
 		},
 		reject: (reason) => probe.rejected.push(reason),
+		isValidVersion: (version) => version !== "0.9.0",
 		send: (message) => probe.sent.push(message),
 		version: "1.2.3",
 	});
@@ -78,6 +79,33 @@ describe("Handshake", ({ it, assert, clock }) => {
 		assert.equal(probe.rejected, [CloseReason.VersionMismatch]);
 		assert.equal((await started).reason, CloseReason.VersionMismatch);
 		assert.equal(probe.opened, 0);
+	});
+
+	it("acceptor - should reject a version of the software we do not connect with", async () => {
+		const probe = make(Direction.Inbound);
+		const started = probe.handshake.start().catch((error) => error);
+
+		probe.handshake.onHello({ ...hello, version: "0.9.0" });
+
+		assert.equal(probe.rejected, [CloseReason.VersionMismatch]);
+		assert.equal(probe.sent, []);
+		assert.equal(probe.opened, 0);
+
+		const error = await started;
+		assert.equal(error.reason, CloseReason.VersionMismatch);
+		assert.equal(error.message, 'Software version "0.9.0" is not accepted');
+	});
+
+	it("dialer - should hang up on an acceptor whose software we do not connect with", async () => {
+		const probe = make(Direction.Outbound);
+		const started = probe.handshake.start().catch((error) => error);
+
+		probe.handshake.onHello({ ...hello, version: "0.9.0" });
+
+		// Only the acceptor tells the other side why.
+		assert.equal(probe.rejected, []);
+		assert.equal(probe.opened, 0);
+		assert.equal((await started).reason, CloseReason.VersionMismatch);
 	});
 
 	it("dialer - should fail with the peer's reason when rejected", async () => {

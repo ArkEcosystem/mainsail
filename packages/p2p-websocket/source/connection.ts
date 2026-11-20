@@ -25,6 +25,7 @@ import { constants } from "./constants.js";
 import { CloseReason, ConnectionState } from "./enums.js";
 import { ConnectionError } from "./errors.js";
 import { Handshake, Heartbeat, RequestQueue, RequestTable } from "./handlers/index.js";
+import { isValidVersion } from "./is-valid-version.js";
 import { decode, encode } from "./message.js";
 
 // ws receiver error codes: WS_ERR_UNSUPPORTED_MESSAGE_LENGTH is a frame over maxPayload, every other
@@ -79,6 +80,7 @@ export class Connection implements ConnectionInterface {
 		this.#handshake = new Handshake({
 			direction: options.direction,
 			fail: (error) => this.terminate(error.reason, error),
+			isValidVersion: (version) => isValidVersion(this.app, version),
 			open: (hello) => this.#open(hello),
 			reject: (reason) => this.reject(reason),
 			send: (message) => this.#send(message),

@@ -6,6 +6,9 @@ export const defaults = {
 		// Transport-level logging (connections accepted, rejected and closed). Off unless debugging.
 		enabled: Environment.isTrue(EnvironmentVariables.MAINSAIL_P2P_WEBSOCKET_LOGGER_ENABLED),
 	},
+	// Versions of the node software we connect with, as semver ranges; a milestone may name its own
+	// (`p2p.minimumVersions`), which then count instead.
+	minimumVersions: ["^0.0.1"],
 	server: {
 		hostname: Environment.get(EnvironmentVariables.MAINSAIL_P2P_HOST, "0.0.0.0"),
 		// Connections others opened to us, and connections we dialed, that may exist at once. Each side
