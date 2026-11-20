@@ -113,7 +113,20 @@ export class Worker implements Contracts.TransactionPool.Worker {
 
 		this.#blockNumber = unit.blockNumber;
 
-		await this.#sendIfRunning("commit", unit.blockNumber, [...sendersAddresses.keys()], block.gasUsed, isSyncing);
+		void this.#sendIfRunning(
+			"commit",
+			unit.blockNumber,
+			[...sendersAddresses.keys()],
+			block.gasUsed,
+			isSyncing,
+		).catch((error: Error) => {
+			if (this.#stopping) {
+				return;
+			}
+
+			this.logger.error(`Failed to commit the transaction pool: ${error.message}`);
+			this.#respawn();
+		});
 	}
 
 	public async start(blockNumber: number): Promise<void> {

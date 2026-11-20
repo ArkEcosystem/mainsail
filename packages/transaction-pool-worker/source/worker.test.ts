@@ -374,13 +374,52 @@ describe<{
 		assert.equal(replacement.requests[1], ["start", 11]);
 	});
 
-	it("onCommit still fails when a running worker rejects the commit", async ({ worker, ipc, spawned }) => {
+	it("onCommit returns before the worker finishes the commit", async ({ worker, ipc }) => {
 		await startWorker(worker);
-		ipc.respond = async () => {
-			throw new Error("commit failed");
-		};
+		const commit = deferred();
+		ipc.respond = async (method) => (method === "commit" ? commit.promise : undefined);
 
-		await assert.rejects(() => worker.onCommit(makeUnit(11)), "commit failed");
+		await within(worker.onCommit(makeUnit(11)));
+
+		assert.equal(ipc.requests.at(-1)?.[0], "commit");
+		commit.resolve();
+	});
+
+	it("onCommit respawns the worker when the running worker rejects the commit", async ({
+		worker,
+		ipc,
+		subprocesses,
+		logs,
+		terminations,
+	}) => {
+		await startWorker(worker);
+		ipc.respond = async (method) => {
+			if (method === "commit") {
+				throw new Error("commit failed");
+			}
+		};
+		const replacement = addReplacement(subprocesses);
+
+		await within(worker.onCommit(makeUnit(11)));
+		await waitFor(() => respawned(logs));
+
+		assert.equal(logs[0], ["error", "Failed to commit the transaction pool: commit failed"]);
+		assert.equal(replacement.requests[1], ["start", 11]);
+		assert.length(terminations, 0);
+	});
+
+	it("onCommit does not report a commit that fails during shutdown", async ({ worker, ipc, logs, spawned }) => {
+		await startWorker(worker);
+		const commit = deferred();
+		ipc.respond = async (method) => (method === "commit" ? commit.promise : undefined);
+
+		await within(worker.onCommit(makeUnit(11)));
+		const disposed = worker.dispose();
+		commit.reject(new Error("pool disposed"));
+		await within(disposed);
+		await new Promise((resolve) => setTimeout(resolve, 10));
+
+		assert.length(logs, 0);
 		assert.length(spawned, 1);
 	});
 
