@@ -6,9 +6,6 @@ import { NotEnoughRoundValidatorsError } from "@mainsail/exceptions";
 
 @injectable()
 export class ValidatorSet implements Contracts.ValidatorSet.Service {
-	@inject(Identifiers.Application.Instance)
-	public readonly app!: Contracts.Kernel.Application;
-
 	@inject(Identifiers.Cryptography.Configuration)
 	private readonly configuration!: Contracts.Crypto.Configuration;
 
@@ -21,33 +18,14 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 	#topValidators: Contracts.State.ValidatorWallet[] = [];
 	#indexByAddress: Map<string, number> = new Map();
 
-	#allValidators: Map<string, Contracts.State.ValidatorWallet> = new Map();
-	#dirtyValidators: Contracts.State.ValidatorWallet[] = [];
-
 	public async restore(): Promise<void> {
 		await this.#buildRoundValidators();
-
-		const validators = await this.consensusContractService.getAllValidators();
-		this.#allValidators = new Map(validators.map((validator) => [validator.address, validator]));
 	}
 
 	public async onCommit(unit: Contracts.Processor.ProcessableUnit): Promise<void> {
 		if (this.roundCalculator.isNewRound(unit.blockNumber + 1)) {
 			await this.#buildRoundValidators();
 		}
-
-		// Changed validators are only used by api-sync, hence skip if not loaded.
-		if (this.app.isBound(Identifiers.ApiSync.Service)) {
-			await this.#calculateChangedValidators();
-		}
-	}
-
-	public getAllValidators(): Contracts.State.ValidatorWallet[] {
-		return [...this.#allValidators.values()];
-	}
-
-	public getDirtyValidators(): Contracts.State.ValidatorWallet[] {
-		return this.#dirtyValidators;
 	}
 
 	public getRoundValidators(): Contracts.State.ValidatorWallet[] {
@@ -89,26 +67,5 @@ export class ValidatorSet implements Contracts.ValidatorSet.Service {
 
 		this.#topValidators = validators.slice(0, roundValidators);
 		this.#indexByAddress = new Map(this.#topValidators.map((validator, index) => [validator.address, index]));
-	}
-
-	async #calculateChangedValidators(): Promise<void> {
-		this.#dirtyValidators = [];
-
-		const validators = await this.consensusContractService.getAllValidators();
-		for (const validator of validators) {
-			const currentValidator = this.#allValidators.get(validator.address);
-			if (
-				!currentValidator ||
-				currentValidator.voteBalance !== validator.voteBalance ||
-				currentValidator.fee !== validator.fee ||
-				currentValidator.isResigned !== validator.isResigned ||
-				currentValidator.votersCount !== validator.votersCount ||
-				currentValidator.blsPublicKey !== validator.blsPublicKey
-			) {
-				this.#dirtyValidators.push(validator);
-			}
-		}
-
-		this.#allValidators = new Map(validators.map((validator) => [validator.address, validator]));
 	}
 }
