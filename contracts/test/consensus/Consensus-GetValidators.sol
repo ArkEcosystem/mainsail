@@ -69,6 +69,19 @@ contract ConsensusTest is Base {
         assertEq(validators[2].data.isResigned, true);
     }
 
+    function test_getValidators_should_return_a_page_of_1000_validators() public {
+        vm.pauseGasMetering();
+        uint256 n = 1000;
+        for (uint256 i = 1; i <= n; i++) {
+            registerValidator(address(uint160(i)));
+        }
+        vm.resumeGasMetering();
+
+        ConsensusV1.Validator[] memory validators = consensus.getValidators(0, n);
+        assertEq(validators.length, n);
+        assertEq(validators[n - 1].addr, address(uint160(n)));
+    }
+
     function test_getValidators_should_page_through_all_validators() public {
         vm.pauseGasMetering();
         uint256 n = 25;

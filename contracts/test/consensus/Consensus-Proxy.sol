@@ -67,7 +67,7 @@ contract ConsensusTest is Base {
         assertEq(consensus.roundValidatorsCount(), 2);
         assertEq(consensus.getVotesCount(), 1);
         assertEq(consensus.getRoundValidators().length, 2);
-        ConsensusV1.Validator[] memory validatorsBefore = consensus.getAllValidators();
+        ConsensusV1.Validator[] memory validatorsBefore = consensus.getValidators(0, 10);
         assertEq(validatorsBefore.length, 3);
 
         // Upgrade
@@ -82,7 +82,7 @@ contract ConsensusTest is Base {
         assertEq(consensusNew.roundValidatorsCount(), 2);
         assertEq(consensusNew.getVotesCount(), 1);
         assertEq(consensus.getRoundValidators().length, 2);
-        ConsensusV1.Validator[] memory validatorsAfter = consensusNew.getAllValidators();
+        ConsensusV1.Validator[] memory validatorsAfter = consensusNew.getValidators(0, 10);
         assertEq(validatorsAfter.length, 3);
 
         // Compare valdiators
