@@ -78,7 +78,7 @@ export class Bootstrapper {
 
 		this.state.setBootstrap(false);
 
-		this.validatorRepository.printLoadedValidators();
+		await this.validatorRepository.printLoadedValidators();
 
 		void this.txPoolWorker
 			.start(this.stateStore.getBlockNumber())

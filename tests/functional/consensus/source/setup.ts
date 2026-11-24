@@ -220,7 +220,7 @@ const bootstrap = async (app: Contracts.Kernel.Application) => {
 	}
 	await blockProcessor.commit(commitState);
 
-	app.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository).printLoadedValidators();
+	await app.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository).printLoadedValidators();
 
 	app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
 };
