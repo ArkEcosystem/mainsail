@@ -460,6 +460,21 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         return result;
     }
 
+    function getValidators(uint256 offset, uint256 count) external view returns (Validator[] memory) {
+        uint256 total = 0;
+        if (offset < _validators.length) {
+            total = _min(count, _validators.length - offset);
+        }
+
+        Validator[] memory result = new Validator[](total);
+        for (uint256 i = 0; i < total; i++) {
+            address addr = _validators[offset + i];
+            result[i] = Validator({addr: addr, data: _validatorsData[addr]});
+        }
+
+        return result;
+    }
+
     function getVotesCount() external view returns (uint256) {
         return _votersCount;
     }
