@@ -96,7 +96,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     mapping(address => ValidatorData) private _validatorsData;
     mapping(address => bool) private _hasValidator;
-    mapping(bytes32 => bool) private _blsPublicKeys;
+    mapping(bytes32 => address) private _blsPublicKeyOwners;
     address[] private _validators; // All registered validators including resigned
     address[] private _activeValidators; // Has valid BLS public key and is not resigned
     mapping(address => uint256) private _activeValidatorIndex; // Points to index in _activeValidators array
@@ -503,6 +503,18 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         return slice;
     }
 
+    function getValidatorsByBlsPublicKeys(bytes[] calldata blsPublicKeys) external view returns (Validator[] memory) {
+        Validator[] memory result = new Validator[](blsPublicKeys.length);
+        for (uint256 i = 0; i < blsPublicKeys.length; i++) {
+            address owner = _blsPublicKeyOwners[keccak256(blsPublicKeys[i])];
+            if (owner != address(0)) {
+                result[i] = Validator({addr: owner, data: _validatorsData[owner]});
+            }
+        }
+
+        return result;
+    }
+
     function getVotesCount() external view returns (uint256) {
         return _votersCount;
     }
@@ -731,13 +743,13 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     function _verifyAndRegisterBlsPublicKey(bytes calldata blsPublicKey) internal {
         bytes32 blsPublicKeyHash = keccak256(blsPublicKey);
-        if (_blsPublicKeys[blsPublicKeyHash]) {
+        if (_blsPublicKeyOwners[blsPublicKeyHash] != address(0)) {
             revert BlsKeyAlreadyRegistered();
         }
 
         _checkBls12_381PublicKey(blsPublicKey);
 
-        _blsPublicKeys[blsPublicKeyHash] = true;
+        _blsPublicKeyOwners[blsPublicKeyHash] = msg.sender;
     }
 
     // Internal pure functions
