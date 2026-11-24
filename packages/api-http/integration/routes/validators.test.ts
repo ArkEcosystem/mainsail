@@ -318,7 +318,15 @@ describe<{
 	it("update_validator_ranks leaves resigned validators without a rank or approval", async () => {
 		const [resigned, ...active] = validators;
 		await apiContext.walletRepository.save([
-			{ ...resigned, attributes: { ...resigned.attributes, validatorResigned: true } },
+			{
+				...resigned,
+				attributes: {
+					...resigned.attributes,
+					validatorApproval: undefined,
+					validatorRank: undefined,
+					validatorResigned: true,
+				},
+			},
 			...active,
 		]);
 		await apiContext.stateRepository.save({ blockNumber: "0", id: 0, supply: "1000" });

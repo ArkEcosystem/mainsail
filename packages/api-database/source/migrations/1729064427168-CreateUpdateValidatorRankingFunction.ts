@@ -7,10 +7,6 @@ export class CreateUpdateValidatorRankingFunction1729064427168 implements Migrat
             CREATE INDEX wallets_ranked_validators ON wallets ((attributes->>'validatorPublicKey'))
                 WHERE attributes ? 'validatorPublicKey'
                     AND NOT COALESCE((attributes->>'validatorResigned')::boolean, FALSE);
-
-            CREATE INDEX wallets_resigned_ranked_validators ON wallets (address)
-                WHERE attributes ? 'validatorRank'
-                    AND COALESCE((attributes->>'validatorResigned')::boolean, FALSE);
         `);
 
 		// language=postgresql
@@ -43,11 +39,6 @@ export class CreateUpdateValidatorRankingFunction1729064427168 implements Migrat
                             OR attributes->'validatorApproval' IS DISTINCT FROM to_jsonb(validator.approval)
                         );
                 END LOOP;
-
-                UPDATE wallets
-                SET attributes = attributes - 'validatorRank' - 'validatorApproval'
-                WHERE attributes ? 'validatorRank'
-                    AND COALESCE((attributes->>'validatorResigned')::boolean, FALSE);
             END;
             $$
             LANGUAGE plpgsql;
@@ -58,7 +49,6 @@ export class CreateUpdateValidatorRankingFunction1729064427168 implements Migrat
 		// language=postgresql
 		await queryRunner.query(`
             DROP FUNCTION IF EXISTS update_validator_ranks();
-            DROP INDEX IF EXISTS wallets_resigned_ranked_validators;
             DROP INDEX IF EXISTS wallets_ranked_validators;
         `);
 	}
