@@ -26,12 +26,6 @@ export class ConsensusContractService implements Contracts.Evm.ConsensusContract
 		return validators.map((validator) => toValidatorWallet(validator));
 	}
 
-	async getAllValidators(): Promise<Contracts.State.ValidatorWallet[]> {
-		const validators = await this.contractCaller.view<ConsensusContractValidator[]>("getAllValidators");
-
-		return validators.map((validator) => toValidatorWallet(validator));
-	}
-
 	getValidators(): AsyncIterable<Contracts.State.ValidatorWallet> {
 		return this.app.resolve(AsyncValidatorsIterator);
 	}

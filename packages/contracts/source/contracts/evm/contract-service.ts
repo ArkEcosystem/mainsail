@@ -25,7 +25,6 @@ export interface ValidatorRound {
 
 export interface ConsensusContractService {
 	getRoundValidators(): Promise<ValidatorWallet[]>;
-	getAllValidators(): Promise<ValidatorWallet[]>;
 	getValidators(): AsyncIterable<ValidatorWallet>;
 	getValidatorsOf(addresses: string[]): Promise<ValidatorWallet[]>;
 	getValidatorsByBlsPublicKeys(blsPublicKeys: string[]): Promise<(ValidatorWallet | undefined)[]>;

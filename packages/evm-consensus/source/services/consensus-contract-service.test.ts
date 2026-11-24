@@ -47,12 +47,6 @@ describe<{
 		]);
 	});
 
-	it("#getAllValidators - should map decoded validators to wallets", async ({ service }) => {
-		assert.equal(await service.getAllValidators(), [
-			{ address: "0xval", blsPublicKey: "beef", fee: 2n, isResigned: false, voteBalance: 10n, votersCount: 3 },
-		]);
-	});
-
 	it("#getValidators - should return a validators iterator", ({ service }) => {
 		assert.instance(service.getValidators(), AsyncValidatorsIterator);
 	});
