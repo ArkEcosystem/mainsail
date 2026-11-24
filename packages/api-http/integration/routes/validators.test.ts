@@ -324,7 +324,9 @@ describe<{
 		await apiContext.stateRepository.save({ blockNumber: "0", id: 0, supply: "1000" });
 
 		const rank = () => apiContext.dataSource.query("SELECT update_validator_ranks()");
-		const rows = (): Promise<{ address: string; approval: number | null; rank: number | null; version: string }[]> =>
+		const rows = (): Promise<
+			{ address: string; approval: number | null; rank: number | null; version: string }[]
+		> =>
 			apiContext.dataSource.query(`
 				SELECT address, xmin::text AS version, (attributes->>'validatorRank')::int AS rank,
 					(attributes->>'validatorApproval')::float AS approval
