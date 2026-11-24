@@ -4,40 +4,50 @@ export class CreateUpdateValidatorRankingFunction1729064427168 implements Migrat
 	public async up(queryRunner: QueryRunner): Promise<void> {
 		// language=postgresql
 		await queryRunner.query(`
+            CREATE INDEX wallets_ranked_validators ON wallets ((attributes->>'validatorPublicKey'))
+                WHERE attributes ? 'validatorPublicKey'
+                    AND NOT COALESCE((attributes->>'validatorResigned')::boolean, FALSE);
+
+            CREATE INDEX wallets_resigned_ranked_validators ON wallets (address)
+                WHERE attributes ? 'validatorRank'
+                    AND COALESCE((attributes->>'validatorResigned')::boolean, FALSE);
+        `);
+
+		// language=postgresql
+		await queryRunner.query(`
             CREATE OR REPLACE FUNCTION update_validator_ranks()
             RETURNS VOID AS $$
+            DECLARE
+                total_supply numeric;
+                validator record;
             BEGIN
-                WITH all_validators AS (
+                SELECT supply::numeric INTO total_supply FROM state;
+
+                FOR validator IN
                     SELECT
                         address,
-                        (attributes->>'validatorVoteBalance')::numeric AS vote_balance,
-                        COALESCE((attributes->>'validatorResigned')::boolean, FALSE) AS is_resigned
+                        ROW_NUMBER() OVER (ORDER BY (attributes->>'validatorVoteBalance')::numeric DESC, address ASC) AS rank,
+                        ROUND(COALESCE((attributes->>'validatorVoteBalance')::numeric / NULLIF(total_supply, 0), 0), 4) AS approval
                     FROM wallets
                     WHERE attributes ? 'validatorPublicKey' AND attributes->>'validatorPublicKey' <> ''
-                ),
-                ranking AS (
-                    SELECT
-                        address,
-                        vote_balance,
-                        ROW_NUMBER() OVER (ORDER BY is_resigned ASC, vote_balance DESC, address ASC) AS rank
-                    FROM all_validators
-                    ORDER BY is_resigned ASC, vote_balance DESC, address ASC
-                )
-                UPDATE wallets
-                SET
-                    attributes = attributes || jsonb_build_object(
-                        'validatorRank', ranking.rank,
-                        'validatorApproval', ROUND(COALESCE(ranking.vote_balance::numeric / NULLIF(state.supply::numeric, 0), 0), 4)
+                        AND NOT COALESCE((attributes->>'validatorResigned')::boolean, FALSE)
+                LOOP
+                    UPDATE wallets
+                    SET attributes = attributes || jsonb_build_object(
+                        'validatorRank', validator.rank,
+                        'validatorApproval', validator.approval
                     )
-                FROM ranking
-                CROSS JOIN state
-                WHERE wallets.address = ranking.address
-                    AND (
-                        wallets.attributes->'validatorRank' IS DISTINCT FROM to_jsonb(ranking.rank)
-                        OR wallets.attributes->'validatorApproval' IS DISTINCT FROM to_jsonb(
-                            ROUND(COALESCE(ranking.vote_balance::numeric / NULLIF(state.supply::numeric, 0), 0), 4)
-                        )
-                    );
+                    WHERE address = validator.address
+                        AND (
+                            attributes->'validatorRank' IS DISTINCT FROM to_jsonb(validator.rank)
+                            OR attributes->'validatorApproval' IS DISTINCT FROM to_jsonb(validator.approval)
+                        );
+                END LOOP;
+
+                UPDATE wallets
+                SET attributes = attributes - 'validatorRank' - 'validatorApproval'
+                WHERE attributes ? 'validatorRank'
+                    AND COALESCE((attributes->>'validatorResigned')::boolean, FALSE);
             END;
             $$
             LANGUAGE plpgsql;
@@ -48,6 +58,8 @@ export class CreateUpdateValidatorRankingFunction1729064427168 implements Migrat
 		// language=postgresql
 		await queryRunner.query(`
             DROP FUNCTION IF EXISTS update_validator_ranks();
+            DROP INDEX IF EXISTS wallets_resigned_ranked_validators;
+            DROP INDEX IF EXISTS wallets_ranked_validators;
         `);
 	}
 }
