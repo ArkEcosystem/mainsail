@@ -315,6 +315,58 @@ describe<{
 		assert.not.equal(reranked.version, voted.version);
 	});
 
+	it("update_validator_ranks leaves resigned validators without a rank or approval", async () => {
+		const [resigned, ...active] = validators;
+		await apiContext.walletRepository.save([
+			{
+				...resigned,
+				attributes: {
+					...resigned.attributes,
+					validatorApproval: undefined,
+					validatorRank: undefined,
+					validatorResigned: true,
+				},
+			},
+			...active,
+		]);
+		await apiContext.stateRepository.save({ blockNumber: "0", id: 0, supply: "1000" });
+
+		const rank = () => apiContext.dataSource.query("SELECT update_validator_ranks()");
+		const rows = (): Promise<
+			{ address: string; approval: number | null; rank: number | null; version: string }[]
+		> =>
+			apiContext.dataSource.query(`
+				SELECT address, xmin::text AS version, (attributes->>'validatorRank')::int AS rank,
+					(attributes->>'validatorApproval')::float AS approval
+				FROM wallets ORDER BY address`);
+
+		await rank();
+		const ranked = await rows();
+
+		const resignedRow = ranked.find((row) => row.address === resigned.address)!;
+		assert.null(resignedRow.rank);
+		assert.null(resignedRow.approval);
+		assert.equal(
+			ranked
+				.filter((row) => row.address !== resigned.address)
+				.map((row) => row.rank!)
+				.sort((a, b) => a - b),
+			active.map((_, index) => index + 1),
+		);
+
+		await apiContext.walletRepository.save({
+			address: "0x0000000000000000000000000000000000000001",
+			attributes: { validatorPublicKey: "aa".repeat(48), validatorResigned: true, validatorVoteBalance: "0" },
+			balance: "0",
+			nonce: "0",
+			updated_at: "0",
+		});
+		const before = await rows();
+		await rank();
+
+		assert.equal(await rows(), before);
+	});
+
 	it("/validators/{id}", async () => {
 		await apiContext.walletRepository.save(validators);
 
