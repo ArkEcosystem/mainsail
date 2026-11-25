@@ -116,6 +116,8 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     RoundValidator[][] private _rounds;
 
+    mapping(address => bytes) private _roundBlsPublicKeys;
+
     // Initializers
     function initialize(uint128 registrationFee) public initializer {
         __Ownable_init(msg.sender);
@@ -397,6 +399,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         for (uint256 i = 0; i < n; i++) {
             address addr = shuffledValidators[i];
             _roundValidators[i] = addr;
+            _roundBlsPublicKeys[addr] = _validatorsData[addr].blsPublicKey;
             round.push(RoundValidator({addr: addr, voteBalance: _validatorsData[addr].voteBalance}));
         }
     }
@@ -443,7 +446,16 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         for (uint256 i = 0; i < _roundValidators.length; i++) {
             address addr = _roundValidators[i];
             ValidatorData storage data = _validatorsData[addr];
-            result[i] = Validator({addr: addr, data: data});
+            result[i] = Validator({
+                addr: addr,
+                data: ValidatorData({
+                    voteBalance: data.voteBalance,
+                    fee: data.fee,
+                    votersCount: data.votersCount,
+                    isResigned: data.isResigned,
+                    blsPublicKey: _roundBlsPublicKeys[addr]
+                })
+            });
         }
 
         return result;
@@ -582,6 +594,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
             address current = next;
             next = _roundValidatorsMap[current];
             delete _roundValidatorsMap[current];
+            delete _roundBlsPublicKeys[current];
         }
         _roundValidatorsCount = 0;
     }
