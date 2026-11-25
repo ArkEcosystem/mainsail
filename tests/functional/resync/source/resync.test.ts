@@ -236,22 +236,51 @@ describe<{
 					functionName: "vote",
 				}).slice(2),
 				recipient: controller,
-				value: 1n,
 			});
 
-		assert.true(
-			await forgeTransactions(context, [
-				await vote(await Utils.getAddressByPublicKey(context, wallets[0].publicKey)),
-			]),
-		);
-		assert.true(
-			await forgeTransactions(context, [
-				await vote(await Utils.getAddressByPublicKey(context, wallets[1].publicKey)),
-			]),
-		);
+		const firstValidator = await Utils.getAddressByPublicKey(context, wallets[0].publicKey);
+		const secondValidator = await Utils.getAddressByPublicKey(context, wallets[1].publicKey);
+
+		assert.true(await forgeTransactions(context, [await vote(firstValidator)]));
+		assert.equal((await controllerAttributes()).vote, firstValidator);
+
+		assert.true(await forgeTransactions(context, [await vote(secondValidator)]));
+		assert.equal((await controllerAttributes()).vote, secondValidator);
 
 		const topUpTx = await EvmCalls.makeEvmCall(context, { recipient: controller, value: parseEther("5") });
 		assert.true(await forgeTransactions(context, [topUpTx]));
+	});
+
+	it("should be ok with a username registered by a contract", async ({ syncNode }) => {
+		const wallets = await getWallets(syncNode);
+
+		const context = { app: syncNode, wallets };
+		const consensus = syncNode.get<string>(Identifiers.EvmConsensus.Contracts.Consensus);
+		const usernames = syncNode.get<string>(Identifiers.EvmConsensus.Contracts.Usernames);
+
+		const deployTx = await EvmCalls.makeEvmCallDeployErc20Contract(context, {
+			payload: validatorControllerDeployment(consensus),
+		});
+		const controller = getCreateAddress({ from: deployTx.from as Hex, nonce: deployTx.nonce });
+		assert.true(await forgeTransactions(context, [deployTx]));
+
+		const registerUsernameTx = await EvmCalls.makeEvmCall(context, {
+			gasLimit: 500_000,
+			payload: encodeFunctionData({
+				abi: validatorControllerAbi,
+				args: [usernames as Hex, "controller"],
+				functionName: "registerUsername",
+			}).slice(2),
+			recipient: controller,
+		});
+		assert.true(await forgeTransactions(context, [registerUsernameTx]));
+
+		await waitForApiSync(syncNode);
+
+		const [row] = await runDatabaseQuery(syncNode.get<string>(Identifiers.Application.Name), (dataSource) =>
+			dataSource.query("SELECT attributes FROM wallets WHERE lower(address) = lower($1)", [controller]),
+		);
+		assert.equal(row.attributes.username, "controller");
 	});
 
 	it("should be ok with tokens", async ({ syncNode }) => {

@@ -6,10 +6,14 @@ use rayon::{
     slice::ParallelSliceMut,
 };
 use revm::{
+    DatabaseRef,
     context::result::ExecutionResult,
     database::{DatabaseCommitExt, TransitionAccount, WrapDatabaseRef},
-    primitives::{Address, B256, map::HashMap},
-    state::{EvmStorage, EvmStorageSlot, TransactionId},
+    primitives::{
+        Address, B256, U256,
+        map::{Entry, HashMap},
+    },
+    state::{AccountInfo, EvmStorage, EvmStorageSlot, TransactionId},
 };
 
 use crate::{
@@ -127,9 +131,12 @@ pub fn commit_to_db(
         None => build_commit(&mut pending_commit)?,
     };
 
+    let dirty_accounts_and_events =
+        collect_dirty_accounts_and_events(&commit, &genesis_info, |address| db.basic_ref(address))?;
+
     commit_with_resize_retry(|| db.commit(&mut commit, &commit_data), || db.resize())?;
 
-    Ok(collect_dirty_accounts_and_events(commit, &genesis_info))
+    Ok(dirty_accounts_and_events)
 }
 
 /// Maximum number of resize-and-retry attempts after an initial `DbFull` on commit.
@@ -165,25 +172,52 @@ fn finalize(state: &mut StateCommit) {
         .par_sort_unstable_by_key(|a| a.address);
 }
 
+fn dirty_account<'a, S: std::hash::BuildHasher>(
+    dirty_accounts: &'a mut HashMap<Address, AccountUpdate, S>,
+    address: Address,
+    load_account: &impl Fn(Address) -> Result<Option<AccountInfo>, Error>,
+) -> Result<Option<&'a mut AccountUpdate>, Error> {
+    match dirty_accounts.entry(address) {
+        Entry::Occupied(entry) => Ok(Some(entry.into_mut())),
+        Entry::Vacant(entry) => Ok(load_account(address)?.map(|account| {
+            entry.insert(AccountUpdate {
+                address,
+                balance: account.balance,
+                nonce: account.nonce,
+                vote: None,
+                unvote: None,
+                username: None,
+                username_resigned: false,
+                merge_info: None,
+            })
+        })),
+    }
+}
+
 fn collect_dirty_accounts_and_events(
-    commit: StateCommit,
+    commit: &StateCommit,
     genesis_info: &Option<GenesisInfo>,
-) -> (Vec<AccountUpdate>, Vec<ContractEvent>) {
+    load_account: impl Fn(Address) -> Result<Option<AccountInfo>, Error>,
+) -> Result<(Vec<AccountUpdate>, Vec<ContractEvent>), Error> {
     let mut dirty_accounts = HashMap::with_capacity(commit.change_set.accounts.len());
     let mut events: Vec<ContractEvent> = Vec::new();
 
-    for (address, account) in commit.change_set.accounts {
+    for (address, account) in &commit.change_set.accounts {
+        let address = *address;
+
         // A destroyed (selfdestructed) account comes through as `None`; surface it as a
         // zeroed update so consumers drop the stale balance — mirroring the history
         // table, which records deletions as a default account.
-        let account = account.unwrap_or_default();
+        let (balance, nonce) = account
+            .as_ref()
+            .map_or((U256::ZERO, 0), |account| (account.balance, account.nonce));
 
         dirty_accounts.insert(
             address,
             AccountUpdate {
                 address,
-                balance: account.balance,
-                nonce: account.nonce,
+                balance,
+                nonce,
                 vote: None,
                 unvote: None,
                 username: None,
@@ -231,11 +265,12 @@ fn collect_dirty_accounts_and_events(
                                         voter,
                                         validator,
                                     }) => {
-                                        dirty_accounts.get_mut(&voter).and_then(|account| {
-                                            account.vote = Some(validator);
-                                            account.unvote = None; // cancel out any previous unvote if one happened in same commit
-                                            Some(account)
-                                        });
+                                        dirty_account(&mut dirty_accounts, voter, &load_account)?
+                                            .and_then(|account| {
+                                                account.vote = Some(validator);
+                                                account.unvote = None; // cancel out any previous unvote if one happened in same commit
+                                                Some(account)
+                                            });
 
                                         events.push(make_event(ContractEventData::Voted {
                                             voter,
@@ -246,11 +281,12 @@ fn collect_dirty_accounts_and_events(
                                         voter,
                                         validator,
                                     }) => {
-                                        dirty_accounts.get_mut(&voter).and_then(|account| {
-                                            account.unvote = Some(validator);
-                                            account.vote = None; // cancel out any previous vote if one happened in same commit
-                                            Some(account)
-                                        });
+                                        dirty_account(&mut dirty_accounts, voter, &load_account)?
+                                            .and_then(|account| {
+                                                account.unvote = Some(validator);
+                                                account.vote = None; // cancel out any previous vote if one happened in same commit
+                                                Some(account)
+                                            });
 
                                         events.push(make_event(ContractEventData::Unvoted {
                                             voter,
@@ -305,11 +341,12 @@ fn collect_dirty_accounts_and_events(
                                             previousUsername: previous_username,
                                         },
                                     ) => {
-                                        dirty_accounts.get_mut(&addr).and_then(|account| {
-                                            account.username = Some(username.clone());
-                                            account.username_resigned = false; // cancel out any previous resignation if one happened in same commit
-                                            Some(account)
-                                        });
+                                        dirty_account(&mut dirty_accounts, addr, &load_account)?
+                                            .and_then(|account| {
+                                                account.username = Some(username.clone());
+                                                account.username_resigned = false; // cancel out any previous resignation if one happened in same commit
+                                                Some(account)
+                                            });
 
                                         events.push(make_event(
                                             ContractEventData::UsernameRegistered {
@@ -323,11 +360,12 @@ fn collect_dirty_accounts_and_events(
                                     UsernamesV1Events::UsernameResigned(
                                         events::UsernameResigned { addr, username },
                                     ) => {
-                                        dirty_accounts.get_mut(&addr).and_then(|account| {
-                                            account.username = None; // cancel out any previous registration if one happened in same commit
-                                            account.username_resigned = true;
-                                            Some(account)
-                                        });
+                                        dirty_account(&mut dirty_accounts, addr, &load_account)?
+                                            .and_then(|account| {
+                                                account.username = None; // cancel out any previous registration if one happened in same commit
+                                                account.username_resigned = true;
+                                                Some(account)
+                                            });
 
                                         events.push(make_event(
                                             ContractEventData::UsernameResigned { addr, username },
@@ -344,7 +382,7 @@ fn collect_dirty_accounts_and_events(
         }
     }
 
-    (dirty_accounts.into_values().collect(), events)
+    Ok((dirty_accounts.into_values().collect(), events))
 }
 
 #[cfg(test)]
@@ -560,7 +598,7 @@ mod tests {
         };
 
         let (mut account_updates, events) =
-            collect_dirty_accounts_and_events(state, &Some(genesis_info));
+            collect_dirty_accounts_and_events(&state, &Some(genesis_info), |_| Ok(None)).unwrap();
         account_updates.sort_by_key(|k| k.address);
 
         assert_eq!(
@@ -657,7 +695,8 @@ mod tests {
             ..Default::default()
         };
 
-        let (mut account_updates, events) = collect_dirty_accounts_and_events(state, &None);
+        let (mut account_updates, events) =
+            collect_dirty_accounts_and_events(&state, &None, |_| Ok(None)).unwrap();
         account_updates.sort_by_key(|u| u.address);
 
         assert!(events.is_empty());
@@ -770,7 +809,7 @@ mod tests {
         };
 
         let (account_updates, events) =
-            collect_dirty_accounts_and_events(state, &Some(genesis_info));
+            collect_dirty_accounts_and_events(&state, &Some(genesis_info), |_| Ok(None)).unwrap();
 
         assert_eq!(
             account_updates,
@@ -823,6 +862,102 @@ mod tests {
                         addr: voter,
                         username: "test".into(),
                     },
+                },
+            ]
+        );
+    }
+
+    #[test]
+    fn test_collect_dirty_accounts_loads_accounts_named_only_in_events() {
+        let voter = address!("00000000000000000000000000000000000000aa");
+        let owner = address!("00000000000000000000000000000000000000bb");
+        let missing = address!("00000000000000000000000000000000000000cc");
+        let validator = address!("0000000000000000000000000000000000000002");
+
+        let genesis_info = GenesisInfo {
+            account: address!("0000000000000000000000000000000000000001"),
+            deployer_account: address!("0000000000000000000000000000000000000002"),
+            validator_contract: address!("0000000000000000000000000000000000000003"),
+            username_contract: address!("0000000000000000000000000000000000000004"),
+            initial_block_number: 0,
+            initial_supply: U256::from(1_000_000),
+        };
+
+        let mut results = BTreeMap::<B256, (ExecutionResult, u64)>::new();
+        results.insert(
+            b256!("0000000000000000000000000000000000000000000000000000000000000001"),
+            (
+                ExecutionResult::Success {
+                    reason: SuccessReason::Stop,
+                    gas: ResultGas::new_with_state_gas(30000, 30000, 0, 0),
+                    logs: vec![
+                        Log {
+                            address: genesis_info.validator_contract,
+                            data: events::Voted { validator, voter }.encode_log_data(),
+                        },
+                        Log {
+                            address: genesis_info.username_contract,
+                            data: events::UsernameRegistered {
+                                addr: owner,
+                                username: "test".into(),
+                                previousUsername: "".into(),
+                            }
+                            .encode_log_data(),
+                        },
+                        Log {
+                            address: genesis_info.validator_contract,
+                            data: events::Voted {
+                                validator,
+                                voter: missing,
+                            }
+                            .encode_log_data(),
+                        },
+                    ],
+                    output: Output::Call(alloy_primitives::Bytes(Bytes::new())),
+                },
+                21000,
+            ),
+        );
+
+        let state = StateCommit {
+            results,
+            ..Default::default()
+        };
+
+        let (mut account_updates, events) =
+            collect_dirty_accounts_and_events(&state, &Some(genesis_info), |address| {
+                Ok((address != missing).then(|| AccountInfo {
+                    balance: U256::from(7),
+                    nonce: 3,
+                    ..Default::default()
+                }))
+            })
+            .unwrap();
+        account_updates.sort_by_key(|u| u.address);
+
+        assert_eq!(events.len(), 3);
+        assert_eq!(
+            account_updates,
+            vec![
+                AccountUpdate {
+                    address: voter,
+                    balance: U256::from(7),
+                    nonce: 3,
+                    vote: Some(validator),
+                    unvote: None,
+                    username: None,
+                    username_resigned: false,
+                    merge_info: None
+                },
+                AccountUpdate {
+                    address: owner,
+                    balance: U256::from(7),
+                    nonce: 3,
+                    vote: None,
+                    unvote: None,
+                    username: Some("test".into()),
+                    username_resigned: false,
+                    merge_info: None
                 },
             ]
         );
@@ -895,7 +1030,8 @@ mod tests {
             ..Default::default()
         };
 
-        let (_, events) = collect_dirty_accounts_and_events(state, &Some(genesis_info));
+        let (_, events) =
+            collect_dirty_accounts_and_events(&state, &Some(genesis_info), |_| Ok(None)).unwrap();
 
         assert_eq!(
             events,

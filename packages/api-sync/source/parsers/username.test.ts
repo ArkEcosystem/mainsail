@@ -12,8 +12,8 @@ const USERNAMES_CONTRACT = "0x1000000000000000000000000000000000000000";
 // Digit-only address, unaffected by checksumming.
 const WALLET = "0x1111111111111111111111111111111111111111";
 
-const registeredLog = (addr: string, username: string) => ({
-	address: USERNAMES_CONTRACT,
+const registeredLog = (addr: string, username: string, emitter = USERNAMES_CONTRACT) => ({
+	address: emitter,
 	data: encodeAbiParameters(
 		[
 			{ name: "addr", type: "address" },
@@ -43,27 +43,33 @@ const otherLog = () => ({
 	topics: ["0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef"] as [`0x${string}`],
 });
 
-const transaction = (to: string): any => ({ hash: "0xtransaction", to });
-
 describe("parseUsernames", ({ assert, it }) => {
-	it("ignores transactions that do not target the usernames contract", () => {
-		const result = parseUsernames(USERNAMES_CONTRACT, transaction(WALLET), {
-			logs: [registeredLog(WALLET, "alice")],
+	it("ignores username events that the usernames contract did not emit", () => {
+		const result = parseUsernames(USERNAMES_CONTRACT, {
+			logs: [registeredLog(WALLET, "alice", WALLET)],
 		} as any);
 
 		assert.equal(result, []);
 	});
 
+	it("matches the usernames contract address regardless of case", () => {
+		const result = parseUsernames("0xABCDEF0000000000000000000000000000000000", {
+			logs: [registeredLog(WALLET, "alice", "0xabcdef0000000000000000000000000000000000")],
+		} as any);
+
+		assert.equal(result, [{ address: WALLET, username: "alice" }]);
+	});
+
 	it("returns nothing without logs", () => {
-		assert.equal(parseUsernames(USERNAMES_CONTRACT, transaction(USERNAMES_CONTRACT), { logs: [] } as any), []);
+		assert.equal(parseUsernames(USERNAMES_CONTRACT, { logs: [] } as any), []);
 	});
 
 	it("tolerates a receipt without a log field", () => {
-		assert.equal(parseUsernames(USERNAMES_CONTRACT, transaction(USERNAMES_CONTRACT), {} as any), []);
+		assert.equal(parseUsernames(USERNAMES_CONTRACT, {} as any), []);
 	});
 
 	it("maps a registration to the registered username", () => {
-		const result = parseUsernames(USERNAMES_CONTRACT, transaction(USERNAMES_CONTRACT), {
+		const result = parseUsernames(USERNAMES_CONTRACT, {
 			logs: [registeredLog(WALLET, "alice")],
 		} as any);
 
@@ -71,7 +77,7 @@ describe("parseUsernames", ({ assert, it }) => {
 	});
 
 	it("maps a resignation to an undefined username", () => {
-		const result = parseUsernames(USERNAMES_CONTRACT, transaction(USERNAMES_CONTRACT), {
+		const result = parseUsernames(USERNAMES_CONTRACT, {
 			logs: [resignedLog(WALLET, "alice")],
 		} as any);
 
@@ -79,7 +85,7 @@ describe("parseUsernames", ({ assert, it }) => {
 	});
 
 	it("keeps the log order and skips unrelated events", () => {
-		const result = parseUsernames(USERNAMES_CONTRACT, transaction(USERNAMES_CONTRACT), {
+		const result = parseUsernames(USERNAMES_CONTRACT, {
 			logs: [registeredLog(WALLET, "alice"), otherLog(), resignedLog(WALLET, "alice")],
 		} as any);
 

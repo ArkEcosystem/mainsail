@@ -19,7 +19,7 @@ const usernameAbi = parseAbi([
 ] as const);
 
 const usernameRegisteredLog = (addr: string, username: string) => ({
-	address: "0x0000000000000000000000000000000000000001",
+	address: USERNAME_CONTRACT,
 	data: encodeAbiParameters(
 		[
 			{ name: "addr", type: "address" },

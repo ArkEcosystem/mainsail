@@ -462,7 +462,7 @@ export class Restore {
 						transaction,
 						receipt,
 					);
-					const parsedUsernames = parseUsernames(this.usernameContractAddress, transaction, receipt);
+					const parsedUsernames = parseUsernames(this.usernameContractAddress, receipt);
 					const {
 						tokenActions: parsedTokenActions,
 						tokenHolders: parsedTokenHolders,
