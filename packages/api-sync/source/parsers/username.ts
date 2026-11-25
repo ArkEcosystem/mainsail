@@ -9,17 +9,14 @@ const paymentAbi = parseAbi([
 
 export function parseUsernames(
 	usernamesContractAddress: string,
-	transaction: Contracts.Crypto.Transaction,
 	receipt: Contracts.Evm.TransactionReceipt,
 ): { address: string; username: string | undefined }[] {
-	if (transaction.to !== usernamesContractAddress) {
-		return [];
-	}
+	const contractAddress = usernamesContractAddress.toLowerCase();
 
 	const logs = parseEventLogs({
 		abi: paymentAbi,
 		//eventName: "UsernameRegistered",
-		logs: receipt.logs ?? [],
+		logs: (receipt.logs ?? []).filter((log) => log.address.toLowerCase() === contractAddress),
 	});
 
 	return logs.map((l) => {
