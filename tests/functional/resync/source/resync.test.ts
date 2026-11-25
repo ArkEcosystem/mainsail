@@ -213,6 +213,20 @@ describe<{
 		});
 		assert.true(await forgeTransactions(context, [registerAndResignTx]));
 
+		const controllerAttributes = async () => {
+			await waitForApiSync(syncNode);
+
+			const [row] = await runDatabaseQuery(syncNode.get<string>(Identifiers.Application.Name), (dataSource) =>
+				dataSource.query("SELECT attributes FROM wallets WHERE lower(address) = lower($1)", [controller]),
+			);
+
+			return row.attributes;
+		};
+
+		const resigned = await controllerAttributes();
+		assert.equal(resigned.validatorPublicKey, validatorKeyPair.publicKey);
+		assert.true(resigned.validatorResigned);
+
 		const vote = async (validator: string) =>
 			EvmCalls.makeEvmCall(context, {
 				gasLimit: 500_000,
@@ -238,14 +252,6 @@ describe<{
 
 		const topUpTx = await EvmCalls.makeEvmCall(context, { recipient: controller, value: parseEther("5") });
 		assert.true(await forgeTransactions(context, [topUpTx]));
-
-		await waitForApiSync(syncNode);
-
-		const [row] = await runDatabaseQuery(syncNode.get<string>(Identifiers.Application.Name), (dataSource) =>
-			dataSource.query("SELECT attributes FROM wallets WHERE lower(address) = lower($1)", [controller]),
-		);
-		assert.equal(row.attributes.validatorPublicKey, validatorKeyPair.publicKey);
-		assert.true(row.attributes.validatorResigned);
 	});
 
 	it("should be ok with tokens", async ({ syncNode }) => {
