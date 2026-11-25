@@ -124,6 +124,44 @@ describe<{
 		);
 	});
 
+	it("POST /api/transactions - waits behind the submissions in progress and refuses the next with 429", async ({
+		processor,
+		transactions,
+	}) => {
+		const configuration = makeConfiguration();
+		configuration.plugins.requestQueue = { concurrent: 1, queued: 1 };
+		const { server, serviceProvider } = await bootstrapServer({ processor, transactions }, configuration);
+		const finish: Array<() => void> = [];
+		const result = await processor.process([]);
+		const process = stub(processor, "process").callsFake(
+			async () => new Promise((resolve) => finish.push(() => resolve(result))),
+		);
+
+		try {
+			const first = post(server, 1);
+			const second = post(server, 1);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			process.calledOnce();
+
+			const refused = await server.inject({ method: "POST", payload: {}, url: "/api/transactions" });
+
+			assert.is(refused.statusCode, 429);
+			assert.equal(JSON.parse(refused.payload).message, "Too many concurrent requests");
+
+			finish.shift()?.();
+			assert.is((await first).statusCode, 200);
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			process.calledTimes(2);
+
+			finish.shift()?.();
+			assert.is((await second).statusCode, 200);
+		} finally {
+			await serviceProvider.dispose();
+		}
+	});
+
 	it("POST /api/transactions - omits the errors key when the processor reports none", async ({ server }) => {
 		const response = await server.inject({
 			method: "POST",

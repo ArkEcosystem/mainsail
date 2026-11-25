@@ -311,6 +311,20 @@ describe<{
 		assert.equal(result.value.plugins.concurrencyLimit.limitPerIp, 8);
 	});
 
+	for (const [variable, key] of [
+		["MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_WRITES", "concurrent"],
+		["MAINSAIL_API_TRANSACTION_POOL_MAX_QUEUED_WRITES", "queued"],
+	] as const) {
+		it(`should parse process.env.${variable}`, async ({ serviceProvider }) => {
+			process.env[variable] = "0";
+
+			const result = serviceProvider.configSchema().validate(await importDefaults());
+
+			assert.undefined(result.error);
+			assert.equal(result.value.plugins.requestQueue[key], 0);
+		});
+	}
+
 	it("#schemaRestrictions - plugins is required && is object", async ({ serviceProvider }) => {
 		const defaults = await importDefaults();
 		defaults.plugins = false;
@@ -367,6 +381,46 @@ describe<{
 			result = serviceProvider.configSchema().validate(defaults);
 
 			assert.equal(result.error?.message, `"plugins.concurrencyLimit.${key}" is required`);
+		});
+	}
+
+	it("#schemaRestrictions - plugins.requestQueue is required && is object", async ({ serviceProvider }) => {
+		const defaults = await importDefaults();
+		defaults.plugins.requestQueue = false;
+		let result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.requestQueue" must be of type object');
+
+		delete defaults.plugins.requestQueue;
+		result = serviceProvider.configSchema().validate(defaults);
+
+		assert.equal(result.error?.message, '"plugins.requestQueue" is required');
+	});
+
+	for (const key of ["concurrent", "queued"] as const) {
+		it(`#schemaRestrictions - plugins.requestQueue.${key} is required && is integer && >= 0`, async ({
+			serviceProvider,
+		}) => {
+			const defaults = await importDefaults();
+			defaults.plugins.requestQueue[key] = false;
+			let result = serviceProvider.configSchema().validate(defaults);
+
+			assert.equal(result.error?.message, `"plugins.requestQueue.${key}" must be a number`);
+
+			defaults.plugins.requestQueue[key] = 1.12;
+			result = serviceProvider.configSchema().validate(defaults);
+
+			assert.equal(result.error?.message, `"plugins.requestQueue.${key}" must be an integer`);
+
+			defaults.plugins.requestQueue[key] = -1;
+			result = serviceProvider.configSchema().validate(defaults);
+
+			assert.equal(result.error?.message, `"plugins.requestQueue.${key}" must be greater than or equal to 0`);
+
+			delete defaults.plugins.requestQueue[key];
+			result = serviceProvider.configSchema().validate(defaults);
+
+			assert.equal(result.error?.message, `"plugins.requestQueue.${key}" is required`);
 		});
 	}
 

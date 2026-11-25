@@ -28,6 +28,10 @@ export const defaults = {
 					EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_RATE_LIMIT_WHITELIST,
 				)?.split(",") ?? [],
 		},
+		requestQueue: {
+			concurrent: Environment.get(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_MAX_CONCURRENT_WRITES, 4),
+			queued: Environment.get(EnvironmentVariables.MAINSAIL_API_TRANSACTION_POOL_MAX_QUEUED_WRITES, 64),
+		},
 		socketTimeout: 5000,
 		transactionRateLimit: {
 			duration: Environment.get(

@@ -21,6 +21,7 @@ export const makeConfiguration = () => ({
 		concurrencyLimit: { limit: 16, limitPerIp: 4 },
 		pagination: { limit: 100, maxBytes: 1_000_000 },
 		rateLimit: { blacklist: [], duration: 60, enabled: false, points: 150, whitelist: [] },
+		requestQueue: { concurrent: 4, queued: 64 },
 		socketTimeout: 5000,
 		transactionRateLimit: { duration: 60, enabled: true, points: 600 },
 		trustProxy: false,
