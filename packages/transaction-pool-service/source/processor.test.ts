@@ -265,4 +265,99 @@ describe<{
 
 		spiedLogger.calledOnce();
 	});
+
+	it("process - should let other work on the event loop run before each transaction", async ({ processor, pool }) => {
+		const calls: string[] = [];
+		stub(pool, "addTransaction").callsFake(async () => {
+			calls.push("transaction");
+			setImmediate(() => calls.push("other work"));
+		});
+
+		await processor.process([Buffer.from("1"), Buffer.from("2")]);
+
+		assert.equal(calls, ["transaction", "other work", "transaction"]);
+	});
+
+	it("pauseWhile - should hold transactions back until the work has finished", async ({ processor, factory }) => {
+		const fromBytes = spy(factory, "fromBytes");
+		let finish!: () => void;
+
+		const work = processor.pauseWhile(async () => new Promise<void>((resolve) => (finish = resolve)));
+		const processed = processor.process([Buffer.from("1")]);
+		await new Promise((resolve) => setTimeout(resolve, 10));
+
+		fromBytes.neverCalled();
+
+		finish();
+		await work;
+
+		assert.equal((await processed).accept, [0]);
+		fromBytes.calledOnce();
+	});
+
+	it("pauseWhile - should start the work once the transaction in progress is done", async ({ processor, pool }) => {
+		const calls: string[] = [];
+		let finish!: () => void;
+		stub(pool, "addTransaction").callsFake(async () => {
+			calls.push("transaction started");
+			await new Promise<void>((resolve) => (finish = resolve));
+			calls.push("transaction finished");
+		});
+
+		const processed = processor.process([Buffer.from("1")]);
+		await new Promise((resolve) => setTimeout(resolve, 10));
+		const work = processor.pauseWhile(async () => void calls.push("work"));
+		await new Promise((resolve) => setTimeout(resolve, 10));
+
+		assert.equal(calls, ["transaction started"]);
+
+		finish();
+		await work;
+		await processed;
+
+		assert.equal(calls, ["transaction started", "transaction finished", "work"]);
+	});
+
+	it("pauseWhile - should run the work of several callers one after the other in call order", async ({
+		processor,
+	}) => {
+		const calls: string[] = [];
+		const finish: Array<() => void> = [];
+		const work = (name: string) => async () => {
+			calls.push(`${name} started`);
+			await new Promise<void>((resolve) => finish.push(resolve));
+			calls.push(`${name} finished`);
+
+			return name;
+		};
+
+		const results = [
+			processor.pauseWhile(work("a")),
+			processor.pauseWhile(work("b")),
+			processor.pauseWhile(work("c")),
+		];
+		await new Promise((resolve) => setTimeout(resolve, 10));
+
+		assert.equal(calls, ["a started"]);
+
+		for (let index = 0; index < 3; index++) {
+			finish[index]();
+			await new Promise((resolve) => setTimeout(resolve, 10));
+		}
+
+		assert.equal(await Promise.all(results), ["a", "b", "c"]);
+		assert.equal(calls, ["a started", "a finished", "b started", "b finished", "c started", "c finished"]);
+	});
+
+	it("pauseWhile - should let transactions through again when the work fails", async ({ processor }) => {
+		await assert.rejects(
+			() =>
+				processor.pauseWhile(async () => {
+					throw new Error("commit failed");
+				}),
+			"commit failed",
+		);
+
+		assert.equal((await processor.process([Buffer.from("1")])).accept, [0]);
+	});
 });

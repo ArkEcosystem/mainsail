@@ -3,7 +3,8 @@ import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable } from "@mainsail/container";
 import { InvalidTransactionDataError, PoolError } from "@mainsail/exceptions";
-import { ensureError } from "@mainsail/utils";
+import { ensureError, Lock } from "@mainsail/utils";
+import { setImmediate } from "node:timers/promises";
 
 @injectable()
 export class Processor implements Contracts.TransactionPool.Processor {
@@ -19,6 +20,12 @@ export class Processor implements Contracts.TransactionPool.Processor {
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
+	readonly #lock = new Lock();
+
+	public async pauseWhile<T>(work: () => Promise<T>): Promise<T> {
+		return this.#lock.runExclusive(work);
+	}
+
 	public async process(data: Buffer[]): Promise<Contracts.TransactionPool.ProcessorResult> {
 		const accept: number[] = [];
 		const broadcast: number[] = [];
@@ -31,9 +38,11 @@ export class Processor implements Contracts.TransactionPool.Processor {
 		try {
 			for (const [index, transactionData] of data.entries()) {
 				try {
-					const transaction = await this.#getTransactionFromBuffer(transactionData);
+					await setImmediate();
 
-					await this.pool.addTransaction(transaction);
+					const transaction = await this.#lock.runNonExclusive(async () =>
+						this.#addTransaction(transactionData),
+					);
 					accept.push(index);
 
 					broadcastTransactions.push(transaction);
@@ -74,6 +83,13 @@ export class Processor implements Contracts.TransactionPool.Processor {
 			excess,
 			invalid,
 		};
+	}
+
+	async #addTransaction(transactionData: Buffer): Promise<Contracts.Crypto.Transaction> {
+		const transaction = await this.#getTransactionFromBuffer(transactionData);
+		await this.pool.addTransaction(transaction);
+
+		return transaction;
 	}
 
 	async #getTransactionFromBuffer(transactionData: Buffer): Promise<Contracts.Crypto.Transaction> {
