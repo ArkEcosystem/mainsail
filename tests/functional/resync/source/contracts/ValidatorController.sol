@@ -9,6 +9,10 @@ interface IConsensusV1 {
     function vote(address addr) external;
 }
 
+interface IUsernamesV1 {
+    function registerUsername(string calldata username) external;
+}
+
 contract ValidatorController {
     IConsensusV1 private immutable consensus;
 
@@ -27,5 +31,9 @@ contract ValidatorController {
 
     function vote(address validator) external {
         consensus.vote(validator);
+    }
+
+    function registerUsername(IUsernamesV1 usernames, string calldata username) external {
+        usernames.registerUsername(username);
     }
 }
