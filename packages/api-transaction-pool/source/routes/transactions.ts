@@ -41,6 +41,9 @@ export const register = (server: Contracts.Api.ApiServer): void => {
 					points: (request: Types.HapiRequest) =>
 						(request.payload as { transactions: string[] }).transactions.length,
 				},
+				requestQueue: {
+					enabled: true,
+				},
 			},
 			validate: {
 				payload: Joi.object({

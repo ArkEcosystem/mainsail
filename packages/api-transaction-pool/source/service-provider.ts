@@ -37,6 +37,10 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 			trustProxy: boolean;
 			whitelist: string[];
 			socketTimeout: number;
+			requestQueue: {
+				concurrent: number;
+				queued: number;
+			};
 			rateLimit: {
 				blacklist: string[];
 				duration: number;
@@ -90,6 +94,10 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 				options: { limit: config.concurrencyLimit.limit },
 				plugin: Plugins.concurrencyLimit,
 			},
+			{
+				options: config.requestQueue,
+				plugin: Plugins.requestQueue,
+			},
 			{ plugin: Plugins.pagination },
 		] as unknown as Plugin<unknown>[];
 	}
@@ -112,6 +120,10 @@ export class ServiceProvider extends AbstractServiceProvider<Server> {
 						enabled: Joi.bool().required(),
 						points: Joi.number().integer().min(0).required(),
 						whitelist: Joi.array().items(Joi.string()).required(),
+					}).required(),
+					requestQueue: Joi.object({
+						concurrent: Joi.number().integer().min(0).required(),
+						queued: Joi.number().integer().min(0).required(),
 					}).required(),
 					socketTimeout: Joi.number().integer().min(0).required(),
 					transactionRateLimit: Joi.object({
