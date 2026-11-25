@@ -25,7 +25,7 @@ contract ValidatorController {
         consensus.resignValidator();
     }
 
-    function vote(address validator) external payable {
+    function vote(address validator) external {
         consensus.vote(validator);
     }
 }
