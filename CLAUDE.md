@@ -116,7 +116,7 @@ Four stateless calculators injected wherever needed:
 ### Validator vs ValidatorSet
 
 - **`packages/validator`** — an individual signing node. `Validator` wraps a key pair and produces `propose()` (serialized block + BLS signature), `prevote()`, and `precommit()` consensus messages for a given round.
-- **`packages/validator-set`** / **`packages/evm-consensus`** — the active set for the current round. `ValidatorSet` holds `#topValidators` (the `roundValidators`-sized active slice), `#allValidators` (all registered across the network), and `#dirtyValidators` (changed this block). `getRoundValidators()` returns the active slice. Proposer for a round is `(totalRound + round) % roundValidators` (deterministic, no per-round state).
+- **`packages/validator-set`** / **`packages/evm-consensus`** — the active set for the current round. `ValidatorSet` holds only `#topValidators` (the `roundValidators`-sized active slice); it never loads the full validator list. `getRoundValidators()` returns the active slice. Proposer for a round is `(totalRound + round) % roundValidators` (deterministic, no per-round state).
 
 ### Forger (`packages/forger`)
 

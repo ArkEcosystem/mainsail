@@ -105,6 +105,7 @@ type Ctx = {
 	systemRepo: any;
 	state: any;
 	validatorSet: any;
+	consensusContractService: any;
 	proposerCalculator: any;
 	logger: any;
 	pluginConfiguration: any;
@@ -160,7 +161,8 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		context.migrations = { runMigrations: async () => {}, synchronizeEntities: async () => {} };
 		context.systemRepo = { inMaintenance: async () => false };
 		context.state = { isBootstrap: () => false };
-		context.validatorSet = { getDirtyValidators: () => [], getRoundValidators: () => [] };
+		context.validatorSet = { getRoundValidators: () => [] };
+		context.consensusContractService = { getValidatorsOf: async () => [] };
 		context.proposerCalculator = { getValidatorIndex: (index: number) => index };
 		context.addressFactory = { fromPublicKey: async () => SENDER };
 		context.configuration = {
@@ -226,6 +228,7 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		context.app.bind(Identifiers.EvmConsensus.Contracts.MultiPayment).toConstantValue("0xmultipayment");
 		context.app.bind(Identifiers.State.State).toConstantValue(context.state);
 		context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
+		context.app.bind(Identifiers.Evm.ContractService.Consensus).toConstantValue(context.consensusContractService);
 		context.app.bind(Identifiers.BlockchainUtils.ProposerCalculator).toConstantValue(context.proposerCalculator);
 		context.app.bind(Identifiers.ApiSync.Logger).toConstantValue(context.logger);
 		context.app
@@ -251,6 +254,7 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 			return {
 				blockNumber: header.number,
 				getAccountUpdates: () => overrides.accountUpdates ?? [],
+				getContractEvents: () => overrides.contractEvents ?? [],
 				getCommit: async () => ({
 					block: { ...header, transactions },
 					proof: { round: 0, signature: "0xproof", validators: [true, false] },
@@ -569,13 +573,13 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 	});
 
 	it("onCommit: inserts dirty validators that are not part of the account updates", async (context) => {
-		const { repos, validatorSet, sync } = context;
+		const { repos, consensusContractService, sync } = context;
 		const restore = { restore: async () => {} };
 		const appResolve = stub(context.app, "resolve").returnValue(restore);
 		await sync.bootstrap();
 		appResolve.restore();
 
-		validatorSet.getDirtyValidators = () => [
+		consensusContractService.getValidatorsOf = async () => [
 			{
 				address: "0xdirty",
 				blsPublicKey: "0xbls",
@@ -609,6 +613,97 @@ describe<Ctx>("Sync", ({ it, beforeEach, assert, stub, spy, clock }) => {
 		assert.equal(dirtyRow![4].validatorVotersCount, 3);
 		assert.equal(dirtyRow![4].validatorFee, "7");
 		assert.false(dirtyRow![4].validatorResigned);
+	});
+
+	it("onCommit: looks up the validators of the account updates and the consensus events", async (context) => {
+		const { consensusContractService, sync } = context;
+		const restore = { restore: async () => {} };
+		const appResolve = stub(context.app, "resolve").returnValue(restore);
+		await sync.bootstrap();
+		appResolve.restore();
+
+		const getValidatorsOf = spy(consensusContractService, "getValidatorsOf");
+
+		await sync.onCommit(
+			context.makeUnit({
+				accountUpdates: [
+					{ address: "0xsender", balance: 1n, nonce: 1n },
+					{ address: "0xvoter", balance: 2n, nonce: 0n },
+				],
+				contractEvents: [
+					{ event: "Voted", txHash: "0x1", txIndex: 0, validator: "0xvoted", voter: "0xcontract" },
+					{ event: "Unvoted", txHash: "0x1", txIndex: 0, validator: "0xunvoted", voter: "0xcontract" },
+					{
+						address: "0xregistered",
+						blsPublicKey: "0xbls",
+						event: "ValidatorRegistered",
+						txHash: "0x2",
+						txIndex: 1,
+					},
+					{
+						address: "0xupdated",
+						blsPublicKey: "0xbls",
+						event: "ValidatorUpdated",
+						txHash: "0x2",
+						txIndex: 1,
+					},
+					{ address: "0xresigned", event: "ValidatorResigned", txHash: "0x2", txIndex: 1 },
+					{ address: "0xsender", event: "ValidatorResigned", txHash: "0x3", txIndex: 2 },
+					{ address: "0xuser", event: "UsernameRegistered", txHash: "0x4", txIndex: 3, username: "user" },
+					{ address: "0xuser", event: "UsernameResigned", txHash: "0x4", txIndex: 3, username: "user" },
+				],
+			}),
+		);
+
+		getValidatorsOf.calledOnce();
+		getValidatorsOf.calledWith([
+			"0xsender",
+			"0xvoter",
+			"0xvoted",
+			"0xunvoted",
+			"0xregistered",
+			"0xupdated",
+			"0xresigned",
+		]);
+	});
+
+	it("onCommit: writes the attributes of a changed validator that is part of the account updates", async (context) => {
+		const { repos, consensusContractService, sync } = context;
+		const restore = { restore: async () => {} };
+		const appResolve = stub(context.app, "resolve").returnValue(restore);
+		await sync.bootstrap();
+		appResolve.restore();
+
+		consensusContractService.getValidatorsOf = async () => [
+			{
+				address: "0xsender",
+				blsPublicKey: "0xbls",
+				fee: 7n,
+				isResigned: true,
+				voteBalance: 5n,
+				votersCount: 2,
+			},
+		];
+
+		await sync.onCommit(context.makeUnit({ accountUpdates: [{ address: "0xsender", balance: 50n, nonce: 1n }] }));
+		await runQueuedJob(context);
+
+		const [, preInsertParameters] = repos.wallet.queries[0];
+		assert.equal(preInsertParameters, ["1", PROPOSER]);
+
+		const [, parameters] = repos.wallet.queries[1];
+		const rows: any[][] = [];
+		for (let index = 0; index < parameters.length; index += 6) {
+			rows.push(parameters.slice(index, index + 6));
+		}
+		const senderRows = rows.filter((row) => row[0] === "0xsender");
+		assert.length(senderRows, 1);
+		assert.equal(senderRows[0][2], "50");
+		assert.equal(senderRows[0][3], "1");
+		assert.equal(senderRows[0][4].validatorPublicKey, "0xbls");
+		assert.true(senderRows[0][4].validatorResigned);
+		assert.equal(senderRows[0][4].validatorVoteBalance, "5");
+		assert.equal(senderRows[0][4].validatorVotersCount, 2);
 	});
 
 	it("onCommit: stores the upcoming validator round on round boundaries", async (context) => {

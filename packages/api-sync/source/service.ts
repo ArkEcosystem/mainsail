@@ -100,6 +100,9 @@ export class Sync implements Contracts.ApiSync.Service {
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
+	@inject(Identifiers.Evm.ContractService.Consensus)
+	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
+
 	@inject(Identifiers.BlockchainUtils.ProposerCalculator)
 	private readonly proposerCalculator!: Contracts.BlockchainUtils.ProposerCalculator;
 
@@ -242,12 +245,7 @@ export class Sync implements Contracts.ApiSync.Service {
 			}
 		}
 
-		const dirtyValidators: Record<string, Contracts.State.ValidatorWallet> = this.validatorSet
-			.getDirtyValidators()
-			.reduce((accumulator, current) => {
-				accumulator[current.address] = current;
-				return accumulator;
-			}, {});
+		const dirtyValidators = await this.#getDirtyValidators(unit);
 
 		const accountUpdates: Record<string, Contracts.Evm.AccountUpdate> = unit
 			.getAccountUpdates()
@@ -412,6 +410,32 @@ export class Sync implements Contracts.ApiSync.Service {
 
 	async #bootstrapRestore(): Promise<void> {
 		await this.app.resolve(Restore).restore();
+	}
+
+	async #getDirtyValidators(
+		unit: Contracts.Processor.ProcessableUnit,
+	): Promise<Record<string, Contracts.State.ValidatorWallet>> {
+		const accounts = new Set(unit.getAccountUpdates().map(({ address }) => address));
+
+		for (const event of unit.getContractEvents()) {
+			switch (event.event) {
+				case "Voted":
+				case "Unvoted": {
+					accounts.add(event.validator);
+					break;
+				}
+				case "ValidatorRegistered":
+				case "ValidatorUpdated":
+				case "ValidatorResigned": {
+					accounts.add(event.address);
+					break;
+				}
+			}
+		}
+
+		const validators = await this.consensusContractService.getValidatorsOf([...accounts]);
+
+		return Object.fromEntries(validators.map((validator) => [validator.address, validator]));
 	}
 
 	async #queueDeferredSync(deferredSync: DeferredSync): Promise<void> {

@@ -96,7 +96,7 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     mapping(address => ValidatorData) private _validatorsData;
     mapping(address => bool) private _hasValidator;
-    mapping(bytes32 => bool) private _blsPublicKeys;
+    mapping(bytes32 => address) private _blsPublicKeyOwners;
     address[] private _validators; // All registered validators including resigned
     address[] private _activeValidators; // Has valid BLS public key and is not resigned
     mapping(address => uint256) private _activeValidatorIndex; // Points to index in _activeValidators array
@@ -449,12 +449,56 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
         return result;
     }
 
-    function getAllValidators() external view returns (Validator[] memory) {
-        Validator[] memory result = new Validator[](_validators.length);
-        for (uint256 i = 0; i < _validators.length; i++) {
-            address addr = _validators[i];
-            ValidatorData storage data = _validatorsData[addr];
-            result[i] = Validator({addr: addr, data: data});
+    function getValidators(uint256 offset, uint256 count) external view returns (Validator[] memory) {
+        uint256 total = 0;
+        if (offset < _validators.length) {
+            total = _min(count, _validators.length - offset);
+        }
+
+        Validator[] memory result = new Validator[](total);
+        for (uint256 i = 0; i < total; i++) {
+            address addr = _validators[offset + i];
+            result[i] = Validator({addr: addr, data: _validatorsData[addr]});
+        }
+
+        return result;
+    }
+
+    function getValidatorsOf(address[] calldata accounts) external view returns (Validator[] memory) {
+        Validator[] memory validators = new Validator[](accounts.length * 2);
+        uint256 n = 0;
+
+        for (uint256 i = 0; i < accounts.length; i++) {
+            address account = accounts[i];
+            if (_hasValidator[account]) {
+                validators[n++] = Validator({addr: account, data: _validatorsData[account]});
+            }
+
+            address target = _voters[account].validator;
+            if (target != address(0) && target != account) {
+                validators[n++] = Validator({addr: target, data: _validatorsData[target]});
+            }
+        }
+
+        if (validators.length == n) {
+            return validators;
+        }
+
+        Validator[] memory slice = new Validator[](n);
+        for (uint256 i = 0; i < n; i++) {
+            slice[i] = validators[i];
+        }
+
+        return slice;
+    }
+
+    function getValidatorsByBlsPublicKeys(bytes[] calldata blsPublicKeys) external view returns (Validator[] memory) {
+        Validator[] memory result = new Validator[](blsPublicKeys.length);
+        for (uint256 i = 0; i < blsPublicKeys.length; i++) {
+            address owner = _blsPublicKeyOwners[keccak256(blsPublicKeys[i])];
+            if (owner != address(0)) {
+                result[i] = Validator({addr: owner, data: _validatorsData[owner]});
+            }
         }
 
         return result;
@@ -688,13 +732,13 @@ contract ConsensusV1 is UUPSUpgradeable, OwnableUpgradeable {
 
     function _verifyAndRegisterBlsPublicKey(bytes calldata blsPublicKey) internal {
         bytes32 blsPublicKeyHash = keccak256(blsPublicKey);
-        if (_blsPublicKeys[blsPublicKeyHash]) {
+        if (_blsPublicKeyOwners[blsPublicKeyHash] != address(0)) {
             revert BlsKeyAlreadyRegistered();
         }
 
         _checkBls12_381PublicKey(blsPublicKey);
 
-        _blsPublicKeys[blsPublicKeyHash] = true;
+        _blsPublicKeyOwners[blsPublicKeyHash] = msg.sender;
     }
 
     // Internal pure functions

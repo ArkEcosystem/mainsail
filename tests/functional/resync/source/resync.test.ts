@@ -1,12 +1,15 @@
 import type { Contracts } from "@mainsail/contracts";
 import { Identifiers } from "@mainsail/constants";
+import { buildProofOfPossession } from "@mainsail/crypto-key-pair-bls12-381";
+import { ConsensusAbi } from "@mainsail/evm-contracts";
 import { describe } from "@mainsail/test-runner";
 import { EvmCalls, Utils } from "@mainsail/test-transaction-builders";
 import { runDatabaseQuery, setupSyncNode } from "./setup.js";
 import { verifyNodeIntegrity } from "./integrity.js";
 import { forgeTransactions, getRandomConsensusKeyPair, getWallets, waitForApiSync } from "./utilities.js";
+import { validatorControllerAbi, validatorControllerDeployment } from "./validator-controller.js";
 import { dirSync } from "tmp";
-import { getCreateAddress, Hex, parseEther } from "viem";
+import { bytesToHex, encodeFunctionData, getCreateAddress, Hex, parseEther } from "viem";
 
 describe<{
 	syncNode: Contracts.Kernel.Application;
@@ -110,6 +113,145 @@ describe<{
 		});
 
 		assert.true(await forgeTransactions(context, [validatorResignationTx]));
+	});
+
+	it("should be ok with validator key updates, vote switches and voter transfers", async ({ syncNode }) => {
+		const wallets = await getWallets(syncNode);
+
+		const context = { app: syncNode, wallets };
+		const consensus = syncNode.get<string>(Identifiers.EvmConsensus.Contracts.Consensus);
+		const { chainId } = syncNode
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.getNetwork();
+
+		const validatorWallet = await Utils.getRandomColdWallet(context);
+		const voterWallet = await Utils.getRandomColdWallet(context);
+
+		const fundTxs = [
+			await EvmCalls.makeEvmCall(context, { recipient: validatorWallet.address, value: parseEther("300") }),
+			await EvmCalls.makeEvmCall(context, {
+				nonceOffset: 1,
+				recipient: voterWallet.address,
+				value: parseEther("300"),
+			}),
+		];
+		assert.true(await forgeTransactions(context, fundTxs));
+
+		const registrationTx = await EvmCalls.makeValidatorRegistration(context, {
+			sender: validatorWallet.keyPair,
+			validatorKeyPair: await getRandomConsensusKeyPair(context),
+		});
+		assert.true(await forgeTransactions(context, [registrationTx]));
+
+		const updatedKeyPair = await getRandomConsensusKeyPair(context);
+		const { pop } = buildProofOfPossession(Buffer.from(updatedKeyPair.privateKey, "hex"), {
+			chainId,
+			registrantAddress: validatorWallet.address,
+		});
+		const updateTx = await EvmCalls.makeEvmCall(context, {
+			gasLimit: 500_000,
+			payload: encodeFunctionData({
+				abi: ConsensusAbi.abi,
+				args: [`0x${updatedKeyPair.publicKey}`, bytesToHex(pop)],
+				functionName: "updateValidator",
+			}).slice(2),
+			recipient: consensus,
+			sender: validatorWallet.keyPair,
+		});
+		assert.true(await forgeTransactions(context, [updateTx]));
+
+		const voteTx = await EvmCalls.makeValidatorVote(context, {
+			sender: voterWallet.keyPair,
+			vote: validatorWallet.address,
+		});
+		assert.true(await forgeTransactions(context, [voteTx]));
+
+		const switchTx = await EvmCalls.makeValidatorVote(context, {
+			sender: voterWallet.keyPair,
+			vote: await Utils.getAddressByPublicKey(context, wallets[0].publicKey),
+		});
+		assert.true(await forgeTransactions(context, [switchTx]));
+
+		const transferTx = await EvmCalls.makeEvmCall(context, {
+			recipient: voterWallet.address,
+			value: parseEther("50"),
+		});
+		assert.true(await forgeTransactions(context, [transferTx]));
+	});
+
+	it("should be ok with validators and votes managed by a contract", async ({ syncNode }) => {
+		const wallets = await getWallets(syncNode);
+
+		const context = { app: syncNode, wallets };
+		const consensus = syncNode.get<string>(Identifiers.EvmConsensus.Contracts.Consensus);
+		const { chainId } = syncNode
+			.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration)
+			.getNetwork();
+
+		const deployTx = await EvmCalls.makeEvmCallDeployErc20Contract(context, {
+			payload: validatorControllerDeployment(consensus),
+		});
+		const controller = getCreateAddress({ from: deployTx.from as Hex, nonce: deployTx.nonce });
+		assert.true(await forgeTransactions(context, [deployTx]));
+
+		const fundTx = await EvmCalls.makeEvmCall(context, { recipient: controller, value: parseEther("300") });
+		assert.true(await forgeTransactions(context, [fundTx]));
+
+		const validatorKeyPair = await getRandomConsensusKeyPair(context);
+		const { pop } = buildProofOfPossession(Buffer.from(validatorKeyPair.privateKey, "hex"), {
+			chainId,
+			registrantAddress: controller,
+		});
+		const registerAndResignTx = await EvmCalls.makeEvmCall(context, {
+			gasLimit: 1_000_000,
+			payload: encodeFunctionData({
+				abi: validatorControllerAbi,
+				args: [`0x${validatorKeyPair.publicKey}`, bytesToHex(pop), parseEther("250")],
+				functionName: "registerAndResign",
+			}).slice(2),
+			recipient: controller,
+		});
+		assert.true(await forgeTransactions(context, [registerAndResignTx]));
+
+		const controllerAttributes = async () => {
+			await waitForApiSync(syncNode);
+
+			const [row] = await runDatabaseQuery(syncNode.get<string>(Identifiers.Application.Name), (dataSource) =>
+				dataSource.query("SELECT attributes FROM wallets WHERE lower(address) = lower($1)", [controller]),
+			);
+
+			return row.attributes;
+		};
+
+		const resigned = await controllerAttributes();
+		assert.equal(resigned.validatorPublicKey, validatorKeyPair.publicKey);
+		assert.true(resigned.validatorResigned);
+
+		const vote = async (validator: string) =>
+			EvmCalls.makeEvmCall(context, {
+				gasLimit: 500_000,
+				payload: encodeFunctionData({
+					abi: validatorControllerAbi,
+					args: [validator as Hex],
+					functionName: "vote",
+				}).slice(2),
+				recipient: controller,
+				value: 1n,
+			});
+
+		assert.true(
+			await forgeTransactions(context, [
+				await vote(await Utils.getAddressByPublicKey(context, wallets[0].publicKey)),
+			]),
+		);
+		assert.true(
+			await forgeTransactions(context, [
+				await vote(await Utils.getAddressByPublicKey(context, wallets[1].publicKey)),
+			]),
+		);
+
+		const topUpTx = await EvmCalls.makeEvmCall(context, { recipient: controller, value: parseEther("5") });
+		assert.true(await forgeTransactions(context, [topUpTx]));
 	});
 
 	it("should be ok with tokens", async ({ syncNode }) => {

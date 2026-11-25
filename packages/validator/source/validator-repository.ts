@@ -11,6 +11,9 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 	@inject(Identifiers.ValidatorSet.Service)
 	private readonly validatorSet!: Contracts.ValidatorSet.Service;
 
+	@inject(Identifiers.Evm.ContractService.Consensus)
+	private readonly consensusContractService!: Contracts.Evm.ConsensusContractService;
+
 	#validators!: Map<string, Contracts.Validator.Validator>;
 
 	public configure(validators: Contracts.Validator.Validator[]): ValidatorRepository {
@@ -23,7 +26,7 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 		return this.#validators.get(consensusPublicKey);
 	}
 
-	public printLoadedValidators(): void {
+	public async printLoadedValidators(): Promise<void> {
 		if (this.#validators.size === 0) {
 			this.logger.info("No validators found on this node");
 			return;
@@ -36,12 +39,13 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 		const resigned: string[] = [];
 		const notRegistered: string[] = [];
 
-		const allValidators = this.validatorSet.getAllValidators();
+		const consensusPublicKeys = [...this.#validators.keys()];
+		const validators = await this.consensusContractService.getValidatorsByBlsPublicKeys(consensusPublicKeys);
 		const roundValidators = this.validatorSet.getRoundValidators();
 
-		for (const consensusPublicKey of this.#validators.keys()) {
-			const validator = allValidators.find((validator) => validator.blsPublicKey === consensusPublicKey);
-			if (validator) {
+		for (const [index, consensusPublicKey] of consensusPublicKeys.entries()) {
+			const validator = validators[index];
+			if (validator && validator.blsPublicKey === consensusPublicKey) {
 				if (validator.isResigned) {
 					resigned.push(validator.address);
 				} else if (

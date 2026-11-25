@@ -293,16 +293,16 @@ describe<Ctx>("Restore", ({ it, beforeEach, assert, spy }) => {
 		context.validatorRounds = [{ round: 1, validators: [{ address: PROPOSER, voteBalance: 100n }] }];
 
 		context.consensusContractService = {
-			getAllValidators: async () => [
-				{
+			getValidators: async function* () {
+				yield {
 					address: PROPOSER,
 					blsPublicKey: "0xbls",
 					fee: 1n,
 					isResigned: false,
 					voteBalance: 100n,
 					votersCount: 1,
-				},
-			],
+				};
+			},
 			getValidatorRounds: async function* () {
 				yield* context.validatorRounds;
 			},
@@ -584,6 +584,39 @@ describe<Ctx>("Restore", ({ it, beforeEach, assert, spy }) => {
 		const multiPayments = repos.multiPayment.qb.calls.values.flatMap(([batch]: [any[]]) => batch);
 		assert.equal(multiPayments.length, 1);
 		assert.equal(multiPayments[0].hash, "0xtx2");
+	});
+
+	it("ingests every validator from the paged contract iterator", async (context) => {
+		const { repos, restore, consensusContractService } = context;
+
+		consensusContractService.getValidators = async function* () {
+			yield {
+				address: PROPOSER,
+				blsPublicKey: "0xbls",
+				fee: 1n,
+				isResigned: false,
+				voteBalance: 100n,
+				votersCount: 1,
+			};
+			yield {
+				address: NAMED_USER,
+				blsPublicKey: "0xresigned",
+				fee: 2n,
+				isResigned: true,
+				voteBalance: 0n,
+				votersCount: 0,
+			};
+		};
+
+		await restore.restore();
+
+		const walletRows = repos.wallet.qb.calls.values.flatMap(([batch]: [any[]]) => batch);
+		const byAddress = new Map(walletRows.map((row: any) => [row.address, row]));
+
+		assert.equal(byAddress.get(PROPOSER)!.attributes.validatorPublicKey, "0xbls");
+		assert.equal(byAddress.get(NAMED_USER)!.attributes.validatorPublicKey, "0xresigned");
+		assert.true(byAddress.get(NAMED_USER)!.attributes.validatorResigned);
+		assert.equal(byAddress.get(NAMED_USER)!.attributes.validatorFee, "2");
 	});
 
 	it("restores without a snapshot importer", async (context) => {

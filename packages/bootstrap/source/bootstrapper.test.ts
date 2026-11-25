@@ -87,7 +87,7 @@ describe<{
 		};
 
 		context.validatorRepository = {
-			printLoadedValidators: () => {},
+			printLoadedValidators: async () => {},
 		};
 
 		context.txPoolWorker = {

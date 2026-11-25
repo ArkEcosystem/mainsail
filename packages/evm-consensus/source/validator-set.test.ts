@@ -13,17 +13,13 @@ describe<{
 	roundCalculator: any;
 	validatorSet: ValidatorSet;
 }>("ValidatorSet", ({ it, beforeEach, assert, spy, stub }) => {
-	const wallet = (
-		address: string,
-		overrides: Partial<Contracts.State.ValidatorWallet> = {},
-	): Contracts.State.ValidatorWallet => ({
+	const wallet = (address: string): Contracts.State.ValidatorWallet => ({
 		address,
 		blsPublicKey: "aa",
 		fee: 1n,
 		isResigned: false,
 		voteBalance: 100n,
 		votersCount: 1,
-		...overrides,
 	});
 
 	const validators = [wallet("0xa"), wallet("0xb"), wallet("0xc")];
@@ -31,7 +27,6 @@ describe<{
 	beforeEach((context) => {
 		context.configuration = { getMilestone: () => ({ roundValidators: 3 }) };
 		context.consensusContractService = {
-			getAllValidators: async () => validators,
 			getRoundValidators: async () => validators,
 		};
 		context.roundCalculator = { isNewRound: () => false };
@@ -44,11 +39,13 @@ describe<{
 		context.validatorSet = context.app.resolve(ValidatorSet);
 	});
 
-	it("#restore - should build round validators and load all validators", async ({ validatorSet }) => {
+	it("#restore - should build only the round validators", async ({ validatorSet, consensusContractService }) => {
+		const build = spy(consensusContractService, "getRoundValidators");
+
 		await validatorSet.restore();
 
+		build.calledOnce();
 		assert.equal(validatorSet.getRoundValidators(), validators);
-		assert.equal(validatorSet.getAllValidators(), validators);
 	});
 
 	it("#getRoundValidators - should throw when not yet restored", ({ validatorSet }) => {
@@ -117,39 +114,5 @@ describe<{
 		await validatorSet.onCommit({ blockNumber: 9 } as unknown as Contracts.Processor.ProcessableUnit);
 
 		build.neverCalled();
-	});
-
-	it("#onCommit - should skip dirty calculation when ApiSync is not bound", async ({
-		validatorSet,
-		consensusContractService,
-	}) => {
-		const all = spy(consensusContractService, "getAllValidators");
-
-		await validatorSet.onCommit({ blockNumber: 9 } as unknown as Contracts.Processor.ProcessableUnit);
-
-		all.neverCalled();
-	});
-
-	it("#onCommit - should mark new and changed validators dirty when ApiSync is bound", async ({
-		app,
-		validatorSet,
-		consensusContractService,
-	}) => {
-		app.bind(Identifiers.ApiSync.Service).toConstantValue({});
-		await validatorSet.restore();
-
-		consensusContractService.getAllValidators = async () => [
-			wallet("0xa"),
-			wallet("0xb", { voteBalance: 999n }),
-			wallet("0xc"),
-			wallet("0xd"),
-		];
-
-		await validatorSet.onCommit({ blockNumber: 9 } as unknown as Contracts.Processor.ProcessableUnit);
-
-		assert.equal(
-			validatorSet.getDirtyValidators().map((validator) => validator.address),
-			["0xb", "0xd"],
-		);
 	});
 });

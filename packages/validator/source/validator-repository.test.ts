@@ -16,11 +16,24 @@ describe<{
 	app: Application;
 	logger: { info: (message: string) => void };
 	validatorSet: {
-		getAllValidators: () => Contracts.State.ValidatorWallet[];
 		getRoundValidators: () => Contracts.State.ValidatorWallet[];
+	};
+	consensusContractService: {
+		getValidatorsByBlsPublicKeys: (
+			blsPublicKeys: string[],
+		) => Promise<(Contracts.State.ValidatorWallet | undefined)[]>;
 	};
 	validatorRepository: ValidatorRepository;
 }>("ValidatorRepository", ({ it, assert, beforeEach, spy }) => {
+	const registered = (...wallets: Contracts.State.ValidatorWallet[]) => {
+		const byKey = new Map<string, Contracts.State.ValidatorWallet>();
+		for (const wallet of wallets) {
+			byKey.set(wallet.blsPublicKey, wallet);
+		}
+
+		return async (blsPublicKeys: string[]) => blsPublicKeys.map((blsPublicKey) => byKey.get(blsPublicKey));
+	};
+
 	beforeEach((context) => {
 		context.app = new Application();
 
@@ -28,10 +41,14 @@ describe<{
 		context.app.bind(Identifiers.Services.Log.Service).toConstantValue(context.logger);
 
 		context.validatorSet = {
-			getAllValidators: () => [],
 			getRoundValidators: () => [],
 		};
 		context.app.bind(Identifiers.ValidatorSet.Service).toConstantValue(context.validatorSet);
+
+		context.consensusContractService = {
+			getValidatorsByBlsPublicKeys: async (blsPublicKeys) => blsPublicKeys.map(() => undefined),
+		};
+		context.app.bind(Identifiers.Evm.ContractService.Consensus).toConstantValue(context.consensusContractService);
 
 		context.validatorRepository = context.app.resolve(ValidatorRepository);
 	});
@@ -55,20 +72,27 @@ describe<{
 		assert.equal(validatorRepository.getValidator("known-key"), validator);
 	});
 
-	it("#printLoadedValidators - should report when no validators are loaded", ({ validatorRepository, logger }) => {
+	it("#printLoadedValidators - should report when no validators are loaded", async ({
+		validatorRepository,
+		logger,
+		consensusContractService,
+	}) => {
 		validatorRepository.configure([]);
 
 		const info = spy(logger, "info");
+		const lookup = spy(consensusContractService, "getValidatorsByBlsPublicKeys");
 
-		validatorRepository.printLoadedValidators();
+		await validatorRepository.printLoadedValidators();
 
 		info.calledOnce();
 		info.calledWith("No validators found on this node");
+		lookup.neverCalled();
 	});
 
-	it("#printLoadedValidators - should bucket validators into active, stand-by, resigned and undefined", ({
+	it("#printLoadedValidators - should bucket validators into active, stand-by, resigned and undefined", async ({
 		validatorRepository,
 		validatorSet,
+		consensusContractService,
 		logger,
 	}) => {
 		const activeKey = "active-key";
@@ -80,7 +104,7 @@ describe<{
 		const standByWallet = makeWallet("0xStandBy", standByKey);
 		const resignedWallet = makeWallet("0xResigned", resignedKey, true);
 
-		validatorSet.getAllValidators = () => [activeWallet, standByWallet, resignedWallet];
+		consensusContractService.getValidatorsByBlsPublicKeys = registered(activeWallet, standByWallet, resignedWallet);
 		validatorSet.getRoundValidators = () => [activeWallet];
 
 		validatorRepository.configure([
@@ -91,8 +115,12 @@ describe<{
 		]);
 
 		const info = spy(logger, "info");
+		const lookup = spy(consensusContractService, "getValidatorsByBlsPublicKeys");
 
-		validatorRepository.printLoadedValidators();
+		await validatorRepository.printLoadedValidators();
+
+		lookup.calledOnce();
+		lookup.calledWith([activeKey, standByKey, resignedKey, unknownKey]);
 
 		// header line + the four bucket lines
 		info.calledTimes(5);
@@ -102,23 +130,51 @@ describe<{
 		info.calledWith("Undefined validators (1): [unknown-key]");
 	});
 
-	it("#printLoadedValidators - should count a resigned validator only once", ({
+	it("#printLoadedValidators - should report a key that its validator has replaced as undefined", async ({
+		validatorRepository,
+		consensusContractService,
+		logger,
+	}) => {
+		const replacedKey = "replaced-key";
+		const resignedReplacedKey = "resigned-replaced-key";
+		const owners = new Map([
+			[replacedKey, makeWallet("0xUpdated", "new-key")],
+			[resignedReplacedKey, makeWallet("0xResigned", "other-key", true)],
+		]);
+
+		consensusContractService.getValidatorsByBlsPublicKeys = async (blsPublicKeys) =>
+			blsPublicKeys.map((blsPublicKey) => owners.get(blsPublicKey));
+
+		validatorRepository.configure([makeValidator(replacedKey), makeValidator(resignedReplacedKey)]);
+
+		const info = spy(logger, "info");
+
+		await validatorRepository.printLoadedValidators();
+
+		info.calledWith("Round validators (0): []");
+		info.calledWith("Stand by validators (0): []");
+		info.calledWith("Resigned validators (0): []");
+		info.calledWith("Undefined validators (2): [replaced-key,resigned-replaced-key]");
+	});
+
+	it("#printLoadedValidators - should count a resigned validator only once", async ({
 		validatorRepository,
 		validatorSet,
+		consensusContractService,
 		logger,
 	}) => {
 		const resignedKey = "resigned-key";
 		const resignedWallet = makeWallet("0xResigned", resignedKey, true);
 
 		// The resigned validator is also part of the active round; it must not be double-counted.
-		validatorSet.getAllValidators = () => [resignedWallet];
+		consensusContractService.getValidatorsByBlsPublicKeys = registered(resignedWallet);
 		validatorSet.getRoundValidators = () => [resignedWallet];
 
 		validatorRepository.configure([makeValidator(resignedKey)]);
 
 		const info = spy(logger, "info");
 
-		validatorRepository.printLoadedValidators();
+		await validatorRepository.printLoadedValidators();
 
 		info.calledWith("Round validators (0): []");
 		info.calledWith("Stand by validators (0): []");

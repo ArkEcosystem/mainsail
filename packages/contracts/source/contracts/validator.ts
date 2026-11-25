@@ -33,7 +33,7 @@ export interface Validator {
 
 export interface ValidatorRepository {
 	getValidator(publicKey: string): Validator | undefined;
-	printLoadedValidators(): void;
+	printLoadedValidators(): Promise<void>;
 }
 
 export interface ProposerReporter extends EventListener {

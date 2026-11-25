@@ -588,9 +588,8 @@ export class Restore {
 	async #ingestConsensusData(context: RestoreContext): Promise<void> {
 		const t0 = performance.now();
 
-		const validators = await this.consensusContractService.getAllValidators();
-
-		for (const validator of validators) {
+		let totalValidators = 0;
+		for await (const validator of this.consensusContractService.getValidators()) {
 			context.validatorAttributes[validator.address] = {
 				blsPublicKey: validator.blsPublicKey,
 				fee: validator.fee,
@@ -601,6 +600,7 @@ export class Restore {
 				voteBalance: validator.voteBalance,
 				votersCount: validator.votersCount,
 			};
+			totalValidators++;
 		}
 
 		let totalVotes = 0;
@@ -615,7 +615,7 @@ export class Restore {
 		}
 
 		const t1 = performance.now();
-		this.logger.info(`Read ${validators.length} validators and ${totalVotes} votes from contract ${t1 - t0}ms`);
+		this.logger.info(`Read ${totalValidators} validators and ${totalVotes} votes from contract ${t1 - t0}ms`);
 	}
 
 	async #ingestWallets(context: RestoreContext): Promise<void> {
