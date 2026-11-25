@@ -129,7 +129,7 @@ export class TransactionForger implements Contracts.Forger.TransactionForger {
 
 		const transactionIterable = this.app
 			.resolve<TransactionIterable>(TransactionIterable)
-			.initialize(this.#commitKey);
+			.initialize(this.#commitKey, this.#timeLimit);
 
 		for await (const transaction of transactionIterable) {
 			if (performance.now() > this.#timeLimit) {
