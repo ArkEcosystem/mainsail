@@ -1,5 +1,6 @@
 import type { Contracts } from "@mainsail/contracts";
 
+import { Identifiers } from "@mainsail/constants";
 import { Application } from "@mainsail/kernel";
 
 import {
@@ -28,7 +29,7 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 	}
 
 	public async start(height: number): Promise<void> {
-		await this.#app.resolve(StartHandler).handle(height);
+		await this.#pauseProcessorWhile(() => this.#app.resolve(StartHandler).handle(height));
 	}
 
 	public async commit(
@@ -37,13 +38,15 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 		consumedGas: number,
 		isSyncing: boolean,
 	): Promise<void> {
-		await this.#app.resolve(CommitHandler).handle(height, sendersAddresses, consumedGas, isSyncing);
+		await this.#pauseProcessorWhile(() =>
+			this.#app.resolve(CommitHandler).handle(height, sendersAddresses, consumedGas, isSyncing),
+		);
 	}
 
 	public async getTransactions(
 		options: Contracts.TransactionPool.GetBatchOptions,
 	): Promise<Contracts.TransactionPool.GetBatchResult> {
-		return await this.#app.resolve(GetTransactionsHandler).handle(options);
+		return await this.#pauseProcessorWhile(() => this.#app.resolve(GetTransactionsHandler).handle(options));
 	}
 
 	public async removeTransaction(address: string, id: string): Promise<void> {
@@ -60,5 +63,11 @@ export class WorkerScriptHandler implements Contracts.TransactionPool.WorkerScri
 
 	public async reloadWebhooks(): Promise<void> {
 		await this.#app.resolve(ReloadWebhooksHandler).handle();
+	}
+
+	async #pauseProcessorWhile<T>(work: () => Promise<T>): Promise<T> {
+		return this.#app
+			.get<Contracts.TransactionPool.Processor>(Identifiers.TransactionPool.Processor)
+			.pauseWhile(work);
 	}
 }

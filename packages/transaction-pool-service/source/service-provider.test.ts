@@ -54,6 +54,24 @@ describe<{
 		assert.true(identifiers.every((identifier) => app.isBound(identifier)));
 	});
 
+	it("register - should bind one processor for the api and the pool worker to share", async ({
+		app,
+		serviceProvider,
+	}) => {
+		for (const identifier of [
+			Identifiers.TransactionPool.Broadcaster,
+			Identifiers.Cryptography.Transaction.Factory,
+			Identifiers.Services.Log.Service,
+		]) {
+			app.bind(identifier).toConstantValue({});
+		}
+
+		await serviceProvider.register();
+		app.rebind(Identifiers.TransactionPool.Service).toConstantValue({});
+
+		assert.is(app.get(Identifiers.TransactionPool.Processor), app.get(Identifiers.TransactionPool.Processor));
+	});
+
 	it("register - should bind a factory that creates a configured sender mempool per sender", async ({
 		app,
 		serviceProvider,
