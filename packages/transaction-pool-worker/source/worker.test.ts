@@ -423,6 +423,121 @@ describe<{
 		assert.length(spawned, 1);
 	});
 
+	it("respawns the worker when a commit does not finish in time", async ({ worker, ipc, subprocesses, logs }) => {
+		await startWorker(worker);
+		const fake = clock({ toFake: ["setTimeout", "clearTimeout"] });
+		const commit = deferred();
+		ipc.respond = async (method) => (method === "commit" ? commit.promise : undefined);
+		ipc.kill = async () => {
+			stopIpc(ipc);
+			commit.reject(new Error("Worker was killed"));
+
+			return 1;
+		};
+		const replacement = addReplacement(subprocesses);
+
+		await within(worker.onCommit(makeUnit(11)));
+		await fake.tickAsync(29_999);
+
+		assert.length(replacement.requests, 0);
+
+		await fake.tickAsync(1);
+		fake.restore();
+		await waitFor(() => respawned(logs));
+
+		assert.equal(replacement.requests[1], ["start", 11]);
+		await within(worker.getTransactions({ blockRound: "12-0", maxBytes: 1024, maxSize: 100 }));
+	});
+
+	it("keeps the worker when a commit finishes in time", async ({ worker, logs, spawned }) => {
+		await startWorker(worker);
+		const fake = clock({ toFake: ["setTimeout", "clearTimeout"] });
+
+		await within(worker.onCommit(makeUnit(11)));
+		await within(worker.getTransactions({ blockRound: "12-0", maxBytes: 1024, maxSize: 100 }));
+		await fake.tickAsync(30_000);
+		fake.restore();
+
+		assert.length(spawned, 1);
+		assert.length(logs, 0);
+	});
+
+	it("keeps the replacement when a commit times out while it reloads the pool", async ({
+		worker,
+		ipc,
+		subprocesses,
+		terminations,
+		logs,
+		spawned,
+	}) => {
+		await startWorker(worker);
+
+		const reload = deferred();
+		const replacement = addReplacement(subprocesses);
+		replacement.respond = async (method) => (method === "boot" ? undefined : reload.promise);
+		stopIpc(ipc);
+
+		await worker.onCommit(makeUnit(11));
+		await waitFor(() => replacement.requests.length === 2);
+		const fake = clock({ toFake: ["setTimeout", "clearTimeout"] });
+
+		await within(worker.onCommit(makeUnit(12)));
+		await fake.tickAsync(30_000);
+		fake.restore();
+
+		assert.length(spawned, 2);
+		assert.length(terminations, 0);
+
+		reload.resolve();
+		await waitFor(() => respawned(logs));
+	});
+
+	it("restarts the commit timeout once the replacement has reloaded the pool", async ({
+		worker,
+		ipc,
+		subprocesses,
+		logs,
+		spawned,
+	}) => {
+		await startWorker(worker);
+
+		const start = deferred();
+		const commit = deferred();
+		const replacement = addReplacement(subprocesses);
+		replacement.respond = async (method) => {
+			if (method === "start") {
+				return start.promise;
+			}
+
+			return method === "commit" ? commit.promise : undefined;
+		};
+		stopIpc(ipc);
+
+		await worker.onCommit(makeUnit(11));
+		await waitFor(() => replacement.requests.length === 2);
+		const fake = clock({ toFake: ["setTimeout", "clearTimeout"] });
+
+		await within(worker.onCommit(makeUnit(12)));
+		await waitFor(() => replacement.requests.length === 3);
+		await fake.tickAsync(25_000);
+		start.resolve();
+		await waitFor(() => respawned(logs));
+		await fake.tickAsync(5_000);
+
+		assert.length(spawned, 2);
+		assert.length(
+			logs.filter(([, message]) => message === "Respawning the transaction pool worker"),
+			1,
+		);
+
+		await fake.tickAsync(25_000);
+		await waitFor(() => spawned.length === 3);
+		fake.restore();
+
+		await waitFor(() => respawned(logs, 2));
+		assert.equal(spawned[2].requests[1], ["start", 12]);
+	});
+
 	it("skips every request while the worker respawns and restarts it at the latest block", async ({
 		worker,
 		ipc,

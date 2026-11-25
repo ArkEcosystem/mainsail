@@ -4,6 +4,8 @@ import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, postConstruct } from "@mainsail/container";
 import dayjs from "dayjs";
 
+const COMMIT_TIMEOUT = 30_000;
+
 @injectable()
 export class Worker implements Contracts.TransactionPool.Worker {
 	@inject(Identifiers.Application.Instance)
@@ -31,6 +33,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 	#respawning = false;
 	#bootPromise?: Promise<void>;
 	#respawnPromise?: Promise<void>;
+	readonly #commitTimeouts = new Set<NodeJS.Timeout>();
 	#disposePromise?: Promise<void>;
 
 	@postConstruct()
@@ -113,20 +116,22 @@ export class Worker implements Contracts.TransactionPool.Worker {
 
 		this.#blockNumber = unit.blockNumber;
 
-		void this.#sendIfRunning(
-			"commit",
-			unit.blockNumber,
-			[...sendersAddresses.keys()],
-			block.gasUsed,
-			isSyncing,
-		).catch((error: Error) => {
-			if (this.#stopping) {
-				return;
-			}
+		const timeout = setTimeout(() => this.#respawn(), COMMIT_TIMEOUT);
+		this.#commitTimeouts.add(timeout);
 
-			this.logger.error(`Failed to commit the transaction pool: ${error.message}`);
-			this.#respawn();
-		});
+		void this.#sendIfRunning("commit", unit.blockNumber, [...sendersAddresses.keys()], block.gasUsed, isSyncing)
+			.catch((error: Error) => {
+				if (this.#stopping) {
+					return;
+				}
+
+				this.logger.error(`Failed to commit the transaction pool: ${error.message}`);
+				this.#respawn();
+			})
+			.finally(() => {
+				clearTimeout(timeout);
+				this.#commitTimeouts.delete(timeout);
+			});
 	}
 
 	public async start(blockNumber: number): Promise<void> {
@@ -184,6 +189,7 @@ export class Worker implements Contracts.TransactionPool.Worker {
 			return;
 		}
 
+		this.#started = false;
 		this.#respawning = true;
 		this.#respawnPromise = this.#doRespawn();
 	}
@@ -222,6 +228,12 @@ export class Worker implements Contracts.TransactionPool.Worker {
 			}
 
 			return;
+		}
+
+		this.#started = true;
+
+		for (const timeout of this.#commitTimeouts) {
+			timeout.refresh();
 		}
 
 		this.logger.info("Respawned the transaction pool worker");
