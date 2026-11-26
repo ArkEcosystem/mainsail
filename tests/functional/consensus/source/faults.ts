@@ -41,6 +41,43 @@ export const disconnect = (stub: StubFactory, node: Contracts.Kernel.Application
 	};
 };
 
+export const holdChainAt = (stub: StubFactory, nodes: Contracts.Kernel.Application[], blockNumber: number) => {
+	const join = (node: Contracts.Kernel.Application) => {
+		const proposalProcessor = proposalProcessorOf(node);
+		const process = proposalProcessor.process.bind(proposalProcessor);
+
+		stub(proposalProcessor, "process").callsFake(async (...arguments_: unknown[]) => {
+			const proposal = arguments_[0] as Contracts.Crypto.Proposal;
+
+			if (proposal.blockHeader.number > blockNumber) {
+				return Skipped;
+			}
+
+			return process(proposal, arguments_[1] as boolean | undefined);
+		});
+	};
+
+	for (const node of nodes) {
+		join(node);
+	}
+
+	return {
+		join,
+		moveTo: (next: number) => {
+			blockNumber = next;
+		},
+	};
+};
+
+export const voteNull = (stub: StubFactory, node: Contracts.Kernel.Application) => {
+	const consensus = node.get<Consensus>(Identifiers.Consensus.Service);
+	const prevote = consensus.prevote.bind(consensus);
+	const precommit = consensus.precommit.bind(consensus);
+
+	stub(consensus, "prevote").callsFake(async () => prevote());
+	stub(consensus, "precommit").callsFake(async () => precommit());
+};
+
 // Message loss on `node`: the proposals of the given rounds, and the prevotes of the given validators in the given
 // rounds, never reach its processors. Everything else passes, and what the node sends is not affected. Validators
 // are named by their index in the validator set, the one their votes carry.

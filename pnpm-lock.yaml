@@ -3437,6 +3437,9 @@ importers:
       '@mainsail/blockchain-utils':
         specifier: workspace:*
         version: link:../../../packages/blockchain-utils
+      '@mainsail/bootstrap':
+        specifier: workspace:*
+        version: link:../../../packages/bootstrap
       '@mainsail/consensus':
         specifier: workspace:*
         version: link:../../../packages/consensus

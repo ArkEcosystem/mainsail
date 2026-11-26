@@ -157,6 +157,53 @@ describe<{
 		info.calledWith("Undefined validators (2): [replaced-key,resigned-replaced-key]");
 	});
 
+	it("#printLoadedValidators - should count a replaced key that is still in the round as a round validator", async ({
+		validatorRepository,
+		validatorSet,
+		consensusContractService,
+		logger,
+	}) => {
+		const roundKey = "round-key";
+		const updatedWallet = makeWallet("0xUpdated", "new-key");
+
+		consensusContractService.getValidatorsByBlsPublicKeys = async (blsPublicKeys) =>
+			blsPublicKeys.map(() => updatedWallet);
+		validatorSet.getRoundValidators = () => [makeWallet("0xUpdated", roundKey)];
+
+		validatorRepository.configure([makeValidator(roundKey)]);
+
+		const info = spy(logger, "info");
+
+		await validatorRepository.printLoadedValidators();
+
+		info.calledWith("Round validators (1): [0xUpdated]");
+		info.calledWith("Stand by validators (0): []");
+		info.calledWith("Undefined validators (0): []");
+	});
+
+	it("#printLoadedValidators - should report the round key and the new key of the same validator", async ({
+		validatorRepository,
+		validatorSet,
+		consensusContractService,
+		logger,
+	}) => {
+		const updatedWallet = makeWallet("0xUpdated", "new-key");
+
+		consensusContractService.getValidatorsByBlsPublicKeys = async (blsPublicKeys) =>
+			blsPublicKeys.map(() => updatedWallet);
+		validatorSet.getRoundValidators = () => [makeWallet("0xUpdated", "round-key")];
+
+		validatorRepository.configure([makeValidator("round-key"), makeValidator("new-key")]);
+
+		const info = spy(logger, "info");
+
+		await validatorRepository.printLoadedValidators();
+
+		info.calledWith("Round validators (1): [0xUpdated]");
+		info.calledWith("Stand by validators (1): [0xUpdated]");
+		info.calledWith("Undefined validators (0): []");
+	});
+
 	it("#printLoadedValidators - should count a resigned validator only once", async ({
 		validatorRepository,
 		validatorSet,

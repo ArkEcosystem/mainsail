@@ -2,7 +2,7 @@ import type { Contracts } from "@mainsail/contracts";
 
 import { Identifiers } from "@mainsail/constants";
 import { Application, Bootstrap, Providers, Services } from "@mainsail/kernel";
-import { copyFileSync } from "fs";
+import { copyFileSync, cpSync } from "fs";
 import { join } from "path";
 import { dirSync } from "tmp";
 
@@ -20,6 +20,7 @@ type PluginOptions = Record<string, any>;
 const nodeToRegister = new WeakMap<Contracts.Kernel.Application, { id: number; p2pRegistry: P2PRegistry }>();
 
 type SetupOptions = {
+	bootstrap?: boolean;
 	// Load the real consensus storage (LMDB under the data path) instead of the no-op stub. It persists the
 	// consensus state on dispose, which is what lets `restart` bring a node back mid-round.
 	consensusStorage?: boolean;
@@ -62,10 +63,18 @@ const setup = async (
 	app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
 		getTransactions: async () => ({ remaining: 0, transactions: [] }),
 		onCommit: async () => {},
+		start: async () => {},
 	});
 	app.bind(Identifiers.Evm.Worker).toConstantValue({
 		onCommit: async () => {},
+		start: async () => {},
 	});
+
+	if (options.bootstrap) {
+		app.bind(Identifiers.P2P.Server).toConstantValue({ boot: async () => p2pRegistry.registerNode(id, app) });
+		app.bind(Identifiers.P2P.Service).toConstantValue({ boot: async () => {} });
+		app.bind(Identifiers.Snapshot.Legacy.Importer).toConstantValue({ dispose: () => {} });
+	}
 
 	app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
 	app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue({
@@ -124,6 +133,7 @@ const setup = async (
 		"@mainsail/validator",
 		...(options.consensusStorage ? ["@mainsail/consensus-storage"] : []),
 		"@mainsail/consensus",
+		...(options.bootstrap ? ["@mainsail/bootstrap"] : []),
 	];
 
 	const pluginOptions = {
@@ -292,4 +302,34 @@ const restart = async (
 	return restarted;
 };
 
-export { boot, bootMany, bootstrap, bootstrapMany, restart, run, runMany, setup, stop, stopMany };
+const restartFromState = async (
+	app: Contracts.Kernel.Application,
+	id: number,
+	p2pRegistry: P2PRegistry,
+	crypto: any,
+	validators: ValidatorsJson,
+): Promise<Contracts.Kernel.Application> => {
+	await stop(app);
+	p2pRegistry.unregisterNode(id);
+
+	const dataPath = dirSync({ unsafeCleanup: true }).name;
+	cpSync(app.dataPath(), dataPath, { recursive: true });
+
+	const restarted = await setup(id, p2pRegistry, crypto, validators, {
+		bootstrap: true,
+		consensusStorage: true,
+		dataPath,
+	});
+
+	try {
+		await boot(restarted);
+	} catch (error) {
+		await stop(restarted);
+
+		throw error;
+	}
+
+	return restarted;
+};
+
+export { boot, bootMany, bootstrap, bootstrapMany, restart, restartFromState, run, runMany, setup, stop, stopMany };

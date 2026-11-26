@@ -45,12 +45,13 @@ export class ValidatorRepository implements Contracts.Validator.ValidatorReposit
 
 		for (const [index, consensusPublicKey] of consensusPublicKeys.entries()) {
 			const validator = validators[index];
-			if (validator && validator.blsPublicKey === consensusPublicKey) {
+			const isRoundKey = roundValidators.some(
+				(roundValidator) => roundValidator.blsPublicKey === consensusPublicKey,
+			);
+			if (validator && (validator.blsPublicKey === consensusPublicKey || isRoundKey)) {
 				if (validator.isResigned) {
 					resigned.push(validator.address);
-				} else if (
-					roundValidators.some((activeValidator) => activeValidator.blsPublicKey === consensusPublicKey)
-				) {
+				} else if (isRoundKey) {
 					active.push(validator.address);
 				} else {
 					standBy.push(validator.address);
