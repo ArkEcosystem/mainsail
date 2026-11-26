@@ -163,6 +163,23 @@ contract ConsensusTest is Base {
         assertRoundKeyStored(address(1), blsKey(address(1), 0));
     }
 
+    function test_should_return_fee_of_each_round_validator() public {
+        register(address(1));
+        consensus.setFee(3 ether);
+        vm.deal(address(2), 3 ether);
+        vm.prank(address(2));
+        consensus.registerValidator{value: 3 ether}(blsKey(address(2), 0), createValidPop());
+        consensus.setFee(5 ether);
+        consensus.calculateRoundValidators(2);
+
+        ConsensusV1.Validator[] memory validators = consensus.getRoundValidators();
+
+        assertEq(validators.length, 2);
+        for (uint256 i = 0; i < validators.length; i++) {
+            assertEq(validators[i].data.fee, validators[i].addr == address(2) ? 3 ether : 0);
+        }
+    }
+
     function test_should_free_round_bls_public_key_of_validator_leaving_round() public {
         register(address(1));
         register(address(2));
