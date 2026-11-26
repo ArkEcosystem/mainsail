@@ -20,6 +20,7 @@ type PluginOptions = Record<string, any>;
 const nodeToRegister = new WeakMap<Contracts.Kernel.Application, { id: number; p2pRegistry: P2PRegistry }>();
 
 type SetupOptions = {
+	bootstrap?: boolean;
 	// Load the real consensus storage (LMDB under the data path) instead of the no-op stub. It persists the
 	// consensus state on dispose, which is what lets `restart` bring a node back mid-round.
 	consensusStorage?: boolean;
@@ -62,10 +63,18 @@ const setup = async (
 	app.bind(Identifiers.TransactionPool.Worker).toConstantValue({
 		getTransactions: async () => ({ remaining: 0, transactions: [] }),
 		onCommit: async () => {},
+		start: async () => {},
 	});
 	app.bind(Identifiers.Evm.Worker).toConstantValue({
 		onCommit: async () => {},
+		start: async () => {},
 	});
+
+	if (options.bootstrap) {
+		app.bind(Identifiers.P2P.Server).toConstantValue({ boot: async () => p2pRegistry.registerNode(id, app) });
+		app.bind(Identifiers.P2P.Service).toConstantValue({ boot: async () => {} });
+		app.bind(Identifiers.Snapshot.Legacy.Importer).toConstantValue({ dispose: () => {} });
+	}
 
 	app.bind(Identifiers.CryptoWorker.Worker.Instance).to(Worker).inSingletonScope();
 	app.bind(Identifiers.CryptoWorker.WorkerPool).toConstantValue({
@@ -124,6 +133,7 @@ const setup = async (
 		"@mainsail/validator",
 		...(options.consensusStorage ? ["@mainsail/consensus-storage"] : []),
 		"@mainsail/consensus",
+		...(options.bootstrap ? ["@mainsail/bootstrap"] : []),
 	];
 
 	const pluginOptions = {
@@ -292,23 +302,6 @@ const restart = async (
 	return restarted;
 };
 
-const bootstrapFromState = async (app: Contracts.Kernel.Application) => {
-	const configuration = app.get<Contracts.Crypto.Configuration>(Identifiers.Cryptography.Configuration);
-	const commitFactory = app.get<Contracts.Crypto.CommitFactory>(Identifiers.Cryptography.Commit.Factory);
-	const databaseService = app.get<Contracts.Database.DatabaseService>(Identifiers.Database.Service);
-	const store = app.get<Contracts.State.Store>(Identifiers.State.Store);
-
-	store.setGenesisCommit(await commitFactory.fromJson(configuration.getGenesisCommit()));
-	store.setLastBlock((await databaseService.getLastCommit()).block);
-	store.setTotalRound(databaseService.getState().totalRound);
-
-	await app.get<Contracts.ValidatorSet.Service>(Identifiers.ValidatorSet.Service).restore();
-
-	await app.get<Contracts.Validator.ValidatorRepository>(Identifiers.Validator.Repository).printLoadedValidators();
-
-	app.get<Contracts.State.State>(Identifiers.State.State).setBootstrap(false);
-};
-
 const restartFromState = async (
 	app: Contracts.Kernel.Application,
 	id: number,
@@ -322,10 +315,19 @@ const restartFromState = async (
 	const dataPath = dirSync({ unsafeCleanup: true }).name;
 	cpSync(app.dataPath(), dataPath, { recursive: true });
 
-	const restarted = await setup(id, p2pRegistry, crypto, validators, { consensusStorage: true, dataPath });
-	await boot(restarted);
-	await bootstrapFromState(restarted);
-	await run(restarted);
+	const restarted = await setup(id, p2pRegistry, crypto, validators, {
+		bootstrap: true,
+		consensusStorage: true,
+		dataPath,
+	});
+
+	try {
+		await boot(restarted);
+	} catch (error) {
+		await stop(restarted);
+
+		throw error;
+	}
 
 	return restarted;
 };
