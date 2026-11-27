@@ -245,15 +245,11 @@ export const Identifiers = {
 			Logger: Symbol("P2P<WebSocket.Logger>"),
 			ReceiveMiddleware: Symbol("P2P<WebSocket.ReceiveMiddleware>"),
 			Router: Symbol("P2P<WebSocket.Router>"),
-			Routes: Symbol("P2P<WebSocket.Routes>"),
 			Sender: Symbol("P2P<WebSocket.Sender>"),
 			SendMiddleware: Symbol("P2P<WebSocket.SendMiddleware>"),
 			Server: Symbol("P2P<WebSocket.Server>"),
 			Service: Symbol("P2P<WebSocket.Service>"),
 		},
-	},
-	P2PService: {
-		Service: Symbol("P2PService<Service>"),
 	},
 	Processor: {
 		BlockProcessor: Symbol("Processor<Block.Processor>"),

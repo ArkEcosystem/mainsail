@@ -1,4 +1,15 @@
+export * from "./broadcaster.js";
 export * from "./codecs/index.js";
+export * from "./defaults.js";
+export * from "./header.js";
+export * as Interfaces from "./interfaces/index.js";
+export * from "./logger.js";
+export * from "./peer-communicator.js";
+export * from "./peer-repository.js";
+export * from "./peer.js";
+export * from "./pending-commits.js";
 export * from "./routes/index.js";
 export * from "./service-provider.js";
 export * from "./service.js";
+export * from "./state.js";
+export * from "./utils/index.js";

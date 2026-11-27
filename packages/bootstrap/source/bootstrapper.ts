@@ -26,9 +26,6 @@ export class Bootstrapper {
 	@inject(Identifiers.Validator.Repository)
 	private readonly validatorRepository!: Contracts.Validator.ValidatorRepository;
 
-	@inject(Identifiers.P2P.Server)
-	private readonly p2pServer!: Contracts.P2P.Server;
-
 	@inject(Identifiers.P2P.Service)
 	private readonly p2pService!: Contracts.P2P.Service;
 
@@ -90,7 +87,6 @@ export class Bootstrapper {
 
 		await this.consensus.run(await this.consensusBootstrapper.bootstrap());
 
-		await this.p2pServer.boot();
 		await this.p2pService.boot();
 	}
 
