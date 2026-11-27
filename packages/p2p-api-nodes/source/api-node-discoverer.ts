@@ -32,8 +32,15 @@ export class ApiNodeDiscoverer implements Contracts.P2PApiNodes.ApiNodeDiscovere
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
-	// A peer that fails to answer is the peer layer's business; here the failure is only logged.
-	public async discoverApiNodes(peer: Contracts.P2PService.Peer): Promise<void> {
+	// Asks the active peer with this address; a peer that is not active (any more) is skipped. A peer that
+	// fails to answer is the peer layer's business; here the failure is only logged.
+	public async discoverApiNodes(ip: string): Promise<void> {
+		if (!this.peerRepository.hasActivePeer(ip)) {
+			return;
+		}
+
+		const peer = this.peerRepository.getActivePeer(ip);
+
 		try {
 			const { apiNodes } = await this.peerCommunicator.getApiNodes(peer);
 
@@ -77,7 +84,7 @@ export class ApiNodeDiscoverer implements Contracts.P2PApiNodes.ApiNodeDiscovere
 
 	public async discoverNewApiNodes(): Promise<void> {
 		const peers = shuffle(this.peerRepository.getActivePeers()).slice(0, constants.PEERS_PER_CHECK);
-		await Promise.all(peers.map((peer) => this.discoverApiNodes(peer)));
+		await Promise.all(peers.map((peer) => this.discoverApiNodes(peer.ip)));
 	}
 
 	public async refreshApiNodes(): Promise<void> {

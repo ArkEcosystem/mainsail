@@ -44,7 +44,6 @@ describe<{
 		latency: 12,
 		plugins: { "api-http": { enabled: true } },
 		port: 4002,
-		ports: { "api-http": 4003 },
 		version: "1.2.3",
 	} as any;
 
@@ -74,7 +73,6 @@ describe<{
 					latency: 12,
 					plugins: peer.plugins,
 					port: 4002,
-					ports: peer.ports,
 					version: "1.2.3",
 				},
 			],

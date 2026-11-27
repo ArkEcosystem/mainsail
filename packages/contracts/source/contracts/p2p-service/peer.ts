@@ -1,10 +1,6 @@
 import type { PeerProtocol } from "./enums.js";
 import type { HeaderData } from "./header.js";
 
-export interface PeerPorts {
-	[name: string]: number;
-}
-
 export interface PeerPlugins {
 	[name: string]: { enabled: boolean; port: number; estimateTotalCount?: boolean };
 }
@@ -14,7 +10,6 @@ export interface Peer {
 	readonly protocol: PeerProtocol;
 
 	readonly ip: string;
-	readonly ports: PeerPorts;
 
 	version: string | undefined;
 	readonly latency: number | undefined;
@@ -33,7 +28,6 @@ export interface Peer {
 export interface PeerData {
 	ip: string;
 	port: number;
-	ports: PeerPorts;
 	version: string | undefined;
 	latency: number | undefined;
 	plugins: PeerPlugins;

@@ -59,7 +59,6 @@ describe("Resources", ({ it, assert }) => {
 			latency: 10,
 			plugins: {},
 			port: 4002,
-			ports: {},
 			version: "1.0.0",
 		});
 	});
