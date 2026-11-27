@@ -1,14 +1,18 @@
-import type { Message } from "./interfaces/index.js";
+import type { HelloMessage, Message } from "./interfaces/index.js";
 
 import { constants } from "./constants.js";
 import { CloseReason } from "./enums.js";
 import { ConnectionError } from "./errors.js";
 
 // Frame layout: <type uint8><body>
-// hello body:    <version uint16>                                  sent by the dialer, echoed by the acceptor once it accepts
-// reject body:   <reason uint8>                                    sent by the acceptor instead of its hello, then it closes
-// request body:  <id uint32><pathLength uint8><path><payload>      either side, once the handshake is done
-// response body: <id uint32><statusCode uint16><payload>           answers the request with the same id
+// hello body:    <protocolVersion uint16><versionLength uint8><version>
+//                sent by the dialer, answered by the acceptor once it accepts
+// reject body:   <reason uint8>
+//                sent by the acceptor instead of its hello, then it closes
+// request body:  <id uint32><pathLength uint8><path><payload>
+//                either side, once the handshake is done
+// response body: <id uint32><statusCode uint16><payload>
+//                answers the request with the same id
 
 // Wire value of each message type.
 enum MessageType {
@@ -34,6 +38,7 @@ const byteToReason = new Map<number, CloseReason>(
 	Object.entries(reasonToByte).map(([reason, byte]) => [byte, reason as CloseReason]),
 );
 
+const HELLO_HEADER_LENGTH = 1 + 2 + 1;
 const REQUEST_HEADER_LENGTH = 1 + 4 + 1;
 const RESPONSE_HEADER_LENGTH = 1 + 4 + 2;
 
@@ -42,10 +47,16 @@ const protocolError = (message: string): ConnectionError => new ConnectionError(
 const encode = (message: Message): Buffer => {
 	switch (message.type) {
 		case "hello": {
-			const buffer = Buffer.alloc(3);
-			buffer.writeUInt8(MessageType.Hello, 0);
-			buffer.writeUInt16BE(message.version, 1);
-			return buffer;
+			const version = Buffer.from(message.version);
+			if (version.byteLength > constants.MAX_VERSION_LENGTH) {
+				throw protocolError("Hello version too long");
+			}
+
+			const header = Buffer.alloc(HELLO_HEADER_LENGTH);
+			header.writeUInt8(MessageType.Hello, 0);
+			header.writeUInt16BE(message.protocolVersion, 1);
+			header.writeUInt8(version.byteLength, 3);
+			return Buffer.concat([header, version]);
 		}
 		case "reject": {
 			const buffer = Buffer.alloc(2);
@@ -75,6 +86,23 @@ const encode = (message: Message): Buffer => {
 	}
 };
 
+const decodeHello = (buffer: Buffer): HelloMessage => {
+	if (buffer.byteLength < HELLO_HEADER_LENGTH) {
+		throw protocolError("Invalid hello length");
+	}
+
+	const versionLength = buffer.readUInt8(3);
+	if (versionLength > constants.MAX_VERSION_LENGTH || buffer.byteLength !== HELLO_HEADER_LENGTH + versionLength) {
+		throw protocolError("Invalid hello version length");
+	}
+
+	return {
+		protocolVersion: buffer.readUInt16BE(1),
+		type: "hello",
+		version: buffer.subarray(HELLO_HEADER_LENGTH).toString(),
+	};
+};
+
 const decode = (buffer: Buffer): Message => {
 	if (buffer.byteLength < 1) {
 		throw protocolError("Empty frame");
@@ -82,11 +110,7 @@ const decode = (buffer: Buffer): Message => {
 
 	switch (buffer.readUInt8(0)) {
 		case MessageType.Hello: {
-			if (buffer.byteLength !== 3) {
-				throw protocolError("Invalid hello length");
-			}
-
-			return { type: "hello", version: buffer.readUInt16BE(1) };
+			return decodeHello(buffer);
 		}
 		case MessageType.Reject: {
 			if (buffer.byteLength !== 2) {

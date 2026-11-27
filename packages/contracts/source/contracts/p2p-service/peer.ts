@@ -11,7 +11,7 @@ export interface Peer {
 
 	readonly ip: string;
 
-	version: string | undefined;
+	readonly version: string | undefined;
 	readonly latency: number | undefined;
 
 	header: HeaderData;
@@ -46,7 +46,6 @@ export interface PeerState {
 }
 
 export interface PeerConfig {
-	version: string;
 	network: {
 		version: number;
 		name: string;

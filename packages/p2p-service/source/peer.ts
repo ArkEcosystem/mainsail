@@ -18,8 +18,6 @@ export class Peer implements PeerInterface {
 
 	public protocol!: Contracts.P2PService.PeerProtocol;
 
-	public version: string | undefined;
-
 	public latency: number | undefined;
 
 	public plugins: Contracts.P2PService.PeerPlugins = {};
@@ -44,6 +42,12 @@ export class Peer implements PeerInterface {
 
 	public get socketUrl(): string {
 		return `ws://${IpAddress.normalizeAddress(this.ip)}:${this.port}`;
+	}
+
+	// The version of its software the peer named when it connected. A peer we were never connected to has
+	// none; one that lost its connection keeps it until the next connection.
+	public get version(): string | undefined {
+		return this.connection?.remoteVersion;
 	}
 
 	public get header(): Contracts.P2PService.HeaderData {

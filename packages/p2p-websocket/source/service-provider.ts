@@ -68,6 +68,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			logger: Joi.object({
 				enabled: Joi.bool().required(),
 			}).required(),
+			minimumVersions: Joi.array().items(Joi.string()).required(),
 			server: Joi.object({
 				hostname: Joi.string()
 					.ip({ version: ["ipv4", "ipv6"] })

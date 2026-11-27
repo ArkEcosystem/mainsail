@@ -26,7 +26,7 @@ export const isValidVersion = (app: Contracts.Kernel.Application, version: strin
 		const configuration = app.getTagged<Contracts.Kernel.PluginConfiguration>(
 			Identifiers.ServiceProvider.Configuration,
 			"plugin",
-			"p2p-service",
+			"p2p-websocket",
 		);
 		minimumVersions = configuration.getOptional<string[]>("minimumVersions", []);
 	}

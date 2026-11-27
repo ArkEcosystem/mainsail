@@ -5,7 +5,9 @@ import { CloseReason, Direction } from "../enums.js";
 import { ConnectionError } from "../errors.js";
 
 // The dialer sends hello and waits for the acceptor's hello back. The acceptor waits for the
-// dialer's hello, checks it, and either echoes hello or sends reject and closes. Both sides give
+// dialer's hello, checks it, and either answers with its own hello or sends reject and closes. A hello
+// names the version of the wire protocol, which must be ours, and the version of the sender's software,
+// which must be one we connect with; each side checks the other's. Both sides give
 // the other HANDSHAKE_TIMEOUT from start(). The dialer's hello may reach the acceptor before its
 // start() runs (same TCP chunk as the upgrade), so the result promise exists from construction.
 // The connection is opened through the `open` callback, not by awaiting start(): the acceptor's
@@ -32,7 +34,7 @@ export class Handshake {
 
 	public async start(): Promise<void> {
 		if (this.#options.direction === Direction.Outbound) {
-			this.#options.send({ type: "hello", version: constants.PROTOCOL_VERSION });
+			this.#options.send(this.#hello());
 		}
 
 		if (!this.#settled) {
@@ -50,26 +52,25 @@ export class Handshake {
 			return;
 		}
 
-		if (message.version !== constants.PROTOCOL_VERSION) {
-			if (this.#options.direction === Direction.Inbound) {
-				this.#options.reject(CloseReason.VersionMismatch);
-			}
-
-			this.#fail(
-				new ConnectionError(
-					CloseReason.VersionMismatch,
-					`Protocol version mismatch: expected ${constants.PROTOCOL_VERSION}, got ${message.version}`,
-				),
+		if (message.protocolVersion !== constants.PROTOCOL_VERSION) {
+			this.#refuse(
+				`Protocol version mismatch: expected ${constants.PROTOCOL_VERSION}, got ${message.protocolVersion}`,
 			);
 			return;
 		}
 
+		// The version comes from the peer; quoted, whatever it holds stays within its log line.
+		if (!this.#options.isValidVersion(message.version)) {
+			this.#refuse(`Software version ${JSON.stringify(message.version)} is not accepted`);
+			return;
+		}
+
 		if (this.#options.direction === Direction.Inbound) {
-			this.#options.send({ type: "hello", version: constants.PROTOCOL_VERSION });
+			this.#options.send(this.#hello());
 		}
 
 		this.#settle();
-		this.#options.open();
+		this.#options.open(message);
 		this.#resolve();
 	}
 
@@ -89,6 +90,19 @@ export class Handshake {
 
 	public abort(error: ConnectionError): void {
 		this.#fail(error);
+	}
+
+	// The acceptor tells the dialer why; the dialer just hangs up.
+	#refuse(message: string): void {
+		if (this.#options.direction === Direction.Inbound) {
+			this.#options.reject(CloseReason.VersionMismatch);
+		}
+
+		this.#fail(new ConnectionError(CloseReason.VersionMismatch, message));
+	}
+
+	#hello(): HelloMessage {
+		return { protocolVersion: constants.PROTOCOL_VERSION, type: "hello", version: this.#options.version };
 	}
 
 	#fail(error: ConnectionError): void {

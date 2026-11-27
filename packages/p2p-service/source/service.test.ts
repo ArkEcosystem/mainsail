@@ -451,6 +451,27 @@ describe<{
 		await service.dispose();
 	});
 
+	it("#mainLoop - should forget a known peer whose software version does not fit ours", async ({
+		service,
+		repository,
+		websocketService,
+	}) => {
+		const fakeTimers = clock({ now: Date.now(), toFake: ["Date", "setTimeout", "clearTimeout"] });
+		const peer = makePeer("1.1.1.1");
+		repository.getKnownPeers = () => [peer];
+		websocketService.dial = async () => {
+			throw new ConnectionError(CloseReason.VersionMismatch, "refused");
+		};
+		const forgetKnownPeer = spy(repository, "forgetKnownPeer");
+
+		void service.mainLoop();
+		await fakeTimers.tickAsync(0);
+
+		forgetKnownPeer.calledWith(peer);
+
+		await service.dispose();
+	});
+
 	it("#mainLoop - should give up a known peer after repeated failed dials", async ({
 		service,
 		repository,

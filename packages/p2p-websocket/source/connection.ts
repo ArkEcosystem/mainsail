@@ -10,6 +10,7 @@ import type { Direction } from "./enums.js";
 import type {
 	Connection as ConnectionInterface,
 	ConnectionOptions,
+	HelloMessage,
 	Message,
 	RequestHandler,
 	RequestMessage,
@@ -24,6 +25,7 @@ import { constants } from "./constants.js";
 import { CloseReason, ConnectionState } from "./enums.js";
 import { ConnectionError } from "./errors.js";
 import { Handshake, Heartbeat, RequestQueue, RequestTable } from "./handlers/index.js";
+import { isValidVersion } from "./is-valid-version.js";
 import { decode, encode } from "./message.js";
 
 // ws receiver error codes: WS_ERR_UNSUPPORTED_MESSAGE_LENGTH is a frame over maxPayload, every other
@@ -39,6 +41,9 @@ const wsErrorReason = (code: string | undefined): CloseReason => {
 // One per socket, created through Identifiers.P2P.WebSocket.Connection.Factory and set up with init().
 @injectable()
 export class Connection implements ConnectionInterface {
+	@inject(Identifiers.Application.Instance)
+	private readonly app!: Contracts.Kernel.Application;
+
 	@inject(Identifiers.P2P.WebSocket.Logger)
 	private readonly logger!: Contracts.Kernel.Logger;
 
@@ -59,6 +64,7 @@ export class Connection implements ConnectionInterface {
 	#heartbeat!: Heartbeat;
 	#direction!: Direction;
 	#remoteAddress!: string;
+	#remoteVersion?: string;
 
 	#state = ConnectionState.Handshaking;
 	#requestsInFlight = 0;
@@ -74,9 +80,11 @@ export class Connection implements ConnectionInterface {
 		this.#handshake = new Handshake({
 			direction: options.direction,
 			fail: (error) => this.terminate(error.reason, error),
-			open: () => this.#open(),
+			isValidVersion: (version) => isValidVersion(this.app, version),
+			open: (hello) => this.#open(hello),
 			reject: (reason) => this.reject(reason),
 			send: (message) => this.#send(message),
+			version: this.app.version(),
 		});
 
 		this.#heartbeat = new Heartbeat({
@@ -106,6 +114,10 @@ export class Connection implements ConnectionInterface {
 
 	public get remoteAddress(): string {
 		return this.#remoteAddress;
+	}
+
+	public get remoteVersion(): string | undefined {
+		return this.#remoteVersion;
 	}
 
 	public get state(): ConnectionState {
@@ -273,8 +285,9 @@ export class Connection implements ConnectionInterface {
 	}
 
 	// A close that began during the handshake wins; only an untouched connection opens.
-	#open(): void {
+	#open(hello: HelloMessage): void {
 		if (this.#state === ConnectionState.Handshaking) {
+			this.#remoteVersion = hello.version;
 			this.#state = ConnectionState.Open;
 			this.#heartbeat.start();
 		}

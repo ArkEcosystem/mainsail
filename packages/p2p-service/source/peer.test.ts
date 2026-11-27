@@ -26,8 +26,18 @@ describe<{
 		assert.equal(app.resolve(Peer).init("2001:3984:3989::104", 4002).socketUrl, "ws://[2001:3984:3989::104]:4002");
 	});
 
+	it("#version - should be the version the peer named on its connection", ({ peer }) => {
+		assert.undefined(peer.version);
+
+		peer.connection = { remoteVersion: "3.0.1" } as any;
+		assert.equal(peer.version, "3.0.1");
+
+		// A closed connection stays on the peer, and its version with it, until the next one.
+		peer.connection = { remoteVersion: "3.0.2" } as any;
+		assert.equal(peer.version, "3.0.2");
+	});
+
 	it("#toBroadcast - should return a Contracts.P2PService.PeerBroadcast object for peer properties", ({ peer }) => {
-		peer.version = "3.0.1";
 		peer.latency = 135;
 
 		const expectedBroadcast: Contracts.P2PService.PeerBroadcast = {
@@ -42,7 +52,7 @@ describe<{
 	it("#toData - should return the peer as plain data", ({ peer }) => {
 		const header = { blockNumber: 7, round: 1 } as Contracts.P2PService.HeaderData;
 		peer.header = header;
-		peer.version = "3.0.1";
+		peer.connection = { remoteVersion: "3.0.1" } as any;
 		peer.latency = 135;
 		peer.plugins = { "@mainsail/api-http": { enabled: true, port: 4003 } };
 

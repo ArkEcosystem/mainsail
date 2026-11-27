@@ -69,6 +69,5 @@ export const getPeerConfig = (app: Contracts.Kernel.Application): Contracts.P2PS
 				app,
 			),
 		),
-		version: app.version(),
 	};
 };
