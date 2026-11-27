@@ -32,7 +32,10 @@ export interface SendContext {
 // A step around an outgoing request. `before` steps run in reverse binding order before the frame is
 // sent, `after` steps in binding order once a 200 response is back, so the first bound step (the codec)
 // is again the one next to the wire and later steps may still change `request.data`. Throwing fails the send.
+// `finally` runs for every step whose `before` completed, in binding order, whatever the outcome; a
+// `response.statusCode` of 0 then means that no response arrived.
 export interface SendMiddleware {
 	before?(context: SendContext): Promise<void>;
 	after?(context: SendContext): Promise<void>;
+	finally?(context: SendContext): Promise<void>;
 }

@@ -83,4 +83,17 @@ export class Peer implements PeerInterface {
 			protocol: this.protocol,
 		};
 	}
+
+	// Copies, so that what is handed out does not change with the peer or reach into it.
+	public toData(): Contracts.P2PService.PeerData {
+		return {
+			header: this.#header ? { ...this.#header } : undefined,
+			ip: this.ip,
+			latency: this.latency,
+			plugins: { ...this.plugins },
+			port: this.port,
+			ports: { ...this.ports },
+			version: this.version,
+		};
+	}
 }

@@ -75,6 +75,7 @@
 		{ "path": "packages/p2p" },
 		{ "path": "packages/p2p-api-nodes" },
 		{ "path": "packages/p2p-service" },
+		{ "path": "packages/p2p-statistic" },
 		{ "path": "packages/p2p-websocket" },
 		{ "path": "packages/processor" },
 		{ "path": "packages/serializer" },

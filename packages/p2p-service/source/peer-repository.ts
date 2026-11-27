@@ -22,6 +22,15 @@ export class PeerRepository implements Contracts.P2PService.PeerRepository {
 		return this.#peers.has(ip) || this.#peersPending.has(ip) || this.#peersKnown.has(ip);
 	}
 
+	// A known peer stays known while it is pending, so pending is looked at before known.
+	public getPeer(ip: string): Contracts.P2PService.Peer {
+		const peer = this.#peers.get(ip) ?? this.#peersPending.get(ip) ?? this.#peersKnown.get(ip);
+
+		assert.defined(peer);
+
+		return peer;
+	}
+
 	public getActivePeers(): Contracts.P2PService.Peer[] {
 		return [...this.#peers.values()];
 	}

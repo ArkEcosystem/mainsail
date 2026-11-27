@@ -34,36 +34,46 @@ export class Sender implements RouteSender {
 			route,
 		};
 
-		// Reverse: the codec is bound first and must encode last, after the other steps shaped the data.
-		for (const step of [...this.middleware].reverse()) {
-			await step.before?.(context);
+		const started: SendMiddleware[] = [];
+
+		try {
+			// Reverse: the codec is bound first and must encode last, after the other steps shaped the data.
+			for (const step of [...this.middleware].reverse()) {
+				await step.before?.(context);
+				started.push(step);
+			}
+
+			if (!context.request.payload) {
+				throw new Error(`No middleware encoded the ${route.path} request; is the codec middleware registered?`);
+			}
+
+			const response = await connection.request(route.path, context.request.payload, context.options);
+			context.response.statusCode = response.statusCode;
+			context.response.payload = response.payload;
+
+			if (response.statusCode !== 200) {
+				throw new RequestError(
+					response.statusCode,
+					`${route.path} to ${connection.remoteAddress} answered ${response.statusCode}`,
+				);
+			}
+
+			if (response.payload.length > route.maxPayload.response) {
+				throw new Error(
+					`${route.path} response from ${connection.remoteAddress} is ${response.payload.length} bytes, more than the ${route.maxPayload.response} allowed`,
+				);
+			}
+
+			for (const step of this.middleware) {
+				await step.after?.(context);
+			}
+
+			return context.response.data as TResponse;
+		} finally {
+			// Steps whose `before` completed get their `finally`, whether the request succeeded or not.
+			for (const step of started.reverse()) {
+				await step.finally?.(context);
+			}
 		}
-
-		if (!context.request.payload) {
-			throw new Error(`No middleware encoded the ${route.path} request; is the codec middleware registered?`);
-		}
-
-		const response = await connection.request(route.path, context.request.payload, context.options);
-		context.response.statusCode = response.statusCode;
-		context.response.payload = response.payload;
-
-		if (response.statusCode !== 200) {
-			throw new RequestError(
-				response.statusCode,
-				`${route.path} to ${connection.remoteAddress} answered ${response.statusCode}`,
-			);
-		}
-
-		if (response.payload.length > route.maxPayload.response) {
-			throw new Error(
-				`${route.path} response from ${connection.remoteAddress} is ${response.payload.length} bytes, more than the ${route.maxPayload.response} allowed`,
-			);
-		}
-
-		for (const step of this.middleware) {
-			await step.after?.(context);
-		}
-
-		return context.response.data as TResponse;
 	}
 }
