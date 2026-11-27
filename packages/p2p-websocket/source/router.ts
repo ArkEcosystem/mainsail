@@ -6,6 +6,7 @@ import { ensureError } from "@mainsail/utils";
 
 import type { Connection, ReceiveContext, ReceiveMiddleware, Response, Route } from "./interfaces/index.js";
 
+import { CloseReason } from "./enums.js";
 import { RequestError } from "./errors.js";
 
 // Maps request paths to routes and runs each request through the middleware chain. Middleware is
@@ -34,29 +35,35 @@ export class Router {
 		return [...this.#byPath.keys()];
 	}
 
+	// The routes are the shared protocol: what we serve is also what we send, so the sending side reads
+	// a route's limits here.
+	public get(path: string): Route<unknown, unknown> | undefined {
+		return this.#byPath.get(path);
+	}
+
 	public async handle(connection: Connection, path: string, payload: Buffer): Promise<Response> {
-		const route = this.#byPath.get(path);
-		if (!route) {
-			this.logger.debug(`Unknown route ${path} requested by ${connection.remoteAddress}`, "p2p");
-			return { payload: Buffer.alloc(0), statusCode: 404 };
-		}
-
-		const context: ReceiveContext = { connection, request: { payload }, response: {}, route };
-
 		try {
-			for (const step of this.middleware) {
-				await step.before?.(context);
+			// The paths are part of the protocol both sides share (see PROTOCOL_VERSION), so a request for a
+			// path we do not have comes from something that is not a peer of ours.
+			const route = this.#byPath.get(path);
+			if (!route) {
+				throw new RequestError(404, `Unknown route ${path}`, { closeReason: CloseReason.ProtocolError });
 			}
 
-			context.response.data = await route.handle(connection, context.request.data);
-
-			for (const step of [...this.middleware].reverse()) {
-				await step.after?.(context);
+			// Checked before the middleware so an oversized request is never decoded or handled.
+			if (payload.length > route.maxPayload.request) {
+				throw new RequestError(
+					413,
+					`${path} request of ${payload.length} bytes exceeds ${route.maxPayload.request}`,
+					{
+						closeReason: CloseReason.PayloadTooLarge,
+					},
+				);
 			}
 
-			if (!context.response.payload) {
-				throw new Error(`No middleware encoded the ${path} response; is the codec middleware registered?`);
-			}
+			const context: ReceiveContext = { connection, request: { payload }, response: {}, route };
+
+			return await this.#run(context);
 		} catch (rawError) {
 			const error = ensureError(rawError);
 			const statusCode = error instanceof RequestError ? error.statusCode : 500;
@@ -64,9 +71,43 @@ export class Router {
 				`${path} from ${connection.remoteAddress} failed (${statusCode}): ${error.message}`,
 				"p2p",
 			);
+
+			// The peer knew the rules it broke; the owner sees the reason on close.
+			if (error instanceof RequestError && error.closeReason) {
+				connection.terminate(error.closeReason, error);
+			}
+
 			return { payload: Buffer.alloc(0), statusCode };
 		}
+	}
 
-		return { payload: context.response.payload, statusCode: 200 };
+	// Steps whose `before` completed get their `finally`, in reverse, even when a later step or the route threw.
+	async #run(context: ReceiveContext): Promise<Response> {
+		const started: ReceiveMiddleware[] = [];
+
+		try {
+			for (const step of this.middleware) {
+				await step.before?.(context);
+				started.push(step);
+			}
+
+			context.response.data = await context.route.handle(context.connection, context.request.data);
+
+			for (const step of [...this.middleware].reverse()) {
+				await step.after?.(context);
+			}
+
+			if (!context.response.payload) {
+				throw new Error(
+					`No middleware encoded the ${context.route.path} response; is the codec middleware registered?`,
+				);
+			}
+
+			return { payload: context.response.payload, statusCode: 200 };
+		} finally {
+			for (const step of started.reverse()) {
+				await step.finally?.(context);
+			}
+		}
 	}
 }

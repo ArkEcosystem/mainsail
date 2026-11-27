@@ -1,0 +1,179 @@
+import { describe } from "@mainsail/test-runner";
+
+import { constants } from "../constants.js";
+import { CloseReason, Direction } from "../enums.js";
+import { Heartbeat } from "./heartbeat.js";
+
+type Probe = { heartbeat: Heartbeat; pings: number; failures: string[] };
+
+const make = (direction: Direction): Probe => {
+	const probe: Probe = { failures: [], heartbeat: undefined as unknown as Heartbeat, pings: 0 };
+	probe.heartbeat = new Heartbeat({
+		direction,
+		fail: (error) => probe.failures.push(`${error.reason}: ${error.message}`),
+		ping: () => probe.pings++,
+	});
+
+	return probe;
+};
+
+describe<{
+	dialer: Probe;
+	acceptor: Probe;
+	fakeTimers: any;
+}>("Heartbeat", ({ it, assert, beforeEach, afterEach, clock }) => {
+	beforeEach((context) => {
+		context.fakeTimers = clock({
+			now: 1_000_000,
+			toFake: ["Date", "setInterval", "clearInterval", "setTimeout", "clearTimeout"],
+		});
+		context.dialer = make(Direction.Outbound);
+		context.acceptor = make(Direction.Inbound);
+	});
+
+	afterEach(({ dialer, acceptor }) => {
+		dialer.heartbeat.stop();
+		acceptor.heartbeat.stop();
+	});
+
+	it("dialer - should ping every interval while the pongs keep coming", ({ dialer, fakeTimers }) => {
+		dialer.heartbeat.start();
+
+		for (let round = 1; round <= 3; round++) {
+			fakeTimers.tick(constants.HEARTBEAT_INTERVAL);
+			assert.equal(dialer.pings, round);
+			dialer.heartbeat.onPong();
+		}
+
+		assert.equal(dialer.failures, []);
+	});
+
+	it("dialer - should keep pinging on the beat and fail once the oldest ping waited the timeout", ({
+		dialer,
+		fakeTimers,
+	}) => {
+		dialer.heartbeat.start();
+
+		fakeTimers.tick(constants.HEARTBEAT_INTERVAL);
+		assert.equal(dialer.pings, 1);
+
+		// Unanswered, but not for long enough yet: the next ping still goes out.
+		fakeTimers.tick(constants.HEARTBEAT_TIMEOUT - constants.HEARTBEAT_INTERVAL);
+		assert.equal(dialer.pings, 2);
+		assert.equal(dialer.failures, []);
+
+		fakeTimers.tick(constants.HEARTBEAT_INTERVAL);
+		assert.equal(dialer.failures, [`${CloseReason.HeartbeatTimeout}: Peer did not answer the heartbeat`]);
+
+		// It stopped itself.
+		fakeTimers.tick(constants.HEARTBEAT_INTERVAL * 3);
+		assert.equal(dialer.pings, 2);
+		assert.equal(dialer.failures.length, 1);
+	});
+
+	it("dialer - should accept the pongs of a ping read late, after a stall, in order", ({ dialer, fakeTimers }) => {
+		dialer.heartbeat.start();
+
+		// Two pings went out before their pongs were read; both pongs are then expected, a third is not.
+		fakeTimers.tick(constants.HEARTBEAT_INTERVAL * 2);
+		assert.equal(dialer.pings, 2);
+		dialer.heartbeat.onPong();
+		dialer.heartbeat.onPong();
+		assert.equal(dialer.failures, []);
+
+		dialer.heartbeat.onPong();
+		assert.equal(dialer.failures, [`${CloseReason.ProtocolError}: Unexpected pong`]);
+	});
+
+	it("dialer - should fail on a pong nobody asked for and ignore everything after", ({ dialer, fakeTimers }) => {
+		dialer.heartbeat.start();
+
+		dialer.heartbeat.onPong();
+		assert.equal(dialer.failures, [`${CloseReason.ProtocolError}: Unexpected pong`]);
+
+		dialer.heartbeat.onPong();
+		dialer.heartbeat.onPing();
+		fakeTimers.tick(constants.HEARTBEAT_INTERVAL * 2);
+		assert.equal(dialer.failures.length, 1);
+		assert.equal(dialer.pings, 0);
+	});
+
+	it("dialer - should fail on a second pong to one ping and on a ping", ({ fakeTimers }) => {
+		const doublePong = make(Direction.Outbound);
+		doublePong.heartbeat.start();
+		fakeTimers.tick(constants.HEARTBEAT_INTERVAL);
+		doublePong.heartbeat.onPong();
+		doublePong.heartbeat.onPong();
+		assert.equal(doublePong.failures, [`${CloseReason.ProtocolError}: Unexpected pong`]);
+
+		const pinged = make(Direction.Outbound);
+		pinged.heartbeat.start();
+		pinged.heartbeat.onPing();
+		assert.equal(pinged.failures, [`${CloseReason.ProtocolError}: Unexpected ping`]);
+	});
+
+	it("acceptor - should never ping and should accept pings that keep coming in time", ({ acceptor, fakeTimers }) => {
+		acceptor.heartbeat.start();
+
+		for (let round = 0; round < 3; round++) {
+			fakeTimers.tick(constants.HEARTBEAT_INTERVAL);
+			acceptor.heartbeat.onPing();
+		}
+
+		assert.equal(acceptor.pings, 0);
+		assert.equal(acceptor.failures, []);
+	});
+
+	it("acceptor - should fail when no ping arrives within the timeout", ({ acceptor, fakeTimers }) => {
+		acceptor.heartbeat.start();
+
+		fakeTimers.tick(constants.HEARTBEAT_TIMEOUT - 1);
+		assert.equal(acceptor.failures, []);
+
+		fakeTimers.tick(1);
+		assert.equal(acceptor.failures, [`${CloseReason.HeartbeatTimeout}: Peer stopped sending heartbeats`]);
+	});
+
+	it("acceptor - should accept pings bunched up by a retransmit but fail a flood", ({ acceptor, fakeTimers }) => {
+		acceptor.heartbeat.start();
+
+		// Two pings back to back, as after a retransmit: fine.
+		fakeTimers.tick(constants.HEARTBEAT_INTERVAL);
+		acceptor.heartbeat.onPing();
+		acceptor.heartbeat.onPing();
+		assert.equal(acceptor.failures, []);
+
+		// One more than the window allows: a flood.
+		for (let index = 2; index < constants.HEARTBEAT_MAX_PINGS; index++) {
+			fakeTimers.tick(100);
+			acceptor.heartbeat.onPing();
+		}
+		assert.equal(acceptor.failures, []);
+
+		fakeTimers.tick(100);
+		acceptor.heartbeat.onPing();
+		assert.equal(acceptor.failures, [`${CloseReason.ProtocolError}: Too many pings`]);
+	});
+
+	it("acceptor - should forget pings older than the timeout window", ({ acceptor, fakeTimers }) => {
+		acceptor.heartbeat.start();
+
+		for (let index = 0; index < constants.HEARTBEAT_MAX_PINGS; index++) {
+			fakeTimers.tick(constants.HEARTBEAT_INTERVAL);
+			acceptor.heartbeat.onPing();
+		}
+
+		// Only the pings of the last window count, so a dialer on the beat never trips the limit.
+		fakeTimers.tick(constants.HEARTBEAT_INTERVAL);
+		acceptor.heartbeat.onPing();
+		assert.equal(acceptor.failures, []);
+	});
+
+	it("acceptor - should fail on a pong", ({ acceptor }) => {
+		acceptor.heartbeat.start();
+
+		acceptor.heartbeat.onPong();
+
+		assert.equal(acceptor.failures, [`${CloseReason.ProtocolError}: Unexpected pong`]);
+	});
+});

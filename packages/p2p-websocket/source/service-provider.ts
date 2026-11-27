@@ -7,13 +7,14 @@ import Joi from "joi";
 
 import type { ConnectionFactory, ConnectionOptions } from "./interfaces/index.js";
 
+import { AddressFamilyVerifier } from "./address-family-verifier.js";
 import { BanList } from "./ban-list.js";
 import { ConnectionRepository } from "./connection-repository.js";
 import { Connection } from "./connection.js";
 import { Dialer } from "./dialer.js";
 import { Listener } from "./listener.js";
 import { Logger } from "./logger.js";
-import { ReceiveCodecMiddleware, SendCodecMiddleware } from "./middleware/index.js";
+import { ReceiveCodecMiddleware, RequestLimitMiddleware, SendCodecMiddleware } from "./middleware/index.js";
 import { Router } from "./router.js";
 import { Sender } from "./sender.js";
 import { Server } from "./server.js";
@@ -27,7 +28,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.WebSocket.BanList).to(BanList).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Connection.Repository).to(ConnectionRepository).inSingletonScope();
 
-		// Verifiers run in this order at accept time: the cheapest, most definitive check first.
+		// Verifiers run in this order at accept time: the cheapest, most definitive check first. The ban list
+		// and the repository are bound under their own identifiers because others use them too.
+		this.app.bind(Identifiers.P2P.WebSocket.Connection.Verifiers).to(AddressFamilyVerifier).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Connection.Verifiers).toService(Identifiers.P2P.WebSocket.BanList);
 		this.app
 			.bind(Identifiers.P2P.WebSocket.Connection.Verifiers)
@@ -38,7 +41,9 @@ export class ServiceProvider extends Providers.ServiceProvider {
 			.toFactory(
 				() => (ws: WebSocket, options: ConnectionOptions) => this.app.resolve(Connection).init(ws, options),
 			);
-		// Middleware runs in binding order; other packages may add steps under the same identifier.
+		// Middleware runs in binding order; other packages may add steps under the same identifier. The limit
+		// comes first so a refused request is never decoded.
+		this.app.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware).to(RequestLimitMiddleware).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware).to(ReceiveCodecMiddleware).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.SendMiddleware).to(SendCodecMiddleware).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Router).to(Router).inSingletonScope();

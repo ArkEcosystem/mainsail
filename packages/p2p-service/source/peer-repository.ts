@@ -1,48 +1,61 @@
 import type { Contracts } from "@mainsail/contracts";
 
-import { Identifiers } from "@mainsail/constants";
+import { Events, Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { assert, IpAddress } from "@mainsail/utils";
 import ipaddr from "ipaddr.js";
 
 @injectable()
-export class PeerRepository implements Contracts.P2P.PeerRepository {
+export class PeerRepository implements Contracts.P2PService.PeerRepository {
 	@inject(Identifiers.ServiceProvider.Configuration)
 	@tagged("plugin", "p2p-service")
 	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
 
-	readonly #peers: Map<string, Contracts.P2P.Peer> = new Map<string, Contracts.P2P.Peer>();
-	readonly #peersPending: Map<string, Contracts.P2P.Peer> = new Map<string, Contracts.P2P.Peer>();
+	@inject(Identifiers.Services.EventDispatcher.Service)
+	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	public getPeers(): Contracts.P2P.Peer[] {
+	readonly #peers: Map<string, Contracts.P2PService.Peer> = new Map<string, Contracts.P2PService.Peer>();
+	readonly #peersPending: Map<string, Contracts.P2PService.Peer> = new Map<string, Contracts.P2PService.Peer>();
+	readonly #peersKnown: Map<string, Contracts.P2PService.Peer> = new Map<string, Contracts.P2PService.Peer>();
+
+	public hasPeer(ip: string): boolean {
+		return this.#peers.has(ip) || this.#peersPending.has(ip) || this.#peersKnown.has(ip);
+	}
+
+	public getActivePeers(): Contracts.P2PService.Peer[] {
 		return [...this.#peers.values()];
 	}
 
-	public hasPeers(): boolean {
+	public hasActivePeers(): boolean {
 		return this.#peers.size > 0;
 	}
 
-	public getPeer(ip: string): Contracts.P2P.Peer {
-		const peer: Contracts.P2P.Peer | undefined = this.#peers.get(ip);
+	public getActivePeer(ip: string): Contracts.P2PService.Peer {
+		const peer: Contracts.P2PService.Peer | undefined = this.#peers.get(ip);
 
 		assert.defined(peer);
 
 		return peer;
 	}
 
-	public setPeer(peer: Contracts.P2P.Peer): void {
+	// Active peers are announced; pending and known ones are internal to this package.
+	public setActivePeer(peer: Contracts.P2PService.Peer): void {
 		this.#peers.set(peer.ip, peer);
+
+		void this.events.dispatch(Events.PeerEvent.Added, peer);
 	}
 
-	public forgetPeer(peer: Contracts.P2P.Peer): void {
-		this.#peers.delete(peer.ip);
+	public forgetActivePeer(peer: Contracts.P2PService.Peer): void {
+		if (this.#peers.delete(peer.ip)) {
+			void this.events.dispatch(Events.PeerEvent.Removed, peer);
+		}
 	}
 
-	public hasPeer(ip: string): boolean {
+	public hasActivePeer(ip: string): boolean {
 		return this.#peers.has(ip);
 	}
 
-	public getPendingPeers(): Contracts.P2P.Peer[] {
+	public getPendingPeers(): Contracts.P2PService.Peer[] {
 		return [...this.#peersPending.values()];
 	}
 
@@ -50,7 +63,7 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 		return this.#peersPending.size > 0;
 	}
 
-	public getPendingPeer(ip: string): Contracts.P2P.Peer {
+	public getPendingPeer(ip: string): Contracts.P2PService.Peer {
 		const peer = this.#peersPending.get(ip);
 
 		assert.defined(peer);
@@ -58,11 +71,11 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 		return peer;
 	}
 
-	public setPendingPeer(peer: Contracts.P2P.Peer): void {
+	public setPendingPeer(peer: Contracts.P2PService.Peer): void {
 		this.#peersPending.set(peer.ip, peer);
 	}
 
-	public forgetPendingPeer(peer: Contracts.P2P.Peer): void {
+	public forgetPendingPeer(peer: Contracts.P2PService.Peer): void {
 		this.#peersPending.delete(peer.ip);
 	}
 
@@ -70,16 +83,65 @@ export class PeerRepository implements Contracts.P2P.PeerRepository {
 		return this.#peersPending.has(ip);
 	}
 
+	public getKnownPeers(): Contracts.P2PService.Peer[] {
+		return [...this.#peersKnown.values()];
+	}
+
+	public hasKnownPeers(): boolean {
+		return this.#peersKnown.size > 0;
+	}
+
+	public getKnownPeer(ip: string): Contracts.P2PService.Peer {
+		const peer = this.#peersKnown.get(ip);
+
+		assert.defined(peer);
+
+		return peer;
+	}
+
+	public setKnownPeer(peer: Contracts.P2PService.Peer): void {
+		this.#peersKnown.set(peer.ip, peer);
+	}
+
+	public forgetKnownPeer(peer: Contracts.P2PService.Peer): void {
+		this.#peersKnown.delete(peer.ip);
+	}
+
+	public hasKnownPeer(ip: string): boolean {
+		return this.#peersKnown.has(ip);
+	}
+
+	public removePeer(ip: string): void {
+		if (this.#peers.has(ip)) {
+			this.forgetActivePeer(this.getActivePeer(ip));
+		}
+
+		this.#peersPending.delete(ip);
+		this.#peersKnown.delete(ip);
+	}
+
+	public demotePeer(ip: string): void {
+		if (this.#peers.has(ip)) {
+			const peer = this.getActivePeer(ip);
+			this.forgetActivePeer(peer);
+			this.setKnownPeer(peer);
+
+			return;
+		}
+
+		this.#peersPending.delete(ip);
+	}
+
 	public hasMinimumPeers(): boolean {
 		if (this.configuration.getOptional<boolean>("ignoreMinimumNetworkReach", false)) {
 			return true;
 		}
 
-		return this.getPeers().length >= this.configuration.getRequired<number>("minimumNetworkReach");
+		return this.getActivePeers().length >= this.configuration.getRequired<number>("minimumNetworkReach");
 	}
 
-	public getSameSubnetPeers(peerIp: string): Contracts.P2P.Peer[] {
-		return this.getPeers().filter((peer) => {
+	public getSameSubnetPeers(peerIp: string): Contracts.P2PService.Peer[] {
+		return this.getActivePeers().filter((peer) => {
 			if (!IpAddress.isIPv6Address(peer.ip) && !IpAddress.isIPv6Address(peerIp)) {
 				return this.#networkAddress(peer.ip) === this.#networkAddress(peerIp);
 			}

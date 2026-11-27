@@ -138,10 +138,12 @@ describe<{
 		const listen = spy(eventDispatcher, "listen");
 		const fresh = app.resolve(Worker);
 
-		listen.calledTimes(3);
+		listen.calledTimes(5);
 		listen.calledNthWith(0, Events.WebhookEvent.Created, fresh);
 		listen.calledNthWith(1, Events.WebhookEvent.Updated, fresh);
 		listen.calledNthWith(2, Events.WebhookEvent.Removed, fresh);
+		listen.calledNthWith(3, Events.PeerEvent.Added, fresh);
+		listen.calledNthWith(4, Events.PeerEvent.Removed, fresh);
 	});
 
 	it("boot sends a single boot request and memoizes it", async ({ worker, ipc }) => {
@@ -273,6 +275,17 @@ describe<{
 		sendRequest.calledWith("reloadWebhooks");
 	});
 
+	it("handle forwards added and removed peers to the pool", async ({ worker, ipc }) => {
+		const sendRequest = spy(ipc, "sendRequest");
+
+		await worker.boot({});
+		await worker.handle({ data: { ip: "1.1.1.1" }, name: Events.PeerEvent.Added });
+		await worker.handle({ data: { ip: "1.1.1.1" }, name: Events.PeerEvent.Removed });
+
+		sendRequest.calledWith("setPeer", "1.1.1.1");
+		sendRequest.calledWith("forgetPeer", "1.1.1.1");
+	});
+
 	it("onCommit commits sender addresses, gas used and a not-syncing flag for a recent block", async ({
 		worker,
 		ipc,
@@ -330,7 +343,7 @@ describe<{
 		await startWorker(worker, flags);
 
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({
-			getPeers: () => [{ ip: "1.1.1.1" }, { ip: "2.2.2.2" }],
+			getActivePeers: () => [{ ip: "1.1.1.1" }, { ip: "2.2.2.2" }],
 		});
 		const replacement = addReplacement(subprocesses);
 		const register = spy(replacement, "registerEventHandler");
@@ -608,7 +621,7 @@ describe<{
 	}) => {
 		await startWorker(worker);
 
-		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getPeers: () => [{ ip: "1.1.1.1" }] });
+		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getActivePeers: () => [{ ip: "1.1.1.1" }] });
 		const start = deferred();
 		const replacement = addReplacement(subprocesses);
 		replacement.respond = async (method) => (method === "start" ? start.promise : undefined);
@@ -766,7 +779,7 @@ describe<{
 	}) => {
 		await startWorker(worker);
 
-		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getPeers: () => [{ ip: "1.1.1.1" }] });
+		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue({ getActivePeers: () => [{ ip: "1.1.1.1" }] });
 		const exit = deferred();
 		const replacement = addReplacement(subprocesses);
 		replacement.respond = async (method) => (method === "boot" ? undefined : exit.promise);

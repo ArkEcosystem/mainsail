@@ -9,7 +9,7 @@ import { inject, injectable } from "@mainsail/container";
 @injectable()
 export class HeaderIncludeReceiveMiddleware implements Interfaces.ReceiveMiddleware {
 	@inject(Identifiers.P2P.Header.Factory)
-	private readonly headerFactory!: Contracts.P2P.HeaderFactory;
+	private readonly headerFactory!: Contracts.P2PService.HeaderFactory;
 
 	public async after(context: Interfaces.ReceiveContext): Promise<void> {
 		context.response.data = {

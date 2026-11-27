@@ -2731,6 +2731,9 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/test-runner':
+        specifier: workspace:*
+        version: link:../test-runner
       '@types/ws':
         specifier: 8.18.1
         version: 8.18.1

@@ -1,7 +1,7 @@
 import type WebSocket from "ws";
 
 import type { CloseReason, ConnectionState, Direction } from "../enums.js";
-import type { RouteDefinition } from "./codec.js";
+import type { RouteDefinition, SendOptions } from "./codec.js";
 
 export type Response = { statusCode: number; payload: Buffer };
 
@@ -30,9 +30,13 @@ export interface Connection {
 	reject(reason: CloseReason): void;
 
 	// Typed request through the send middleware.
-	send<TRequest, TResponse>(route: RouteDefinition<TRequest, TResponse>, data: TRequest): Promise<TResponse>;
+	send<TRequest, TResponse>(
+		route: RouteDefinition<TRequest, TResponse>,
+		data: TRequest,
+		options?: SendOptions,
+	): Promise<TResponse>;
 	// Raw request: sends a frame and resolves with the peer's response, or rejects on timeout or close.
-	request(path: string, payload: Buffer): Promise<Response>;
+	request(path: string, payload: Buffer, options?: SendOptions): Promise<Response>;
 
 	// Graceful close; resolves once the socket has closed. Idempotent.
 	close(reason?: CloseReason): Promise<void>;

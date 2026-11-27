@@ -11,6 +11,7 @@ export * as Evm from "./evm/index.js";
 export * as Forger from "./forger.js";
 export * as Kernel from "./kernel/index.js";
 export * as NetworkGenerator from "./network-generator.js";
+export * as P2PService from "./p2p-service/index.js";
 export * as P2P from "./p2p/index.js";
 export * as Processor from "./processor/index.js";
 export * as Serializer from "./serializer.js";
