@@ -82,6 +82,7 @@ const EXCEPTIONS = {
 			"@mainsail/logger-pino",
 			"@mainsail/networking-ntp",
 			"@mainsail/p2p",
+			"@mainsail/p2p-api-nodes",
 			"@mainsail/p2p-service",
 			"@mainsail/p2p-websocket",
 			"@mainsail/processor",
