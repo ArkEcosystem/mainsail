@@ -7,27 +7,30 @@ import { once } from "node:events";
 import WebSocket from "ws";
 
 import type { Direction } from "./enums.js";
+import type {
+	Connection as ConnectionInterface,
+	ConnectionOptions,
+	Message,
+	RequestHandler,
+	RequestMessage,
+	Response,
+	RouteDefinition,
+	RouteSender,
+} from "./interfaces/index.js";
 
 import { CloseReason, ConnectionState } from "./enums.js";
 import { ConnectionError } from "./errors.js";
-import { Handshake, RequestTable, type Response } from "./handlers/index.js";
-import { decode, encode, type Message, type RequestMessage } from "./message.js";
-
-export type ConnectionOptions = {
-	direction: Direction;
-	remoteAddress: string;
-};
-
-export type ConnectionFactory = (ws: WebSocket, options: ConnectionOptions) => Connection;
-
-// Set by the owner; answers requests from the peer. Throwing yields a 500 with an empty payload.
-export type RequestHandler = (path: string, payload: Buffer) => Promise<Response>;
+import { Handshake, RequestTable } from "./handlers/index.js";
+import { decode, encode } from "./message.js";
 
 // One per socket, created through Identifiers.P2P.WebSocket.Connection.Factory and set up with init().
 @injectable()
-export class Connection {
+export class Connection implements ConnectionInterface {
 	@inject(Identifiers.P2P.WebSocket.Logger)
 	private readonly logger!: Contracts.Kernel.Logger;
+
+	@inject(Identifiers.P2P.WebSocket.Sender)
+	private readonly sender!: RouteSender;
 
 	public onRequest?: RequestHandler;
 
@@ -111,7 +114,15 @@ export class Connection {
 		await this.#closed;
 	}
 
-	// Sends a request and resolves with the peer's response, or rejects on timeout or close.
+	// Typed request through the send middleware; see Sender.
+	public async send<TRequest, TResponse>(
+		route: RouteDefinition<TRequest, TResponse>,
+		data: TRequest,
+	): Promise<TResponse> {
+		return this.sender.send(this, route, data);
+	}
+
+	// Raw request: sends a frame and resolves with the peer's response, or rejects on timeout or close.
 	public async request(path: string, payload: Buffer): Promise<Response> {
 		if (this.#state !== ConnectionState.Open) {
 			throw new ConnectionError(CloseReason.NotOpen, `Connection is ${this.#state}`);
