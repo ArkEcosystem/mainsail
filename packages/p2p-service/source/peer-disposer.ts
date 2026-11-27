@@ -24,6 +24,8 @@ export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 	// The ban list of the transport is the single record of bans; it also refuses banned sockets.
 	// A failure of the connection itself is not the peer's doing and the transport has already closed
 	// the connection, which disposes the peer through the close listener; only other errors ban.
+	// The connection is torn down either way: without a ban time the address may come back at once, but
+	// a peer that is in no list must not keep a connection.
 	public banPeer(ip: string, error: Error): void {
 		if (error instanceof ConnectionError) {
 			return;
@@ -34,9 +36,11 @@ export class PeerDisposer implements Contracts.P2PService.PeerDisposer {
 		const timeout = this.configuration.getRequired<number>("peerBanTime");
 		if (timeout > 0) {
 			this.websocketService.ban(ip, dayjs().add(timeout, "minute").valueOf());
+		} else {
+			this.websocketService.terminate(ip);
 		}
 
-		// The ban terminated the connection; banned addresses are forgotten entirely, the loop must not dial them.
+		// Banned addresses are forgotten entirely, the loop must not dial them.
 		this.repository.removePeer(ip);
 	}
 

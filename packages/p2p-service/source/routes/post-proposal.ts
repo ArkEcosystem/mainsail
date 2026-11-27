@@ -19,7 +19,8 @@ export const PostProposal: Interfaces.RouteDefinition<Request, Response> = {
 	path: "postProposal",
 };
 
-// An invalid proposal is logged instead of banning the peer; peers are trusted until the disposer is ported.
+// A proposal that cannot be read or fails the checks of the consensus costs its sender a ban, as in
+// @mainsail/p2p: an honest peer forwards only what it accepted itself.
 @injectable()
 export class PostProposalRoute implements Interfaces.Route<Request, Response> {
 	@inject(Identifiers.Consensus.Processor.Proposal)
@@ -28,11 +29,8 @@ export class PostProposalRoute implements Interfaces.Route<Request, Response> {
 	@inject(Identifiers.Cryptography.Proposal.Factory)
 	private readonly factory!: Contracts.Crypto.ProposalFactory;
 
-	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2PService.State;
-
-	@inject(Identifiers.P2P.Logger)
-	private readonly logger!: Contracts.P2PService.Logger;
+	@inject(Identifiers.P2P.Peer.Disposer)
+	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
 	public readonly path = PostProposal.path;
 	public readonly codec = PostProposal.codec;
@@ -46,13 +44,8 @@ export class PostProposalRoute implements Interfaces.Route<Request, Response> {
 			if ((await this.proposalProcessor.process(proposal)) === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error("Invalid proposal");
 			}
-
-			this.state.resetLastMessageTime();
 		} catch (rawError) {
-			this.logger.debug(
-				`Rejected proposal from ${connection.remoteAddress}: ${ensureError(rawError).message}`,
-				"p2p",
-			);
+			this.peerDisposer.banPeer(connection.remoteAddress, ensureError(rawError));
 		}
 
 		return {};

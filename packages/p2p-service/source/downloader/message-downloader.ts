@@ -57,9 +57,6 @@ export class MessageDownloader implements Contracts.P2PService.Downloader {
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
-	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2PService.State;
-
 	#fullDownloadsByBlockNumber: Map<number, Set<number>> = new Map();
 	#downloadsByBlockNumber: Map<number, Map<number, DownloadsByRound>> = new Map();
 
@@ -73,19 +70,6 @@ export class MessageDownloader implements Contracts.P2PService.Downloader {
 				this.#fullDownloadsByBlockNumber.delete(number);
 			},
 		});
-	}
-
-	public tryToDownload(): void {
-		if (this.blockDownloader.isDownloading()) {
-			return;
-		}
-
-		const header = this.headerFactory();
-		let peers = this.repository.getActivePeers();
-
-		while ((peers = peers.filter((peer) => this.#canDownload(header, peer.header))) && peers.length > 0) {
-			this.download(getRandomPeer(peers));
-		}
 	}
 
 	public download(peer: Contracts.P2PService.Peer): void {
@@ -137,6 +121,19 @@ export class MessageDownloader implements Contracts.P2PService.Downloader {
 		return this.#downloadsByBlockNumber.size > 0 || this.#fullDownloadsByBlockNumber.size > 0;
 	}
 
+	#tryToDownload(): void {
+		if (this.blockDownloader.isDownloading()) {
+			return;
+		}
+
+		const header = this.headerFactory();
+		let peers = this.repository.getActivePeers();
+
+		while ((peers = peers.filter((peer) => this.#canDownload(header, peer.header))) && peers.length > 0) {
+			this.download(getRandomPeer(peers));
+		}
+	}
+
 	#canDownload(ourHeader: Contracts.P2PService.Header, peerHeader: Contracts.P2PService.HeaderData): boolean {
 		if (ourHeader.blockNumber !== peerHeader.blockNumber || ourHeader.round > peerHeader.round) {
 			return false;
@@ -180,12 +177,8 @@ export class MessageDownloader implements Contracts.P2PService.Downloader {
 	}
 
 	#canDownloadFullRound(blockNumber: number, round: number): boolean {
-		if (!this.#fullDownloadsByBlockNumber.has(blockNumber)) {
-			return true;
-		}
-
-		const rounds = [...this.#fullDownloadsByBlockNumber.get(blockNumber)!.values()];
-		if (rounds.length === 0) {
+		const rounds = this.#fullDownloadsByBlockNumber.get(blockNumber);
+		if (!rounds || rounds.size === 0) {
 			return true;
 		}
 
@@ -194,25 +187,29 @@ export class MessageDownloader implements Contracts.P2PService.Downloader {
 	}
 
 	#setFullDownload(blockNumber: number, round: number): void {
-		if (!this.#fullDownloadsByBlockNumber.has(blockNumber)) {
-			this.#fullDownloadsByBlockNumber.set(blockNumber, new Set<number>());
+		let rounds = this.#fullDownloadsByBlockNumber.get(blockNumber);
+		if (!rounds) {
+			rounds = new Set<number>();
+			this.#fullDownloadsByBlockNumber.set(blockNumber, rounds);
 		}
 
-		this.#fullDownloadsByBlockNumber.get(blockNumber)!.add(round);
+		rounds.add(round);
 	}
 
 	#getDownloadsByRound(blockNumber: number, round: number): DownloadsByRound {
-		if (!this.#downloadsByBlockNumber.has(blockNumber)) {
-			this.#downloadsByBlockNumber.set(blockNumber, new Map<number, DownloadsByRound>());
+		let roundsByBlockNumber = this.#downloadsByBlockNumber.get(blockNumber);
+		if (!roundsByBlockNumber) {
+			roundsByBlockNumber = new Map<number, DownloadsByRound>();
+			this.#downloadsByBlockNumber.set(blockNumber, roundsByBlockNumber);
 		}
 
-		const roundsByBlockNumber = this.#downloadsByBlockNumber.get(blockNumber)!;
-
-		if (!roundsByBlockNumber.has(round)) {
-			roundsByBlockNumber.set(round, this.#makeDownloadsByRound(blockNumber));
+		let downloads = roundsByBlockNumber.get(round);
+		if (!downloads) {
+			downloads = this.#makeDownloadsByRound(blockNumber);
+			roundsByBlockNumber.set(round, downloads);
 		}
 
-		return roundsByBlockNumber.get(round)!;
+		return downloads;
 	}
 
 	#peekDownloadsByRound(blockNumber: number, round: number): DownloadsByRound {
@@ -247,8 +244,6 @@ export class MessageDownloader implements Contracts.P2PService.Downloader {
 		if (prevotes.length === 0 && precommits.length === 0) {
 			return;
 		}
-
-		this.state.resetLastMessageTime();
 
 		if (job.peerHeader.round !== job.round) {
 			return;
@@ -340,7 +335,7 @@ export class MessageDownloader implements Contracts.P2PService.Downloader {
 
 		if (error) {
 			this.peerDisposer.banPeer(job.peer.ip, error);
-			this.tryToDownload();
+			this.#tryToDownload();
 		}
 	}
 

@@ -9,6 +9,7 @@ describe<{
 	disposer: PeerDisposer;
 	repository: any;
 	websocketService: any;
+	configuration: any;
 }>("PeerDisposer", ({ it, beforeEach, spy, clock }) => {
 	beforeEach((context) => {
 		context.repository = {
@@ -19,6 +20,7 @@ describe<{
 			hasPendingPeer: () => false,
 			removePeer: () => {},
 		};
+		context.configuration = { getRequired: () => 3 };
 		context.websocketService = {
 			ban: () => {},
 			bans: () => [],
@@ -27,7 +29,7 @@ describe<{
 		};
 		const app = new Application();
 		app.bind(Identifiers.ServiceProvider.Configuration)
-			.toConstantValue({ getRequired: () => 3 })
+			.toConstantValue(context.configuration)
 			.whenTagged("plugin", "p2p-service");
 		app.bind(Identifiers.P2P.WebSocket.Service).toConstantValue(context.websocketService);
 		app.bind(Identifiers.P2P.Peer.Repository).toConstantValue(context.repository);
@@ -65,6 +67,24 @@ describe<{
 		removePeer.calledWith("1.1.1.1");
 
 		fakeTimers.restore();
+	});
+
+	it("#banPeer - should still tear the connection down and forget the peer without a ban time", ({
+		disposer,
+		repository,
+		websocketService,
+		configuration,
+	}) => {
+		configuration.getRequired = () => 0;
+		const ban = spy(websocketService, "ban");
+		const terminate = spy(websocketService, "terminate");
+		const removePeer = spy(repository, "removePeer");
+
+		disposer.banPeer("1.1.1.1", new Error("bad block"));
+
+		ban.neverCalled();
+		terminate.calledWith("1.1.1.1");
+		removePeer.calledWith("1.1.1.1");
 	});
 
 	it("#disposePeers - should tear every pending and active connection down at once", async ({

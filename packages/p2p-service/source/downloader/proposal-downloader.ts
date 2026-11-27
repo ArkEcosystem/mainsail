@@ -34,9 +34,6 @@ export class ProposalDownloader implements Contracts.P2PService.Downloader {
 	@inject(Identifiers.Consensus.Processor.Proposal)
 	private readonly proposalProcessor!: Contracts.Consensus.ProposalProcessor;
 
-	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2PService.State;
-
 	@inject(Identifiers.Services.EventDispatcher.Service)
 	private readonly events!: Contracts.Kernel.EventDispatcher;
 
@@ -49,19 +46,6 @@ export class ProposalDownloader implements Contracts.P2PService.Downloader {
 				this.#downloadsByBlockNumber.delete((data as Contracts.Crypto.BlockData).number);
 			},
 		});
-	}
-
-	public tryToDownload(): void {
-		if (this.blockDownloader.isDownloading()) {
-			return;
-		}
-
-		const header = this.headerFactory();
-		const peers = this.repository.getActivePeers().filter((peer) => this.#canDownload(header, peer.header));
-
-		if (peers.length > 0) {
-			this.download(getRandomPeer(peers));
-		}
 	}
 
 	public download(peer: Contracts.P2PService.Peer): void {
@@ -88,15 +72,25 @@ export class ProposalDownloader implements Contracts.P2PService.Downloader {
 		return this.#downloadsByBlockNumber.size > 0;
 	}
 
+	#tryToDownload(): void {
+		if (this.blockDownloader.isDownloading()) {
+			return;
+		}
+
+		const header = this.headerFactory();
+		const peers = this.repository.getActivePeers().filter((peer) => this.#canDownload(header, peer.header));
+
+		if (peers.length > 0) {
+			this.download(getRandomPeer(peers));
+		}
+	}
+
 	#canDownload(ourHeader: Contracts.P2PService.Header, peerHeader: Contracts.P2PService.HeaderData) {
 		if (ourHeader.blockNumber !== peerHeader.blockNumber || ourHeader.round !== peerHeader.round) {
 			return false;
 		}
 
-		if (
-			this.#downloadsByBlockNumber.has(peerHeader.blockNumber) &&
-			this.#downloadsByBlockNumber.get(peerHeader.blockNumber)!.has(peerHeader.round)
-		) {
+		if (this.#downloadsByBlockNumber.get(peerHeader.blockNumber)?.has(peerHeader.round)) {
 			return false;
 		}
 
@@ -104,21 +98,24 @@ export class ProposalDownloader implements Contracts.P2PService.Downloader {
 	}
 
 	#setDownload(job: DownloadJob) {
-		if (!this.#downloadsByBlockNumber.has(job.blockNumber)) {
-			this.#downloadsByBlockNumber.set(job.blockNumber, new Set());
+		let rounds = this.#downloadsByBlockNumber.get(job.blockNumber);
+		if (!rounds) {
+			rounds = new Set();
+			this.#downloadsByBlockNumber.set(job.blockNumber, rounds);
 		}
 
-		this.#downloadsByBlockNumber.get(job.blockNumber)!.add(job.round);
+		rounds.add(job.round);
 	}
 
 	#removeDownload(job: DownloadJob) {
-		if (!this.#downloadsByBlockNumber.has(job.blockNumber)) {
+		const rounds = this.#downloadsByBlockNumber.get(job.blockNumber);
+		if (!rounds) {
 			return;
 		}
 
-		this.#downloadsByBlockNumber.get(job.blockNumber)!.delete(job.round);
+		rounds.delete(job.round);
 
-		if (this.#downloadsByBlockNumber.get(job.blockNumber)!.size === 0) {
+		if (rounds.size === 0) {
 			this.#downloadsByBlockNumber.delete(job.blockNumber);
 		}
 	}
@@ -151,8 +148,6 @@ export class ProposalDownloader implements Contracts.P2PService.Downloader {
 			if (response === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error(`Received proposal is invalid`);
 			}
-
-			this.state.resetLastMessageTime();
 		} catch (rawError) {
 			error = ensureError(rawError);
 		} finally {
@@ -163,7 +158,7 @@ export class ProposalDownloader implements Contracts.P2PService.Downloader {
 
 		if (error) {
 			this.peerDisposer.banPeer(job.peer.ip, error);
-			this.tryToDownload();
+			this.#tryToDownload();
 		}
 	}
 }

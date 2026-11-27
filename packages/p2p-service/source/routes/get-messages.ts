@@ -22,7 +22,7 @@ export class GetMessagesRoute implements Interfaces.Route<Request, Response> {
 	private readonly consensus!: Contracts.Consensus.Service;
 
 	@inject(Identifiers.Consensus.RoundStateRepository)
-	private readonly roundStateRepo!: Contracts.Consensus.RoundStateRepository;
+	private readonly roundStateRepository!: Contracts.Consensus.RoundStateRepository;
 
 	public readonly path = GetMessages.path;
 	public readonly codec = GetMessages.codec;
@@ -40,7 +40,7 @@ export class GetMessagesRoute implements Interfaces.Route<Request, Response> {
 			return { precommits: [], prevotes: [] };
 		}
 
-		const roundState = this.roundStateRepo.getRoundState(query.blockNumber, query.round ?? 0);
+		const roundState = this.roundStateRepository.getRoundState(query.blockNumber, query.round ?? 0);
 		const signedPrevote = query.validatorsSignedPrevote ?? [];
 		const signedPrecommit = query.validatorsSignedPrecommit ?? [];
 

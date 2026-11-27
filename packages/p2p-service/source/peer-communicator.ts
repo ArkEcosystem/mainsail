@@ -11,9 +11,10 @@ import type { Peer } from "./interfaces/index.js";
 import { constants } from "./constants.js";
 import { GetBlocks, GetMessages, GetPeers, GetProposal, GetStatus, PostMessage, PostProposal } from "./routes/index.js";
 
-// Minimal port of the @mainsail/p2p communicator over the new transport: no timeouts per route,
-// no reply validation, no throttling. It never connects: a peer without an open connection is not
-// an active peer, and the service loop dials known peers.
+// Port of the @mainsail/p2p communicator over the new transport, without reply validation and
+// throttling. Every request waits the transport's REQUEST_TIMEOUT for its response, except for a batch
+// of blocks. It never connects: a peer without an open connection is not an active peer, and the
+// service loop dials known peers.
 @injectable()
 export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 	@inject(Identifiers.ServiceProvider.Configuration)
@@ -49,16 +50,21 @@ export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 		return (await this.#emit(peer, GetStatus, {})) as unknown as Contracts.P2PService.GetStatusResponse;
 	}
 
-	// A batch of blocks is the one response that takes longer than a round trip; it gets its own timeout.
+	// A batch of blocks is the one response that takes longer than a round trip; its timeout is configured.
+	// A single block, which the verifier asks a new peer for, is no larger than a proposal and gets the
+	// transport's timeout like every other request.
 	public async getBlocks(
 		peer: Peer,
 		{ fromBlockNumber, limit = constants.MAX_DOWNLOAD_BLOCKS }: { fromBlockNumber: number; limit?: number },
 	): Promise<Contracts.P2PService.GetBlocksResponse> {
+		const options: Interfaces.SendOptions =
+			limit > 1 ? { timeout: this.configuration.getRequired<number>("getBlocksTimeout") } : {};
+
 		return (await this.#emit(
 			peer,
 			GetBlocks,
 			{ fromBlockNumber, limit },
-			{ timeout: this.configuration.getRequired<number>("getBlocksTimeout") },
+			options,
 		)) as unknown as Contracts.P2PService.GetBlocksResponse;
 	}
 
@@ -77,7 +83,7 @@ export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 	}
 
 	public async getPeers(peer: Peer): Promise<Contracts.P2PService.GetPeersResponse> {
-		this.logger.debug(`Fetching a fresh peer list from ${peer.url}`, "p2p");
+		this.logger.debug(`Fetching a fresh peer list from ${peer.ip}`, "p2p");
 
 		return (await this.#emit(peer, GetPeers, {})) as unknown as Contracts.P2PService.GetPeersResponse;
 	}
@@ -93,12 +99,12 @@ export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 		// The request headers are added by HeaderIncludeSendMiddleware.
 		const started = performance.now();
 		const response = await connection.send(route, payload as TRequest, options);
-		peer.setPinged(Math.floor(performance.now() - started));
+		peer.setLatency(Math.floor(performance.now() - started));
 
 		// The wire type of the headers is the protobuf shape; the contract shape is what the codec unpacks.
 		const { headers } = response as { headers?: Contracts.P2PService.HeaderData };
 		assert.defined(headers);
-		void this.headerService.handle(peer, headers);
+		this.headerService.handle(peer, headers);
 
 		return response;
 	}

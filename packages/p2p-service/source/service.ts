@@ -2,30 +2,23 @@ import type { Contracts } from "@mainsail/contracts";
 import type { Service as WebSocketService } from "@mainsail/p2p-websocket";
 
 import { EnvironmentVariables, Identifiers } from "@mainsail/constants";
-import { inject, injectable, tagged } from "@mainsail/container";
+import { inject, injectable } from "@mainsail/container";
 import { CloseReason, ConnectionError } from "@mainsail/p2p-websocket";
-import { ensureError, groupBy, pluralize, shuffle } from "@mainsail/utils";
+import { ensureError, shuffle } from "@mainsail/utils";
 import dayjs from "dayjs";
 
 import type { Peer } from "./interfaces/index.js";
 
 import { constants } from "./constants.js";
-import { getPeerSocketUrl, percentile } from "./utils/index.js";
+import { percentile } from "./utils/index.js";
 
 // Port of the @mainsail/p2p service without API nodes. It also owns the transport lifecycle, which the
 // old service left to the hapi server, and the redialing of known peers, which the old connector did
 // on demand.
 @injectable()
 export class Service implements Contracts.P2PService.Service {
-	@inject(Identifiers.ServiceProvider.Configuration)
-	@tagged("plugin", "p2p-service")
-	private readonly configuration!: Contracts.Kernel.PluginConfiguration;
-
 	@inject(Identifiers.P2P.WebSocket.Service)
 	private readonly websocketService!: WebSocketService;
-
-	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2PService.State;
 
 	@inject(Identifiers.P2P.Peer.Discoverer)
 	private readonly peerDiscoverer!: Contracts.P2PService.PeerDiscoverer;
@@ -33,8 +26,8 @@ export class Service implements Contracts.P2PService.Service {
 	@inject(Identifiers.P2P.Peer.Seeds)
 	private readonly seeds!: Contracts.P2PService.Seeds;
 
-	@inject(Identifiers.P2P.Peer.Verifier)
-	private readonly peerVerifier!: Contracts.P2PService.PeerVerifier;
+	@inject(Identifiers.P2P.Peer.DialQueue)
+	private readonly dialQueue!: Contracts.P2PService.DialQueue;
 
 	@inject(Identifiers.P2P.Peer.Disposer)
 	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
@@ -42,11 +35,17 @@ export class Service implements Contracts.P2PService.Service {
 	@inject(Identifiers.P2P.Peer.Repository)
 	private readonly repository!: Contracts.P2PService.PeerRepository;
 
+	@inject(Identifiers.P2P.Peer.Communicator)
+	private readonly communicator!: Contracts.P2PService.PeerCommunicator;
+
+	@inject(Identifiers.Cryptography.Configuration)
+	private readonly cryptoConfiguration!: Contracts.Crypto.Configuration;
+
 	@inject(Identifiers.Services.Log.Service)
 	private readonly logger!: Contracts.Kernel.Logger;
 
 	#lastMinPeerCheck: dayjs.Dayjs = dayjs();
-	#verifyingPeers = new Set<string>();
+	readonly #refreshingPeers = new Set<string>();
 	#disposed = false;
 	#mainLoopTimeout?: NodeJS.Timeout = undefined;
 
@@ -61,13 +60,8 @@ export class Service implements Contracts.P2PService.Service {
 
 		await this.seeds.load();
 		await this.peerDiscoverer.populateSeedPeers();
+		// The seeds are dialed here; they become peers once verified, which nothing at boot waits for.
 		await this.#dialKnownPeers();
-
-		for (const [version, peers] of Object.entries(
-			groupBy(this.repository.getActivePeers(), (peer) => peer.version ?? "unknown"),
-		)) {
-			this.logger.info(`Discovered ${pluralize("peer", peers.length, true)} with v${version}.`, "p2p");
-		}
 
 		void this.mainLoop();
 	}
@@ -76,7 +70,7 @@ export class Service implements Contracts.P2PService.Service {
 		try {
 			await this.#dialKnownPeers();
 			await this.#checkMinPeers();
-			await this.#checkReceivedMessages();
+			this.#refreshStaleHeaders();
 		} catch (rawError) {
 			this.logger.error(`P2P main loop failed: ${ensureError(rawError).message}`, "p2p");
 		} finally {
@@ -88,10 +82,12 @@ export class Service implements Contracts.P2PService.Service {
 		}
 	}
 
-	// Same order as the old provider: stop the loop, say goodbye to the peers, then stop the transport.
+	// Same order as the old provider: stop the loop and the dialing of new addresses, say goodbye to the
+	// peers, then stop the transport.
 	public async dispose(): Promise<void> {
 		this.#disposed = true;
 		clearTimeout(this.#mainLoopTimeout);
+		this.dialQueue.dispose();
 
 		this.websocketService.onConnection = undefined;
 
@@ -100,44 +96,53 @@ export class Service implements Contracts.P2PService.Service {
 	}
 
 	// Known peers are the seeds and peers that lost their connection; they are dialed, spaced out, until
-	// they answer or are given up.
+	// they become active or are given up. One that is pending already has a connection and is being verified.
 	async #dialKnownPeers(): Promise<void> {
 		const now = Date.now();
 		const due = (this.repository.getKnownPeers() as Peer[]).filter(
-			(peer) => now - (peer.lastDialAt ?? 0) >= constants.DIAL_SPACING,
+			(peer) => !this.repository.hasPendingPeer(peer.ip) && now - peer.lastDialAt >= constants.DIAL_SPACING,
 		);
 
 		await Promise.all(due.map((peer) => this.#dial(peer)));
 	}
 
+	// A dial counts as failed until the peer is verified: the count is cleared only when the processor
+	// makes the peer active, so a peer that answers but never passes the verification is given up too.
 	async #dial(peer: Peer): Promise<void> {
+		if (this.#isGivenUp(peer)) {
+			this.repository.forgetKnownPeer(peer);
+
+			return;
+		}
+
 		peer.lastDialAt = Date.now();
+		peer.dialAttempts += 1;
 
 		try {
-			await this.websocketService.dial(getPeerSocketUrl(peer));
-			peer.dialFailures = 0;
+			await this.websocketService.dial(peer.socketUrl);
 		} catch (rawError) {
 			const error = ensureError(rawError);
 			this.logger.debug(`Dial to ${peer.ip}:${peer.port} failed: ${error.message}`, "p2p");
 
-			this.#forgetIfHopeless(peer, error);
+			if (this.#isRefused(error)) {
+				this.repository.forgetKnownPeer(peer);
+			}
 		}
 	}
 
-	// The transport refuses addresses that may not be peers (rules, bans) before opening a socket; such an
-	// address is dropped at once. One that only does not answer is dropped after repeated failures.
-	#forgetIfHopeless(peer: Peer, error: Error): void {
-		peer.dialFailures = (peer.dialFailures ?? 0) + 1;
+	// Seeds get no exception, so that a node with enough peers does not keep knocking on them; a node
+	// that is short of peers records them again in #checkMinPeers.
+	#isGivenUp(peer: Peer): boolean {
+		return peer.dialAttempts >= constants.MAX_DIAL_ATTEMPTS;
+	}
 
-		const refused =
+	// Refused by our own address rules or ban list before a socket was opened, or by the peer's during the
+	// handshake. The address is not worth further dials; discovery brings it back if that changes.
+	#isRefused(error: Error): boolean {
+		return (
 			error instanceof ConnectionError &&
-			(error.reason === CloseReason.Rejected || error.reason === CloseReason.Banned);
-
-		const hopeless = peer.dialFailures >= constants.MAX_DIAL_FAILURES && !this.seeds.isSeed(peer.ip);
-
-		if ((refused || hopeless) && this.repository.hasKnownPeer(peer.ip)) {
-			this.repository.forgetKnownPeer(peer);
-		}
+			(error.reason === CloseReason.Rejected || error.reason === CloseReason.Banned)
+		);
 	}
 
 	async #checkMinPeers(): Promise<void> {
@@ -151,66 +156,46 @@ export class Service implements Contracts.P2PService.Service {
 
 			await this.peerDiscoverer.populateSeedPeers();
 
-			for (const peer of shuffle(this.repository.getActivePeers()).slice(0, 8)) {
-				await this.peerDiscoverer.discoverPeers(peer);
-			}
+			await Promise.all(
+				shuffle(this.repository.getActivePeers())
+					.slice(0, 8)
+					.map((peer) => this.peerDiscoverer.discoverPeers(peer)),
+			);
 		}
 	}
 
-	async #checkReceivedMessages(): Promise<void> {
-		if (this.state.getLastMessageTime().isBefore(dayjs().subtract(8, "seconds"))) {
-			const peersCount = Math.max(Math.ceil(this.repository.getActivePeers().length * 0.2), 5);
+	// Every exchange with a peer, in either direction, carries its header, so on a live network the headers
+	// stay fresh by themselves. A peer we have not heard from for a while is asked for its status: the
+	// answer brings its header, which starts the downloads if we are behind, and a peer that does not
+	// answer loses its connection to the request timeout. The peers with the oldest headers go first, a
+	// few per turn, and the loop does not wait for the answers.
+	#refreshStaleHeaders(): void {
+		const { blockTime } = this.cryptoConfiguration.getMilestone().timeouts;
+		const staleBefore = Date.now() - constants.HEADER_STALE_AFTER_BLOCKS * blockTime;
 
-			await this.cleansePeers({
-				fast: true,
-				peerCount: peersCount,
-			});
+		const stalePeers = (this.repository.getActivePeers() as Peer[])
+			.filter((peer) => peer.lastHeaderAt < staleBefore && !this.#refreshingPeers.has(peer.ip))
+			.sort((a, b) => a.lastHeaderAt - b.lastHeaderAt)
+			.slice(0, constants.HEADER_REFRESH_BATCH);
+
+		for (const peer of stalePeers) {
+			void this.#refreshHeader(peer);
 		}
 	}
 
-	public async cleansePeers({ fast, peerCount }: { fast: boolean; peerCount: number }): Promise<void> {
-		const peers = shuffle(
-			this.repository.getActivePeers().filter((peer) => !this.#verifyingPeers.has(peer.ip)),
-		).slice(0, peerCount);
+	// The communicator hands the header of the answer to the header service. A failed connection has
+	// already disposed the peer; any other failure is the peer's and bans it.
+	async #refreshHeader(peer: Peer): Promise<void> {
+		this.#refreshingPeers.add(peer.ip);
 
-		if (peers.length === 0) {
-			return;
-		}
-
-		let unresponsivePeers = 0;
-		const verifyTimeout = fast
-			? constants.FAST_VERIFY_TIMEOUT
-			: this.configuration.getRequired<number>("verifyTimeout");
-
-		this.logger.info(`Checking ${pluralize("peer", peers.length, true)}`, "p2p");
-
-		const verifications = Promise.all(
-			peers.map(async (peer) => {
-				this.#verifyingPeers.add(peer.ip);
-
-				try {
-					if (!(await this.peerVerifier.verify(peer))) {
-						unresponsivePeers++;
-					}
-				} finally {
-					this.#verifyingPeers.delete(peer.ip);
-				}
-			}),
-		).catch((rawError) => {
-			this.logger.error(`Peer verification failed: ${ensureError(rawError).message}`, "p2p");
-		});
-
-		let cutoff: NodeJS.Timeout | undefined;
-		await Promise.race([
-			verifications,
-			new Promise<void>((resolve) => {
-				cutoff = setTimeout(resolve, verifyTimeout);
-			}),
-		]);
-		clearTimeout(cutoff);
-
-		if (unresponsivePeers > 0) {
-			this.logger.debug(`Removed ${pluralize("peer", unresponsivePeers, true)}`, "p2p");
+		try {
+			await this.communicator.getStatus(peer);
+		} catch (rawError) {
+			const error = ensureError(rawError);
+			this.logger.debug(`Failed to get the status of ${peer.ip}: ${error.message}`, "p2p");
+			this.peerDisposer.banPeer(peer.ip, error);
+		} finally {
+			this.#refreshingPeers.delete(peer.ip);
 		}
 	}
 

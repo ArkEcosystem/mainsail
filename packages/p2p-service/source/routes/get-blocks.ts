@@ -21,6 +21,13 @@ export const GetBlocks: Interfaces.RouteDefinition<Request, Response> = {
 	path: "getBlocks",
 };
 
+// The block data a response to a request for `limit` blocks may hold, so that its fully serialized frame
+// fits what the caller accepts for this route: the route's response limit less the per-block protobuf
+// framing, for the worst case of `limit` blocks, and the fixed envelope reserve. The block downloader
+// judges a short response against the same number.
+export const getBlocksBudget = (limit: number): number =>
+	GetBlocks.maxPayload.response - constants.RESPONSE_ENVELOPE_RESERVE - limit * constants.PROTO_BLOCK_OVERHEAD;
+
 @injectable()
 export class GetBlocksRoute implements Interfaces.Route<Request, Response> {
 	@inject(Identifiers.Services.Log.Service)
@@ -50,18 +57,10 @@ export class GetBlocksRoute implements Interfaces.Route<Request, Response> {
 			return { blocks: [] };
 		}
 
-		// Budget the response so its fully serialized frame fits what the caller accepts for this route: raw
-		// block data plus the per-block protobuf framing and the fixed envelope reserve, for the worst case
-		// of `limit` blocks.
-		const maxBytes =
-			GetBlocks.maxPayload.response -
-			constants.RESPONSE_ENVELOPE_RESERVE -
-			requestBlockLimit * constants.PROTO_BLOCK_OVERHEAD;
-
 		const blocks = await this.database.findCommitBuffers(
 			requestBlockNumber,
 			requestBlockNumber + requestBlockLimit - 1,
-			maxBytes,
+			getBlocksBudget(requestBlockLimit),
 		);
 
 		this.logger.debug(

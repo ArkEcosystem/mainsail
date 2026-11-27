@@ -8,11 +8,16 @@ import { assert, IpAddress } from "@mainsail/utils";
 import Joi from "joi";
 
 import { Broadcaster } from "./broadcaster.js";
+import { DialQueue } from "./dial-queue.js";
 import { BlockDownloader, MessageDownloader, ProposalDownloader } from "./downloader/index.js";
 import { HeaderService } from "./header-service.js";
 import { Header } from "./header.js";
 import { Logger } from "./logger.js";
-import { HeaderIncludeReceiveMiddleware, HeaderIncludeSendMiddleware } from "./middleware/index.js";
+import {
+	HeaderHandleReceiveMiddleware,
+	HeaderIncludeReceiveMiddleware,
+	HeaderIncludeSendMiddleware,
+} from "./middleware/index.js";
 import { PeerCommunicator } from "./peer-communicator.js";
 import { PeerDiscoverer } from "./peer-discoverer.js";
 import { PeerDisposer } from "./peer-disposer.js";
@@ -33,7 +38,6 @@ import {
 } from "./routes/index.js";
 import { Seeds } from "./seeds.js";
 import { Service } from "./service.js";
-import { State } from "./state.js";
 
 // Requires the @mainsail/p2p-websocket service provider to be registered first.
 @injectable()
@@ -41,19 +45,21 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public async register(): Promise<void> {
 		this.app.bind(Identifiers.P2P.Logger).to(Logger).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Repository).to(PeerRepository).inSingletonScope();
-		this.app.bind(Identifiers.P2P.State).to(State).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Communicator).to(PeerCommunicator).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Disposer).to(PeerDisposer).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Discoverer).to(PeerDiscoverer).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Processor).to(PeerProcessor).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Verifier).to(PeerVerifier).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Peer.Seeds).to(Seeds).inSingletonScope();
+		this.app.bind(Identifiers.P2P.Peer.DialQueue).to(DialQueue).inSingletonScope();
 		// Also runs on the transport after its own verifiers (ban list, duplicate address), before the handshake.
 		this.app.bind(Identifiers.P2P.Peer.IpVerifier).to(PeerIpVerifier).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.Connection.Verifiers).toService(Identifiers.P2P.Peer.IpVerifier);
 		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
 		this.app.bind<() => Header>(Identifiers.P2P.Header.Factory).toFactory(() => () => this.app.resolve(Header));
 		this.app.bind(Identifiers.P2P.Header.Service).to(HeaderService).inSingletonScope();
+		// Both run after the transport's codec middleware: the request is decoded and the response not yet encoded.
+		this.app.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware).to(HeaderHandleReceiveMiddleware).inSingletonScope();
 		this.app
 			.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware)
 			.to(HeaderIncludeReceiveMiddleware)
@@ -85,7 +91,7 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		const websocketService = this.app.get<WebSocketService>(Identifiers.P2P.WebSocket.Service);
 
 		// Constructing the processor installs its connection hook on the transport.
-		this.app.get<Contracts.P2PService.PeerProcessor>(Identifiers.P2P.Peer.Processor);
+		this.app.get<PeerProcessor>(Identifiers.P2P.Peer.Processor);
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const routes: Contracts.Kernel.Container.Newable<Interfaces.Route<any, any>>[] = [
@@ -119,16 +125,12 @@ export class ServiceProvider extends Providers.ServiceProvider {
 	public configSchema(): Joi.AnySchema {
 		return Joi.object({
 			blacklist: Joi.array().items(Joi.string()).required(),
-			disableDiscovery: Joi.bool().required(),
 			getBlocksTimeout: Joi.number().integer().min(0).required(),
-			ignoreMinimumNetworkReach: Joi.bool().required(),
 			maxPeersBroadcast: Joi.number().integer().min(0).required(),
 			maxSameSubnetPeers: Joi.number().integer().min(0).required(),
 			minimumNetworkReach: Joi.number().integer().min(0).required(),
 			minimumVersions: Joi.array().items(Joi.string()).required(),
 			peerBanTime: Joi.number().integer().min(0).required(),
-			skipPeerStateVerification: Joi.bool().required(),
-			verifyTimeout: Joi.number().integer().min(0).required(),
 			whitelist: Joi.array().items(Joi.string()).required(),
 		}).unknown(true);
 	}

@@ -18,7 +18,8 @@ export const PostMessage: Interfaces.RouteDefinition<Request, Response> = {
 	path: "postMessage",
 };
 
-// An invalid message is logged instead of banning the peer; peers are trusted until the disposer is ported.
+// A message that cannot be read or fails the checks of the consensus costs its sender a ban, as in
+// @mainsail/p2p: an honest peer forwards only what it accepted itself.
 @injectable()
 export class PostMessageRoute implements Interfaces.Route<Request, Response> {
 	@inject(Identifiers.Consensus.Processor.Message)
@@ -27,11 +28,8 @@ export class PostMessageRoute implements Interfaces.Route<Request, Response> {
 	@inject(Identifiers.Cryptography.Message.Factory)
 	private readonly factory!: Contracts.Crypto.MessageFactory;
 
-	@inject(Identifiers.P2P.State)
-	private readonly state!: Contracts.P2PService.State;
-
-	@inject(Identifiers.P2P.Logger)
-	private readonly logger!: Contracts.P2PService.Logger;
+	@inject(Identifiers.P2P.Peer.Disposer)
+	private readonly peerDisposer!: Contracts.P2PService.PeerDisposer;
 
 	public readonly path = PostMessage.path;
 	public readonly codec = PostMessage.codec;
@@ -45,13 +43,8 @@ export class PostMessageRoute implements Interfaces.Route<Request, Response> {
 			if ((await this.messageProcessor.process(message)) === Enums.Consensus.ProcessorResult.Invalid) {
 				throw new Error("Invalid message");
 			}
-
-			this.state.resetLastMessageTime();
 		} catch (rawError) {
-			this.logger.debug(
-				`Rejected message from ${connection.remoteAddress}: ${ensureError(rawError).message}`,
-				"p2p",
-			);
+			this.peerDisposer.banPeer(connection.remoteAddress, ensureError(rawError));
 		}
 
 		return {};
