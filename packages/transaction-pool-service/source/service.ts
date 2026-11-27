@@ -153,32 +153,52 @@ export class Service implements Contracts.TransactionPool.Service {
 			const lastBlockNumber: number = this.stateStore.getBlockNumber();
 			const expiredBlockNumber: number = lastBlockNumber - maxTransactionAge;
 			const removedHashes: string[] = [];
+			const previouslyStoredTransactions: { hash: string; transaction: Contracts.Crypto.Transaction }[] = [];
+
+			const onReAddFailure = (hash: string, rawError: unknown): void => {
+				const error = ensureError(rawError);
+				removedHashes.push(hash);
+				this.#txRebroadcastCooldowns.delete(hash);
+				this.logger.debug(`Failed to re-add previously stored tx ${hash}: ${error.message}`);
+
+				previouslyStoredFailures++;
+			};
 
 			for (const { blockNumber, hash, serialized } of this.storage.getAllTransactions()) {
 				if (blockNumber > expiredBlockNumber) {
 					try {
-						const previouslyStoredTransaction = await this.transactionFactory.fromBytes(serialized);
-						await this.#addTransactionToMempool(previouslyStoredTransaction);
-
-						void this.events.dispatch(
-							Events.TransactionEvent.AddedToPool,
-							previouslyStoredTransaction.toData(),
-						);
-
-						previouslyStoredSuccesses++;
+						const transaction = await this.transactionFactory.fromBytes(serialized);
+						previouslyStoredTransactions.push({ hash, transaction });
 					} catch (rawError) {
-						const error = ensureError(rawError);
-						removedHashes.push(hash);
-						this.#txRebroadcastCooldowns.delete(hash);
-						this.logger.debug(`Failed to re-add previously stored tx ${hash}: ${error.message}`);
-
-						previouslyStoredFailures++;
+						onReAddFailure(hash, rawError);
 					}
 				} else {
 					removedHashes.push(hash);
 					this.#txRebroadcastCooldowns.delete(hash);
 					this.logger.debug(`Not re-adding previously stored expired tx ${hash}`);
 					previouslyStoredExpirations++;
+				}
+			}
+
+			// Storage returns transactions in insertion order. A replacement is stored after the sender's
+			// later nonces, so re-adding in that order would reject them with a nonce gap.
+			previouslyStoredTransactions.sort((a, b) => {
+				if (a.transaction.nonce === b.transaction.nonce) {
+					return 0;
+				}
+
+				return a.transaction.nonce < b.transaction.nonce ? -1 : 1;
+			});
+
+			for (const { hash, transaction } of previouslyStoredTransactions) {
+				try {
+					await this.#addTransactionToMempool(transaction);
+
+					void this.events.dispatch(Events.TransactionEvent.AddedToPool, transaction.toData());
+
+					previouslyStoredSuccesses++;
+				} catch (rawError) {
+					onReAddFailure(hash, rawError);
 				}
 			}
 
