@@ -291,6 +291,27 @@ describe<{
 		assert.true(conditions.includes("tf.address = :address"));
 	});
 
+	it("GET /api/tokens/{address}/transfers - responds with the paginated listing format", async ({
+		server,
+		repos,
+	}) => {
+		repos.token.data.one = makeToken();
+		repos.dataSource.data.rawMany = [makeTransferRow()];
+		repos.dataSource.data.rawOne = { cnt: "1" };
+
+		const response = await server.inject({ method: "GET", url: `/api/tokens/${TOKEN_ADDRESS}/transfers` });
+
+		assert.is(response.statusCode, 200);
+
+		const body = JSON.parse(response.payload);
+		assert.is(body.meta.totalCount, 1);
+		assert.is(body.meta.count, 1);
+		assert.is(body.meta.pageCount, 1);
+		assert.string(body.meta.self);
+		assert.equal(body.data[0].transactionHash, TRANSACTION_HASH);
+		assert.undefined(body.results);
+	});
+
 	it("GET /api/tokens/{address}/transfers - responds 404 for an unknown token", async ({ server }) => {
 		const response = await server.inject({ method: "GET", url: `/api/tokens/${TOKEN_ADDRESS}/transfers` });
 
@@ -304,6 +325,26 @@ describe<{
 
 		assert.is(response.statusCode, 200);
 		assert.equal(repos.tokenAction.qb.calls.where[0], ["tf.action = :action", { action: "Approval" }]);
+	});
+
+	it("GET /api/tokens/{address}/approvals - responds with the paginated listing format", async ({
+		server,
+		repos,
+	}) => {
+		repos.token.data.one = makeToken();
+		repos.dataSource.data.rawMany = [makeTransferRow({ functionSig: Buffer.from("095ea7b3", "hex") })];
+		repos.dataSource.data.rawOne = { cnt: "1" };
+
+		const response = await server.inject({ method: "GET", url: `/api/tokens/${TOKEN_ADDRESS}/approvals` });
+
+		assert.is(response.statusCode, 200);
+
+		const body = JSON.parse(response.payload);
+		assert.is(body.meta.totalCount, 1);
+		assert.is(body.meta.count, 1);
+		assert.string(body.meta.self);
+		assert.equal(body.data[0].functionSig, "0x095ea7b3");
+		assert.undefined(body.results);
 	});
 
 	it("GET /api/tokens/whitelist - lists the whitelist entries", async ({ server, repos }) => {
