@@ -127,6 +127,12 @@
 			"path": "../p2p"
 		},
 		{
+			"path": "../p2p-service"
+		},
+		{
+			"path": "../p2p-websocket"
+		},
+		{
 			"path": "../processor"
 		},
 		{
