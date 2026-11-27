@@ -4,7 +4,9 @@ import { packHeadersBitmaps, unpackHeadersBitmaps, type WithUnpackedHeaders } fr
 export const getPeers = {
 	request: {
 		deserialize: (payload: Buffer): WithUnpackedHeaders<proto.GetPeersRequest.$Properties> => {
-			const decoded = proto.GetPeersRequest.decode(payload);
+			const decoded = proto.GetPeersRequest.toObject(proto.GetPeersRequest.decode(payload), {
+				defaults: true,
+			});
 			return unpackHeadersBitmaps(decoded);
 		},
 		serialize: (object: WithUnpackedHeaders<proto.GetPeersRequest.$Properties>): Buffer =>

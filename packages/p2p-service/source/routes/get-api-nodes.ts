@@ -5,6 +5,7 @@ import { Identifiers, Units } from "@mainsail/constants";
 import { inject, injectable, optional } from "@mainsail/container";
 
 import { Codecs } from "../codecs/index.js";
+import { Schemas } from "../schemas/index.js";
 
 type Request = ReturnType<typeof Codecs.getApiNodes.request.deserialize>;
 type Response = ReturnType<typeof Codecs.getApiNodes.response.deserialize>;
@@ -15,6 +16,7 @@ export const GetApiNodes: Interfaces.RouteDefinition<Request, Response> = {
 	maxPayload: { request: Units.KILOBYTE, response: 256 * Units.KILOBYTE },
 	maxQueuedRequests: 1,
 	path: "getApiNodes",
+	schema: Schemas.getApiNodes,
 };
 
 // The directory of API nodes is kept by @mainsail/p2p-api-nodes, which a node may leave out. The route
@@ -31,6 +33,7 @@ export class GetApiNodesRoute implements Interfaces.Route<Request, Response> {
 	public readonly maxPayload = GetApiNodes.maxPayload;
 	public readonly maxConcurrentRequests = GetApiNodes.maxConcurrentRequests;
 	public readonly maxQueuedRequests = GetApiNodes.maxQueuedRequests;
+	public readonly schema = GetApiNodes.schema;
 
 	public async handle(): Promise<Response> {
 		return { apiNodes: this.apiNodeRepository?.getPublicApiNodes() ?? [] };

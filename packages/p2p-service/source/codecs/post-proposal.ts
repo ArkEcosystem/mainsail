@@ -1,16 +1,20 @@
 import { postProposal as proto } from "../../protos/protos.js";
 import { packHeadersBitmaps, unpackHeadersBitmaps, type WithUnpackedHeaders } from "./headers.js";
 
+type PostProposalRequest = WithUnpackedHeaders<proto.PostProposalRequest.$Properties> & { proposal: Buffer };
+
 export const postProposal = {
 	request: {
-		deserialize: (payload: Buffer): WithUnpackedHeaders<proto.PostProposalRequest.$Properties> => {
-			const decoded = proto.PostProposalRequest.decode(payload);
+		deserialize: (payload: Buffer): PostProposalRequest => {
+			const decoded = proto.PostProposalRequest.toObject(proto.PostProposalRequest.decode(payload), {
+				defaults: true,
+			});
 			return {
 				...unpackHeadersBitmaps(decoded),
 				proposal: Buffer.from(decoded.proposal),
 			};
 		},
-		serialize: (object: WithUnpackedHeaders<proto.PostProposalRequest.$Properties>): Buffer =>
+		serialize: (object: PostProposalRequest): Buffer =>
 			Buffer.from(proto.PostProposalRequest.encode(packHeadersBitmaps(object)).finish()),
 	},
 	response: {

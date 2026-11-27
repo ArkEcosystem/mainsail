@@ -32,6 +32,7 @@ describe<{
 			maxPayload: { request: 8, response: 64 },
 			maxQueuedRequests: 1,
 			path: "echo",
+			schema: { request: { type: "string" }, response: { type: "string" } },
 		} as Route<unknown, unknown>);
 	});
 
@@ -101,6 +102,7 @@ describe<{
 			maxPayload: { request: 8, response: 64 },
 			maxQueuedRequests: 0,
 			path: "slow",
+			schema: { request: { type: "string" }, response: { type: "string" } },
 		} as Route<unknown, unknown>);
 
 		let terminated: string | undefined;

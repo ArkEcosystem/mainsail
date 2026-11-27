@@ -17,6 +17,8 @@ import {
 	HeaderHandleReceiveMiddleware,
 	HeaderIncludeReceiveMiddleware,
 	HeaderIncludeSendMiddleware,
+	ValidateReceiveMiddleware,
+	ValidateSendMiddleware,
 } from "./middleware/index.js";
 import { PeerCommunicator } from "./peer-communicator.js";
 import { PeerDiscoverer } from "./peer-discoverer.js";
@@ -59,13 +61,16 @@ export class ServiceProvider extends Providers.ServiceProvider {
 		this.app.bind(Identifiers.P2P.PendingCommits).to(PendingCommits).inSingletonScope();
 		this.app.bind<() => Header>(Identifiers.P2P.Header.Factory).toFactory(() => () => this.app.resolve(Header));
 		this.app.bind(Identifiers.P2P.Header.Service).to(HeaderService).inSingletonScope();
-		// Both run after the transport's codec middleware: the request is decoded and the response not yet encoded.
+		// All run after the transport's codec middleware: the request is decoded and the response not yet
+		// encoded. The validation comes first, so the steps after it and the route see checked data only.
+		this.app.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware).to(ValidateReceiveMiddleware).inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware).to(HeaderHandleReceiveMiddleware).inSingletonScope();
 		this.app
 			.bind(Identifiers.P2P.WebSocket.ReceiveMiddleware)
 			.to(HeaderIncludeReceiveMiddleware)
 			.inSingletonScope();
 		this.app.bind(Identifiers.P2P.WebSocket.SendMiddleware).to(HeaderIncludeSendMiddleware).inSingletonScope();
+		this.app.bind(Identifiers.P2P.WebSocket.SendMiddleware).to(ValidateSendMiddleware).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Downloader.Block).to(BlockDownloader).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Downloader.Proposal).to(ProposalDownloader).inSingletonScope();
 		this.app.bind(Identifiers.P2P.Downloader.Message).to(MessageDownloader).inSingletonScope();

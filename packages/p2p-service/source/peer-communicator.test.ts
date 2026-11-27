@@ -12,7 +12,6 @@ const headers = {
 	step: 0,
 	validatorsSignedPrecommit: [],
 	validatorsSignedPrevote: [],
-	version: "1",
 };
 
 describe<{

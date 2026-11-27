@@ -7,7 +7,8 @@ export const constants = {
 	// Longest API node url we keep, serve to peers or accept from them.
 	MAX_API_NODE_URL_LENGTH: 2048,
 
-	// Urls taken from one peer's answer, and nodes told to a peer that asks.
+	// Nodes told to a peer that asks. The getApiNodes route of @mainsail/p2p-service takes no more in an
+	// answer.
 	MAX_API_NODES_PER_PEER: 100,
 
 	// Peers asked for their API nodes in one check.

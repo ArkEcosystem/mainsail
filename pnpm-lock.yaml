@@ -2737,9 +2737,15 @@ importers:
       '@mainsail/contracts':
         specifier: workspace:*
         version: link:../contracts
+      '@mainsail/crypto-validation':
+        specifier: workspace:*
+        version: link:../crypto-validation
       '@mainsail/test-runner':
         specifier: workspace:*
         version: link:../test-runner
+      '@mainsail/validation':
+        specifier: workspace:*
+        version: link:../validation
       '@types/fs-extra':
         specifier: 11.0.4
         version: 11.0.4

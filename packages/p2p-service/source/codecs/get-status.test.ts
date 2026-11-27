@@ -9,13 +9,11 @@ describe("PeerCodec", ({ it, assert }) => {
 		step: 1,
 		validatorsSignedPrecommit: [true, false, true],
 		validatorsSignedPrevote: [false, true, false],
-		version: "0.0.1",
 	};
 
 	it("#getStatus should serde request", () => {
 		const result: any = getStatus.request.deserialize(getStatus.request.serialize({ headers } as any));
 
-		assert.equal(result.headers.version, headers.version);
 		assert.equal(result.headers.blockNumber, headers.blockNumber);
 		assert.equal(result.headers.round, headers.round);
 		assert.equal(result.headers.validatorsSignedPrevote, headers.validatorsSignedPrevote);

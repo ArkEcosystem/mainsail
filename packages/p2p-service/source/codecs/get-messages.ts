@@ -1,21 +1,24 @@
+import type { Contracts } from "@mainsail/contracts";
+
 import { getMessages as proto } from "../../protos/protos.js";
 import {
 	packBitmaps,
 	packHeadersBitmaps,
-	type Unpacked,
 	unpackBitmapsInPlace,
 	unpackHeadersBitmaps,
 	type WithUnpackedHeaders,
 } from "./headers.js";
 
 type GetMessagesRequest = Omit<WithUnpackedHeaders<proto.GetMessagesRequest.$Properties>, "query"> & {
-	query?: Unpacked<proto.GetMessagesQuery.$Properties> | null;
+	query: Contracts.P2PService.GetMessagesQuery;
 };
 
 export const getMessages = {
 	request: {
 		deserialize: (payload: Buffer): GetMessagesRequest => {
-			const decoded = proto.GetMessagesRequest.decode(payload);
+			const decoded = proto.GetMessagesRequest.toObject(proto.GetMessagesRequest.decode(payload), {
+				defaults: true,
+			});
 			unpackBitmapsInPlace(decoded.query);
 			return unpackHeadersBitmaps(decoded) as GetMessagesRequest;
 		},

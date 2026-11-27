@@ -863,7 +863,6 @@ export const shared = $root.shared = (() => {
         /**
          * Properties of a Headers.
          * @typedef {Object} shared.Headers.$Properties
-         * @property {string|null} [version] Headers version
          * @property {number|null} [blockNumber] Headers blockNumber
          * @property {number|null} [round] Headers round
          * @property {number|null} [step] Headers step
@@ -900,14 +899,6 @@ export const shared = $root.shared = (() => {
                     if (properties[keys[i]] != null && keys[i] !== "__proto__")
                         this[keys[i]] = properties[keys[i]];
         };
-
-        /**
-         * Headers version.
-         * @member {string} version
-         * @memberof shared.Headers
-         * @instance
-         */
-        Headers.prototype.version = "";
 
         /**
          * Headers blockNumber.
@@ -998,8 +989,6 @@ export const shared = $root.shared = (() => {
                 _depth = 0;
             if (_depth > $util.recursionLimit)
                 throw $Error("max depth exceeded");
-            if (message.version != null && $Object.hasOwnProperty.call(message, "version") && message.version !== "")
-                writer.uint32(/* id 1, wireType 2 =*/10).string(message.version);
             if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber") && message.blockNumber !== 0)
                 writer.uint32(/* id 2, wireType 0 =*/16).uint32(message.blockNumber);
             if (message.round != null && $Object.hasOwnProperty.call(message, "round") && message.round !== 0)
@@ -1059,15 +1048,6 @@ export const shared = $root.shared = (() => {
                 }
                 let wireType = tag & 7;
                 switch (tag >>>= 3) {
-                case 1: {
-                        if (wireType !== 2)
-                            break;
-                        if ((value = reader.stringVerify()).length)
-                            message.version = value;
-                        else
-                            delete message.version;
-                        continue;
-                    }
                 case 2: {
                         if (wireType !== 0)
                             break;
@@ -1164,9 +1144,6 @@ export const shared = $root.shared = (() => {
             if (_depth > $util.recursionLimit)
                 return "max depth exceeded";
             let properties = {};
-            if (message.version != null && $Object.hasOwnProperty.call(message, "version"))
-                if (!$util.isString(message.version))
-                    return "version: string expected";
             if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
                 if (!$util.isInteger(message.blockNumber))
                     return "blockNumber: integer expected";
@@ -1208,9 +1185,6 @@ export const shared = $root.shared = (() => {
             if (_depth > $util.recursionLimit)
                 throw $Error("max depth exceeded");
             let message = new $root.shared.Headers();
-            if (object.version != null)
-                if (typeof object.version !== "string" || object.version.length)
-                    message.version = $String(object.version);
             if (object.blockNumber != null)
                 if ($Number(object.blockNumber) !== 0)
                     message.blockNumber = object.blockNumber >>> 0;
@@ -1255,7 +1229,6 @@ export const shared = $root.shared = (() => {
                 throw $Error("max depth exceeded");
             let object = {};
             if (options.defaults) {
-                object.version = "";
                 object.blockNumber = 0;
                 object.round = 0;
                 object.step = 0;
@@ -1274,8 +1247,6 @@ export const shared = $root.shared = (() => {
                         object.validatorsSignedPrecommit = $util.newBuffer(object.validatorsSignedPrecommit);
                 }
             }
-            if (message.version != null && $Object.hasOwnProperty.call(message, "version"))
-                object.version = message.version;
             if (message.blockNumber != null && $Object.hasOwnProperty.call(message, "blockNumber"))
                 object.blockNumber = message.blockNumber;
             if (message.round != null && $Object.hasOwnProperty.call(message, "round"))

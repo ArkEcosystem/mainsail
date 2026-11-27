@@ -4,7 +4,7 @@ import type { Interfaces } from "@mainsail/p2p-websocket";
 import { Identifiers } from "@mainsail/constants";
 import { inject, injectable, tagged } from "@mainsail/container";
 import { CloseReason, ConnectionError, ConnectionState } from "@mainsail/p2p-websocket";
-import { assert, ensureError } from "@mainsail/utils";
+import { ensureError } from "@mainsail/utils";
 
 import type { Peer } from "./interfaces/index.js";
 
@@ -20,10 +20,10 @@ import {
 	PostProposal,
 } from "./routes/index.js";
 
-// Port of the @mainsail/p2p communicator over the new transport, without reply validation and
-// throttling. Every request waits the transport's REQUEST_TIMEOUT for its response, except for a batch
-// of blocks. It never connects: a peer without an open connection is not an active peer, and the
-// service loop dials known peers.
+// Port of the @mainsail/p2p communicator over the new transport, without throttling. The responses are
+// checked against the schema of their route by ValidateSendMiddleware. Every request waits the
+// transport's REQUEST_TIMEOUT for its response, except for a batch of blocks. It never connects: a peer
+// without an open connection is not an active peer, and the service loop dials known peers.
 @injectable()
 export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 	@inject(Identifiers.ServiceProvider.Configuration)
@@ -117,9 +117,9 @@ export class PeerCommunicator implements Contracts.P2PService.PeerCommunicator {
 		const response = await connection.send(route, payload as TRequest, options);
 		peer.setLatency(Math.floor(performance.now() - started));
 
-		// The wire type of the headers is the protobuf shape; the contract shape is what the codec unpacks.
-		const { headers } = response as { headers?: Contracts.P2PService.HeaderData };
-		assert.defined(headers);
+		// The wire type of the headers is the protobuf shape; the contract shape is what the codec unpacks,
+		// and the schema of every route requires it.
+		const { headers } = response as { headers: Contracts.P2PService.HeaderData };
 		this.headerService.handle(peer, headers);
 
 		return response;
